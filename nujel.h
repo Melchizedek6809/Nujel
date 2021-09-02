@@ -5,7 +5,7 @@
  * into your project.
  */
 #pragma once
-#include "common.h"
+#include "lib/common.h"
 
 extern int lGCRuns;
 
