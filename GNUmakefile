@@ -6,7 +6,7 @@ LIB_SRCS    := $(shell find lib -type f -name '*.c')
 LIB_HDRS    := $(shell find lib -type f -name '*.h')
 LIB_OBJS    := $(LIB_SRCS:.c=.o)
 LIB_DEPS    := ${LIB_SRCS:.c=.d}
-STDLIB_NUJS := $(shell find stdlib  -type f -name '*.nuj')
+STDLIB_NUJS := $(shell find stdlib -type f -name '*.nuj')
 
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
@@ -53,6 +53,7 @@ $(ASSET): tools/assets.c
 	$(CC) -o $@    $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 
 nujel.a: $(LIB_OBJS) tmp/stdlib.o
+	rm -rf $@
 	ar cq $@ $^
 
 $(NUJEL): $(BIN_OBJS) tmp/binlib.o nujel.a
