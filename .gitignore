@@ -1,0 +1,37 @@
+# OSX Files
+Icon?
+.DS_Store
+._*
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+/DerivedData/
+
+# debugging/profiling data
+/callgrind.out.*
+/vgcore.*
+gmon.out
+
+# Executables/Object/Temporary files
+/tmp
+/nujel
+/tools/assets
+*.out
+*.a
+*.lib
+*.so
+*.o
+*.wo
+*.d
+*.deps
+*.gch
+*.obj
+*.dylib
+*.exe
+*.kate-swp
+*.dll
+*.core
+*.res
+*.dSYM
+*.tar.xz
+*.tar.gz
