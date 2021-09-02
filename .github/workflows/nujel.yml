@@ -8,10 +8,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: make test -j4
-      run: make test -j4
+    - name: Compile
+      run: make -j4
+    - name: Run Tests
+      run: make test
