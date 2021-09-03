@@ -90,8 +90,8 @@ static lVal *lParseString(lString *s){
 
 static lVal *lParseNumberDecimal(lString *s){
 	lVal *v      = lValInt(0);
-	int c        = *s->data;
-	int fc       = c;
+	char c       = *s->data;
+	char fc      = c;
 	bool isFloat = false;
 	int cval     = 0;
 	int digits   = 0;
@@ -101,7 +101,7 @@ static lVal *lParseNumberDecimal(lString *s){
 		if(isdigit(c)){
 			cval *= 10;
 			cval += c - '0';
-			digits++;
+			if(++digits > 9){break;}
 		}else if(c == '.'){
 			isFloat = true;
 			v->vInt = cval;
@@ -116,16 +116,14 @@ static lVal *lParseNumberDecimal(lString *s){
 		int t     = v->vInt;
 		v->type   = ltFloat;
 		float tv  = cval / powf(10.f,digits);
-		v->vFloat = t + tv;
+		v->vFloat = fc == '-' ? -(t + tv) : (t + tv);
 	}else{
-		v->vInt   = cval;
+		v->vInt   = fc == '-' ? -cval : cval;
 	}
-	if(fc == '-'){
-		if(isFloat){
-			v->vFloat = -v->vFloat;
-		}else{
-			v->vInt = -v->vInt;
-		}
+	while(c){
+		if(isspace((u8)c)){break;}
+		if(!isdigit(c) && c != '.' && c != ',' && c != '_'){break;}
+		c = *++s->data;
 	}
 	return v;
 }
