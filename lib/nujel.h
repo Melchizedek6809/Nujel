@@ -124,6 +124,7 @@ lClosure *lClosureNewRoot   ();
 uint      lClosureNew       (uint parent);
 void      lClosureFree      (uint c);
 lVal     *lClosureAddNF     (uint c, const char *sym, lVal *(*func)(lClosure *,lVal *));
+lVal     *lClosureAddSF     (uint c, const char *sym, lVal *(*func)(lClosure *,lVal *));
 
 lVal     *lValAlloc         ();
 void      lValFree          (lVal *v);

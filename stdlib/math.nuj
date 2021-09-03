@@ -1,0 +1,2 @@
+[def PI [const 3.14159]]
+[def π  [const 3.14159]]

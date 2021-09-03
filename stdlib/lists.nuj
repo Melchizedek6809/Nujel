@@ -11,6 +11,10 @@
 	]
 ]]
 
+[def last-pair [λ [l]
+	[if [cdr l] [last-pair [cdr l]] l]
+]]
+
 [def make-list [let []
 	[def iter [λ [number value list]
 		[if [<= number 0] list [iter [-- number] value [cons value list]]]

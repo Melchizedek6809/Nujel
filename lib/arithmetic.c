@@ -302,9 +302,9 @@ void lAddArithmeticFuncs(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]","Multiplication",lnfMul));
 	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]","Substraction",  lnfSub));
 	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]","Addition",      lnfAdd));
+	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",    "Return a raised to the power of b",lnfPow));
 
 	lAddNativeFunc(c,"abs","[a]",  "Return the absolute value of a",   lnfAbs);
-	lAddInfix(lAddNativeFunc(c,"pow","[a b]","Return a raised to the power of b",lnfPow));
 	lAddNativeFunc(c,"sqrt","[a]", "Return the squareroot of a",       lnfSqrt);
 	lAddNativeFunc(c,"floor","[a]","Round a down",                     lnfFloor);
 	lAddNativeFunc(c,"ceil","[a]", "Round a up",                       lnfCeil);
@@ -317,9 +317,6 @@ void lAddArithmeticFuncs(lClosure *c){
 	lAddNativeFunc(c,"vec/y","[vec]","Return y part of VEC",lnfVY);
 	lAddNativeFunc(c,"vec/z","[vec]","Return z part of VEC",lnfVZ);
 	lAddNativeFunc(c,"vec/length vec/magnitude","[vec]","Return the length of VEC",lnfVMag);
-
-	lDefineVal(c,"π",  lConst(lValFloat(PI)));
-	lDefineVal(c,"PI", lConst(lValFloat(PI)));
 }
 
 lVal *lnfInfix (lClosure *c, lVal *v){
