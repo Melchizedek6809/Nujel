@@ -413,7 +413,6 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 lVal *lnfCat(lClosure *c, lVal *v){
 	char tmpStringBuf[8192];
 	char *buf = tmpStringBuf;
-	int len = 0;
 	forEach(sexpr,v){
 		lVal *t = lEval(c,lCar(sexpr));
 		int clen = 0;
@@ -444,7 +443,6 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			break;
 		}
 		if(clen > 0){
-			len += clen;
 			buf += clen;
 		}
 	}
