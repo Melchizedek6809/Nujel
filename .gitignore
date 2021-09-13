@@ -21,6 +21,7 @@ gmon.out
 *.lib
 *.so
 *.o
+*.wd
 *.wa
 *.wo
 *.d
