@@ -17,6 +17,8 @@
 #include "../lib/datatypes/closure.h"
 #include "../lib/datatypes/native-function.h"
 #include "../lib/datatypes/string.h"
+#include "../lib/datatypes/symbol.h"
+#include "../lib/operations/string.h"
 
 extern char binlib_nuj_data[];
 

@@ -13,6 +13,7 @@
 #include "datatypes/closure.h"
 #include "datatypes/native-function.h"
 #include "datatypes/string.h"
+#include "datatypes/symbol.h"
 #include "datatypes/vec.h"
 #include "operations/arithmetic.h"
 #include "operations/array.h"
@@ -33,44 +34,23 @@
 
 extern u8 stdlib_nuj_data[];
 
-int lGCRuns = 0;
-
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;
 uint     lValMax    = 1;
 uint     lValFFree  = 0;
 
-lSymbol lSymbolList[SYM_MAX];
-uint    lSymbolActive = 0;
-uint    lSymbolMax    = 1;
-uint    lSymbolFFree  = 0;
-
 char dispWriteBuf[1<<16];
-lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
 
 void lInit(){
 	lValActive      = 0;
 	lValMax         = 1;
-
-	lSymbolActive   = 0;
-	lSymbolMax      = 1;
-
-	symNull     = lSymS("");
-	symQuote    = lSymS("quote");
-	symArr      = lSymS("arr");
-	symIf       = lSymS("if");
-	symCond     = lSymS("cond");
-	symWhen     = lSymS("when");
-	symUnless   = lSymS("unless");
-	symLet      = lSymS("let");
-	symBegin    = lSymS("begin");
-	symMinus    = lSymS("-");
 
 	lInitArray();
 	lInitClosure();
 	lInitNativeFunctions();
 	lInitStr();
 	lInitVec();
+	lInitSymbol();
 }
 
 lVal *lValAlloc(){
@@ -148,40 +128,6 @@ lVal *lValBool(bool v){
 	ret->type = ltBool;
 	ret->vBool = v;
 	return ret;
-}
-
-lSymbol *lSymSL(const char *str, uint len){
-	char buf[32];
-	len = MIN(sizeof(buf)-1,len);
-	memcpy(buf,str,len);
-	buf[len] = 0;
-	return lSymS(buf);
-}
-
-lSymbol *lSymS(const char *str){
-	for(uint i = 0;i<lSymbolMax;i++){
-		if(strncmp(str,lSymbolList[i].c,sizeof(lSymbolList[0].c)-1)){continue;}
-		return &lSymbolList[i];
-	}
-	if(lSymbolMax >= SYM_MAX){
-		fprintf(stderr,"lSym Overflow\n");
-		return NULL;
-	}
-	snprintf(lSymbolList[lSymbolMax].c,sizeof(lSymbolList[0].c),"%s",str);
-	return &lSymbolList[lSymbolMax++];
-}
-
-lVal *lValSymS(const lSymbol *s){
-	if(s == NULL){return NULL;}
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
-	ret->type = ltSymbol;
-	ret->vCdr = lvSymI(s);
-	return ret;
-}
-
-lVal *lValSym(const char *s){
-	return lValSymS(lSymS(s));
 }
 
 lVal *lCons(lVal *car, lVal *cdr){
@@ -291,22 +237,6 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	ret = lCons(lValInt(lValActive),ret);
 	ret = lCons(lValSym(":value"),ret);
 	return ret;
-}
-
-static inline bool lSymVariadic(lSymbol *s){
-	const char *p = s->c;
-	if((*p == '@') || (*p == '&')){p++;}
-	if((*p == '@') || (*p == '&')){p++;}
-	if((p[0] == '.') && (p[1] == '.') && (p[2] == '.')){
-		return true;
-	}
-	return false;
-}
-
-static inline bool lSymNoEval(lSymbol *s){
-	if(s->c[0] == '@'){return true;}
-	if((s->c[0] == '&') && (s->c[1] == '@')){return true;}
-	return false;
 }
 
 static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
@@ -731,16 +661,6 @@ int lListLength(lVal *v){
 	int i = 0;
 	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
 	return i;
-}
-
-int lSymCmp(const lVal *a,const lVal *b){
-	if((a == NULL) || (b == NULL)){return 2;}
-	if((a->type != ltSymbol) || (b->type != ltSymbol) || (a->vCdr == 0)){return 2;}
-	return a->vCdr == b->vCdr ? 0 : -1;
-}
-
-int lSymEq(const lSymbol *a,const lSymbol *b){
-	return a == b ? 0 : -1;
 }
 
 lVal *lConst(lVal *v){

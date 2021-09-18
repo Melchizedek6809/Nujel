@@ -7,6 +7,7 @@
 #include "../nujel.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
+#include "../datatypes/symbol.h"
 
 #include <ctype.h>
 #include <stdio.h>

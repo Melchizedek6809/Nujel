@@ -7,6 +7,7 @@
 #include "../casting.h"
 #include "../datatypes/closure.h"
 #include "../datatypes/native-function.h"
+#include "../datatypes/symbol.h"
 
 static lVal *lnfDefine(uint c, lClosure *ec, lVal *v, lVal *(*func)(uint ,lSymbol *)){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}

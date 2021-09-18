@@ -19,15 +19,13 @@ typedef enum lType {
 } lType;
 
 typedef struct lClosure lClosure;
+typedef struct lSymbol  lSymbol;
 typedef struct lVal     lVal;
-typedef struct {
-	char c[32];
-} lSymbol;
+
 
 typedef struct {
 	lVal *car,*cdr;
 } lPair;
-
 #define lfSpecial   (16)
 
 struct lVal {
@@ -47,13 +45,10 @@ struct lVal {
 #define lfInUse     ( 8)
 
 #define VAL_MAX (1<<20)
-#define SYM_MAX (1<<14)
-
 #define VAL_MASK ((VAL_MAX)-1)
-#define SYM_MASK ((SYM_MAX)-1)
+
 
 extern lVal     lValList    [VAL_MAX];
-extern lSymbol  lSymbolList [SYM_MAX];
 
 extern uint     lValMax;
 extern uint     lValActive;
@@ -83,11 +78,6 @@ lVal     *lValBool          (bool v);
 lVal     *lValInf           ();
 lVal     *lValInt           (int v);
 lVal     *lValFloat         (float v);
-lVal     *lValSymS          (const lSymbol *s);
-lVal     *lValSym           (const char *s);
-lSymbol  *lSymS             (const char *s);
-lSymbol  *lSymSL            (const char *s, uint len);
-lVal     *lnfCat            (lClosure *c, lVal *v);
 lVal     *lValCopy          (lVal *dst, const lVal *src);
 lVal     *getLArgB          (lClosure *c, lVal *v, bool *res);
 lVal     *getLArgI          (lClosure *c, lVal *v, int *res);
@@ -117,17 +107,10 @@ lVal     *lLastCar          (lVal *v);
 int       lListLength       (lVal *v);
 lType     lGetType          (lVal *v);
 
-int       lSymCmp           (const lVal *a,const lVal *b);
-int       lSymEq            (const lSymbol *a,const lSymbol *b);
-
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
 
 #define lValD(i) (i == 0 ? NULL : &lValList[i & VAL_MASK])
 #define lValI(v) (v == NULL ? 0 : v - lValList)
-
-#define lvSym(i)  (i == 0 ? symNull : &lSymbolList[i & SYM_MASK])
-#define lvSymI(s) (s == NULL ? 0 : s - lSymbolList)
-#define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : lvSym(v->vCdr))
 
 #define lEvalCastIApply(FUNC, c , v) do { \
 	if((c == NULL) || (v == NULL)){return lValInt(0);} \

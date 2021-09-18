@@ -40,5 +40,4 @@ lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
 lVal     *lGetClosureSym    (uint      c, lSymbol *s);
 lVal     *lResolveClosureSym(uint      c, lSymbol *s);
 lVal     *lDefineClosureSym (uint      c, lSymbol *s);
-// lVal     *lMatchClosureSym  (uint      c, lVal *v, lSymbol *s);
 lVal     *lSearchClosureSym (uint      c, lVal *v, const char *str, uint len);

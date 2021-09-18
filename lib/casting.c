@@ -11,6 +11,7 @@
 #include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/vec.h"
+#include "operations/string.h"
 
 #include <stdlib.h>
 #include <stdio.h>

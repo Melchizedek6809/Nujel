@@ -11,6 +11,8 @@
 #include "datatypes/vec.h"
 #include "nujel.h"
 
+int lGCRuns = 0;
+
 static void lClosureGCMark(lClosure *c);
 static void lValGCMark(lVal *v);
 static void lArrayGCMark(lArray *v);
