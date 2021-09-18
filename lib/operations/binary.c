@@ -5,7 +5,7 @@
  */
 #include "arithmetic.h"
 #include "binary.h"
-#include "casting.h"
+#include "../casting.h"
 
 static lVal *lnfLogAndI(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){ t->vInt &= lCar(vv)->vInt; }
@@ -69,7 +69,7 @@ lVal *lnfAshRight(lClosure *c, lVal *v){
 	}
 }
 
-void lAddBinaryFuncs(lClosure *c){
+void lOperationsBinary(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"logand &","[...args]","And ...ARGS together",             lnfLogAnd));
 	lAddInfix(lAddNativeFunc(c,"logior |","[...args]","Or ...ARGS",                       lnfLogIor));
 	lAddInfix(lAddNativeFunc(c,"logxor ^","[...args]","Xor ...ARGS",                      lnfLogXor));

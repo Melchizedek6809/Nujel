@@ -4,9 +4,10 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "arithmetic.h"
-#include "nujel.h"
-#include "vec.h"
-#include "casting.h"
+#include "../casting.h"
+#include "../nujel.h"
+#include "../vec.h"
+#include "../datatypes/vec.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -265,24 +266,6 @@ lVal *lnfPow(lClosure *c, lVal *v){
 	}
 }
 
-lVal *lnfVX(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
-	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).x);
-}
-
-lVal *lnfVY(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
-	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).y);
-}
-
-lVal *lnfVZ(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
-	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).z);
-}
-
 lVal *lnfVMag(lClosure *c, lVal *v){
 	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
@@ -294,29 +277,6 @@ int infixFunctionCount = 0;
 
 void lAddInfix(lVal *v){
 	infixFunctions[infixFunctionCount++] = v;
-}
-
-void lAddArithmeticFuncs(lClosure *c){
-	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]","Modulo",        lnfMod));
-	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]","Division",      lnfDiv));
-	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]","Multiplication",lnfMul));
-	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]","Substraction",  lnfSub));
-	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]","Addition",      lnfAdd));
-	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",    "Return a raised to the power of b",lnfPow));
-
-	lAddNativeFunc(c,"abs","[a]",  "Return the absolute value of a",   lnfAbs);
-	lAddNativeFunc(c,"sqrt","[a]", "Return the squareroot of a",       lnfSqrt);
-	lAddNativeFunc(c,"floor","[a]","Round a down",                     lnfFloor);
-	lAddNativeFunc(c,"ceil","[a]", "Round a up",                       lnfCeil);
-	lAddNativeFunc(c,"round","[a]","Round a",                          lnfRound);
-	lAddNativeFunc(c,"sin","[a]",  "Sin A",                            lnfSin);
-	lAddNativeFunc(c,"cos","[a]",  "Cos A",                            lnfCos);
-	lAddNativeFunc(c,"tan","[a]",  "Tan A",                            lnfTan);
-
-	lAddNativeFunc(c,"vec/x","[vec]","Return x part of VEC",lnfVX);
-	lAddNativeFunc(c,"vec/y","[vec]","Return y part of VEC",lnfVY);
-	lAddNativeFunc(c,"vec/z","[vec]","Return z part of VEC",lnfVZ);
-	lAddNativeFunc(c,"vec/length vec/magnitude","[vec]","Return the length of VEC",lnfVMag);
 }
 
 lVal *lnfInfix (lClosure *c, lVal *v){
@@ -350,4 +310,24 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 		}
 	}
 	return lCar(start);
+}
+
+void lOperationsArithmetic(lClosure *c){
+	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]","Modulo",        lnfMod));
+	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]","Division",      lnfDiv));
+	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]","Multiplication",lnfMul));
+	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]","Substraction",  lnfSub));
+	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]","Addition",      lnfAdd));
+	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",    "Return a raised to the power of b",lnfPow));
+
+	lAddNativeFunc(c,"abs","[a]",  "Return the absolute value of a",   lnfAbs);
+	lAddNativeFunc(c,"sqrt","[a]", "Return the squareroot of a",       lnfSqrt);
+	lAddNativeFunc(c,"floor","[a]","Round a down",                     lnfFloor);
+	lAddNativeFunc(c,"ceil","[a]", "Round a up",                       lnfCeil);
+	lAddNativeFunc(c,"round","[a]","Round a",                          lnfRound);
+	lAddNativeFunc(c,"sin","[a]",  "Sin A",                            lnfSin);
+	lAddNativeFunc(c,"cos","[a]",  "Cos A",                            lnfCos);
+	lAddNativeFunc(c,"tan","[a]",  "Tan A",                            lnfTan);
+
+	lAddNativeFunc(c,"vec/length vec/magnitude","[vec]","Return the length of VEC",lnfVMag);
 }

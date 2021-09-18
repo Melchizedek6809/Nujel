@@ -5,16 +5,22 @@
  */
 #include "nujel.h"
 
-#include "arithmetic.h"
-#include "array.h"
-#include "binary.h"
-#include "boolean.h"
 #include "casting.h"
-#include "predicates.h"
+#include "garbage-collection.h"
 #include "reader.h"
-#include "string.h"
-#include "time.h"
-#include "rng.h"
+#include "random-number-generator.h"
+#include "datatypes/array.h"
+#include "datatypes/string.h"
+#include "datatypes/vec.h"
+#include "operations/arithmetic.h"
+#include "operations/array.h"
+#include "operations/binary.h"
+#include "operations/conditional.h"
+#include "operations/predicates.h"
+#include "operations/random.h"
+#include "operations/string.h"
+#include "operations/time.h"
+#include "operations/vec.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -36,22 +42,12 @@ uint     lClosureActive = 0;
 uint     lClosureMax    = 1;
 uint     lClosureFFree  = 0;
 
-lString  lStringList[STR_MAX];
-uint     lStringActive = 0;
-uint     lStringMax    = 1;
-uint     lStringFFree  = 0;
-
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
 uint     lNFuncMax    = 1;
 uint     lNFuncFFree  = 0;
 
-lVec     lVecList[VEC_MAX];
-uint     lVecActive = 0;
-uint     lVecMax    = 1;
-uint     lVecFFree  = 0;
-
-lSymbol lSymbolList[VEC_MAX];
+lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
 uint    lSymbolFFree  = 0;
@@ -66,14 +62,8 @@ void lInit(){
 	lClosureActive  = 0;
 	lClosureMax     = 1;
 
-	lStringActive   = 0;
-	lStringMax      = 1;
-
 	lNFuncActive    = 0;
 	lNFuncMax       = 1;
-
-	lVecActive      = 0;
-	lVecMax         = 1;
 
 	lSymbolActive   = 0;
 	lSymbolMax      = 1;
@@ -90,36 +80,11 @@ void lInit(){
 	symMinus    = lSymS("-");
 
 	lInitArray();
+	lInitStr();
+	lInitVec();
 }
 
-static void lVecFree(uint i){
-	if((i == 0) || (i >= lVecMax)){return;}
-	lVec *v = &lVecList[i];
-	if(v->nextFree != 0){return;}
-	lVecActive--;
-	v->nextFree   = lVecFFree;
-	v->flags      = 0;
-	lVecFFree = i;
-}
-
-static uint lVecAlloc(){
-	lVec *ret;
-	if(lVecFFree == 0){
-		if(lVecMax >= VEC_MAX-1){
-			lPrintError("lVec OOM ");
-			return 0;
-		}
-		ret = &lVecList[lVecMax++];
-	}else{
-		ret = &lVecList[lVecFFree & VEC_MASK];
-		lVecFFree = ret->nextFree;
-	}
-	lVecActive++;
-	*ret = (lVec){0};
-	return ret - lVecList;
-}
-
-static void lNFuncFree(uint i){
+void lNFuncFree(uint i){
 	if((i == 0) || (i >= lNFuncMax)){return;}
 	lNFunc *nfn = &lNFuncList[i];
 	if(nfn->nextFree != 0){return;}
@@ -174,96 +139,6 @@ void lClosureFree(uint c){
 	clo->nextFree   = lClosureFFree;
 	clo->flags      = 0;
 	lClosureFFree = c;
-}
-
-u32 lStringAlloc(){
-	lString *ret;
-	if(lStringFFree == 0){
-		if(lStringMax >= STR_MAX){
-			lPrintError("lString OOM ");
-			return 0;
-		}
-		ret = &lStringList[lStringMax++];
-	}else{
-		ret = &lStringList[lStringFFree & STR_MASK];
-		lStringFFree  = ret->nextFree;
-	}
-	lStringActive++;
-	*ret = (lString){0};
-	return ret - lStringList;
-}
-
-void lStringFree(u32 v){
-	v = v & STR_MASK;
-	if((v == 0) || (v > lStringMax)){return;}
-	lString *s = &lStringList[v & STR_MASK];
-	if((s->buf != NULL) && (s->flags & lfHeapAlloc)){
-		free((void *)s->buf);
-		s->buf = NULL;
-	}
-	lStringActive--;
-	s->nextFree = lStringFFree;
-	lStringFFree = v;
-}
-
-u32 lStringNew(const char *str, uint len){
-	const u32 i = lStringAlloc();
-	if(i == 0){return 0;}
-	lString *s = &lStringList[i & STR_MASK];
-	if(s == NULL){return 0;}
-	char *nbuf = malloc(len+1);
-	memcpy(nbuf,str,len);
-	nbuf[len] = 0;
-	s->flags |= lfHeapAlloc;
-	s->buf    = s->data = nbuf;
-	s->bufEnd = &s->buf[len];
-	return i;
-}
-
-u32 lStringDup(uint oi){
-	lString *os = &lStringList[oi & STR_MASK];
-	uint len = os->bufEnd - os->buf;
-	const char *str = os->data;
-	const u32 i = lStringAlloc();
-	if(i == 0){return 0;}
-	lString *s = &lStringList[i & STR_MASK];
-	if(s == NULL){return 0;}
-	char *nbuf = malloc(len+1);
-	memcpy(nbuf,str,len);
-	nbuf[len] = 0;
-	s->flags |= lfHeapAlloc;
-	s->buf    = s->data = nbuf;
-	s->bufEnd = &s->buf[len];
-	return i;
-}
-
-
-lVal *lValString(const char *c){
-	if(c == NULL){return NULL;}
-	lVal *t = lValAlloc();
-	if(t == NULL){return NULL;}
-	t->type = ltString;
-	t->vCdr = lStringNew(c,strlen(c));
-	if(t->vCdr == 0){
-		lValFree(t);
-		return NULL;
-	}
-	return t;
-}
-lVal *lValCString(const char *c){
-	if(c == NULL){return NULL;}
-	lVal *t = lValAlloc();
-	if(t == NULL){return NULL;}
-	t->type = ltString;
-	t->vCdr = lStringAlloc();
-	if(t->vCdr == 0){
-		lValFree(t);
-		return NULL;
-	}
-	lStrBuf(t)    =  lStrData(t) = c;
-	lStrEnd(t)    = &lStrBuf(t)[strlen(c)];
-	lStrFlags(t) |=  lfConst;
-	return t;
 }
 
 lVal *lValAlloc(){
@@ -328,18 +203,6 @@ lVal *lValInt(int v){
 	return ret;
 }
 
-lVal *lValVec(const vec v){
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
-	ret->type = ltVec;
-	ret->vCdr = lVecAlloc();
-	if(ret->vCdr == 0){
-		lValFree(ret);
-		return NULL;
-	}
-	lVecV(ret->vCdr) = v;
-	return ret;
-}
 lVal *lValFloat(float v){
 	lVal *ret   = lValAlloc();
 	if(ret == NULL){return ret;}
@@ -762,27 +625,6 @@ lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docStri
 	return v;
 }
 
-lVal *lnfCond(lClosure *c, lVal *v){
-	if(v == NULL)        {return NULL;}
-	if(v->type != ltPair){return NULL;}
-	lVal *t = lCar(v);
-	lVal *b = lnfBool(c,lCar(t));
-	if((b != NULL) && b->vBool){
-		return lLastCar(lApply(c,lCdr(t),lEval));
-	}
-	return lnfCond(c,lCdr(v));
-}
-
-static lVal *lnfIf(lClosure *c, lVal *v){
-	if(v == NULL)         {return NULL;}
-	if(v->type != ltPair) {return NULL;}
-	lVal *pred = lnfBool(c,lCar(v));
-	v = lCdr(v);
-	if(v == NULL)         {return NULL;}
-	if(((pred == NULL) || (pred->vBool == false)) && (lCdr(v) != NULL)){v = lCdr(v);}
-	return lEval(c,lCar(v));
-}
-
 static lVal *lnfCar(lClosure *c, lVal *v){
 	return lCar(lEval(c,lCar(v)));
 }
@@ -809,30 +651,6 @@ static lVal *lnfSetCdr(lClosure *c, lVal *v){
 	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){cdr = lEval(c,lCadr(v));}
 	t->vList.cdr = cdr;
 	return t;
-}
-
-static lVal *lnfRandom(lClosure *c, lVal *v){
-	int n = 0;
-	v = getLArgI(c,v,&n);
-	if(n == 0){
-		return lValInt(rngValR());
-	}else{
-		return lValInt(rngValR() % n);
-	}
-}
-
-static lVal *lnfRandomSeedGet(lClosure *c, lVal *v){
-	(void)c;(void)v;
-	return lValInt(RNGValue);
-}
-
-static lVal *lnfRandomSeedSet(lClosure *c, lVal *v){
-	if(v != NULL){
-		int n = 0;
-		v = getLArgI(c,v,&n);
-		seedRNG(n);
-	}
-	return NULL;
 }
 
 lVal *lResolve(lClosure *c, lVal *v){
@@ -998,20 +816,6 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
-static lVal *lnfWhen(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
-	lVal *condition = lnfBool(c,lEval(c,lCar(v)));
-	if((condition == NULL) || (condition->type != ltBool) || (!condition->vBool)){return NULL;}
-	return lnfBegin(c,lCdr(v));
-}
-
-static lVal *lnfUnless(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
-	lVal *condition = lnfBool(c,lEval(c,lCar(v)));
-	if((condition != NULL) && (condition->type == ltBool) && (condition->vBool)){return NULL;}
-	return lnfBegin(c,lCdr(v));
-}
-
 static lVal *lnfConstant(lClosure *c, lVal *v){
 	lVal *t = lEval(c,lCar(v));
 	if(t == NULL){return NULL;}
@@ -1020,14 +824,16 @@ static lVal *lnfConstant(lClosure *c, lVal *v){
 }
 
 static void lAddCoreFuncs(lClosure *c){
-	lAddArithmeticFuncs(c);
-	lAddBinaryFuncs(c);
-	lAddPredicateFuncs(c);
-	lAddBooleanFuncs(c);
-	lAddCastingFuncs(c);
-	lAddStringFuncs(c);
-	lAddArrayFuncs(c);
-	lAddTimeFuncs(c);
+	lOperationsArithmetic(c);
+	lOperationsArray(c);
+	lOperationsBinary(c);
+	lOperationsCasting(c);
+	lOperationsConditional(c);
+	lOperationsPredicates(c);
+	lOperationsRandom(c);
+	lOperationsString(c);
+	lOperationsTime(c);
+	lOperationsVector(c);
 
 	lAddNativeFunc(c,"car",     "[list]",     "Returs the head of LIST",                          lnfCar);
 	lAddNativeFunc(c,"cdr",     "[list]",     "Return the rest of LIST",                          lnfCdr);
@@ -1053,21 +859,12 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"symbol-table",   "[off len]",      "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",             "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
-	lAddNativeFunc(c,"if",             "[pred? then ...else]","Evalute then if pred? is #t, otherwise evaluates ...else", lnfIf);
-	lAddNativeFunc(c,"cond",           "[...c]",              "Contain at least 1 cond block of form (pred? ...body) and evaluates and returns the first where pred? is #t",lnfCond);
-	lAddNativeFunc(c,"when",           "[condition ...body]", "Evaluates BODY if CONDITION is #t",lnfWhen);
-	lAddNativeFunc(c,"unless",         "[condition ...body]", "Evaluates BODY if CONDITION is #f",lnfUnless);
-
 	lAddNativeFunc(c,"define def","[sym val]",     "Define a new symbol SYM and link it to value VAL",                  lnfDef);
 	lAddNativeFunc(c,"undefine!", "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
 	lAddNativeFunc(c,"let",       "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddNativeFunc(c,"begin",     "[...body]",     "Evaluate ...body in order and returns the last result",            lnfBegin);
 	lAddNativeFunc(c,"quote",     "[v]",           "Return v as is without evaluating",                                lnfQuote);
 	lAddNativeFunc(c,"set!",      "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
-
-	lAddNativeFunc(c,"random",      "[&max]",       "Return a random value from 0 to MAX ot INT_MAX if MAX is #nil",lnfRandom);
-	lAddNativeFunc(c,"random-seed", "[]",           "get the Random Number Generator Seed to SEED",lnfRandomSeedGet);
-	lAddNativeFunc(c,"random-seed!","[seed]",       "Set the Random Number Generator Seed to SEED",lnfRandomSeedSet);
 }
 
 lClosure *lClosureNewRoot(){
@@ -1136,156 +933,6 @@ lVal  *lApply(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	}
 
 	return ret;
-}
-
-static void lClosureGCMark(lClosure *c);
-static void lValGCMark(lVal *v);
-static void lArrayGCMark(lArray *v);
-static void lNFuncGCMark(lNFunc *f);
-
-static void lValGCMark(lVal *v){
-	if((v == NULL) || (v->flags & lfMarked)){return;} // Circular refs
-	v->flags |= lfMarked;
-
-	switch(v->type){
-	case ltPair:
-		lValGCMark(lCar(v));
-		lValGCMark(lCdr(v));
-		break;
-	case ltLambda:
-		lClosureGCMark(&lClo(v->vCdr));
-		break;
-	case ltArray:
-		lArrayGCMark(&lArr(v));
-		break;
-	case ltString:
-		lStrFlags(v) |= lfMarked;
-		break;
-	case ltVec:
-		lVecFlags(v->vCdr) |= lfMarked;
-		break;
-	case ltNativeFunc:
-		lNFuncGCMark(&lNFN(v->vCdr));
-		break;
-	default:
-		break;
-	}
-}
-
-static void lClosureGCMark(lClosure *c){
-	if((c == NULL) || (c->flags & lfMarked) || (!(c->flags & lfUsed))){return;} // Circular refs
-	c->flags |= lfMarked;
-
-	lValGCMark(c->data);
-	lValGCMark(c->text);
-	lClosureGCMark(&lClo(c->parent));
-}
-
-static void lArrayGCMark(lArray *v){
-	if((v == NULL) || (v->nextFree != 0)){return;}
-	v->flags |= lfMarked;
-	for(int i=0;i<v->length;i++){
-		if(v->data[i] == 0){continue;}
-		lValGCMark(lValD(v->data[i]));
-	}
-}
-
-static void lNFuncGCMark(lNFunc *f){
-	if((f == NULL) || (f->flags & lfMarked)){return;}
-	f->flags |= lfMarked;
-	lValGCMark(f->doc);
-}
-
-static void lGCMark(){
-	for(uint i=0;i<lValMax;i++){
-		if(!(lValList[i].flags & lfNoGC)){continue;}
-		lValGCMark(&lValList[i]);
-	}
-	for(uint i=0;i<lClosureMax;i++){
-		if(!(lClosureList[i].flags & lfNoGC)){continue;}
-		lClosureGCMark(&lClosureList[i]);
-	}
-	for(uint i=0;i<lStringMax;i++){
-		if(!(lStringList[i].flags & lfNoGC)){continue;}
-		lStringList[i].flags |= lfMarked;
-	}
-	for(uint i=0;i<lArrayMax;i++){
-		if(!(lArrayList[i].flags & lfNoGC)){continue;}
-		lArrayGCMark(&lArrayList[i]);
-	}
-	for(uint i=0;i<lNFuncMax;i++){
-		if(!(lNFuncList[i].flags & lfNoGC)){continue;}
-		lNFuncGCMark(&lNFuncList[i]);
-	}
-	for(uint i=0;i<lNFuncMax;i++){
-		if(!(lVecList[i].flags & lfNoGC)){continue;}
-		lVecFlags(i) |= lfMarked;
-	}
-}
-
-static void lGCSweep(){
-	for(uint i=0;i<lValMax;i++){
-		if(lValList[i].flags & lfMarked){
-			lValList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lValFree(&lValList[i]);
-	}
-	for(uint i=0;i<lClosureMax;i++){
-		if(lClosureList[i].flags & lfMarked){
-			lClosureList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lClosureFree(i);
-	}
-	for(uint i=0;i<lStringMax;i++){
-		if(lStringList[i].flags & lfMarked){
-			lStringList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lStringFree(i);
-	}
-	for(uint i=0;i<lArrayMax;i++){
-		if(lArrayList[i].flags & lfMarked){
-			lArrayList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lArrayFree(i);
-	}
-	for(uint i=0;i<lNFuncMax;i++){
-		if(lNFuncList[i].flags & lfMarked){
-			lNFuncList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lNFuncFree(i);
-	}
-	for(uint i=0;i<lVecMax;i++){
-		if(lVecList[i].flags & lfMarked){
-			lVecList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lVecFree(i);
-	}
-}
-
-static void lClosureDoGC(){
-	lGCRuns++;
-	lGCMark();
-	lGCSweep();
-}
-
-void lClosureGC(){
-	static int calls = 0;
-
-	int thresh =         (VAL_MAX - (int)lValActive)     - (VAL_MAX / 128);
-	thresh = MIN(thresh,((CLO_MAX - (int)lClosureActive) - 128) *  8);
-	thresh = MIN(thresh,((ARR_MAX - (int)lArrayActive)   -  64) * 16);
-	thresh = MIN(thresh,((STR_MAX - (int)lStringActive)  -  64) * 16);
-	thresh = MIN(thresh,((VEC_MAX - (int)lVecActive)     -  64) * 16);
-	thresh = MIN(thresh,((SYM_MAX - (int)lSymbolActive)  -  64) *  8);
-	if(++calls < thresh){return;}
-	lClosureDoGC();
-	calls = 0;
 }
 
 lType lTypecast(const lType a,const lType b){
@@ -1456,10 +1103,6 @@ int lListLength(lVal *v){
 	int i = 0;
 	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
 	return i;
-}
-
-int lStringLength(const lString *s){
-	return s->bufEnd - s->buf;
 }
 
 int lSymCmp(const lVal *a,const lVal *b){

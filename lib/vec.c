@@ -6,7 +6,7 @@
 #define PI    (3.1415926535897932384626433832795f)
 
 #include "vec.h"
-#include "rng.h"
+#include "random-number-generator.h"
 
 #include <math.h>
 

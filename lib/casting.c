@@ -7,6 +7,8 @@
 
 #include "nujel.h"
 #include "vec.h"
+#include "datatypes/string.h"
+#include "datatypes/vec.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -140,7 +142,7 @@ lVal *lnfString(lClosure *c, lVal *t){
 	return ret;
 }
 
-void lAddCastingFuncs(lClosure *c){
+void lOperationsCasting(lClosure *c){
 	lAddNativeFunc(c,"bool",      "[val]","VAL -> bool ", lnfBool);
 	lAddNativeFunc(c,"int",       "[val]","VAL -> int",   lnfInt);
 	lAddNativeFunc(c,"float",     "[val]","VAL -> float", lnfFloat);

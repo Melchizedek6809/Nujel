@@ -5,8 +5,9 @@
  */
 #include "predicates.h"
 
-#include "nujel.h"
-#include "casting.h"
+#include "../casting.h"
+#include "../nujel.h"
+#include "../datatypes/string.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -71,37 +72,37 @@ static int lValCompare(lClosure *c, lVal *v){
 	}
 }
 
-lVal *lnfLess(lClosure *c, lVal *v){
+static lVal *lnfLess(lClosure *c, lVal *v){
 	const int cmp = lValCompare(c,v);
 	return lValBool(cmp == 2 ? false : cmp < 0);
 }
 
-lVal *lnfEqual(lClosure *c, lVal *v){
+static lVal *lnfEqual(lClosure *c, lVal *v){
 	const int cmp = lValCompare(c,v);
 	return lValBool(cmp == 2 ? false : cmp == 0);
 }
 
-lVal *lnfLessEqual(lClosure *c, lVal *v){
+static lVal *lnfLessEqual(lClosure *c, lVal *v){
 	const int cmp = lValCompare(c,v);
 	return lValBool(cmp == 2 ? false : cmp <= 0);
 }
 
-lVal *lnfGreater(lClosure *c, lVal *v){
+static lVal *lnfGreater(lClosure *c, lVal *v){
 	const int cmp = lValCompare(c,v);
 	return lValBool(cmp == 2 ? false : cmp > 0);
 }
 
-lVal *lnfGreaterEqual(lClosure *c, lVal *v){
+static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 	const int cmp = lValCompare(c,v);
 	return lValBool(cmp == 2 ? false : cmp >= 0);
 }
 
-lVal *lnfNilPred(lClosure *c, lVal *v){
+static lVal *lnfNilPred(lClosure *c, lVal *v){
 	lVal *t = lEval(c,lCar(v));
 	return lValBool(t == NULL);
 }
 
-void lAddPredicateFuncs(lClosure *c){
+void lOperationsPredicates(lClosure *c){
 	lAddNativeFunc(c,"less? <",           "[a b]","#t if A < B",  lnfLess);
 	lAddNativeFunc(c,"less-equal? <=",    "[a b]","#t if A <= B", lnfLessEqual);
 	lAddNativeFunc(c,"equal? eqv? eq? =", "[a b]","#t if A == B", lnfEqual);

@@ -11,9 +11,10 @@
 
 #include "../lib/common.h"
 #include "../lib/nujel.h"
+#include "../lib/garbage-collection.h"
 #include "../lib/casting.h"
 #include "../lib/reader.h"
-#include "../lib/string.h"
+#include "../lib/datatypes/string.h"
 
 extern char binlib_nuj_data[];
 
@@ -88,7 +89,7 @@ void doRepl(lClosure *c){
 		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		lWriteVal(v);
-		lClosureGC();
+		lGarbageCollect();
 		lVal *tmp = lValString(str);
 		if((tmp != NULL) && (lastl != NULL)){lastl->vList.car = tmp;}
 	}
@@ -199,7 +200,7 @@ int main(int argc, char *argv[]){
 	lClosure *c = lClosureNewRoot();
 	addNativeFuncs(c);
 	lEval(c,lWrap(lRead((const char *)binlib_nuj_data)));
-	lClosureGC();
+	lGarbageCollect();
 
 	for(int i=1;i<argc;i++){
 		size_t len;
@@ -221,7 +222,7 @@ int main(int argc, char *argv[]){
 		if(!eval){str = loadFile(argv[i],&len);}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
-		lClosureGC();
+		lGarbageCollect();
 
 		if(!eval){
 			free(str);

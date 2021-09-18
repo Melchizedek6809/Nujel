@@ -22,7 +22,6 @@ typedef enum lType {
 
 typedef struct lVal     lVal;
 typedef struct lClosure lClosure;
-typedef struct lString  lString;
 typedef struct lNFunc   lNFunc;
 typedef struct {
 	char c[32];
@@ -31,12 +30,6 @@ typedef struct {
 typedef struct {
 	lVal *car,*cdr;
 } lPair;
-
-typedef struct {
-	vec v;
-	u16 nextFree;
-	u16 flags;
-} lVec;
 
 struct lNFunc {
 	lVal *(*fp)(lClosure *, lVal *);
@@ -74,35 +67,29 @@ struct lClosure {
 #define lfObject    (32)
 #define lfUsed      (64)
 
-struct lString {
-	const char *buf,*data,*bufEnd;
-	u16 nextFree;
-	u16 flags;
-};
-#define lfHeapAlloc (16)
-
 #define VAL_MAX (1<<20)
 #define CLO_MAX (1<<16)
-#define STR_MAX (1<<14)
 #define NFN_MAX (1<<10)
-#define VEC_MAX (1<<14)
 #define SYM_MAX (1<<14)
 
 #define VAL_MASK ((VAL_MAX)-1)
 #define CLO_MASK ((CLO_MAX)-1)
-#define STR_MASK ((STR_MAX)-1)
 #define NFN_MASK ((NFN_MAX)-1)
-#define VEC_MASK ((VEC_MAX)-1)
 #define SYM_MASK ((SYM_MAX)-1)
 
 extern lVal     lValList    [VAL_MAX];
 extern lClosure lClosureList[CLO_MAX];
-extern lString  lStringList [STR_MAX];
 extern lNFunc   lNFuncList  [NFN_MAX];
-extern lVec     lVecList    [VEC_MAX];
 extern lSymbol  lSymbolList [SYM_MAX];
 
-extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symIntAt,*symFloatAt,*symVecAt, *symMinus;
+extern uint     lValMax;
+extern uint     lValActive;
+extern uint     lClosureMax;
+extern uint     lClosureActive;
+extern uint     lNFuncMax;
+extern uint     lNFuncActive;
+
+extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
 
 void      lInit             ();
 int       lMemUsage         ();
@@ -118,10 +105,7 @@ lVal     *lClosureAddSF     (uint c, const char *sym, lVal *(*func)(lClosure *,l
 lVal     *lValAlloc         ();
 void      lValFree          (lVal *v);
 
-uint      lStringAlloc      ();
-void      lStringFree       (uint v);
-uint      lStringNew        (const char *str, uint len);
-uint      lStringDup        (uint i);
+void      lNFuncFree        (uint i);
 
 void      lClosureGC        ();
 void      lDisplayVal       (lVal *v);
@@ -147,12 +131,10 @@ lVal     *lValBool          (bool v);
 lVal     *lValInf           ();
 lVal     *lValInt           (int v);
 lVal     *lValFloat         (float v);
-lVal     *lValVec           (const vec v);
 lVal     *lValSymS          (const lSymbol *s);
 lVal     *lValSym           (const char *s);
 lSymbol  *lSymS             (const char *s);
 lSymbol  *lSymSL            (const char *s, uint len);
-lVal     *lValString        (const char *s);
 lVal     *lnfCat            (lClosure *c, lVal *v);
 lVal     *lValCopy          (lVal *dst, const lVal *src);
 lVal     *getLArgB          (lClosure *c, lVal *v, bool *res);
@@ -183,22 +165,10 @@ lVal     *lLastCar          (lVal *v);
 int       lListLength       (lVal *v);
 lType     lGetType          (lVal *v);
 
-int       lStringLength     (const lString *s);
 int       lSymCmp           (const lVal *a,const lVal *b);
 int       lSymEq            (const lSymbol *a,const lSymbol *b);
 
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
-
-#define lVec(i)      lVecList[i & VEC_MASK]
-#define lVecV(i)     lVec(i).v
-#define lVecFlags(i) lVec(i).flags
-
-#define lStrNull(val)  (((val->vCdr & STR_MASK) == 0) || (lStringList[val->vCdr & STR_MASK].data == NULL))
-#define lStr(val)      lStringList[val->vCdr & STR_MASK]
-#define lStrData(val)  lStr(val).data
-#define lStrBuf(val)   lStr(val).buf
-#define lStrEnd(val)   lStr(val).bufEnd
-#define lStrFlags(val) lStr(val).flags
 
 #define lClo(i)       lClosureList[i & CLO_MASK]
 #define lCloI(c)      (c == NULL ? 0 : c - lClosureList)

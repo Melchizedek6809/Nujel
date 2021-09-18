@@ -4,9 +4,8 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "time.h"
-
-#include "boolean.h"
-#include "casting.h"
+#include "../casting.h"
+#include "../datatypes/string.h"
 
 #include <time.h>
 #include <sys/time.h>
@@ -18,17 +17,17 @@ static u64 getMSecs(){
 }
 
 
-lVal *lnfTime(lClosure *c, lVal *v){
+static lVal *lnfTime(lClosure *c, lVal *v){
 	(void)c;(void)v;
 	return lValInt(time(NULL));
 }
 
-lVal *lnfTimeMsecs(lClosure *c, lVal *v){
+static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	return lValInt(getMSecs());
 }
 
-lVal *lnfStrftime(lClosure *c, lVal *v){
+static lVal *lnfStrftime(lClosure *c, lVal *v){
 	int timestamp = 0;
 	const char *format = "%Y-%m-%d %H:%M:%S";
 
@@ -43,7 +42,7 @@ lVal *lnfStrftime(lClosure *c, lVal *v){
 	return lValString(buf);
 }
 
-void lAddTimeFuncs(lClosure *c){
+void lOperationsTime(lClosure *c){
 	lAddNativeFunc(c,"time",             "[]",         "Returns unix time",lnfTime);
 	lAddNativeFunc(c,"strftime",         "[ts format]","Returns TS as a date using FORMAT (uses strftime)",lnfStrftime);
 	lAddNativeFunc(c,"time-milliseconds","[]",         "Returns monotonic msecs",lnfTimeMsecs);

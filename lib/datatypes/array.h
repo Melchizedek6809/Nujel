@@ -1,5 +1,5 @@
 #pragma once
-#include "nujel.h"
+#include "../nujel.h"
 
 typedef struct {
 	u32 *data;
@@ -22,11 +22,3 @@ extern lArray lArrayList[ARR_MAX];
 void lInitArray    ();
 uint lArrayAlloc   ();
 void lArrayFree    (uint v);
-
-lVal *lnfArrLength (lClosure *c, lVal *v);
-lVal *lnfArrRef    (lClosure *c, lVal *v);
-lVal *lnfArrSet    (lClosure *c, lVal *v);
-lVal *lnfArrNew    (lClosure *c, lVal *v);
-lVal *lnfArr       (lClosure *c, lVal *v);
-
-void lAddArrayFuncs(lClosure *c);

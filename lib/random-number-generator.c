@@ -3,7 +3,7 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "rng.h"
+#include "random-number-generator.h"
 
 u64 RNGValue;
 

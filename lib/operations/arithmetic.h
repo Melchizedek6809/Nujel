@@ -1,5 +1,5 @@
 #pragma once
-#include "nujel.h"
+#include "../nujel.h"
 
 lVal *lnfAdd   (lClosure *c, lVal *v);
 lVal *lnfSub   (lClosure *c, lVal *v);
@@ -17,11 +17,7 @@ lVal *lnfSin   (lClosure *c, lVal *v);
 lVal *lnfCos   (lClosure *c, lVal *v);
 lVal *lnfTan   (lClosure *c, lVal *v);
 
-lVal *lnfVX    (lClosure *c, lVal *v);
-lVal *lnfVY    (lClosure *c, lVal *v);
-lVal *lnfVZ    (lClosure *c, lVal *v);
-
 lVal *lnfInfix (lClosure *c, lVal *v);
 void lAddInfix(lVal *v);
 
-void lAddArithmeticFuncs(lClosure *c);
+void lOperationsArithmetic(lClosure *c);
