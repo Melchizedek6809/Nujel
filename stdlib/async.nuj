@@ -28,8 +28,8 @@
 ]]
 
 [def timeout [λ [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed"
-	[let [[goal [+ [time-milliseconds] milliseconds]]]
-		[λ [] [> [time-milliseconds] goal]]
+	[let [[goal [+ [time/milliseconds] milliseconds]]]
+		[λ [] [> [time/milliseconds] goal]]
 	]
 ]]
 
