@@ -6,6 +6,7 @@
 #include "string.h"
 
 #include "nujel.h"
+#include "array.h"
 #include "casting.h"
 
 #include <ctype.h>

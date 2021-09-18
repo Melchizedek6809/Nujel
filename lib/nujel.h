@@ -23,7 +23,6 @@ typedef enum lType {
 typedef struct lVal     lVal;
 typedef struct lClosure lClosure;
 typedef struct lString  lString;
-typedef struct lArray   lArray;
 typedef struct lNFunc   lNFunc;
 typedef struct {
 	char c[32];
@@ -38,13 +37,6 @@ typedef struct {
 	u16 nextFree;
 	u16 flags;
 } lVec;
-
-struct lArray {
-	u32 *data;
-	i32 length;
-	u16 flags;
-	u16 nextFree;
-};
 
 struct lNFunc {
 	lVal *(*fp)(lClosure *, lVal *);
@@ -92,7 +84,6 @@ struct lString {
 #define VAL_MAX (1<<20)
 #define CLO_MAX (1<<16)
 #define STR_MAX (1<<14)
-#define ARR_MAX (1<<12)
 #define NFN_MAX (1<<10)
 #define VEC_MAX (1<<14)
 #define SYM_MAX (1<<14)
@@ -100,7 +91,6 @@ struct lString {
 #define VAL_MASK ((VAL_MAX)-1)
 #define CLO_MASK ((CLO_MAX)-1)
 #define STR_MASK ((STR_MAX)-1)
-#define ARR_MASK ((ARR_MAX)-1)
 #define NFN_MASK ((NFN_MAX)-1)
 #define VEC_MASK ((VEC_MAX)-1)
 #define SYM_MASK ((SYM_MAX)-1)
@@ -108,7 +98,6 @@ struct lString {
 extern lVal     lValList    [VAL_MAX];
 extern lClosure lClosureList[CLO_MAX];
 extern lString  lStringList [STR_MAX];
-extern lArray   lArrayList  [ARR_MAX];
 extern lNFunc   lNFuncList  [NFN_MAX];
 extern lVec     lVecList    [VEC_MAX];
 extern lSymbol  lSymbolList [SYM_MAX];
@@ -128,9 +117,6 @@ lVal     *lClosureAddSF     (uint c, const char *sym, lVal *(*func)(lClosure *,l
 
 lVal     *lValAlloc         ();
 void      lValFree          (lVal *v);
-
-uint      lArrayAlloc       ();
-void      lArrayFree        (uint v);
 
 uint      lStringAlloc      ();
 void      lStringFree       (uint v);
@@ -213,11 +199,6 @@ int       lSymEq            (const lSymbol *a,const lSymbol *b);
 #define lStrBuf(val)   lStr(val).buf
 #define lStrEnd(val)   lStr(val).bufEnd
 #define lStrFlags(val) lStr(val).flags
-
-#define lArrNull(val)   (((val->vCdr & ARR_MASK) == 0) || (lArrayList[val->vCdr & ARR_MASK].data == NULL))
-#define lArr(val)       lArrayList[val->vCdr & ARR_MASK]
-#define lArrLength(val) lArr(val).length
-#define lArrData(val)   lArr(val).data
 
 #define lClo(i)       lClosureList[i & CLO_MASK]
 #define lCloI(c)      (c == NULL ? 0 : c - lClosureList)

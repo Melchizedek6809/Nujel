@@ -11,6 +11,43 @@
 #include <stdlib.h>
 #include <string.h>
 
+lArray   lArrayList[ARR_MAX];
+uint     lArrayActive = 0;
+uint     lArrayMax    = 1;
+uint     lArrayFFree  = 0;
+
+void lInitArray(){
+	lArrayActive    = 0;
+	lArrayMax       = 1;
+}
+
+u32 lArrayAlloc(){
+	lArray *ret;
+	if(lArrayFFree == 0){
+		if(lArrayMax >= ARR_MAX-1){
+			lPrintError("lArray OOM ");
+			return 0;
+		}
+		ret = &lArrayList[lArrayMax++];
+	}else{
+		ret = &lArrayList[lArrayFFree & ARR_MASK];;
+		lArrayFFree = ret->nextFree;
+	}
+	lArrayActive++;
+	*ret = (lArray){0};
+	return ret - lArrayList;
+}
+
+void lArrayFree(u32 v){
+	v = v & ARR_MASK;
+	if((v == 0) || (v >= lArrayMax)){return;}
+	lArrayActive--;
+	free(lArrayList[v].data);
+	lArrayList[v].data = NULL;
+	lArrayList[v].nextFree = lArrayFFree;
+	lArrayFFree = v;
+}
+
 lVal *lnfArrLength(lClosure *c, lVal *v){
 	lVal *arr = lEval(c,lCar(v));
 	if((arr == NULL) || (arr->type != ltArray)){return lValInt(0);}

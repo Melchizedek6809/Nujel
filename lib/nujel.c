@@ -41,11 +41,6 @@ uint     lStringActive = 0;
 uint     lStringMax    = 1;
 uint     lStringFFree  = 0;
 
-lArray   lArrayList[ARR_MAX];
-uint     lArrayActive = 0;
-uint     lArrayMax    = 1;
-uint     lArrayFFree  = 0;
-
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
 uint     lNFuncMax    = 1;
@@ -74,9 +69,6 @@ void lInit(){
 	lStringActive   = 0;
 	lStringMax      = 1;
 
-	lArrayActive    = 0;
-	lArrayMax       = 1;
-
 	lNFuncActive    = 0;
 	lNFuncMax       = 1;
 
@@ -96,6 +88,8 @@ void lInit(){
 	symLet      = lSymS("let");
 	symBegin    = lSymS("begin");
 	symMinus    = lSymS("-");
+
+	lInitArray();
 }
 
 static void lVecFree(uint i){
@@ -180,33 +174,6 @@ void lClosureFree(uint c){
 	clo->nextFree   = lClosureFFree;
 	clo->flags      = 0;
 	lClosureFFree = c;
-}
-
-u32 lArrayAlloc(){
-	lArray *ret;
-	if(lArrayFFree == 0){
-		if(lArrayMax >= ARR_MAX-1){
-			lPrintError("lArray OOM ");
-			return 0;
-		}
-		ret = &lArrayList[lArrayMax++];
-	}else{
-		ret = &lArrayList[lArrayFFree & ARR_MASK];;
-		lArrayFFree = ret->nextFree;
-	}
-	lArrayActive++;
-	*ret = (lArray){0};
-	return ret - lArrayList;
-}
-
-void lArrayFree(u32 v){
-	v = v & ARR_MASK;
-	if((v == 0) || (v >= lArrayMax)){return;}
-	lArrayActive--;
-	free(lArrayList[v].data);
-	lArrayList[v].data = NULL;
-	lArrayList[v].nextFree = lArrayFFree;
-	lArrayFFree = v;
 }
 
 u32 lStringAlloc(){
