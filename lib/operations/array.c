@@ -5,6 +5,7 @@
  */
 #include "array.h"
 #include "../datatypes/array.h"
+#include "../datatypes/native-function.h"
 #include "../casting.h"
 
 #include <stdlib.h>

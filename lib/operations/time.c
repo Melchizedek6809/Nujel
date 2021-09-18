@@ -5,6 +5,7 @@
  */
 #include "time.h"
 #include "../casting.h"
+#include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
 
 #include <time.h>

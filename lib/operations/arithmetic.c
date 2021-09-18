@@ -7,6 +7,7 @@
 #include "../casting.h"
 #include "../nujel.h"
 #include "../vec.h"
+#include "../datatypes/native-function.h"
 #include "../datatypes/vec.h"
 
 #include <math.h>

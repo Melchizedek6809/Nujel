@@ -6,6 +6,7 @@
 #include "arithmetic.h"
 #include "binary.h"
 #include "../casting.h"
+#include "../datatypes/native-function.h"
 
 static lVal *lnfLogAndI(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){ t->vInt &= lCar(vv)->vInt; }

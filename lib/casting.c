@@ -7,6 +7,7 @@
 
 #include "nujel.h"
 #include "vec.h"
+#include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/vec.h"
 

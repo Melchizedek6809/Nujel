@@ -5,6 +5,7 @@
  */
 #include "string.h"
 #include "../nujel.h"
+#include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
 
 #include <ctype.h>

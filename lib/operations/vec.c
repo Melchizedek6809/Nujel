@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "vec.h"
+#include "../datatypes/native-function.h"
 #include "../datatypes/vec.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){

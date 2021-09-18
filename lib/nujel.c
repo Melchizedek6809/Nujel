@@ -10,6 +10,7 @@
 #include "reader.h"
 #include "random-number-generator.h"
 #include "datatypes/array.h"
+#include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/vec.h"
 #include "operations/arithmetic.h"
@@ -42,11 +43,6 @@ uint     lClosureActive = 0;
 uint     lClosureMax    = 1;
 uint     lClosureFFree  = 0;
 
-lNFunc   lNFuncList[NFN_MAX];
-uint     lNFuncActive = 0;
-uint     lNFuncMax    = 1;
-uint     lNFuncFFree  = 0;
-
 lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
@@ -61,9 +57,6 @@ void lInit(){
 
 	lClosureActive  = 0;
 	lClosureMax     = 1;
-
-	lNFuncActive    = 0;
-	lNFuncMax       = 1;
 
 	lSymbolActive   = 0;
 	lSymbolMax      = 1;
@@ -80,37 +73,9 @@ void lInit(){
 	symMinus    = lSymS("-");
 
 	lInitArray();
+	lInitNativeFunctions();
 	lInitStr();
 	lInitVec();
-}
-
-void lNFuncFree(uint i){
-	if((i == 0) || (i >= lNFuncMax)){return;}
-	lNFunc *nfn = &lNFuncList[i];
-	if(nfn->nextFree != 0){return;}
-	lNFuncActive--;
-	nfn->fp       = NULL;
-	nfn->doc      = NULL;
-	nfn->nextFree = lNFuncFFree;
-	nfn->flags    = 0;
-	lNFuncFFree   = i;
-}
-
-static uint lNFuncAlloc(){
-	lNFunc *ret;
-	if(lNFuncFFree == 0){
-		if(lNFuncMax >= NFN_MAX-1){
-			lPrintError("lNFunc OOM ");
-			return 0;
-		}
-		ret = &lNFuncList[lNFuncMax++];
-	}else{
-		ret = &lNFuncList[lNFuncFFree & NFN_MASK];
-		lNFuncFFree = ret->nextFree;
-	}
-	lNFuncActive++;
-	*ret = (lNFunc){0};
-	return ret - lNFuncList;
 }
 
 uint lClosureAlloc(){
@@ -754,17 +719,6 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	}
 	lPrintError("Quite the amount of aliases we have there (%s)\n",sym);
 	return NULL;
-}
-
-lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
-	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
-	return lDefineAliased(c,lNF,sym);
-}
-
-lVal *lAddSpecialForm(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
-	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
-	lNF->type = ltSpecialForm;
-	return lDefineAliased(c,lNF,sym);
 }
 
 static lVal *lnfTypeOf(lClosure *c, lVal *v){

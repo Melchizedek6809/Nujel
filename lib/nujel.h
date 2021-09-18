@@ -22,7 +22,6 @@ typedef enum lType {
 
 typedef struct lVal     lVal;
 typedef struct lClosure lClosure;
-typedef struct lNFunc   lNFunc;
 typedef struct {
 	char c[32];
 } lSymbol;
@@ -31,12 +30,6 @@ typedef struct {
 	lVal *car,*cdr;
 } lPair;
 
-struct lNFunc {
-	lVal *(*fp)(lClosure *, lVal *);
-	lVal *doc;
-	u16 flags;
-	u16 nextFree;
-};
 #define lfSpecial   (16)
 
 struct lVal {
@@ -69,25 +62,20 @@ struct lClosure {
 
 #define VAL_MAX (1<<20)
 #define CLO_MAX (1<<16)
-#define NFN_MAX (1<<10)
 #define SYM_MAX (1<<14)
 
 #define VAL_MASK ((VAL_MAX)-1)
 #define CLO_MASK ((CLO_MAX)-1)
-#define NFN_MASK ((NFN_MAX)-1)
 #define SYM_MASK ((SYM_MAX)-1)
 
 extern lVal     lValList    [VAL_MAX];
 extern lClosure lClosureList[CLO_MAX];
-extern lNFunc   lNFuncList  [NFN_MAX];
 extern lSymbol  lSymbolList [SYM_MAX];
 
 extern uint     lValMax;
 extern uint     lValActive;
 extern uint     lClosureMax;
 extern uint     lClosureActive;
-extern uint     lNFuncMax;
-extern uint     lNFuncActive;
 
 extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
 
@@ -99,13 +87,9 @@ uint      lClosureAlloc     ();
 lClosure *lClosureNewRoot   ();
 uint      lClosureNew       (uint parent);
 void      lClosureFree      (uint c);
-lVal     *lClosureAddNF     (uint c, const char *sym, lVal *(*func)(lClosure *,lVal *));
-lVal     *lClosureAddSF     (uint c, const char *sym, lVal *(*func)(lClosure *,lVal *));
 
 lVal     *lValAlloc         ();
 void      lValFree          (lVal *v);
-
-void      lNFuncFree        (uint i);
 
 void      lClosureGC        ();
 void      lDisplayVal       (lVal *v);
@@ -113,8 +97,7 @@ void      lDisplayErrorVal  (lVal *v);
 void      lWriteVal         (lVal *v);
 
 void      lDefineVal        (lClosure *c, const char *sym, lVal *val);
-lVal     *lAddNativeFunc    (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
-lVal     *lValNativeFunc    (lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString);
+lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
 lVal     *lGetClosureSym    (uint      c, lSymbol *s);
 lVal     *lResolveClosureSym(uint      c, lSymbol *s);
 lVal     *lDefineClosureSym (uint      c, lSymbol *s);
@@ -179,7 +162,6 @@ int       lSymEq            (const lSymbol *a,const lSymbol *b);
 #define lValD(i) (i == 0 ? NULL : &lValList[i & VAL_MASK])
 #define lValI(v) (v == NULL ? 0 : v - lValList)
 
-#define lNFN(i) lNFuncList[i & NFN_MASK]
 #define lvSym(i)  (i == 0 ? symNull : &lSymbolList[i & SYM_MASK])
 #define lvSymI(s) (s == NULL ? 0 : s - lSymbolList)
 #define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : lvSym(v->vCdr))

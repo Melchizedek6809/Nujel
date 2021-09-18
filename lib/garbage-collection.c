@@ -5,6 +5,7 @@
  */
 #include "garbage-collection.h"
 #include "datatypes/array.h"
+#include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/vec.h"
 #include "nujel.h"

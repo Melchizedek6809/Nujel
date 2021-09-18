@@ -5,6 +5,7 @@
  */
 #include "conditional.h"
 #include "../casting.h"
+#include "../datatypes/native-function.h"
 
 static lVal *lnfNot(lClosure *c, lVal *v){
 	lVal *a = lnfBool(c,v);
