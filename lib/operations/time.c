@@ -13,11 +13,10 @@
 #include <sys/time.h>
 
 static u64 getMSecs(){
-	struct timeval tv;
-	gettimeofday(&tv,NULL);
-	return (tv.tv_usec / 1000) + (tv.tv_sec * 1000);
+	struct timespec tv;
+	clock_gettime(CLOCK_MONOTONIC,&tv);
+	return (tv.tv_nsec / 1000000) + (tv.tv_sec * 1000);
 }
-
 
 static lVal *lnfTime(lClosure *c, lVal *v){
 	(void)c;(void)v;

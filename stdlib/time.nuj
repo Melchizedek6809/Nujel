@@ -2,3 +2,18 @@
 
 ; Initialize the RNG
 [random-seed [logxor [time] [time/millliseconds]]]
+
+[def time/seconds [λ [timestamp]
+	"Return the seconds part of TIMESTAMP, defaults to current time"
+	[% [default timestamp [time]] 60]
+]]
+
+[def time/minutes [λ [timestamp]
+	"Return the minutes part of TIMESTAMP, defaults to current time"
+	[% [/ [default timestamp [time]] 60] 60]
+]]
+
+[def time/hours [λ [timestamp]
+	"Return the hours part of TIMESTAMP, defaults to current time"
+	[% [/ [default timestamp [time]] 3600] 24]
+]]
