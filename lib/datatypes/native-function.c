@@ -45,6 +45,22 @@ uint lNFuncAlloc(){
 	return ret - lNFuncList;
 }
 
+lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
+	lVal *v = lValAlloc();
+	if(v == NULL){return NULL;}
+	v->type    = ltNativeFunc;
+	v->flags  |= lfConst;
+	v->vCdr    = lNFuncAlloc();
+	if(v->vCdr == 0){
+		lValFree(v);
+		return NULL;
+	}
+	lNFunc *fn = &lNFN(v->vCdr);
+	fn->fp     = func;
+	fn->doc    = lCons(args,docString);
+	return v;
+}
+
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
 	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
 	return lDefineAliased(c,lNF,sym);

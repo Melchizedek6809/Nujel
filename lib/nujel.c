@@ -516,12 +516,7 @@ static inline bool lSymVariadic(lSymbol *s){
 	}
 	return false;
 }
-/*
-static inline bool lSymOptional(lSymbol s){
-	if(s.c[0] == '&'){return true;}
-	if((s.c[0] == '@') && (s.c[1] == '&')){return true;}
-	return false;
-}*/
+
 static inline bool lSymNoEval(lSymbol *s){
 	if(s->c[0] == '@'){return true;}
 	if((s->c[0] == '&') && (s->c[1] == '@')){return true;}
@@ -572,22 +567,6 @@ static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
 		lClosureFree(tmpci);
 	}
 	return ret;
-}
-
-lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
-	lVal *v = lValAlloc();
-	if(v == NULL){return NULL;}
-	v->type    = ltNativeFunc;
-	v->flags  |= lfConst;
-	v->vCdr    = lNFuncAlloc();
-	if(v->vCdr == 0){
-		lValFree(v);
-		return NULL;
-	}
-	lNFunc *fn = &lNFN(v->vCdr);
-	fn->fp     = func;
-	fn->doc    = lCons(args,docString);
-	return v;
 }
 
 static lVal *lnfCar(lClosure *c, lVal *v){
