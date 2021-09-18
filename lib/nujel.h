@@ -1,8 +1,6 @@
 #pragma once
 #include "common.h"
 
-extern int lGCRuns;
-
 typedef enum lType {
 	ltNoAlloc = 0,
 	ltBool,
@@ -20,8 +18,8 @@ typedef enum lType {
 	ltGUIWidget
 } lType;
 
-typedef struct lVal     lVal;
 typedef struct lClosure lClosure;
+typedef struct lVal     lVal;
 typedef struct {
 	char c[32];
 } lSymbol;
@@ -48,34 +46,17 @@ struct lVal {
 #define lfConst     ( 4)
 #define lfInUse     ( 8)
 
-struct lClosure {
-	lVal *data;
-	lVal *text;
-	u16 parent;
-	u16 nextFree;
-	u16 flags;
-	u16 refCount;
-};
-#define lfDynamic   (16)
-#define lfObject    (32)
-#define lfUsed      (64)
-
 #define VAL_MAX (1<<20)
-#define CLO_MAX (1<<16)
 #define SYM_MAX (1<<14)
 
 #define VAL_MASK ((VAL_MAX)-1)
-#define CLO_MASK ((CLO_MAX)-1)
 #define SYM_MASK ((SYM_MAX)-1)
 
 extern lVal     lValList    [VAL_MAX];
-extern lClosure lClosureList[CLO_MAX];
 extern lSymbol  lSymbolList [SYM_MAX];
 
 extern uint     lValMax;
 extern uint     lValActive;
-extern uint     lClosureMax;
-extern uint     lClosureActive;
 
 extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
 
@@ -83,27 +64,15 @@ void      lInit             ();
 int       lMemUsage         ();
 void      lPrintError       (const char *format, ...);
 
-uint      lClosureAlloc     ();
-lClosure *lClosureNewRoot   ();
-uint      lClosureNew       (uint parent);
-void      lClosureFree      (uint c);
-
 lVal     *lValAlloc         ();
 void      lValFree          (lVal *v);
 
-void      lClosureGC        ();
+lClosure *lClosureNewRoot   ();
+
 void      lDisplayVal       (lVal *v);
 void      lDisplayErrorVal  (lVal *v);
 void      lWriteVal         (lVal *v);
 
-void      lDefineVal        (lClosure *c, const char *sym, lVal *val);
-lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
-lVal     *lGetClosureSym    (uint      c, lSymbol *s);
-lVal     *lResolveClosureSym(uint      c, lSymbol *s);
-lVal     *lDefineClosureSym (uint      c, lSymbol *s);
-lVal     *lMatchClosureSym  (uint      c, lVal *v, lSymbol *s);
-lVal     *lSearchClosureSym (uint      c, lVal *v, const char *str, uint len);
-lVal     *lResolveSym       (uint      c, lVal *v);
 lVal     *lApply            (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lCast             (lClosure *c, lVal *v, lType t);
 lVal     *lEval             (lClosure *c, lVal *v);
@@ -152,12 +121,6 @@ int       lSymCmp           (const lVal *a,const lVal *b);
 int       lSymEq            (const lSymbol *a,const lSymbol *b);
 
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
-
-#define lClo(i)       lClosureList[i & CLO_MASK]
-#define lCloI(c)      (c == NULL ? 0 : c - lClosureList)
-#define lCloParent(i) lClosureList[i & CLO_MASK].parent
-#define lCloData(i)   lClosureList[i & CLO_MASK].data
-#define lCloText(i)   lClosureList[i & CLO_MASK].text
 
 #define lValD(i) (i == 0 ? NULL : &lValList[i & VAL_MASK])
 #define lValI(v) (v == NULL ? 0 : v - lValList)

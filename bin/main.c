@@ -14,6 +14,7 @@
 #include "../lib/garbage-collection.h"
 #include "../lib/casting.h"
 #include "../lib/reader.h"
+#include "../lib/datatypes/closure.h"
 #include "../lib/datatypes/native-function.h"
 #include "../lib/datatypes/string.h"
 

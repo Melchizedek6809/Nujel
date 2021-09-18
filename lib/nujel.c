@@ -10,12 +10,14 @@
 #include "reader.h"
 #include "random-number-generator.h"
 #include "datatypes/array.h"
+#include "datatypes/closure.h"
 #include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/vec.h"
 #include "operations/arithmetic.h"
 #include "operations/array.h"
 #include "operations/binary.h"
+#include "operations/closure.h"
 #include "operations/conditional.h"
 #include "operations/predicates.h"
 #include "operations/random.h"
@@ -38,11 +40,6 @@ uint     lValActive = 0;
 uint     lValMax    = 1;
 uint     lValFFree  = 0;
 
-lClosure lClosureList[CLO_MAX];
-uint     lClosureActive = 0;
-uint     lClosureMax    = 1;
-uint     lClosureFFree  = 0;
-
 lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
@@ -54,9 +51,6 @@ lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*
 void lInit(){
 	lValActive      = 0;
 	lValMax         = 1;
-
-	lClosureActive  = 0;
-	lClosureMax     = 1;
 
 	lSymbolActive   = 0;
 	lSymbolMax      = 1;
@@ -73,37 +67,10 @@ void lInit(){
 	symMinus    = lSymS("-");
 
 	lInitArray();
+	lInitClosure();
 	lInitNativeFunctions();
 	lInitStr();
 	lInitVec();
-}
-
-uint lClosureAlloc(){
-	lClosure *ret;
-	if(lClosureFFree == 0){
-		if(lClosureMax >= CLO_MAX-1){
-			lPrintError("lClosure OOM ");
-			return 0;
-		}
-		ret = &lClosureList[lClosureMax++];
-	}else{
-		ret = &lClosureList[lClosureFFree & CLO_MASK];
-		lClosureFFree = ret->nextFree;
-	}
-	lClosureActive++;
-	*ret = (lClosure){0};
-	ret->flags = lfUsed;
-	return ret - lClosureList;
-}
-
-void lClosureFree(uint c){
-	if((c == 0) || (c >= lClosureMax)){return;}
-	lClosure *clo = &lClosureList[c];
-	if(!(clo->flags & lfUsed)){return;}
-	lClosureActive--;
-	clo->nextFree   = lClosureFFree;
-	clo->flags      = 0;
-	lClosureFFree = c;
 }
 
 lVal *lValAlloc(){
@@ -226,16 +193,6 @@ lVal *lCons(lVal *car, lVal *cdr){
 	return v;
 }
 
-uint lClosureNew(uint parent){
-	const uint i = lClosureAlloc();
-	if(i == 0){return 0;}
-	lClosure *c = &lClosureList[i];
-	c->parent = parent;
-	lClosure *p = &lClosureList[parent & CLO_MASK];
-	p->refCount++;
-	return i;
-}
-
 /* TODO: Both seem to write outside of buf if v gets too long */
 void lDisplayVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
@@ -252,166 +209,11 @@ void lWriteVal(lVal *v){
 	printf("%s\n",dispWriteBuf);
 }
 
-lVal *lSearchClosureSym(uint c, lVal *ret, const char *str, uint len){
-	if(c == 0){return ret;}
-
-	forEach(n,lCloData(c)){
-		lVal *e = lCaar(n);
-		if((e == NULL) || (e->type != ltSymbol)){continue;}
-		lSymbol *sym = lvSym(e->vCdr);
-		if(sym == NULL){continue;}
-		if(strncmp(sym->c,str,len)){continue;}
-		ret = lCons(e,ret);
-	}
-	return lSearchClosureSym(lCloParent(c),ret,str,len);
-}
-
-static lVal *lnfDefine(uint c, lClosure *ec, lVal *v, lVal *(*func)(uint ,lSymbol *)){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *sym = lCar(v);
-	lVal *nv = NULL;
-	if(lCdr(v) != NULL){
-		nv = lEval(ec,lCadr(v));
-	}
-	if(sym->type != ltSymbol){sym = lEval(&lClo(c),sym);}
-	if(sym->type != ltSymbol){return NULL;}
-	lSymbol *lsym = lvSym(sym->vCdr);
-	if((lsym != NULL) && (lsym->c[0] == ':')){return NULL;}
-	lVal *t = func(c,lsym);
-	if((t == NULL) || (t->type != ltPair)){return NULL;}
-	if((lCar(t) != NULL) && (lCar(t)->flags & lfConst)){
-		return lCar(t);
-	}else{
-		t->vList.car = nv;
-		return lCar(t);
-	}
-}
-
-static lVal *lUndefineClosureSym(uint c, lVal *s){
-	if(c == 0){return lValBool(false);}
-
-	lVal *lastPair = lCloData(c);
-	forEach(v,lCloData(c)){
-		lVal *n = lCar(v);
-		if((n == NULL) || (n->type != ltPair))  {break;}
-		const lVal *sym = lCar(n);
-		if(lSymCmp(s,sym) == 0){
-			lastPair->vList.cdr = lCdr(v);
-			return lValBool(true);
-		}
-		lastPair = v;
-	}
-	return lUndefineClosureSym(lCloParent(c),s);
-}
-static lVal *lnfUndef(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *sym = lCar(v);
-	if(sym->type != ltSymbol){sym = lEval(c,sym);}
-	if(sym->type != ltSymbol){return NULL;}
-	return lUndefineClosureSym(c - lClosureList,sym);
-}
-static lVal *lnfDef(lClosure *c, lVal *v){
-	return lnfDefine(c - lClosureList,c,v,lDefineClosureSym);
-}
-static lVal *lnfSet(lClosure *c, lVal *v){
-	return lnfDefine(c - lClosureList,c,v,lGetClosureSym);
-}
-
-static lVal *lSymTable(lClosure *c, lVal *v, int off, int len){
-	(void)v;
-	if((c == NULL) || (len == 0)){return v;}
-	forEach(n,c->data){
-		lVal *entry = lCadar(n);
-		if(entry == NULL){continue;}
-		if((entry->type != ltNativeFunc) && (entry->type != ltLambda)){continue;}
-
-		if(off > 0){--off; continue;}
-		v = lCons(lCaar(n),v);
-		if(--len <= 0){return v;}
-	}
-	if(c->parent == 0){return v;}
-	return lSymTable(&lClo(c->parent),v,off,len);
-}
-
-static lVal *lnfSymTable(lClosure *c, lVal *v){
-	lVal *loff = lnfInt(c,lEval(c,lCar(v)));
-	lVal *llen = lnfInt(c,lEval(c,lCadr(v)));
-	int off = loff->vInt;
-	int len = llen->vInt;
-	if(len <= 0){len = 1<<16;}
-	return lSymTable(c,NULL,off,len);
-}
-
-static int lSymCount(lClosure *c, int ret){
-	if(c == NULL){return ret;}
-	forEach(n,c->data){
-		lVal *entry = lCadar(n);
-		if(entry == NULL){continue;}
-		if((entry->type != ltNativeFunc) && (entry->type != ltLambda)){continue;}
-		++ret;
-	}
-	if(c->parent == 0){return ret;}
-	return lSymCount(&lClo(c->parent),ret);
-}
-
-static lVal *lnfSymCount(lClosure *c, lVal *v){
-	(void)v;
-	return lValInt(lSymCount(c,0));
-}
-
 lVal *lnfBegin(lClosure *c, lVal *v){
 	lVal *ret = NULL;
 	forEach(n,v){
 		ret = lEval(c,lCar(n));
 	}
-	return ret;
-}
-
-static lVal *lnfCl(lClosure *c, lVal *v){
-	if(c == NULL){return NULL;}
-	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lEval(c,lCar(v)));
-	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
-		return lnfCl(&lClo(c->parent),lCons(lValInt(t->vInt - 1),NULL));
-	}
-	return c->data != NULL ? c->data : lCons(NULL,NULL);
-}
-
-static lVal *lnfClText(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *t = lEval(c,lCar(v));
-	if(t == NULL){return NULL;}
-	if(t->type == ltLambda){
-		return lCloText(t->vCdr);
-	}else if(t->type == ltNativeFunc){
-		return lCons(lCdr(lNFN(t->vCdr).doc),NULL);
-	}
-	return NULL;
-}
-
-static lVal *lnfClData(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *t = lEval(c,lCar(v));
-	if(t == NULL){return NULL;}
-	if(t->type == ltLambda){
-		return lCloData(t->vCdr);
-	}else if(t->type == ltNativeFunc){
-		return lCar(lNFN(t->vCdr).doc);
-	}
-	return NULL;
-}
-
-static lVal *lnfClLambda(lClosure *c, lVal *v){
-	if(c == NULL){return NULL;}
-	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lEval(c,lCar(v)));
-	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
-		return lnfClLambda(&lClo(c->parent),lCons(lValInt(t->vInt - 1),NULL));
-	}
-	lVal *ret = lValAlloc();
-	ret->type = ltLambda;
-	ret->vCdr = c - lClosureList;
-	c->refCount++;
 	return ret;
 }
 
@@ -489,22 +291,6 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	ret = lCons(lValInt(lValActive),ret);
 	ret = lCons(lValSym(":value"),ret);
 	return ret;
-}
-
-static lVal *lnfLet(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	const uint nci = lClosureNew(c - lClosureList);
-	if(nci == 0){return NULL;}
-	lClosure *nc = &lClosureList[nci & CLO_MASK];
-	forEach(n,lCar(v)){
-		lnfDefine(nci,c,lCar(n),lDefineClosureSym);
-	}
-	lVal *ret = NULL;
-	forEach(n,lCdr(v)){
-		ret = lEval(nc,lCar(n));
-	}
-	c->refCount--;
-	return ret == NULL ? NULL : ret;
 }
 
 static inline bool lSymVariadic(lSymbol *s){
@@ -597,15 +383,6 @@ static lVal *lnfSetCdr(lClosure *c, lVal *v){
 	return t;
 }
 
-lVal *lResolve(lClosure *c, lVal *v){
-	v = lEval(c,lCar(v));
-	for(int i=0;i<16;i++){
-		if((v == NULL) || (v->type != ltSymbol)){break;}
-		v = lResolveSym(c - lClosureList,v);
-	}
-	return v;
-}
-
 lVal *lEval(lClosure *c, lVal *v){
 	if((c == NULL) || (v == NULL)){return NULL;}
 
@@ -655,12 +432,6 @@ lVal *lnfApply(lClosure *c, lVal *v){
 	}
 }
 
-void lDefineVal(lClosure *c, const char *str, lVal *val){
-	lVal *var = lDefineClosureSym(lCloI(c),lSymS(str));
-	if(var == NULL){return;}
-	var->vList.car = val;
-}
-
 lVal *lnfRead(lClosure *c, lVal *v){
 	lVal *t = lEval(c,v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
@@ -672,32 +443,6 @@ lVal *lnfRead(lClosure *c, lVal *v){
 	}else{
 		return t;
 	}
-}
-
-lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
-	const char *cur = sym;
-
-	// Run at most 64 times, just a precaution
-	for(int i=0;i<64;i++){
-		uint len;
-		for(len=0;len < sizeof(lSymbol);len++){ // Find the end of the current token, either space or 0
-			if(cur[len] == 0)    {break;}
-			if(isspace((u8)cur[len])){break;}
-		}
-		lVal *var = lDefineClosureSym(lCloI(c),lSymSL(cur,len));
-		if(var == NULL){
-			lPrintError("Error adding NFunc %s\n",sym);
-			return NULL;
-		}
-		var->vList.car = lNF;
-		for(;len<32;len++){ // Advance to the next non whitespace character
-			if(cur[len] == 0)     {return lNF;} // Or return if we reached the final 0 byte
-			if(!isspace((u8)cur[len])){break;}
-		}
-		cur += len;
-	}
-	lPrintError("Quite the amount of aliases we have there (%s)\n",sym);
-	return NULL;
 }
 
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
@@ -761,8 +506,9 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsArray(c);
 	lOperationsBinary(c);
 	lOperationsCasting(c);
+	lOperationsClosure(c);
 	lOperationsConditional(c);
-	lOperationsPredicates(c);
+	lOperationsPredicate(c);
 	lOperationsRandom(c);
 	lOperationsString(c);
 	lOperationsTime(c);
@@ -778,26 +524,15 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"apply",          "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
 	lAddNativeFunc(c,"eval",           "[expr]",         "Evaluate EXPR",                              lEval);
 	lAddNativeFunc(c,"read",           "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
-	lAddNativeFunc(c,"resolve",        "[sym]",          "Resolve SYM until it is no longer a symbol", lResolve);
 	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
 	lAddNativeFunc(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                        lnfLambda);
 	lAddNativeFunc(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                  lnfDynamic);
 	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
-	lAddNativeFunc(c,"cl",             "[i]",            "Return closure",                             lnfCl);
-	lAddNativeFunc(c,"cl-lambda",      "[i]",            "Return closure as a lambda",                 lnfClLambda);
-	lAddNativeFunc(c,"cl-text",        "[f]",            "Return closures text segment",               lnfClText);
-	lAddNativeFunc(c,"cl-data",        "[f]",            "Return closures data segment",               lnfClData);
 	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
-	lAddNativeFunc(c,"symbol-table",   "[off len]",      "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
-	lAddNativeFunc(c,"symbol-count",   "[]",             "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
-	lAddNativeFunc(c,"define def","[sym val]",     "Define a new symbol SYM and link it to value VAL",                  lnfDef);
-	lAddNativeFunc(c,"undefine!", "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
-	lAddNativeFunc(c,"let",       "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddNativeFunc(c,"begin",     "[...body]",     "Evaluate ...body in order and returns the last result",            lnfBegin);
 	lAddNativeFunc(c,"quote",     "[v]",           "Return v as is without evaluating",                                lnfQuote);
-	lAddNativeFunc(c,"set!",      "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
 }
 
 lClosure *lClosureNewRoot(){
@@ -810,46 +545,6 @@ lClosure *lClosureNewRoot(){
 	lEval(c,lWrap(lRead((const char *)stdlib_nuj_data)));
 	lAddPlatformVars(c);
 	return c;
-}
-
-static lVal *lGetSym(uint c, lSymbol *s){
-	if((c == 0) || (s == NULL)){return NULL;}
-	uint sym = lvSymI(s);
-	forEach(v,lCloData(c)){
-		lVal *cursym = lCaar(v);
-		if((cursym == NULL) || (sym != cursym->vCdr)){continue;}
-		return lCdar(v);
-	}
-	return NULL;
-}
-
-lVal *lGetClosureSym(uint c, lSymbol *s){
-	if(c == 0){return NULL;}
-	lVal *t = lGetSym(c,s);
-	return t != NULL ? t : lGetClosureSym(lCloParent(c),s);
-}
-
-lVal *lDefineClosureSym(uint c, lSymbol *s){
-	if(c == 0){return NULL;}
-	lVal *get = lGetSym(c,s);
-	if(get != NULL){return get;}
-	lVal *t = lCons(lValSymS(s),lCons(NULL,NULL));
-	if(t == NULL){return NULL;}
-	if(lCloData(c) == NULL){
-		lCloData(c) = lCons(t,NULL);
-	}else{
-		lVal *cdr = NULL;
-		for(cdr = lCloData(c);(cdr != NULL) && (lCdr(cdr) != NULL);cdr = lCdr(cdr)){}
-		if(cdr == NULL){return NULL;}
-		cdr->vList.cdr = lCons(t,NULL);
-	}
-	return t->vList.cdr;
-}
-
-lVal *lResolveSym(uint c, lVal *v){
-	if((v == NULL) || (v->type != ltSymbol)){return NULL;}
-	lVal *ret = lGetClosureSym(c,lvSym(v->vCdr));
-	return ret == NULL ? v : lCar(ret);
 }
 
 lVal  *lApply(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){

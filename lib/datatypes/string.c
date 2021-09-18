@@ -7,8 +7,9 @@
 
 #include "../nujel.h"
 #include "../casting.h"
-#include "vec.h"
 #include "array.h"
+#include "closure.h"
+#include "vec.h"
 
 #include <ctype.h>
 #include <stdio.h>

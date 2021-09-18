@@ -103,7 +103,7 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 	return lValBool(t == NULL);
 }
 
-void lOperationsPredicates(lClosure *c){
+void lOperationsPredicate(lClosure *c){
 	lAddNativeFunc(c,"less? <",           "[a b]","#t if A < B",  lnfLess);
 	lAddNativeFunc(c,"less-equal? <=",    "[a b]","#t if A <= B", lnfLessEqual);
 	lAddNativeFunc(c,"equal? eqv? eq? =", "[a b]","#t if A == B", lnfEqual);
