@@ -4,7 +4,9 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "reader.h"
+#include "datatypes/list.h"
 #include "datatypes/symbol.h"
+#include "datatypes/val.h"
 
 #include <ctype.h>
 #include <math.h>

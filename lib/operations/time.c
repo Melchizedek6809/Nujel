@@ -7,6 +7,7 @@
 #include "../casting.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
+#include "../datatypes/val.h"
 
 #include <time.h>
 #include <sys/time.h>

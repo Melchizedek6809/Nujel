@@ -8,8 +8,10 @@
 #include "nujel.h"
 #include "vec.h"
 #include "datatypes/closure.h"
+#include "datatypes/list.h"
 #include "datatypes/native-function.h"
 #include "datatypes/string.h"
+#include "datatypes/val.h"
 #include "datatypes/vec.h"
 #include "operations/string.h"
 

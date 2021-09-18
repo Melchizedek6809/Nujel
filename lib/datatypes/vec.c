@@ -3,6 +3,7 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
+#include "val.h"
 #include "vec.h"
 #include "../nujel.h"
 

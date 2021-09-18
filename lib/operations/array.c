@@ -5,7 +5,9 @@
  */
 #include "array.h"
 #include "../datatypes/array.h"
+#include "../datatypes/list.h"
 #include "../datatypes/native-function.h"
+#include "../datatypes/val.h"
 #include "../casting.h"
 
 #include <stdlib.h>

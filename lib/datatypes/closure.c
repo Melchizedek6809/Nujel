@@ -4,7 +4,9 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "closure.h"
+#include "list.h"
 #include "symbol.h"
+#include "val.h"
 #include "../nujel.h"
 
 #include <ctype.h>

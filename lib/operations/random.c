@@ -6,6 +6,7 @@
 #include "random.h"
 #include "../random-number-generator.h"
 #include "../datatypes/native-function.h"
+#include "../datatypes/val.h"
 
 static lVal *lnfRandom(lClosure *c, lVal *v){
 	int n = 0;

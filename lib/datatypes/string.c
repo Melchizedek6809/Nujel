@@ -9,7 +9,9 @@
 #include "../casting.h"
 #include "array.h"
 #include "closure.h"
+#include "list.h"
 #include "symbol.h"
+#include "val.h"
 #include "vec.h"
 
 #include <ctype.h>

@@ -11,15 +11,18 @@
 #include "random-number-generator.h"
 #include "datatypes/array.h"
 #include "datatypes/closure.h"
+#include "datatypes/list.h"
 #include "datatypes/native-function.h"
 #include "datatypes/string.h"
 #include "datatypes/symbol.h"
+#include "datatypes/val.h"
 #include "datatypes/vec.h"
 #include "operations/arithmetic.h"
 #include "operations/array.h"
 #include "operations/binary.h"
 #include "operations/closure.h"
 #include "operations/conditional.h"
+#include "operations/list.h"
 #include "operations/predicates.h"
 #include "operations/random.h"
 #include "operations/string.h"
@@ -34,109 +37,16 @@
 
 extern u8 stdlib_nuj_data[];
 
-lVal     lValList[VAL_MAX];
-uint     lValActive = 0;
-uint     lValMax    = 1;
-uint     lValFFree  = 0;
-
 char dispWriteBuf[1<<16];
 
 void lInit(){
-	lValActive      = 0;
-	lValMax         = 1;
-
 	lInitArray();
 	lInitClosure();
 	lInitNativeFunctions();
 	lInitStr();
+	lInitVal();
 	lInitVec();
 	lInitSymbol();
-}
-
-lVal *lValAlloc(){
-	lVal *ret;
-	if(lValFFree == 0){
-		if(lValMax >= VAL_MAX-1){
-			exit(1);
-			lPrintError("lVal OOM ");
-			return NULL;
-		}
-		ret = &lValList[lValMax++];
-	}else{
-		ret       = &lValList[lValFFree & VAL_MASK];
-		lValFFree = ret->vCdr;
-	}
-	lValActive++;
-	*ret = (lVal){0};
-	return ret;
-}
-
-void lGUIWidgetFree(lVal *v);
-void lValFree(lVal *v){
-	if((v == NULL) || (v->type == ltNoAlloc)){return;}
-	if(v->type == ltLambda){
-		lClo(v->vCdr).refCount--;
-	}else if(v->type == ltGUIWidget){
-		lGUIWidgetFree(v);
-	}
-	lValActive--;
-	v->type   = ltNoAlloc;
-	v->vCdr   = lValFFree;
-	lValFFree = v - lValList;
-}
-
-lVal *lValCopy(lVal *dst, const lVal *src){
-	if((dst == NULL) || (src == NULL)){return NULL;}
-	*dst = *src;
-	if(dst->type == ltString){
-		dst->vCdr = lStringNew(lStrData(src),lStringLength(&lStr(src)));
-	}else if(dst->type == ltVec){
-		dst->vCdr = lVecAlloc();
-		lVecV(dst->vCdr) = lVecV(src->vCdr);
-	}else if(dst->type == ltPair){
-		dst->vList.car = lValDup(dst->vList.car);
-		dst->vList.cdr = lValDup(dst->vList.cdr);
-	}
-	return dst;
-}
-
-lVal *lValInf(){
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
-	ret->type = ltInf;
-	return ret;
-}
-
-lVal *lValInt(int v){
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
-	ret->type = ltInt;
-	ret->vInt = v;
-	return ret;
-}
-
-lVal *lValFloat(float v){
-	lVal *ret   = lValAlloc();
-	if(ret == NULL){return ret;}
-	ret->type   = ltFloat;
-	ret->vFloat = v;
-	return ret;
-}
-lVal *lValBool(bool v){
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
-	ret->type = ltBool;
-	ret->vBool = v;
-	return ret;
-}
-
-lVal *lCons(lVal *car, lVal *cdr){
-	lVal *v = lValAlloc();
-	if(v == NULL){return NULL;}
-	v->type = ltPair;
-	v->vList.car = car;
-	v->vList.cdr = cdr;
-	return v;
 }
 
 /* TODO: Both seem to write outside of buf if v gets too long */
@@ -285,34 +195,6 @@ static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
 	return ret;
 }
 
-static lVal *lnfCar(lClosure *c, lVal *v){
-	return lCar(lEval(c,lCar(v)));
-}
-
-static lVal *lnfCdr(lClosure *c, lVal *v){
-	return lCdr(lEval(c,lCar(v)));
-}
-
-static lVal *lnfCons(lClosure *c, lVal *v){
-	return lCons(lEval(c,lCar(v)),lEval(c,lCadr(v)));
-}
-static lVal *lnfSetCar(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
-	if((t == NULL) || (t->type != ltPair)){return NULL;}
-	lVal *car = NULL;
-	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){car = lEval(c,lCadr(v));}
-	t->vList.car = car;
-	return t;
-}
-static lVal *lnfSetCdr(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
-	if((t == NULL) || (t->type != ltPair)){return NULL;}
-	lVal *cdr = NULL;
-	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){cdr = lEval(c,lCadr(v));}
-	t->vList.cdr = cdr;
-	return t;
-}
-
 lVal *lEval(lClosure *c, lVal *v){
 	if((c == NULL) || (v == NULL)){return NULL;}
 
@@ -379,19 +261,19 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	v = lEval(c,lCar(v));
 	if(v == NULL){return lValSym(":nil");}
 	switch(v->type){
-	case ltNoAlloc:    return lValSym(":no-alloc");
-	case ltBool:       return lValSym(":bool");
-	case ltPair:       return lValSym(":pair");
-	case ltLambda:     return lValSym(":lambda");
-	case ltInt:        return lValSym(":int");
-	case ltFloat:      return lValSym(":float");
-	case ltVec:        return lValSym(":vec");
-	case ltString:     return lValSym(":string");
-	case ltSymbol:     return lValSym(":symbol");
-	case ltNativeFunc: return lValSym(":native-function");
-	case ltInf:        return lValSym(":infinity");
-	case ltArray:      return lValSym(":array");
-	case ltGUIWidget:  return lValSym(":gui-widget");
+	case ltNoAlloc:    return lValSymS(lSymLTNoAlloc);
+	case ltBool:       return lValSymS(lSymLTBool);
+	case ltPair:       return lValSymS(lSymLTPair);
+	case ltLambda:     return lValSymS(lSymLTLambda);
+	case ltInt:        return lValSymS(lSymLTInt);
+	case ltFloat:      return lValSymS(lSymLTFloat);
+	case ltVec:        return lValSymS(lSymLTVec);
+	case ltString:     return lValSymS(lSymLTString);
+	case ltSymbol:     return lValSymS(lSymLTSymbol);
+	case ltNativeFunc: return lValSymS(lSymLTNativeFunction);
+	case ltInf:        return lValSymS(lSymLTInfinity);
+	case ltArray:      return lValSymS(lSymLTArray);
+	case ltGUIWidget:  return lValSymS(lSymLTGUIWidget);
 	}
 	return lValSym(":nil");
 }
@@ -424,11 +306,17 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
+lVal *lConst(lVal *v){
+	if(v == NULL){
+		return v;
+	}
+	v->flags |= lfConst;
+	return v;
+}
+
+
 static lVal *lnfConstant(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
-	if(t == NULL){return NULL;}
-	t->flags |= lfConst;
-	return t;
+	return lConst(lEval(c,lCar(v)));
 }
 
 static void lAddCoreFuncs(lClosure *c){
@@ -438,19 +326,13 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsCasting(c);
 	lOperationsClosure(c);
 	lOperationsConditional(c);
+	lOperationsList(c);
 	lOperationsPredicate(c);
 	lOperationsRandom(c);
 	lOperationsString(c);
 	lOperationsTime(c);
 	lOperationsVector(c);
 
-	lAddNativeFunc(c,"car",     "[list]",     "Returs the head of LIST",                          lnfCar);
-	lAddNativeFunc(c,"cdr",     "[list]",     "Return the rest of LIST",                          lnfCdr);
-	lAddNativeFunc(c,"cons",    "[car cdr]",  "Return a new pair of CAR and CDR",                lnfCons);
-	lAddNativeFunc(c,"set-car!","[list car]", "Set the CAR of LIST",                           lnfSetCar);
-	lAddNativeFunc(c,"set-cdr!","[list cdr]", "Set the CDR of LIST",                           lnfSetCdr);
-
-	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
 	lAddNativeFunc(c,"apply",          "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
 	lAddNativeFunc(c,"eval",           "[expr]",         "Evaluate EXPR",                              lEval);
 	lAddNativeFunc(c,"read",           "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
@@ -460,9 +342,10 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
 	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
+	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
 
-	lAddNativeFunc(c,"begin",     "[...body]",     "Evaluate ...body in order and returns the last result",            lnfBegin);
-	lAddNativeFunc(c,"quote",     "[v]",           "Return v as is without evaluating",                                lnfQuote);
+	lAddNativeFunc(c,"begin",          "[...body]",      "Evaluate ...body in order and returns the last result",            lnfBegin);
+	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
 }
 
 lClosure *lClosureNewRoot(){
@@ -590,10 +473,6 @@ lVal *getLArgL(lClosure *c, lVal *v,lVal **res){
 	return lCdr(v);
 }
 
-lVal *lValDup(const lVal *v){
-	return v == NULL ? NULL : lValCopy(lValAlloc(),v);
-}
-
 lVal *lWrap(lVal *v){
 	return lCons(lValSymS(symBegin),v);
 }
@@ -612,58 +491,4 @@ lVal *lEvalCastNumeric(lClosure *c, lVal *v){
 	lType type = lTypecastList(t);
 	if(type == ltString){type = ltFloat;}
 	return lCast(c,t,type);
-}
-
-lVal *lLastCar(lVal *v){
-	forEach(a,v){
-		if(lCdr(a) == NULL){return lCar(a);}
-	}
-	return NULL;
-}
-
-lVal *lCar(lVal *v){
-	return (v != NULL) && (v->type == ltPair) ? v->vList.car : NULL;
-}
-
-lVal *lCdr(lVal *v){
-	return (v != NULL) && (v->type == ltPair) ? v->vList.cdr : NULL;
-}
-
-lVal *lCaar(lVal *v){
-	return lCar(lCar(v));
-}
-
-lVal *lCadr(lVal *v){
-	return lCar(lCdr(v));
-}
-
-lVal *lCdar(lVal *v){
-	return lCdr(lCar(v));
-}
-
-lVal *lCddr(lVal *v){
-	return lCdr(lCdr(v));
-}
-
-lVal *lCadar(lVal *v){
-	return lCar(lCdr(lCar(v)));
-}
-
-lVal *lCaddr(lVal *v){
-	return lCar(lCdr(lCdr(v)));
-}
-
-lVal *lCdddr(lVal *v){
-	return lCdr(lCdr(lCdr(v)));
-}
-
-int lListLength(lVal *v){
-	int i = 0;
-	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
-	return i;
-}
-
-lVal *lConst(lVal *v){
-	v->flags |= lfConst;
-	return v;
 }

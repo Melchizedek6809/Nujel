@@ -7,8 +7,10 @@
 
 #include "../casting.h"
 #include "../nujel.h"
+#include "../datatypes/list.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
+#include "../datatypes/val.h"
 
 #include <ctype.h>
 #include <math.h>

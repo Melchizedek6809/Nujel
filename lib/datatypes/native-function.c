@@ -4,7 +4,9 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "closure.h"
+#include "list.h"
 #include "native-function.h"
+#include "val.h"
 #include "../reader.h"
 
 lNFunc   lNFuncList[NFN_MAX];

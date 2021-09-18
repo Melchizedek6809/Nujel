@@ -5,6 +5,8 @@
  */
 #include "vec.h"
 #include "../datatypes/native-function.h"
+#include "../datatypes/list.h"
+#include "../datatypes/val.h"
 #include "../datatypes/vec.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){

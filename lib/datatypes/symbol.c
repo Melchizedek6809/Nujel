@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "symbol.h"
+#include "val.h"
 #include "../nujel.h"
 
 #include <stdlib.h>
@@ -16,6 +17,7 @@ uint    lSymbolMax    = 1;
 uint    lSymbolFFree  = 0;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
+lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
 	lSymbolActive   = 0;
@@ -31,6 +33,20 @@ void lInitSymbol(){
 	symLet      = lSymS("let");
 	symBegin    = lSymS("begin");
 	symMinus    = lSymS("-");
+
+	lSymLTNoAlloc        = lSymS(":no-alloc");
+	lSymLTBool           = lSymS(":bool");
+	lSymLTPair           = lSymS(":pair");
+	lSymLTLambda         = lSymS(":lambda");
+	lSymLTInt            = lSymS(":int");
+	lSymLTFloat          = lSymS(":float");
+	lSymLTVec            = lSymS(":vec");
+	lSymLTString         = lSymS(":string");
+	lSymLTSymbol         = lSymS(":symbol");
+	lSymLTNativeFunction = lSymS(":native-function");
+	lSymLTInfinity       = lSymS(":infinity");
+	lSymLTArray          = lSymS(":array");
+	lSymLTGUIWidget      = lSymS(":gui-widget");
 }
 
 lSymbol *lSymSL(const char *str, uint len){

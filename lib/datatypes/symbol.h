@@ -14,14 +14,18 @@ extern uint     lSymbolMax;
 #define lvSymI(s) (s == NULL ? 0 : s - lSymbolList)
 #define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : lvSym(v->vCdr))
 
-void lInitSymbol();
-lVal     *lValSymS (const lSymbol *s);
-lVal     *lValSym  (const char *s);
-lSymbol  *lSymS    (const char *s);
-lSymbol  *lSymSL   (const char *s, uint len);
+extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
 
-int       lSymCmp  (const lVal *a,const lVal *b);
-int       lSymEq   (const lSymbol *a,const lSymbol *b);
+extern lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
-bool      lSymVariadic(const lSymbol *s);
-bool      lSymNoEval  (const lSymbol *s);
+void      lInitSymbol  ();
+lVal     *lValSymS     (const lSymbol *s);
+lVal     *lValSym      (const char *s);
+lSymbol  *lSymS        (const char *s);
+lSymbol  *lSymSL       (const char *s, uint len);
+
+int       lSymCmp      (const lVal *a,const lVal *b);
+int       lSymEq       (const lSymbol *a,const lSymbol *b);
+
+bool      lSymVariadic (const lSymbol *s);
+bool      lSymNoEval   (const lSymbol *s);
