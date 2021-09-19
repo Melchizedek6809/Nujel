@@ -124,6 +124,11 @@ static lVal *lnfSelf(lClosure *c, lVal *v){
 	return lnfSelf(&lClosureList[c->parent],v);
 }
 
+static lVal *lnfQuote(lClosure *c, lVal *v){
+	(void)c;
+	return lCar(v);
+}
+
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	lVal *ret = NULL;
@@ -340,6 +345,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
 
 	lAddNativeFunc(c,"begin",          "[...body]",      "Evaluate ...body in order and returns the last result",            lnfBegin);
+	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
 }
 
 lClosure *lClosureNewRoot(){

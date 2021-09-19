@@ -16,11 +16,6 @@
 ;; Contains various little pieces that were implemented in nujel instead of
 ;; C because of various reasons
 
-[def quote [λ [@v]
-	"Return V as is, without evaluating"
-	@v
-]]
-
 [def default [λ [arg default-value]
 	"Returns ARG or DEFAULT-VALUE if ARG is #nil"
 	[if arg arg default-value]
