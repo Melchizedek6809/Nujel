@@ -4,6 +4,7 @@
 struct lClosure {
 	lVal *data;
 	lVal *text;
+	lVal *source;
 	u16 parent;
 	u16 nextFree;
 	u16 flags;
@@ -25,6 +26,7 @@ extern uint     lClosureActive;
 #define lCloParent(i) lClosureList[i & CLO_MASK].parent
 #define lCloData(i)   lClosureList[i & CLO_MASK].data
 #define lCloText(i)   lClosureList[i & CLO_MASK].text
+#define lCloSource(i) lClosureList[i & CLO_MASK].source
 
 void      lInitClosure      ();
 uint      lClosureAlloc     ();

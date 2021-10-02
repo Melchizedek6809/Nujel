@@ -77,6 +77,7 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	const uint cli = lClosureNew(c - lClosureList);
 	if(cli == 0){return NULL;}
 	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){return NULL;}
+	lCloSource(cli) = lCdr(v);
 	lCloText(cli) = lCdr(v);
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
@@ -90,6 +91,33 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 		(void)t;
 	}
 
+	return ret;
+}
+
+static lVal *lnfDisasm(lClosure *c, lVal *v){
+	lVal *t = lEval(c,lCar(v));
+	if(t->type == ltLambda){
+		return lCloText(t->vCdr);
+	}
+	return t;
+}
+
+static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
+	const uint cli = lClosureNew(c - lClosureList);
+	if(cli == 0){return NULL;}
+	lCloSource(cli) = lCadr(v);
+	lCloText(cli) = lCaddr(v);
+	lVal *ret = lValAlloc();
+	if(ret == NULL){return NULL;}
+	ret->type = ltLambda;
+	ret->vCdr = cli;
+
+	forEach(n,lCar(v)){
+		if(lGetType(lCar(n)) != ltSymbol){continue;}
+		lVal *t = lDefineClosureSym(cli,lGetSymbol(lCar(n)));
+		t->vList.car = NULL;
+		(void)t;
+	}
 	return ret;
 }
 
@@ -338,6 +366,8 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"read",           "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
 	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
 	lAddNativeFunc(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                        lnfLambda);
+	lAddNativeFunc(c,"λ*",             "[args source body]", "Create a new, raw, lambda",              lnfLambdaRaw);
+	lAddNativeFunc(c,"disassemble disasm","[fun]",          "Return the text segment of a FUN",           lnfDisasm);
 	lAddNativeFunc(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                  lnfDynamic);
 	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);

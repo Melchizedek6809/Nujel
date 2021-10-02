@@ -265,7 +265,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			cur = lSWriteVal(cv,cur,bufEnd,indentLevel,display);
 		}
 		if(!(cl->flags & lfObject)){*cur++ = ']';}
-		lVal *cloText = lCloText(v->vCdr);
+		lVal *cloText = lCloSource(v->vCdr);
 		forEach(n,cloText){
 			*cur++ = '\n';
 			for(int i=indentLevel;i>=0;i--){*cur++=' ';}
