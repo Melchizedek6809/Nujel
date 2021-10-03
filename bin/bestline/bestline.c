@@ -1520,7 +1520,9 @@ static char *GetLineChar(int fin, int fout) {
                     break;
                 }
             } else {
-                write(fout, "\n", 1);
+                if(write(fout, "\n", 1) <= 0){
+			break;
+		}
                 break;
             }
         } else if (seq[0] == Ctrl('D')) {
