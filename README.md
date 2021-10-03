@@ -1,3 +1,5 @@
+![Automated Tests](https://github.com/Melchizedek6809/Nujel/actions/workflows/tests.yml/badge.svg?branch=master)
+
 # Nujel
 A Lisp inspired language for games and other latency sensitive applications.
 ## This Language should NOT be used for anything important right now, maybe in a couple years
