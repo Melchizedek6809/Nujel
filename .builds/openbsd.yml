@@ -1,0 +1,12 @@
+image: openbsd/latest
+packages:
+  - gmake
+sources:
+  - https://git.sr.ht/~melchizedek6809/Nujel
+tasks:
+  - compile: |
+      cd Nujel
+      gmake -j4
+  - test: |
+      cd Nujel
+      gmake test
