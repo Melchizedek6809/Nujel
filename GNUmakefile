@@ -20,14 +20,6 @@ BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj')
 
 NUJEL       := ./nujel
 ASSET       := ./tools/assets
-ifeq ($(OS),Windows_NT)
-	NUJEL := ./nujel.exe
-	ASSET := ./tools/assets.exe
-else
-	BIN_SRCS += vendor/bestline/bestline.c
-endif
-BIN_OBJS    := $(BIN_SRCS:.c=.o)
-BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
 CC                   := cc
 CFLAGS               := -g -D_GNU_SOURCE
@@ -39,6 +31,16 @@ LIBS                 := -lm
 
 RELEASE_OPTIMIZATION := -O3
 VERSION_ARCH         := $(shell uname -m)
+
+ifeq ($(OS),Windows_NT)
+	NUJEL := ./nujel.exe
+	ASSET := ./tools/assets.exe
+	LIBS  += -lpthread
+else
+	BIN_SRCS += vendor/bestline/bestline.c
+endif
+BIN_OBJS    := $(BIN_SRCS:.c=.o)
+BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
 all: $(NUJEL)
 .PHONY: all release .deps
