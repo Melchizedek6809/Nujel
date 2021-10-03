@@ -49,6 +49,25 @@
 	[eq? 0 val]
 ]]
 
+[def list-equal? [λ [a b]
+	"#t if A and B are equal"
+	;[display ["A:" a "B:" b "\n"]]
+	[cond [[or [nil? a] [nil? b]]
+	       [and [nil? a] [nil? b]]]
+	      [[or [nil? [car a]] [nil? [car b]]]
+	       [and [nil? [car a]] [nil? [car b]]]]
+	      [[and [pair? [car a]] [pair? [car b]]]
+	       [if [list-equal? [car a] [car b]]
+		   [list-equal? [cdr a] [cdr b]]
+		   #f]]
+	      [[equal? [type-of [car a]] [type-of [car b]]]
+	       [if [equal? [car a] [car b]]
+		   [list-equal? [cdr a] [cdr b]]
+		   #f]]
+	      [#t #f]
+	]
+]]
+
 [def there-exists? [λ [l pred]
 	"Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
 	[cond [[nil? l] #f]
