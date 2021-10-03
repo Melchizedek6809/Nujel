@@ -7,7 +7,8 @@ itself further, one commit at a time.
 
 | Operating System  | CI Status |
 |-------------------|-----------|
-| Ubuntu            | [![Automated Tests](https://github.com/Melchizedek6809/Nujel/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/tests.yml)|
+| MacOS             | [![MacOS CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml)|
+| Ubuntu            | [![Ubuntu CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml)|
 | Arch Linux        | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/arch.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/arch.yml?)|
 | Alpine Linux      | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/alpine.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/alpine.yml?)|
 | FreeBSD           | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/freebsd.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/freebsd.yml?)|

@@ -1,14 +1,14 @@
-name: CI
+name: MacOS CI
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
