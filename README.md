@@ -1,10 +1,16 @@
-![Automated Tests](https://github.com/Melchizedek6809/Nujel/actions/workflows/tests.yml/badge.svg?branch=master)
 
 # Nujel
 A Lisp inspired language for games and other latency sensitive applications.
 ## This Language should NOT be used for anything important right now, maybe in a couple years
 For now Nujel is still pretty similar to others Lisps, but it will probably distance
 itself further one commit at a time.
+
+# CI
+Ubuntu ![Automated Tests](https://github.com/Melchizedek6809/Nujel/actions/workflows/tests.yml/badge.svg?branch=master)
+
+Arch Linux [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/arch.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/arch.yml?)
+
+Alpine Linux [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/alpine.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/alpine.yml?)
 
 ### Infix operations
 One part that is quite different to most Lisps is that one can evaluate `[display [1 + 2 * 3]]` and get `7`,
