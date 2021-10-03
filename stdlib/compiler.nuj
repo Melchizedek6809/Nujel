@@ -1,0 +1,53 @@
+;; Contains the self-hosting Nujel compiler
+
+[def optimize
+     [let []
+
+       [def optimize-do-args
+	    [λ [args]
+	      [if [nil? [cdr args]]
+		  args
+		  [if [pair? [car args]]
+		      [let [[ocar [optimize [car args]]]]
+			[if [pair? ocar]
+			    [cons ocar [optimize-do-args [cdr args]]]
+			    [optimize-do-args [cdr args]]]]
+		      [optimize-do-args [cdr args]]]]]]
+
+       [def optimize-do
+	    [λ [source]
+	      [let [[args [optimize-do-args [cdr source]]]]
+		[if [nil? [cdr args]]
+		    [car args]
+		    [cons do args]]]]]
+
+       [λ [source]
+	 "Optimize the forms in source"
+	 [let [[op [resolve [car source]]]]
+	   [cond [[eq? op do] [optimize-do source]]
+		 [#t source]]]]
+
+]]
+
+
+[def macroexpand
+     [λ [source]
+       "Expand all macros in the forms contained in SOURCE"
+       source]]
+
+[def assemble
+     [λ [source]
+       "Assembles the forms in SOURCE into low level bytecode instructions"
+       source]]
+
+[def compile
+     [λ [source]
+       "Macroexpand, optimize and assemble the forms in SOURCE"
+       [assemble [optimize [macroexpand source]]]]]
+
+[def λδ
+     [λ [@args @...body]
+       "Define a λ with the self-hosting Nujel compiler/optimizer"
+       [λ* @args @...body [compile [cons do @...body]]]]]
+
+[def +1 [λδ [α] "Add 1 to α" [+ 1 α]]]

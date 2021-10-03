@@ -109,3 +109,7 @@ run: $(NUJEL)
 .PHONY: rund
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
+
+.PHONY: runn
+runn: $(NUJEL)
+	$(NUJEL)

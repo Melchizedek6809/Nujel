@@ -94,25 +94,18 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfDisasm(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
-	if(t->type == ltLambda){
-		return lCloText(t->vCdr);
-	}
-	return t;
-}
-
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	const uint cli = lClosureNew(c - lClosureList);
 	if(cli == 0){return NULL;}
-	lCloSource(cli) = lCadr(v);
-	lCloText(cli) = lCaddr(v);
+	lCloSource(cli) = lEval(c,lCadr(v));
+	lCloText(cli) = lEval(c,lCaddr(v));
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltLambda;
 	ret->vCdr = cli;
+	lVal *args = lEval(c,lCar(v));
 
-	forEach(n,lCar(v)){
+	forEach(n,args){
 		if(lGetType(lCar(n)) != ltSymbol){continue;}
 		lVal *t = lDefineClosureSym(cli,lGetSymbol(lCar(n)));
 		t->vList.car = NULL;
@@ -367,14 +360,13 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
 	lAddNativeFunc(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                        lnfLambda);
 	lAddNativeFunc(c,"λ*",             "[args source body]", "Create a new, raw, lambda",              lnfLambdaRaw);
-	lAddNativeFunc(c,"disassemble disasm","[fun]",       "Return the text segment of a FUN",           lnfDisasm);
 	lAddNativeFunc(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                  lnfDynamic);
 	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
 	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
 	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
 
-	lAddNativeFunc(c,"begin",          "[...body]",      "Evaluate ...body in order and returns the last result",            lnfBegin);
+	lAddNativeFunc(c,"do begin",       "[...body]",      "Evaluate ...body in order and returns the last result",            lnfBegin);
 	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
 }
 
