@@ -9,10 +9,32 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "bestline/bestline.h"
+#ifdef __MINGW32__
+    #include <windows.h>
+	#include <shlobj.h>
+#else
+	#include "../vendor/bestline/bestline.h"
+#endif
+
 #include "../lib/api.h"
 
 extern char binlib_nuj_data[];
+
+#ifdef __MINGW32__
+	static void bestlineHistoryLoad(const char *path){(void)path;}
+	static void bestlineHistorySave(const char *path){(void)path;}
+	static void bestlineHistoryAdd (const char *line){(void)line;}
+
+	static char *bestline(const char *prompt){
+		static char buf[4096];
+		printf("%s",prompt);
+		fflush(stdout);
+		if(fgets(buf,sizeof(buf),stdin) == NULL){
+			return NULL;
+		}
+		return buf;
+	}
+#endif
 
 void lGUIWidgetFree(lVal *v){
 	(void)v;
@@ -76,10 +98,14 @@ const char *getHistoryPath(){
 	#ifdef __MINGW32__
 	char home[512];
 	HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, home);
-	if(result != S_OK){return;}
+	if(result != S_OK){
+		return NULL;
+	}
 	#else
 	const char* home = getenv("HOME");
-	if(!home){return NULL;}
+	if(!home){
+		return NULL;
+	}
 	#endif
 
 	if(snprintf(buf,sizeof(buf),"%s/.nujel_history",home) <= 0){ // snprintf instead of strcpy/strcat

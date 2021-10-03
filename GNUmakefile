@@ -16,8 +16,6 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
-BIN_OBJS    := $(BIN_SRCS:.c=.o)
-BIN_DEPS    := ${BIN_SRCS:.c=.d}
 BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj')
 
 NUJEL       := ./nujel
@@ -25,7 +23,11 @@ ASSET       := ./tools/assets
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
+else
+	BIN_SRCS += vendor/bestline/bestline.c
 endif
+BIN_OBJS    := $(BIN_SRCS:.c=.o)
+BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
 CC                   := cc
 CFLAGS               := -g -D_GNU_SOURCE
