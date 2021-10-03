@@ -30,12 +30,12 @@ endif
 CC                   := cc
 CFLAGS               := -g -D_GNU_SOURCE
 CSTD                 := -std=c99
-OPTIMIZATION         := -O2 -fno-lto -ffast-math -freciprocal-math
+OPTIMIZATION         := -O2
 WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing-braces
 
 LIBS                 := -lm
 
-RELEASE_OPTIMIZATION := -O3 -flto -ffast-math -freciprocal-math
+RELEASE_OPTIMIZATION := -O3
 VERSION_ARCH         := $(shell uname -m)
 
 all: $(NUJEL)
