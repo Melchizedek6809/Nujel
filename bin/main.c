@@ -9,18 +9,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../lib/common.h"
-#include "../lib/nujel.h"
-#include "../lib/garbage-collection.h"
-#include "../lib/casting.h"
-#include "../lib/reader.h"
-#include "../lib/datatypes/closure.h"
-#include "../lib/datatypes/list.h"
-#include "../lib/datatypes/native-function.h"
-#include "../lib/datatypes/string.h"
-#include "../lib/datatypes/symbol.h"
-#include "../lib/datatypes/val.h"
-#include "../lib/operations/string.h"
+#include "bestline/bestline.h"
+#include "../lib/api.h"
 
 extern char binlib_nuj_data[];
 
@@ -80,18 +70,41 @@ static void saveFile(const char *filename,const void *buf, size_t len){
 	fclose(fp);
 }
 
+const char *getHistoryPath(){
+	static char buf[512];
+
+	#ifdef __MINGW32__
+	char home[512];
+	HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, home);
+	if(result != S_OK){return;}
+	#else
+	const char* home = getenv("HOME");
+	if(!home){return NULL;}
+	#endif
+
+	if(snprintf(buf,sizeof(buf),"%s/.nujel_history",home) <= 0){ // snprintf instead of strcpy/strcat
+		fprintf(stderr,"Can't create historyPath, maybe your $HOME is too big?\n");
+		return NULL;
+	}
+	return buf;
+}
+
 void doRepl(lClosure *c){
-	static char str[4096];
+	const char *historyPath = getHistoryPath();
+	if(historyPath){
+		bestlineHistoryLoad(historyPath);
+	}
 	lVal *lastlsym = lValSym("lastl");
 	lVal *lastl    = lDefineClosureSym(c - lClosureList, lvSym(lastlsym->vCdr));
-	lVal *repl     = lCons(lValSym("repl-prompt"),NULL);
-	repl->flags |= lfNoGC;
 	while(1){
-		lEval(c,repl);
-		fflush(stdout);
-		if(fgets(str,sizeof(str),stdin) == NULL){
+		char *str = bestline("> ");
+		if(str == NULL){
 			printf("\nBye!\n");
 			return;
+		}
+		bestlineHistoryAdd(str);
+		if(historyPath){
+			bestlineHistorySave(historyPath);
 		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		lWriteVal(v);

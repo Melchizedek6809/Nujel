@@ -310,7 +310,7 @@ static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
 	lDefineVal(c, "OS", lConst(lValString("Haiku")));
 	#elif defined(__APPLE__)
-	lDefineVal(c, "OS", lConst(lValString("Macos")));
+	lDefineVal(c, "OS", lConst(lValString("MacOS")));
 	#elif defined(__EMSCRIPTEN__)
 	lDefineVal(c, "OS", lConst(lValString("Emscripten")));
 	#elif defined(__MINGW32__)
@@ -367,7 +367,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
 	lAddNativeFunc(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                        lnfLambda);
 	lAddNativeFunc(c,"λ*",             "[args source body]", "Create a new, raw, lambda",              lnfLambdaRaw);
-	lAddNativeFunc(c,"disassemble disasm","[fun]",          "Return the text segment of a FUN",           lnfDisasm);
+	lAddNativeFunc(c,"disassemble disasm","[fun]",       "Return the text segment of a FUN",           lnfDisasm);
 	lAddNativeFunc(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                  lnfDynamic);
 	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
