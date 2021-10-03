@@ -1,0 +1,10 @@
+image: archlinux
+sources:
+  - https://git.sr.ht/~melchizedek6809/Nujel
+tasks:
+  - compile: |
+      cd Nujel
+      make -j4
+  - test: |
+      cd Nujel
+      make test
