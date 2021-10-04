@@ -16,15 +16,27 @@
 
        [def optimize-do
 	    [λ [source]
+	      ;[display ["Do: " [str/write source] "\n\n"]]
 	      [let [[args [optimize-do-args [cdr source]]]]
 		[if [nil? [cdr args]]
 		    [car args]
-		    [cons do args]]]]]
+		    [cons 'do args]]]]]
+
+       [def optimize-def
+	    [λ [source]
+	      [list 'def [cadr source] [optimize [caddr source]]]]]
+
+       [def optimize-fun
+	    [λ [source]
+	      [list 'λ* [cadr source] source [optimize-do [cddr source]]]]]
 
        [λ [source]
 	 "Optimize the forms in source"
+	 ;[display ["Opt: " [str/write source] "\n\n"]]
 	 [let [[op [resolve [car source]]]]
 	   [cond [[eq? op do] [optimize-do source]]
+		 [[eq? op def] [optimize-def source]]
+		 [[eq? op λ] [optimize-fun source]]
 		 [#t source]]]]
 
 ]]
@@ -46,8 +58,8 @@
        [assemble [optimize [macroexpand source]]]]]
 
 [def λδ
-     [λ [@args @...body]
+     [λ [@...λδ]
        "Define a λ with the self-hosting Nujel compiler/optimizer"
-       [λ* @args @...body [compile [cons do @...body]]]]]
+       [eval [compile [cons 'λ @...λδ]]]]]
 
-[def +1 [λδ [α] "Add 1 to α" [+ 1 α]]]
+;[def +1 [λδ [α] "Add 1 to α" [+ 1 α]]]

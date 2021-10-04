@@ -230,45 +230,14 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		}
 		break;
 	case ltLambda: {
-		lClosure *cl = &lClosureList[v->vCdr & CLO_MASK];
-		if(cl->flags & lfObject){
-			t = snprintf(cur,bufEnd-cur,"[ω ");
-			indentLevel += 2;
-		}else if(cl->flags & lfDynamic){
-			t = snprintf(cur,bufEnd-cur,"[δ [");
-			indentLevel += 3;
-		}else{
-			t = snprintf(cur,bufEnd-cur,"[λ [");
-			indentLevel += 3;
-		}
-		if(t > 0){cur += t;}
-		lVal *cloData = lCloData(v->vCdr);
-		forEach(n,cloData){
-			if(lCaar(n) == NULL){continue;}
-			if(n != cloData){
-				if(cl->flags & lfObject){
-					*cur++ = '\n';
-					for(int i=indentLevel;i>=0;i--){*cur++=' ';}
-				}else{
-					*cur++ = ' ';
-				}
-			}
-			lVal *cv = NULL;
-			if(lCadar(n) != NULL){
-				cv = lCar(n);
-			}else{
-				cv = lCaar(n);
-			}
-			if(cl->flags & lfObject){
-				cv = lCons(lValSym("def"),cv);
-			}
-			cur = lSWriteVal(cv,cur,bufEnd,indentLevel,display);
-		}
-		if(!(cl->flags & lfObject)){*cur++ = ']';}
+		*cur++ = '[';
+		int syms = 0;
 		lVal *cloText = lCloSource(v->vCdr);
 		forEach(n,cloText){
-			*cur++ = '\n';
-			for(int i=indentLevel;i>=0;i--){*cur++=' ';}
+			if(++syms > 2){ *cur++ = '\n';}
+			if(syms > 1){
+				for(int i=indentLevel;i>=0;i--){*cur++=' ';}
+			}
 			cur = lSWriteVal(lCar(n),cur,bufEnd,indentLevel,display);
 		}
 		indentLevel -= 2;

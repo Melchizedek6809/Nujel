@@ -97,8 +97,8 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	const uint cli = lClosureNew(c - lClosureList);
 	if(cli == 0){return NULL;}
-	lCloSource(cli) = lEval(c,lCadr(v));
-	lCloText(cli) = lEval(c,lCaddr(v));
+	lCloSource(cli) = lCadr(v);
+	lCloText(cli) = lCddr(v);
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltLambda;
