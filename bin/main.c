@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #ifdef __MINGW32__
-    #include <windows.h>
+	#include <windows.h>
 	#include <shlobj.h>
 #else
 	#include "../vendor/bestline/bestline.h"

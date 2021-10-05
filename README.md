@@ -1,7 +1,7 @@
 # Nujel
 A Lisp inspired language for games and other latency sensitive applications.
 ## This Language should NOT be used for anything important right now, maybe in a couple years
-For now Nujel is still pretty similar to others Lisps, but it will probably distance
+For now Nujel is still pretty similar to other Lisps, but it will probably distance
 itself further, one commit at a time.
 
 | Operating System  | CI Status |

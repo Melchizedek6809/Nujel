@@ -1,5 +1,6 @@
 ;; Contains the self-hosting Nujel compiler
 
+
 [def optimize
      [let []
 
@@ -47,15 +48,10 @@
        "Expand all macros in the forms contained in SOURCE"
        source]]
 
-[def assemble
-     [λ [source]
-       "Assembles the forms in SOURCE into low level bytecode instructions"
-       source]]
-
 [def compile
      [λ [source]
        "Macroexpand, optimize and assemble the forms in SOURCE"
-       [assemble [optimize [macroexpand source]]]]]
+       [optimize [macroexpand source]]]]
 
 [def λδ
      [λ [@...λδ]
