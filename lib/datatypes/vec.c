@@ -7,6 +7,8 @@
 #include "vec.h"
 #include "../nujel.h"
 
+#include <string.h>
+
 lVec     lVecList[VEC_MAX];
 uint     lVecActive = 0;
 uint     lVecMax    = 1;
@@ -40,7 +42,7 @@ uint lVecAlloc(){
 		lVecFFree = ret->nextFree;
 	}
 	lVecActive++;
-	*ret = (lVec){0};
+	memset(ret,0,sizeof(lVec));
 	return ret - lVecList;
 }
 

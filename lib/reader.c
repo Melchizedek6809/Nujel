@@ -101,7 +101,7 @@ static lVal *lParseNumberDecimal(lString *s){
 	if(fc == '-'){c = *++s->data;}
 	while(!isspace((u8)c)){
 		if(c == 0){break;}
-		if(isdigit(c)){
+		if(isdigit((int)c)){
 			cval *= 10;
 			cval += c - '0';
 			if(++digits > 9){break;}
@@ -125,7 +125,7 @@ static lVal *lParseNumberDecimal(lString *s){
 	}
 	while(c){
 		if(isspace((u8)c)){break;}
-		if(!isdigit(c) && c != '.' && c != ',' && c != '_'){break;}
+		if(!isdigit((int)c) && c != '.' && c != ',' && c != '_'){break;}
 		c = *++s->data;
 	}
 	return v;
