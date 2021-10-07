@@ -1,0 +1,49 @@
+;; Contains the self-hosting Nujel compiler
+
+
+[def compile
+     [let []
+
+       [def compile-do-args
+	    [λ [args]
+	      [if [nil? [cdr args]]
+		  args
+		  [if [pair? [car args]]
+		      [let [[ocar [optimize [car args]]]]
+			[if [pair? ocar]
+			    [cons ocar [compile-do-args [cdr args]]]
+			    [compile-do-args [cdr args]]]]
+		      [compile-do-args [cdr args]]]]]]
+
+       [def compile-do
+	    [λ [source]
+	      ;[display ["Do: " [str/write source] "\n\n"]]
+	      [let [[args [compile-do-args [cdr source]]]]
+		[if [nil? [cdr args]]
+		    [car args]
+		    [cons 'do args]]]]]
+
+       [def compile-def
+	    [λ [source]
+	      [list 'def [cadr source] [optimize [caddr source]]]]]
+
+       [def compile-fun
+	    [λ [source]
+	      [list 'λ* [cadr source] source [compile-do [cddr source]]]]]
+
+       [λ [source]
+	 "Compile the forms in source"
+	 ;[display ["Opt: " [str/write source] "\n\n"]]
+	 [let [[op [resolve [car source]]]]
+	   [cond [[eq? op do] [compile-do source]]
+		 [[eq? op def] [compile-def source]]
+		 [[eq? op λ] [compile-fun source]]
+		 [#t source]]]]
+]]
+
+[def λδ
+     [λ [@...λδ]
+       "Define a λ with the self-hosting Nujel compiler"
+       [eval [compile [cons 'λ @...λδ]]]]]
+
+[def +1 [λδ [α] "Add 1 to α" [+ 1 α]]]
