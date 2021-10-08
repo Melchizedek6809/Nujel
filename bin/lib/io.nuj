@@ -1,18 +1,17 @@
-[def help]
-[let []
+[def help [let []
 	[def iter [λ [l]
 		[cond [[nil? l] #t]
 		      [#t [display [describe [car l]]] [newline] [iter [cdr l]]
 		]]
 	]]
 
-	[set! help [λ [i]
+	[λ [i]
 		"Describe 10 functions at offset 1"
 		[let [[off [* [int i] 10]]]
 		[iter [map cat [symbol-table off 10]]]
 		[display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]] [newline] #t]
-	]]
-]
+	]
+]]
 
 [def repl-prompt #nil]
 [let [[repl-count -1]]
@@ -22,5 +21,12 @@
 		[display [cat "[" repl-count "]" [ansi-fg 1] "λ" [ansi-fg 12] ">" [ansi-reset] " "]]
 	]]
 ]
+
+[def file/compile [λ [path no-write]
+	[def source [read [file/read path]]]
+	[def object-code [compile [if [pair? [car source]] [cons 'do source] source]]]
+	[unless no-write [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
+	object-code
+]]
 
 [def test-context "Nujel Standalone"]

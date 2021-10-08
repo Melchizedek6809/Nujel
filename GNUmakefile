@@ -10,6 +10,7 @@ LIB_HDRS    := $(shell find lib -type f -name '*.h')
 LIB_OBJS    := $(LIB_SRCS:.c=.o)
 LIB_DEPS    := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS := $(shell find stdlib -type f -name '*.nuj')
+STDLIB_NOBS := $(STDLIB_NUJS:.nuj=.no)
 
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
@@ -17,6 +18,7 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj')
+BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
 NUJEL       := ./nujel
 ASSET       := ./tools/assets
@@ -68,6 +70,10 @@ clean:
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
+%.no: %.nuj
+	@$(NUJEL) -x "[file/compile \"$^\"]"
+	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
+
 %.wo: %.c
 	$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
@@ -95,7 +101,17 @@ tmp/stdlib.nuj: $(STDLIB_NUJS)
 	@cat $^ > $@
 	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
 
+tmp/stdlib.no: $(STDLIB_NOBS)
+	@mkdir -p tmp/
+	@cat $^ > $@
+	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+
 tmp/binlib.nuj: $(BINLIB_NUJS)
+	@mkdir -p tmp/
+	@cat $^ > $@
+	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+
+tmp/binlib.no: $(BINLIB_NOBS)
 	@mkdir -p tmp/
 	@cat $^ > $@
 	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
@@ -110,7 +126,7 @@ tmp/stdlib.h: tmp/stdlib.c
 tmp/binlib.c: tmp/binlib.nuj $(ASSET)
 	@mkdir -p tmp/
 	@$(ASSET) tmp/binlib tmp/binlib.nuj
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/binlib.h: tmp/binlib.c
 	@true
 

@@ -59,7 +59,7 @@
 	[ansi-wrap 6 [apply cat ...args]]
 ]]
 
-[def ansi-dgray [λ [...args]
+[def ansi-dark-gray [λ [...args]
 	"Wrap ARGS in dark gray"
 	[ansi-wrap 7 [apply cat ...args]]
 ]]

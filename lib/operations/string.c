@@ -202,15 +202,21 @@ lVal *lnfCat(lClosure *c, lVal *v){
 lVal *lnfIndexOf(lClosure *c, lVal *v){
 	const char *haystack = NULL;
 	const char *needle = NULL;
-	int pos = 0;
 
 	v = getLArgS(c,v,&haystack);
-	v = getLArgS(c,v,&needle);
-	v = getLArgI(c,v,&pos);
-
-	if(needle == NULL)   {return lValInt(-1);}
 	if(haystack == NULL) {return lValInt(-1);}
+	const int haystackLength = strlen(haystack);
+
+	v = getLArgS(c,v,&needle);
+	if(needle == NULL)   {return lValInt(-2);}
 	const int needleLength = strlen(needle);
+
+	int pos = 0;
+	v = getLArgI(c,v,&pos);
+	if(pos > haystackLength-needleLength){return lValInt(-3);}
+	/* Empty strings just return the current position, this is so we can
+         * split an empty string into each character by passing an empty string
+         */
 	if(needleLength <= 0){return lValInt(pos);}
 
 	for(const char *s = &haystack[pos]; *s != 0; s++){
@@ -218,7 +224,31 @@ lVal *lnfIndexOf(lClosure *c, lVal *v){
 			return lValInt(s-haystack);
 		}
 	}
-	return lValInt(-1);
+	return lValInt(-4);
+}
+
+lVal *lnfLastIndexOf(lClosure *c, lVal *v){
+	const char *haystack = NULL;
+	const char *needle = NULL;
+
+	v = getLArgS(c,v,&haystack);
+	if(haystack == NULL) {return lValInt(-1);}
+	const int haystackLength = strlen(haystack);
+
+	v = getLArgS(c,v,&needle);
+	if(needle == NULL)   {return lValInt(-2);}
+	const int needleLength = strlen(needle);
+
+	if(needleLength <= 0){return lValInt(-3);}
+	int pos = haystackLength - needleLength - 1;
+	v = getLArgI(c,v,&pos);
+
+	for(const char *s = &haystack[pos]; s > haystack; s--){
+		if(strncmp(s,needle,needleLength) == 0){
+			return lValInt(s-haystack);
+		}
+	}
+	return lValInt(-4);
 }
 
 lVal *lnfStrSym(lClosure *c, lVal *v){
@@ -285,6 +315,7 @@ void lOperationsString(lClosure *c){
 	lAddNativeFunc(c,"str/capitalize capitalize",  "[str]",           "Return STR capitalized",                                                      lnfStrCap);
 	lAddNativeFunc(c,"str/substr substr",          "[str &start &stop]","Return STR starting at position START=0 and ending at &STOP=[str-len s]",  lnfSubstr);
 	lAddNativeFunc(c,"str/index-of index-of",      "[haystack needle &start]","Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
+	lAddNativeFunc(c,"str/last-index-of",          "[haystack needle &start]","Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 	lAddNativeFunc(c,"str/char-at char-at",        "[str pos]",       "Return the character at position POS in STR",                                                  lnfCharAt);
 	lAddNativeFunc(c,"str/from-char-code from-char-code","[...codes]",      "Construct a string out of ...CODE codepoints and return it",                                    lnfFromCharCode);
 	lAddNativeFunc(c,"str->sym",      "[str]",           "Convert STR to a symbol",                                                                      lnfStrSym);
