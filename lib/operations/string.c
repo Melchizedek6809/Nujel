@@ -160,7 +160,7 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 }
 
 lVal *lnfCat(lClosure *c, lVal *v){
-	char tmpStringBuf[8192];
+	char tmpStringBuf[1<<20];
 	char *buf = tmpStringBuf;
 	forEach(sexpr,v){
 		lVal *t = lEval(c,lCar(sexpr));
