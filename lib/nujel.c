@@ -370,15 +370,20 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
 }
 
-lClosure *lClosureNewRoot(){
+lClosure *lClosureNewRootNoStdLib(){
 	const uint ci = lClosureAlloc();
 	if(ci == 0){return NULL;}
 	lClosure *c = &lClosureList[ci];
 	c->parent = 0;
 	c->flags |= lfNoGC;
 	lAddCoreFuncs(c);
-	lEval(c,lWrap(lRead((const char *)stdlib_nuj_data)));
 	lAddPlatformVars(c);
+	return c;
+}
+
+lClosure *lClosureNewRoot(){
+	lClosure *c = lClosureNewRootNoStdLib();
+	lEval(c,lWrap(lRead((const char *)stdlib_nuj_data)));
 	return c;
 }
 

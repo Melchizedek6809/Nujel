@@ -236,17 +236,36 @@ static void addNativeFuncs(lClosure *c){
 	lAddNativeFunc(c,"file/write","[filename content]","Writes CONTENT into FILENAME",                       lnfWriteFile);
 }
 
+lClosure * parsePreOptions(int argc, char *argv[]){
+	bool loadStdLib = true;
+	for(int i=1;i<argc;i++){
+		if(argv[i][0] == '-'){
+			if(argv[i][1] == 'n'){
+				loadStdLib = false;
+			}
+		}
+	}
+	lClosure *c;
+	if(loadStdLib){
+		c = lClosureNewRoot();
+		addNativeFuncs(c);
+		lEval(c,lWrap(lRead((const char *)binlib_nuj_data)));
+		lGarbageCollectForce();
+	}else{
+		c = lClosureNewRootNoStdLib();
+		addNativeFuncs(c);
+	}
+	return c;
+}
+
 int main(int argc, char *argv[]){
 	int eval = 0;
 	int repl = 1;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
-	lClosure *c = lClosureNewRoot();
-	addNativeFuncs(c);
-	lEval(c,lWrap(lRead((const char *)binlib_nuj_data)));
-	lGarbageCollect();
-
+	
+	lClosure *c = parsePreOptions(argc,argv);
 	for(int i=1;i<argc;i++){
 		size_t len;
 		char *str = argv[i];

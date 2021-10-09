@@ -32,6 +32,7 @@ int       lMemUsage         ();
 void      lPrintError       (const char *format, ...);
 
 lClosure *lClosureNewRoot   ();
+lClosure *lClosureNewRootNoStdLib();
 
 void      lDisplayVal       (lVal *v);
 void      lDisplayErrorVal  (lVal *v);

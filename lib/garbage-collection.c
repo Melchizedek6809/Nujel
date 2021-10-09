@@ -145,7 +145,7 @@ static void lGCSweep(){
 	}
 }
 
-static void lClosureDoGC(){
+void lGarbageCollectForce(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
@@ -160,6 +160,6 @@ void lGarbageCollect(){
 	thresh = MIN(thresh,((STR_MAX - (int)lStringActive)  -  64) * 16);
 	thresh = MIN(thresh,((VEC_MAX - (int)lVecActive)     -  64) * 16);
 	if(++calls < thresh){return;}
-	lClosureDoGC();
+	lGarbageCollectForce();
 	calls = 0;
 }
