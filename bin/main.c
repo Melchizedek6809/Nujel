@@ -279,11 +279,15 @@ int main(int argc, char *argv[]){
 			}else if(argv[i][1] == '-'){
 				repl = 1;
 				continue;
+			}else if(argv[i][1] == 'n'){
+				continue;
 			}else{
 				break;
 			}
 		}
-		if(!eval){str = loadFile(argv[i],&len);}
+		if(!eval){
+			str = loadFile(argv[i],&len);
+		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
 		lGarbageCollect();

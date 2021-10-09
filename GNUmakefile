@@ -70,7 +70,7 @@ clean:
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-%.no: %.nuj
+%.no: %.nuj | $(NUJEL)
 	@$(NUJEL) -x "[file/compile \"$^\"]"
 	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
 
@@ -142,6 +142,15 @@ run: $(NUJEL)
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
 
-.PHONY: runn
+.PHONY: runn	
 runn: $(NUJEL)
 	$(NUJEL)
+
+.PHONY: runn
+runng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
+	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no --
+
+.PHONY: runn
+testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
+	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run]]"
+
