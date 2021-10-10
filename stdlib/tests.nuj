@@ -1,93 +1,3 @@
-[def test-context "Nujel"]
-[def test-list [cons [cons 1 1] #nil]]
-
-[def test-add [λ [result @...expr]
-	"Add a test where ...EXPR must eval to RESULT"
-	[set! test-list [cons [cons result [cons 'do @...expr]] test-list]]
-]]
-
-[def test-run]
-[def test-run-verbose]
-[let []
-	[def nujel-start    0]
-	[def test-count     0]
-	[def success-count  0]
-	[def error-count    0]
-	[def print-errors  #t]
-	[def print-passes  #f]
-
-	[def display-results [λ []
-		"Prints the result Message"
-		[error [cat test-context
-			        " ["
-			        [ansi-green success-count]
-			        " / "
-			        [ansi-red error-count]
-			        "] in "
-			        [- [time/milliseconds] nujel-start]
-			        "ms - "
-			        [if [zero? error-count]
-			            [ansi-rainbow "Everything is working, very nice!"]
-			            [ansi-red "Better fix those!"]]
-			        "\n"]]]]
-	[def test-success [λ [res-should res-is expr i]
-		"Should be called after a test has finished successfully"
-		[when print-passes [error [cat "#" i " -> "
-		            [ansi-green "[PASS] "]
-				    [ansi-green [str/write res-is]]
-				    " != "
-				    [ansi-green [str/write res-should]]
-				    "\n"
-				    [str/write expr]
-				    "\n\n"]]]
-		[set! success-count [++ success-count]]]]
-	[def test-failure [λ [res-should res-is expr i]
-		"Should be called if EXPR does not equal RES"
-		[when print-errors [error [cat "#" i " -> "
-		            [ansi-red "[FAIL] "]
-				    [ansi-red [str/write res-is]]
-				    " != "
-				    [ansi-green [str/write res-should]]
-				    "\n"
-				    [str/write expr]
-				    "\n\n"]]]
-		[set! error-count [++ error-count]]]]
-	[def test [λ [result rawexpr i]
-		"Tests that RAWEXPR evaluates to RESULT"
-		[def expr [eval rawexpr]]
-		[when [string? result]
-		      [set! expr [str/write expr]]]
-		[[if [eq? result expr] test-success test-failure] result expr rawexpr i]]]
-	[def test-run-iter [λ [list i]
-		"Recurse through LIST and runs eatch test"
-		[cond [[nil? list] #t]
-				[#t [test [caar list] [cdar list] i]
-				    [test-run-iter [cdr list] [+ i 1]]]]]]
-
-	[def test-run-real [λ []
-		[set! nujel-start    [time/milliseconds]]
-		[set! test-count     0]
-		[set! success-count  0]
-		[set! error-count    0]
-		[test-run-iter test-list 0]
-		[display-results]
-		[when [> error-count 0]
-		      [display-errors]
-			  [display-results]]
-		error-count
-	]]
-
-	[set! test-run [λ [] "Run through all automated Tests"
-		[set! print-errors  #t]
-		[set! print-passes  #f]
-		[test-run-real]]]
-	[set! test-run-verbose [λ [] "Run through all automated Tests"
-		[set! print-errors  #t]
-		[set! print-passes  #t]
-		[test-run-real]]]
-]
-
-; [error"Evaluating comments is a terrible Idea!"] [newline] [quit 2]
 [test-add 1073741824 [ash 1 30]]
 [test-add 2147483647 [lognot [ash 1 31]]]
 [test-add 39 [+ 42 [- 3]]]
@@ -399,6 +309,7 @@
 [test-add  3 [wrap-value 3 2 4]]
 [test-add  2 [wrap-value 4 2 4]]
 [test-add  3 [wrap-value 5 2 4]]
+[test-add #f #t]
 
 ; Edge cases that still need a specified behaviour
 ; [test-add "[123 #nil]" '[123 #nil]]

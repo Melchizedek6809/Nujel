@@ -152,5 +152,5 @@ runng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 
 .PHONY: runn
 testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
-	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run-verbose]]"
+	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run]]"
 
