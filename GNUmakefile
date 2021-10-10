@@ -9,7 +9,7 @@ LIB_SRCS    := $(shell find lib -type f -name '*.c')
 LIB_HDRS    := $(shell find lib -type f -name '*.h')
 LIB_OBJS    := $(LIB_SRCS:.c=.o)
 LIB_DEPS    := ${LIB_SRCS:.c=.d}
-STDLIB_NUJS := $(shell find stdlib -type f -name '*.nuj')
+STDLIB_NUJS := $(shell find stdlib -type f -name '*.nuj' | sort)
 STDLIB_NOBS := $(STDLIB_NUJS:.nuj=.no)
 
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
@@ -17,7 +17,7 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
-BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj')
+BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
 NUJEL       := ./nujel
@@ -62,7 +62,7 @@ endif
 
 .PHONY: clean
 clean:
-	@rm -f nujel nujel.exe nujel.a nujel.wa tools/assets tools/assets.exe $(shell find bin lib -type f -name '*.o') $(shell find bin lib -type f -name '*.wo') $(shell find bin lib -type f -name '*.d') $(shell find bin lib -type f -name '*.wd')
+	@rm -f nujel nujel.exe nujel.a nujel.wa tools/assets tools/assets.exe $(shell find bin lib -type f -name '*.o') $(shell find bin lib -type f -name '*.wo') $(shell find bin lib -type f -name '*.d') $(shell find bin lib -type f -name '*.wd') $(shell find bin/lib stdlib -type f -name '*.no')
 	@rm -rf tmp
 	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
 
@@ -75,7 +75,7 @@ clean:
 	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.wo: %.c
-	$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
+	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo
@@ -142,7 +142,7 @@ run: $(NUJEL)
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
 
-.PHONY: runn	
+.PHONY: runn
 runn: $(NUJEL)
 	$(NUJEL)
 
@@ -153,4 +153,3 @@ runng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 .PHONY: runn
 testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run]]"
-

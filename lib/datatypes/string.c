@@ -213,7 +213,10 @@ char *lSIndent(char *buf, char *bufEnd, int indentLevel){
 
 char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display){
 	*buf = 0;
-	if(v == NULL){return buf;}
+	if(v == NULL){
+		int t = snprintf(buf,bufEnd-buf,"#nil");
+		return t ? buf + t : buf;
+	}
 	char *cur = buf;
 	int t = 0;
 	int len = bufEnd-buf;
@@ -265,7 +268,16 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 				indentLevel += 8;
 			}else if(sym == symIf){
 				indentStyle = 1;
+				indentLevel += 3;
+			}else if(sym == symLambda){
+				indentStyle = 1;
+				indentLevel += 3;
+			}else if(sym == symLambdAst){
+				indentStyle = 1;
 				indentLevel += 4;
+			}else if(sym == symDo){
+				indentStyle = 1;
+				indentLevel += 3;
 			}else if(sym == symLet){
 				indentStyle = 1;
 				indentLevel += 5;
@@ -275,7 +287,9 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		if(t > 0){cur += t;}
 		for(lVal *n = v;n != NULL; n = lCdr(n)){
 			if(n->type == ltPair){
-				cur = lSWriteVal(lCar(n),cur,bufEnd,indentLevel,display);
+				lVal *cv = lCar(n);
+				if((n == v) && (cv == NULL) && (lCdr(n) == NULL)){continue;}
+				cur = lSWriteVal(cv,cur,bufEnd,indentLevel,display);
 				if(lCdr(n) != NULL){
 					if((indentStyle == 1) && (n != v)){
 						*cur++ = '\n';

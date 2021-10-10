@@ -14,7 +14,7 @@ extern uint     lSymbolMax;
 #define lvSymI(s) (s == NULL ? 0 : s - lSymbolList)
 #define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : lvSym(v->vCdr))
 
-extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus;
+extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
 extern lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void      lInitSymbol  ();

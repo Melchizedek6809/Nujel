@@ -12,7 +12,10 @@
 ]]
 
 [def last-pair [λ [l]
-	[if [cdr l] [last-pair [cdr l]] l]
+	"Return the last pair of l"
+	[if [cdr l]
+	    [last-pair [cdr l]]
+		l]
 ]]
 
 [def make-list [let []
@@ -143,10 +146,12 @@
 	]
 ]]
 
-[def getf [λ [list key]
-	"Retursn the value in LIST following KEY"
-	[cond [[nil? list] #nil]
-	      [[eq? key [car list]] [cadr list]]
-	      [#t [getf [cdr list] key]]
+[def getf [let []
+	[λ [list key]
+		"Return the value in LIST following KEY"
+		[cond [[nil? list] #nil]
+		      [[eq? key [car list]] [cadr list]]
+		      [#t [getf [cdr list] key]]
+		]
 	]
 ]]
