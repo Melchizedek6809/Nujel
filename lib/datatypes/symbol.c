@@ -16,7 +16,7 @@ uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
 uint    lSymbolFFree  = 0;
 
-lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symBegin,*symMinus;
+lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus;
 lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
@@ -31,7 +31,7 @@ void lInitSymbol(){
 	symWhen     = lSymS("when");
 	symUnless   = lSymS("unless");
 	symLet      = lSymS("let");
-	symBegin    = lSymS("begin");
+	symDo       = lSymS("do");
 	symMinus    = lSymS("-");
 
 	lSymLTNoAlloc        = lSymS(":no-alloc");

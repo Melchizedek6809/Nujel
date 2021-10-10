@@ -389,8 +389,16 @@
 [test-add #f [list-equal? '[1 2 3] '[1 2]]]
 [test-add #f [list-equal? '[1 2 3] '[1 2 [3 4]]]]
 [test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
-
+[test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
+[test-add "do" 'do]
+[test-add "[123]" '[123]]
+[test-add "[123 #t]" '[123 #t]]
+[test-add "[123 'do]" '[123 'do]]
+[test-add "[123 \"asd\"]" '[123 "asd"]]
 [test-add  2 [wrap-value 2 2 4]]
 [test-add  3 [wrap-value 3 2 4]]
 [test-add  2 [wrap-value 4 2 4]]
 [test-add  3 [wrap-value 5 2 4]]
+
+; Edge cases that still need a specified behaviour
+; [test-add "[123 #nil]" '[123 #nil]]

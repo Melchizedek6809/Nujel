@@ -38,9 +38,9 @@
 	 ;[display ["[opt] " [str/write source] "\n\n"]]
 	 [let [[op [resolve [car source]]]]
 	   [cond [[eq? op do]  [compile-do  source]]
-		 [[eq? op def] [compile-def source]]
-		 [[eq? op λ]   [compile-fun source]]
-		 [#t source]]]]
+	         [[eq? op def] [compile-def source]]
+	         [[eq? op λ]   [compile-fun source]]
+	         [#t source]]]]
 ]]
 
 [def λδ

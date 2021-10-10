@@ -34,7 +34,7 @@ static void lStringAdvanceToNextLine(lString *s){
 }
 
 static lVal *lParseString(lString *s){
-	static char buf[4096];
+	char buf[1<<20];
 	char *b = buf;
 	for(uint i=0;i<sizeof(buf);i++){
 		if(*s->data == '\\'){

@@ -167,6 +167,9 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	ret = lCons(lValSym(":closure"),ret);
 	ret = lCons(lValInt(lValActive),ret);
 	ret = lCons(lValSym(":value"),ret);
+	fprintf(stderr,"%p\n",lValSymS(symQuote));
+	lWriteVal(lCons(lValSymS(symQuote),lCons(ret, NULL)));
+	lWriteVal(lCons(ret, NULL));
 	return ret;
 }
 
@@ -501,7 +504,7 @@ lVal *getLArgL(lClosure *c, lVal *v,lVal **res){
 }
 
 lVal *lWrap(lVal *v){
-	return lCons(lValSymS(symBegin),v);
+	return lCons(lValSymS(symDo),v);
 }
 
 lVal *lEvalCast(lClosure *c, lVal *v){

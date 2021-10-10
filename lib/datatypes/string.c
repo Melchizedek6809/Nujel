@@ -250,8 +250,10 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		if((carSym != NULL) && (carSym->type == ltSymbol) && (lCdr(v) != NULL)){
 			lSymbol *sym = lvSym(carSym->vCdr);
 			if(sym == symQuote){
-				v = lCdar(v);
+				v = lCadr(v);
 				*cur++ = '\'';
+				cur = lSWriteVal(v,cur,bufEnd,indentLevel,display);
+				goto endOfWriteVal;
 			}else if(sym == symCond){
 				indentStyle = 1;
 				indentLevel += 6;
@@ -340,6 +342,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		break;
 	}
 
+	endOfWriteVal:
 	if(t > 0){cur += t;}
 	*cur = 0;
 	return cur;
