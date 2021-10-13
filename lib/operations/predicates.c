@@ -17,12 +17,12 @@
 #include <stdio.h>
 
 static int lValCompare(lClosure *c, lVal *v){
-	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){return 2;}
+	if(v == NULL){return 2;}
 	lVal *a = lCar(v);
 	v = lCdr(v);
-	if(lCar(v) == NULL){return 2;}
+	if(v == NULL){return 2;}
 	lVal *b = lCar(v);
-	if((a == NULL) || (b == NULL)){return 2;}
+	if((a == NULL) || (b == NULL)){return lBool(a) != lBool(b);}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
 	default:
@@ -38,7 +38,9 @@ static int lValCompare(lClosure *c, lVal *v){
 		if((a->type == ltInf) && (b->type == ltInf)){return 0;}
 		if(a->type == ltInf){return 1;}
 		return -1;
+	case ltNoAlloc:
 	case ltBool:
+		return lBool(a) != lBool(b);
 	case ltInt:
 		a = lnfInt(c,a);
 		b = lnfInt(c,b);
@@ -102,8 +104,7 @@ static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 
 static lVal *lnfNilPred(lClosure *c, lVal *v){
 	(void)c;
-	lVal *t = lCar(v);
-	return lValBool(t == NULL);
+	return lValBool(lCar(v) == NULL);
 }
 
 void lOperationsPredicate(lClosure *c){

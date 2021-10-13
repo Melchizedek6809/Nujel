@@ -57,7 +57,7 @@ lVal     *lCastAuto         (lClosure *c, lVal *v);
 lVal     *lCastSpecific     (lClosure *c, lVal *v, const lType type);
 lVal     *lCastNumeric      (lClosure *c, lVal *v);
 
-#define lEvalCastIApply(FUNC, c , v) do { \
+#define lCastIApply(FUNC, c , v) do { \
 	if((c == NULL) || (v == NULL)){return lValInt(0);} \
 	lVal *t = lCastSpecific(c,v,ltInt); \
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);} \
@@ -66,7 +66,7 @@ lVal     *lCastNumeric      (lClosure *c, lVal *v);
 	return FUNC(d,t); \
 	} while (0)
 
-#define lEvalCastApply(FUNC, c , v) do { \
+#define lCastApply(FUNC, c , v) do { \
 	lVal *t = lCastAuto(c,v); \
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);} \
 	lVal *d = lValDup(t->vList.car); \

@@ -36,7 +36,7 @@ static lVal *lnfAddI(lVal *t, lVal *v){
 }
 lVal *lnfAdd(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lEvalCastApply(lnfAdd,c,v);
+	lCastApply(lnfAdd,c,v);
 }
 
 
@@ -63,7 +63,7 @@ lVal *lnfSub(lClosure *c, lVal *v){
 	if((v->type == ltPair) && (lCar(v) != NULL) && (lCdr(v) == NULL)){
 		v = lCons(lValInt(0),v);
 	}
-	lEvalCastApply(lnfSub,c,v);
+	lCastApply(lnfSub,c,v);
 }
 
 static lVal *lnfMulV(lVal *t, lVal *v){
@@ -82,7 +82,7 @@ static lVal *lnfMulI(lVal *t, lVal *v){
 }
 lVal *lnfMul(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(1);}
-	lEvalCastApply(lnfMul, c , v);
+	lCastApply(lnfMul, c , v);
 }
 
 
@@ -109,7 +109,7 @@ static lVal *lnfDivI(lVal *t, lVal *v){
 }
 lVal *lnfDiv(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(1);}
-	lEvalCastApply(lnfDiv, c, v);
+	lCastApply(lnfDiv, c, v);
 }
 
 
@@ -137,7 +137,7 @@ static lVal *lnfModI(lVal *t, lVal *v){
 	return t;
 }
 lVal *lnfMod(lClosure *c, lVal *v){
-	lEvalCastApply(lnfMod, c, v);
+	lCastApply(lnfMod, c, v);
 }
 
 lVal *lnfAbs(lClosure *c, lVal *v){

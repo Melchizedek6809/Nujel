@@ -27,21 +27,19 @@ lVal *lnfInf(lClosure *c, lVal *v){
 
 lVal *lnfInt(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lVal *t = lEval(c,v);
-	if(t == NULL){return lValInt(0);}
-	switch(t->type){
+	switch(v->type){
 	default: return lValInt(0);
 	case ltBool:
-		return lValInt(t->vBool ? 1 : 0);
+		return lValInt(v->vBool ? 1 : 0);
 	case ltInt:
-		return t;
+		return v;
 	case ltFloat:
-		return lValInt(t->vFloat);
+		return lValInt(v->vFloat);
 	case ltVec:
-		return lValInt(lVecV(t->vCdr).x);
+		return lValInt(lVecV(v->vCdr).x);
 	case ltString:
-		if(t->vCdr == 0){return lValInt(0);}
-		return lValInt(atoi(lStrData(t)));
+		if(v->vCdr == 0){return lValInt(0);}
+		return lValInt(atoi(lStrData(v)));
 	case ltPair:
 		return lnfInt(c,lCar(v));
 	}
@@ -49,19 +47,17 @@ lVal *lnfInt(lClosure *c, lVal *v){
 
 lVal *lnfFloat(lClosure *c, lVal *v){
 	if(v == NULL){return lValFloat(0);}
-	lVal *t = lEval(c,v);
-	if(t == NULL){return lValFloat(0);}
-	switch(t->type){
+	switch(v->type){
 	default: return lValFloat(0);
 	case ltFloat:
-		return t;
+		return v;
 	case ltInt:
-		return lValFloat(t->vInt);
+		return lValFloat(v->vInt);
 	case ltVec:
-		return lValFloat(lVecV(t->vCdr).x);
+		return lValFloat(lVecV(v->vCdr).x);
 	case ltString:
-		if(t->vCdr == 0){return lValFloat(0);}
-		return lValFloat(atof(lStrData(t)));
+		if(v->vCdr == 0){return lValFloat(0);}
+		return lValFloat(atof(lStrData(v)));
 	case ltPair:
 		return lnfFloat(c,v->vList.car);
 	}
@@ -91,20 +87,18 @@ lVal *lnfVec(lClosure *c, lVal *v){
 }
 
 lVal *lnfBool(lClosure *c, lVal *v){
-	lVal *a = lEval(c,v);
-	if(a == NULL)            {return lValBool(false);}
-	if(a->type == ltSymbol)  {a = lResolveSym(c - lClosureList,a);}
-	if(a->type == ltBool)    {return a;}
-	if(a->type == ltPair)    {a = lCar(a);}
-	if(a == NULL)            {return lValBool(false);}
-	if(a->type == ltSymbol)  {a = lResolveSym(c - lClosureList,a);}
-	if(a->type == ltBool)    {return a;}
-	if(a->type == ltPair)    {a = lEval(c,a);}
-	if(a == NULL)            {return lValBool(false);}
-	if(a->type == ltSymbol)  {a = lResolveSym(c - lClosureList,a);}
-	if(a->type == ltBool)    {return a;}
-	if(a->type == ltInt)     {return lValBool(a->vInt != 0);}
-	return lValBool(true);
+	(void)c;
+	return lValBool(lCar(v));
+}
+
+bool lBool(const lVal *v){
+	if(v == NULL){return false;}
+	if(v->type == ltBool){
+		return v->vBool;
+	}else if(v->type == ltPair){
+		return (v->vList.car != NULL) || (v->vList.cdr != NULL);
+	}
+	return true;
 }
 
 lVal *lnfString(lClosure *c, lVal *t){

@@ -49,3 +49,10 @@
 		]
 	]
 ]]
+
+[def fib [λ [i]
+	   "Terribly inefficient, but useful for testing the GC"
+	   [if [< i 2]
+	       i
+	       [+ [fib [- i 2]] [fib [- i 1]]]]
+]]

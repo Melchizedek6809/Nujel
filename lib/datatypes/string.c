@@ -80,11 +80,13 @@ void lStringFree(u32 v){
 }
 
 u32 lStringNew(const char *str, uint len){
+	if(str == NULL){return 0;}
 	const u32 i = lStringAlloc();
 	if(i == 0){return 0;}
 	lString *s = &lStringList[i & STR_MASK];
 	if(s == NULL){return 0;}
 	char *nbuf = malloc(len+1);
+	if(nbuf == NULL){return 0;}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
 	s->flags |= lfHeapAlloc;

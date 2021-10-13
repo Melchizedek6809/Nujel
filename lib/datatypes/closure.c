@@ -85,8 +85,10 @@ lVal *lResolve(lClosure *c, lVal *v){
 
 lVal *lResolveSym(uint c, lVal *v){
 	if((v == NULL) || (v->type != ltSymbol)){return NULL;}
-	lVal *ret = lGetClosureSym(c,lvSym(v->vCdr));
-	return ret == NULL ? v : lCar(ret);
+	lSymbol *sym = lvSym(v->vCdr);
+	if(lSymKeyword(sym)){return v;}
+	lVal *ret = lGetClosureSym(c,sym);
+	return ret == NULL ? NULL : lCar(ret);
 }
 
 void lDefineVal(lClosure *c, const char *str, lVal *val){

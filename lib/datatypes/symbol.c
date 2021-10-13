@@ -102,6 +102,10 @@ bool lSymNoEval(const lSymbol *s){
 	return false;
 }
 
+bool lSymKeyword(const lSymbol *s){
+	return s->c[0] == ':';
+}
+
 int lSymCmp(const lVal *a,const lVal *b){
 	if((a == NULL) || (b == NULL)){return 2;}
 	if((a->type != ltSymbol) || (b->type != ltSymbol) || (a->vCdr == 0)){return 2;}

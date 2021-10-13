@@ -15,7 +15,7 @@ static lVal *lnfLogAndI(lVal *t, lVal *v){
 	return t;
 }
 lVal *lnfLogAnd (lClosure *c, lVal *v){
-	lEvalCastIApply(lnfLogAndI,c,v);
+	lCastIApply(lnfLogAndI,c,v);
 }
 
 static lVal *lnfLogIorI(lVal *t, lVal *v){
@@ -24,7 +24,7 @@ static lVal *lnfLogIorI(lVal *t, lVal *v){
 }
 lVal *lnfLogIor (lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lEvalCastIApply(lnfLogIorI,c,v);
+	lCastIApply(lnfLogIorI,c,v);
 }
 
 static lVal *lnfLogXorI(lVal *t, lVal *v){
@@ -32,7 +32,7 @@ static lVal *lnfLogXorI(lVal *t, lVal *v){
 	return t;
 }
 lVal *lnfLogXor (lClosure *c, lVal *v){
-	lEvalCastIApply(lnfLogXorI,c,v);
+	lCastIApply(lnfLogXorI,c,v);
 }
 
 lVal *lnfLogNot (lClosure *c, lVal *v){

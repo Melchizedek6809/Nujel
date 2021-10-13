@@ -10,52 +10,45 @@
 #include "../datatypes/val.h"
 
 static lVal *lnfAnd(lClosure *c, lVal *v){
-	if(v == NULL){return lValBool(true);}
-	lVal *t = lnfBool(c,v);
-	if((t == NULL) || (!t->vBool)){return lValBool(false);}
-	return lnfAnd(c,lCdr(v));
+	if(v == NULL){return lValBool(false);}
+	lVal *t = lEval(c,lCar(v));
+	if(lBool(t)){
+		lVal *cdr = lCdr(v);
+		return cdr == NULL ? t : lnfAnd(c,cdr);
+	}
+	return lValBool(false);
 }
 
 static lVal *lnfOr(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(false);}
-	lVal *t = lnfBool(c,v);
-	if((t != NULL) && t->vBool){return lValBool(true);}
-	return lnfOr(c,lCdr(v));
+	lVal *t = lEval(c,lCar(v));
+	return lBool(t) ? t : lnfOr(c,lCdr(v));
 }
 
 static lVal *lnfCond(lClosure *c, lVal *v){
-	if(v == NULL)        {return NULL;}
-	if(v->type != ltPair){return NULL;}
 	lVal *t = lCar(v);
-	lVal *b = lnfBool(c,lCar(t));
-	if((b != NULL) && b->vBool){
-		return lLastCar(lMap(c,lCdr(t),lEval));
-	}
-	return lnfCond(c,lCdr(v));
+	if(t == NULL){return NULL;}
+	return lBool(lEval(c,lCar(t)))
+	       ? lnfBegin(c,lCdr(t))
+	       : lnfCond(c,lCdr(v));
 }
 
 static lVal *lnfWhen(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
-	lVal *condition = lnfBool(c,lEval(c,lCar(v)));
-	if((condition == NULL) || (condition->type != ltBool) || (!condition->vBool)){return NULL;}
+	if(!lBool(lEval(c,lCar(v)))){return NULL;}
 	return lnfBegin(c,lCdr(v));
 }
 
 static lVal *lnfUnless(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
-	lVal *condition = lnfBool(c,lEval(c,lCar(v)));
-	if((condition != NULL) && (condition->type == ltBool) && (condition->vBool)){return NULL;}
+	if(lBool(lEval(c,lCar(v)))){return NULL;}
 	return lnfBegin(c,lCdr(v));
 }
 
 static lVal *lnfIf(lClosure *c, lVal *v){
-	if(v == NULL)         {return NULL;}
-	if(v->type != ltPair) {return NULL;}
-	lVal *pred = lnfBool(c,lEval(c,lCar(v)));
-	v = lCdr(v);
-	if(v == NULL)         {return NULL;}
-	if(((pred == NULL) || (pred->vBool == false)) && (lCdr(v) != NULL)){v = lCdr(v);}
-	return lEval(c,lCar(v));
+	if(v == NULL){return NULL;}
+	const bool pred = lBool(lEval(c,lCar(v)));
+	return lEval(c,pred ? lCadr(v) : lCaddr(v));
 }
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
