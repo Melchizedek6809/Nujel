@@ -345,6 +345,9 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 	case ltSymbol:
 		t = snprintf(buf,len,"%s",lvSym(v->vCdr)->c);
 		break;
+	case ltSpecialForm:
+		t = snprintf(buf,len,"#sfo_%u",v->vCdr);
+		break;
 	case ltNativeFunc:
 		t = snprintf(buf,len,"#cfn_%u",v->vCdr);
 		break;

@@ -17,7 +17,7 @@ uint    lSymbolMax    = 1;
 uint    lSymbolFFree  = 0;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
-lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
+lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
 	lSymbolActive   = 0;
@@ -46,6 +46,7 @@ void lInitSymbol(){
 	lSymLTString         = lSymS(":string");
 	lSymLTSymbol         = lSymS(":symbol");
 	lSymLTNativeFunction = lSymS(":native-function");
+	lSymLTSpecialForm    = lSymS(":special-form");
 	lSymLTInfinity       = lSymS(":infinity");
 	lSymLTArray          = lSymS(":array");
 	lSymLTGUIWidget      = lSymS(":gui-widget");

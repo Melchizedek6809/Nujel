@@ -41,6 +41,7 @@ static void lValGCMark(lVal *v){
 	case ltVec:
 		lVecFlags(v->vCdr) |= lfMarked;
 		break;
+	case ltSpecialForm:
 	case ltNativeFunc:
 		lNFuncGCMark(&lNFN(v->vCdr));
 		break;

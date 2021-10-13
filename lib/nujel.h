@@ -49,7 +49,6 @@ lVal     *getLArgB          (lClosure *c, lVal *v, bool *res);
 lVal     *getLArgI          (lClosure *c, lVal *v, int *res);
 lVal     *getLArgF          (lClosure *c, lVal *v, float *res);
 lVal     *getLArgV          (lClosure *c, lVal *v, vec *res);
-lVal     *getLArgL          (lClosure *c, lVal *v, lVal **res);
 lVal     *getLArgS          (lClosure *c, lVal *v, const char **res);
 lVal     *lConst            (lVal *v);
 lVal     *lnfBegin          (lClosure *c, lVal *v);

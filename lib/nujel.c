@@ -21,7 +21,7 @@
 #include "operations/array.h"
 #include "operations/binary.h"
 #include "operations/closure.h"
-#include "operations/conditional.h"
+#include "operations/special.h"
 #include "operations/list.h"
 #include "operations/predicates.h"
 #include "operations/random.h"
@@ -63,14 +63,6 @@ void lDisplayErrorVal(lVal *v){
 void lWriteVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,false);
 	printf("%s\n",dispWriteBuf);
-}
-
-lVal *lnfBegin(lClosure *c, lVal *v){
-	lVal *ret = NULL;
-	forEach(n,v){
-		ret = lEval(c,lCar(n));
-	}
-	return ret;
 }
 
 static lVal *lnfLambda(lClosure *c, lVal *v){
@@ -256,6 +248,9 @@ lVal *lnfApply(lClosure *c, lVal *v){
 	if(func == NULL){return NULL;}
 	if(func->type == ltSymbol){func = lResolveSym(c - lClosureList,func);}
 	switch(func->type){
+	case ltSpecialForm:
+		if(lNFN(func->vCdr).fp == NULL){return v;}
+		return lNFN(func->vCdr).fp(c,lEval(c,lCadr(v)));
 	case ltNativeFunc:
 		if(lNFN(func->vCdr).fp == NULL){return v;}
 		return lNFN(func->vCdr).fp(c,lEval(c,lCadr(v)));
@@ -295,6 +290,7 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	case ltString:     return lValSymS(lSymLTString);
 	case ltSymbol:     return lValSymS(lSymLTSymbol);
 	case ltNativeFunc: return lValSymS(lSymLTNativeFunction);
+	case ltSpecialForm:return lValSymS(lSymLTSpecialForm);
 	case ltInf:        return lValSymS(lSymLTInfinity);
 	case ltArray:      return lValSymS(lSymLTArray);
 	case ltGUIWidget:  return lValSymS(lSymLTGUIWidget);
@@ -338,7 +334,6 @@ lVal *lConst(lVal *v){
 	return v;
 }
 
-
 static lVal *lnfConstant(lClosure *c, lVal *v){
 	return lConst(lEval(c,lCar(v)));
 }
@@ -349,7 +344,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsBinary(c);
 	lOperationsCasting(c);
 	lOperationsClosure(c);
-	lOperationsConditional(c);
+	lOperationsSpecial(c);
 	lOperationsList(c);
 	lOperationsPredicate(c);
 	lOperationsRandom(c);
@@ -368,8 +363,6 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
 	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
 	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
-
-	lAddNativeFunc(c,"do begin",       "[...body]",      "Evaluate ...body in order and returns the last result",            lnfBegin);
 	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
 }
 
@@ -490,15 +483,6 @@ lVal *getLArgS(lClosure *c, lVal *v,const char **res){
 	lVal *tlv = lnfString(c,lEval(c,lCar(v)));
 	if(tlv != NULL){
 		*res = lStrData(tlv);
-	}
-	return lCdr(v);
-}
-
-lVal *getLArgL(lClosure *c, lVal *v,lVal **res){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lEval(c,lCar(v));
-	if((tlv != NULL) && ((tlv->type == ltLambda) || (tlv->type == ltNativeFunc))){
-		*res = tlv;
 	}
 	return lCdr(v);
 }

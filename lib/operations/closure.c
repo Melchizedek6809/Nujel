@@ -68,7 +68,7 @@ static lVal *lSymTable(lClosure *c, lVal *v, int off, int len){
 	forEach(n,c->data){
 		lVal *entry = lCadar(n);
 		if(entry == NULL){continue;}
-		if((entry->type != ltNativeFunc) && (entry->type != ltLambda)){continue;}
+		if((entry->type != ltSpecialForm) && (entry->type != ltNativeFunc) && (entry->type != ltLambda)){continue;}
 
 		if(off > 0){--off; continue;}
 		v = lCons(lCaar(n),v);

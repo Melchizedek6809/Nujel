@@ -3,7 +3,7 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "conditional.h"
+#include "special.h"
 #include "../casting.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/list.h"
@@ -63,12 +63,21 @@ static lVal *lnfIf(lClosure *c, lVal *v){
 	return lEval(c,lCar(v));
 }
 
-void lOperationsConditional(lClosure *c){
-	lAddNativeFunc(c,"if",             "[pred? then ...else]","Evalute then if pred? is #t, otherwise evaluates ...else", lnfIf);
-	lAddNativeFunc(c,"cond",           "[...c]",              "Contain at least 1 cond block of form (pred? ...body) and evaluates and returns the first where pred? is #t",lnfCond);
-	lAddNativeFunc(c,"when",           "[condition ...body]", "Evaluates BODY if CONDITION is #t",lnfWhen);
-	lAddNativeFunc(c,"unless",         "[condition ...body]", "Evaluates BODY if CONDITION is #f",lnfUnless);
-	lAddNativeFunc(c,"and &&", "[...args]", "#t if all ARGS evaluate to true",            lnfAnd);
-	lAddNativeFunc(c,"or ||" , "[...args]", "#t if one member of ARGS evaluates to true", lnfOr);
-	lAddNativeFunc(c,"not !",  "[val]",     "#t if VAL is #f, #f if VAL is #t",           lnfNot);
+lVal *lnfBegin(lClosure *c, lVal *v){
+	lVal *ret = NULL;
+	forEach(n,v){
+		ret = lEval(c,lCar(n));
+	}
+	return ret;
+}
+
+void lOperationsSpecial(lClosure *c){
+	lAddSpecialForm(c,"if",      "[pred? then ...else]","Evalute then if pred? is #t, otherwise evaluates ...else", lnfIf);
+	lAddSpecialForm(c,"cond",    "[...c]",              "Contain at least 1 cond block of form (pred? ...body) and evaluates and returns the first where pred? is #t", lnfCond);
+	lAddSpecialForm(c,"when",    "[condition ...body]", "Evaluates BODY if CONDITION is #t", lnfWhen);
+	lAddSpecialForm(c,"unless",  "[condition ...body]", "Evaluates BODY if CONDITION is #f", lnfUnless);
+	lAddSpecialForm(c,"and &&",  "[...args]",           "#t if all ARGS evaluate to true", lnfAnd);
+	lAddSpecialForm(c,"or ||" ,  "[...args]",           "#t if one member of ARGS evaluates to true", lnfOr);
+	lAddSpecialForm(c,"do begin","[...body]",           "Evaluate ...body in order and returns the last result", lnfBegin);
+	lAddNativeFunc (c,"not !",    "[val]",              "#t if VAL is #f, #f if VAL is #t", lnfNot);
 }
