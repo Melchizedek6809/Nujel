@@ -75,7 +75,7 @@ lVal *lSearchClosureSym(uint c, lVal *ret, const char *str, uint len){
 }
 
 lVal *lResolve(lClosure *c, lVal *v){
-	v = lEval(c,lCar(v));
+	v = lCar(v);
 	for(int i=0;i<16;i++){
 		if((v == NULL) || (v->type != ltSymbol)){break;}
 		v = lResolveSym(c - lClosureList,v);

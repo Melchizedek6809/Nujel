@@ -38,7 +38,7 @@ void      lDisplayVal       (lVal *v);
 void      lDisplayErrorVal  (lVal *v);
 void      lWriteVal         (lVal *v);
 
-lVal     *lApply            (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
+lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lCast             (lClosure *c, lVal *v, lType t);
 lVal     *lEval             (lClosure *c, lVal *v);
 lType     lTypecast         (const lType a,const lType b);
@@ -53,13 +53,13 @@ lVal     *getLArgS          (lClosure *c, lVal *v, const char **res);
 lVal     *lConst            (lVal *v);
 lVal     *lnfBegin          (lClosure *c, lVal *v);
 lVal     *lWrap             (lVal *v);
-lVal     *lEvalCast         (lClosure *c, lVal *v);
-lVal     *lEvalCastSpecific (lClosure *c, lVal *v, const lType type);
-lVal     *lEvalCastNumeric  (lClosure *c, lVal *v);
+lVal     *lCastAuto         (lClosure *c, lVal *v);
+lVal     *lCastSpecific     (lClosure *c, lVal *v, const lType type);
+lVal     *lCastNumeric      (lClosure *c, lVal *v);
 
 #define lEvalCastIApply(FUNC, c , v) do { \
 	if((c == NULL) || (v == NULL)){return lValInt(0);} \
-	lVal *t = lEvalCastSpecific(c,v,ltInt); \
+	lVal *t = lCastSpecific(c,v,ltInt); \
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);} \
 	lVal *d = lValDup(t->vList.car); \
 	if(d == NULL){return lValInt(0);} \
@@ -67,7 +67,7 @@ lVal     *lEvalCastNumeric  (lClosure *c, lVal *v);
 	} while (0)
 
 #define lEvalCastApply(FUNC, c , v) do { \
-	lVal *t = lEvalCast(c,v); \
+	lVal *t = lCastAuto(c,v); \
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);} \
 	lVal *d = lValDup(t->vList.car); \
 	if(d == NULL){return lValInt(0);} \

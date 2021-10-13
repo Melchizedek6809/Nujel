@@ -25,8 +25,8 @@ lVal *lValAlloc(){
 	lVal *ret;
 	if(lValFFree == 0){
 		if(lValMax >= VAL_MAX-1){
+			lPrintError("lVal OOM\n");
 			exit(1);
-			lPrintError("lVal OOM ");
 			return NULL;
 		}
 		ret = &lValList[lValMax++];

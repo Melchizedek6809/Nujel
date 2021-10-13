@@ -9,11 +9,6 @@
 #include "../datatypes/list.h"
 #include "../datatypes/val.h"
 
-static lVal *lnfNot(lClosure *c, lVal *v){
-	lVal *a = lnfBool(c,v);
-	return lValBool(a == NULL ? true : !a->vBool);
-}
-
 static lVal *lnfAnd(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(true);}
 	lVal *t = lnfBool(c,v);
@@ -34,7 +29,7 @@ static lVal *lnfCond(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	lVal *b = lnfBool(c,lCar(t));
 	if((b != NULL) && b->vBool){
-		return lLastCar(lApply(c,lCdr(t),lEval));
+		return lLastCar(lMap(c,lCdr(t),lEval));
 	}
 	return lnfCond(c,lCdr(v));
 }
@@ -56,11 +51,16 @@ static lVal *lnfUnless(lClosure *c, lVal *v){
 static lVal *lnfIf(lClosure *c, lVal *v){
 	if(v == NULL)         {return NULL;}
 	if(v->type != ltPair) {return NULL;}
-	lVal *pred = lnfBool(c,lCar(v));
+	lVal *pred = lnfBool(c,lEval(c,lCar(v)));
 	v = lCdr(v);
 	if(v == NULL)         {return NULL;}
 	if(((pred == NULL) || (pred->vBool == false)) && (lCdr(v) != NULL)){v = lCdr(v);}
 	return lEval(c,lCar(v));
+}
+
+static lVal *lnfQuote(lClosure *c, lVal *v){
+	(void)c;
+	return lCar(v);
 }
 
 lVal *lnfBegin(lClosure *c, lVal *v){
@@ -79,5 +79,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddSpecialForm(c,"and &&",  "[...args]",           "#t if all ARGS evaluate to true", lnfAnd);
 	lAddSpecialForm(c,"or ||" ,  "[...args]",           "#t if one member of ARGS evaluates to true", lnfOr);
 	lAddSpecialForm(c,"do begin","[...body]",           "Evaluate ...body in order and returns the last result", lnfBegin);
-	lAddNativeFunc (c,"not !",    "[val]",              "#t if VAL is #f, #f if VAL is #t", lnfNot);
+	lAddSpecialForm(c,"quote",   "[v]",                 "Return v as is without evaluating",         lnfQuote);
 }

@@ -22,7 +22,7 @@
 
 [def ansi-wrap [λ [code string]
 	"Wrap STRING in the ansi color CODE"
-	[[ansi-fg code] string [ansi-reset]]
+	[cat [ansi-fg code] string ansi-reset]
 ]]
 
 [def ansi-black [λ [...args]
@@ -109,7 +109,7 @@
 	[let [[count 0]]
 		[join [map
 			[λ [a]
-				[set! count [logand [++ count] #x7]]
+				[set! count [logand [+ 1 count] #x7]]
 				[ansi-wrap [if [zero? count] 7 [+ count 8]] a]
 			]
 			[split [apply cat ...args] ""]]

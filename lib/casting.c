@@ -152,5 +152,5 @@ void lOperationsCasting(lClosure *c){
 	lAddNativeFunc(c,"int",       "[val]","VAL -> int",   lnfInt);
 	lAddNativeFunc(c,"float",     "[val]","VAL -> float", lnfFloat);
 	lAddNativeFunc(c,"vec",       "[val]","VAL -> vec",   lnfVec);
-	lAddNativeFunc(c,"string str","[val]","VAL -> string",lnfCat);
+	lAddNativeFunc(c,"string","[val]","VAL -> string",lnfCat);
 }

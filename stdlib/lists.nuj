@@ -51,7 +51,7 @@
 
 	[λ [list glue]
 		"Join LIST into a string with GLUE in between each element"
-		[iter "" list [str glue]]
+		[iter "" list [string glue]]
 	]
 ]]
 

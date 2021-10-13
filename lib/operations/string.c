@@ -17,16 +17,18 @@
 #include <string.h>
 
 lVal *lnfStrlen(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return lValInt(0);}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return lValInt(0);}
 	if(lStrNull(t)){return lValInt(0);}
 	return lValInt(lStringLength(&lStr(t)));
 }
 
 lVal *lnfTrim(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	if(lStrNull(t)){return lValInt(0);}
 	const char *s;
@@ -47,8 +49,9 @@ lVal *lnfTrim(lClosure *c, lVal *v){
 }
 
 lVal *lnfStrDown(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	if(lStrNull(t)){return lValInt(0);}
 	const int len = lStringLength(&lStr(t));
@@ -68,8 +71,9 @@ lVal *lnfStrDown(lClosure *c, lVal *v){
 }
 
 lVal *lnfStrUp(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	if(lStrNull(t)){return lValInt(0);}
 	const int len = lStringLength(&lStr(t));
@@ -89,8 +93,9 @@ lVal *lnfStrUp(lClosure *c, lVal *v){
 }
 
 lVal *lnfStrCap(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	if(lStrNull(t)){return lValInt(0);}
 	const int len = lStringLength(&lStr(t));
@@ -121,12 +126,13 @@ lVal *lnfStrCap(lClosure *c, lVal *v){
 }
 
 lVal *lnfSubstr(lClosure *c, lVal *v){
+	(void)c;
 	const char *buf;
 	int start = 0;
 	int len   = 0;
 	int slen  = 0;
 	if(v == NULL){return NULL;}
-	lVal *str = lEval(c,lCar(v));
+	lVal *str = lCar(v);
 	if(str == NULL)          {return NULL;}
 	if(str->type != ltString){return NULL;}
 	if(str->vCdr == 0)       {return NULL;}
@@ -135,13 +141,13 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 
 	if(lCdr(v) != NULL){
 		v = lCdr(v);
-		lVal *lStart = lEval(c,lCar(v));
+		lVal *lStart = lCar(v);
 		if((lStart != NULL) && (lStart->type == ltInt)){
 			start = lStart->vInt;
 		}
 		if(lCdr(v) != NULL){
 			v = lCdr(v);
-			lVal *lLen = lEval(c,lCar(v));
+			lVal *lLen = lCar(v);
 			if((lLen != NULL) && (lLen->type == ltInt)){
 				len = lLen->vInt;
 			}
@@ -160,10 +166,11 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 }
 
 lVal *lnfCat(lClosure *c, lVal *v){
+	(void)c;
 	char tmpStringBuf[1<<20];
 	char *buf = tmpStringBuf;
 	forEach(sexpr,v){
-		lVal *t = lEval(c,lCar(sexpr));
+		lVal *t = lCar(sexpr);
 		int clen = 0;
 		if(t == NULL){continue;}
 		switch(t->type){
@@ -252,30 +259,31 @@ lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 }
 
 lVal *lnfStrSym(lClosure *c, lVal *v){
-	v = lEval(c,lCar(v));
+	(void)c;
+	v = lCar(v);
 	if(v == NULL){return NULL;}
 	if(v->type != ltString){return NULL;}
 	return lValSym(lStrData(v));
 }
 
 lVal *lnfSymStr(lClosure *c, lVal *v){
-	v = lEval(c,lCar(v));
+	(void)c;
+	v = lCar(v);
 	if(v == NULL){return NULL;}
 	if(v->type != ltSymbol){return NULL;}
 	return lValString(lvSym(v->vCdr)->c);
 }
 
 lVal *lnfWriteStr(lClosure *c, lVal *v){
+	(void)c;
 	static char *buf = NULL;
-	lVal *t = lApply(c,v,lEval);
-	if(t == NULL){
+	if(v == NULL){
 		return lValString("#nil");
 	}
 	if(buf == NULL){buf = malloc(1<<16);}
-	lSWriteVal(lCar(t), buf, &buf[1<<16],0,false);
+	lSWriteVal(lCar(v), buf, &buf[1<<16],0,false);
 	buf[(1<<16)-1]=0;
-	t = lValString(buf);
-	return t;
+	return lValString(buf);
 }
 
 lVal *lnfCharAt(lClosure *c,lVal *v){

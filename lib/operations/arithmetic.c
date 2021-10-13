@@ -141,7 +141,7 @@ lVal *lnfMod(lClosure *c, lVal *v){
 }
 
 lVal *lnfAbs(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValInt(0);}
 	switch(t->type){
 	default:
@@ -156,7 +156,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 }
 
 lVal *lnfSqrt(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValInt(0);}
 	switch(t->type){
 	default:
@@ -171,7 +171,7 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 }
 
 lVal *lnfCeil(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -186,7 +186,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 }
 
 lVal *lnfFloor(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -201,7 +201,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 }
 
 lVal *lnfRound(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -216,7 +216,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 }
 
 lVal *lnfSin(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -227,7 +227,7 @@ lVal *lnfSin(lClosure *c, lVal *v){
 }
 
 lVal *lnfCos(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -238,7 +238,7 @@ lVal *lnfCos(lClosure *c, lVal *v){
 }
 
 lVal *lnfTan(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastNumeric(c,v));
+	lVal *t = lCar(lCastNumeric(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 	default:
@@ -251,7 +251,7 @@ lVal *lnfTan(lClosure *c, lVal *v){
 
 lVal *lnfPow(lClosure *c, lVal *v){
 	if(lCdr(v) == NULL){return lValInt(0);}
-	v = lEvalCastNumeric(c,v);
+	v = lCastNumeric(c,v);
 	if(lCdr(v) == NULL){return lValInt(0);}
 	lVal *t = lCar(v);
 	if(t == NULL){return lValInt(0);}
@@ -270,7 +270,7 @@ lVal *lnfPow(lClosure *c, lVal *v){
 }
 
 lVal *lnfVMag(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
+	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
 	return lValFloat(vecMag(lVecV(t->vCdr)));
 }

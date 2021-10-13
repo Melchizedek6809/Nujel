@@ -10,29 +10,34 @@
 #include "../nujel.h"
 
 static lVal *lnfCar(lClosure *c, lVal *v){
-	return lCar(lEval(c,lCar(v)));
+	(void)c;
+	return lCaar(v);
 }
 
 static lVal *lnfCdr(lClosure *c, lVal *v){
-	return lCdr(lEval(c,lCar(v)));
+	(void)c;
+	return lCdar(v);
 }
 
 static lVal *lnfCons(lClosure *c, lVal *v){
-	return lCons(lEval(c,lCar(v)),lEval(c,lCadr(v)));
+	(void)c;
+	return lCons(lCar(v),lCadr(v));
 }
 static lVal *lnfSetCar(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
+	(void)c;
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltPair)){return NULL;}
 	lVal *car = NULL;
-	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){car = lEval(c,lCadr(v));}
+	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){car = lCadr(v);}
 	t->vList.car = car;
 	return t;
 }
 static lVal *lnfSetCdr(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
+	(void)c;
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltPair)){return NULL;}
 	lVal *cdr = NULL;
-	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){cdr = lEval(c,lCadr(v));}
+	if((v != NULL) && (v->type == ltPair) && (lCdr(v) != NULL)){cdr = lCadr(v);}
 	t->vList.cdr = cdr;
 	return t;
 }

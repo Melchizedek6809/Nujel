@@ -10,19 +10,19 @@
 #include "../datatypes/vec.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
+	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
 	return lValFloat(lVecV(t->vCdr).x);
 }
 
 static lVal *lnfVY(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
+	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
 	return lValFloat(lVecV(t->vCdr).y);
 }
 
 static lVal *lnfVZ(lClosure *c, lVal *v){
-	lVal *t = lCar(lEvalCastSpecific(c,v,ltVec));
+	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
 	return lValFloat(lVecV(t->vCdr).z);
 }

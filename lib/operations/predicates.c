@@ -18,10 +18,10 @@
 
 static int lValCompare(lClosure *c, lVal *v){
 	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){return 2;}
-	lVal *a = lEval(c,lCar(v));
+	lVal *a = lCar(v);
 	v = lCdr(v);
 	if(lCar(v) == NULL){return 2;}
-	lVal *b = lEval(c,lCar(v));
+	lVal *b = lCar(v);
 	if((a == NULL) || (b == NULL)){return 2;}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
@@ -101,7 +101,8 @@ static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 }
 
 static lVal *lnfNilPred(lClosure *c, lVal *v){
-	lVal *t = lEval(c,lCar(v));
+	(void)c;
+	lVal *t = lCar(v);
 	return lValBool(t == NULL);
 }
 

@@ -37,14 +37,14 @@ lVal *lnfLogXor (lClosure *c, lVal *v){
 
 lVal *lnfLogNot (lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lVal *t = lEvalCastSpecific(c,v,ltInt);
+	lVal *t = lCastSpecific(c,v,ltInt);
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
 	return lValInt(~lCar(t)->vInt);
 }
 
 lVal *lnfAsh(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltPair)){return lValInt(0);}
-	lVal *vals  = lEvalCastSpecific(c,v,ltInt);
+	lVal *vals  = lCastSpecific(c,v,ltInt);
 	if(vals == NULL){return lValInt(0);}
 	lVal *val   = lCar(vals);
 	lVal *shift = lCadr(vals);
@@ -59,7 +59,7 @@ lVal *lnfAsh(lClosure *c, lVal *v){
 
 lVal *lnfAshRight(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltPair)){return lValInt(0);}
-	lVal *vals  = lEvalCastSpecific(c,v,ltInt);
+	lVal *vals  = lCastSpecific(c,v,ltInt);
 	if(vals == NULL){return lValInt(0);}
 	lVal *val   = lCar(vals);
 	lVal *shift = lCadr(vals);

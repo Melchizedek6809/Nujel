@@ -79,8 +79,8 @@ static lVal *lSymTable(lClosure *c, lVal *v, int off, int len){
 }
 
 static lVal *lnfSymTable(lClosure *c, lVal *v){
-	lVal *loff = lnfInt(c,lEval(c,lCar(v)));
-	lVal *llen = lnfInt(c,lEval(c,lCadr(v)));
+	lVal *loff = lnfInt(c,lCar(v));
+	lVal *llen = lnfInt(c,lCadr(v));
 	int off = loff->vInt;
 	int len = llen->vInt;
 	if(len <= 0){len = 1<<16;}
@@ -107,7 +107,7 @@ static lVal *lnfSymCount(lClosure *c, lVal *v){
 static lVal *lnfCl(lClosure *c, lVal *v){
 	if(c == NULL){return NULL;}
 	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lEval(c,lCar(v)));
+	lVal *t = lnfInt(c,lCar(v));
 	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
 		return lnfCl(&lClo(c->parent),lCons(lValInt(t->vInt - 1),NULL));
 	}
@@ -115,8 +115,9 @@ static lVal *lnfCl(lClosure *c, lVal *v){
 }
 
 static lVal *lnfClText(lClosure *c, lVal *v){
+	(void)c;
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
 		return lCloText(t->vCdr);
@@ -127,8 +128,9 @@ static lVal *lnfClText(lClosure *c, lVal *v){
 }
 
 static lVal *lnfClSource(lClosure *c, lVal *v){
+	(void)c;
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
 		return lCloSource(t->vCdr);
@@ -137,8 +139,9 @@ static lVal *lnfClSource(lClosure *c, lVal *v){
 }
 
 static lVal *lnfClData(lClosure *c, lVal *v){
+	(void)c;
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *t = lEval(c,lCar(v));
+	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
 		return lCloData(t->vCdr);
@@ -151,7 +154,7 @@ static lVal *lnfClData(lClosure *c, lVal *v){
 static lVal *lnfClLambda(lClosure *c, lVal *v){
 	if(c == NULL){return NULL;}
 	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lEval(c,lCar(v)));
+	lVal *t = lnfInt(c,lCar(v));
 	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
 		return lnfClLambda(&lClo(c->parent),lCons(lValInt(t->vInt - 1),NULL));
 	}
@@ -179,17 +182,17 @@ static lVal *lnfLet(lClosure *c, lVal *v){
 }
 
 void lOperationsClosure(lClosure *c){
-	lAddNativeFunc(c,"resolve",        "[sym]",          "Resolve SYM until it is no longer a symbol", lResolve);
-	lAddNativeFunc(c,"cl",             "[i]",            "Return closure",                             lnfCl);
-	lAddNativeFunc(c,"cl-lambda",      "[i]",            "Return closure as a lambda",                 lnfClLambda);
-	lAddNativeFunc(c,"cl-text disasm", "[f]",            "Return closures text segment",               lnfClText);
-	lAddNativeFunc(c,"cl-source",      "[f]",            "Return closures source segment",             lnfClSource);
-	lAddNativeFunc(c,"cl-data",        "[f]",            "Return closures data segment",               lnfClData);
-	lAddNativeFunc(c,"symbol-table",   "[off len]",      "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
-	lAddNativeFunc(c,"symbol-count",   "[]",             "Return a count of the symbols accessible from the current closure",lnfSymCount);
+	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lResolve);
+	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
+	lAddNativeFunc(c,"cl-lambda",      "[i]",           "Return closure as a lambda",                 lnfClLambda);
+	lAddNativeFunc(c,"cl-text disasm", "[f]",           "Return closures text segment",               lnfClText);
+	lAddNativeFunc(c,"cl-source",      "[f]",           "Return closures source segment",             lnfClSource);
+	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
+	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
+	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
-	lAddNativeFunc(c,"define def","[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
-	lAddNativeFunc(c,"undefine!", "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
-	lAddNativeFunc(c,"set!",      "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
-	lAddNativeFunc(c,"let",       "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
+	lAddSpecialForm(c,"define def",    "[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
+	lAddSpecialForm(c,"undefine!",     "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
+	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
+	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 }

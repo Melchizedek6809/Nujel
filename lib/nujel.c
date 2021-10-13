@@ -137,11 +137,6 @@ static lVal *lnfSelf(lClosure *c, lVal *v){
 	return lnfSelf(&lClosureList[c->parent],v);
 }
 
-static lVal *lnfQuote(lClosure *c, lVal *v){
-	(void)c;
-	return lCar(v);
-}
-
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	lVal *ret = NULL;
@@ -190,7 +185,7 @@ static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
 		lSymbol *csym = lGetSymbol(lCar(nn));
 		lVal *lv = lDefineClosureSym(tmpci,csym);
 		if(lSymVariadic(csym)){
-			lVal *t = lSymNoEval(csym) ? vn : lApply(c,vn,lEval);
+			lVal *t = lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
 			if((lv != NULL) && (lv->type == ltPair)){ lv->vList.car = t;}
 			break;
 		}else{
@@ -219,41 +214,51 @@ lVal *lEval(lClosure *c, lVal *v){
 	}else if(v->type == ltPair){
 		lVal *ret = lEval(c,lCar(v));
 		if(ret == NULL){return v;}
+		if(ret->type == ltSpecialForm){
+			return lNFN(ret->vCdr).fp(c,lCdr(v));
+		}else if(ret->type == ltLambda){
+			return lLambda(c,lCdr(v),&lClo(ret->vCdr));
+		}
+		lVal *args = lMap(c,lCdr(v),lEval);
 		switch(ret->type){
 		default:
 			return v;
-		case ltSpecialForm:
-			return lNFN(ret->vCdr).fp(c,lCdr(v));
 		case ltNativeFunc:
-			return lNFN(ret->vCdr).fp(c,lCdr(v));
-		case ltLambda:
-			return lLambda(c,lCdr(v),&lClo(ret->vCdr));
+			return lNFN(ret->vCdr).fp(c,args);
 		case ltPair:
 			return lEval(c,ret);
 		case ltString:
-			return lnfCat(c,v);
+			return lnfCat(c,lCons(ret,args));
 		case ltInt:
 		case ltFloat:
 		case ltVec:
-			return v->vList.cdr == NULL ? ret : lnfInfix(c,v);
+			if(v->vList.cdr == NULL){
+				return ret;
+			}else{
+				return lnfInfix(c,lCons(ret,args));
+			}
 		case ltArray:
-			return v->vList.cdr == NULL ? ret : lnfArrRef(c,v);
+			if(v->vList.cdr == NULL){
+				return ret;
+			}else{
+				return lnfArrRef(c,lCons(ret,args));
+			}
 		}
 	}
 	return v;
 }
 
 lVal *lnfApply(lClosure *c, lVal *v){
-	lVal *func = lEval(c,lCar(v));
+	lVal *func = lCar(v);
 	if(func == NULL){return NULL;}
 	if(func->type == ltSymbol){func = lResolveSym(c - lClosureList,func);}
 	switch(func->type){
 	case ltSpecialForm:
-		if(lNFN(func->vCdr).fp == NULL){return v;}
-		return lNFN(func->vCdr).fp(c,lEval(c,lCadr(v)));
+		if(lNFN(func->vCdr).fp == NULL){return NULL;}
+		return lNFN(func->vCdr).fp(c,lCadr(v));
 	case ltNativeFunc:
-		if(lNFN(func->vCdr).fp == NULL){return v;}
-		return lNFN(func->vCdr).fp(c,lEval(c,lCadr(v)));
+		if(lNFN(func->vCdr).fp == NULL){return NULL;}
+		return lNFN(func->vCdr).fp(c,lCadr(v));
 	case ltLambda: {
 		lVal *t = lCadr(v);
 		if((t == NULL) || (t->type != ltPair)){t = lCons(t,NULL);}
@@ -264,7 +269,8 @@ lVal *lnfApply(lClosure *c, lVal *v){
 }
 
 lVal *lnfRead(lClosure *c, lVal *v){
-	lVal *t = lEval(c,v);
+	(void)c;
+	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	uint dup = lStringDup(t->vCdr);
 	if(dup == 0){return NULL;}
@@ -277,7 +283,8 @@ lVal *lnfRead(lClosure *c, lVal *v){
 }
 
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
-	v = lEval(c,lCar(v));
+	(void)c;
+	v = lCar(v);
 	if(v == NULL){return lValSym(":nil");}
 	switch(v->type){
 	case ltNoAlloc:    return lValSymS(lSymLTNoAlloc);
@@ -335,7 +342,12 @@ lVal *lConst(lVal *v){
 }
 
 static lVal *lnfConstant(lClosure *c, lVal *v){
-	return lConst(lEval(c,lCar(v)));
+	(void)c;
+	return lConst(lCar(v));
+}
+
+static lVal *lnfEval(lClosure *c, lVal *v){
+	return lEval(c,lCar(v));
 }
 
 static void lAddCoreFuncs(lClosure *c){
@@ -353,17 +365,17 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsVector(c);
 
 	lAddNativeFunc(c,"apply",          "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
-	lAddNativeFunc(c,"eval",           "[expr]",         "Evaluate EXPR",                              lEval);
+	lAddNativeFunc(c,"eval",           "[expr]",         "Evaluate EXPR",                              lnfEval);
 	lAddNativeFunc(c,"read",           "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
 	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
-	lAddNativeFunc(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                        lnfLambda);
-	lAddNativeFunc(c,"λ*",             "[args source body]", "Create a new, raw, lambda",              lnfLambdaRaw);
-	lAddNativeFunc(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                  lnfDynamic);
-	lAddNativeFunc(c,"object obj ω",   "[args ...body]", "Create a new object",                        lnfObject);
 	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
 	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
 	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
-	lAddNativeFunc(c,"quote",          "[v]",            "Return v as is without evaluating",                                lnfQuote);
+
+	lAddSpecialForm(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
+	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
+	lAddSpecialForm(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
+	lAddSpecialForm(c,"object obj ω",   "[args ...body]", "Create a new object",                       lnfObject);
 }
 
 lClosure *lClosureNewRootNoStdLib(){
@@ -383,7 +395,7 @@ lClosure *lClosureNewRoot(){
 	return c;
 }
 
-lVal  *lApply(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
+lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	if((c == NULL) || (v == NULL)){return NULL;}
 	lVal *ret = NULL, *cc = NULL;
 
@@ -425,17 +437,17 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 	default:
 		return v;
 	case ltString:
-		return lApply(c,v,lnfString);
+		return lMap(c,v,lnfString);
 	case ltInt:
-		return lApply(c,v,lnfInt);
+		return lMap(c,v,lnfInt);
 	case ltFloat:
-		return lApply(c,v,lnfFloat);
+		return lMap(c,v,lnfFloat);
 	case ltVec:
-		return lApply(c,v,lnfVec);
+		return lMap(c,v,lnfVec);
 	case ltInf:
-		return lApply(c,v,lnfInf);
+		return lMap(c,v,lnfInf);
 	case ltBool:
-		return lApply(c,v,lnfBool);
+		return lMap(c,v,lnfBool);
 	case ltNoAlloc:
 		return NULL;
 	}
@@ -444,7 +456,7 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 
 lVal *getLArgB(lClosure *c, lVal *v, bool *res){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lnfBool(c,lEval(c,lCar(v)));
+	lVal *tlv = lnfBool(c,lCar(v));
 	if(tlv != NULL){
 		*res = tlv->vBool;
 	}
@@ -453,7 +465,7 @@ lVal *getLArgB(lClosure *c, lVal *v, bool *res){
 
 lVal *getLArgI(lClosure *c, lVal *v, int *res){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lnfInt(c,lEval(c,lCar(v)));
+	lVal *tlv = lnfInt(c,lCar(v));
 	if(tlv != NULL){
 		*res = tlv->vInt;
 	}
@@ -462,7 +474,7 @@ lVal *getLArgI(lClosure *c, lVal *v, int *res){
 
 lVal *getLArgF(lClosure *c, lVal *v, float *res){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lnfFloat(c,lEval(c,lCar(v)));
+	lVal *tlv = lnfFloat(c,lCar(v));
 	if(tlv != NULL){
 		*res = tlv->vFloat;
 	}
@@ -471,7 +483,7 @@ lVal *getLArgF(lClosure *c, lVal *v, float *res){
 
 lVal *getLArgV(lClosure *c, lVal *v, vec *res){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lnfVec(c,lEval(c,lCar(v)));
+	lVal *tlv = lnfVec(c,lCar(v));
 	if(tlv != NULL){
 		*res = lVecV(tlv->vCdr);
 	}
@@ -480,7 +492,7 @@ lVal *getLArgV(lClosure *c, lVal *v, vec *res){
 
 lVal *getLArgS(lClosure *c, lVal *v,const char **res){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *tlv = lnfString(c,lEval(c,lCar(v)));
+	lVal *tlv = lnfString(c,lCar(v));
 	if(tlv != NULL){
 		*res = lStrData(tlv);
 	}
@@ -491,18 +503,17 @@ lVal *lWrap(lVal *v){
 	return lCons(lValSymS(symDo),v);
 }
 
-lVal *lEvalCast(lClosure *c, lVal *v){
-	lVal *t = lApply(c,v,lEval);
+lVal *lCastAuto(lClosure *c, lVal *v){
+	lVal *t = lMap(c,v,lEval);
 	return lCast(c,t,lTypecastList(t));
 }
 
-lVal *lEvalCastSpecific(lClosure *c, lVal *v, const lType type){
-	return lCast(c,lApply(c,v,lEval),type);
+lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
+	return lCast(c,v,type);
 }
 
-lVal *lEvalCastNumeric(lClosure *c, lVal *v){
-	lVal *t = lApply(c,v,lEval);
-	lType type = lTypecastList(t);
+lVal *lCastNumeric(lClosure *c, lVal *v){
+	lType type = lTypecastList(v);
 	if(type == ltString){type = ltFloat;}
-	return lCast(c,t,type);
+	return lCast(c,v,type);
 }

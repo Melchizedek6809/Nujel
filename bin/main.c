@@ -133,7 +133,11 @@ void doRepl(lClosure *c){
 			bestlineHistorySave(historyPath);
 		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
-		lWriteVal(v);
+		if(v != NULL){
+			lWriteVal(v);
+		}else{
+			printf("\n");
+		}
 		lGarbageCollect();
 		lVal *tmp = lValString(str);
 		if((tmp != NULL) && (lastl != NULL)){lastl->vList.car = tmp;}
@@ -143,7 +147,7 @@ void doRepl(lClosure *c){
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	int ecode = 0;
 	if(v != NULL){
-		lVal *t = lnfInt(c,lEval(c,v->vList.car));
+		lVal *t = lnfInt(c,lCar(v));
 		if((t != NULL) && (t->type == ltInt)){
 			ecode = t->vInt;
 		}
@@ -167,26 +171,16 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 }
 
 static lVal *lnfPrint(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return v;}
-	lVal *t = NULL;
-	if(v->type == ltPair){
-		t = lEval(c,v->vList.car);
-	}else{
-		t = lEval(c,v);
-	}
-	lDisplayVal(t);
+	lDisplayVal(lCar(v));
 	return NULL;
 }
 
 static lVal *lnfError(lClosure *c, lVal *v){
+	(void)c;
 	if(v == NULL){return v;}
-	lVal *t = NULL;
-	if(v->type == ltPair){
-		t = lEval(c,v->vList.car);
-	}else{
-		t = lEval(c,v);
-	}
-	lDisplayErrorVal(t);
+	lDisplayErrorVal(lCar(v));
 	return NULL;
 }
 
@@ -228,7 +222,6 @@ void lPrintError(const char *format, ...){
 static void addNativeFuncs(lClosure *c){
 	lAddNativeFunc(c,"error",     "[...args]",         "Prints ...args to stderr",                           lnfError);
 	lAddNativeFunc(c,"print",     "[...args]",         "Displays ...args",                                   lnfPrint);
-	lAddNativeFunc(c,"display",   "[...args]",         "Prints ...args",                                     lnfPrint);
 	lAddNativeFunc(c,"input",     "[]",                "Reads in a line of user input and returns it",       lnfInput);
 	lAddNativeFunc(c,"quit",      "[a]",               "Exits with code a",                                  lnfQuit);
 	lAddNativeFunc(c,"exit",      "[a]",               "Quits with code a",                                  lnfQuit);
@@ -264,7 +257,7 @@ int main(int argc, char *argv[]){
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
-	
+
 	lClosure *c = parsePreOptions(argc,argv);
 	for(int i=1;i<argc;i++){
 		size_t len;
