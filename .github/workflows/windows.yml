@@ -30,6 +30,6 @@ jobs:
           mingw-w64-${{matrix.env}}-toolchain
     - uses: actions/checkout@v2
     - name: Compile
-      run: make -j4
+      run: make -j
     - name: Run Tests
       run: make test

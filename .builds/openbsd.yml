@@ -6,7 +6,7 @@ sources:
 tasks:
   - compile: |
       cd Nujel
-      gmake -j4
+      gmake -j
   - test: |
       cd Nujel
       gmake test
