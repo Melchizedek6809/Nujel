@@ -37,7 +37,7 @@
 
 extern u8 stdlib_nuj_data[];
 
-char dispWriteBuf[1<<16];
+char dispWriteBuf[1<<18];
 
 void lInit(){
 	lInitArray();

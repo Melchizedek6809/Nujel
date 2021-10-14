@@ -35,11 +35,18 @@ static void lStringAdvanceToNextLine(lString *s){
 
 static lVal *lParseString(lString *s){
 	static char *buf = NULL;
-	const uint bufSize = 1<<20;
+	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
-	if(buf == NULL){exit(99);}
+	if(buf == NULL){exit(20);}
 	char *b = buf;
-	for(uint i=0;i<bufSize;i++){
+	uint i=0;
+	while(true){
+		if(++i == bufSize){
+			bufSize *= 2;
+			buf = realloc(buf,bufSize);
+			if(buf == NULL){exit(21);}
+			b = &buf[i];
+		}
 		if(*s->data == '\\'){
 			s->data++;
 			switch(*s->data){
