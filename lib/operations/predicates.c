@@ -25,6 +25,14 @@ static int lValCompare(lClosure *c, lVal *v){
 	if((a == NULL) || (b == NULL)){return lBool(a) != lBool(b);}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
+	case ltPair:
+		if(b->type != ltPair){
+			return -1;
+		}else{
+			return !((a->vList.car == b->vList.car)
+				&& (a->vList.cdr == b->vList.cdr));
+		}
+	case ltNoAlloc:
 	default:
 		return 2;
 	case ltSymbol:
@@ -38,9 +46,12 @@ static int lValCompare(lClosure *c, lVal *v){
 		if((a->type == ltInf) && (b->type == ltInf)){return 0;}
 		if(a->type == ltInf){return 1;}
 		return -1;
-	case ltNoAlloc:
 	case ltBool:
-		return lBool(a) != lBool(b);
+		if((b->type != ltBool) || (a->type != ltBool)){
+			return -1;
+		}else{
+			return lBool(a) != lBool(b);
+		}
 	case ltInt:
 		a = lnfInt(c,a);
 		b = lnfInt(c,b);
