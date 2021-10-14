@@ -34,9 +34,12 @@ static void lStringAdvanceToNextLine(lString *s){
 }
 
 static lVal *lParseString(lString *s){
-	char buf[1<<20];
+	static char *buf = NULL;
+	const uint bufSize = 1<<20;
+	if(buf == NULL){buf = malloc(bufSize);}
+	if(buf == NULL){exit(99);}
 	char *b = buf;
-	for(uint i=0;i<sizeof(buf);i++){
+	for(uint i=0;i<bufSize;i++){
 		if(*s->data == '\\'){
 			s->data++;
 			switch(*s->data){
@@ -284,6 +287,7 @@ lVal *lReadString(lString *s){
 		}
 	}
 }
+#include <stdio.h>
 
 lVal *lRead(const char *str){
 	const u32 i = lStringAlloc();

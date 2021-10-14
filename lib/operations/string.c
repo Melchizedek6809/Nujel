@@ -167,7 +167,10 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 
 lVal *lnfCat(lClosure *c, lVal *v){
 	(void)c;
-	char tmpStringBuf[1<<20];
+	static char *tmpStringBuf = NULL;
+	const uint tmpStringBufSize = 1<<20;
+	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
+	if(tmpStringBuf == NULL){exit(99);}
 	char *buf = tmpStringBuf;
 	forEach(sexpr,v){
 		lVal *t = lCar(sexpr);
@@ -176,26 +179,26 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		switch(t->type){
 		default: break;
 		case ltInf: {
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"#inf");
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"#inf");
 			break; }
 		case ltSymbol: {
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%s",lvSym(t->vCdr)->c);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",lvSym(t->vCdr)->c);
 			break; }
 		case ltFloat: {
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%.5f",t->vFloat);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%.5f",t->vFloat);
 			for(;buf[clen-1] == '0';clen--){buf[clen]=0;}
 			if(buf[clen] == '0'){buf[clen] = 0;}
 			if(buf[clen-1] == '.'){buf[clen++] = '0';}
 			break; }
 		case ltInt: {
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%i",t->vInt);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%i",t->vInt);
 			break; }
 		case ltBool: {
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
 			break; }
 		case ltString:
 			if(t->vCdr == 0){continue;}
-			clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%s",lStrData(t));
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",lStrData(t));
 			break;
 		}
 		if(clen > 0){

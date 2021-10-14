@@ -23,10 +23,17 @@
 ]
 
 [def file/compile [λ [path no-write]
+	"Compile a Nujel source file into optimized object code"
 	[def source [read [file/read path]]]
 	[def object-code [compile [if [pair? [car source]] [cons 'do source] source]]]
 	[unless no-write [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
 	object-code
+]]
+
+[def file/eval [λ [path]
+	"Evaluate a Nujel source file in the current context"
+	[def source [cons 'do [read [file/read path]]]]
+	[eval source]
 ]]
 
 [def test-context "Nujel Standalone"]
