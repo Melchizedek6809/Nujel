@@ -6,6 +6,7 @@ xcuserdata/
 *.xcscmblueprint
 *.xccheckout
 /DerivedData/
+.vscode/
 
 # debugging/profiling data
 /callgrind.out.*
