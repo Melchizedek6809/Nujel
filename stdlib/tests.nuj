@@ -309,14 +309,16 @@
 [test-add 3 [wrap-value 3 2 4]]
 [test-add 2 [wrap-value 4 2 4]]
 [test-add 3 [wrap-value 5 2 4]]
+[test-add #f [and #nil #nil]]
+[test-add #t [eq? #f #f]]
+[test-add #t [eq? '[] #f]]
+[test-add #t [eq? #f '[]]]
 
-;[test-add #f [and #nil #nil]]
-;[test-add #t [eq? #f #f]]
 ;[test-add #t [eq? #nil #nil]]
 ;[test-add #t [eq? '[] '[]]]
 ;[test-add #t [eq? #nil #f]]
-;[test-add #t [eq? '[] #f]]
 ;[test-add #t [eq? '[] #nil]]
+
 ; Edge cases that still need a specified behaviour
 ; [test-add "[123 #nil]" '[123 #nil]]
 ; [test-add "[and #nil #nil]" '[and #nil #nil]]
