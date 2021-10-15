@@ -15,15 +15,11 @@ STDLIB_NOBS := $(STDLIB_NUJS:.nuj=.no)
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
-BIN_SRCS    := $(shell find bin -type f -name '*.c')
-BIN_HDRS    := $(shell find bin -type f -name '*.h')
-BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj' | sort)
-BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
-
 NUJEL       := ./nujel
 ASSET       := ./tools/assets
 
 CC                   := cc
+CC_MUSL              := musl-gcc
 CFLAGS               := -g -D_GNU_SOURCE
 CSTD                 := -std=c99
 OPTIMIZATION         := -O2
@@ -31,9 +27,13 @@ WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing
 
 LIBS                 := -lm
 
-RELEASE_OPTIMIZATION := -O3
+RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
 
+BIN_SRCS    := $(shell find bin -type f -name '*.c')
+BIN_HDRS    := $(shell find bin -type f -name '*.h')
+BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj' | sort)
+BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
@@ -45,7 +45,7 @@ BIN_OBJS    := $(BIN_SRCS:.c=.o)
 BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
 all: $(NUJEL)
-.PHONY: all release .deps
+.PHONY: all release release.musl
 
 include mk/ansi_colors.mk
 include mk/disable_implicit_rules.mk
@@ -62,7 +62,12 @@ endif
 
 .PHONY: clean
 clean:
-	@rm -f nujel nujel.exe nujel.a nujel.wa tools/assets tools/assets.exe $(shell find bin lib -type f -name '*.o') $(shell find bin lib -type f -name '*.wo') $(shell find bin lib -type f -name '*.d') $(shell find bin lib -type f -name '*.wd') $(shell find bin/lib stdlib -type f -name '*.no')
+	@rm -f -- nujel nujel.exe nujel.a nujel.wa tools/assets tools/assets.exe
+	@rm -f -- $(shell find bin lib -type f -name '*.o')
+	@rm -f -- $(shell find bin lib -type f -name '*.wo')
+	@rm -f -- $(shell find bin lib -type f -name '*.d')
+	@rm -f -- $(shell find bin lib -type f -name '*.wd')
+	@rm -f -- $(shell find bin/lib stdlib -type f -name '*.no')
 	@rm -rf tmp
 	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
 
@@ -95,6 +100,18 @@ nujel.a: $(LIB_OBJS) tmp/stdlib.o
 $(NUJEL): $(BIN_OBJS) tmp/binlib.o nujel.a
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+
+release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
+	@rm -f $(NUJEL)
+	$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(NUJEL) -x "[quit [test-run]]"
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
+release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
+	@rm -f $(NUJEL)
+	$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(NUJEL) -x "[quit [test-run]]"
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 tmp/stdlib.nuj: $(STDLIB_NUJS)
 	@mkdir -p tmp/
