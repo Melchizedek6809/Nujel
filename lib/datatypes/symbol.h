@@ -10,15 +10,13 @@ struct lSymbol {
 extern lSymbol  lSymbolList [SYM_MAX];
 extern uint     lSymbolMax;
 
-#define lvSym(i)  (i == 0 ? symNull : &lSymbolList[i & SYM_MASK])
-#define lvSymI(s) (s == NULL ? 0 : s - lSymbolList)
-#define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : lvSym(v->vCdr))
+#define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : v->vSymbol)
 
 extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
 extern lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void      lInitSymbol  ();
-lVal     *lValSymS     (const lSymbol *s);
+lVal     *lValSymS     (lSymbol *s);
 lVal     *lValSym      (const char *s);
 lSymbol  *lSymS        (const char *s);
 lSymbol  *lSymSL       (const char *s, uint len);

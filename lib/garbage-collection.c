@@ -30,20 +30,21 @@ static void lValGCMark(lVal *v){
 		lValGCMark(lCdr(v));
 		break;
 	case ltLambda:
-		lClosureGCMark(&lClo(v->vCdr));
+		lClosureGCMark(v->vClosure);
 		break;
 	case ltArray:
-		lArrayGCMark(&lArr(v));
+		lArrayGCMark(v->vArray);
 		break;
 	case ltString:
-		lStrFlags(v) |= lfMarked;
+		if(v->vString == NULL){break;}
+		v->vString->flags |= lfMarked;
 		break;
 	case ltVec:
-		lVecFlags(v->vCdr) |= lfMarked;
+		v->vVec->flags |= lfMarked;
 		break;
 	case ltSpecialForm:
 	case ltNativeFunc:
-		lNFuncGCMark(&lNFN(v->vCdr));
+		lNFuncGCMark(v->vNFunc);
 		break;
 	default:
 		break;
@@ -56,15 +57,15 @@ static void lClosureGCMark(lClosure *c){
 
 	lValGCMark(c->data);
 	lValGCMark(c->text);
-	lClosureGCMark(&lClo(c->parent));
+	lClosureGCMark(c->parent);
 }
 
 static void lArrayGCMark(lArray *v){
-	if((v == NULL) || (v->nextFree != 0)){return;}
+	if(v == NULL){return;}
 	v->flags |= lfMarked;
 	for(int i=0;i<v->length;i++){
 		if(v->data[i] == 0){continue;}
-		lValGCMark(lValD(v->data[i]));
+		lValGCMark(v->data[i]);
 	}
 }
 
@@ -97,7 +98,7 @@ static void lGCMark(){
 	}
 	for(uint i=0;i<lVecMax;i++){
 		if(!(lVecList[i].flags & lfNoGC)){continue;}
-		lVecFlags(i) |= lfMarked;
+		lVecList[i].flags |= lfMarked;
 	}
 }
 
@@ -114,21 +115,21 @@ static void lGCSweep(){
 			lClosureList[i].flags &= ~lfMarked;
 			continue;
 		}
-		lClosureFree(i);
+		lClosureFree(&lClosureList[i]);
 	}
 	for(uint i=0;i<lStringMax;i++){
 		if(lStringList[i].flags & lfMarked){
 			lStringList[i].flags &= ~lfMarked;
 			continue;
 		}
-		lStringFree(i);
+		lStringFree(&lStringList[i]);
 	}
 	for(uint i=0;i<lArrayMax;i++){
 		if(lArrayList[i].flags & lfMarked){
 			lArrayList[i].flags &= ~lfMarked;
 			continue;
 		}
-		lArrayFree(i);
+		lArrayFree(&lArrayList[i]);
 	}
 	for(uint i=0;i<lNFuncMax;i++){
 		if(lNFuncList[i].flags & lfMarked){

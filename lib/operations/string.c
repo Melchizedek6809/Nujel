@@ -23,8 +23,7 @@ lVal *lnfStrlen(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return lValInt(0);}
-	if(lStrNull(t)){return lValInt(0);}
-	return lValInt(lStringLength(&lStr(t)));
+	return lValInt(lStringLength(t->vString));
 }
 
 lVal *lnfTrim(lClosure *c, lVal *v){
@@ -32,21 +31,20 @@ lVal *lnfTrim(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	if(lStrNull(t)){return lValInt(0);}
 	const char *s;
-	for(s = lStrData(t);*s != 0 && isspace((u8)*s);s++){}
-	int len = lStringLength(&lStr(t)) - (s -  lStrData(t));
+	for(s = t->vString->data;*s != 0 && isspace((u8)*s);s++){}
+	int len = lStringLength(t->vString) - (s -  t->vString->data);
 	for(;len > 0 && isspace((u8)s[len-1]);len--){}
 	char *buf = malloc(len+1);
 	memcpy(buf,s,len);
 	buf[len] = 0;
 	lVal *ret = lValAlloc();
 	ret->type = ltString;
-	ret->vCdr = lStringAlloc();
-	if(ret->vCdr == 0){return NULL;}
-	lStr(ret).flags |= lfHeapAlloc;
-	lStr(ret).buf = lStr(ret).data = buf;
-	lStr(ret).bufEnd = &lStrBuf(ret)[len];
+	ret->vString = lStringAlloc();
+	if(ret->vString == NULL){return NULL;}
+	ret->vString->flags |= lfHeapAlloc;
+	ret->vString->buf = ret->vString->data = buf;
+	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
 }
 
@@ -55,20 +53,19 @@ lVal *lnfStrDown(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	if(lStrNull(t)){return lValInt(0);}
-	const int len = lStringLength(&lStr(t));
+	const int len = lStringLength(t->vString);
 	char *buf = malloc(len+1);
 	for(int i=0;i<len;i++){
-		buf[i] = tolower((u8)lStrData(t)[i]);
+		buf[i] = tolower((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
 	lVal *ret = lValAlloc();
 	ret->type = ltString;
-	ret->vCdr = lStringAlloc();
-	if(ret->vCdr == 0){return NULL;}
-	lStr(ret).flags |= lfHeapAlloc;
-	lStr(ret).buf = lStr(ret).data = buf;
-	lStr(ret).bufEnd = &lStrBuf(ret)[len];
+	ret->vString = lStringAlloc();
+	if(ret->vString == NULL){return NULL;}
+	ret->vString->flags |= lfHeapAlloc;
+	ret->vString->buf = ret->vString->data = buf;
+	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
 }
 
@@ -77,20 +74,19 @@ lVal *lnfStrUp(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	if(lStrNull(t)){return lValInt(0);}
-	const int len = lStringLength(&lStr(t));
+	const int len = lStringLength(t->vString);
 	char *buf = malloc(len+1);
 	for(int i=0;i<len;i++){
-		buf[i] = toupper((u8)lStrData(t)[i]);
+		buf[i] = toupper((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
 	lVal *ret = lValAlloc();
 	ret->type = ltString;
-	ret->vCdr = lStringAlloc();
-	if(ret->vCdr == 0){return NULL;}
-	lStrFlags(ret) |= lfHeapAlloc;
-	lStrBuf(ret) = lStrData(ret) = buf;
-	lStrEnd(ret) = &lStrBuf(ret)[len];
+	ret->vString = lStringAlloc();
+	if(ret->vString == NULL){return NULL;}
+	ret->vString->flags |= lfHeapAlloc;
+	ret->vString->buf = ret->vString->data = buf;
+	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
 }
 
@@ -99,31 +95,30 @@ lVal *lnfStrCap(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	if(lStrNull(t)){return lValInt(0);}
-	const int len = lStringLength(&lStr(t));
+	const int len = lStringLength(t->vString);
 	char *buf = malloc(len+1);
 	int cap = 1;
 	for(int i=0;i<len;i++){
-		if(isspace((u8)lStrData(t)[i])){
+		if(isspace((u8)t->vString->data[i])){
 			cap = 1;
-			buf[i] = lStrData(t)[i];
+			buf[i] = t->vString->data[i];
 		}else{
 			if(cap){
-				buf[i] = toupper((u8)lStrData(t)[i]);
+				buf[i] = toupper((u8)t->vString->data[i]);
 				cap = 0;
 			}else{
-				buf[i] = tolower((u8)lStrData(t)[i]);
+				buf[i] = tolower((u8)t->vString->data[i]);
 			}
 		}
 	}
 	buf[len] = 0;
 	lVal *ret = lValAlloc();
 	ret->type = ltString;
-	ret->vCdr = lStringAlloc();
-	if(ret->vCdr == 0){return NULL;}
-	lStrFlags(ret) |= lfHeapAlloc;
-	lStrBuf(ret) = lStrData(ret) = buf;
-	lStrEnd(ret) = &lStrBuf(ret)[len];
+	ret->vString = lStringAlloc();
+	if(ret->vString == 0){return NULL;}
+	ret->vString->flags |= lfHeapAlloc;
+	ret->vString->buf = ret->vString->data = buf;
+	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
 }
 
@@ -137,9 +132,9 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 	lVal *str = lCar(v);
 	if(str == NULL)          {return NULL;}
 	if(str->type != ltString){return NULL;}
-	if(str->vCdr == 0)       {return NULL;}
-	buf  = lStrData(str);
-	slen = len = lStringLength(&lStr(str));
+	if(str->vString == 0)    {return NULL;}
+	buf  = str->vString->data;
+	slen = len = lStringLength(str->vString);
 
 	if(lCdr(v) != NULL){
 		v = lCdr(v);
@@ -163,7 +158,7 @@ lVal *lnfSubstr(lClosure *c, lVal *v){
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltString;
-	ret->vCdr = lStringNew(&buf[start], len);
+	ret->vString = lStringNew(&buf[start], len);
 	return ret;
 }
 
@@ -186,7 +181,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"#inf");
 			break;
 		case ltSymbol:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",lvSym(t->vCdr)->c);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vSymbol->c);
 			break;
 		case ltFloat:
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%.5f",t->vFloat);
@@ -201,8 +196,8 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
 			break;
 		case ltString:
-			if(t->vCdr == 0){continue;}
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",lStrData(t));
+			if(t->vString == NULL){continue;}
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vString->data);
 			break;
 		}
 		if(clen < 0){
@@ -278,7 +273,7 @@ lVal *lnfStrSym(lClosure *c, lVal *v){
 	v = lCar(v);
 	if(v == NULL){return NULL;}
 	if(v->type != ltString){return NULL;}
-	return lValSym(lStrData(v));
+	return lValSym(v->vString->data);
 }
 
 lVal *lnfSymStr(lClosure *c, lVal *v){
@@ -286,7 +281,7 @@ lVal *lnfSymStr(lClosure *c, lVal *v){
 	v = lCar(v);
 	if(v == NULL){return NULL;}
 	if(v->type != ltSymbol){return NULL;}
-	return lValString(lvSym(v->vCdr)->c);
+	return lValString(v->vSymbol->c);
 }
 
 lVal *lnfWriteStr(lClosure *c, lVal *v){

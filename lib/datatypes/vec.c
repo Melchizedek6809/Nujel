@@ -14,7 +14,7 @@
 lVec     lVecList[VEC_MAX];
 uint     lVecActive = 0;
 uint     lVecMax    = 1;
-uint     lVecFFree  = 0;
+lVec    *lVecFFree  = NULL;
 
 void lInitVec(){
 	lVecActive  = 0;
@@ -24,39 +24,38 @@ void lInitVec(){
 void lVecFree(uint i){
 	if((i == 0) || (i >= lVecMax)){return;}
 	lVec *v = &lVecList[i];
-	if(v->nextFree != 0){return;}
 	lVecActive--;
 	v->nextFree   = lVecFFree;
 	v->flags      = 0;
-	lVecFFree = i;
+	lVecFFree     = v;
 }
 
-uint lVecAlloc(){
+lVec *lVecAlloc(){
 	lVec *ret;
-	if(lVecFFree == 0){
+	if(lVecFFree == NULL){
 		if(lVecMax >= VEC_MAX-1){
 			lPrintError("lVec OOM ");
 			return 0;
 		}
 		ret = &lVecList[lVecMax++];
 	}else{
-		ret = &lVecList[lVecFFree & VEC_MASK];
+		ret = lVecFFree;
 		lVecFFree = ret->nextFree;
 	}
 	lVecActive++;
 	memset(ret,0,sizeof(lVec));
-	return ret - lVecList;
+	return ret;
 }
 
 lVal *lValVec(const vec v){
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return ret;}
 	ret->type = ltVec;
-	ret->vCdr = lVecAlloc();
-	if(ret->vCdr == 0){
+	ret->vVec = lVecAlloc();
+	if(ret->vVec == NULL){
 		lValFree(ret);
 		return NULL;
 	}
-	lVecV(ret->vCdr) = v;
+	ret->vVec->v = v;
 	return ret;
 }

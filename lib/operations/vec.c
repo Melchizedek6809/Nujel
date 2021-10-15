@@ -12,19 +12,19 @@
 static lVal *lnfVX(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).x);
+	return lValFloat(t->vVec->v.x);
 }
 
 static lVal *lnfVY(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).y);
+	return lValFloat(t->vVec->v.y);
 }
 
 static lVal *lnfVZ(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(lVecV(t->vCdr).z);
+	return lValFloat(t->vVec->v.z);
 }
 
 void lOperationsVector(lClosure *c){

@@ -16,7 +16,7 @@
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;
 uint     lValMax    = 1;
-uint     lValFFree  = 0;
+lVal    *lValFFree  = NULL;
 
 void lInitVal(){
 	lValActive = 0;
@@ -25,7 +25,7 @@ void lInitVal(){
 
 lVal *lValAlloc(){
 	lVal *ret;
-	if(lValFFree == 0){
+	if(lValFFree == NULL){
 		if(lValMax >= VAL_MAX-1){
 			lPrintError("lVal OOM\n");
 			exit(1);
@@ -33,8 +33,8 @@ lVal *lValAlloc(){
 		}
 		ret = &lValList[lValMax++];
 	}else{
-		ret       = &lValList[lValFFree & VAL_MASK];
-		lValFFree = ret->vCdr;
+		ret       = lValFFree;
+		lValFFree = ret->nextFree;
 	}
 	lValActive++;
 	*ret = (lVal){0};
@@ -45,24 +45,24 @@ void lGUIWidgetFree(lVal *v);
 void lValFree(lVal *v){
 	if((v == NULL) || (v->type == ltNoAlloc)){return;}
 	if(v->type == ltLambda){
-		lClo(v->vCdr).refCount--;
+		v->vClosure->refCount--;
 	}else if(v->type == ltGUIWidget){
 		lGUIWidgetFree(v);
 	}
 	lValActive--;
-	v->type   = ltNoAlloc;
-	v->vCdr   = lValFFree;
-	lValFFree = v - lValList;
+	v->type     = ltNoAlloc;
+	v->nextFree = lValFFree;
+	lValFFree   = v;
 }
 
 lVal *lValCopy(lVal *dst, const lVal *src){
 	if((dst == NULL) || (src == NULL)){return NULL;}
 	*dst = *src;
 	if(dst->type == ltString){
-		dst->vCdr = lStringNew(lStrData(src),lStringLength(&lStr(src)));
+		dst->vString = lStringNew(src->vString->buf,lStringLength(src->vString));
 	}else if(dst->type == ltVec){
-		dst->vCdr = lVecAlloc();
-		lVecV(dst->vCdr) = lVecV(src->vCdr);
+		dst->vVec = lVecAlloc();
+		*dst->vVec = *src->vVec;
 	}else if(dst->type == ltPair){
 		dst->vList.car = lValDup(dst->vList.car);
 		dst->vList.cdr = lValDup(dst->vList.cdr);

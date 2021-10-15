@@ -125,7 +125,7 @@ void doRepl(lClosure *c){
 		bestlineHistoryLoad(historyPath);
 	}
 	lVal *lastlsym = lValSym("lastl");
-	lVal *lastl    = lDefineClosureSym(c - lClosureList, lvSym(lastlsym->vCdr));
+	lVal *lastl    = lDefineClosureSym(c, lastlsym->vSymbol);
 	while(1){
 		char *str = bestline("> ");
 		if(str == NULL){
@@ -165,7 +165,7 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 	if(v != NULL){
 		lVal *t = lnfCat(c,v);
 		if((t != NULL) && (t->type == ltString)){
-			printf("%s",lStrData(t));
+			printf("%s",t->vString->data);
 		}
 	}
 	if(fgets(buf,sizeof(buf),stdin) == NULL){
@@ -298,6 +298,6 @@ int main(int argc, char *argv[]){
 	if(repl){
 		doRepl(c);
 	}
-	lClosureFree(c - lClosureList);
+	lClosureFree(c);
 	return 0;
 }

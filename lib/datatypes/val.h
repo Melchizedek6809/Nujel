@@ -5,11 +5,19 @@ struct lVal {
 	u8 flags;
 	u8 type;
 	union {
-		u32        vCdr;
 		bool       vBool;
 		lPair      vList;
 		int        vInt;
 		float      vFloat;
+		lVec      *vVec;
+		lArray    *vArray;
+		lString   *vString;
+		lSymbol   *vSymbol;
+		lClosure  *vClosure;
+		lNFunc    *vNFunc;
+		void      *vPointer;
+
+		lVal      *nextFree;
 	};
 };
 #define lfMarked    ( 1)
@@ -25,8 +33,6 @@ extern uint     lValMax;
 extern uint     lValActive;
 
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
-#define lValD(i) (i == 0 ? NULL : &lValList[i & VAL_MASK])
-#define lValI(v) (v == NULL ? 0 : v - lValList)
 
 void lInitVal();
 

@@ -2,11 +2,13 @@
 #include "../nujel.h"
 
 struct lClosure {
+	union {
+		lClosure *parent;
+		lClosure *nextFree;
+	};
 	lVal *data;
 	lVal *text;
 	lVal *source;
-	u16 parent;
-	u16 nextFree;
 	u16 flags;
 	u16 refCount;
 };
@@ -21,25 +23,19 @@ extern lClosure lClosureList[CLO_MAX];
 extern uint     lClosureMax;
 extern uint     lClosureActive;
 
-#define lClo(i)       lClosureList[i & CLO_MASK]
-#define lCloI(c)      (c == NULL ? 0 : c - lClosureList)
-#define lCloParent(i) lClosureList[i & CLO_MASK].parent
-#define lCloData(i)   lClosureList[i & CLO_MASK].data
-#define lCloText(i)   lClosureList[i & CLO_MASK].text
-#define lCloSource(i) lClosureList[i & CLO_MASK].source
-
 void      lInitClosure      ();
-uint      lClosureAlloc     ();
-uint      lClosureNew       (uint parent);
-void      lClosureFree      (uint c);
+lClosure *lClosureAlloc     ();
+lClosure *lClosureNew       (lClosure *parent);
+void      lClosureFree      (lClosure *c);
+int       lClosureID        (const lClosure *n);
 
-lVal     *lSearchClosureSym (uint c, lVal *ret, const char *str, uint len);
+lVal     *lSearchClosureSym (lClosure *c, lVal *ret, const char *str, uint len);
 lVal     *lResolve          (lClosure *c, lVal *v);
-lVal     *lResolveSym       (uint c, lVal *v);
+lVal     *lResolveSym       (lClosure *c, lVal *v);
 void      lDefineVal        (lClosure *c, const char *str, lVal *val);
 lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
 
-lVal     *lGetClosureSym    (uint      c, lSymbol *s);
-lVal     *lResolveClosureSym(uint      c, lSymbol *s);
-lVal     *lDefineClosureSym (uint      c, lSymbol *s);
-lVal     *lSearchClosureSym (uint      c, lVal *v, const char *str, uint len);
+lVal     *lGetClosureSym    (lClosure *c, lSymbol *s);
+lVal     *lResolveClosureSym(lClosure *c, lSymbol *s);
+lVal     *lDefineClosureSym (lClosure *c, lSymbol *s);
+lVal     *lSearchClosureSym (lClosure *c, lVal *v, const char *str, uint len);

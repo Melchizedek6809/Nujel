@@ -16,7 +16,6 @@
 lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
-uint    lSymbolFFree  = 0;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
 lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
@@ -75,12 +74,12 @@ lSymbol *lSymS(const char *str){
 	return &lSymbolList[lSymbolMax++];
 }
 
-lVal *lValSymS(const lSymbol *s){
+lVal *lValSymS(lSymbol *s){
 	if(s == NULL){return NULL;}
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltSymbol;
-	ret->vCdr = lvSymI(s);
+	ret->vSymbol = s;
 	return ret;
 }
 
@@ -110,8 +109,8 @@ bool lSymKeyword(const lSymbol *s){
 
 int lSymCmp(const lVal *a,const lVal *b){
 	if((a == NULL) || (b == NULL)){return 2;}
-	if((a->type != ltSymbol) || (b->type != ltSymbol) || (a->vCdr == 0)){return 2;}
-	return a->vCdr == b->vCdr ? 0 : -1;
+	if((a->type != ltSymbol) || (b->type != ltSymbol) || (a->vSymbol == NULL)){return 2;}
+	return a->vSymbol == b->vSymbol ? 0 : -1;
 }
 
 int lSymEq(const lSymbol *a,const lSymbol *b){

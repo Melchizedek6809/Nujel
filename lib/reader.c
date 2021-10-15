@@ -94,7 +94,7 @@ static lVal *lParseString(lString *s){
 			s->data++;
 			lVal *v = lValAlloc();
 			v->type = ltString;
-			v->vCdr = lStringNew(buf,b-buf);
+			v->vString = lStringNew(buf,b-buf);
 			return v;
 		}else{
 			*b++ = *s->data++;
@@ -298,9 +298,8 @@ lVal *lReadString(lString *s){
 }
 
 lVal *lRead(const char *str){
-	const u32 i = lStringAlloc();
-	if(i == 0){return NULL;}
-	lString *s  = &lStringList[i & STR_MASK];
+	lString *s  = lStringAlloc();
+	if(s == NULL){return NULL;}
 	s->data     = str;
 	s->buf      = str;
 	s->bufEnd   = &str[strlen(str)];

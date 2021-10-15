@@ -19,12 +19,12 @@ lVal *lnfArrLength(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){return lValInt(0);}
-	return lValInt(lArrLength(arr));
+	return lValInt(arr->vArray->length);
 }
 
 lVal *lnfArrRef(lClosure *c, lVal *v){
 	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray) || (v == NULL)){return NULL;}
+	if((arr == NULL) || (arr->type != ltArray)){return NULL;}
 	v = lCdr(v);
 	lVal *t = lCar(v);
 	if(t == NULL){return arr;}
@@ -32,9 +32,8 @@ lVal *lnfArrRef(lClosure *c, lVal *v){
 	const lVal *lkey = lnfInt(c,t);
 	if(lkey == NULL){return NULL;}
 	const int key = lkey->vInt;
-	if((key < 0) || (key >= lArrLength(arr))){return NULL;}
-	const int val = lArrData(arr)[key];
-	return lValD(val);
+	if((key < 0) || (key >= arr->vArray->length)){return NULL;}
+	return arr->vArray->data[key];
 }
 
 lVal *lnfArrSet(lClosure *c, lVal *v){
@@ -47,53 +46,52 @@ lVal *lnfArrSet(lClosure *c, lVal *v){
 	const lVal *lkey = lnfInt(c,t);
 	if(lkey == NULL){return NULL;}
 	int key = lkey->vInt;
-	if((key < 0) || (key >= lArrLength(arr))){return NULL;}
+	if((key < 0) || (key >= arr->vArray->length)){return NULL;}
 	v = lCdr(v);
 	forEach(cur,v){
 		lVal *cv = lCar(cur);
-		lArrData(arr)[key++] = cv == NULL ? 0 : lValI(cv);
-		if(key >= lArrLength(arr)){return NULL;}
+		arr->vArray->data[key++] = cv;
+		if(key >= arr->vArray->length){return NULL;}
 	}
-	int val = lArrData(arr)[key];
-	return lValD(val);
+	return arr->vArray->data[key];
 }
+
 
 lVal *lnfArrNew(lClosure *c, lVal *v){
 	lVal *t = lnfInt(c,v);
 	if((t == NULL) || (t->type != ltInt)){return NULL;}
 	lVal *r = lValAlloc();
 	r->type = ltArray;
-	r->vCdr = lArrayAlloc();
-	lArrLength(r) = t->vInt;
-	lArrData(r) = malloc(t->vInt * sizeof(*lArrData(r)));
-	if(lArrData(r) == NULL){
-		lArrLength(r) = 0;
+	r->vArray = lArrayAlloc();
+	r->vArray->length = t->vInt;
+	r->vArray->data = calloc(t->vInt,sizeof(*r->vArray->data));
+	if(r->vArray->data == NULL){
+		lArrayFree(r->vArray);
+		lValFree(r);
 		return NULL;
 	}
-	memset(lArrData(r),0,lArrLength(r) * sizeof(*lArrData(r)));
 	return r;
 }
 
 lVal *lnfArr(lClosure *c, lVal *v){
 	if((c == NULL) || (v == NULL)){return NULL;}
-	lVal *vals = v;
-	int length = lListLength(vals);
+	int length = lListLength(v);
 	lVal *r = lValAlloc();
 	r->type = ltArray;
-	r->vCdr = lArrayAlloc();
-	if(r->vCdr == 0){return NULL;}
-	lArray *arr = &lArr(r);
+	lArray *arr = lArrayAlloc();
+	if(arr == NULL){return NULL;}
+	r->vArray = arr;
 	arr->length = length;
-	arr->data = malloc(length * sizeof(*arr->data));
+	arr->data = calloc(length,sizeof(*arr->data));
 	if(arr->data == NULL){
 		arr->length = 0;
+		lArrayFree(arr);
 		lValFree(r);
 		return NULL;
 	}
-	memset(lArrData(r),0,lArrLength(r) * sizeof(*arr->data));
 	int key = 0;
-	forEach(cur,vals){
-		lArrData(r)[key++] = lValI(lCar(cur));
+	forEach(cur, v){
+		arr->data[key++] = lCar(cur);
 	}
 	return r;
 }

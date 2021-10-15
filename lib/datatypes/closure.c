@@ -14,87 +14,83 @@
 	#include <string.h>
 #endif
 
-lClosure lClosureList[CLO_MAX];
-uint     lClosureActive = 0;
-uint     lClosureMax    = 1;
-uint     lClosureFFree  = 0;
+lClosure  lClosureList[CLO_MAX];
+uint      lClosureActive = 0;
+uint      lClosureMax    = 1;
+lClosure *lClosureFFree  = NULL;
 
 void lInitClosure(){
 	lClosureActive  = 0;
 	lClosureMax     = 1;
 }
 
-uint lClosureAlloc(){
+lClosure *lClosureAlloc(){
 	lClosure *ret;
-	if(lClosureFFree == 0){
+	if(lClosureFFree == NULL){
 		if(lClosureMax >= CLO_MAX-1){
 			lPrintError("lClosure OOM ");
 			return 0;
 		}
 		ret = &lClosureList[lClosureMax++];
 	}else{
-		ret = &lClosureList[lClosureFFree & CLO_MASK];
+		ret = lClosureFFree;
 		lClosureFFree = ret->nextFree;
 	}
 	lClosureActive++;
 	*ret = (lClosure){0};
 	ret->flags = lfUsed;
-	return ret - lClosureList;
+	return ret;
 }
 
-void lClosureFree(uint c){
-	if((c == 0) || (c >= lClosureMax)){return;}
-	lClosure *clo = &lClosureList[c];
-	if(!(clo->flags & lfUsed)){return;}
+void lClosureFree(lClosure *clo){
+	if((clo == NULL) || !(clo->flags & lfUsed)){return;}
 	lClosureActive--;
-	clo->nextFree   = lClosureFFree;
-	clo->flags      = 0;
-	lClosureFFree = c;
+	clo->nextFree = lClosureFFree;
+	clo->flags    = 0;
+	lClosureFFree = clo;
 }
 
-uint lClosureNew(uint parent){
-	const uint i = lClosureAlloc();
-	if(i == 0){return 0;}
-	lClosure *c = &lClosureList[i];
+lClosure *lClosureNew(lClosure *parent){
+	lClosure *c = lClosureAlloc();
+	if(c == NULL){return NULL;}
 	c->parent = parent;
-	lClosure *p = &lClosureList[parent & CLO_MASK];
-	p->refCount++;
-	return i;
+	if(parent != NULL){
+		parent->refCount++;
+	}
+	return c;
 }
 
-lVal *lSearchClosureSym(uint c, lVal *ret, const char *str, uint len){
+lVal *lSearchClosureSym(lClosure *c, lVal *ret, const char *str, uint len){
 	if(c == 0){return ret;}
 
-	forEach(n,lCloData(c)){
+	forEach(n, c->data){
 		lVal *e = lCaar(n);
 		if((e == NULL) || (e->type != ltSymbol)){continue;}
-		lSymbol *sym = lvSym(e->vCdr);
-		if(sym == NULL){continue;}
-		if(strncmp(sym->c,str,len)){continue;}
+		if(strncmp(e->vSymbol->c,str,len)){continue;}
 		ret = lCons(e,ret);
 	}
-	return lSearchClosureSym(lCloParent(c),ret,str,len);
+	return lSearchClosureSym(c->parent,ret,str,len);
 }
 
 lVal *lResolve(lClosure *c, lVal *v){
 	v = lCar(v);
 	for(int i=0;i<16;i++){
 		if((v == NULL) || (v->type != ltSymbol)){break;}
-		v = lResolveSym(c - lClosureList,v);
+		v = lResolveSym(c,v);
 	}
 	return v;
 }
 
-lVal *lResolveSym(uint c, lVal *v){
+lVal *lResolveSym(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltSymbol)){return NULL;}
-	lSymbol *sym = lvSym(v->vCdr);
+	lSymbol *sym = v->vSymbol;
 	if(lSymKeyword(sym)){return v;}
 	lVal *ret = lGetClosureSym(c,sym);
 	return ret == NULL ? NULL : lCar(ret);
 }
 
 void lDefineVal(lClosure *c, const char *str, lVal *val){
-	lVal *var = lDefineClosureSym(lCloI(c),lSymS(str));
+	lVal *var = lDefineClosureSym(c,lSymS(str));
 	if(var == NULL){return;}
 	var->vList.car = val;
 }
@@ -109,7 +105,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 			if(cur[len] == 0)    {break;}
 			if(isspace((u8)cur[len])){break;}
 		}
-		lVal *var = lDefineClosureSym(lCloI(c),lSymSL(cur,len));
+		lVal *var = lDefineClosureSym(c,lSymSL(cur,len));
 		if(var == NULL){
 			lPrintError("Error adding NFunc %s\n",sym);
 			return NULL;
@@ -125,36 +121,39 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	return NULL;
 }
 
-static lVal *lGetSym(uint c, lSymbol *s){
+static lVal *lGetSym(lClosure *c, lSymbol *s){
 	if((c == 0) || (s == NULL)){return NULL;}
-	uint sym = lvSymI(s);
-	forEach(v,lCloData(c)){
+	forEach(v, c->data){
 		lVal *cursym = lCaar(v);
-		if((cursym == NULL) || (sym != cursym->vCdr)){continue;}
+		if((cursym == NULL) || (s != cursym->vSymbol)){continue;}
 		return lCdar(v);
 	}
 	return NULL;
 }
 
-lVal *lGetClosureSym(uint c, lSymbol *s){
+lVal *lGetClosureSym(lClosure *c, lSymbol *s){
 	if(c == 0){return NULL;}
 	lVal *t = lGetSym(c,s);
-	return t != NULL ? t : lGetClosureSym(lCloParent(c),s);
+	return t != NULL ? t : lGetClosureSym(c->parent,s);
 }
 
-lVal *lDefineClosureSym(uint c, lSymbol *s){
+lVal *lDefineClosureSym(lClosure *c, lSymbol *s){
 	if(c == 0){return NULL;}
 	lVal *get = lGetSym(c,s);
 	if(get != NULL){return get;}
 	lVal *t = lCons(lValSymS(s),lCons(NULL,NULL));
 	if(t == NULL){return NULL;}
-	if(lCloData(c) == NULL){
-		lCloData(c) = lCons(t,NULL);
+	if(c->data == NULL){
+		c->data = lCons(t,NULL);
 	}else{
 		lVal *cdr = NULL;
-		for(cdr = lCloData(c);(cdr != NULL) && (lCdr(cdr) != NULL);cdr = lCdr(cdr)){}
+		for(cdr = c->data;(cdr != NULL) && (lCdr(cdr) != NULL);cdr = lCdr(cdr)){}
 		if(cdr == NULL){return NULL;}
 		cdr->vList.cdr = lCons(t,NULL);
 	}
 	return t->vList.cdr;
+}
+
+int lClosureID(const lClosure *n){
+	return n - lClosureList;
 }

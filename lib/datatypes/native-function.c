@@ -12,7 +12,7 @@
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
 uint     lNFuncMax    = 1;
-uint     lNFuncFFree  = 0;
+lNFunc  *lNFuncFFree  = NULL;
 
 void lInitNativeFunctions(){
 	lNFuncActive = 0;
@@ -28,24 +28,24 @@ void lNFuncFree(uint i){
 	nfn->doc      = NULL;
 	nfn->nextFree = lNFuncFFree;
 	nfn->flags    = 0;
-	lNFuncFFree   = i;
+	lNFuncFFree   = nfn;
 }
 
-uint lNFuncAlloc(){
+lNFunc *lNFuncAlloc(){
 	lNFunc *ret;
-	if(lNFuncFFree == 0){
+	if(lNFuncFFree == NULL){
 		if(lNFuncMax >= NFN_MAX-1){
 			lPrintError("lNFunc OOM ");
 			return 0;
 		}
 		ret = &lNFuncList[lNFuncMax++];
 	}else{
-		ret = &lNFuncList[lNFuncFFree & NFN_MASK];
+		ret = lNFuncFFree;
 		lNFuncFFree = ret->nextFree;
 	}
 	lNFuncActive++;
 	*ret = (lNFunc){0};
-	return ret - lNFuncList;
+	return ret;
 }
 
 lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
@@ -53,14 +53,14 @@ lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docStri
 	if(v == NULL){return NULL;}
 	v->type    = ltNativeFunc;
 	v->flags  |= lfConst;
-	v->vCdr    = lNFuncAlloc();
-	if(v->vCdr == 0){
+	lNFunc *fn = lNFuncAlloc();
+	if(fn == NULL){
 		lValFree(v);
 		return NULL;
 	}
-	lNFunc *fn = &lNFN(v->vCdr);
 	fn->fp     = func;
 	fn->doc    = lCons(args,docString);
+	v->vNFunc  = fn;
 	return v;
 }
 
@@ -73,4 +73,8 @@ lVal *lAddSpecialForm(lClosure *c, const char *sym, const char *args, const char
 	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
 	lNF->type = ltSpecialForm;
 	return lDefineAliased(c,lNF,sym);
+}
+
+int lNFuncID(const lNFunc *n){
+	return n - lNFuncList;
 }

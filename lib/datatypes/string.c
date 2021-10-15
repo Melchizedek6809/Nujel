@@ -9,6 +9,7 @@
 #include "../casting.h"
 #include "array.h"
 #include "closure.h"
+#include "native-function.h"
 #include "list.h"
 #include "symbol.h"
 #include "val.h"
@@ -24,7 +25,7 @@
 lString  lStringList[STR_MAX];
 uint     lStringActive = 0;
 uint     lStringMax    = 1;
-uint     lStringFFree  = 0;
+lString *lStringFFree  = NULL;
 
 char *ansiRS = "\033[0m";
 char *ansiFG[16] = {
@@ -51,41 +52,37 @@ void lInitStr(){
 	lStringMax    = 1;
 }
 
-u32 lStringAlloc(){
+lString *lStringAlloc(){
 	lString *ret;
-	if(lStringFFree == 0){
+	if(lStringFFree == NULL){
 		if(lStringMax >= STR_MAX){
 			lPrintError("lString OOM ");
 			return 0;
 		}
 		ret = &lStringList[lStringMax++];
 	}else{
-		ret = &lStringList[lStringFFree & STR_MASK];
-		lStringFFree  = ret->nextFree;
+		ret = lStringFFree;
+		lStringFFree = ret->nextFree;
 	}
 	lStringActive++;
 	*ret = (lString){0};
-	return ret - lStringList;
+	return ret;
 }
 
-void lStringFree(u32 v){
-	v = v & STR_MASK;
-	if((v == 0) || (v > lStringMax)){return;}
-	lString *s = &lStringList[v & STR_MASK];
+void lStringFree(lString *s){
+	if(s == NULL){return;}
 	if((s->buf != NULL) && (s->flags & lfHeapAlloc)){
 		free((void *)s->buf);
 		s->buf = NULL;
 	}
 	lStringActive--;
 	s->nextFree = lStringFFree;
-	lStringFFree = v;
+	lStringFFree = s;
 }
 
-u32 lStringNew(const char *str, uint len){
+lString *lStringNew(const char *str, uint len){
 	if(str == NULL){return 0;}
-	const u32 i = lStringAlloc();
-	if(i == 0){return 0;}
-	lString *s = &lStringList[i & STR_MASK];
+	lString *s = lStringAlloc();
 	if(s == NULL){return 0;}
 	char *nbuf = malloc(len+1);
 	if(nbuf == NULL){return 0;}
@@ -94,16 +91,13 @@ u32 lStringNew(const char *str, uint len){
 	s->flags |= lfHeapAlloc;
 	s->buf    = s->data = nbuf;
 	s->bufEnd = &s->buf[len];
-	return i;
+	return s;
 }
 
-u32 lStringDup(uint oi){
-	lString *os = &lStringList[oi & STR_MASK];
+lString *lStringDup(lString *os){
 	uint len = os->bufEnd - os->buf;
 	const char *str = os->data;
-	const u32 i = lStringAlloc();
-	if(i == 0){return 0;}
-	lString *s = &lStringList[i & STR_MASK];
+	lString *s = lStringAlloc();
 	if(s == NULL){return 0;}
 	char *nbuf = malloc(len+1);
 	memcpy(nbuf,str,len);
@@ -111,7 +105,7 @@ u32 lStringDup(uint oi){
 	s->flags |= lfHeapAlloc;
 	s->buf    = s->data = nbuf;
 	s->bufEnd = &s->buf[len];
-	return i;
+	return s;
 }
 
 int lStringLength(const lString *s){
@@ -123,8 +117,8 @@ lVal *lValString(const char *c){
 	lVal *t = lValAlloc();
 	if(t == NULL){return NULL;}
 	t->type = ltString;
-	t->vCdr = lStringNew(c,strlen(c));
-	if(t->vCdr == 0){
+	t->vString = lStringNew(c,strlen(c));
+	if(t->vString == NULL){
 		lValFree(t);
 		return NULL;
 	}
@@ -135,14 +129,14 @@ lVal *lValCString(const char *c){
 	lVal *t = lValAlloc();
 	if(t == NULL){return NULL;}
 	t->type = ltString;
-	t->vCdr = lStringAlloc();
-	if(t->vCdr == 0){
+	t->vString = lStringAlloc();
+	if(t->vString == NULL){
 		lValFree(t);
 		return NULL;
 	}
-	lStrBuf(t)    =  lStrData(t) = c;
-	lStrEnd(t)    = &lStrBuf(t)[strlen(c)];
-	lStrFlags(t) |=  lfConst;
+	t->vString->buf    = t->vString->data = c;
+	t->vString->bufEnd = c + strlen(c);
+	t->vString->flags  = lfConst;
 	return t;
 }
 
@@ -239,7 +233,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 	case ltLambda: {
 		*cur++ = '[';
 		int syms = 0;
-		lVal *cloText = lCloSource(v->vCdr);
+		lVal *cloText = v->vClosure->source;
 		forEach(n,cloText){
 			if(++syms > 2){ *cur++ = '\n';}
 			if(syms > 1){
@@ -255,7 +249,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		int oldIndent = indentLevel;
 		lVal *carSym = lCar(v);
 		if((carSym != NULL) && (carSym->type == ltSymbol) && (lCdr(v) != NULL)){
-			lSymbol *sym = lvSym(carSym->vCdr);
+			lSymbol *sym = carSym->vSymbol;
 			if(sym == symQuote){
 				v = lCadr(v);
 				*cur++ = '\'';
@@ -315,11 +309,11 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 	case ltArray: {
 		t = snprintf(cur,bufEnd-cur,"#[");
 		if(t > 0){cur += t;}
-		if(lArrData(v) != NULL){
-			const int arrLen = lArrLength(v);
+		if(v->vArray->data != NULL){
+			const int arrLen = v->vArray->length;
 			for(int i=0;i<arrLen;i++){
-				cur = lSWriteVal(lValD(lArrData(v)[i]),cur,bufEnd,indentLevel,display);
-				if(i < (lArrLength(v)-1)){*cur++ = ' ';}
+				cur = lSWriteVal(v->vArray->data[i],cur,bufEnd,indentLevel,display);
+				if(i < (arrLen-1)){*cur++ = ' ';}
 			}
 		}
 		t = snprintf(cur,bufEnd-cur,"]");
@@ -332,34 +326,34 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		break;
 	case ltVec:
 		t  = snprintf(buf,len,"[vec ");
-		t += bufPrintFloat(lVecV(v->vCdr).x,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec->v.x,&buf[t],t,len);
 		buf[t++] = ' ';
-		t += bufPrintFloat(lVecV(v->vCdr).y,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec->v.y,&buf[t],t,len);
 		buf[t++] = ' ';
-		t += bufPrintFloat(lVecV(v->vCdr).z,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec->v.z,&buf[t],t,len);
 		t += snprintf(&buf[t],len,"]");
 		break;
 	case ltString:
 		if(display){
-			t = snprintf(buf,len,"%s",lStrData(v));
+			t = snprintf(buf,len,"%s",v->vString->data);
 		}else{
-			t = bufWriteString(buf,len,lStrData(v));
+			t = bufWriteString(buf,len,v->vString->data);
 		}
 		break;
 	case ltSymbol:
-		t = snprintf(buf,len,"%s",lvSym(v->vCdr)->c);
+		t = snprintf(buf,len,"%s",v->vSymbol->c);
 		break;
 	case ltSpecialForm:
-		t = snprintf(buf,len,"#sfo_%u",v->vCdr);
+		t = snprintf(buf,len,"#sfo_%u",lNFuncID(v->vNFunc));
 		break;
 	case ltNativeFunc:
-		t = snprintf(buf,len,"#cfn_%u",v->vCdr);
+		t = snprintf(buf,len,"#cfn_%u",lNFuncID(v->vNFunc));
 		break;
 	case ltInf:
 		t = snprintf(buf,len,"#inf");
 		break;
 	case ltGUIWidget:
-		t = snprintf(buf,len,"#gui_%u",v->vCdr);
+		t = snprintf(buf,len,"#gui_%p",v->vPointer);
 		break;
 	}
 

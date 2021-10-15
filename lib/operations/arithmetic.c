@@ -20,7 +20,7 @@
 
 static lVal *lnfAddV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){
-		lVecV(t->vCdr) = vecAdd(lVecV(t->vCdr),lVecV(lCar(vv)->vCdr));
+		t->vVec->v = vecAdd(t->vVec->v,lCar(vv)->vVec->v);
 	}
 	return t;
 }
@@ -44,7 +44,7 @@ lVal *lnfAdd(lClosure *c, lVal *v){
 
 static lVal *lnfSubV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){
-		lVecV(t->vCdr) = vecSub(lVecV(t->vCdr),lVecV(lCar(vv)->vCdr));
+		t->vVec->v = vecSub(t->vVec->v,lCar(vv)->vVec->v);
 	}
 	return t;
 }
@@ -70,7 +70,7 @@ lVal *lnfSub(lClosure *c, lVal *v){
 
 static lVal *lnfMulV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){
-		lVecV(t->vCdr) = vecMul(lVecV(t->vCdr),lVecV(lCar(vv)->vCdr));
+		t->vVec->v = vecMul(t->vVec->v,lCar(vv)->vVec->v);
 	}
 	return t;
 }
@@ -90,7 +90,7 @@ lVal *lnfMul(lClosure *c, lVal *v){
 
 static lVal *lnfDivV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){
-		lVecV(t->vCdr) = vecDiv(lVecV(t->vCdr),lVecV(lCar(vv)->vCdr));
+		t->vVec->v = vecDiv(t->vVec->v,lCar(vv)->vVec->v);
 	}
 	return t;
 }
@@ -118,7 +118,7 @@ lVal *lnfDiv(lClosure *c, lVal *v){
 
 static lVal *lnfModV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){
-		lVecV(t->vCdr) = vecMod(lVecV(t->vCdr),lVecV(lCar(vv)->vCdr));
+		t->vVec->v = vecMod(t->vVec->v,lCar(vv)->vVec->v);
 	}
 	return t;
 }
@@ -153,7 +153,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	case ltInt:
 		return lValInt(abs(t->vInt));
 	case ltVec:
-		return lValVec(vecAbs(lVecV(t->vCdr)));
+		return lValVec(vecAbs(t->vVec->v));
 	}
 }
 
@@ -168,7 +168,7 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(sqrtf(t->vInt));
 	case ltVec:
-		return lValVec(vecSqrt(lVecV(t->vCdr)));
+		return lValVec(vecSqrt(t->vVec->v));
 	}
 }
 
@@ -183,7 +183,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecCeil(lVecV(t->vCdr)));
+		return lValVec(vecCeil(t->vVec->v));
 	}
 }
 
@@ -198,7 +198,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecFloor(lVecV(t->vCdr)));
+		return lValVec(vecFloor(t->vVec->v));
 	}
 }
 
@@ -213,7 +213,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecRound(lVecV(t->vCdr)));
+		return lValVec(vecRound(t->vVec->v));
 	}
 }
 
@@ -267,14 +267,14 @@ lVal *lnfPow(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(powf(t->vInt,u->vInt));
 	case ltVec:
-		return lValVec(vecPow(lVecV(t->vCdr),lVecV(u->vCdr)));
+		return lValVec(vecPow(t->vVec->v,u->vVec->v));
 	}
 }
 
 lVal *lnfVMag(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(vecMag(lVecV(t->vCdr)));
+	return lValFloat(vecMag(t->vVec->v));
 }
 
 lVal *infixFunctions[32];
@@ -300,8 +300,8 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 		lVal *func;
 		for(lVal *cur=start;cur != NULL;cur=lCdr(cur)){
 			tryAgain: func = lCadr(cur);
-			if((func == NULL) || (func->vCdr == 0))  {break;}
-			if(func->vCdr != infixFunctions[i]->vCdr){continue;}
+			if(func == NULL){break;}
+			if(func->vNFunc != infixFunctions[i]->vNFunc){continue;}
 			if(func->type != infixFunctions[i]->type){continue;}
 			lVal *args = cur;
 			lVal *tmp = args->vList.car;

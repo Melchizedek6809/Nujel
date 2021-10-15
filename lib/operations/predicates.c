@@ -40,8 +40,8 @@ static int lValCompare(lClosure *c, lVal *v){
 	case ltSymbol:
 	case ltLambda:
 	case ltNativeFunc:
-		if(a->type != b->type){return -1;}
-		if(b->vCdr != a->vCdr){return -1;}
+		if(a->type   != b->type)  {return -1;}
+		if(b->vNFunc != a->vNFunc){return -1;}
 		return 0;
 	case ltInf:
 		if((a == NULL) || (b == NULL)){return  2;}
@@ -69,10 +69,10 @@ static int lValCompare(lClosure *c, lVal *v){
 		else if(a->vFloat  < b->vFloat){return -1;}
 		return 1;
 	case ltString: {
-		const uint alen = lStringLength(&lStr(a));
-		const uint blen = lStringLength(&lStr(b));
-		const char *ab = lStrBuf(a);
-		const char *bb = lStrBuf(b);
+		const uint alen = lStringLength(a->vString);
+		const uint blen = lStringLength(b->vString);
+		const char *ab = a->vString->buf;
+		const char *bb = b->vString->buf;
 		for(uint i=0;i<alen;i++){
 			const u8 ac = ab[i];
 			const u8 bc = bb[i];

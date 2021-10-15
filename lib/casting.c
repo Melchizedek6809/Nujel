@@ -38,10 +38,10 @@ lVal *lnfInt(lClosure *c, lVal *v){
 	case ltFloat:
 		return lValInt(v->vFloat);
 	case ltVec:
-		return lValInt(lVecV(v->vCdr).x);
+		return lValInt(v->vVec->v.x);
 	case ltString:
-		if(v->vCdr == 0){return lValInt(0);}
-		return lValInt(atoi(lStrData(v)));
+		if(v->vString == NULL){return lValInt(0);}
+		return lValInt(atoi(v->vString->data));
 	case ltPair:
 		return lnfInt(c,lCar(v));
 	}
@@ -56,10 +56,10 @@ lVal *lnfFloat(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(v->vInt);
 	case ltVec:
-		return lValFloat(lVecV(v->vCdr).x);
+		return lValFloat(v->vVec->v.x);
 	case ltString:
-		if(v->vCdr == 0){return lValFloat(0);}
-		return lValFloat(atof(lStrData(v)));
+		if(v->vString == NULL){return lValFloat(0);}
+		return lValFloat(atof(v->vString->data));
 	case ltPair:
 		return lnfFloat(c,v->vList.car);
 	}
@@ -137,9 +137,9 @@ lVal *lnfString(lClosure *c, lVal *t){
 	}
 
 	buf[len] = 0;
-	lVal *ret = lValAlloc();
-	ret->type = ltString;
-	ret->vCdr = lStringNew(tmpStringBuf, len);
+	lVal *ret    = lValAlloc();
+	ret->type    = ltString;
+	ret->vString = lStringNew(tmpStringBuf, len);
 	return ret;
 }
 

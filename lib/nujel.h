@@ -18,8 +18,12 @@ typedef enum lType {
 	ltGUIWidget
 } lType;
 
+typedef struct lArray   lArray;;
 typedef struct lClosure lClosure;
+typedef struct lNFunc   lNFunc;;
 typedef struct lSymbol  lSymbol;
+typedef struct lString  lString;;
+typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 
 typedef struct {
