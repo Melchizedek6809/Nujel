@@ -14,10 +14,12 @@
 #include "val.h"
 #include "vec.h"
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
 
 lString  lStringList[STR_MAX];
 uint     lStringActive = 0;

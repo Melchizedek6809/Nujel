@@ -29,11 +29,13 @@
 #include "operations/time.h"
 #include "operations/vec.h"
 
-#include <ctype.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <math.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
 
 extern u8 stdlib_nuj_data[];
 

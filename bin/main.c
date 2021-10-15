@@ -3,15 +3,19 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#ifndef COSMOPOLITAN_H_
+	#include <stdarg.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <unistd.h>
 
-#ifdef __MINGW32__
-	#include <windows.h>
-	#include <shlobj.h>
+	#ifdef __MINGW32__
+		#include <windows.h>
+		#include <shlobj.h>
+	#else
+		#include "../vendor/bestline/bestline.h"
+	#endif
 #else
 	#include "../vendor/bestline/bestline.h"
 #endif

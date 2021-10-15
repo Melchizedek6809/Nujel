@@ -8,8 +8,9 @@
 #include "vec.h"
 #include "random-number-generator.h"
 
-#include <math.h>
-
+#ifndef COSMOPOLITAN_H_
+	#include <math.h>
+#endif
 
 vec vecSqrt(const vec a){
 	return (vec){{{sqrtf(a.x),sqrtf(a.y),sqrtf(a.z)}}};

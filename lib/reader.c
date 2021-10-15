@@ -8,10 +8,12 @@
 #include "datatypes/symbol.h"
 #include "datatypes/val.h"
 
-#include <ctype.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <math.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
 
 static void lStringAdvanceToNextCharacter(lString *s){
 	for(;(*s->data != 0) && (isspace((u8)*s->data));s->data++){}
@@ -294,7 +296,6 @@ lVal *lReadString(lString *s){
 		}
 	}
 }
-#include <stdio.h>
 
 lVal *lRead(const char *str){
 	const u32 i = lStringAlloc();

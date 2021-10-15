@@ -7,7 +7,9 @@
 
 #include "../casting.h"
 
-#include <stdlib.h>
+#ifndef COSMOPOLITAN_H_
+	#include <stdlib.h>
+#endif
 
 lArray   lArrayList[ARR_MAX];
 uint     lArrayActive = 0;

@@ -12,9 +12,11 @@
 #include "../datatypes/string.h"
 #include "../datatypes/val.h"
 
-#include <ctype.h>
-#include <math.h>
-#include <stdio.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <math.h>
+	#include <stdio.h>
+#endif
 
 static int lValCompare(lClosure *c, lVal *v){
 	if(v == NULL){return 2;}

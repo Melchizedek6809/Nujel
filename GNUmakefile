@@ -62,7 +62,7 @@ endif
 
 .PHONY: clean
 clean:
-	@rm -f -- nujel nujel.exe nujel.a nujel.wa tools/assets tools/assets.exe
+	@rm -f -- nujel nujel.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
 	@rm -f -- $(shell find bin lib -type f -name '*.o')
 	@rm -f -- $(shell find bin lib -type f -name '*.wo')
 	@rm -f -- $(shell find bin lib -type f -name '*.d')
@@ -111,6 +111,18 @@ release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(NUJEL) -x "[quit [test-run]]"
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
+release.cosmopolitan: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
+	@rm -f $(NUJEL)
+	@mkdir -p tmp/cosmopolitan
+	cd tmp/cosmopolitan && curl --silent -C - https://justine.lol/cosmopolitan/cosmopolitan-amalgamation-1.0.zip -o cosmopolitan.zip
+	cd tmp/cosmopolitan && echo "d6a11ec4cf85d79d172aacb84e2894c8d09e115ab1acec36e322708559a711cb  cosmopolitan.zip" | shasum -c -
+	cd tmp/cosmopolitan && unzip -u cosmopolitan.zip
+	gcc -o nujel.com.dbg $^ $(CSTD) -Os -static -fno-pie -no-pie -mno-red-zone -nostdlib -nostdinc \
+	-fno-omit-frame-pointer -pg -mnop-mcount -Wl,--gc-sections -fuse-ld=bfd \
+	-Wl,-T,tmp/cosmopolitan/ape.lds -include tmp/cosmopolitan/cosmopolitan.h tmp/cosmopolitan/crt.o tmp/cosmopolitan/ape.o tmp/cosmopolitan/cosmopolitan.a
+	objcopy -S -O binary nujel.com.dbg nujel.com
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 tmp/stdlib.nuj: $(STDLIB_NUJS)

@@ -11,10 +11,12 @@
 #include "../datatypes/symbol.h"
 #include "../datatypes/val.h"
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+#endif
 
 lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;

@@ -10,8 +10,10 @@
 #include "../datatypes/val.h"
 #include "../casting.h"
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <stdlib.h>
+	#include <string.h>
+#endif
 
 lVal *lnfArrLength(lClosure *c, lVal *v){
 	(void)c;

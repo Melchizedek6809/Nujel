@@ -9,8 +9,10 @@
 #include "../datatypes/string.h"
 #include "../datatypes/val.h"
 
-#include <time.h>
-#include <sys/time.h>
+#ifndef COSMOPOLITAN_H_
+	#include <time.h>
+	#include <sys/time.h>
+#endif
 
 static u64 getMSecs(){
 	struct timespec tv;

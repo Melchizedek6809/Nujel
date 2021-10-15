@@ -15,9 +15,11 @@
 #include "datatypes/vec.h"
 #include "operations/string.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <stdlib.h>
+	#include <stdio.h>
+	#include <string.h>
+#endif
 
 lVal *lnfInf(lClosure *c, lVal *v){
 	(void)c;
@@ -88,7 +90,7 @@ lVal *lnfVec(lClosure *c, lVal *v){
 
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
-	return lValBool(lCar(v));
+	return lValBool(lCar(v) != NULL);
 }
 
 bool lBool(const lVal *v){

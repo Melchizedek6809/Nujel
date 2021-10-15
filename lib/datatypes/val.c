@@ -9,7 +9,9 @@
 #include "string.h"
 #include "vec.h"
 
-#include <stdlib.h>
+#ifndef COSMOPOLITAN_H_
+	#include <stdlib.h>
+#endif
 
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;

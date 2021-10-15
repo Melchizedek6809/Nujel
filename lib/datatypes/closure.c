@@ -9,8 +9,10 @@
 #include "val.h"
 #include "../nujel.h"
 
-#include <ctype.h>
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <ctype.h>
+	#include <string.h>
+#endif
 
 lClosure lClosureList[CLO_MAX];
 uint     lClosureActive = 0;

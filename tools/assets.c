@@ -49,8 +49,8 @@ int main(int argc,char *argv[]){
 		fprintf(stderr,"Error opening src/tmp/assets*");
 		return 1;
 	}
-	fprintf(hfp,"#pragma once\n#include <stddef.h>\n\n");
-	fprintf(cfp,"#include <stddef.h>\n\n");
+	fprintf(hfp,"#pragma once\n#ifndef COSMOPOLITAN_H_\n\t#include <stddef.h>\n#endif\n\n");
+	fprintf(cfp,"#ifndef COSMOPOLITAN_H_\n\t#include <stddef.h>\n#endif\n\n");
 	for(i=2;i<argc;i++){
 		FILE *afp = fopen(argv[i],"rb");
 		if(afp == NULL){

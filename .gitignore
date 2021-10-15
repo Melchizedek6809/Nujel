@@ -19,6 +19,8 @@ gmon.out
 /tools/assets
 *.out
 *.a
+*.com
+*.dbg
 *.lib
 *.so
 *.o

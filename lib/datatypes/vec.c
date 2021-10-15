@@ -7,7 +7,9 @@
 #include "vec.h"
 #include "../nujel.h"
 
-#include <string.h>
+#ifndef COSMOPOLITAN_H_
+	#include <string.h>
+#endif
 
 lVec     lVecList[VEC_MAX];
 uint     lVecActive = 0;
