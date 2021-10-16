@@ -149,25 +149,18 @@ void doRepl(lClosure *c){
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
-	int ecode = 0;
-	if(v != NULL){
-		lVal *t = lnfInt(c,lCar(v));
-		if((t != NULL) && (t->type == ltInt)){
-			ecode = t->vInt;
-		}
-	}
-	exit(ecode);
+	(void)c;
+	exit(castToInt(lCar(v),0));
 	return NULL;
 }
 
 static lVal *lnfInput(lClosure *c, lVal *v){
-	static char buf[512];
-	if(v != NULL){
-		lVal *t = lnfCat(c,v);
-		if((t != NULL) && (t->type == ltString)){
-			printf("%s",t->vString->data);
-		}
+	(void)c;
+	const char *prompt = castToString(lCar(v),NULL);
+	if(prompt != NULL){
+		printf("%s",prompt);
 	}
+	char buf[4096];
 	if(fgets(buf,sizeof(buf),stdin) == NULL){
 		return NULL;
 	}
@@ -189,27 +182,23 @@ static lVal *lnfError(lClosure *c, lVal *v){
 }
 
 static lVal *lnfReadFile(lClosure *c, lVal *v){
-	const char *filename = NULL;
-	size_t len = 0;
-
-	v = getLArgS(c,v,&filename);
+	(void)c;
+	const char *filename = castToString(lCar(v),NULL);
 	if(filename == NULL){return NULL;}
+	size_t len = 0;
 	const char *data = loadFile(filename,&len);
 	lVal *ret = lValString(data);
 	free((void *)data);
-
 	return ret;
 
 }
 
 static lVal *lnfWriteFile(lClosure *c, lVal *v){
-	const char *filename = NULL;
-	const char *content = NULL;
-
-	v = getLArgS(c,v,&filename);
-	v = getLArgS(c,v,&content);
+	(void)c;
+	const char *filename = castToString( lCar(v),NULL);
+	const char *content  = castToString(lCadr(v),NULL);
 	if(filename == NULL){return NULL;}
-	if(content == NULL) {return NULL;}
+	if(content  == NULL){return NULL;}
 	size_t len = strnlen(content,1<<20);
 	saveFile(filename,content,len);
 	return NULL;

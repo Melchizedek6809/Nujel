@@ -18,13 +18,13 @@
 	#include <stdio.h>
 #endif
 
-static int lValCompare(lClosure *c, lVal *v){
+static int lValCompare(lVal *v){
 	if(v == NULL){return 2;}
 	lVal *a = lCar(v);
 	v = lCdr(v);
 	if(v == NULL){return 2;}
 	lVal *b = lCar(v);
-	if((a == NULL) || (b == NULL)){return lBool(a) != lBool(b);}
+	if((a == NULL) || (b == NULL)){return castToBool(a) != castToBool(b);}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
 	case ltPair:
@@ -52,22 +52,30 @@ static int lValCompare(lClosure *c, lVal *v){
 		if((b->type != ltBool) || (a->type != ltBool)){
 			return -1;
 		}else{
-			return lBool(a) != lBool(b);
+			return castToBool(a) != castToBool(b);
 		}
-	case ltInt:
-		a = lnfInt(c,a);
-		b = lnfInt(c,b);
+	case ltInt: {
 		if((a == NULL) || (b == NULL)){return  2;}
-		if(b->vInt == a->vInt)        {return  0;}
-		else if(a->vInt  < b->vInt)   {return -1;}
-		return 1;
-	case ltFloat:
-		a = lnfFloat(c,a);
-		b = lnfFloat(c,b);
+		const int av = castToInt(a,0);
+		const int bv = castToInt(b,0);
+		if(bv == av){
+			return  0;
+		}else if(av < bv){
+			return -1;
+		}else{
+			return  1;
+		}}
+	case ltFloat: {
 		if((a == NULL) || (b == NULL)) {return  2;}
-		if(b->vFloat == a->vFloat)     {return  0;}
-		else if(a->vFloat  < b->vFloat){return -1;}
-		return 1;
+		const float av = castToFloat(a,0.f);
+		const float bv = castToFloat(b,0.f);
+		if(bv == av){
+			return  0;
+		}else if(av < bv){
+			return -1;
+		}else{
+			return  1;
+		}}
 	case ltString: {
 		const uint alen = lStringLength(a->vString);
 		const uint blen = lStringLength(b->vString);
@@ -91,27 +99,32 @@ static int lValCompare(lClosure *c, lVal *v){
 }
 
 static lVal *lnfLess(lClosure *c, lVal *v){
-	const int cmp = lValCompare(c,v);
+	(void)c;
+	const int cmp = lValCompare(v);
 	return lValBool(cmp == 2 ? false : cmp < 0);
 }
 
 static lVal *lnfEqual(lClosure *c, lVal *v){
-	const int cmp = lValCompare(c,v);
+	(void)c;
+	const int cmp = lValCompare(v);
 	return lValBool(cmp == 2 ? false : cmp == 0);
 }
 
 static lVal *lnfLessEqual(lClosure *c, lVal *v){
-	const int cmp = lValCompare(c,v);
+	(void)c;
+	const int cmp = lValCompare(v);
 	return lValBool(cmp == 2 ? false : cmp <= 0);
 }
 
 static lVal *lnfGreater(lClosure *c, lVal *v){
-	const int cmp = lValCompare(c,v);
+	(void)c;
+	const int cmp = lValCompare(v);
 	return lValBool(cmp == 2 ? false : cmp > 0);
 }
 
 static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
-	const int cmp = lValCompare(c,v);
+	(void)c;
+	const int cmp = lValCompare(v);
 	return lValBool(cmp == 2 ? false : cmp >= 0);
 }
 

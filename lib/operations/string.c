@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "string.h"
+#include "../casting.h"
 #include "../nujel.h"
 #include "../datatypes/list.h"
 #include "../datatypes/native-function.h"
@@ -12,6 +13,7 @@
 #include "../datatypes/val.h"
 
 #ifndef COSMOPOLITAN_H_
+	#include <alloca.h>
 	#include <ctype.h>
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -217,19 +219,15 @@ lVal *lnfCat(lClosure *c, lVal *v){
 }
 
 lVal *lnfIndexOf(lClosure *c, lVal *v){
-	const char *haystack = NULL;
-	const char *needle = NULL;
-
-	v = getLArgS(c,v,&haystack);
+	(void)c;
+	const char *haystack = castToString(lCar(v),NULL);
+	const char *needle = castToString(lCadr(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}
-	const int haystackLength = strlen(haystack);
-
-	v = getLArgS(c,v,&needle);
 	if(needle == NULL)   {return lValInt(-2);}
+	const int haystackLength = strlen(haystack);
 	const int needleLength = strlen(needle);
 
-	int pos = 0;
-	v = getLArgI(c,v,&pos);
+	const int pos = castToInt(lCaddr(v),0);
 	if(pos > haystackLength-needleLength){return lValInt(-3);}
 	/* Empty strings just return the current position, this is so we can
          * split an empty string into each character by passing an empty string
@@ -245,20 +243,16 @@ lVal *lnfIndexOf(lClosure *c, lVal *v){
 }
 
 lVal *lnfLastIndexOf(lClosure *c, lVal *v){
-	const char *haystack = NULL;
-	const char *needle = NULL;
-
-	v = getLArgS(c,v,&haystack);
+	(void)c;
+	const char *haystack = castToString(lCar(v),NULL);
+	const char *needle = castToString(lCadr(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}
-	const int haystackLength = strlen(haystack);
-
-	v = getLArgS(c,v,&needle);
 	if(needle == NULL)   {return lValInt(-2);}
+	const int haystackLength = strlen(haystack);
 	const int needleLength = strlen(needle);
 
 	if(needleLength <= 0){return lValInt(-3);}
-	int pos = haystackLength - needleLength - 1;
-	v = getLArgI(c,v,&pos);
+	const int pos = castToInt(lCaddr(v),haystackLength - needleLength - 1);
 
 	for(const char *s = &haystack[pos]; s > haystack; s--){
 		if(strncmp(s,needle,needleLength) == 0){
@@ -297,12 +291,9 @@ lVal *lnfWriteStr(lClosure *c, lVal *v){
 }
 
 lVal *lnfCharAt(lClosure *c,lVal *v){
-	const char *str = NULL;
-	int pos = 0;
-
-	v = getLArgS(c,v,&str);
-	v = getLArgI(c,v,&pos);
-
+	(void)c;
+	const char *str = castToString(lCar(v),NULL);
+	const int pos = castToInt(lCadr(v),0);
 	if(str == NULL){return NULL;}
 	const int len = strlen(str);
 	if(pos >= len){return NULL;}
@@ -310,17 +301,18 @@ lVal *lnfCharAt(lClosure *c,lVal *v){
 }
 
 lVal *lnfFromCharCode(lClosure *c,lVal *v){
+	(void)c;
 	int len = lListLength(v)+1;
-	char *buf = malloc(len);
-	int i=0,code=0;
+	char *buf = alloca(len);
+	int i=0;
 
 	while(v != NULL){
-		v = getLArgI(c,v,&code);
-		buf[i++] = code;
+		buf[i++] = castToInt(lCar(v),0);
+		v = lCdr(v);
 		if(i >= len){break;}
 	}
+	buf[i] = 0;
 	v = lValString(buf);
-	free(buf);
 	return v;
 }
 

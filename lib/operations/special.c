@@ -12,7 +12,7 @@
 static lVal *lnfAnd(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(false);}
 	lVal *t = lEval(c,lCar(v));
-	if(lBool(t)){
+	if(castToBool(t)){
 		lVal *cdr = lCdr(v);
 		return cdr == NULL ? t : lnfAnd(c,cdr);
 	}
@@ -22,32 +22,32 @@ static lVal *lnfAnd(lClosure *c, lVal *v){
 static lVal *lnfOr(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(false);}
 	lVal *t = lEval(c,lCar(v));
-	return lBool(t) ? t : lnfOr(c,lCdr(v));
+	return castToBool(t) ? t : lnfOr(c,lCdr(v));
 }
 
 static lVal *lnfCond(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
-	return lBool(lEval(c,lCar(t)))
+	return castToBool(lEval(c,lCar(t)))
 	       ? lnfBegin(c,lCdr(t))
 	       : lnfCond(c,lCdr(v));
 }
 
 static lVal *lnfWhen(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
-	if(!lBool(lEval(c,lCar(v)))){return NULL;}
+	if(!castToBool(lEval(c,lCar(v)))){return NULL;}
 	return lnfBegin(c,lCdr(v));
 }
 
 static lVal *lnfUnless(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
-	if(lBool(lEval(c,lCar(v)))){return NULL;}
+	if(castToBool(lEval(c,lCar(v)))){return NULL;}
 	return lnfBegin(c,lCdr(v));
 }
 
 static lVal *lnfIf(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
-	const bool pred = lBool(lEval(c,lCar(v)));
+	const bool pred = castToBool(lEval(c,lCar(v)));
 	return lEval(c,pred ? lCadr(v) : lCaddr(v));
 }
 

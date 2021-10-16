@@ -78,10 +78,8 @@ static lVal *lSymTable(lClosure *c, lVal *v, int off, int len){
 }
 
 static lVal *lnfSymTable(lClosure *c, lVal *v){
-	lVal *loff = lnfInt(c,lCar(v));
-	lVal *llen = lnfInt(c,lCadr(v));
-	int off = loff->vInt;
-	int len = llen->vInt;
+	int off = castToInt(lCar(v),0);
+	int len = castToInt(lCadr(v),-1);
 	if(len <= 0){len = 1<<16;}
 	return lSymTable(c,NULL,off,len);
 }
@@ -103,19 +101,20 @@ static lVal *lnfSymCount(lClosure *c, lVal *v){
 	return lValInt(lSymCount(c,0));
 }
 
-static lVal *lnfCl(lClosure *c, lVal *v){
+static lVal *lCl(lClosure *c, int stepsLeft){
 	if(c == NULL){return NULL;}
-	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lCar(v));
-	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
-		return lnfCl(c->parent,lCons(lValInt(t->vInt - 1),NULL));
+	if(stepsLeft > 0){
+		return lCl(c->parent,stepsLeft-1);
 	}
 	return c->data != NULL ? c->data : lCons(NULL,NULL);
 }
 
+static lVal *lnfCl(lClosure *c, lVal *v){
+	return lCl(c,castToInt(lCar(v),0));
+}
+
 static lVal *lnfClText(lClosure *c, lVal *v){
 	(void)c;
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
@@ -128,7 +127,6 @@ static lVal *lnfClText(lClosure *c, lVal *v){
 
 static lVal *lnfClSource(lClosure *c, lVal *v){
 	(void)c;
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
@@ -139,7 +137,6 @@ static lVal *lnfClSource(lClosure *c, lVal *v){
 
 static lVal *lnfClData(lClosure *c, lVal *v){
 	(void)c;
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
@@ -150,18 +147,21 @@ static lVal *lnfClData(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfClLambda(lClosure *c, lVal *v){
+static lVal *lClLambda(lClosure *c, int stepsLeft){
 	if(c == NULL){return NULL;}
-	if(v == NULL){return c->data != NULL ? c->data : lCons(NULL,NULL);}
-	lVal *t = lnfInt(c,lCar(v));
-	if((t != NULL) && (t->type == ltInt) && (t->vInt > 0)){
-		return lnfClLambda(c->parent,lCons(lValInt(t->vInt - 1),NULL));
+	if(stepsLeft > 0){
+		return lClLambda(c->parent,stepsLeft-1);
 	}
 	lVal *ret = lValAlloc();
+	if(ret == NULL){return NULL;}
+	c->refCount++;
 	ret->type = ltLambda;
 	ret->vClosure = c;
-	c->refCount++;
 	return ret;
+}
+
+static lVal *lnfClLambda(lClosure *c, lVal *v){
+	return lClLambda(c,castToInt(lCar(v),0));
 }
 
 static lVal *lnfLet(lClosure *c, lVal *v){

@@ -43,23 +43,14 @@ void      lDisplayErrorVal  (lVal *v);
 void      lWriteVal         (lVal *v);
 
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
-lVal     *lCast             (lClosure *c, lVal *v, lType t);
 lVal     *lEval             (lClosure *c, lVal *v);
 lType     lTypecast         (const lType a,const lType b);
 lType     lTypecastList     (lVal *a);
 lType     lGetType          (lVal *v);
 
-lVal     *getLArgB          (lClosure *c, lVal *v, bool *res);
-lVal     *getLArgI          (lClosure *c, lVal *v, int *res);
-lVal     *getLArgF          (lClosure *c, lVal *v, float *res);
-lVal     *getLArgV          (lClosure *c, lVal *v, vec *res);
-lVal     *getLArgS          (lClosure *c, lVal *v, const char **res);
 lVal     *lConst            (lVal *v);
 lVal     *lnfBegin          (lClosure *c, lVal *v);
 lVal     *lWrap             (lVal *v);
-lVal     *lCastAuto         (lClosure *c, lVal *v);
-lVal     *lCastSpecific     (lClosure *c, lVal *v, const lType type);
-lVal     *lCastNumeric      (lClosure *c, lVal *v);
 
 #define lCastIApply(FUNC, c , v) do { \
 	if((c == NULL) || (v == NULL)){return lValInt(0);} \

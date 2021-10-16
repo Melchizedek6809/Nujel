@@ -5,6 +5,7 @@
  */
 #include "time.h"
 #include "../casting.h"
+#include "../datatypes/list.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/string.h"
 #include "../datatypes/val.h"
@@ -31,13 +32,11 @@ static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
 }
 
 static lVal *lnfStrftime(lClosure *c, lVal *v){
-	int timestamp = 0;
-	const char *format = "%Y-%m-%d %H:%M:%S";
+	(void)c;
+	const int timestamp = castToInt(lCar(v),time(NULL));
+	const char *format = castToString(lCadr(v),"%Y-%m-%d %H:%M:%S");
 
-	v = getLArgI(c,v,&timestamp);
-	v = getLArgS(c,v,&format);
-
-	char buf[1024];
+	char buf[4096];
 	time_t ts = timestamp;
 	struct tm *info = localtime(&ts);
 	strftime(buf,sizeof(buf),format,info);

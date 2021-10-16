@@ -1,12 +1,15 @@
 #pragma once
 #include "nujel.h"
 
-lVal *lnfInt    (lClosure *c, lVal *v);
-lVal *lnfFloat  (lClosure *c, lVal *v);
-lVal *lnfVec    (lClosure *c, lVal *v);
-lVal *lnfInf    (lClosure *c, lVal *v);
-lVal *lnfBool   (lClosure *c, lVal *v);
-lVal *lnfString (lClosure *c, lVal *v);
-bool  lBool     (const lVal *v);
+int         castToInt   (const lVal *v, int         fallback);
+float       castToFloat (const lVal *v, float       fallback);
+vec         castToVec   (const lVal *v, vec         fallback);
+bool        castToBool  (const lVal *v);
+const char *castToString(const lVal *v, const char *fallback);
 
-void lOperationsCasting(lClosure *c);
+lVal *lCast             (lClosure *c, lVal *v, lType t);
+lVal *lCastAuto         (lClosure *c, lVal *v);
+lVal *lCastSpecific     (lClosure *c, lVal *v, const lType type);
+lVal *lCastNumeric      (lClosure *c, lVal *v);
+
+void  lOperationsCasting(lClosure *c);

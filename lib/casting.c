@@ -93,16 +93,6 @@ lVal *lnfBool(lClosure *c, lVal *v){
 	return lValBool(lCar(v) != NULL);
 }
 
-bool lBool(const lVal *v){
-	if(v == NULL){return false;}
-	if(v->type == ltBool){
-		return v->vBool;
-	}else if(v->type == ltPair){
-		return (v->vList.car != NULL) || (v->vList.cdr != NULL);
-	}
-	return true;
-}
-
 lVal *lnfString(lClosure *c, lVal *t){
 	char tmpStringBuf[32];
 	char *buf = tmpStringBuf;
@@ -141,6 +131,100 @@ lVal *lnfString(lClosure *c, lVal *t){
 	ret->type    = ltString;
 	ret->vString = lStringNew(tmpStringBuf, len);
 	return ret;
+}
+
+lVal *lCast(lClosure *c, lVal *v, lType t){
+	switch(t){
+	default:
+		return v;
+	case ltString:
+		return lMap(c,v,lnfString);
+	case ltInt:
+		return lMap(c,v,lnfInt);
+	case ltFloat:
+		return lMap(c,v,lnfFloat);
+	case ltVec:
+		return lMap(c,v,lnfVec);
+	case ltInf:
+		return lMap(c,v,lnfInf);
+	case ltBool:
+		return lMap(c,v,lnfBool);
+	case ltNoAlloc:
+		return NULL;
+	}
+}
+
+int castToInt(const lVal *v, int fallback){
+	if(v == NULL){return fallback;}
+	switch(v->type){
+	case ltVec:
+		return v->vVec->v.x;
+	case ltFloat:
+		return v->vFloat;
+	case ltInt:
+		return v->vInt;
+	default:
+		return fallback;
+	}
+}
+
+float castToFloat(const lVal *v, float fallback){
+	if(v == NULL){return fallback;}
+	switch(v->type){
+	case ltVec:
+		return v->vVec->v.x;
+	case ltFloat:
+		return v->vFloat;
+	case ltInt:
+		return v->vInt;
+	default:
+		return fallback;
+	}
+}
+
+vec castToVec(const lVal *v, vec fallback){
+	if(v == NULL){return fallback;}
+	switch(v->type){
+	case ltVec:
+		return v->vVec->v;
+	case ltFloat:
+		return vecNew(v->vFloat,v->vFloat,v->vFloat);
+	case ltInt:
+		return vecNew(v->vInt,v->vInt,v->vInt);
+	default:
+		return fallback;
+	}
+}
+
+bool castToBool(const lVal *v){
+	if(v == NULL){return false;}
+	if(v->type == ltBool){
+		return v->vBool;
+	}else if(v->type == ltPair){
+		return (v->vList.car != NULL) || (v->vList.cdr != NULL);
+	}
+	return true;
+}
+
+const char *castToString(const lVal *v, const char *fallback){
+	if(v == NULL){return fallback;}
+	if(v->type != ltString){return fallback;}
+	return v->vString->data;
+}
+
+lVal *lCastAuto(lClosure *c, lVal *v){
+	lVal *t = lMap(c,v,lEval);
+	return lCast(c,t,lTypecastList(t));
+}
+
+lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
+	return lCast(c,v,type);
+}
+
+lVal *lCastNumeric(lClosure *c, lVal *v){
+	lType type = lTypecastList(v);
+	if(type == ltString){type = ltFloat;}
+	return lCast(c,v,type);
 }
 
 void lOperationsCasting(lClosure *c){

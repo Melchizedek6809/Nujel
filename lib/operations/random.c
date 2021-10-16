@@ -4,13 +4,15 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "random.h"
+#include "../casting.h"
 #include "../random-number-generator.h"
+#include "../datatypes/list.h"
 #include "../datatypes/native-function.h"
 #include "../datatypes/val.h"
 
 static lVal *lnfRandom(lClosure *c, lVal *v){
-	int n = 0;
-	v = getLArgI(c,v,&n);
+	(void)c;
+	const int n = castToInt(lCar(v),0);
 	if(n == 0){
 		return lValInt(rngValR());
 	}else{
@@ -24,11 +26,8 @@ static lVal *lnfRandomSeedGet(lClosure *c, lVal *v){
 }
 
 static lVal *lnfRandomSeedSet(lClosure *c, lVal *v){
-	if(v != NULL){
-		int n = 0;
-		v = getLArgI(c,v,&n);
-		seedRNG(n);
-	}
+	(void)c;
+	seedRNG(castToInt(lCar(v),0));
 	return NULL;
 }
 
