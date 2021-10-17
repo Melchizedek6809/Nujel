@@ -79,8 +79,9 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	ret->vClosure = cl;
 
 	forEach(n,lCar(v)){
-		if(lGetType(lCar(n)) != ltSymbol){continue;}
-		lVal *t = lDefineClosureSym(cl,lGetSymbol(lCar(n)));
+		lVal *car = lCar(n);
+		if((car == NULL) || (car->type != ltSymbol)){continue;}
+		lVal *t = lDefineClosureSym(cl,lGetSymbol(car));
 		t->vList.car = NULL;
 		(void)t;
 	}
@@ -100,8 +101,9 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	lVal *args = lEval(c,lCar(v));
 
 	forEach(n,args){
-		if(lGetType(lCar(n)) != ltSymbol){continue;}
-		lVal *t = lDefineClosureSym(cl,lGetSymbol(lCar(n)));
+		lVal *car = lCar(n);
+		if((car == NULL) || (car->type != ltSymbol)){continue;}
+		lVal *t = lDefineClosureSym(cl,lGetSymbol(car));
 		t->vList.car = NULL;
 		(void)t;
 	}
@@ -178,9 +180,9 @@ static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
 	tmpc->text = lambda->text;
 	forEach(n,lambda->data){
 		if(vn == NULL){break;}
-		lVal *nn = lCar(n);
-		if(lGetType(lCar(nn)) != ltSymbol){continue;}
-		lSymbol *csym = lGetSymbol(lCar(nn));
+		lVal *car = lCaar(n);
+		if((car == NULL) || (car->type != ltSymbol)){continue;}
+		lSymbol *csym = lGetSymbol(car);
 		lVal *lv = lDefineClosureSym(tmpc,csym);
 		if(lSymVariadic(csym)){
 			lVal *t = lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
@@ -404,27 +406,6 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	}
 
 	return ret;
-}
-
-lType lTypecast(const lType a,const lType b){
-	if((a == ltInf)   || (b == ltInf))  {return ltInf;}
-	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
-	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
-	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
-	if((a == ltBool)  || (b == ltBool)) {return ltBool;}
-	if (a == b){ return a;}
-	return ltNoAlloc;
-}
-
-lType lTypecastList(lVal *a){
-	if((a == NULL) || (a->type != ltPair) || (lCar(a) == NULL)){return ltNoAlloc;}
-	lType ret = lGetType(lCar(a));
-	forEach(t,lCdr(a)){ret = lTypecast(ret,lGetType(lCar(t)));}
-	return ret;
-}
-
-lType lGetType(lVal *v){
-	return v == NULL ? ltNoAlloc : v->type;
 }
 
 lVal *lWrap(lVal *v){

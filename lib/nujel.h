@@ -3,18 +3,22 @@
 
 typedef enum lType {
 	ltNoAlloc = 0,
+
+	ltSymbol,
 	ltBool,
-	ltPair,
-	ltLambda,
 	ltInt,
 	ltFloat,
 	ltVec,
+	ltInf,
+
+	ltPair,
 	ltString,
-	ltSymbol,
+	ltArray,
+
+	ltLambda,
 	ltNativeFunc,
 	ltSpecialForm,
-	ltInf,
-	ltArray,
+
 	ltGUIWidget
 } lType;
 
@@ -44,9 +48,6 @@ void      lWriteVal         (lVal *v);
 
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
-lType     lTypecast         (const lType a,const lType b);
-lType     lTypecastList     (lVal *a);
-lType     lGetType          (lVal *v);
 
 lVal     *lConst            (lVal *v);
 lVal     *lnfBegin          (lClosure *c, lVal *v);

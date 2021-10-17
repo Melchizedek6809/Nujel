@@ -48,7 +48,7 @@ lNFunc *lNFuncAlloc(){
 	return ret;
 }
 
-lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
+static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
 	lVal *v = lValAlloc();
 	if(v == NULL){return NULL;}
 	v->type    = ltNativeFunc;

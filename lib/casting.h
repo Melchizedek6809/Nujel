@@ -11,5 +11,7 @@ lVal *lCast             (lClosure *c, lVal *v, lType t);
 lVal *lCastAuto         (lClosure *c, lVal *v);
 lVal *lCastSpecific     (lClosure *c, lVal *v, const lType type);
 lVal *lCastNumeric      (lClosure *c, lVal *v);
+lType lTypecast         (const lType a, const lType b);
+lType lTypecastList     (lVal *a);
 
 void  lOperationsCasting(lClosure *c);

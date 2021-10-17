@@ -227,6 +227,27 @@ lVal *lCastNumeric(lClosure *c, lVal *v){
 	return lCast(c,v,type);
 }
 
+lType lTypecast(const lType a,const lType b){
+	if((a == ltInf)   || (b == ltInf))  {return ltInf;}
+	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
+	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
+	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
+	if((a == ltBool)  || (b == ltBool)) {return ltBool;}
+	if (a == b){ return a;}
+	return ltNoAlloc;
+}
+
+lType lTypecastList(lVal *a){
+	const lVal *car = lCar(a);
+	if(car == NULL){return ltNoAlloc;}
+	lType ret = car->type;
+	forEach(t,lCdr(a)){
+		const lVal *tcar = lCar(t);
+		ret = lTypecast(ret,tcar == NULL ? ltNoAlloc : tcar->type);
+	}
+	return ret;
+}
+
 void lOperationsCasting(lClosure *c){
 	lAddNativeFunc(c,"bool",      "[val]","VAL -> bool ", lnfBool);
 	lAddNativeFunc(c,"int",       "[val]","VAL -> int",   lnfInt);
