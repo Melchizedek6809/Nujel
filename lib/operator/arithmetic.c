@@ -4,13 +4,13 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "arithmetic.h"
-#include "../casting.h"
 #include "../nujel.h"
-#include "../vec.h"
-#include "../datatypes/list.h"
-#include "../datatypes/native-function.h"
-#include "../datatypes/val.h"
-#include "../datatypes/vec.h"
+#include "../type-system.h"
+#include "../misc/vec.h"
+#include "../types/list.h"
+#include "../types/native-function.h"
+#include "../types/val.h"
+#include "../types/vec.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <math.h>

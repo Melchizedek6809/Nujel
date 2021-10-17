@@ -7,7 +7,7 @@
 #include "list.h"
 #include "native-function.h"
 #include "val.h"
-#include "../reader.h"
+#include "../s-expression/reader.h"
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;

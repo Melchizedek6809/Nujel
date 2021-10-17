@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 vec   vecNew      (float x, float y, float z);
 vec   vecNewP     (const float *p);

@@ -4,12 +4,12 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "closure.h"
-#include "../casting.h"
-#include "../datatypes/closure.h"
-#include "../datatypes/list.h"
-#include "../datatypes/native-function.h"
-#include "../datatypes/symbol.h"
-#include "../datatypes/val.h"
+#include "../type-system.h"
+#include "../types/closure.h"
+#include "../types/list.h"
+#include "../types/native-function.h"
+#include "../types/symbol.h"
+#include "../types/val.h"
 
 static lVal *lnfDefine(lClosure *c, lClosure *ec, lVal *v, lVal *(*func)(lClosure *,lSymbol *)){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}

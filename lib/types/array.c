@@ -5,7 +5,7 @@
  */
 #include "array.h"
 
-#include "../casting.h"
+#include "../type-system.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>

@@ -5,29 +5,30 @@
  */
 #include "nujel.h"
 
-#include "casting.h"
-#include "garbage-collection.h"
-#include "reader.h"
-#include "random-number-generator.h"
-#include "datatypes/array.h"
-#include "datatypes/closure.h"
-#include "datatypes/list.h"
-#include "datatypes/native-function.h"
-#include "datatypes/string.h"
-#include "datatypes/symbol.h"
-#include "datatypes/val.h"
-#include "datatypes/vec.h"
-#include "operations/arithmetic.h"
-#include "operations/array.h"
-#include "operations/binary.h"
-#include "operations/closure.h"
-#include "operations/special.h"
-#include "operations/list.h"
-#include "operations/predicates.h"
-#include "operations/random.h"
-#include "operations/string.h"
-#include "operations/time.h"
-#include "operations/vec.h"
+#include "allocator/garbage-collection.h"
+#include "misc/random-number-generator.h"
+#include "s-expression/reader.h"
+#include "s-expression/writer.h"
+#include "type-system.h"
+#include "types/array.h"
+#include "types/closure.h"
+#include "types/list.h"
+#include "types/native-function.h"
+#include "types/string.h"
+#include "types/symbol.h"
+#include "types/val.h"
+#include "types/vec.h"
+#include "operator/arithmetic.h"
+#include "operator/array.h"
+#include "operator/binary.h"
+#include "operator/closure.h"
+#include "operator/special.h"
+#include "operator/list.h"
+#include "operator/predicates.h"
+#include "operator/random.h"
+#include "operator/string.h"
+#include "operator/time.h"
+#include "operator/vec.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>
@@ -280,29 +281,6 @@ lVal *lnfRead(lClosure *c, lVal *v){
 	}
 }
 
-static lVal *lnfTypeOf(lClosure *c, lVal *v){
-	(void)c;
-	v = lCar(v);
-	if(v == NULL){return lValSym(":nil");}
-	switch(v->type){
-	case ltNoAlloc:    return lValSymS(lSymLTNoAlloc);
-	case ltBool:       return lValSymS(lSymLTBool);
-	case ltPair:       return lValSymS(lSymLTPair);
-	case ltLambda:     return lValSymS(lSymLTLambda);
-	case ltInt:        return lValSymS(lSymLTInt);
-	case ltFloat:      return lValSymS(lSymLTFloat);
-	case ltVec:        return lValSymS(lSymLTVec);
-	case ltString:     return lValSymS(lSymLTString);
-	case ltSymbol:     return lValSymS(lSymLTSymbol);
-	case ltNativeFunc: return lValSymS(lSymLTNativeFunction);
-	case ltSpecialForm:return lValSymS(lSymLTSpecialForm);
-	case ltInf:        return lValSymS(lSymLTInfinity);
-	case ltArray:      return lValSymS(lSymLTArray);
-	case ltGUIWidget:  return lValSymS(lSymLTGUIWidget);
-	}
-	return lValSym(":nil");
-}
-
 static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
 	lDefineVal(c, "OS", lConst(lValString("Haiku")));
@@ -331,19 +309,6 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
-lVal *lConst(lVal *v){
-	if(v == NULL){
-		return v;
-	}
-	v->flags |= lfConst;
-	return v;
-}
-
-static lVal *lnfConstant(lClosure *c, lVal *v){
-	(void)c;
-	return lConst(lCar(v));
-}
-
 static lVal *lnfEval(lClosure *c, lVal *v){
 	return lEval(c,lCar(v));
 }
@@ -352,7 +317,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsArithmetic(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
-	lOperationsCasting(c);
+	lOperationsTypeSystem(c);
 	lOperationsClosure(c);
 	lOperationsSpecial(c);
 	lOperationsList(c);
@@ -362,13 +327,11 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsTime(c);
 	lOperationsVector(c);
 
-	lAddNativeFunc(c,"apply",          "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
-	lAddNativeFunc(c,"eval",           "[expr]",         "Evaluate EXPR",                              lnfEval);
-	lAddNativeFunc(c,"read",           "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
-	lAddNativeFunc(c,"memory-info",    "[]",             "Return memory usage data",                   lnfMemInfo);
-	lAddNativeFunc(c,"self",           "[]",             "Return the closest object closure",          lnfSelf);
-	lAddNativeFunc(c,"type-of",        "[val]",          "Return a symbol describing the type of VAL", lnfTypeOf);
-	lAddNativeFunc(c,"constant const", "[v]",            "Returns V as a constant",                    lnfConstant);
+	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
+	lAddNativeFunc(c,"eval",            "[expr]",         "Evaluate EXPR",                              lnfEval);
+	lAddNativeFunc(c,"read",            "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
+	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
+	lAddNativeFunc(c,"self",            "[]",             "Return the closest object closure",          lnfSelf);
 
 	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
 	lAddSpecialForm(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);

@@ -3,17 +3,18 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "casting.h"
+#include "type-system.h"
 
 #include "nujel.h"
-#include "vec.h"
-#include "datatypes/closure.h"
-#include "datatypes/list.h"
-#include "datatypes/native-function.h"
-#include "datatypes/string.h"
-#include "datatypes/val.h"
-#include "datatypes/vec.h"
-#include "operations/string.h"
+#include "misc/vec.h"
+#include "types/closure.h"
+#include "types/list.h"
+#include "types/native-function.h"
+#include "types/string.h"
+#include "types/symbol.h"
+#include "types/val.h"
+#include "types/vec.h"
+#include "operator/string.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>
@@ -212,6 +213,14 @@ const char *castToString(const lVal *v, const char *fallback){
 	return v->vString->data;
 }
 
+lVal *lConst(lVal *v){
+	if(v == NULL){
+		return v;
+	}
+	v->flags |= lfConst;
+	return v;
+}
+
 lVal *lCastAuto(lClosure *c, lVal *v){
 	lVal *t = lMap(c,v,lEval);
 	return lCast(c,t,lTypecastList(t));
@@ -248,10 +257,40 @@ lType lTypecastList(lVal *a){
 	return ret;
 }
 
-void lOperationsCasting(lClosure *c){
-	lAddNativeFunc(c,"bool",      "[val]","VAL -> bool ", lnfBool);
-	lAddNativeFunc(c,"int",       "[val]","VAL -> int",   lnfInt);
-	lAddNativeFunc(c,"float",     "[val]","VAL -> float", lnfFloat);
-	lAddNativeFunc(c,"vec",       "[val]","VAL -> vec",   lnfVec);
-	lAddNativeFunc(c,"string","[val]","VAL -> string",lnfCat);
+static lVal *lnfTypeOf(lClosure *c, lVal *v){
+	(void)c;
+	v = lCar(v);
+	if(v == NULL){return lValSym(":nil");}
+	switch(v->type){
+	case ltNoAlloc:    return lValSymS(lSymLTNoAlloc);
+	case ltBool:       return lValSymS(lSymLTBool);
+	case ltPair:       return lValSymS(lSymLTPair);
+	case ltLambda:     return lValSymS(lSymLTLambda);
+	case ltInt:        return lValSymS(lSymLTInt);
+	case ltFloat:      return lValSymS(lSymLTFloat);
+	case ltVec:        return lValSymS(lSymLTVec);
+	case ltString:     return lValSymS(lSymLTString);
+	case ltSymbol:     return lValSymS(lSymLTSymbol);
+	case ltNativeFunc: return lValSymS(lSymLTNativeFunction);
+	case ltSpecialForm:return lValSymS(lSymLTSpecialForm);
+	case ltInf:        return lValSymS(lSymLTInfinity);
+	case ltArray:      return lValSymS(lSymLTArray);
+	case ltGUIWidget:  return lValSymS(lSymLTGUIWidget);
+	}
+	return lValSym(":nil");
+}
+
+static lVal *lnfConstant(lClosure *c, lVal *v){
+	(void)c;
+	return lConst(lCar(v));
+}
+
+void lOperationsTypeSystem(lClosure *c){
+	lAddNativeFunc(c,"bool",          "[v]","VAL -> bool ", lnfBool);
+	lAddNativeFunc(c,"int",           "[v]","VAL -> int", lnfInt);
+	lAddNativeFunc(c,"float",         "[v]","VAL -> float", lnfFloat);
+	lAddNativeFunc(c,"vec",           "[v]","VAL -> vec", lnfVec);
+	lAddNativeFunc(c,"string",        "[v]","VAL -> string", lnfCat);
+	lAddNativeFunc(c,"type-of",       "[v]","Return a symbol describing the type of VAL", lnfTypeOf);
+	lAddNativeFunc(c,"constant const","[v]","Returns V as a constant", lnfConstant);
 }
