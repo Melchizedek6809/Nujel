@@ -42,6 +42,7 @@ extern u8 stdlib_nuj_data[];
 
 char dispWriteBuf[1<<18];
 
+/* Initialize the allocator and symbol table, needs to be called before any other call.*/
 void lInit(){
 	lInitArray();
 	lInitClosure();
@@ -52,22 +53,25 @@ void lInit(){
 	lInitSymbol();
 }
 
-/* TODO: Both seem to write outside of buf if v gets too long */
+/* Display v on the default channel, most likely stdout */
 void lDisplayVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
 	printf("%s",dispWriteBuf);
 }
 
+/* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
 	fprintf(stderr,"%s",dispWriteBuf);
 }
 
+/* Write a machine-readable presentation of v to stdout */
 void lWriteVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,false);
 	printf("%s\n",dispWriteBuf);
 }
 
+/* Handler for [λ [...args] ...body] */
 static lVal *lnfLambda(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
@@ -90,6 +94,7 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	return ret;
 }
 
+/* Handler for [λ* [..args] source body] */
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
@@ -111,6 +116,7 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	return ret;
 }
 
+/* Handler for [δ [...args] ...body] */
 static lVal *lnfDynamic(lClosure *c, lVal *v){
 	lVal *ret = lnfLambda(c,v);
 	if(ret == NULL){return NULL;}
@@ -118,6 +124,7 @@ static lVal *lnfDynamic(lClosure *c, lVal *v){
 	return ret;
 }
 
+/* Handler for [ω ...body] */
 static lVal *lnfObject(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
@@ -125,11 +132,12 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	ret->type = ltLambda;
 	ret->vClosure = cl;
 	cl->flags |= lfObject;
-	lnfBegin(cl,v);
+	lnfDo(cl,v);
 
 	return ret;
 }
 
+/* Handler for [self] */
 static lVal *lnfSelf(lClosure *c, lVal *v){
 	if(c == NULL){return NULL;}
 	if(c->flags & lfObject){
@@ -142,6 +150,7 @@ static lVal *lnfSelf(lClosure *c, lVal *v){
 	return lnfSelf(c->parent,v);
 }
 
+/* Handler for [memory-info] */
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	lVal *ret = NULL;
@@ -162,15 +171,16 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
+/* Evaluate the Nujel Lambda expression and return the results */
+static lVal *lLambda(lClosure *c,lVal *args, lClosure *lambda){
 	if(lambda == NULL){
 		lPrintError("lLambda: NULL\n");
 		return NULL;
 	}
 	if(lambda->flags & lfObject){
-		return lnfBegin(lambda,v);
+		return lnfDo(lambda,args);
 	}
-	lVal *vn = v;
+	lVal *vn = args;
 	lClosure *tmpc = 0;
 	if(lambda->flags & lfDynamic){
 		tmpc = lClosureNew(c);
@@ -207,6 +217,7 @@ static lVal *lLambda(lClosure *c,lVal *v, lClosure *lambda){
 	return ret;
 }
 
+/* Evaluate a single value, v, and return the result */
 lVal *lEval(lClosure *c, lVal *v){
 	if((c == NULL) || (v == NULL)){return NULL;}
 
@@ -249,7 +260,8 @@ lVal *lEval(lClosure *c, lVal *v){
 	return v;
 }
 
-lVal *lnfApply(lClosure *c, lVal *v){
+/* Handler for [apply fn list] */
+static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *func = lCar(v);
 	if(func == NULL){return NULL;}
 	if(func->type == ltSymbol){func = lResolveSym(c,func);}
@@ -267,20 +279,7 @@ lVal *lnfApply(lClosure *c, lVal *v){
 	}
 }
 
-lVal *lnfRead(lClosure *c, lVal *v){
-	(void)c;
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	lString *dup = lStringDup(t->vString);
-	if(dup == 0){return NULL;}
-	t = lReadString(dup);
-	if((t != NULL) && (t->type == ltPair) && (lCar(t) != NULL) && (lCdr(t) == NULL)){
-		return lCar(t);
-	}else{
-		return t;
-	}
-}
-
+/* Add all the platform specific constants to c */
 static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
 	lDefineVal(c, "OS", lConst(lValString("Haiku")));
@@ -309,10 +308,12 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
+/* Handler for [eval s-expr] */
 static lVal *lnfEval(lClosure *c, lVal *v){
 	return lEval(c,lCar(v));
 }
 
+/* Add all the core native functions to c, without IO or stdlib */
 static void lAddCoreFuncs(lClosure *c){
 	lOperationsArithmetic(c);
 	lOperationsArray(c);
@@ -323,13 +324,13 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsList(c);
 	lOperationsPredicate(c);
 	lOperationsRandom(c);
+	lOperationsReader(c);
 	lOperationsString(c);
 	lOperationsTime(c);
 	lOperationsVector(c);
 
 	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
 	lAddNativeFunc(c,"eval",            "[expr]",         "Evaluate EXPR",                              lnfEval);
-	lAddNativeFunc(c,"read",            "[str]",          "Read and Parses STR as an S-Expression",     lnfRead);
 	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
 	lAddNativeFunc(c,"self",            "[]",             "Return the closest object closure",          lnfSelf);
 
@@ -339,6 +340,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddSpecialForm(c,"object obj ω",   "[args ...body]", "Create a new object",                       lnfObject);
 }
 
+/* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
 lClosure *lClosureNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	if(c == NULL){return NULL;}
@@ -349,12 +351,14 @@ lClosure *lClosureNewRootNoStdLib(){
 	return c;
 }
 
+/* Create a new root closure with the default included stdlib */
 lClosure *lClosureNewRoot(){
 	lClosure *c = lClosureNewRootNoStdLib();
 	lEval(c,lWrap(lRead((const char *)stdlib_nuj_data)));
 	return c;
 }
 
+/* Evaluate func for every entry in list v and return a list containing the results */
 lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	if((c == NULL) || (v == NULL)){return NULL;}
 	lVal *ret = NULL, *cc = NULL;
@@ -371,6 +375,7 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	return ret;
 }
 
+/* Append a do to the beginning of v, useful when evaluating user input via a repl, since otherwise we could only accept a single expression. */
 lVal *lWrap(lVal *v){
 	return lCons(lValSymS(symDo),v);
 }

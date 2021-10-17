@@ -29,20 +29,20 @@ static lVal *lnfCond(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	return castToBool(lEval(c,lCar(t)))
-	       ? lnfBegin(c,lCdr(t))
+	       ? lnfDo(c,lCdr(t))
 	       : lnfCond(c,lCdr(v));
 }
 
 static lVal *lnfWhen(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	if(!castToBool(lEval(c,lCar(v)))){return NULL;}
-	return lnfBegin(c,lCdr(v));
+	return lnfDo(c,lCdr(v));
 }
 
 static lVal *lnfUnless(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	if(castToBool(lEval(c,lCar(v)))){return NULL;}
-	return lnfBegin(c,lCdr(v));
+	return lnfDo(c,lCdr(v));
 }
 
 static lVal *lnfIf(lClosure *c, lVal *v){
@@ -56,7 +56,7 @@ static lVal *lnfQuote(lClosure *c, lVal *v){
 	return lCar(v);
 }
 
-lVal *lnfBegin(lClosure *c, lVal *v){
+lVal *lnfDo(lClosure *c, lVal *v){
 	lVal *ret = NULL;
 	forEach(n,v){
 		ret = lEval(c,lCar(n));
@@ -71,6 +71,6 @@ void lOperationsSpecial(lClosure *c){
 	lAddSpecialForm(c,"unless",  "[condition ...body]", "Evaluates BODY if CONDITION is #f", lnfUnless);
 	lAddSpecialForm(c,"and &&",  "[...args]",           "#t if all ARGS evaluate to true", lnfAnd);
 	lAddSpecialForm(c,"or ||" ,  "[...args]",           "#t if one member of ARGS evaluates to true", lnfOr);
-	lAddSpecialForm(c,"do begin","[...body]",           "Evaluate ...body in order and returns the last result", lnfBegin);
+	lAddSpecialForm(c,"do begin","[...body]",           "Evaluate ...body in order and returns the last result", lnfDo);
 	lAddSpecialForm(c,"quote",   "[v]",                 "Return v as is without evaluating",         lnfQuote);
 }

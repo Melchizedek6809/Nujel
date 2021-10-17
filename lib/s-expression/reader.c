@@ -5,6 +5,7 @@
  */
 #include "reader.h"
 #include "../types/list.h"
+#include "../types/native-function.h"
 #include "../types/symbol.h"
 #include "../types/val.h"
 
@@ -242,6 +243,7 @@ static lVal *lParseSpecial(lString *s){
 
 }
 
+/* Read the string in s and parse all escape sequences */
 lVal *lReadString(lString *s){
 	lVal *v, *ret;
 	ret = v = lCons(NULL,NULL);
@@ -297,6 +299,7 @@ lVal *lReadString(lString *s){
 	}
 }
 
+/* Read the s-expression in str */
 lVal *lRead(const char *str){
 	lString *s  = lStringAlloc();
 	if(s == NULL){return NULL;}
@@ -305,4 +308,23 @@ lVal *lRead(const char *str){
 	s->bufEnd   = &str[strlen(str)];
 	lVal *ret   = lReadString(s);
 	return ret;
+}
+
+static lVal *lnfRead(lClosure *c, lVal *v){
+	(void)c;
+	lVal *t = lCar(v);
+	if((t == NULL) || (t->type != ltString)){return NULL;}
+	lString *dup = lStringDup(t->vString);
+	if(dup == 0){return NULL;}
+	t = lReadString(dup);
+	if((t != NULL) && (t->type == ltPair) && (lCar(t) != NULL) && (lCdr(t) == NULL)){
+		return lCar(t);
+	}else{
+		return t;
+	}
+}
+
+/* Add all reader operators to c */
+void lOperationsReader(lClosure *c){
+	lAddNativeFunc(c,"read","[str]","Read and Parses STR as an S-Expression", lnfRead);
 }

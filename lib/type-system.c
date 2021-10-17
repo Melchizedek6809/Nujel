@@ -2,6 +2,10 @@
  * Wolkenwelten - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
+ *
+ * In this file you will find different subroutines for casting from one type to
+ * another, as well as code for determining which type would be most fitting when
+ * you have to for example add two values together.
  */
 #include "type-system.h"
 
@@ -22,12 +26,13 @@
 	#include <string.h>
 #endif
 
+/* [inf] - Return infinity */
 lVal *lnfInf(lClosure *c, lVal *v){
-	(void)c;
-	(void)v;
+	(void)c; (void)v;
 	return lValInf();
 }
 
+/* [int v] - Convert v into an integer number */
 lVal *lnfInt(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	switch(v->type){
@@ -48,6 +53,7 @@ lVal *lnfInt(lClosure *c, lVal *v){
 	}
 }
 
+/* [float v] - Convert v into a floating-point number */
 lVal *lnfFloat(lClosure *c, lVal *v){
 	if(v == NULL){return lValFloat(0);}
 	switch(v->type){
@@ -66,6 +72,7 @@ lVal *lnfFloat(lClosure *c, lVal *v){
 	}
 }
 
+/* [vec v] - Convert v into a vector value consistig of 3 floats x,y and z */
 lVal *lnfVec(lClosure *c, lVal *v){
 	vec nv = vecNew(0,0,0);
 	if(v == NULL){return lValVec(nv);}
@@ -89,11 +96,13 @@ lVal *lnfVec(lClosure *c, lVal *v){
 	return lValVec(nv);
 }
 
+/* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
 	return lValBool(lCar(v) != NULL);
 }
 
+/* [string v] - Convert v into a printable and readable string */
 lVal *lnfString(lClosure *c, lVal *t){
 	char tmpStringBuf[32];
 	char *buf = tmpStringBuf;
@@ -134,6 +143,7 @@ lVal *lnfString(lClosure *c, lVal *t){
 	return ret;
 }
 
+/* Cast all values in list v to be of type t */
 lVal *lCast(lClosure *c, lVal *v, lType t){
 	switch(t){
 	default:
@@ -155,6 +165,7 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 	}
 }
 
+/* Cast v to be an int without memory allocations, or return fallback */
 int castToInt(const lVal *v, int fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
@@ -169,6 +180,7 @@ int castToInt(const lVal *v, int fallback){
 	}
 }
 
+/* Cast v to be a float without memory allocations, or return fallback */
 float castToFloat(const lVal *v, float fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
@@ -183,6 +195,7 @@ float castToFloat(const lVal *v, float fallback){
 	}
 }
 
+/* Cast v to be a vec without memory allocations, or return fallback */
 vec castToVec(const lVal *v, vec fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
@@ -197,6 +210,7 @@ vec castToVec(const lVal *v, vec fallback){
 	}
 }
 
+/* Cast v to be a bool without memory allocations, or return false */
 bool castToBool(const lVal *v){
 	if(v == NULL){return false;}
 	if(v->type == ltBool){
@@ -207,12 +221,14 @@ bool castToBool(const lVal *v){
 	return true;
 }
 
+/* Cast v to be a string without memory allocations, or return fallback */
 const char *castToString(const lVal *v, const char *fallback){
 	if(v == NULL){return fallback;}
 	if(v->type != ltString){return fallback;}
 	return v->vString->data;
 }
 
+/* Set the constant bit of v and return it */
 lVal *lConst(lVal *v){
 	if(v == NULL){
 		return v;
@@ -221,21 +237,25 @@ lVal *lConst(lVal *v){
 	return v;
 }
 
+/* Cast the list v to their type of highest precedence */
 lVal *lCastAuto(lClosure *c, lVal *v){
 	lVal *t = lMap(c,v,lEval);
 	return lCast(c,t,lTypecastList(t));
 }
 
+/* Cast v to a value of type */
 lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
 	return lCast(c,v,type);
 }
 
+/* Determine the numeric type with the highest precedence in list v */
 lVal *lCastNumeric(lClosure *c, lVal *v){
 	lType type = lTypecastList(v);
 	if(type == ltString){type = ltFloat;}
 	return lCast(c,v,type);
 }
 
+/* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a,const lType b){
 	if((a == ltInf)   || (b == ltInf))  {return ltInf;}
 	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
@@ -246,6 +266,7 @@ lType lTypecast(const lType a,const lType b){
 	return ltNoAlloc;
 }
 
+/* Determine the type with the highest precedence in the list a */
 lType lTypecastList(lVal *a){
 	const lVal *car = lCar(a);
 	if(car == NULL){return ltNoAlloc;}
@@ -257,6 +278,7 @@ lType lTypecastList(lVal *a){
 	return ret;
 }
 
+/* [type-of v] - Return a symbol describing the type of VAL*/
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
@@ -280,17 +302,20 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	return lValSym(":nil");
 }
 
+/* [const v] - Return V as a constant */
 static lVal *lnfConstant(lClosure *c, lVal *v){
 	(void)c;
 	return lConst(lCar(v));
 }
 
+/* Add typing and casting operators to c */
 void lOperationsTypeSystem(lClosure *c){
-	lAddNativeFunc(c,"bool",          "[v]","VAL -> bool ", lnfBool);
-	lAddNativeFunc(c,"int",           "[v]","VAL -> int", lnfInt);
-	lAddNativeFunc(c,"float",         "[v]","VAL -> float", lnfFloat);
-	lAddNativeFunc(c,"vec",           "[v]","VAL -> vec", lnfVec);
-	lAddNativeFunc(c,"string",        "[v]","VAL -> string", lnfCat);
+	lAddNativeFunc(c,"inf",           "[v]","Return infinity", lnfInf);
+	lAddNativeFunc(c,"bool",          "[v]","Convert v into a boolean value, true or false", lnfBool);
+	lAddNativeFunc(c,"int",           "[v]","Convert v into an integer number", lnfInt);
+	lAddNativeFunc(c,"float",         "[v]","Convert v into a floating-point number", lnfFloat);
+	lAddNativeFunc(c,"vec",           "[v]","Convert v into a vector value consistig of 3 floats x,y and z", lnfVec);
+	lAddNativeFunc(c,"string",        "[v]","Convert v into a printable and readable string", lnfCat);
 	lAddNativeFunc(c,"type-of",       "[v]","Return a symbol describing the type of VAL", lnfTypeOf);
-	lAddNativeFunc(c,"constant const","[v]","Returns V as a constant", lnfConstant);
+	lAddNativeFunc(c,"constant const","[v]","Return V as a constant", lnfConstant);
 }

@@ -2,6 +2,9 @@
  * Wolkenwelten - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
+ *
+ * Contains a terrible implementation of a mark-sweep garbage collector, but it
+ * is good enough for now.
  */
 #include "garbage-collection.h"
 #include "../types/array.h"
@@ -16,10 +19,11 @@
 int lGCRuns = 0;
 
 static void lClosureGCMark(lClosure *c);
-static void lValGCMark(lVal *v);
-static void lArrayGCMark(lArray *v);
-static void lNFuncGCMark(lNFunc *f);
+static void lValGCMark    (lVal *v);
+static void lArrayGCMark  (lArray *v);
+static void lNFuncGCMark  (lNFunc *f);
 
+/* Mark v as being in use so it won't get freed when sweeping */
 static void lValGCMark(lVal *v){
 	if((v == NULL) || (v->flags & lfMarked)){return;} // Circular refs
 	v->flags |= lfMarked;
@@ -51,6 +55,7 @@ static void lValGCMark(lVal *v){
 	}
 }
 
+/* Mark every reference for the GC to ignore contained in c */
 static void lClosureGCMark(lClosure *c){
 	if((c == NULL) || (c->flags & lfMarked) || (!(c->flags & lfUsed))){return;} // Circular refs
 	c->flags |= lfMarked;
@@ -60,6 +65,7 @@ static void lClosureGCMark(lClosure *c){
 	lClosureGCMark(c->parent);
 }
 
+/* Mark every reference for the GC to ignore contained in v */
 static void lArrayGCMark(lArray *v){
 	if(v == NULL){return;}
 	v->flags |= lfMarked;
@@ -69,12 +75,14 @@ static void lArrayGCMark(lArray *v){
 	}
 }
 
+/* Mark f so it won't get swept */
 static void lNFuncGCMark(lNFunc *f){
 	if((f == NULL) || (f->flags & lfMarked)){return;}
 	f->flags |= lfMarked;
 	lValGCMark(f->doc);
 }
 
+/* Scan through the whole heap so we can mark the roots, terribly inefficient implementation! */
 static void lGCMark(){
 	for(uint i=0;i<lValMax;i++){
 		if(!(lValList[i].flags & lfNoGC)){continue;}
@@ -102,6 +110,7 @@ static void lGCMark(){
 	}
 }
 
+/* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	for(uint i=0;i<lValMax;i++){
 		if(lValList[i].flags & lfMarked){
@@ -147,12 +156,14 @@ static void lGCSweep(){
 	}
 }
 
+/* Force a garbage collection cycle, probably not what you want */
 void lGarbageCollectForce(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
 }
 
+/* Check if a garbage collction cycle is needed, and if so, do so */
 void lGarbageCollect(){
 	static int calls = 0;
 

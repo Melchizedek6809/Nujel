@@ -2,5 +2,6 @@
 #include "../nujel.h"
 #include "../types/string.h"
 
-lVal *lRead        (const char *str);
-lVal *lReadString  (lString *s);
+lVal *lRead             (const char *str);
+lVal *lReadString       (lString *s);
+void  lOperationsReader (lClosure *c);
