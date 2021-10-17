@@ -14,7 +14,6 @@
 #include "../types/val.h"
 
 #ifndef COSMOPOLITAN_H_
-	#include <alloca.h>
 	#include <ctype.h>
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -304,7 +303,7 @@ lVal *lnfCharAt(lClosure *c,lVal *v){
 lVal *lnfFromCharCode(lClosure *c,lVal *v){
 	(void)c;
 	int len = lListLength(v)+1;
-	char *buf = alloca(len);
+	char *buf = __builtin_alloca(len);
 	int i=0;
 
 	while(v != NULL){
