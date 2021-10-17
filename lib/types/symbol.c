@@ -18,7 +18,7 @@ uint    lSymbolActive = 0;
 uint    lSymbolMax    = 1;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
-lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
+lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
 	lSymbolActive   = 0;
@@ -37,6 +37,7 @@ void lInitSymbol(){
 	symLambda   = lSymS("λ");
 	symLambdAst = lSymS("λ*");
 
+	lSymLTNil            = lSymS(":nil");
 	lSymLTNoAlloc        = lSymS(":no-alloc");
 	lSymLTBool           = lSymS(":bool");
 	lSymLTPair           = lSymS(":pair");
@@ -115,4 +116,25 @@ int lSymCmp(const lVal *a,const lVal *b){
 
 int lSymEq(const lSymbol *a,const lSymbol *b){
 	return a == b ? 0 : -1;
+}
+
+lSymbol *getTypeSymbol(const lVal* v){
+	if(v == NULL){return lSymLTNil;}
+	switch(v->type){
+	default:           return lSymLTNil;
+	case ltNoAlloc:    return lSymLTNoAlloc;
+	case ltBool:       return lSymLTBool;
+	case ltPair:       return lSymLTPair;
+	case ltLambda:     return lSymLTLambda;
+	case ltInt:        return lSymLTInt;
+	case ltFloat:      return lSymLTFloat;
+	case ltVec:        return lSymLTVec;
+	case ltString:     return lSymLTString;
+	case ltSymbol:     return lSymLTSymbol;
+	case ltNativeFunc: return lSymLTNativeFunction;
+	case ltSpecialForm:return lSymLTSpecialForm;
+	case ltInf:        return lSymLTInfinity;
+	case ltArray:      return lSymLTArray;
+	case ltGUIWidget:  return lSymLTGUIWidget;
+	}
 }

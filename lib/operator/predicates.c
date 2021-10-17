@@ -10,6 +10,7 @@
 #include "../types/list.h"
 #include "../types/native-function.h"
 #include "../types/string.h"
+#include "../types/symbol.h"
 #include "../types/val.h"
 
 #ifndef COSMOPOLITAN_H_
@@ -40,6 +41,7 @@ static int lValCompare(lVal *v){
 	case ltSymbol:
 	case ltLambda:
 	case ltNativeFunc:
+	case ltSpecialForm:
 		if(a->type   != b->type)  {return -1;}
 		if(b->vNFunc != a->vNFunc){return -1;}
 		return 0;

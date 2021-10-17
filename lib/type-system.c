@@ -281,25 +281,7 @@ lType lTypecastList(lVal *a){
 /* [type-of v] - Return a symbol describing the type of VAL*/
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	(void)c;
-	v = lCar(v);
-	if(v == NULL){return lValSym(":nil");}
-	switch(v->type){
-	case ltNoAlloc:    return lValSymS(lSymLTNoAlloc);
-	case ltBool:       return lValSymS(lSymLTBool);
-	case ltPair:       return lValSymS(lSymLTPair);
-	case ltLambda:     return lValSymS(lSymLTLambda);
-	case ltInt:        return lValSymS(lSymLTInt);
-	case ltFloat:      return lValSymS(lSymLTFloat);
-	case ltVec:        return lValSymS(lSymLTVec);
-	case ltString:     return lValSymS(lSymLTString);
-	case ltSymbol:     return lValSymS(lSymLTSymbol);
-	case ltNativeFunc: return lValSymS(lSymLTNativeFunction);
-	case ltSpecialForm:return lValSymS(lSymLTSpecialForm);
-	case ltInf:        return lValSymS(lSymLTInfinity);
-	case ltArray:      return lValSymS(lSymLTArray);
-	case ltGUIWidget:  return lValSymS(lSymLTGUIWidget);
-	}
-	return lValSym(":nil");
+	return lValSymS(getTypeSymbol(lCar(v)));
 }
 
 /* [const v] - Return V as a constant */

@@ -20,6 +20,7 @@ lVal     *lValSymS     (lSymbol *s);
 lVal     *lValSym      (const char *s);
 lSymbol  *lSymS        (const char *s);
 lSymbol  *lSymSL       (const char *s, uint len);
+lSymbol  *getTypeSymbol(const lVal *a);
 
 int       lSymCmp      (const lVal *a,const lVal *b);
 int       lSymEq       (const lSymbol *a,const lSymbol *b);
