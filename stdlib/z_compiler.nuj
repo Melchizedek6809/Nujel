@@ -3,6 +3,7 @@
 
 [def compile [let []
     [def compile-do-args [λ [args]
+		;[display ["[do-args] " [str/write args] "\n\n"]]
         [if [nil? [cdr args]]
             [cons [compile [car args]] #nil]
             [if [pair? [car args]]
@@ -14,8 +15,8 @@
         ]]
 
     [def compile-do [λ [source]
-          ;[display ["[do] " [str/write source] "\n\n"]]
-        [let [[args [compile-do-args [cdr source]]]]
+        ;[display ["[do] " [str/write source] "\n\n"]]
+        [let [[args [compile-do-args source]]]
              [if [nil? [cdr args]]
                  [car args]
                  [cons 'do args]]
@@ -28,15 +29,15 @@
     ]]
 
     [def compile-fun [λ [source]
-        [display ["[λ] " [str/write source] "\n\n"]]
-        [if [string? [cadr source]]
-            [list 'λ* [cadr source] source [compile-do [cdr source]]]
-            [list 'λ* [cadr source] source [compile-do [cdr source]]]]
+        ;[display ["[λ] " [str/write source] "\n\n"]]
+        [if [string?  [cadr source]]
+            [list 'λ* [cadr source] source [compile-do [cddr source]]]
+            [list 'λ* [cadr source] source [compile-do [cddr source]]]]
     ]]
 
     [λ [source]
         "Compile the forms in source"
-        [display ["[opt] " [str/write [resolve [car source]]] "\n"  [str/write source] "\n\n"]]
+        ;[display ["[opt] " [str/write [resolve [car source]]] "\n"  [str/write source] "\n\n"]]
         [let [[op [resolve [car source]]]]
              [cond [[eq? op do]  [compile-do  source]]
                    [[eq? op def] [compile-def source]]

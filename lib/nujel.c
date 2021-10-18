@@ -201,7 +201,6 @@ static lVal *lLambda(lClosure *c,lVal *args, lClosure *lambda){
 			break;
 		}else{
 			lVal *t = lSymNoEval(csym) ? lCar(vn) : lEval(c,lCar(vn));
-			if(t  != NULL && t->type == ltSymbol && !lSymNoEval(csym)){t = lEval(c,t);}
 			if((lv != NULL) && (lv->type == ltPair)){ lv->vList.car = t;}
 			if(vn != NULL){vn = lCdr(vn);}
 		}
