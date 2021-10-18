@@ -76,8 +76,8 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
 	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){return NULL;}
-	cl->source = lCdr(v);
-	cl->text = lCdr(v);
+	cl->doc  = lCons(lCar(v),lCadr(v));
+	cl->text = lWrap(lCdr(v));
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltLambda;
@@ -94,25 +94,26 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* Handler for [λ* [..args] source body] */
+/* Handler for [λ* [..args] docstring body] */
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
-	cl->source = lCadr(v);
-	cl->text = lCddr(v);
+	lVal *doc = lCons(lCar(v),lCadr(v));
+	cl->doc  = doc;
+	cl->text = lCaddr(v);
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
 	ret->type = ltLambda;
 	ret->vClosure = cl;
-	lVal *args = lEval(c,lCar(v));
 
-	forEach(n,args){
+	forEach(n,lCar(v)){
 		lVal *car = lCar(n);
 		if((car == NULL) || (car->type != ltSymbol)){continue;}
 		lVal *t = lDefineClosureSym(cl,lGetSymbol(car));
 		t->vList.car = NULL;
 		(void)t;
 	}
+
 	return ret;
 }
 
@@ -206,10 +207,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lClosure *lambda){
 		}
 	}
 
-	lVal *ret = NULL;
-	forEach(n,lambda->text){
-		ret = lEval(tmpc,lCar(n));
-	}
+	lVal *ret = lEval(tmpc,lambda->text);
 	if(tmpc->refCount == 0){
 		lClosureFree(tmpc);
 	}

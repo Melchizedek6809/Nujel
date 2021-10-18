@@ -9,12 +9,20 @@
 	]
 ]]
 
-[def describe [λ [a] "Returns the DocString to its argument, if available"
-	[cond [[not [string? a]] "Please quote the symbol in question, like [describe \"help\"]"]
-	      [#t [let [[ds [car [cl-text [resolve [str->sym a]]]]]
-		[args [arg-list [resolve [str->sym a]]]]
-		[fn [cat a]]]
-		["[" fn args "] - " [if [string? ds] ds "No DocString found"]]]]
+[def describe [let []
+	[def describe-fun [λ [fun]
+		[def doc [cl-doc fun]]
+		[cat [str/write [car doc]] " - " [cdr doc]]
+	]]
+
+	[def describe-string [λ [a]
+		[describe-fun [resolve [str->sym a]]]
+	]]
+
+	[λ [fun] "Describe FUN, if there is documentation available"
+	   [if [string? fun]
+	       [describe-string fun]
+	       [describe-fun fun]]
 	]
 ]]
 

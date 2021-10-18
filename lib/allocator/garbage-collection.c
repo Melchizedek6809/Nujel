@@ -61,6 +61,7 @@ static void lClosureGCMark(lClosure *c){
 	c->flags |= lfMarked;
 
 	lValGCMark(c->data);
+	lValGCMark(c->doc);
 	lValGCMark(c->text);
 	lClosureGCMark(c->parent);
 }

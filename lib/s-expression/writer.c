@@ -114,7 +114,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 	case ltLambda: {
 		*cur++ = '[';
 		int syms = 0;
-		lVal *cloText = v->vClosure->source;
+		lVal *cloText = v->vClosure->text;
 		forEach(n,cloText){
 			if(++syms > 2){ *cur++ = '\n';}
 			if(syms > 1){

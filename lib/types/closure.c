@@ -103,7 +103,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 		uint len;
 		for(len=0;len < sizeof(lSymbol);len++){ // Find the end of the current token, either space or 0
 			if(cur[len] == 0)    {break;}
-			if(isspace((u8)cur[len])){break;}
+				if(isspace((u8)cur[len])){break;}
 		}
 		lVal *var = lDefineClosureSym(c,lSymSL(cur,len));
 		if(var == NULL){

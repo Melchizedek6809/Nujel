@@ -125,12 +125,14 @@ static lVal *lnfClText(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfClSource(lClosure *c, lVal *v){
+static lVal *lnfClDoc(lClosure *c, lVal *v){
 	(void)c;
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
-		return t->vClosure->source;
+		return t->vClosure->doc;
+	}else if((t->type == ltNativeFunc) || (t->type == ltSpecialForm)){
+		return t->vNFunc->doc;
 	}
 	return NULL;
 }
@@ -140,7 +142,7 @@ static lVal *lnfClData(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
 	if(t->type == ltLambda){
-		return t->vClosure->data;
+		return lCar(t->vClosure->data);
 	}else if(t->type == ltNativeFunc){
 		return lCar(t->vNFunc->doc);
 	}
@@ -184,7 +186,7 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
 	lAddNativeFunc(c,"cl-lambda",      "[i]",           "Return closure as a lambda",                 lnfClLambda);
 	lAddNativeFunc(c,"cl-text disasm", "[f]",           "Return closures text segment",               lnfClText);
-	lAddNativeFunc(c,"cl-source",      "[f]",           "Return closures source segment",             lnfClSource);
+	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
 	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);

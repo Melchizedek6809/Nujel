@@ -65,12 +65,12 @@ static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *
 }
 
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
-	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
+	lVal *lNF = lValNativeFunc(func,lCar(lRead(args)),lValString(doc));
 	return lDefineAliased(c,lNF,sym);
 }
 
 lVal *lAddSpecialForm(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
-	lVal *lNF = lValNativeFunc(func,lRead(args),lValString(doc));
+	lVal *lNF = lValNativeFunc(func,lCar(lRead(args)),lValString(doc));
 	lNF->type = ltSpecialForm;
 	return lDefineAliased(c,lNF,sym);
 }

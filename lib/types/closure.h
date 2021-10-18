@@ -8,7 +8,7 @@ struct lClosure {
 	};
 	lVal *data;
 	lVal *text;
-	lVal *source;
+	lVal *doc;
 	u16 flags;
 	u16 refCount;
 };

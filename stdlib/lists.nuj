@@ -2,7 +2,9 @@
 
 [def except-last-pair [let []
 	[def iter [λ [list rest]
-		[if [nil? [cdr list]] [reverse rest] [iter [cdr list] [cons [car list] rest]]]
+                     [if [nil? [cdr list]]
+			 [reverse rest]
+			 [iter [cdr list] [cons [car list] rest]]]
 	]]
 
 	[λ [list]
@@ -11,16 +13,18 @@
 	]
 ]]
 
-[def last-pair [λ [l]
+[def last-pair [λ [list]
 	"Return the last pair of l"
-	[if [cdr l]
-	    [last-pair [cdr l]]
-		l]
+	[if [cdr list]
+	    [last-pair [cdr list]]
+	    list]
 ]]
 
 [def make-list [let []
-	[def iter [λ [number value list]
-		[if [<= number 0] list [iter [-- number] value [cons value list]]]
+	[def iter [λ [number value l]
+		     [if [<= number 0]
+			 l
+			 [iter [-- number] value [cons value l]]]
 	]]
 
 	[λ [number value]
@@ -31,7 +35,9 @@
 
 [def reduce [λ [o l s]
 	"Combine all elements in l using operation o and starting value s"
-	[if [nil? l] s [reduce o [cdr l] [o s [car l]]]]
+	[if [nil? l]
+	    s
+	    [reduce o [cdr l] [o s [car l]]]]
 ]]
 
 [def list-ref [λ [l i]
@@ -43,15 +49,15 @@
 ]]
 
 [def join [let []
-	[def iter [λ [str list glue]
-		[cond [[nil? list] [substr str 0 [- [str/length str] [str/length glue]]]]
-		      [#t [iter [cat str [car list] glue] [cdr list] glue]]
+	[def iter [λ [str l glue]
+		[cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
+		      [#t [iter [cat str [car l] glue] [cdr l] glue]]
 		]
 	]]
 
-	[λ [list glue]
+	[λ [l glue]
 		"Join LIST into a string with GLUE in between each element"
-		[iter "" list [string glue]]
+		[iter "" l [string glue]]
 	]
 ]]
 
@@ -60,8 +66,7 @@
 		[let [[pos [index-of str separator start]]]
 			[if [and [>= pos start] [< pos slen]]
 			    [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
-			    [cons [substr str start slen]]
-			]
+			    [cons [substr str start slen]]]
 		]
 	]]
 
@@ -73,12 +78,16 @@
 
 [def reverse [λ [l r]
 	"Return the list l in reverse order"
-	[if [nil? l] r [reverse [cdr l] [cons [car l] r]]]
+	[if [nil? l]
+	    r
+	    [reverse [cdr l] [cons [car l] r]]]
 ]]
 
 [def list-length [λ [a t]
 	"Returns the length of list a"
-	[if [nil? a] t [list-length [cdr a] [++ t]]]
+	[if [nil? a]
+	    t
+	    [list-length [cdr a] [++ t]]]
 ]]
 
 [def filter [λ [p l]
@@ -91,12 +100,16 @@
 
 [def map [λ [f l]
 	"Runs f over every item in list l and returns the resulting list"
-	[if [nil? l] l [cons [f [car l]] [map f [cdr l]]]]
+	[if [nil? l]
+	    l
+	    [cons [f [car l]] [map f [cdr l]]]]
 ]]
 
 [def append [let []
 	[def iter [λ [a b]
-		[if [nil? a] b [iter [cdr a] [cons [car a] b]]]
+		     [if [nil? a]
+			 b
+			 [iter [cdr a] [cons [car a] b]]]
 	]]
 
 	[λ [a b]
@@ -147,11 +160,11 @@
 ]]
 
 [def getf [let []
-	[λ [list key]
+	[λ [l key]
 		"Return the value in LIST following KEY"
-		[cond [[nil? list] #nil]
-		      [[eq? key [car list]] [cadr list]]
-		      [#t [getf [cdr list] key]]
+		[cond [[nil? l] #nil]
+		      [[eq? key [car l]] [cadr l]]
+		      [#t [getf [cdr l] key]]
 		]
 	]
 ]]
