@@ -1,5 +1,5 @@
-[def PI [const 3.14159]]
-[def π  [const 3.14159]]
+[def PI 3.14159]
+[def π  3.14159]
 
 [def ++ [λ [i]
 	"[+ I 1]"

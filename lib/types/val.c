@@ -44,10 +44,11 @@ lVal *lValAlloc(){
 void lGUIWidgetFree(lVal *v);
 void lValFree(lVal *v){
 	if((v == NULL) || (v->type == ltNoAlloc)){return;}
-	if(v->type == ltLambda){
-		v->vClosure->refCount--;
-	}else if(v->type == ltGUIWidget){
+	if(v->type == ltGUIWidget){
 		lGUIWidgetFree(v);
+	}else if(v->type == ltVec){
+		lVecFree(v->vVec);
+		v->vVec = NULL;
 	}
 	lValActive--;
 	v->type     = ltNoAlloc;

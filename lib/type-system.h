@@ -7,7 +7,6 @@ vec         castToVec   (const lVal *v, vec         fallback);
 bool        castToBool  (const lVal *v);
 const char *castToString(const lVal *v, const char *fallback);
 
-lVal *lConst            (lVal *v);
 lVal *lCast             (lClosure *c, lVal *v, lType t);
 lVal *lCastAuto         (lClosure *c, lVal *v);
 lVal *lCastSpecific     (lClosure *c, lVal *v, const lType type);

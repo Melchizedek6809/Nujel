@@ -228,15 +228,6 @@ const char *castToString(const lVal *v, const char *fallback){
 	return v->vString->data;
 }
 
-/* Set the constant bit of v and return it */
-lVal *lConst(lVal *v){
-	if(v == NULL){
-		return v;
-	}
-	v->flags |= lfConst;
-	return v;
-}
-
 /* Cast the list v to their type of highest precedence */
 lVal *lCastAuto(lClosure *c, lVal *v){
 	lVal *t = lMap(c,v,lEval);
@@ -284,12 +275,6 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	return lValSymS(getTypeSymbol(lCar(v)));
 }
 
-/* [const v] - Return V as a constant */
-static lVal *lnfConstant(lClosure *c, lVal *v){
-	(void)c;
-	return lConst(lCar(v));
-}
-
 /* Add typing and casting operators to c */
 void lOperationsTypeSystem(lClosure *c){
 	lAddNativeFunc(c,"inf",           "[v]","Return infinity", lnfInf);
@@ -299,5 +284,4 @@ void lOperationsTypeSystem(lClosure *c){
 	lAddNativeFunc(c,"vec",           "[v]","Convert v into a vector value consistig of 3 floats x,y and z", lnfVec);
 	lAddNativeFunc(c,"string",        "[v]","Convert v into a printable and readable string", lnfCat);
 	lAddNativeFunc(c,"type-of",       "[v]","Return a symbol describing the type of VAL", lnfTypeOf);
-	lAddNativeFunc(c,"constant const","[v]","Return V as a constant", lnfConstant);
 }

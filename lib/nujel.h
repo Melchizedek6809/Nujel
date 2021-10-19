@@ -16,6 +16,8 @@ typedef enum lType {
 	ltArray,
 
 	ltLambda,
+	ltDynamic,
+	ltObject,
 	ltNativeFunc,
 	ltSpecialForm,
 
@@ -33,7 +35,6 @@ typedef struct lVal     lVal;
 typedef struct {
 	lVal *car,*cdr;
 } lPair;
-#define lfSpecial   (16)
 
 void      lInit             ();
 int       lMemUsage         ();
@@ -48,7 +49,6 @@ void      lWriteVal         (lVal *v);
 
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
-
 lVal     *lnfBegin          (lClosure *c, lVal *v);
 lVal     *lWrap             (lVal *v);
 

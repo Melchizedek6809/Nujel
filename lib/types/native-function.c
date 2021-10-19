@@ -27,7 +27,6 @@ void lNFuncFree(uint i){
 	nfn->fp       = NULL;
 	nfn->doc      = NULL;
 	nfn->nextFree = lNFuncFFree;
-	nfn->flags    = 0;
 	lNFuncFFree   = nfn;
 }
 
@@ -52,7 +51,6 @@ static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *
 	lVal *v = lValAlloc();
 	if(v == NULL){return NULL;}
 	v->type    = ltNativeFunc;
-	v->flags  |= lfConst;
 	lNFunc *fn = lNFuncAlloc();
 	if(fn == NULL){
 		lValFree(v);

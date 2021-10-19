@@ -12,7 +12,6 @@ struct lString{
 #define lfHeapAlloc (16)
 
 #define STR_MAX  (1<<14)
-#define STR_MASK ((STR_MAX)-1)
 
 extern lString  lStringList [STR_MAX];
 extern uint     lStringActive;

@@ -21,12 +21,10 @@ void lInitVec(){
 	lVecMax     = 1;
 }
 
-void lVecFree(uint i){
-	if((i == 0) || (i >= lVecMax)){return;}
-	lVec *v = &lVecList[i];
+void lVecFree(lVec *v){
+	if(v == NULL){return;}
 	lVecActive--;
 	v->nextFree   = lVecFFree;
-	v->flags      = 0;
 	lVecFFree     = v;
 }
 

@@ -7,11 +7,9 @@ struct lNFunc {
 		lNFunc *nextFree;
 	};
 	lVal *doc;
-	u16 flags;
 };
 
 #define NFN_MAX (1<<10)
-#define NFN_MASK ((NFN_MAX)-1)
 
 extern lNFunc   lNFuncList  [NFN_MAX];
 extern uint     lNFuncMax;

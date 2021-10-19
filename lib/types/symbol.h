@@ -6,7 +6,6 @@ struct lSymbol {
 };
 
 #define SYM_MAX (1<<14)
-#define SYM_MASK ((SYM_MAX)-1)
 extern lSymbol  lSymbolList [SYM_MAX];
 extern uint     lSymbolMax;
 

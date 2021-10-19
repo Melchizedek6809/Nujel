@@ -136,6 +136,5 @@ lVal *lValCString(const char *c){
 	}
 	t->vString->buf    = t->vString->data = c;
 	t->vString->bufEnd = c + strlen(c);
-	t->vString->flags  = lfConst;
 	return t;
 }

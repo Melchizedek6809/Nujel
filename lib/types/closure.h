@@ -9,15 +9,9 @@ struct lClosure {
 	lVal *data;
 	lVal *text;
 	lVal *doc;
-	u16 flags;
-	u16 refCount;
 };
-#define lfDynamic   (16)
-#define lfObject    (32)
-#define lfUsed      (64)
 
 #define CLO_MAX (1<<16)
-#define CLO_MASK ((CLO_MAX)-1)
 
 extern lClosure lClosureList[CLO_MAX];
 extern uint     lClosureMax;

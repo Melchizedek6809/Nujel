@@ -38,15 +38,13 @@ lClosure *lClosureAlloc(){
 	}
 	lClosureActive++;
 	*ret = (lClosure){0};
-	ret->flags = lfUsed;
 	return ret;
 }
 
 void lClosureFree(lClosure *clo){
-	if((clo == NULL) || !(clo->flags & lfUsed)){return;}
+	if(clo == NULL){return;}
 	lClosureActive--;
 	clo->nextFree = lClosureFFree;
-	clo->flags    = 0;
 	lClosureFFree = clo;
 }
 
@@ -54,9 +52,6 @@ lClosure *lClosureNew(lClosure *parent){
 	lClosure *c = lClosureAlloc();
 	if(c == NULL){return NULL;}
 	c->parent = parent;
-	if(parent != NULL){
-		parent->refCount++;
-	}
 	return c;
 }
 

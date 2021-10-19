@@ -7,6 +7,7 @@
  * is good enough for now.
  */
 #include "garbage-collection.h"
+#include "roots.h"
 #include "../types/array.h"
 #include "../types/closure.h"
 #include "../types/list.h"
@@ -18,15 +19,24 @@
 
 int lGCRuns = 0;
 
-static void lClosureGCMark(lClosure *c);
-static void lValGCMark    (lVal *v);
-static void lArrayGCMark  (lArray *v);
-static void lNFuncGCMark  (lNFunc *f);
+u8 lValMarkMap    [CLO_MAX];
+u8 lClosureMarkMap[CLO_MAX];
+u8 lArrayMarkMap  [ARR_MAX];
+u8 lStringMarkMap [STR_MAX];
+
+void lStringGCMark(lString *v){
+	if(v == NULL){return;}
+	const uint ci = v - lStringList;
+	if(lStringMarkMap[ci]){return;}
+	lStringMarkMap[ci] = 1;
+}
 
 /* Mark v as being in use so it won't get freed when sweeping */
-static void lValGCMark(lVal *v){
-	if((v == NULL) || (v->flags & lfMarked)){return;} // Circular refs
-	v->flags |= lfMarked;
+void lValGCMark(lVal *v){
+	if(v == NULL){return;}
+	const uint ci = v - lValList;
+	if(lValMarkMap[ci]){return;}
+	lValMarkMap[ci] = 1;
 
 	switch(v->type){
 	case ltPair:
@@ -40,15 +50,7 @@ static void lValGCMark(lVal *v){
 		lArrayGCMark(v->vArray);
 		break;
 	case ltString:
-		if(v->vString == NULL){break;}
-		v->vString->flags |= lfMarked;
-		break;
-	case ltVec:
-		v->vVec->flags |= lfMarked;
-		break;
-	case ltSpecialForm:
-	case ltNativeFunc:
-		lNFuncGCMark(v->vNFunc);
+		lStringGCMark(v->vString);
 		break;
 	default:
 		break;
@@ -56,9 +58,11 @@ static void lValGCMark(lVal *v){
 }
 
 /* Mark every reference for the GC to ignore contained in c */
-static void lClosureGCMark(lClosure *c){
-	if((c == NULL) || (c->flags & lfMarked) || (!(c->flags & lfUsed))){return;} // Circular refs
-	c->flags |= lfMarked;
+void lClosureGCMark(const lClosure *c){
+	if(c == NULL){return;}
+	const uint ci = c - lClosureList;
+	if(lClosureMarkMap[ci]){return;}
+	lClosureMarkMap[ci] = 1;
 
 	lValGCMark(c->data);
 	lValGCMark(c->doc);
@@ -67,93 +71,53 @@ static void lClosureGCMark(lClosure *c){
 }
 
 /* Mark every reference for the GC to ignore contained in v */
-static void lArrayGCMark(lArray *v){
+void lArrayGCMark(lArray *v){
 	if(v == NULL){return;}
-	v->flags |= lfMarked;
+	const uint ci = v - lArrayList;
+	if(lArrayMarkMap[ci]){return;}
+	lArrayMarkMap[ci] = 1;
 	for(int i=0;i<v->length;i++){
-		if(v->data[i] == 0){continue;}
-		lValGCMark(v->data[i]);
+		if(v->data[i]){
+			lValGCMark(v->data[i]);
+		}
 	}
-}
-
-/* Mark f so it won't get swept */
-static void lNFuncGCMark(lNFunc *f){
-	if((f == NULL) || (f->flags & lfMarked)){return;}
-	f->flags |= lfMarked;
-	lValGCMark(f->doc);
 }
 
 /* Scan through the whole heap so we can mark the roots, terribly inefficient implementation! */
 static void lGCMark(){
-	for(uint i=0;i<lValMax;i++){
-		if(!(lValList[i].flags & lfNoGC)){continue;}
-		lValGCMark(&lValList[i]);
-	}
-	for(uint i=0;i<lClosureMax;i++){
-		if(!(lClosureList[i].flags & lfNoGC)){continue;}
-		lClosureGCMark(&lClosureList[i]);
-	}
-	for(uint i=0;i<lStringMax;i++){
-		if(!(lStringList[i].flags & lfNoGC)){continue;}
-		lStringList[i].flags |= lfMarked;
-	}
-	for(uint i=0;i<lArrayMax;i++){
-		if(!(lArrayList[i].flags & lfNoGC)){continue;}
-		lArrayGCMark(&lArrayList[i]);
-	}
-	for(uint i=0;i<lNFuncMax;i++){
-		if(!(lNFuncList[i].flags & lfNoGC)){continue;}
-		lNFuncGCMark(&lNFuncList[i]);
-	}
-	for(uint i=0;i<lVecMax;i++){
-		if(!(lVecList[i].flags & lfNoGC)){continue;}
-		lVecList[i].flags |= lfMarked;
-	}
+	lRootsClosureMark();
+	lRootsValMark();
 }
 
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	for(uint i=0;i<lValMax;i++){
-		if(lValList[i].flags & lfMarked){
-			lValList[i].flags &= ~lfMarked;
-			continue;
+		if(lValMarkMap[i]){
+			lValMarkMap[i] = 0;
+		}else{
+			lValFree(&lValList[i]);
 		}
-		lValFree(&lValList[i]);
 	}
 	for(uint i=0;i<lClosureMax;i++){
-		if(lClosureList[i].flags & lfMarked){
-			lClosureList[i].flags &= ~lfMarked;
-			continue;
+		if(lClosureMarkMap[i]){
+			lClosureMarkMap[i] = 0;
+		}else{
+			lClosureFree(&lClosureList[i]);
 		}
-		lClosureFree(&lClosureList[i]);
 	}
 	for(uint i=0;i<lStringMax;i++){
-		if(lStringList[i].flags & lfMarked){
-			lStringList[i].flags &= ~lfMarked;
-			continue;
+		if(lStringMarkMap[i]){
+			lStringMarkMap[i] = 0;
+		}else{
+			lStringFree(&lStringList[i]);
 		}
-		lStringFree(&lStringList[i]);
 	}
 	for(uint i=0;i<lArrayMax;i++){
-		if(lArrayList[i].flags & lfMarked){
-			lArrayList[i].flags &= ~lfMarked;
-			continue;
+		if(lArrayMarkMap[i]){
+			lArrayMarkMap[i] = 0;
+		}else{
+			lArrayFree(&lArrayList[i]);
 		}
-		lArrayFree(&lArrayList[i]);
-	}
-	for(uint i=0;i<lNFuncMax;i++){
-		if(lNFuncList[i].flags & lfMarked){
-			lNFuncList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lNFuncFree(i);
-	}
-	for(uint i=0;i<lVecMax;i++){
-		if(lVecList[i].flags & lfMarked){
-			lVecList[i].flags &= ~lfMarked;
-			continue;
-		}
-		lVecFree(i);
 	}
 }
 

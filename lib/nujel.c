@@ -6,6 +6,7 @@
 #include "nujel.h"
 
 #include "allocator/garbage-collection.h"
+#include "allocator/roots.h"
 #include "misc/random-number-generator.h"
 #include "s-expression/reader.h"
 #include "s-expression/writer.h"
@@ -121,7 +122,7 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 static lVal *lnfDynamic(lClosure *c, lVal *v){
 	lVal *ret = lnfLambda(c,v);
 	if(ret == NULL){return NULL;}
-	ret->vClosure->flags |= lfDynamic;
+	ret->type = ltDynamic;
 	return ret;
 }
 
@@ -130,25 +131,11 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	lClosure *cl = lClosureNew(c);
 	if(cl == NULL){return NULL;}
 	lVal *ret = lValAlloc();
-	ret->type = ltLambda;
+	ret->type = ltObject;
 	ret->vClosure = cl;
-	cl->flags |= lfObject;
 	lnfDo(cl,v);
 
 	return ret;
-}
-
-/* Handler for [self] */
-static lVal *lnfSelf(lClosure *c, lVal *v){
-	if(c == NULL){return NULL;}
-	if(c->flags & lfObject){
-		lVal *t = lValAlloc();
-		t->type = ltLambda;
-		t->vClosure = c;
-		return t;
-	}
-	if(c->parent == 0){return NULL;}
-	return lnfSelf(c->parent,v);
 }
 
 /* Handler for [memory-info] */
@@ -173,24 +160,24 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
-static lVal *lLambda(lClosure *c,lVal *args, lClosure *lambda){
+static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	if(lambda == NULL){
 		lPrintError("lLambda: NULL\n");
 		return NULL;
 	}
-	if(lambda->flags & lfObject){
-		return lnfDo(lambda,args);
+	if(lambda->type == ltObject){
+		return lnfDo(lambda->vClosure,args);
 	}
 	lVal *vn = args;
 	lClosure *tmpc = 0;
-	if(lambda->flags & lfDynamic){
+	if(lambda->type == ltDynamic){
 		tmpc = lClosureNew(c);
 	}else{
-		tmpc = lClosureNew(lambda);
+		tmpc = lClosureNew(lambda->vClosure);
 	}
 	if(tmpc == NULL){return NULL;}
-	tmpc->text = lambda->text;
-	forEach(n,lambda->data){
+	tmpc->text = lambda->vClosure->text;
+	forEach(n,lambda->vClosure->data){
 		if(vn == NULL){break;}
 		lVal *car = lCaar(n);
 		if((car == NULL) || (car->type != ltSymbol)){continue;}
@@ -207,10 +194,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lClosure *lambda){
 		}
 	}
 
-	lVal *ret = lEval(tmpc,lambda->text);
-	if(tmpc->refCount == 0){
-		lClosureFree(tmpc);
-	}
+	lVal *ret = lEval(tmpc,lambda->vClosure->text);
 	return ret;
 }
 
@@ -225,8 +209,8 @@ lVal *lEval(lClosure *c, lVal *v){
 		if(ret == NULL){return v;}
 		if(ret->type == ltSpecialForm){
 			return ret->vNFunc->fp(c,lCdr(v));
-		}else if(ret->type == ltLambda){
-			return lLambda(c,lCdr(v),ret->vClosure);
+		}else if((ret->type == ltLambda) || (ret->type == ltDynamic) || (ret->type == ltObject)){
+			return lLambda(c,lCdr(v),ret);
 		}
 		lVal *args = lMap(c,lCdr(v),lEval);
 		switch(ret->type){
@@ -267,10 +251,12 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 		return func->vNFunc->fp(c,lCadr(v));
 	case ltNativeFunc:
 		return func->vNFunc->fp(c,lCadr(v));
+	case ltDynamic:
+	case ltObject:
 	case ltLambda: {
 		lVal *t = lCadr(v);
 		if((t == NULL) || (t->type != ltPair)){t = lCons(t,NULL);}
-		return lLambda(c,t,func->vClosure);}
+		return lLambda(c,t,func);}
 	default:
 		return v;
 	}
@@ -279,29 +265,29 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 /* Add all the platform specific constants to c */
 static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
-	lDefineVal(c, "OS", lConst(lValString("Haiku")));
+	lDefineVal(c, "OS", lValString("Haiku"));
 	#elif defined(__APPLE__)
-	lDefineVal(c, "OS", lConst(lValString("MacOS")));
+	lDefineVal(c, "OS", lValString("MacOS"));
 	#elif defined(__EMSCRIPTEN__)
-	lDefineVal(c, "OS", lConst(lValString("Emscripten")));
+	lDefineVal(c, "OS", lValString("Emscripten"));
 	#elif defined(__MINGW32__)
-	lDefineVal(c, "OS", lConst(lValString("Windows")));
+	lDefineVal(c, "OS", lValString("Windows"));
 	#elif defined(__linux__)
-	lDefineVal(c, "OS", lConst(lValString("Linux")));
+	lDefineVal(c, "OS", lValString("Linux"));
 	#else
-	lDefineVal(c, "OS", lConst(lValString("*nix")));
+	lDefineVal(c, "OS", lValString("*nix"));
 	#endif
 
 	#if defined(__arm__)
-	lDefineVal(c, "ARCH", lConst(lValString("armv7l")));
+	lDefineVal(c, "ARCH", lValString("armv7l"));
 	#elif defined(__aarch64__)
-	lDefineVal(c, "ARCH", lConst(lValString("aarch64")));
+	lDefineVal(c, "ARCH", lValString("aarch64"));
 	#elif defined(__x86_64__)
-	lDefineVal(c, "ARCH", lConst(lValString("x86_64")));
+	lDefineVal(c, "ARCH", lValString("x86_64"));
 	#elif defined(__EMSCRIPTEN__)
-	lDefineVal(c, "ARCH", lConst(lValString("wasm")));
+	lDefineVal(c, "ARCH", lValString("wasm"));
 	#else
-	lDefineVal(c, "ARCH", lConst(lValString("unknown")));
+	lDefineVal(c, "ARCH", lValString("unknown"));
 	#endif
 }
 
@@ -329,7 +315,6 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
 	lAddNativeFunc(c,"eval",            "[expr]",         "Evaluate EXPR",                              lnfEval);
 	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
-	lAddNativeFunc(c,"self",            "[]",             "Return the closest object closure",          lnfSelf);
 
 	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
 	lAddSpecialForm(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
@@ -342,7 +327,7 @@ lClosure *lClosureNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	if(c == NULL){return NULL;}
 	c->parent = 0;
-	c->flags |= lfNoGC;
+	lRootsClosurePush(c);
 	lAddCoreFuncs(c);
 	lAddPlatformVars(c);
 	return c;

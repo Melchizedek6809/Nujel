@@ -24,12 +24,8 @@ static lVal *lnfDefine(lClosure *c, lClosure *ec, lVal *v, lVal *(*func)(lClosur
 	if((lsym != NULL) && (lsym->c[0] == ':')){return NULL;}
 	lVal *t = func(c,lsym);
 	if((t == NULL) || (t->type != ltPair)){return NULL;}
-	if((lCar(t) != NULL) && (lCar(t)->flags & lfConst)){
-		return lCar(t);
-	}else{
-		t->vList.car = nv;
-		return lCar(t);
-	}
+	t->vList.car = nv;
+	return lCar(t);
 }
 
 static lVal *lUndefineClosureSym(lClosure *c, lVal *s){
@@ -156,7 +152,6 @@ static lVal *lClLambda(lClosure *c, int stepsLeft){
 	}
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}
-	c->refCount++;
 	ret->type = ltLambda;
 	ret->vClosure = c;
 	return ret;
@@ -177,7 +172,6 @@ static lVal *lnfLet(lClosure *c, lVal *v){
 	forEach(n,lCdr(v)){
 		ret = lEval(nc,lCar(n));
 	}
-	c->refCount--;
 	return ret == NULL ? NULL : ret;
 }
 

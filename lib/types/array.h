@@ -7,7 +7,6 @@ struct lArray {
 		lArray *nextFree;
 	};
 	i32 length;
-	u16 flags;
 };
 #define ARR_MAX (1<<12)
 
