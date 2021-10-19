@@ -236,7 +236,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 		c = lClosureNewRoot();
 		addNativeFuncs(c);
 		lEval(c,lWrap(lRead((const char *)binlib_nuj_data)));
-		lGarbageCollectForce();
+		lGarbageCollect();
 	}else{
 		c = lClosureNewRootNoStdLib();
 		addNativeFuncs(c);
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]){
 		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
-		lGarbageCollect();
+		//lGarbageCollect();
 
 		if(!eval){
 			free(str);

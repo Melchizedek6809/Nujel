@@ -44,7 +44,6 @@ lVal *lnfTrim(lClosure *c, lVal *v){
 	ret->type = ltString;
 	ret->vString = lStringAlloc();
 	if(ret->vString == NULL){return NULL;}
-	ret->vString->flags |= lfHeapAlloc;
 	ret->vString->buf = ret->vString->data = buf;
 	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
@@ -65,7 +64,6 @@ lVal *lnfStrDown(lClosure *c, lVal *v){
 	ret->type = ltString;
 	ret->vString = lStringAlloc();
 	if(ret->vString == NULL){return NULL;}
-	ret->vString->flags |= lfHeapAlloc;
 	ret->vString->buf = ret->vString->data = buf;
 	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
@@ -86,7 +84,6 @@ lVal *lnfStrUp(lClosure *c, lVal *v){
 	ret->type = ltString;
 	ret->vString = lStringAlloc();
 	if(ret->vString == NULL){return NULL;}
-	ret->vString->flags |= lfHeapAlloc;
 	ret->vString->buf = ret->vString->data = buf;
 	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;
@@ -118,7 +115,6 @@ lVal *lnfStrCap(lClosure *c, lVal *v){
 	ret->type = ltString;
 	ret->vString = lStringAlloc();
 	if(ret->vString == 0){return NULL;}
-	ret->vString->flags |= lfHeapAlloc;
 	ret->vString->buf = ret->vString->data = buf;
 	ret->vString->bufEnd = &ret->vString->buf[len];
 	return ret;

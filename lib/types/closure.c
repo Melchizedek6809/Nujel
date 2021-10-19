@@ -8,6 +8,7 @@
 #include "symbol.h"
 #include "val.h"
 #include "../nujel.h"
+#include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>
@@ -28,10 +29,17 @@ lClosure *lClosureAlloc(){
 	lClosure *ret;
 	if(lClosureFFree == NULL){
 		if(lClosureMax >= CLO_MAX-1){
-			lPrintError("lClosure OOM ");
-			return 0;
+			lGarbageCollect();
+			if(lClosureFFree == NULL){
+				lPrintError("lClosure OOM ");
+				return 0;
+			}else{
+				ret = lClosureFFree;
+				lClosureFFree = ret->nextFree;
+			}
+		}else{
+			ret = &lClosureList[lClosureMax++];
 		}
-		ret = &lClosureList[lClosureMax++];
 	}else{
 		ret = lClosureFFree;
 		lClosureFFree = ret->nextFree;

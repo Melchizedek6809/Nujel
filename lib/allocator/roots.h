@@ -1,10 +1,14 @@
 #pragma once
 #include "../nujel.h"
 
-void lRootsClosurePush(const lClosure *c);
-void lRootsClosurePop ();
-void lRootsClosureMark();
+lClosure *lRootsClosurePush(lClosure *c);
+lClosure *lRootsClosurePop ();
+void      lRootsClosureMark();
 
-void lRootsValPush(lVal *c);
-void lRootsValPop ();
-void lRootsValMark();
+lVal *lRootsValPush(lVal *c);
+lVal *lRootsValPop ();
+void  lRootsValMark();
+
+lString *lRootsStringPush(lString *s);
+lString *lRootsStringPop ();
+void     lRootsStringMark();

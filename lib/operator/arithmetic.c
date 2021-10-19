@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "arithmetic.h"
+#include "../allocator/roots.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../misc/vec.h"
@@ -286,15 +287,13 @@ void lAddInfix(lVal *v){
 
 lVal *lnfInfix (lClosure *c, lVal *v){
 	lVal *l = NULL, *start = NULL;
-	for(lVal *cur=v;cur != NULL;cur=lCdr(cur)){
-		lVal *cv = lEval(c,lCar(cur));
-		lVal *new = lCons(cv,NULL);
-		if(l == NULL){
-			l = start = new;
-		}else{
-			l->vList.cdr = new;
-			l = new;
-		}
+	if(v == NULL){return NULL;}
+	start = l = lRootsValPush(lCons(NULL,NULL));
+	start->vList.car = lEval(c,lCar(v));
+	for(lVal *cur=lCdr(v);cur != NULL;cur=lCdr(cur)){
+		l->vList.cdr = lCons(NULL,NULL);
+		l = l->vList.cdr;
+		l->vList.car = lEval(c,lCar(cur));
 	}
 	for(int i=0;i<infixFunctionCount;i++){
 		lVal *func;
@@ -314,6 +313,7 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 			goto tryAgain;
 		}
 	}
+	lRootsValPop();
 	return lCar(start);
 }
 

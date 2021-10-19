@@ -24,7 +24,7 @@
 	[def iter [λ [number value l]
 		     [if [<= number 0]
 			 l
-			 [iter [-- number] value [cons value l]]]
+			 [iter [- number 1] value [cons value l]]]
 	]]
 
 	[λ [number value]

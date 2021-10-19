@@ -6,6 +6,7 @@
 #include "array.h"
 
 #include "../type-system.h"
+#include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>
@@ -25,10 +26,17 @@ lArray *lArrayAlloc(){
 	lArray *ret;
 	if(lArrayFFree == NULL){
 		if(lArrayMax >= ARR_MAX-1){
-			lPrintError("lArray OOM ");
-			return 0;
+			lGarbageCollect();
+			if(lArrayFFree == NULL){
+				lPrintError("lArray OOM ");
+				return NULL;
+			}else{
+				ret = lArrayFFree;
+				lArrayFFree = ret->nextFree;
+			}
+		}else{
+			ret = &lArrayList[lArrayMax++];
 		}
-		ret = &lArrayList[lArrayMax++];
 	}else{
 		ret = lArrayFFree;
 		lArrayFFree = ret->nextFree;
@@ -41,7 +49,9 @@ lArray *lArrayAlloc(){
 void lArrayFree(lArray *v){
 	if(v == NULL){return;}
 	lArrayActive--;
-	free(v->data);
+	if((v->data != NULL) && (v->length > 0)){
+		free(v->data);
+	}
 	v->data     = NULL;
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;

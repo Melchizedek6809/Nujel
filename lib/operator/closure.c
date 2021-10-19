@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "closure.h"
+#include "../allocator/roots.h"
 #include "../type-system.h"
 #include "../types/closure.h"
 #include "../types/list.h"
@@ -14,22 +15,20 @@
 static lVal *lnfDefine(lClosure *c, lClosure *ec, lVal *v, lVal *(*func)(lClosure *,lSymbol *)){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
 	lVal *sym = lCar(v);
-	lVal *nv = NULL;
-	if(lCdr(v) != NULL){
-		nv = lEval(ec,lCadr(v));
-	}
-	if(sym->type != ltSymbol){sym = lEval(c,sym);}
-	if(sym->type != ltSymbol){return NULL;}
 	lSymbol *lsym = sym->vSymbol;
 	if((lsym != NULL) && (lsym->c[0] == ':')){return NULL;}
-	lVal *t = func(c,lsym);
+	lVal *t = lRootsValPush(func(c,lsym));
 	if((t == NULL) || (t->type != ltPair)){return NULL;}
-	t->vList.car = nv;
-	return lCar(t);
+	if(lCdr(v) == NULL){
+		t->vList.car = NULL;
+	}else{
+		t->vList.car = lEval(ec,lCadr(v));
+	}
+	return lCar(lRootsValPop());
 }
 
 static lVal *lUndefineClosureSym(lClosure *c, lVal *s){
-	if(c == NULL){return lValBool(false);}
+	if(c == NULL){return NULL;}
 	lVal *lastPair = c->data;
 	forEach(v,c->data){
 		lVal *n = lCar(v);

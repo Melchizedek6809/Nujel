@@ -14,76 +14,95 @@
 	#include <stdlib.h>
 #endif
 
-typedef struct rootLink rootLink;
-struct rootLink {
-	void *entry;
-	rootLink *next;
-};
-rootLink *freeLink     = NULL;
+lClosure **rootsClosure = NULL;
+uint rootsClosureSP     = 0;
+uint rootsClosureMax    = 0;
 
-rootLink *rootsClosure = NULL;
-rootLink *rootsVal     = NULL;
+lVal **rootsVal  = NULL;
+uint rootsValSP  = 0;
+uint rootsValMax = 0;
 
-void rootLinkAllocFromHeap(){
-	rootLink *block = malloc(sizeof(rootLink) * 256);
-	if(block == NULL){
-		fprintf(stderr,"rootLink OOM\n");
-		exit(13);
+lString **rootsString = NULL;
+uint rootsStringSP    = 0;
+uint rootsStringMax   = 0;
+
+lClosure *lRootsClosurePush(lClosure *c){
+	if(rootsClosureSP >= rootsClosureMax){
+		rootsClosureMax = MAX(rootsClosureMax * 2, 256);
+		rootsClosure = realloc(rootsClosure, rootsClosureMax * sizeof(lClosure *));
+		if(rootsClosure == NULL){
+			fprintf(stderr,"Can't grow rootsClosure\n");
+			exit(123);
+		}
 	}
-	for(int i=255;i>=0;i--){
-		block[i].entry = freeLink;
-		freeLink = &block[i];
+	rootsClosure[rootsClosureSP++] = c;
+	return c;
+}
+
+lClosure *lRootsClosurePop(){
+	if(rootsClosureSP == 0){
+		fprintf(stderr,"rootsClosure underflow\n");
+		exit(124);
 	}
-}
-
-rootLink *rootLinkAlloc(){
-	if(freeLink == NULL){
-		rootLinkAllocFromHeap();
-	}
-	rootLink *ret = freeLink;
-	freeLink = ret->entry;
-	return ret;
-}
-
-void rootLinkFree(rootLink *l){
-	if(l == NULL){return;}
-	l->entry = freeLink;
-	freeLink = l;
-}
-
-
-void lRootsClosurePush(const lClosure *c){
-	rootLink *ret = rootLinkAlloc();
-	ret->next     = rootsClosure;
-	ret->entry    = (void *)c;
-	rootsClosure  = ret;
-}
-
-void lRootsClosurePop(){
-	if(rootsClosure == NULL){return;}
-	rootsClosure = rootsClosure->next;
+	return rootsClosure[--rootsClosureSP];
 }
 
 void lRootsClosureMark(){
-	for(rootLink *l = rootsClosure; l != NULL; l = l->next){
-		lClosureGCMark((const lClosure *)l->entry);
+	for(uint i=0;i<rootsClosureSP;i++){
+		lClosureGCMark(rootsClosure[i]);
 	}
 }
 
-void lRootsValPush(lVal *c){
-	rootLink *ret = rootLinkAlloc();
-	ret->next     = rootsVal;
-	ret->entry    = (void *)c;
-	rootsVal  = ret;
+lVal *lRootsValPush(lVal *c){
+	if(rootsValSP >= rootsValMax){
+		rootsValMax = MAX(rootsValMax * 2, 1024);
+		rootsVal = realloc(rootsVal, rootsValMax * sizeof(lVal *));
+		if(rootsVal == NULL){
+			fprintf(stderr,"Can't grow rootsVal\n");
+			exit(123);
+		}
+	}
+	rootsVal[rootsValSP++] = c;
+	return c;
 }
 
-void lRootsValPop(){
-	if(rootsVal == NULL){return;}
-	rootsVal = rootsVal->next;
+lVal *lRootsValPop(){
+	if(rootsValSP == 0){
+		fprintf(stderr,"rootsVal underflow\n");
+		exit(124);
+	}
+	return rootsVal[--rootsValSP];
 }
 
 void lRootsValMark(){
-	for(rootLink *l = rootsVal; l != NULL; l = l->next){
-		lValGCMark((lVal *)l->entry);
+	for(uint i=0;i<rootsValMax;i++){
+		lValGCMark(rootsVal[i]);
+	}
+}
+
+lString *lRootsStringPush(lString *s){
+	if(rootsStringSP >= rootsStringMax){
+		rootsStringMax = MAX(rootsStringMax * 2, 1024);
+		rootsString = realloc(rootsString, rootsStringMax * sizeof(lString *));
+		if(rootsString == NULL){
+			fprintf(stderr,"Can't grow rootsString\n");
+			exit(123);
+		}
+	}
+	rootsString[rootsStringSP++] = s;
+	return s;
+}
+
+lString *lRootsStringPop(){
+	if(rootsStringSP == 0){
+		fprintf(stderr,"rootsString underflow\n");
+		exit(124);
+	}
+	return rootsString[--rootsStringSP];
+}
+
+void lRootsStringMark(){
+	for(uint i=0;i<rootsStringMax;i++){
+		lStringGCMark(rootsString[i]);
 	}
 }

@@ -8,6 +8,7 @@
 #include "closure.h"
 #include "string.h"
 #include "vec.h"
+#include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>
@@ -27,11 +28,17 @@ lVal *lValAlloc(){
 	lVal *ret;
 	if(lValFFree == NULL){
 		if(lValMax >= VAL_MAX-1){
-			lPrintError("lVal OOM\n");
-			exit(1);
-			return NULL;
+			lGarbageCollect();
+			if(lValFFree == NULL){
+				lPrintError("lVal OOM\n");
+				exit(1);
+			}else{
+				ret       = lValFFree;
+				lValFFree = ret->nextFree;
+			}
+		}else{
+			ret = &lValList[lValMax++];
 		}
-		ret = &lValList[lValMax++];
 	}else{
 		ret       = lValFFree;
 		lValFFree = ret->nextFree;

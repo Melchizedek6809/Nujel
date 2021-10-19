@@ -5,8 +5,9 @@ extern int lGCRuns;
 
 void lValGCMark    (lVal *v);
 void lClosureGCMark(const lClosure *c);
-void lArrayGCMark  (lArray *v);
-void lNFuncGCMark  (lNFunc *f);
+void lStringGCMark (const lString *v);
+void lArrayGCMark  (const lArray *v);
+void lNFuncGCMark  (const lNFunc *f);
 
 void lGarbageCollect();
 void lGarbageCollectForce();

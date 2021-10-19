@@ -14,6 +14,7 @@
 #include "symbol.h"
 #include "val.h"
 #include "vec.h"
+#include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>
@@ -56,10 +57,17 @@ lString *lStringAlloc(){
 	lString *ret;
 	if(lStringFFree == NULL){
 		if(lStringMax >= STR_MAX){
-			lPrintError("lString OOM ");
-			return 0;
+			lGarbageCollect();
+			if(lStringFFree == NULL){
+				lPrintError("lString OOM ");
+				return 0;
+			}else{
+				ret = lStringFFree;
+				lStringFFree = ret->nextFree;
+			}
+		}else{
+			ret = &lStringList[lStringMax++];
 		}
-		ret = &lStringList[lStringMax++];
 	}else{
 		ret = lStringFFree;
 		lStringFFree = ret->nextFree;
@@ -71,10 +79,6 @@ lString *lStringAlloc(){
 
 void lStringFree(lString *s){
 	if(s == NULL){return;}
-	if((s->buf != NULL) && (s->flags & lfHeapAlloc)){
-		free((void *)s->buf);
-		s->buf = NULL;
-	}
 	lStringActive--;
 	s->nextFree = lStringFFree;
 	lStringFFree = s;
@@ -88,7 +92,6 @@ lString *lStringNew(const char *str, uint len){
 	if(nbuf == NULL){return 0;}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
-	s->flags |= lfHeapAlloc;
 	s->buf    = s->data = nbuf;
 	s->bufEnd = &s->buf[len];
 	return s;
@@ -102,8 +105,7 @@ lString *lStringDup(lString *os){
 	char *nbuf = malloc(len+1);
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
-	s->flags |= lfHeapAlloc;
-	s->buf    = s->data = nbuf;
+s->buf    = s->data = nbuf;
 	s->bufEnd = &s->buf[len];
 	return s;
 }

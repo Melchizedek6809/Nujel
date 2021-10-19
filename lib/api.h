@@ -1,4 +1,7 @@
 #pragma once
+/* The API is completely unstable right now and will change
+ * a lot from commit to commit!
+ */
 
 #include "allocator/garbage-collection.h"
 #include "nujel.h"

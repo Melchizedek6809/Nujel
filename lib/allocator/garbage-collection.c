@@ -19,12 +19,12 @@
 
 int lGCRuns = 0;
 
-u8 lValMarkMap    [CLO_MAX];
+u8 lValMarkMap    [VAL_MAX];
 u8 lClosureMarkMap[CLO_MAX];
 u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
 
-void lStringGCMark(lString *v){
+void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
 	if(lStringMarkMap[ci]){return;}
@@ -71,7 +71,7 @@ void lClosureGCMark(const lClosure *c){
 }
 
 /* Mark every reference for the GC to ignore contained in v */
-void lArrayGCMark(lArray *v){
+void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
 	if(lArrayMarkMap[ci]){return;}
@@ -121,23 +121,10 @@ static void lGCSweep(){
 	}
 }
 
-/* Force a garbage collection cycle, probably not what you want */
-void lGarbageCollectForce(){
+/* Force a garbage collection cycle, shouldn't need to be called manually since
+ * when the heap is exhausted the GC is run */
+void lGarbageCollect(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
-}
-
-/* Check if a garbage collction cycle is needed, and if so, do so */
-void lGarbageCollect(){
-	static int calls = 0;
-
-	int thresh =         (VAL_MAX - (int)lValActive)     - (VAL_MAX / 128);
-	thresh = MIN(thresh,((CLO_MAX - (int)lClosureActive) - 128) *  8);
-	thresh = MIN(thresh,((ARR_MAX - (int)lArrayActive)   -  64) * 16);
-	thresh = MIN(thresh,((STR_MAX - (int)lStringActive)  -  64) * 16);
-	thresh = MIN(thresh,((VEC_MAX - (int)lVecActive)     -  64) * 16);
-	if(++calls < thresh){return;}
-	lGarbageCollectForce();
-	calls = 0;
 }

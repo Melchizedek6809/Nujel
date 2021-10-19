@@ -74,48 +74,44 @@ void lWriteVal(lVal *v){
 
 /* Handler for [λ [...args] ...body] */
 static lVal *lnfLambda(lClosure *c, lVal *v){
-	lClosure *cl = lClosureNew(c);
-	if(cl == NULL){return NULL;}
-	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){return NULL;}
-	cl->doc  = lCons(lCar(v),lCadr(v));
-	cl->text = lWrap(lCdr(v));
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
-	ret->type = ltLambda;
-	ret->vClosure = cl;
+	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){
+		return NULL;
+	}
+	lVal *ret = lRootsValPush(lValAlloc());
+	ret->type           = ltLambda;
+	ret->vClosure       = lClosureNew(c);
+	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
+	ret->vClosure->text = lWrap(lCdr(v));
 
 	forEach(n,lCar(v)){
 		lVal *car = lCar(n);
 		if((car == NULL) || (car->type != ltSymbol)){continue;}
-		lVal *t = lDefineClosureSym(cl,lGetSymbol(car));
+		lVal *t = lDefineClosureSym(ret->vClosure,lGetSymbol(car));
 		t->vList.car = NULL;
 		(void)t;
 	}
 
-	return ret;
+	return lRootsValPop();
 }
 
 /* Handler for [λ* [..args] docstring body] */
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
-	lClosure *cl = lClosureNew(c);
-	if(cl == NULL){return NULL;}
-	lVal *doc = lCons(lCar(v),lCadr(v));
-	cl->doc  = doc;
-	cl->text = lCaddr(v);
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
-	ret->type = ltLambda;
-	ret->vClosure = cl;
+	lRootsValPush(ret);
+	ret->type           = ltLambda;
+	ret->vClosure       = lClosureNew(c);
+	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
+	ret->vClosure->text = lCaddr(v);
 
 	forEach(n,lCar(v)){
 		lVal *car = lCar(n);
 		if((car == NULL) || (car->type != ltSymbol)){continue;}
-		lVal *t = lDefineClosureSym(cl,lGetSymbol(car));
+		lVal *t = lDefineClosureSym(ret->vClosure,lGetSymbol(car));
 		t->vList.car = NULL;
 		(void)t;
 	}
 
-	return ret;
+	return lRootsValPop();
 }
 
 /* Handler for [δ [...args] ...body] */
@@ -128,34 +124,54 @@ static lVal *lnfDynamic(lClosure *c, lVal *v){
 
 /* Handler for [ω ...body] */
 static lVal *lnfObject(lClosure *c, lVal *v){
-	lClosure *cl = lClosureNew(c);
-	if(cl == NULL){return NULL;}
-	lVal *ret = lValAlloc();
-	ret->type = ltObject;
-	ret->vClosure = cl;
-	lnfDo(cl,v);
-
-	return ret;
+	lVal *ret = lRootsValPush(lValAlloc());
+	ret->type     = ltObject;
+	ret->vClosure = lClosureNew(c);
+	lnfDo(ret->vClosure,v);
+	return lRootsValPop();
 }
 
 /* Handler for [memory-info] */
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
-	lVal *ret = NULL;
-	ret = lCons(lValInt(lSymbolMax),ret);
-	ret = lCons(lValSym(":symbol"),ret);
-	ret = lCons(lValInt(lNFuncActive),ret);
-	ret = lCons(lValSym(":native-function"),ret);
-	ret = lCons(lValInt(lStringActive),ret);
-	ret = lCons(lValSym(":string"),ret);
-	ret = lCons(lValInt(lClosureActive),ret);
-	ret = lCons(lValSym(":array"),ret);
-	ret = lCons(lValInt(lArrayActive),ret);
-	ret = lCons(lValSym(":vector"),ret);
-	ret = lCons(lValInt(lVecActive),ret);
-	ret = lCons(lValSym(":closure"),ret);
-	ret = lCons(lValInt(lValActive),ret);
-	ret = lCons(lValSym(":value"),ret);
+	lVal *ret = lRootsValPush(lCons(NULL,NULL));
+	lVal *l = ret;
+
+	l->vList.car = lValSym(":value");
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+	l->vList.car = lValInt(lValActive);
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+
+	l->vList.car = lValSym(":closure");
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+	l->vList.car = lValInt(lClosureActive);
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+
+	l->vList.car = lValSym(":array");
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+	l->vList.car = lValInt(lArrayActive);
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+
+	l->vList.car = lValSym(":string");
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+	l->vList.car = lValInt(lStringActive);
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+
+	l->vList.car = lValSym(":symbol");
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+	l->vList.car = lValInt(lSymbolMax);
+	l->vList.cdr = lCons(NULL,NULL);
+	l = l->vList.cdr;
+
 	return ret;
 }
 
@@ -169,13 +185,10 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		return lnfDo(lambda->vClosure,args);
 	}
 	lVal *vn = args;
-	lClosure *tmpc = 0;
-	if(lambda->type == ltDynamic){
-		tmpc = lClosureNew(c);
-	}else{
-		tmpc = lClosureNew(lambda->vClosure);
-	}
-	if(tmpc == NULL){return NULL;}
+	lClosure *tmpc = (lambda->type == ltDynamic
+		? lClosureNew(c)
+		: lClosureNew(lambda->vClosure));
+	lRootsClosurePush(tmpc);
 	tmpc->text = lambda->vClosure->text;
 	forEach(n,lambda->vClosure->data){
 		if(vn == NULL){break;}
@@ -195,6 +208,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	}
 
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
+	lRootsClosurePop();
 	return ret;
 }
 
@@ -205,40 +219,60 @@ lVal *lEval(lClosure *c, lVal *v){
 	if(v->type == ltSymbol){
 		return lResolveSym(c,v);
 	}else if(v->type == ltPair){
-		lVal *ret = lEval(c,lCar(v));
-		if(ret == NULL){return v;}
-		if(ret->type == ltSpecialForm){
-			return ret->vNFunc->fp(c,lCdr(v));
+		lVal *ret = lRootsValPush(lEval(c,lCar(v)));
+		if(ret == NULL){
+			v = NULL;
+		}else if(ret->type == ltSpecialForm){
+			v = ret->vNFunc->fp(c,lCdr(v));
 		}else if((ret->type == ltLambda) || (ret->type == ltDynamic) || (ret->type == ltObject)){
-			return lLambda(c,lCdr(v),ret);
-		}
-		lVal *args = lMap(c,lCdr(v),lEval);
-		switch(ret->type){
-		default:
-			return v;
-		case ltNativeFunc:
-			return ret->vNFunc->fp(c,args);
-		case ltPair:
-			return lEval(c,ret);
-		case ltString:
-			return lnfCat(c,lCons(ret,args));
-		case ltInt:
-		case ltFloat:
-		case ltVec:
-			if(v->vList.cdr == NULL){
-				return ret;
+			v = lLambda(c,lCdr(v),ret);
+		}else{
+			lVal *args = lMap(c,lCdr(v),lEval);
+			if(ret->type == ltNativeFunc){
+				lRootsValPush(args);
+				v = ret->vNFunc->fp(c,args);
+				lRootsValPop();
 			}else{
-				return lnfInfix(c,lCons(ret,args));
-			}
-		case ltArray:
-			if(v->vList.cdr == NULL){
-				return ret;
-			}else{
-				return lnfArrRef(c,lCons(ret,args));
+				lVal *nv = lCons(ret,args);
+				lRootsValPush(nv);
+				switch(ret->type){
+				case ltPair:
+					v = lEval(c,nv);
+					break;
+				case ltString:
+					v = lnfCat(c,nv);
+					break;
+				case ltInt:
+				case ltFloat:
+				case ltVec:
+					v = (v->vList.cdr == NULL) ? ret : lnfInfix(c,nv);
+					break;
+				case ltArray:
+					v = (v->vList.cdr == NULL) ? ret : lnfArrRef(c,nv);
+					break;
+				}
+				lRootsValPop();
 			}
 		}
+		lRootsValPop();
 	}
 	return v;
+}
+
+/* Evaluate func for every entry in list v and return a list containing the results */
+lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
+	if((c == NULL) || (v == NULL)){return NULL;}
+	lVal *car = func(c,lCar(v));
+	lRootsValPush(car);
+	lVal *cc = lCons(car,NULL);
+	lRootsValPop();
+	lRootsValPush(cc);
+	forEach(t,lCdr(v)){
+		cc->vList.cdr = lCons(NULL,NULL);
+		cc = cc->vList.cdr;
+		cc->vList.car = func(c,lCar(t));
+	}
+	return lRootsValPop();
 }
 
 /* Handler for [apply fn list] */
@@ -325,7 +359,6 @@ static void lAddCoreFuncs(lClosure *c){
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
 lClosure *lClosureNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
-	if(c == NULL){return NULL;}
 	c->parent = 0;
 	lRootsClosurePush(c);
 	lAddCoreFuncs(c);
@@ -336,28 +369,17 @@ lClosure *lClosureNewRootNoStdLib(){
 /* Create a new root closure with the default included stdlib */
 lClosure *lClosureNewRoot(){
 	lClosure *c = lClosureNewRootNoStdLib();
-	lEval(c,lWrap(lRead((const char *)stdlib_nuj_data)));
+	c->text = lRead((const char *)stdlib_nuj_data);
+	c->text = lWrap(c->text);
+	lEval(c,c->text);
+	c->text = NULL;
 	return c;
-}
-
-/* Evaluate func for every entry in list v and return a list containing the results */
-lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
-	if((c == NULL) || (v == NULL)){return NULL;}
-	lVal *ret = NULL, *cc = NULL;
-
-	forEach(t,v){
-		lVal *ct = func(c,lCar(t));
-		if(ct == NULL){continue;}
-		ct = lCons(ct,NULL);
-		if(ret == NULL){ret = ct;}
-		if(cc  != NULL){cc->vList.cdr = ct;}
-		cc = ct;
-	}
-
-	return ret;
 }
 
 /* Append a do to the beginning of v, useful when evaluating user input via a repl, since otherwise we could only accept a single expression. */
 lVal *lWrap(lVal *v){
-	return lCons(lValSymS(symDo),v);
+	lVal *r = lRootsValPush(lCons(NULL,NULL));
+	r->vList.cdr = v;
+	r->vList.car = lValSymS(symDo);
+	return lRootsValPop();
 }

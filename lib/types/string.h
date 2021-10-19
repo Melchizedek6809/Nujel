@@ -9,8 +9,6 @@ struct lString{
 	};
 	u16 flags;
 };
-#define lfHeapAlloc (16)
-
 #define STR_MAX  (1<<14)
 
 extern lString  lStringList [STR_MAX];

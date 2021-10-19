@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "array.h"
+#include "../allocator/roots.h"
 #include "../type-system.h"
 #include "../types/array.h"
 #include "../types/list.h"
@@ -26,8 +27,7 @@ lVal *lnfArrRef(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){return NULL;}
-	v = lCdr(v);
-	lVal *t = lCar(v);
+	lVal *t = lCadr(v);
 	if(t == NULL){return arr;}
 	if((t->type != ltInt) && (t->type != ltFloat)){return NULL;}
 	const int key = castToInt(t,-1);
@@ -59,48 +59,45 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	const int len = castToInt(lCar(v),-1);
 	if(len < 0){return NULL;}
-	lVal *r = lValAlloc();
+	lVal *r = lRootsValPush(lValAlloc());
 	r->type = ltArray;
 	r->vArray = lArrayAlloc();
 	r->vArray->length = len;
 	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
 	if(r->vArray->data == NULL){
 		lArrayFree(r->vArray);
-		lValFree(r);
+		lValFree(lRootsValPop());
 		return NULL;
 	}
-	return r;
+	return lRootsValPop();
 }
 
 lVal *lnfArr(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	int length = lListLength(v);
-	lVal *r = lValAlloc();
+	lVal *r = lRootsValPush(lValAlloc());
 	r->type = ltArray;
-	lArray *arr = lArrayAlloc();
-	if(arr == NULL){return NULL;}
-	r->vArray = arr;
-	arr->length = length;
-	arr->data = calloc(length,sizeof(*arr->data));
-	if(arr->data == NULL){
-		arr->length = 0;
-		lArrayFree(arr);
+	r->vArray = lArrayAlloc();
+	r->vArray->length = length;
+	r->vArray->data = calloc(length,sizeof(*r->vArray->data));
+	if(r->vArray->data == NULL){
+		r->vArray->length = 0;
+		lArrayFree(r->vArray);
 		lValFree(r);
 		return NULL;
 	}
 	int key = 0;
 	forEach(cur, v){
-		arr->data[key++] = lCar(cur);
+		r->vArray->data[key++] = lCar(cur);
 	}
-	return r;
+	return lRootsValPop();
 }
 
 lVal *lnfArrPred(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){return lValBool(false);}
-	return lValBool(true);
+	return lValBool(!((arr == NULL) || (arr->type != ltArray)));
 }
 
 void lOperationsArray(lClosure *c){

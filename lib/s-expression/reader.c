@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "reader.h"
+#include "../allocator/roots.h"
 #include "../types/list.h"
 #include "../types/native-function.h"
 #include "../types/symbol.h"
@@ -247,11 +248,13 @@ static lVal *lParseSpecial(lString *s){
 lVal *lReadString(lString *s){
 	lVal *v, *ret;
 	ret = v = lCons(NULL,NULL);
+	lRootsValPush(ret);
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 		char c = *s->data;
 		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (s->data >= s->bufEnd)){
 			s->data++;
+			lRootsValPop();
 			return ret;
 		}
 
@@ -301,12 +304,12 @@ lVal *lReadString(lString *s){
 
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
-	lString *s  = lStringAlloc();
-	if(s == NULL){return NULL;}
+	lString *s  = lRootsStringPush(lStringAlloc());
 	s->data     = str;
 	s->buf      = str;
 	s->bufEnd   = &str[strlen(str)];
 	lVal *ret   = lReadString(s);
+	lRootsStringPop();
 	return ret;
 }
 
@@ -314,9 +317,9 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 	(void)c;
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	lString *dup = lStringDup(t->vString);
-	if(dup == 0){return NULL;}
+	lString *dup = lRootsStringPush(lStringDup(t->vString));
 	t = lReadString(dup);
+	lRootsStringPop();
 	if((t != NULL) && (t->type == ltPair) && (lCar(t) != NULL) && (lCdr(t) == NULL)){
 		return lCar(t);
 	}else{
