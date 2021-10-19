@@ -17,3 +17,11 @@
 	"Return the hours part of TIMESTAMP, defaults to current time"
 	[% [/ [default timestamp [time]] 3600] 24]
 ]]
+
+[def profile [λ [@...body]
+	[def form [cons 'do @...body]]
+	[def start-time [time/milliseconds]]
+	[def val [eval form]]
+	[def end-time [time/milliseconds]]
+	[display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]
+]]
