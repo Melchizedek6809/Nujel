@@ -14,12 +14,12 @@
 
 lArray   lArrayList[ARR_MAX];
 uint     lArrayActive = 0;
-uint     lArrayMax    = 1;
+uint     lArrayMax    = 0;
 lArray  *lArrayFFree  = NULL;
 
 void lInitArray(){
 	lArrayActive = 0;
-	lArrayMax    = 1;
+	lArrayMax    = 0;
 }
 
 lArray *lArrayAlloc(){
@@ -42,16 +42,13 @@ lArray *lArrayAlloc(){
 		lArrayFFree = ret->nextFree;
 	}
 	lArrayActive++;
-	*ret = (lArray){0};
 	return ret;
 }
 
 void lArrayFree(lArray *v){
 	if(v == NULL){return;}
 	lArrayActive--;
-	if((v->data != NULL) && (v->length > 0)){
-		free(v->data);
-	}
+	free(v->data);
 	v->data     = NULL;
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;

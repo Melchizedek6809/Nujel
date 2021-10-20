@@ -16,6 +16,7 @@ struct lClosure {
 extern lClosure lClosureList[CLO_MAX];
 extern uint     lClosureMax;
 extern uint     lClosureActive;
+extern lClosure *lClosureFFree;
 
 void      lInitClosure      ();
 lClosure *lClosureAlloc     ();

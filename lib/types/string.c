@@ -25,7 +25,7 @@
 
 lString  lStringList[STR_MAX];
 uint     lStringActive = 0;
-uint     lStringMax    = 1;
+uint     lStringMax    = 0;
 lString *lStringFFree  = NULL;
 
 char *ansiRS = "\033[0m";
@@ -50,7 +50,7 @@ char *ansiFG[16] = {
 
 void lInitStr(){
 	lStringActive = 0;
-	lStringMax    = 1;
+	lStringMax    = 0;
 }
 
 lString *lStringAlloc(){

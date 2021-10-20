@@ -2,6 +2,7 @@
 #include "../nujel.h"
 
 extern int lGCRuns;
+extern bool lGCVerbose;
 
 void lValGCMark    (lVal *v);
 void lClosureGCMark(const lClosure *c);

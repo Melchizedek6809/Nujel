@@ -16,12 +16,12 @@
 
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;
-uint     lValMax    = 1;
+uint     lValMax    = 0;
 lVal    *lValFFree  = NULL;
 
 void lInitVal(){
 	lValActive = 0;
-	lValMax    = 1;
+	lValMax    = 0;
 }
 
 lVal *lValAlloc(){

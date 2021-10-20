@@ -322,7 +322,7 @@
 [test-add #t [list-equal? '[1] '[1]]]
 [test-add #f [eq? '[] #nil]]
 [test-add #t [eq? λ [resolve [car '[λ asd]]]]]
-[test-add 100000 [let [] [def i 0] [while [< i 100000] [set! i [+ 1 i]]]]]
+[test-add 100000 [let [] [def i 0] [while [< i 100000] [set! i [++ i]]]]]
 
 ; Has to wait until the new constant system is in place
 ;[test-add 3.14159 [set! π 3] π]

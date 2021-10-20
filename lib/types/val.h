@@ -22,9 +22,10 @@ struct lVal {
 
 #define VAL_MAX (1<<20)
 
-extern lVal     lValList[VAL_MAX];
-extern uint     lValMax;
-extern uint     lValActive;
+extern lVal  lValList[VAL_MAX];
+extern uint  lValMax;
+extern uint  lValActive;
+extern lVal *lValFFree;
 
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
 

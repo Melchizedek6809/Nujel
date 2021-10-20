@@ -110,7 +110,6 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 		t->vList.car = NULL;
 		(void)t;
 	}
-
 	return lRootsValPop();
 }
 
@@ -216,8 +215,10 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 lVal *lEval(lClosure *c, lVal *v){
 	if((c == NULL) || (v == NULL)){return NULL;}
 
+	lRootsValPush(v);
+	lRootsClosurePush(c);
 	if(v->type == ltSymbol){
-		return lResolveSym(c,v);
+		v = lResolveSym(c,v);
 	}else if(v->type == ltPair){
 		lVal *ret = lRootsValPush(lEval(c,lCar(v)));
 		if(ret == NULL){
@@ -228,10 +229,9 @@ lVal *lEval(lClosure *c, lVal *v){
 			v = lLambda(c,lCdr(v),ret);
 		}else{
 			lVal *args = lMap(c,lCdr(v),lEval);
+			lRootsValPush(args);
 			if(ret->type == ltNativeFunc){
-				lRootsValPush(args);
 				v = ret->vNFunc->fp(c,args);
-				lRootsValPop();
 			}else{
 				lVal *nv = lCons(ret,args);
 				lRootsValPush(nv);
@@ -253,9 +253,12 @@ lVal *lEval(lClosure *c, lVal *v){
 				}
 				lRootsValPop();
 			}
+			lRootsValPop();
 		}
 		lRootsValPop();
 	}
+	lRootsClosurePop();
+	lRootsValPop();
 	return v;
 }
 
@@ -359,7 +362,7 @@ static void lAddCoreFuncs(lClosure *c){
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
 lClosure *lClosureNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
-	c->parent = 0;
+	c->parent = NULL;
 	lRootsClosurePush(c);
 	lAddCoreFuncs(c);
 	lAddPlatformVars(c);

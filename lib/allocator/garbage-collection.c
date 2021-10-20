@@ -8,6 +8,7 @@
  */
 #include "garbage-collection.h"
 #include "roots.h"
+#include "../operator/time.h"
 #include "../types/array.h"
 #include "../types/closure.h"
 #include "../types/list.h"
@@ -17,7 +18,12 @@
 #include "../types/vec.h"
 #include "../nujel.h"
 
+#ifndef COSMOPOLITAN_H_
+	#include <stdio.h>
+#endif
+
 int lGCRuns = 0;
+bool lGCVerbose = false;
 
 u8 lValMarkMap    [VAL_MAX];
 u8 lClosureMarkMap[CLO_MAX];
@@ -40,8 +46,8 @@ void lValGCMark(lVal *v){
 
 	switch(v->type){
 	case ltPair:
-		lValGCMark(lCar(v));
-		lValGCMark(lCdr(v));
+		lValGCMark(v->vList.car);
+		lValGCMark(v->vList.cdr);
 		break;
 	case ltLambda:
 		lClosureGCMark(v->vClosure);
@@ -83,10 +89,27 @@ void lArrayGCMark(const lArray *v){
 	}
 }
 
+static void lMarkFree(){
+	for(lArray *arr = lArrayFFree;arr != NULL;arr = arr->nextFree){
+		lArrayGCMark(arr);
+	}
+	for(lClosure *clo = lClosureFFree;clo != NULL;clo = clo->nextFree){
+		lClosureGCMark(clo);
+	}
+	for(lString *str = lStringFFree;str != NULL;str = str->nextFree){
+		lStringGCMark(str);
+	}
+	for(lVal *v = lValFFree;v != NULL;v = v->nextFree){
+		lValGCMark(v);
+	}
+}
+
 /* Scan through the whole heap so we can mark the roots, terribly inefficient implementation! */
 static void lGCMark(){
 	lRootsClosureMark();
 	lRootsValMark();
+	lRootsStringMark();
+	lMarkFree();
 }
 
 /* Free all values that have not been marked by lGCMark */
@@ -124,7 +147,22 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
+	const int bva = lValActive;
+	const int bca = lClosureActive;
+	const int baa = lArrayActive;
+	const int bsa = lStringActive;
+	const u64 start = getMSecs();
+
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
+	if(lGCVerbose){
+		const u64 end = getMSecs();
+		printf("== Garbage Collection #%u took %lums ==\n",lGCRuns,end-start);
+		printf("Vals: %u -> %u [%i] {%i}\n",bva,lValActive,(int)lValActive - bva, rootsValSP);
+		printf("Clos: %u -> %u [%i] {%i}\n",bca,lClosureActive,(int)lClosureActive - bca, rootsClosureSP);
+		printf("Arrs: %u -> %u [%i] {%i}\n",baa,lArrayActive,(int)lArrayActive - baa, 0);
+		printf("Strs: %u -> %u [%i] {%i}\n",bsa,lStringActive,(int)lStringActive - bsa, rootsStringSP);
+		printf("--------------\n\n");
+	}
 }

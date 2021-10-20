@@ -11,12 +11,12 @@
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
-uint     lNFuncMax    = 1;
+uint     lNFuncMax    = 0;
 lNFunc  *lNFuncFFree  = NULL;
 
 void lInitNativeFunctions(){
 	lNFuncActive = 0;
-	lNFuncMax    = 1;
+	lNFuncMax    = 0;
 }
 
 void lNFuncFree(uint i){

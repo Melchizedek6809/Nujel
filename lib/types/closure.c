@@ -17,12 +17,12 @@
 
 lClosure  lClosureList[CLO_MAX];
 uint      lClosureActive = 0;
-uint      lClosureMax    = 1;
+uint      lClosureMax    = 0;
 lClosure *lClosureFFree  = NULL;
 
 void lInitClosure(){
 	lClosureActive  = 0;
-	lClosureMax     = 1;
+	lClosureMax     = 0;
 }
 
 lClosure *lClosureAlloc(){
@@ -64,7 +64,7 @@ lClosure *lClosureNew(lClosure *parent){
 }
 
 lVal *lSearchClosureSym(lClosure *c, lVal *ret, const char *str, uint len){
-	if(c == 0){return ret;}
+	if(c == NULL){return ret;}
 
 	forEach(n, c->data){
 		lVal *e = lCaar(n);
@@ -125,7 +125,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 }
 
 static lVal *lGetSym(lClosure *c, lSymbol *s){
-	if((c == 0) || (s == NULL)){return NULL;}
+	if((c == NULL) || (s == NULL)){return NULL;}
 	forEach(v, c->data){
 		lVal *cursym = lCaar(v);
 		if((cursym == NULL) || (s != cursym->vSymbol)){continue;}
@@ -135,13 +135,13 @@ static lVal *lGetSym(lClosure *c, lSymbol *s){
 }
 
 lVal *lGetClosureSym(lClosure *c, lSymbol *s){
-	if(c == 0){return NULL;}
+	if(c == NULL){return NULL;}
 	lVal *t = lGetSym(c,s);
 	return t != NULL ? t : lGetClosureSym(c->parent,s);
 }
 
 lVal *lDefineClosureSym(lClosure *c, lSymbol *s){
-	if(c == 0){return NULL;}
+	if(c == NULL){return NULL;}
 	lVal *get = lGetSym(c,s);
 	if(get != NULL){return get;}
 	lVal *t = lCons(lValSymS(s),lCons(NULL,NULL));

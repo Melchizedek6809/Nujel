@@ -226,8 +226,15 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	bool loadStdLib = true;
 	for(int i=1;i<argc;i++){
 		if(argv[i][0] == '-'){
-			if(argv[i][1] == 'n'){
-				loadStdLib = false;
+			for(const char *opts = &argv[i][1];*opts;opts++){
+				switch(*opts){
+				case 'n':
+					loadStdLib = false;
+					break;
+				case 'v':
+					lGCVerbose = true;
+					break;
+				}
 			}
 		}
 	}
@@ -276,7 +283,6 @@ int main(int argc, char *argv[]){
 		}
 		lVal *v = lEval(c,lWrap(lRead(str)));
 		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
-		//lGarbageCollect();
 
 		if(!eval){
 			free(str);

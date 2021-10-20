@@ -13,12 +13,12 @@
 
 lVec     lVecList[VEC_MAX];
 uint     lVecActive = 0;
-uint     lVecMax    = 1;
+uint     lVecMax    = 0;
 lVec    *lVecFFree  = NULL;
 
 void lInitVec(){
 	lVecActive  = 0;
-	lVecMax     = 1;
+	lVecMax     = 0;
 }
 
 void lVecFree(lVec *v){

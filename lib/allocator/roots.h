@@ -12,3 +12,7 @@ void  lRootsValMark();
 lString *lRootsStringPush(lString *s);
 lString *lRootsStringPop ();
 void     lRootsStringMark();
+
+extern uint rootsClosureSP;
+extern uint rootsValSP;
+extern uint rootsStringSP;

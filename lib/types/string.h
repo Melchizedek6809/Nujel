@@ -14,6 +14,7 @@ struct lString{
 extern lString  lStringList [STR_MAX];
 extern uint     lStringActive;
 extern uint     lStringMax;
+extern lString *lStringFFree;
 
 void     lInitStr      ();
 lString *lStringAlloc  ();

@@ -67,11 +67,11 @@ lVal *lnfDo(lClosure *c, lVal *v){
 
 lVal *lnfWhile(lClosure *c, lVal *v){
 	lVal *cond = lCar(v);
-	lVal *body = lWrap(lCdr(v));
+	lVal *body = lCdr(v);
 	lVal *ret  = NULL;
 	lRootsValPush(body);
 	while(castToBool(lEval(c,cond))){
-		ret = lEval(c,body);
+		ret = lnfDo(c,body);
 	}
 	lRootsValPop();
 	return ret;

@@ -15,14 +15,14 @@
 
 lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
-uint    lSymbolMax    = 1;
+uint    lSymbolMax    = 0;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
 	lSymbolActive   = 0;
-	lSymbolMax      = 1;
+	lSymbolMax      = 0;
 
 	symNull     = lSymS("");
 	symQuote    = lSymS("quote");
