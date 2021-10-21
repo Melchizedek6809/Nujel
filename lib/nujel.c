@@ -39,7 +39,7 @@
 	#include <string.h>
 #endif
 
-extern u8 stdlib_nuj_data[];
+extern u8 stdlib_no_data[];
 
 char dispWriteBuf[1<<18];
 bool lVerbose = false;
@@ -373,7 +373,7 @@ lClosure *lClosureNewRootNoStdLib(){
 /* Create a new root closure with the default included stdlib */
 lClosure *lClosureNewRoot(){
 	lClosure *c = lClosureNewRootNoStdLib();
-	c->text = lRead((const char *)stdlib_nuj_data);
+	c->text = lRead((const char *)stdlib_no_data);
 	c->text = lWrap(c->text);
 	lEval(c,c->text);
 	c->text = NULL;

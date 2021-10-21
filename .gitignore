@@ -16,6 +16,7 @@ gmon.out
 # Executables/Object/Temporary files
 /tmp
 /nujel
+/nujel-bootstrap
 /tools/assets
 *.out
 *.a
@@ -24,7 +25,8 @@ gmon.out
 *.lib
 *.so
 *.o
-*.no
+/bin/lib/*.no
+/stdlib/*.no
 *.wd
 *.wa
 *.wo
@@ -41,3 +43,8 @@ gmon.out
 *.dSYM
 *.tar.xz
 *.tar.gz
+
+/bootstrap/stdlib.c
+/bootstrap/stdlib.h
+/bootstrap/binlib.c
+/bootstrap/binlib.h

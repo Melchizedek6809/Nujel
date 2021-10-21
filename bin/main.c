@@ -22,7 +22,7 @@
 
 #include "../lib/api.h"
 
-extern char binlib_nuj_data[];
+extern char binlib_no_data[];
 
 #ifdef __MINGW32__
 	static void bestlineHistoryLoad(const char *path){(void)path;}
@@ -242,7 +242,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	if(loadStdLib){
 		c = lClosureNewRoot();
 		addNativeFuncs(c);
-		lEval(c,lWrap(lRead((const char *)binlib_nuj_data)));
+		lEval(c,lWrap(lRead((const char *)binlib_no_data)));
 		lGarbageCollect();
 	}else{
 		c = lClosureNewRootNoStdLib();

@@ -16,6 +16,7 @@ LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 NUJEL       := ./nujel
+NUJEL_BOOT  := ./nujel-bootstrap
 ASSET       := ./tools/assets
 
 CC                   := cc
@@ -76,8 +77,8 @@ clean:
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-%.no: %.nuj | $(NUJEL)
-	@$(NUJEL) -x "[file/compile \"$^\"]"
+%.no: %.nuj | $(NUJEL_BOOT)
+	@$(NUJEL_BOOT) -x "[file/compile \"$^\"]"
 	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.wo: %.c
@@ -93,14 +94,19 @@ $(ASSET): tools/assets.c
 	@$(CC) -o $@    $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
 
-nujel.a: $(LIB_OBJS) tmp/stdlib.o
+nujel.a: $(LIB_OBJS)
 	@rm -rf $@
 	@ar cq $@ $^
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
-$(NUJEL): $(BIN_OBJS) tmp/binlib.o nujel.a
+$(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+
+$(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
+	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+	@$(NUJEL_BOOT) -x "[quit [test-run]]"
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
@@ -126,36 +132,34 @@ release.cosmopolitan: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	objcopy -S -O binary nujel.com.dbg nujel.com
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-tmp/stdlib.nuj: $(STDLIB_NUJS)
-	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
+	@$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
+	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
+
+bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
+	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
+	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/stdlib.no: $(STDLIB_NOBS)
 	@mkdir -p tmp/
 	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
-
-tmp/binlib.nuj: $(BINLIB_NUJS)
-	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+		@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
 
 tmp/binlib.no: $(BINLIB_NOBS)
 	@mkdir -p tmp/
 	@cat $^ > $@
 	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
 
-tmp/stdlib.c: tmp/stdlib.nuj $(ASSET)
+tmp/stdlib.c: tmp/stdlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/stdlib tmp/stdlib.nuj
+	@$(ASSET) tmp/stdlib tmp/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/stdlib.h: tmp/stdlib.c
 	@true
 
-tmp/binlib.c: tmp/binlib.nuj $(ASSET)
+tmp/binlib.c: tmp/binlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/binlib tmp/binlib.nuj
+	@$(ASSET) tmp/binlib tmp/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/binlib.h: tmp/binlib.c
 	@true
