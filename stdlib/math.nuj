@@ -16,7 +16,7 @@
 	[ash val [- amount]]
 ]]
 
-[def min [let []
+[def min [let*
 	[def iter [λ [a l]
 		[cond [[nil? l] a]
 		      [[< a [car l]] [iter a [cdr l]]]
@@ -33,7 +33,7 @@
 	]
 ]]
 
-[def max [let []
+[def max [let*
 	[def iter [λ [a l]
 		[cond [[nil? l] a]
 		      [[> a [car l]] [iter a [cdr l]]]

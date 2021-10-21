@@ -68,6 +68,7 @@ clean:
 	@rm -f -- $(shell find bin lib -type f -name '*.d')
 	@rm -f -- $(shell find bin lib -type f -name '*.wd')
 	@rm -f -- $(shell find bin/lib stdlib -type f -name '*.no')
+	@rm -f ./callgrind.out.*
 	@rm -rf tmp
 	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
 
@@ -182,3 +183,7 @@ runng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 .PHONY: runn
 testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run]]"
+
+.PHONY: profile
+profile: $(NUJEL)
+	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[test-run]"

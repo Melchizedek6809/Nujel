@@ -127,9 +127,10 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 static lVal *lGetSym(lClosure *c, lSymbol *s){
 	if((c == NULL) || (s == NULL)){return NULL;}
 	forEach(v, c->data){
-		lVal *cursym = lCaar(v);
-		if((cursym == NULL) || (s != cursym->vSymbol)){continue;}
-		return lCdar(v);
+		lVal *cursym = v->vList.car->vList.car;
+		if(s == cursym->vSymbol){
+			return lCdar(v);
+		}
 	}
 	return NULL;
 }

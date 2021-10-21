@@ -106,8 +106,8 @@
 
 [def ansi-rainbow [λ [...args]
 	"Wrap ARGS in the colors of the rainbow!"
-	[let [[count 0]]
-		[join [map
+	[let* [def count 0]
+	      [join [map
 			[λ [a]
 				[set! count [logand [+ 1 count] #x7]]
 				[ansi-wrap [if [zero? count] 7 [+ count 8]] a]

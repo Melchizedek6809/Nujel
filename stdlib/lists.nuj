@@ -1,6 +1,6 @@
 ; Put all the LISt Processing stuff in here
 
-[def except-last-pair [let []
+[def except-last-pair [let*
 	[def iter [λ [list rest]
                      [if [nil? [cdr list]]
 			 [reverse rest]
@@ -20,7 +20,7 @@
 	    list]
 ]]
 
-[def make-list [let []
+[def make-list [let*
 	[def iter [λ [number value l]
 		     [if [<= number 0]
 			 l
@@ -48,7 +48,7 @@
 	]
 ]]
 
-[def join [let []
+[def join [let*
 	[def iter [λ [str l glue]
 		[cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
 		      [#t [iter [cat str [car l] glue] [cdr l] glue]]
@@ -61,9 +61,10 @@
 	]
 ]]
 
-[def split [let []
+[def split [let*
 	[def iter [λ [str separator separator-len start slen]
-		[let [[pos [index-of str separator start]]]
+		    [let*
+			[def pos [index-of str separator start]]
 			[if [and [>= pos start] [< pos slen]]
 			    [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
 			    [cons [substr str start slen]]]
@@ -105,7 +106,7 @@
 	    [cons [f [car l]] [map f [cdr l]]]]
 ]]
 
-[def append [let []
+[def append [let*
 	[def iter [λ [a b]
 		     [if [nil? a]
 			 b
@@ -159,7 +160,7 @@
 	]
 ]]
 
-[def getf [let []
+[def getf [let*
 	[λ [l key]
 		"Return the value in LIST following KEY"
 		[cond [[nil? l] #nil]

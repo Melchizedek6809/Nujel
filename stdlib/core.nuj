@@ -9,7 +9,7 @@
 	]
 ]]
 
-[def describe [let []
+[def describe [let*
 	[def describe-fun [λ [fun]
 		[def doc [cl-doc fun]]
 		[cat [str/write [car doc]] " - " [cdr doc]]
@@ -49,7 +49,8 @@
 ]]
 
 [def mem [λ [] "Return some pretty printed memory usage information"
-	[let [[info [memory-info]]] [cat
+	[let* [def info [memory-info]]
+	      [cat
 		[ansi-white  "Memory Info"] "\n"
 		[ansi-green  "Values:   "] [getf info :value] "\n"
 		[ansi-blue   "Closures: "] [getf info :closure] "\n"
@@ -58,7 +59,8 @@
 		[ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
 		[ansi-purple "Vectors:  "] [getf info :vector] "\n"
 		[ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
-	]]
+	      ]
+	]
 ]]
 
 [def wrap-value [λ [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"

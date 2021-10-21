@@ -1,24 +1,25 @@
 ;; Contains the self-hosting Nujel compiler
 
-[def compile [let []
+[def compile [let*
     [def compile-do-args [λ [args]
         ;[display ["[do-args] " [str/write args] "\n\n"]]
         [if [nil? [cdr args]]
             [cons [compile [car args]] #nil]
             [if [pair? [car args]]
-                [let [[ocar [compile [car args]]]]
+                [let* [def ocar [compile [car args]]]
                      [if [pair? ocar]
                          [cons ocar [compile-do-args [cdr args]]]
-                         [compile-do-args [cdr args]]]]
+                         [compile-do-args [cdr args]]]
+                ]
                 [compile-do-args [cdr args]]]]
         ]]
 
     [def compile-do [λ [source]
         ;[display ["[do] " [str/write source] "\n\n"]]
-        [let [[args [compile-do-args source]]]
-             [if [nil? [cdr args]]
-                 [car args]
-                 [cons 'do args]]
+        [let* [def args [compile-do-args source]]
+              [if [nil? [cdr args]]
+                  [car args]
+                  [cons 'do args]]
         ]
     ]]
 
@@ -47,13 +48,14 @@
     [λ [source]
         "Compile the forms in source"
         ;[display ["[opt] " [str/write [resolve [car source]]] "\n"  [str/write source] "\n\n"]]
-        [let [[op [resolve [car source]]]]
-             [cond [[eq? op do]  [compile-do  source]]
-                   [[eq? op def] [compile-def source]]
-                   [[eq? op set!][compile-set source]]
-                   [[eq? op let] [compile-let source]]
-                   [[eq? op λ]   [compile-fun source]]
-                   [#t source]]]
+        [let* [def op [resolve [car source]]]
+              [cond [[eq? op do]  [compile-do  source]]
+                    [[eq? op def] [compile-def source]]
+                    [[eq? op set!][compile-set source]]
+                    [[eq? op let] [compile-let source]]
+                    [[eq? op λ]   [compile-fun source]]
+                    [#t source]]
+	]
     ]
 ]]
 
@@ -61,3 +63,8 @@
      [λ [@...λδ]
        "Define a λ with the self-hosting Nujel compiler"
        [eval [compile [cons 'λ @...λδ]]]]]
+
+[def eval [λ [expr]
+	"Compile, Evaluate and then return the result of EXPR"
+	[eval* [compile expr]]
+]]

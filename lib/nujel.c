@@ -329,21 +329,21 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
-/* Handler for [eval s-expr] */
-static lVal *lnfEval(lClosure *c, lVal *v){
+/* [eval* expr] - Evaluate the already compiled EXPR */
+static lVal *lnfEvalRaw(lClosure *c, lVal *v){
 	return lEval(c,lCar(v));
 }
 
 /* Add all the core native functions to c, without IO or stdlib */
 static void lAddCoreFuncs(lClosure *c){
 	lOperationsArithmetic(c);
+	lOperationsPredicate(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
 	lOperationsTypeSystem(c);
 	lOperationsClosure(c);
 	lOperationsSpecial(c);
 	lOperationsList(c);
-	lOperationsPredicate(c);
 	lOperationsRandom(c);
 	lOperationsReader(c);
 	lOperationsString(c);
@@ -351,7 +351,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsVector(c);
 
 	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
-	lAddNativeFunc(c,"eval",            "[expr]",         "Evaluate EXPR",                              lnfEval);
+	lAddNativeFunc(c,"eval*",           "[expr]",         "Evaluate the already compiled EXPR",         lnfEvalRaw);
 	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
 
 	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);

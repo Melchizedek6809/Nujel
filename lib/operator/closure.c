@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "closure.h"
+#include "special.h"
 #include "../allocator/roots.h"
 #include "../type-system.h"
 #include "../types/closure.h"
@@ -174,6 +175,10 @@ static lVal *lnfLet(lClosure *c, lVal *v){
 	return ret == NULL ? NULL : ret;
 }
 
+static lVal *lnfLetRaw(lClosure *c, lVal *v){
+	return lnfDo(lClosureNew(c),v);
+}
+
 void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lResolve);
 	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
@@ -188,4 +193,5 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"undefine!",     "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
 	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
+	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);
 }
