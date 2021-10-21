@@ -323,6 +323,27 @@
 [test-add #f [eq? '[] #nil]]
 [test-add #t [eq? λ [resolve [car '[λ asd]]]]]
 [test-add 100000 [let [] [def i 0] [while [< i 100000] [set! i [++ i]]]]]
+[test-add '[1 :a "q"] '[1 :a "q"]]
+[test-add 4 [compile '[do "Test" 4]]]
+[test-add '[do [display "Test"] 4] [compile '[do [display "Test"] 4]]]
+[test-add '[do [display "Test"] 4] [compile '[do [display "Test"] 9 4]]]
+[test-add '[λ* [v] "Add 1 to V" [+ 1 v]] [compile '[λ [v] "Add 1 to V" [+ 1 v]]]]
+[test-add '[λ* [v] "" [+ 1 v]] [compile '[λ [v] [+ 1 v]]]]
+[test-add '[λ* [v] "" [do [display v] [+ 1 v]]] [compile '[λ [v] [display v] [+ 1 v]]]]
+[test-add '[1 2] [except-last-pair '[1 2 3]]]
+[test-add '[3] [last-pair '[1 2 3]]]
+[test-add '[1 3 5] [filter odd?  '[1 2 3 4 5 6]]]
+[test-add '[2 4 6] [filter even? '[1 2 3 4 5 6]]]
+[test-add '["vier"] [filter string? '[1 2 3 "vier" 5 6]]]
+[test-add '[1 2 3 5 6] [filter int? '[1 2 3 "vier" 5 6]]]
+[test-add '[2 3 4] [map [λ [v] [+ 1 v]] '[1 2 3]]]
+[test-add '[2 4 6] [map [λ [v] [* 2 v]] '[1 2 3]]]
+[test-add '["1" "2" "3"] [map str/write '[1 2 3]]]
+[test-add "[123 #nil]" '[123 #nil]]
+[test-add '[123 #nil] '[123 #nil]]
+;[test-add "[#nil]" [str/write '[#nil]]]
+
+; [test-add #t [eq? #nil #nil]]
 
 ; Has to wait until the new constant system is in place
 ;[test-add 3.14159 [set! π 3] π]
@@ -330,7 +351,6 @@
 ; Has to wait until infix operators can be λs
 ;[test-add 64 [512 >> 3]]
 
+
 ; Edge cases that still need a specified behaviour
-; [test-add "[123 #nil]" '[123 #nil]]
 ; [test-add "[and #nil #nil]" '[and #nil #nil]]
-; [test-add #t [eq? #nil #nil]]

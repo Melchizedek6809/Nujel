@@ -59,9 +59,12 @@
 	[def test [λ [result rawexpr i]
 		"Tests that RAWEXPR evaluates to RESULT"
 		[def expr [eval rawexpr]]
+		[def pred? eq?]
 		[when [string? result]
 		      [set! expr [str/write expr]]]
-		[[if [eq? result expr] test-success test-failure] result expr rawexpr i]
+		[when [pair? result]
+		      [set! pred? list-equal?]]
+		[[if [pred? result expr] test-success test-failure] result expr rawexpr i]
 	]]
 	[def test-run-iter [λ [l i]
 		"Recurse through LIST and runs eatch test"

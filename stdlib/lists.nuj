@@ -93,10 +93,12 @@
 
 [def filter [λ [p l]
 	"Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-	[cond [[nil? l] #nil]
-	      [[p [car l]] [cons [car l] [filter p [cdr l]]]]
-	      [#t                        [filter p [cdr l]]]
-	]
+	[def ret #nil]
+	[if l
+	    [if [p [car l]]
+		[cons [car l] [filter p [cdr l]]]
+		[filter p [cdr l]]
+	    #nil]]
 ]]
 
 [def map [λ [f l]
