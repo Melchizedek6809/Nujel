@@ -55,7 +55,7 @@ void lRootsClosureMark(){
 
 lVal *lRootsValPush(lVal *c){
 	if(rootsValSP >= rootsValMax){
-		rootsValMax = MAX(rootsValMax * 2, 1024);
+		rootsValMax = MAX(rootsValMax * 2, 256);
 		rootsVal = realloc(rootsVal, rootsValMax * sizeof(lVal *));
 		if(rootsVal == NULL){
 			fprintf(stderr,"Can't grow rootsVal\n");
@@ -82,7 +82,7 @@ void lRootsValMark(){
 
 lString *lRootsStringPush(lString *s){
 	if(rootsStringSP >= rootsStringMax){
-		rootsStringMax = MAX(rootsStringMax * 2, 1024);
+		rootsStringMax = MAX(rootsStringMax * 2, 256);
 		rootsString = realloc(rootsString, rootsStringMax * sizeof(lString *));
 		if(rootsString == NULL){
 			fprintf(stderr,"Can't grow rootsString\n");

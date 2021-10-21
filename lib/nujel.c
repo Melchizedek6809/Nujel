@@ -42,6 +42,7 @@
 extern u8 stdlib_nuj_data[];
 
 char dispWriteBuf[1<<18];
+bool lVerbose = false;
 
 /* Initialize the allocator and symbol table, needs to be called before any other call.*/
 void lInit(){

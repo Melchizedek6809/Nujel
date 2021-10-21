@@ -36,6 +36,8 @@ typedef struct {
 	lVal *car,*cdr;
 } lPair;
 
+extern bool lVerbose;
+
 void      lInit             ();
 int       lMemUsage         ();
 void      lPrintError       (const char *format, ...);

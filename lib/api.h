@@ -8,6 +8,7 @@
 #include "operator/string.h"
 #include "s-expression/reader.h"
 #include "type-system.h"
+#include "types/array.h"
 #include "types/closure.h"
 #include "types/list.h"
 #include "types/native-function.h"

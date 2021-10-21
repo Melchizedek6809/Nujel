@@ -23,7 +23,6 @@
 #endif
 
 int lGCRuns = 0;
-bool lGCVerbose = false;
 
 u8 lValMarkMap    [VAL_MAX];
 u8 lClosureMarkMap[CLO_MAX];
@@ -91,16 +90,20 @@ void lArrayGCMark(const lArray *v){
 
 static void lMarkFree(){
 	for(lArray *arr = lArrayFFree;arr != NULL;arr = arr->nextFree){
-		lArrayGCMark(arr);
+		const uint ci = arr - lArrayList;
+		lArrayMarkMap[ci] = 1;
 	}
 	for(lClosure *clo = lClosureFFree;clo != NULL;clo = clo->nextFree){
-		lClosureGCMark(clo);
+		const uint ci = clo - lClosureList;
+		lClosureMarkMap[ci] = 1;
 	}
 	for(lString *str = lStringFFree;str != NULL;str = str->nextFree){
-		lStringGCMark(str);
+		const uint ci = str - lStringList;
+		lStringMarkMap[ci] = 1;
 	}
 	for(lVal *v = lValFFree;v != NULL;v = v->nextFree){
-		lValGCMark(v);
+		const uint ci = v - lValList;
+		lValMarkMap[ci] = 1;
 	}
 }
 
@@ -156,13 +159,13 @@ void lGarbageCollect(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
-	if(lGCVerbose){
+	if(lVerbose){
 		const u64 end = getMSecs();
 		printf("== Garbage Collection #%u took %lums ==\n",lGCRuns,end-start);
-		printf("Vals: %u -> %u [%i] {%i}\n",bva,lValActive,(int)lValActive - bva, rootsValSP);
-		printf("Clos: %u -> %u [%i] {%i}\n",bca,lClosureActive,(int)lClosureActive - bca, rootsClosureSP);
-		printf("Arrs: %u -> %u [%i] {%i}\n",baa,lArrayActive,(int)lArrayActive - baa, 0);
-		printf("Strs: %u -> %u [%i] {%i}\n",bsa,lStringActive,(int)lStringActive - bsa, rootsStringSP);
+		printf("Vals: %u -> %u [Δ %i] {Roots: %i}\n",bva,lValActive,(int)lValActive - bva, rootsValSP);
+		printf("Clos: %u -> %u [Δ %i] {Roots: %i}\n",bca,lClosureActive,(int)lClosureActive - bca, rootsClosureSP);
+		printf("Arrs: %u -> %u [Δ %i] {Roots: %i}\n",baa,lArrayActive,(int)lArrayActive - baa, 0);
+		printf("Strs: %u -> %u [Δ %i] {Roots: %i}\n",bsa,lStringActive,(int)lStringActive - bsa, rootsStringSP);
 		printf("--------------\n\n");
 	}
 }

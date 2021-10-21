@@ -232,7 +232,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 					loadStdLib = false;
 					break;
 				case 'v':
-					lGCVerbose = true;
+					lVerbose = true;
 					break;
 				}
 			}
@@ -247,6 +247,13 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	}else{
 		c = lClosureNewRootNoStdLib();
 		addNativeFuncs(c);
+	}
+
+	if(lVerbose){
+		printf("sizeof(lClosure): %lu\n",sizeof(lClosure));
+		printf("sizeof(lVal): %lu\n",sizeof(lVal));
+		printf("sizeof(lArray): %lu\n",sizeof(lArray));
+		printf("sizeof(lString): %lu\n",sizeof(lString));
 	}
 	return c;
 }
