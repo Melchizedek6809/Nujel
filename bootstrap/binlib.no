@@ -14,9 +14,7 @@
     [def file/compile [λ* [path no-write]
         "Compile a Nujel source file into optimized object code"
         [do [def source [read [file/read path]]]
-           [def object-code [compile [if [pair? [car source]]
-              [cons 'do source]
-              source]]]
+           [def object-code [compile [cons 'do source]]]
            [unless no-write
                    [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
            object-code]]]
