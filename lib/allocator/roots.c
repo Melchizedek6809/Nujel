@@ -75,7 +75,7 @@ lVal *lRootsValPop(){
 }
 
 void lRootsValMark(){
-	for(uint i=0;i<rootsValMax;i++){
+	for(uint i=0;i<rootsValSP;i++){
 		lValGCMark(rootsVal[i]);
 	}
 }
@@ -102,7 +102,7 @@ lString *lRootsStringPop(){
 }
 
 void lRootsStringMark(){
-	for(uint i=0;i<rootsStringMax;i++){
+	for(uint i=0;i<rootsStringSP;i++){
 		lStringGCMark(rootsString[i]);
 	}
 }
