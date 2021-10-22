@@ -8,10 +8,10 @@
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../misc/vec.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/val.h"
-#include "../types/vec.h"
+#include "../collection/list.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
+#include "../type/vec.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <math.h>

@@ -5,10 +5,10 @@
  */
 #include "time.h"
 #include "../type-system.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/string.h"
-#include "../types/val.h"
+#include "../collection/list.h"
+#include "../collection/string.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <time.h>

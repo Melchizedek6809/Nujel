@@ -10,14 +10,14 @@
 #include "type-system.h"
 
 #include "nujel.h"
+#include "collection/closure.h"
+#include "collection/list.h"
+#include "collection/string.h"
 #include "misc/vec.h"
-#include "types/closure.h"
-#include "types/list.h"
-#include "types/native-function.h"
-#include "types/string.h"
-#include "types/symbol.h"
-#include "types/val.h"
-#include "types/vec.h"
+#include "type/native-function.h"
+#include "type/symbol.h"
+#include "type/val.h"
+#include "type/vec.h"
 #include "operator/string.h"
 
 #ifndef COSMOPOLITAN_H_

@@ -5,14 +5,14 @@
  */
 #include "writer.h"
 
-#include "../types/array.h"
-#include "../types/closure.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/string.h"
-#include "../types/symbol.h"
-#include "../types/val.h"
-#include "../types/vec.h"
+#include "../collection/closure.h"
+#include "../collection/array.h"
+#include "../collection/list.h"
+#include "../collection/string.h"
+#include "../type/native-function.h"
+#include "../type/symbol.h"
+#include "../type/val.h"
+#include "../type/vec.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>

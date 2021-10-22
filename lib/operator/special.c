@@ -4,11 +4,11 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "special.h"
-#include "../allocator/roots.h"
 #include "../type-system.h"
-#include "../types/native-function.h"
-#include "../types/list.h"
-#include "../types/val.h"
+#include "../allocator/roots.h"
+#include "../collection/list.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
 
 static lVal *lnfAnd(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(false);}

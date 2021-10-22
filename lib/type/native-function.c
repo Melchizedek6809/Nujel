@@ -3,10 +3,10 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "closure.h"
-#include "list.h"
 #include "native-function.h"
 #include "val.h"
+#include "../collection/closure.h"
+#include "../collection/list.h"
 #include "../s-expression/reader.h"
 
 lNFunc   lNFuncList[NFN_MAX];

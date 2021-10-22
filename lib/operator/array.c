@@ -6,10 +6,10 @@
 #include "array.h"
 #include "../allocator/roots.h"
 #include "../type-system.h"
-#include "../types/array.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/val.h"
+#include "../collection/array.h"
+#include "../collection/list.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>

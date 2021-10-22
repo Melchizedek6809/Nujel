@@ -4,10 +4,10 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "list.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/val.h"
 #include "../nujel.h"
+#include "../collection/list.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
 
 static lVal *lnfCar(lClosure *c, lVal *v){
 	(void)c;

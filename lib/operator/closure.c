@@ -5,13 +5,13 @@
  */
 #include "closure.h"
 #include "special.h"
-#include "../allocator/roots.h"
 #include "../type-system.h"
-#include "../types/closure.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/symbol.h"
-#include "../types/val.h"
+#include "../allocator/roots.h"
+#include "../collection/closure.h"
+#include "../collection/list.h"
+#include "../type/native-function.h"
+#include "../type/symbol.h"
+#include "../type/val.h"
 
 static lVal *lnfDefine(lClosure *c, lClosure *ec, lVal *v, lVal *(*func)(lClosure *,lSymbol *)){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}

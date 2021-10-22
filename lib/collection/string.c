@@ -5,15 +5,15 @@
  */
 #include "string.h"
 
-#include "../nujel.h"
-#include "../type-system.h"
 #include "array.h"
 #include "closure.h"
-#include "native-function.h"
 #include "list.h"
-#include "symbol.h"
-#include "val.h"
-#include "vec.h"
+#include "../type/native-function.h"
+#include "../type/symbol.h"
+#include "../type/val.h"
+#include "../type/vec.h"
+#include "../nujel.h"
+#include "../type-system.h"
 #include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_

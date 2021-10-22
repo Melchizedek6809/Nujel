@@ -5,9 +5,9 @@
  */
 #include "val.h"
 
-#include "closure.h"
-#include "string.h"
 #include "vec.h"
+#include "../collection/string.h"
+#include "../collection/closure.h"
 #include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_

@@ -4,12 +4,12 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "vec.h"
+#include "../collection/list.h"
 #include "../misc/vec.h"
 #include "../type-system.h"
-#include "../types/native-function.h"
-#include "../types/list.h"
-#include "../types/val.h"
-#include "../types/vec.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
+#include "../type/vec.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){
 	(void)c;

@@ -5,8 +5,8 @@
  */
 #include "closure.h"
 #include "list.h"
-#include "symbol.h"
-#include "val.h"
+#include "../type/symbol.h"
+#include "../type/val.h"
 #include "../nujel.h"
 #include "../allocator/garbage-collection.h"
 

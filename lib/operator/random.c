@@ -4,11 +4,11 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "random.h"
+#include "../collection/list.h"
 #include "../misc/random-number-generator.h"
 #include "../type-system.h"
-#include "../types/list.h"
-#include "../types/native-function.h"
-#include "../types/val.h"
+#include "../type/native-function.h"
+#include "../type/val.h"
 
 static lVal *lnfRandom(lClosure *c, lVal *v){
 	(void)c;
