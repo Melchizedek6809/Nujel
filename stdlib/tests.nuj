@@ -341,13 +341,7 @@
 [test-add '["1" "2" "3"] [map str/write '[1 2 3]]]
 [test-add "[123 #nil]" '[123 #nil]]
 [test-add '[123 #nil] '[123 #nil]]
-[test-add "[]" '[#nil]]
-[test-add "[#nil #nil]" '[#nil #nil]]
-[test-add '[#nil #nil] '[#nil #nil]]
-[test-add #f [equal? '[] #nil]]
-
-; Needs a better list-equal, or a better [car]
-;[test-add #t [not [list-equal? '[] '[#nil #nil]]]]
+;[test-add "[#nil]" [str/write '[#nil]]]
 
 ; [test-add #t [eq? #nil #nil]]
 

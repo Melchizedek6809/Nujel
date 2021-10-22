@@ -246,23 +246,21 @@ static lVal *lParseSpecial(lString *s){
 
 /* Read the string in s and parse all escape sequences */
 lVal *lReadString(lString *s){
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	lVal *v = ret;
-	bool cdrIter = false;
+	lVal *v, *ret;
+	ret = v = lCons(NULL,NULL);
+	lRootsValPush(ret);
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 		char c = *s->data;
-		if((c == 0) || (c == ']') || (c == ')') || (s->data >= s->bufEnd)){
+		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (s->data >= s->bufEnd)){
 			s->data++;
 			lRootsValPop();
 			return ret;
 		}
 
-		if(cdrIter){
+		if(lCar(v) != NULL){
 			v->vList.cdr = lCons(NULL,NULL);
 			v = lCdr(v);
-		}else{
-			cdrIter = true;
 		}
 
 		switch(c){
