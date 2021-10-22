@@ -161,7 +161,7 @@ void lGarbageCollect(){
 	lGCSweep();
 	if(lVerbose){
 		const u64 end = getMSecs();
-		printf("== Garbage Collection #%u took %lums ==\n",lGCRuns,end-start);
+		printf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(int)(end-start));
 		printf("Vals: %u -> %u [Δ %i] {Roots: %i}\n",bva,lValActive,(int)lValActive - bva, rootsValSP);
 		printf("Clos: %u -> %u [Δ %i] {Roots: %i}\n",bca,lClosureActive,(int)lClosureActive - bca, rootsClosureSP);
 		printf("Arrs: %u -> %u [Δ %i] {Roots: %i}\n",baa,lArrayActive,(int)lArrayActive - baa, 0);

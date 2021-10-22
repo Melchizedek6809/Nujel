@@ -133,10 +133,10 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	}
 
 	if(lVerbose){
-		printf("sizeof(lClosure): %lu\n",sizeof(lClosure));
-		printf("sizeof(lVal): %lu\n",sizeof(lVal));
-		printf("sizeof(lArray): %lu\n",sizeof(lArray));
-		printf("sizeof(lString): %lu\n",sizeof(lString));
+		printf("sizeof(lClosure): %u\n",(uint)sizeof(lClosure));
+		printf("sizeof(lVal): %u\n",    (uint)sizeof(lVal));
+		printf("sizeof(lArray): %u\n",  (uint)sizeof(lArray));
+		printf("sizeof(lString): %u\n", (uint)sizeof(lString));
 	}
 	return c;
 }
