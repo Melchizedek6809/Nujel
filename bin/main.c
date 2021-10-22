@@ -21,6 +21,8 @@
 #endif
 
 #include "../lib/api.h"
+#include "misc.h"
+#include "operator/io.h"
 
 extern char binlib_no_data[];
 
@@ -44,56 +46,11 @@ void lGUIWidgetFree(lVal *v){
 	(void)v;
 }
 
-static void *loadFile(const char *filename,size_t *len){
-	FILE *fp;
-	size_t filelen,readlen,read;
-	u8 *buf = NULL;
-
-	fp = fopen(filename,"rb");
-	if(fp == NULL){return NULL;}
-
-	fseek(fp,0,SEEK_END);
-	filelen = ftell(fp);
-	fseek(fp,0,SEEK_SET);
-
-	buf = malloc(filelen+1);
-	if(buf == NULL){return NULL;}
-
-	readlen = 0;
-	while(readlen < filelen){
-		read = fread(buf+readlen,1,filelen-readlen,fp);
-		if(read == 0){
-			free(buf);
-			return NULL;
-		}
-		readlen += read;
-	}
-	fclose(fp);
-	buf[filelen] = 0;
-
-	*len = filelen;
-	return buf;
-}
-
-static void saveFile(const char *filename,const void *buf, size_t len){
-	FILE *fp;
-	size_t written,wlen = 0;
-	#if defined (__EMSCRIPTEN__)
-	(void)filename;
-	(void)buf;
-	(void)len;
-	return;
-	#endif
-
-	fp = fopen(filename,"wb");
-	if(fp == NULL){return;}
-
-	while(wlen < len){
-		written = fwrite(buf+wlen,1,len-wlen,fp);
-		if(written == 0){return;}
-		wlen += written;
-	}
-	fclose(fp);
+void lPrintError(const char *format, ...){
+	va_list ap;
+	va_start(ap,format);
+	vfprintf(stderr,format,ap);
+	va_end(ap);
 }
 
 const char *getHistoryPath(){
@@ -146,80 +103,6 @@ void doRepl(lClosure *c){
 		lVal *tmp = lValString(str);
 		if((tmp != NULL) && (lastl != NULL)){lastl->vList.car = tmp;}
 	}
-}
-
-static lVal *lnfQuit(lClosure *c, lVal *v){
-	(void)c;
-	exit(castToInt(lCar(v),0));
-	return NULL;
-}
-
-static lVal *lnfInput(lClosure *c, lVal *v){
-	(void)c;
-	const char *prompt = castToString(lCar(v),NULL);
-	if(prompt != NULL){
-		printf("%s",prompt);
-	}
-	char buf[4096];
-	if(fgets(buf,sizeof(buf),stdin) == NULL){
-		return NULL;
-	}
-	return lValString(buf);
-}
-
-static lVal *lnfPrint(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return v;}
-	lDisplayVal(lCar(v));
-	return NULL;
-}
-
-static lVal *lnfError(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return v;}
-	lDisplayErrorVal(lCar(v));
-	return NULL;
-}
-
-static lVal *lnfReadFile(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString(lCar(v),NULL);
-	if(filename == NULL){return NULL;}
-	size_t len = 0;
-	const char *data = loadFile(filename,&len);
-	lVal *ret = lValString(data);
-	free((void *)data);
-	return ret;
-
-}
-
-static lVal *lnfWriteFile(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString( lCar(v),NULL);
-	const char *content  = castToString(lCadr(v),NULL);
-	if(filename == NULL){return NULL;}
-	if(content  == NULL){return NULL;}
-	size_t len = strnlen(content,1<<20);
-	saveFile(filename,content,len);
-	return NULL;
-
-}
-
-void lPrintError(const char *format, ...){
-	va_list ap;
-	va_start(ap,format);
-	vfprintf(stderr,format,ap);
-	va_end(ap);
-}
-
-static void addNativeFuncs(lClosure *c){
-	lAddNativeFunc(c,"error",     "[...args]",         "Prints ...args to stderr",                           lnfError);
-	lAddNativeFunc(c,"print",     "[...args]",         "Displays ...args",                                   lnfPrint);
-	lAddNativeFunc(c,"input",     "[]",                "Reads in a line of user input and returns it",       lnfInput);
-	lAddNativeFunc(c,"quit",      "[a]",               "Exits with code a",                                  lnfQuit);
-	lAddNativeFunc(c,"exit",      "[a]",               "Quits with code a",                                  lnfQuit);
-	lAddNativeFunc(c,"file/read", "[filename]",        "Load FILENAME and return the contents as a string",  lnfReadFile);
-	lAddNativeFunc(c,"file/write","[filename content]","Writes CONTENT into FILENAME",                       lnfWriteFile);
 }
 
 lClosure * parsePreOptions(int argc, char *argv[]){
