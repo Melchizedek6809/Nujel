@@ -8,13 +8,13 @@
 #include "array.h"
 #include "closure.h"
 #include "list.h"
+#include "../nujel.h"
+#include "../allocation/garbage-collection.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 #include "../type/vec.h"
-#include "../nujel.h"
 #include "../type-system.h"
-#include "../allocator/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>

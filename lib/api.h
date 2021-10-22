@@ -4,7 +4,7 @@
  */
 
 #include "nujel.h"
-#include "allocator/garbage-collection.h"
+#include "allocation/garbage-collection.h"
 #include "collection/array.h"
 #include "collection/closure.h"
 #include "collection/list.h"

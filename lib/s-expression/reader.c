@@ -4,7 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "reader.h"
-#include "../allocator/roots.h"
+#include "../allocation/roots.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
@@ -288,6 +288,16 @@ lVal *lReadString(lString *s){
 		case ';':
 			lStringAdvanceToNextLine(s);
 			break;
+		case '@':
+			if((s->data[1] == '[') || (s->data[1] == '(')){
+				s->data+=2;
+				v->vList.cdr = lReadString(s);
+				v->vList.car = lValSymS(symTreeNew);
+				v->vList.car = lCons(v->vList.car,v->vList.cdr);
+				v->vList.cdr = NULL;
+				break;
+			}
+			// fall through
 		default:
 			if((isdigit((u8)c)) || ((c == '-') && (isdigit((u8)s->data[1])))){
 				v->vList.car = lParseNumberDecimal(s);

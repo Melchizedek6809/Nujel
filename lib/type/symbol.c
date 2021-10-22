@@ -17,7 +17,7 @@ lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 0;
 
-lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst;
+lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
 void lInitSymbol(){
@@ -36,6 +36,7 @@ void lInitSymbol(){
 	symMinus    = lSymS("-");
 	symLambda   = lSymS("λ");
 	symLambdAst = lSymS("λ*");
+	symTreeNew  = lSymS("tree/new");
 
 	lSymLTNil            = lSymS(":nil");
 	lSymLTNoAlloc        = lSymS(":no-alloc");
@@ -75,7 +76,7 @@ lSymbol *lSymS(const char *str){
 	return &lSymbolList[lSymbolMax++];
 }
 
-lVal *lValSymS(lSymbol *s){
+lVal *lValSymS(const lSymbol *s){
 	if(s == NULL){return NULL;}
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return NULL;}

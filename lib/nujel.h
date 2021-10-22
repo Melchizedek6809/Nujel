@@ -14,6 +14,7 @@ typedef enum lType {
 	ltPair,
 	ltString,
 	ltArray,
+	ltTree,
 
 	ltLambda,
 	ltDynamic,
@@ -29,12 +30,23 @@ typedef struct lClosure lClosure;
 typedef struct lNFunc   lNFunc;;
 typedef struct lSymbol  lSymbol;
 typedef struct lString  lString;;
+typedef struct lTree    lTree;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 
 typedef struct {
 	lVal *car,*cdr;
 } lPair;
+
+struct lTree {
+	lTree *left;
+	lTree *right;
+	lVal *value;
+	union {
+		const lSymbol *key;
+		lTree *nextFree;
+	};
+};
 
 extern bool lVerbose;
 

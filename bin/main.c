@@ -137,6 +137,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 		printf("sizeof(lVal): %u\n",    (uint)sizeof(lVal));
 		printf("sizeof(lArray): %u\n",  (uint)sizeof(lArray));
 		printf("sizeof(lString): %u\n", (uint)sizeof(lString));
+		printf("sizeof(lTree): %u\n", (uint)sizeof(lTree));
 	}
 	return c;
 }

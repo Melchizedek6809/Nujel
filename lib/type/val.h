@@ -4,19 +4,20 @@
 struct lVal {
 	u8 type;
 	union {
-		bool       vBool;
-		lPair      vList;
-		int        vInt;
-		float      vFloat;
-		lVec      *vVec;
-		lArray    *vArray;
-		lString   *vString;
-		lSymbol   *vSymbol;
-		lClosure  *vClosure;
-		lNFunc    *vNFunc;
-		void      *vPointer;
+		bool           vBool;
+		lPair          vList;
+		int            vInt;
+		float          vFloat;
+		lVec          *vVec;
+		lArray        *vArray;
+		lTree         *vTree;
+		lString       *vString;
+		const lSymbol *vSymbol;
+		lClosure      *vClosure;
+		lNFunc        *vNFunc;
+		void          *vPointer;
 
-		lVal      *nextFree;
+		lVal          *nextFree;
 	};
 };
 

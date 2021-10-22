@@ -14,6 +14,7 @@
 #include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
+#include "../collection/tree.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
 #include "../type/vec.h"
@@ -25,6 +26,7 @@
 int lGCRuns = 0;
 
 u8 lValMarkMap    [VAL_MAX];
+u8 lTreeMarkMap   [TRE_MAX];
 u8 lClosureMarkMap[CLO_MAX];
 u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
@@ -57,9 +59,22 @@ void lValGCMark(lVal *v){
 	case ltString:
 		lStringGCMark(v->vString);
 		break;
+	case ltTree:
+		lTreeGCMark(v->vTree);
+		break;
 	default:
 		break;
 	}
+}
+
+void lTreeGCMark(const lTree *v){
+	if(v == NULL){return;}
+	const uint ci = v - lTreeList;
+	if(lTreeMarkMap[ci]){return;}
+	lTreeMarkMap[ci] = 1;
+	lValGCMark(v->value);
+	lTreeGCMark(v->left);
+	lTreeGCMark(v->right);
 }
 
 /* Mark every reference for the GC to ignore contained in c */
@@ -88,6 +103,9 @@ void lArrayGCMark(const lArray *v){
 	}
 }
 
+/* There should be a way to avoid having this procedure alltogether, but for
+ * now a solution is not apparent to me
+ */
 static void lMarkFree(){
 	for(lArray *arr = lArrayFFree;arr != NULL;arr = arr->nextFree){
 		const uint ci = arr - lArrayList;
@@ -104,6 +122,10 @@ static void lMarkFree(){
 	for(lVal *v = lValFFree;v != NULL;v = v->nextFree){
 		const uint ci = v - lValList;
 		lValMarkMap[ci] = 1;
+	}
+	for(lTree *t = lTreeFFree;t != NULL;t = t->nextFree){
+		const uint ci = t - lTreeList;
+		lTreeMarkMap[ci] = 1;
 	}
 }
 
@@ -145,6 +167,13 @@ static void lGCSweep(){
 			lArrayFree(&lArrayList[i]);
 		}
 	}
+	for(uint i=0;i<lTreeMax;i++){
+		if(lTreeMarkMap[i]){
+			lTreeMarkMap[i] = 0;
+		}else{
+			lTreeFree(&lTreeList[i]);
+		}
+	}
 }
 
 /* Force a garbage collection cycle, shouldn't need to be called manually since
@@ -154,6 +183,7 @@ void lGarbageCollect(){
 	const int bca = lClosureActive;
 	const int baa = lArrayActive;
 	const int bsa = lStringActive;
+	const int bta = lTreeActive;
 	const u64 start = getMSecs();
 
 	lGCRuns++;
@@ -162,10 +192,11 @@ void lGarbageCollect(){
 	if(lVerbose){
 		const u64 end = getMSecs();
 		printf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(int)(end-start));
-		printf("Vals: %u -> %u [Δ %i] {Roots: %i}\n",bva,lValActive,(int)lValActive - bva, rootsValSP);
-		printf("Clos: %u -> %u [Δ %i] {Roots: %i}\n",bca,lClosureActive,(int)lClosureActive - bca, rootsClosureSP);
-		printf("Arrs: %u -> %u [Δ %i] {Roots: %i}\n",baa,lArrayActive,(int)lArrayActive - baa, 0);
-		printf("Strs: %u -> %u [Δ %i] {Roots: %i}\n",bsa,lStringActive,(int)lStringActive - bsa, rootsStringSP);
+		printf("Vals: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bva,lValActive,(int)lValActive - bva, lValMax, rootsValSP);
+		printf("Clos: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bca,lClosureActive,(int)lClosureActive - bca, lClosureMax,  rootsClosureSP);
+		printf("Strs: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bsa,lStringActive,(int)lStringActive - bsa, lStringMax,  rootsStringSP);
+		printf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive, (int)lArrayActive - baa, lArrayMax);
+		printf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive, (int)lTreeActive - bta, lTreeMax);
 		printf("--------------\n\n");
 	}
 }

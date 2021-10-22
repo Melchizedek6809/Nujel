@@ -8,7 +8,7 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 #include "../nujel.h"
-#include "../allocator/garbage-collection.h"
+#include "../allocation/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>
@@ -86,7 +86,7 @@ lVal *lResolve(lClosure *c, lVal *v){
 
 lVal *lResolveSym(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltSymbol)){return NULL;}
-	lSymbol *sym = v->vSymbol;
+	const lSymbol *sym = v->vSymbol;
 	if(lSymKeyword(sym)){return v;}
 	lVal *ret = lGetClosureSym(c,sym);
 	return ret == NULL ? NULL : lCar(ret);
@@ -124,7 +124,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	return NULL;
 }
 
-static lVal *lGetSym(lClosure *c, lSymbol *s){
+static lVal *lGetSym(lClosure *c, const lSymbol *s){
 	if((c == NULL) || (s == NULL)){return NULL;}
 	forEach(v, c->data){
 		lVal *cursym = v->vList.car->vList.car;
@@ -135,13 +135,13 @@ static lVal *lGetSym(lClosure *c, lSymbol *s){
 	return NULL;
 }
 
-lVal *lGetClosureSym(lClosure *c, lSymbol *s){
+lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
 	if(c == NULL){return NULL;}
 	lVal *t = lGetSym(c,s);
 	return t != NULL ? t : lGetClosureSym(c->parent,s);
 }
 
-lVal *lDefineClosureSym(lClosure *c, lSymbol *s){
+lVal *lDefineClosureSym(lClosure *c,const lSymbol *s){
 	if(c == NULL){return NULL;}
 	lVal *get = lGetSym(c,s);
 	if(get != NULL){return get;}

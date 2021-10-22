@@ -90,6 +90,35 @@ char *lSIndent(char *buf, char *bufEnd, int indentLevel){
 	return buf;
 }
 
+static char *lSWriteTreeRec(lTree *v, char *buf, char *bufEnd, int indentLevel, bool display){
+	if(v == NULL){return buf;}
+	if(v->key == NULL){return buf;}
+	char *cur = buf;
+	cur = lSWriteTreeRec(v->left,cur,bufEnd,indentLevel,display);
+	int t = snprintf(cur,bufEnd-cur,"%s ",v->key->c);
+	if(t > 0){cur += t;}
+	cur = lSWriteVal(v->value,cur,bufEnd,indentLevel,display);
+	t = snprintf(cur,bufEnd-cur," ");
+	if(t > 0){cur += t;}
+	cur = lSWriteTreeRec(v->right,cur,bufEnd,indentLevel,display);
+
+	return cur;
+}
+
+static char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool display){
+	char *cur = buf;
+	int t = snprintf(cur,bufEnd-cur,"@[");
+	if(t > 0){cur += t;}
+	char *new = lSWriteTreeRec(v,cur,bufEnd,indentLevel,display);
+	if(new != cur){
+		cur = new;
+		cur[-1] = ']';
+	}else if(cur < bufEnd){
+		*cur++ = ']';
+	}
+	return cur;
+}
+
 char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display){
 	*buf = 0;
 	if(v == NULL){
@@ -130,7 +159,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		int oldIndent = indentLevel;
 		lVal *carSym = lCar(v);
 		if((carSym != NULL) && (carSym->type == ltSymbol) && (lCdr(v) != NULL)){
-			lSymbol *sym = carSym->vSymbol;
+			const lSymbol *sym = carSym->vSymbol;
 			if(sym == symQuote){
 				v = lCadr(v);
 				*cur++ = '\'';
@@ -187,6 +216,10 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		t = snprintf(cur,bufEnd-cur,"]");
 		indentLevel = oldIndent;
 		break; }
+	case ltTree: {
+		cur = lSWriteTree(v->vTree,cur,bufEnd,indentLevel,display);
+		break;
+	}
 	case ltArray: {
 		t = snprintf(cur,bufEnd-cur,"#[");
 		if(t > 0){cur += t;}

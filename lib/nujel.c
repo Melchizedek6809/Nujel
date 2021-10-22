@@ -5,12 +5,13 @@
  */
 #include "nujel.h"
 
-#include "allocator/garbage-collection.h"
-#include "allocator/roots.h"
+#include "allocation/garbage-collection.h"
+#include "allocation/roots.h"
 #include "collection/array.h"
 #include "collection/closure.h"
 #include "collection/list.h"
 #include "collection/string.h"
+#include "collection/tree.h"
 #include "misc/random-number-generator.h"
 #include "s-expression/reader.h"
 #include "s-expression/writer.h"
@@ -29,6 +30,7 @@
 #include "operator/random.h"
 #include "operator/string.h"
 #include "operator/time.h"
+#include "operator/tree.h"
 #include "operator/vec.h"
 
 #ifndef COSMOPOLITAN_H_
@@ -53,6 +55,7 @@ void lInit(){
 	lInitVal();
 	lInitVec();
 	lInitSymbol();
+	lTreeInit();
 }
 
 /* Display v on the default channel, most likely stdout */
@@ -194,7 +197,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		if(vn == NULL){break;}
 		lVal *car = lCaar(n);
 		if((car == NULL) || (car->type != ltSymbol)){continue;}
-		lSymbol *csym = lGetSymbol(car);
+		const lSymbol *csym = lGetSymbol(car);
 		lVal *lv = lDefineClosureSym(tmpc,csym);
 		if(lSymVariadic(csym)){
 			lVal *t = lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
@@ -250,6 +253,9 @@ lVal *lEval(lClosure *c, lVal *v){
 					break;
 				case ltArray:
 					v = (v->vList.cdr == NULL) ? ret : lnfArrRef(c,nv);
+					break;
+				case ltTree:
+					v = (v->vList.cdr == NULL) ? ret : lnfTreeGet(c,nv);
 					break;
 				}
 				lRootsValPop();
@@ -348,6 +354,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsReader(c);
 	lOperationsString(c);
 	lOperationsTime(c);
+	lOperationsTree(c);
 	lOperationsVector(c);
 
 	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);

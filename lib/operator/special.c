@@ -5,7 +5,7 @@
  */
 #include "special.h"
 #include "../type-system.h"
-#include "../allocator/roots.h"
+#include "../allocation/roots.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
 #include "../type/val.h"

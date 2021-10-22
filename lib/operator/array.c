@@ -4,7 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "array.h"
-#include "../allocator/roots.h"
+#include "../allocation/roots.h"
 #include "../type-system.h"
 #include "../collection/array.h"
 #include "../collection/list.h"

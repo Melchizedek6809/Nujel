@@ -4,7 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "arithmetic.h"
-#include "../allocator/roots.h"
+#include "../allocation/roots.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../misc/vec.h"

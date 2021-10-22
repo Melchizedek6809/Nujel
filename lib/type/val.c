@@ -8,7 +8,7 @@
 #include "vec.h"
 #include "../collection/string.h"
 #include "../collection/closure.h"
-#include "../allocator/garbage-collection.h"
+#include "../allocation/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>
@@ -50,7 +50,7 @@ lVal *lValAlloc(){
 
 void lGUIWidgetFree(lVal *v);
 void lValFree(lVal *v){
-	if((v == NULL) || (v->type == ltNoAlloc)){return;}
+	if(v == NULL){return;}
 	if(v->type == ltGUIWidget){
 		lGUIWidgetFree(v);
 	}else if(v->type == ltVec){
@@ -58,7 +58,6 @@ void lValFree(lVal *v){
 		v->vVec = NULL;
 	}
 	lValActive--;
-	v->type     = ltNoAlloc;
 	v->nextFree = lValFFree;
 	lValFFree   = v;
 }

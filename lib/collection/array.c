@@ -6,7 +6,7 @@
 #include "array.h"
 
 #include "../type-system.h"
-#include "../allocator/garbage-collection.h"
+#include "../allocation/garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <stdlib.h>
