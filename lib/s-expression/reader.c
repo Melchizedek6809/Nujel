@@ -27,6 +27,8 @@ static void lStringAdvanceToNextSpaceOrSpecial(lString *s){
 		if(*s->data == ']'){break;}
 		if(*s->data == '('){break;}
 		if(*s->data == ')'){break;}
+		if(*s->data == '{'){break;}
+		if(*s->data == '}'){break;}
 		if(*s->data == '"'){break;}
 		if(*s->data == '#'){break;}
 		if(*s->data == ':'){break;}
@@ -150,7 +152,11 @@ static lVal *lParseSymbol(lString *s){
 	char buf[128];
 	for(i=0;i<4096;i++){
 		char c = *s->data++;
-		if(isspace((u8)c) || (c == ']') ||(c == ')') || (c ==0)){
+		if(isspace((u8)c)  || (c == 0)   ||
+			(c == '[') || (c == ']') ||
+			(c == '(') || (c == ')') ||
+			(c == '{') || (c == '}'))
+		{
 			s->data--;
 			break;
 		}
@@ -172,6 +178,7 @@ static lVal *lParseNumberBinary(lString *s){
 		if (*s->data <= ' ')                       {break;}
 		if((*s->data == '[')  || (*s->data == ']')){break;}
 		if((*s->data == '(')  || (*s->data == ')')){break;}
+		if((*s->data == '{')  || (*s->data == '}')){break;}
 		if((*s->data == '\'') || (*s->data == '"')){break;}
 		if((*s->data == '#')  || (*s->data == '`')){break;}
 		if((*s->data == '0')  || (*s->data == '1')){
@@ -188,6 +195,7 @@ static lVal *lParseNumberHex(lString *s){
 		if (*s->data <= ' ')                       {break;}
 		if((*s->data == '[')  || (*s->data == ']')){break;}
 		if((*s->data == '(')  || (*s->data == ')')){break;}
+		if((*s->data == '{')  || (*s->data == '}')){break;}
 		if((*s->data == '\'') || (*s->data == '"')){break;}
 		if((*s->data == '#')  || (*s->data == '`')){break;}
 		if((*s->data >= '0')  && (*s->data <= '9')){ret = (ret << 4) |  (*s->data - '0');}
@@ -203,6 +211,7 @@ static lVal *lParseNumberOctal(lString *s){
 		if (*s->data <= ' ')                       {break;}
 		if((*s->data == '[')  || (*s->data == ']')){break;}
 		if((*s->data == '(')  || (*s->data == ')')){break;}
+		if((*s->data == '{')  || (*s->data == '}')){break;}
 		if((*s->data == '\'') || (*s->data == '"')){break;}
 		if((*s->data == '#')  |  (*s->data == '`')){break;}
 		if((*s->data >= '0')  && (*s->data <= '7')){ret = (ret << 3) |  (*s->data - '0');}
@@ -252,7 +261,7 @@ lVal *lReadString(lString *s){
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 		char c = *s->data;
-		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (s->data >= s->bufEnd)){
+		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (c == '}') ||(s->data >= s->bufEnd)){
 			s->data++;
 			lRootsValPop();
 			return ret;
@@ -265,6 +274,7 @@ lVal *lReadString(lString *s){
 
 		switch(c){
 		case '(':
+		case '{':
 		case '[':
 			s->data+=1;
 			v->vList.car = lReadString(s);
@@ -289,7 +299,7 @@ lVal *lReadString(lString *s){
 			lStringAdvanceToNextLine(s);
 			break;
 		case '@':
-			if((s->data[1] == '[') || (s->data[1] == '(')){
+			if((s->data[1] == '[') || (s->data[1] == '(') || (s->data[1] == '{')){
 				s->data+=2;
 				v->vList.cdr = lReadString(s);
 				v->vList.car = lValSymS(symTreeNew);

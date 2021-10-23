@@ -60,7 +60,7 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	lTree *tre = car->vTree;
 	lVal *vs = lCadr(v);
 	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
-	return lTreeGet(tre,vs->vSymbol);
+	return lTreeGet(tre,vs->vSymbol,NULL);
 }
 
 static lVal *lnfTreeHas(lClosure *c, lVal *v){
@@ -70,7 +70,7 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	lTree *tre = car->vTree;
 	lVal *vs = lCadr(v);
 	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
-	return lValBool(lTreeHas(tre,vs->vSymbol));
+	return lValBool(lTreeHas(tre,vs->vSymbol,NULL));
 }
 
 static lVal *lnfTreeSet(lClosure *c, lVal *v){

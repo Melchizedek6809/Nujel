@@ -353,6 +353,12 @@
 [test-add #t [let* [def vals [tree/values @[:b 2 :a 123]]] [or [list-equal? vals '[2 123]] [list-equal? vals '[123 2]]]]]
 [test-add 2 [length [tree/keys @[:b 2 :a 123]]]]
 [test-add 2 [length [tree/values @[:b 2 :a 123]]]]
+[test-add '[:asd 123] [read "{:asd 123}"]]
+[test-add '[123 [:asd]] [read "[123[:asd]]"]]
+[test-add '[123 [:asd]] [read "{123{:asd}}"]]
+[test-add '[123 [:asd]] [read "(123(:asd))"]]
+[test-add '[123 [:asd]] [read "(123{:asd})"]]
+[test-add '[:asd [123]] [read "(:asd[123])"]]
 ;[test-add "[#nil]" [str/write '[#nil]]]
 
 ; [test-add #t [eq? #nil #nil]]

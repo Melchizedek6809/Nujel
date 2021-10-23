@@ -90,23 +90,31 @@ void lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 	}
 }
 
-lVal *lTreeGet(const lTree *t, const lSymbol *s){
+lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
 	const lTree *c = t;
 	while(c != NULL){
 		if(c->key == NULL){break;}
-		if(s == c->key){return c->value;}
+		if(s == c->key){
+			if(found != NULL){*found = true;}
+			return c->value;
+		}
 		c = s > c->key ? c->right : c->left;
 	}
+	if(found != NULL){*found = false;}
 	return NULL;
 }
 
-bool lTreeHas(const lTree *t, const lSymbol *s){
+bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 	const lTree *c = t;
 	while(c != NULL){
 		if(c->key == NULL){break;}
-		if(s == c->key){return true;}
+		if(s == c->key){
+			if(value != NULL){*value = c->value;}
+			return true;
+		}
 		c = s > c->key ? c->right : c->left;
 	}
+	if(value != NULL){*value = NULL;}
 	return false;
 }
 
