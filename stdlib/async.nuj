@@ -1,29 +1,25 @@
 ;; Contains everything related to the yield/coroutine system
 
-[def yield-queue [cons "Start of Yield Queue"]]
+[def yield-queue #nil]
 
-[def yield [λ [pred expr] "Evaluates EXPR once PRED is true"
-	[set-cdr! [last-pair yield-queue] [cons [cons pred expr]]]
+[def yield [λ [pred fun] "Evaluates FUN once PRED is true"
+	[set! yield-queue [cons [cons pred fun] yield-queue]]
 	#t
 ]]
 
 [def yield-run [let*
-	[def yield-try [λ [l]
-		[cond [[[car l]] [[cdr l]] #t]
-		      [#t #f]
-		]
-	]]
-
-	[def yield-run-iter [λ [l]
-		[cond [[nil? l] #t]
-		      [[nil? [cdr l]] #t]
-		      [[yield-try [cadr l]] [set-cdr! l [cddr l]] [yield-run-iter l]]
-		      [#t [yield-run-iter [cdr l]]]
-		]
-	]]
-
 	[λ [] "Executes pending coroutines if their predicate evaluates to #t"
-		[yield-run-iter yield-queue]
+		[def l yield-queue]
+		[def new #nil]
+		[def cur #nil]
+		[set! yield-queue #nil]
+		[while l
+		       [set! cur [car l]]
+		       [if [[car cur]]
+			   [[cdr cur]]
+			   [set! yield-queue [cons cur yield-queue]]]
+		       [set! l [cdr l]]
+		]
 	]
 ]]
 
