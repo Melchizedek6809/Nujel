@@ -9,7 +9,7 @@
 
 [def yield-run [let*
 	[def yield-try [λ [l]
-		[cond [[eval [car l]] [eval [cdr l]] #t]
+		[cond [[[car l]] [[cdr l]] #t]
 		      [#t #f]
 		]
 	]]

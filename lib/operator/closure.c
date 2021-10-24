@@ -16,6 +16,8 @@
 static lVal *lnfDefine(lClosure *c, lClosure *ec, lVal *v, lVal *(*func)(lClosure *,const lSymbol *)){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
 	lVal *sym = lCar(v);
+	if(sym == NULL){return NULL;}
+	if(sym->type == ltPair){sym = lEval(c,sym);}
 	const lSymbol *lsym = sym->vSymbol;
 	if((lsym != NULL) && (lsym->c[0] == ':')){return NULL;}
 	lVal *t = lRootsValPush(func(c,lsym));
@@ -179,6 +181,19 @@ static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	return lnfDo(lClosureNew(c),v);
 }
 
+static lVal *lnfClObj(lClosure *c, lVal *v){
+	int p = castToInt(lCar(v),0);
+	while((p > 0) && (c != NULL)){
+		p--;
+		c = c->parent;
+	}
+	if(c == NULL){return NULL;}
+	lVal *ret = lValAlloc();
+	ret->type = ltObject;
+	ret->vClosure = c;
+	return ret;
+}
+
 void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lResolve);
 	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
@@ -186,6 +201,7 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"cl-text disasm", "[f]",           "Return closures text segment",               lnfClText);
 	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
 	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
+	lAddNativeFunc(c,"cl-obj",         "[i]",           "Return object of the I parent",              lnfClObj);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 

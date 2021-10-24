@@ -31,6 +31,5 @@ void      lDefineVal        (lClosure *c, const char *str, lVal *val);
 lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
 
 lVal     *lGetClosureSym    (lClosure *c, const lSymbol *s);
-lVal     *lResolveClosureSym(lClosure *c, const lSymbol *s);
 lVal     *lDefineClosureSym (lClosure *c, const lSymbol *s);
 lVal     *lSearchClosureSym (lClosure *c, lVal *v, const char *str, uint len);

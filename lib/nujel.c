@@ -130,8 +130,9 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type     = ltObject;
 	ret->vClosure = lClosureNew(c);
-	lnfDo(ret->vClosure,v);
-	return lRootsValPop();
+	lnfDo(ret->vClosure,lCdr(v));
+	lRootsValPop();
+	return ret;
 }
 
 /* Handler for [memory-info] */
@@ -362,9 +363,9 @@ static void lAddCoreFuncs(lClosure *c){
 	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
 
 	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
-	lAddSpecialForm(c,"lambda lam λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
+	lAddSpecialForm(c,"lambda fun λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
 	lAddSpecialForm(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"object obj ω",   "[args ...body]", "Create a new object",                       lnfObject);
+	lAddSpecialForm(c,"object ω",       "[args ...body]", "Create a new object",                       lnfObject);
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
