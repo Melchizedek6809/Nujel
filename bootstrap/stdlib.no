@@ -662,8 +662,6 @@
     [test-add ":asd" [begin [def :asd #t] :asd]]
     [test-add "#nil" [define testerle 123] [undefine! testerle] testerle]
     [test-add "[1 . 2]" [define test [cons 1 2]] test]
-    [test-add "[3 . 2]" [define test [cons 1 2]] [set-car! test 3]]
-    [test-add "[3 . 4]" [define test [cons 1 2]] [set-car! test 3] [set-cdr! test 4]]
     [test-add "\"Eins\"" [define eins [ω [] [define say [λ []
        "Eins"]]]] [eins [say]]]
     [test-add "\"Zwei\"" [define eins [ω [] [define say [λ []

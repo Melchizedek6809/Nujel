@@ -18,7 +18,7 @@ uint    lSymbolActive = 0;
 uint    lSymbolMax    = 0;
 
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
-lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
+lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic;
 
 void lInitSymbol(){
 	lSymbolActive   = 0;
@@ -42,6 +42,8 @@ void lInitSymbol(){
 	lSymLTNoAlloc        = lSymS(":no-alloc");
 	lSymLTBool           = lSymS(":bool");
 	lSymLTPair           = lSymS(":pair");
+	lSymLTObject         = lSymS(":object");
+	lSymLTDynamic        = lSymS(":dynamic");
 	lSymLTLambda         = lSymS(":lambda");
 	lSymLTInt            = lSymS(":int");
 	lSymLTFloat          = lSymS(":float");
@@ -126,6 +128,8 @@ lSymbol *getTypeSymbol(const lVal* v){
 	case ltNoAlloc:    return lSymLTNoAlloc;
 	case ltBool:       return lSymLTBool;
 	case ltPair:       return lSymLTPair;
+	case ltObject:     return lSymLTObject;
+	case ltDynamic:    return lSymLTDynamic;
 	case ltLambda:     return lSymLTLambda;
 	case ltInt:        return lSymLTInt;
 	case ltFloat:      return lSymLTFloat;

@@ -130,8 +130,11 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type     = ltObject;
 	ret->vClosure = lClosureNew(c);
+	ret->vClosure->type = closureObject;
 	lnfDo(ret->vClosure,v);
-	return lRootsValPop();
+	//lWriteVal(ret);
+	lRootsValPop();
+	return ret;
 }
 
 /* Handler for [memory-info] */

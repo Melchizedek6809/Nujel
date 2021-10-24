@@ -124,9 +124,14 @@
 	[eq? :symbol [type-of val]]
 ]]
 
+[def object? [λ [val]
+	"#t if VAL is an object"
+	[eq? :object [type-of val]]
+]]
+
 [def lambda? [λ [val]
 	"#t if VAL is a lambda"
-	[eq? :lambda [type-of val]]
+	[or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]
 ]]
 
 [def native? [λ [val]

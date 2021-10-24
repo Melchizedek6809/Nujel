@@ -50,6 +50,8 @@ void lValGCMark(lVal *v){
 		lValGCMark(v->vList.car);
 		lValGCMark(v->vList.cdr);
 		break;
+	case ltObject:
+	case ltDynamic:
 	case ltLambda:
 		lClosureGCMark(v->vClosure);
 		break;

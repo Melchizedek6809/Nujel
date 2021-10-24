@@ -181,11 +181,20 @@ static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	return lnfDo(lClosureNew(c),v);
 }
 
-static lVal *lnfClObj(lClosure *c, lVal *v){
-	int p = castToInt(lCar(v),0);
-	while((p > 0) && (c != NULL)){
-		p--;
+static lClosure *getNextObject(lClosure *c){
+	while(c != NULL){
+		if(c->type == closureConstant){return NULL;}
+		if(c->type == closureObject){return c;}
 		c = c->parent;
+	}
+	return NULL;
+}
+
+static lVal *lnfClSelf(lClosure *c, lVal *v){
+	c = getNextObject(c);
+	for(int i=castToInt(lCar(v),0);i>0;i--){
+		if(c == NULL){return NULL;}
+		c = getNextObject(c->parent);
 	}
 	if(c == NULL){return NULL;}
 	lVal *ret = lValAlloc();
@@ -201,7 +210,7 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"cl-text disasm", "[f]",           "Return closures text segment",               lnfClText);
 	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
 	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
-	lAddNativeFunc(c,"cl-obj",         "[i]",           "Return object of the I parent",              lnfClObj);
+	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 

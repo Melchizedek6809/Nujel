@@ -140,6 +140,26 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			t = snprintf(buf,len,"#f");
 		}
 		break;
+	case ltObject: {
+		t = snprintf(cur,bufEnd-cur,"[ω\n");
+		if(t > 0){cur += t;}
+		lVal *cloData = v->vClosure->data;
+		indentLevel += 3;
+		forEach(n,cloData){
+			for(int i=indentLevel;i>=0;i--){*cur++=' ';}
+			t = snprintf(cur,bufEnd-cur,"[def ");
+			if(t > 0){cur += t;}
+			cur = lSWriteVal(lCaar(n),cur,bufEnd,indentLevel,0);
+			t = snprintf(cur,bufEnd-cur," ");
+			if(t > 0){cur += t;}
+			cur = lSWriteVal(lCadar(n),cur,bufEnd,indentLevel,0);
+			t = snprintf(cur,bufEnd-cur,"]\n");
+			if(t > 0){cur += t;}
+		}
+		indentLevel -= 3;
+		t = snprintf(cur,bufEnd-cur,"]");
+		break; }
+	case ltDynamic:
 	case ltLambda: {
 		*cur++ = '[';
 		int syms = 0;
@@ -149,7 +169,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			if(syms > 1){
 				for(int i=indentLevel;i>=0;i--){*cur++=' ';}
 			}
-			cur = lSWriteVal(lCar(n),cur,bufEnd,indentLevel,display);
+			cur = lSWriteVal(lCar(n),cur,bufEnd,indentLevel,0);
 		}
 		indentLevel -= 2;
 		t = snprintf(cur,bufEnd-cur,"]");
@@ -163,7 +183,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			if(sym == symQuote){
 				v = lCadr(v);
 				*cur++ = '\'';
-				cur = lSWriteVal(v,cur,bufEnd,indentLevel,display);
+				cur = lSWriteVal(v,cur,bufEnd,indentLevel,0);
 				goto endOfWriteVal;
 			}else if(sym == symCond){
 				indentStyle = 1;
@@ -197,7 +217,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			if(n->type == ltPair){
 				lVal *cv = lCar(n);
 				if((n == v) && (cv == NULL) && (lCdr(n) == NULL)){continue;}
-				cur = lSWriteVal(cv,cur,bufEnd,indentLevel,display);
+				cur = lSWriteVal(cv,cur,bufEnd,indentLevel,0);
 				if(lCdr(n) != NULL){
 					if((indentStyle == 1) && (n != v)){
 						*cur++ = '\n';
@@ -209,7 +229,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			}else{
 				*cur++ = '.';
 				*cur++ = ' ';
-				cur = lSWriteVal(n,cur,bufEnd,indentLevel,display);
+				cur = lSWriteVal(n,cur,bufEnd,indentLevel,0);
 				break;
 			}
 		}
@@ -217,7 +237,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		indentLevel = oldIndent;
 		break; }
 	case ltTree: {
-		cur = lSWriteTree(v->vTree,cur,bufEnd,indentLevel,display);
+		cur = lSWriteTree(v->vTree,cur,bufEnd,indentLevel,0);
 		break;
 	}
 	case ltArray: {
@@ -226,7 +246,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		if(v->vArray->data != NULL){
 			const int arrLen = v->vArray->length;
 			for(int i=0;i<arrLen;i++){
-				cur = lSWriteVal(v->vArray->data[i],cur,bufEnd,indentLevel,display);
+				cur = lSWriteVal(v->vArray->data[i],cur,bufEnd,indentLevel,0);
 				if(i < (arrLen-1)){*cur++ = ' ';}
 			}
 		}
