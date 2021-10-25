@@ -298,11 +298,12 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 		return func->vNFunc->fp(c,lCadr(v));
 	case ltNativeFunc:
 		return func->vNFunc->fp(c,lCadr(v));
+	case ltObject: {
+		lVal *t = lCadr(v);
+		return lLambda(c,t,func);}
 	case ltDynamic:
-	case ltObject:
 	case ltLambda: {
 		lVal *t = lCadr(v);
-		if((t == NULL) || (t->type != ltPair)){t = lCons(t,NULL);}
 		return lLambda(c,t,func);}
 	default:
 		return v;
