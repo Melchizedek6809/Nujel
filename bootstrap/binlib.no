@@ -1,25 +1,41 @@
-[do [def help [let* [def iter [λ [l]
-       [cond [[nil? l] #t]
-             [#t [display [describe [car l]]] [newline] [iter [cdr l]]]]]] [λ [i]
-       "Describe 10 functions at offset 1"
-       [def off [* [int i] 10]]
-       [iter [map cat [symbol-table off 10]]]
-       [display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
-       [newline]
-       #t]]]
-    [def repl-prompt [let* [def repl-count -1] [λ [i]
-       "Display the REPL prompt"
-       [set! repl-count [++ repl-count]]
-       [display [cat "[" repl-count "]" [ansi-fg 1] "λ" [ansi-fg 12] ">" [ansi-reset] " "]]]]]
-    [def file/compile [λ* [path no-write]
-        "Compile a Nujel source file into optimized object code"
-        [do [def source [read [file/read path]]]
-           [def object-code [compile [cons 'do source]]]
-           [unless no-write
-                   [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
-           object-code]]]
-    [def file/eval [λ* [path]
-        "Evaluate a Nujel source file in the current context"
-        [do [def source [cons 'do [read [file/read path]]]]
-           [eval source]]]]
-    [def test-context "Nujel Bootstrap"]]
+[def help [let*
+	[def iter [λ [l]
+		[cond [[nil? l] #t]
+		      [#t [display [describe [car l]]] [newline] [iter [cdr l]]
+		]]
+	]]
+
+	[λ [i]
+		"Describe 10 functions at offset 1"
+		[def off [* [int i] 10]]
+		[iter [map cat [symbol-table off 10]]]
+		[display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
+		[newline]
+		#t
+	]
+]]
+
+[def repl-prompt [let*
+	[def repl-count -1]
+	[λ [i]
+		"Display the REPL prompt"
+		[set! repl-count [++ repl-count]]
+		[display [cat "[" repl-count "]" [ansi-fg 1] "λ" [ansi-fg 12] ">" [ansi-reset] " "]]
+	]
+]]
+
+[def file/compile [λ [path no-write]
+	"Compile a Nujel source file into optimized object code"
+	[def source [read [file/read path]]]
+	[def object-code [compile [cons 'do source] source]]
+	[unless no-write [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
+	object-code
+]]
+
+[def file/eval [λ [path]
+	"Evaluate a Nujel source file in the current context"
+	[def source [cons 'do [read [file/read path]]]]
+	[eval source]
+]]
+
+[def test-context "Nujel Standalone"]

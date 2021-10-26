@@ -5,10 +5,11 @@
  */
 #include "closure.h"
 #include "list.h"
-#include "../type/symbol.h"
-#include "../type/val.h"
+#include "tree.h"
 #include "../nujel.h"
 #include "../allocation/garbage-collection.h"
+#include "../type/symbol.h"
+#include "../type/val.h"
 
 #ifndef COSMOPOLITAN_H_
 	#include <ctype.h>
@@ -64,15 +65,16 @@ lClosure *lClosureNew(lClosure *parent){
 }
 
 lVal *lSearchClosureSym(lClosure *c, lVal *ret, const char *str, uint len){
+	(void)str;(void)len;
 	if(c == NULL){return ret;}
-
+	return NULL;/*
 	forEach(n, c->data){
 		lVal *e = lCaar(n);
 		if((e == NULL) || (e->type != ltSymbol)){continue;}
 		if(strncmp(e->vSymbol->c,str,len)){continue;}
 		ret = lCons(e,ret);
 	}
-	return lSearchClosureSym(c->parent,ret,str,len);
+	return lSearchClosureSym(c->parent,ret,str,len);*/
 }
 
 lVal *lResolve(lClosure *c, lVal *v){
@@ -89,13 +91,7 @@ lVal *lResolveSym(lClosure *c, lVal *v){
 	const lSymbol *sym = v->vSymbol;
 	if(lSymKeyword(sym)){return v;}
 	lVal *ret = lGetClosureSym(c,sym);
-	return ret == NULL ? NULL : lCar(ret);
-}
-
-void lDefineVal(lClosure *c, const char *str, lVal *val){
-	lVal *var = lDefineClosureSym(c,lSymS(str));
-	if(var == NULL){return;}
-	var->vList.car = val;
+	return ret == NULL ? NULL : ret;
 }
 
 lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
@@ -108,12 +104,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 			if(cur[len] == 0)    {break;}
 				if(isspace((u8)cur[len])){break;}
 		}
-		lVal *var = lDefineClosureSym(c,lSymSL(cur,len));
-		if(var == NULL){
-			lPrintError("Error adding NFunc %s\n",sym);
-			return NULL;
-		}
-		var->vList.car = lNF;
+		lDefineClosureSym(c,lSymSL(cur,len),lNF);
 		for(;len<32;len++){ // Advance to the next non whitespace character
 			if(cur[len] == 0)     {return lNF;} // Or return if we reached the final 0 byte
 			if(!isspace((u8)cur[len])){break;}
@@ -126,13 +117,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 
 static lVal *lGetSym(lClosure *c, const lSymbol *s){
 	if((c == NULL) || (s == NULL)){return NULL;}
-	forEach(v, c->data){
-		lVal *cursym = v->vList.car->vList.car;
-		if(s == cursym->vSymbol){
-			return lCdar(v);
-		}
-	}
-	return NULL;
+	return lTreeGet(c->data,s,NULL);
 }
 
 lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
@@ -141,21 +126,21 @@ lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
 	return t != NULL ? t : lGetClosureSym(c->parent,s);
 }
 
-lVal *lDefineClosureSym(lClosure *c,const lSymbol *s){
-	if(c == NULL){return NULL;}
-	lVal *get = lGetSym(c,s);
-	if(get != NULL){return get;}
-	lVal *t = lCons(lValSymS(s),lCons(NULL,NULL));
-	if(t == NULL){return NULL;}
-	if(c->data == NULL){
-		c->data = lCons(t,NULL);
-	}else{
-		lVal *cdr = NULL;
-		for(cdr = c->data;(cdr != NULL) && (lCdr(cdr) != NULL);cdr = lCdr(cdr)){}
-		if(cdr == NULL){return NULL;}
-		cdr->vList.cdr = lCons(t,NULL);
+void lDefineClosureSym(lClosure *c,const lSymbol *s, lVal *v){
+	c->data = lTreeInsert(c->data,s,v);
+}
+
+void lSetClosureSym(lClosure *c,const lSymbol *s, lVal *v){
+	if(c == NULL){return;}
+	bool found = false;
+	lTreeSet(c->data,s,v,&found);
+	if(!found){
+		lSetClosureSym(c->parent,s,v);
 	}
-	return t->vList.cdr;
+}
+
+void lDefineVal(lClosure *c, const char *str, lVal *val){
+	lDefineClosureSym(c,lSymS(str),val);
 }
 
 int lClosureID(const lClosure *n){

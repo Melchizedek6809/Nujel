@@ -165,7 +165,10 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	static char *tmpStringBuf = NULL;
 	static int tmpStringBufSize = 1<<8; // Start with 4K
 	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
-	if(tmpStringBuf == NULL){exit(99);}
+	if(tmpStringBuf == NULL){
+		lPrintError("lnfCat OOM\n");
+		return NULL;
+	}
 	char *buf = tmpStringBuf;
 	int i = 0;
 	forEach(sexpr,v){
@@ -204,6 +207,10 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		if((i + clen) >= tmpStringBufSize){
 			tmpStringBufSize *= 2;
 			tmpStringBuf = realloc(tmpStringBuf,tmpStringBufSize);
+			if(tmpStringBuf == NULL){
+				lPrintError("lnfCat2 OOM\n");
+				return NULL;
+			}
 			buf = &tmpStringBuf[i];
 			goto restart;
 		}

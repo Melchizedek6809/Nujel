@@ -51,9 +51,9 @@ lVal *lValVec(const vec v){
 	ret->type = ltVec;
 	ret->vVec = lVecAlloc();
 	if(ret->vVec == NULL){
-		lValFree(ret);
 		return NULL;
+	}else{
+		ret->vVec->v = v;
+		return ret;
 	}
-	ret->vVec->v = v;
-	return ret;
 }

@@ -223,15 +223,22 @@ bool castToBool(const lVal *v){
 
 /* Cast v to be a string without memory allocations, or return fallback */
 const char *castToString(const lVal *v, const char *fallback){
-	if(v == NULL){return fallback;}
-	if(v->type != ltString){return fallback;}
+	if((v == NULL) || (v->type != ltString)){return fallback;}
 	return v->vString->data;
+}
+
+/* Return the tree in V if possible, otherwise fallback. */
+lTree *castToTree(const lVal *v, lTree *fallback){
+	if((v == NULL) || (v->type != ltTree)){return fallback;}
+	return v->vTree;
 }
 
 /* Cast the list v to their type of highest precedence */
 lVal *lCastAuto(lClosure *c, lVal *v){
-	lVal *t = lMap(c,v,lEval);
-	return lCast(c,t,lTypecastList(t));
+	lVal *t   = lRootsValPush(lMap(c,v,lEval));
+	lVal *ret = lCast(c,t,lTypecastList(t));
+	lRootsValPop();
+	return ret;
 }
 
 /* Cast v to a value of type */

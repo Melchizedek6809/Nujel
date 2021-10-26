@@ -1,5 +1,7 @@
 #pragma once
 #include "../nujel.h"
+#include "../collection/list.h"
+#include "../type-system.h"
 
 struct lVal {
 	u8 type;
@@ -28,8 +30,6 @@ extern uint  lValMax;
 extern uint  lValActive;
 extern lVal *lValFFree;
 
-#define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
-
 void      lInitVal();
 
 lVal     *lValAlloc ();
@@ -39,5 +39,6 @@ lVal     *lValBool  (bool v);
 lVal     *lValInf   ();
 lVal     *lValInt   (int v);
 lVal     *lValFloat (float v);
+lVal     *lValTree  (lTree *v);
 lVal     *lValCopy  (lVal *dst, const lVal *src);
 lVal     *lValDup   (const lVal *v);

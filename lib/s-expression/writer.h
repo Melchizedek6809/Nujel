@@ -1,4 +1,5 @@
 #pragma once
 #include "../nujel.h"
 
-char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display);
+char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool display);
+char *lSWriteVal (lVal  *v, char *buf, char *bufEnd, int indentLevel, bool display);

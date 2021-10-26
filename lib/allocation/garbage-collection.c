@@ -58,6 +58,10 @@ void lValGCMark(lVal *v){
 	case ltArray:
 		lArrayGCMark(v->vArray);
 		break;
+	case ltSpecialForm:
+	case ltNativeFunc:
+		lValGCMark(v->vNFunc->doc);
+		break;
 	case ltString:
 		lStringGCMark(v->vString);
 		break;
@@ -74,21 +78,23 @@ void lTreeGCMark(const lTree *v){
 	const uint ci = v - lTreeList;
 	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
-	lValGCMark(v->value);
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
+	lValGCMark(v->value);
 }
 
 /* Mark every reference for the GC to ignore contained in c */
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
+
 	if(lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
 
-	lValGCMark(c->data);
+	lTreeGCMark(c->data);
 	lValGCMark(c->doc);
 	lValGCMark(c->text);
+	lValGCMark(c->args);
 	lClosureGCMark(c->parent);
 }
 
@@ -99,9 +105,7 @@ void lArrayGCMark(const lArray *v){
 	if(lArrayMarkMap[ci]){return;}
 	lArrayMarkMap[ci] = 1;
 	for(int i=0;i<v->length;i++){
-		if(v->data[i]){
-			lValGCMark(v->data[i]);
-		}
+		lValGCMark(v->data[i]);
 	}
 }
 

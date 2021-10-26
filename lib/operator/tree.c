@@ -10,19 +10,20 @@
 #include "../collection/tree.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
+#include "../type-system.h"
 
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type = ltTree;
-	ret->vTree = lTreeAlloc();
+	ret->vTree = NULL;
 
 	while(v != NULL){
 		lVal *key = lCar(v);
 		lVal *val = lCadr(v);
 		if((key == NULL) || (key->type != ltSymbol)){break;}
-		lTreeInsert(ret->vTree,key->vSymbol,val);
+		ret->vTree = lTreeInsert(ret->vTree,key->vSymbol,val);
 		v = lCddr(v);
 	}
 
@@ -80,8 +81,14 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	lTree *tre = car->vTree;
 	lVal *vs = lCadr(v);
 	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
-	lTreeInsert(tre,vs->vSymbol,lCaddr(v));
+	car->vTree = lTreeInsert(tre,vs->vSymbol,lCaddr(v));
 	return car;
+}
+
+static lVal *lnfTreeSize(lClosure *c, lVal *v){
+	(void)c;
+	lTree *tree = castToTree(lCar(v),NULL);
+	return lValInt(tree == 0 ? 0 : lTreeSize(tree));
 }
 
 void lOperationsTree(lClosure *c){
@@ -90,6 +97,7 @@ void lOperationsTree(lClosure *c){
 	lAddNativeFunc(c,"tree/keys",    "[tree]",         "Return each key of TREE in a list", lnfTreeGetKeys);
 	lAddNativeFunc(c,"tree/values",  "[tree]",         "Return each value of TREE in a list", lnfTreeGetValues);
 	lAddNativeFunc(c,"tree/get-list","[tree]",         "Return a TREE as a plist", lnfTreeGetList);
+	lAddNativeFunc(c,"tree/size",    "[tree]",         "Return the amount of entries in TREE", lnfTreeSize);
 	lAddNativeFunc(c,"tree/get",     "[tree sym]",     "Return the value of SYM in TREE, or #nil", lnfTreeGet);
 	lAddNativeFunc(c,"tree/has?",    "[tree sym]",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
 	lAddNativeFunc(c,"tree/set!",    "[tree sym val]", "Set SYM to VAL in TREE", lnfTreeSet);

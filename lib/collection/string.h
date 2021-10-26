@@ -9,6 +9,7 @@ struct lString{
 	};
 	u16 flags;
 };
+#define HEAP_ALLOCATED 1
 #define STR_MAX  (1<<14)
 
 extern lString  lStringList [STR_MAX];
@@ -20,6 +21,6 @@ void     lInitStr      ();
 lString *lStringAlloc  ();
 void     lStringFree   (lString *s);
 lString *lStringNew    (const char *str, uint len);
-lString *lStringDup    (lString *s);
+lString *lStringDup    (      lString *s);
 int      lStringLength (const lString *s);
 lVal    *lValString    (const char *s);

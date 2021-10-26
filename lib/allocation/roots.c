@@ -7,6 +7,7 @@
  * objects on the heap are still reachable.
  */
 #include "roots.h"
+#include "../collection/closure.h"
 #include "garbage-collection.h"
 
 #ifndef COSMOPOLITAN_H_

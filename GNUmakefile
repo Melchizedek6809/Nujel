@@ -140,10 +140,20 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
+tmp/stdlib.nuj: $(STDLIB_NUJS)
+	@mkdir -p tmp/
+	@cat $^ > $@
+	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+
 tmp/stdlib.no: $(STDLIB_NOBS)
 	@mkdir -p tmp/
 	@cat $^ > $@
-		@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+
+tmp/binlib.nuj: $(BINLIB_NUJS)
+	@mkdir -p tmp/
+	@cat $^ > $@
+	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
 
 tmp/binlib.no: $(BINLIB_NOBS)
 	@mkdir -p tmp/
@@ -191,3 +201,7 @@ testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
 .PHONY: profile
 profile: $(NUJEL)
 	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[test-run]"
+
+.PHONY: profile-while
+profile-while: $(NUJEL)
+	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 10,000,000] [set! v [+ 1 v]]] v]]"

@@ -61,33 +61,31 @@ void lTreeFree(lTree *t){
 	lTreeFFree = t;
 }
 
-void lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
-	lTree *c = t;
-	if(s == NULL){return;}
-	while(c != NULL){
-		if(c->key == NULL){
-			c->key   = s;
-			c->value = v;
-			return;
-		}
-		if(s == c->key){
-			c->value = v;
-			return;
-		}
-		if(s > c->key){
-			if(c->right == NULL){
-				c->right = lTreeNew(s,v);
-				break;
-			}
-			c = c->right;
-		}else{
-			if(c->left == NULL){
-				c->left = lTreeNew(s,v);
-				break;
-			}
-			c = c->left;
-		}
+void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
+	if(t == NULL){
+		return;
+	}else if(s == t->key){
+		t->value = v;
+		if(found){*found = true;}
+	}else if(s > t->key){
+		lTreeSet(t->right,s,v,found);
+	}else{
+		lTreeSet(t->left,s,v,found);
 	}
+}
+
+lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
+	if(t == NULL){
+		return lTreeNew(s,v);
+	}else if(t->key == s){
+		t->value = v;
+		return t;
+	}else if(s > t->key){
+		t->right = lTreeInsert(t->right,s,v);
+	}else {
+		t->left = lTreeInsert(t->left,s,v);
+	}
+	return t;
 }
 
 lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
@@ -131,18 +129,17 @@ lVal *lTreeAddToList(const lTree *t, lVal *list){
 }
 
 lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
-	if(t == NULL){return list;}
+	if((t == NULL) || (t->key == NULL)){return list;}
+
+	lRootsValPush(list);
 	list = lTreeAddKeysToList(t->right,list);
 
-	if(list != NULL){lRootsValPush(list);}
-	lVal *l = lCons(NULL,list);
-	if(list != NULL){lRootsValPop();}
-
-	lRootsValPush(l);
-	l->vList.car = lValSymS(t->key);
+	lVal *sym = lRootsValPush(lValSymS(t->key));
+	list = lCons(sym,list);
+	lRootsValPop();
 	lRootsValPop();
 
-	return lTreeAddKeysToList(t->left,l);
+	return lTreeAddKeysToList(t->left,list);
 }
 
 lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
@@ -166,4 +163,8 @@ lVal *lTreeKeysToList(const lTree *t){
 
 lVal *lTreeValuesToList(const lTree *t){
 	return lTreeAddValuesToList(t,NULL);
+}
+
+uint lTreeSize(const lTree *t){
+	return t == NULL ? 0 : (t->key ? 1 : 0) + lTreeSize(t->left) + lTreeSize(t->right);
 }

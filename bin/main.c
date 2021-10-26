@@ -9,6 +9,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include <unistd.h>
+	#include <setjmp.h>
 
 	#ifdef __MINGW32__
 		#include <windows.h>
@@ -81,8 +82,7 @@ void doRepl(lClosure *c){
 	if(historyPath){
 		bestlineHistoryLoad(historyPath);
 	}
-	lVal *lastlsym = lValSym("lastl");
-	lVal *lastl    = lDefineClosureSym(c, lastlsym->vSymbol);
+	const lSymbol *lastlsym = lSymS("last-line");
 	while(1){
 		char *str = bestline("> ");
 		if(str == NULL){
@@ -93,15 +93,18 @@ void doRepl(lClosure *c){
 		if(historyPath){
 			bestlineHistorySave(historyPath);
 		}
-		lVal *v = lEval(c,lWrap(lRead(str)));
+		lVal *read = lRootsValPush(lRead(str));
+		lVal *expr = lWrap(read);
+		lRootsValPop();
+		lRootsValPush(expr);
+		lVal *v = lEval(c,expr);
+		lRootsValPop();
 		if(v != NULL){
 			lWriteVal(v);
 		}else{
 			printf("\n");
 		}
-		lGarbageCollect();
-		lVal *tmp = lValString(str);
-		if((tmp != NULL) && (lastl != NULL)){lastl->vList.car = tmp;}
+		lDefineClosureSym(c, lastlsym, lValString(str));
 	}
 }
 
@@ -138,6 +141,9 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 		printf("sizeof(lArray): %u\n",  (uint)sizeof(lArray));
 		printf("sizeof(lString): %u\n", (uint)sizeof(lString));
 		printf("sizeof(lTree): %u\n", (uint)sizeof(lTree));
+		printf("sizeof(jmp_buf): %u\n", (uint)sizeof(jmp_buf));
+		printf("\n\nRoot Closure Data Size: %u\n",lTreeSize(c->data));
+		//lWriteVal(lValTree(c->data));
 	}
 	return c;
 }
@@ -154,20 +160,26 @@ int main(int argc, char *argv[]){
 		size_t len;
 		char *str = argv[i];
 		if(argv[i][0] == '-'){
-			if(argv[i][1] == 'e'){
-				eval = 1;
-				continue;
-			}else if(argv[i][1] == 'x'){
-				eval = 2;
-				continue;
-			}else if(argv[i][1] == '-'){
-				repl = 1;
-				continue;
-			}else if(argv[i][1] == 'n'){
-				continue;
-			}else{
-				break;
+			for(int ii=1;argv[i][ii];ii++){
+				switch(argv[i][ii]){
+				case 'e':
+					eval = 1;
+					continue;
+				case 'x':
+					eval = 2;
+					continue;
+				case '-':
+					repl = 1;
+					continue;
+				case 'n':
+				case 'v':
+					continue;
+				default:
+					fprintf(stderr,"Unknown option '%c', exiting.", argv[i][ii]);
+					exit(1);
+				}
 			}
+			continue;
 		}
 		if(!eval){
 			str = loadFile(argv[i],&len);
@@ -181,6 +193,7 @@ int main(int argc, char *argv[]){
 		}
 		repl = 0;
 	}
+
 	if(repl){
 		doRepl(c);
 	}

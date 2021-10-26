@@ -80,6 +80,10 @@ lString *lStringAlloc(){
 void lStringFree(lString *s){
 	if(s == NULL){return;}
 	lStringActive--;
+	if(s->flags & HEAP_ALLOCATED){
+		free((void *)s->buf);
+	}
+	s->flags = 0;
 	s->nextFree = lStringFFree;
 	lStringFFree = s;
 }
@@ -87,12 +91,14 @@ void lStringFree(lString *s){
 lString *lStringNew(const char *str, uint len){
 	if(str == NULL){return 0;}
 	lString *s = lStringAlloc();
-	if(s == NULL){return 0;}
 	char *nbuf = malloc(len+1);
-	if(nbuf == NULL){return 0;}
+	if(nbuf == NULL){
+		lPrintError("lStringNew OOM");
+	}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
 	s->buf    = s->data = nbuf;
+	s->flags  = HEAP_ALLOCATED;
 	s->bufEnd = &s->buf[len];
 	return s;
 }
@@ -105,7 +111,8 @@ lString *lStringDup(lString *os){
 	char *nbuf = malloc(len+1);
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
-s->buf    = s->data = nbuf;
+	s->buf    = s->data = nbuf;
+	s->flags  = HEAP_ALLOCATED;
 	s->bufEnd = &s->buf[len];
 	return s;
 }
@@ -120,23 +127,5 @@ lVal *lValString(const char *c){
 	if(t == NULL){return NULL;}
 	t->type = ltString;
 	t->vString = lStringNew(c,strlen(c));
-	if(t->vString == NULL){
-		lValFree(t);
-		return NULL;
-	}
-	return t;
-}
-lVal *lValCString(const char *c){
-	if(c == NULL){return NULL;}
-	lVal *t = lValAlloc();
-	if(t == NULL){return NULL;}
-	t->type = ltString;
-	t->vString = lStringAlloc();
-	if(t->vString == NULL){
-		lValFree(t);
-		return NULL;
-	}
-	t->vString->buf    = t->vString->data = c;
-	t->vString->bufEnd = c + strlen(c);
-	return t;
+	return t->vString == NULL ? NULL : t;
 }

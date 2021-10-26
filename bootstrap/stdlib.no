@@ -1,848 +1,1252 @@
-[do [def not [λ* [v]
-        "Return true if V is false"
-        [if v
-           #f
-           #t]]]
-    [def list [λ* [...arguments]
-        "Return ARGUMENTS as a list"
-        ...arguments]]
-    [def default [λ* [arg default-value]
-        "Returns ARG or DEFAULT-VALUE if ARG is #nil"
-        [if arg
-           arg
-           default-value]]]
-    [def caar [λ* [p]
-        "[car [car p]]"
-        [car [car p]]]]
-    [def cadr [λ* [p]
-        "[car [cdr p]]"
-        [car [cdr p]]]]
-    [def cdar [λ* [p]
-        "[cdr [car p]]"
-        [cdr [car p]]]]
-    [def cddr [λ* [p]
-        "[cdr [cdr p]]"
-        [cdr [cdr p]]]]
-    [def caddr [λ* [p]
-        "[car [cdr [cdr p]]]"
-        [car [cdr [cdr p]]]]]
-    [def cdddr [λ* [p]
-        "[cdr [cdr [cdr p]]]"
-        [cdr [cdr [cdr p]]]]]
-    [def cadddr [λ* [p]
-        "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr p]]]]]]][do [def test-context "Nujel"]
-    [def test-run #nil]
-    [def test-add #nil]
-    [def test-run-verbose #nil]
-    [let* [def test-list #nil] [def test-count 0] [def nujel-start 0] [def success-count 0] [def error-count 0] [def print-errors #t] [def print-passes #f] [set! test-add [λ [result @...expr]
-       "Add a test where ...EXPR must eval to RESULT"
-       [set! test-list [cons [cons result [cons 'do @...expr]] test-list]]
-       [set! test-count [+ test-count 1]]]] [def display-results [λ []
-       "Prints the result Message"
-       [error [cat test-context " [" [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
-          [ansi-rainbow "Everything is working, very nice!"]
-          [ansi-red "Better fix those!"]] "\n"]]]] [def test-success [λ [res-should res-is expr i]
-       "Should be called after a test has finished successfully"
-       [when print-passes
-             [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-green "[PASS] -> "] [ansi-green [str/write res-is]] " != " [ansi-green [str/write res-should]] "\n" [str/write expr] "\n\n"]]]
-       [set! success-count [++ success-count]]]] [def test-failure [λ [res-should res-is expr i]
-       "Should be called if EXPR does not equal RES"
-       [when print-errors
-             [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-red "[FAIL] -> "] [ansi-red [str/write res-is]] " != " [ansi-green [str/write res-should]] "\n" [str/write expr] "\n\n"]]]
-       [set! error-count [++ error-count]]]] [def test [λ [result rawexpr i]
-       "Tests that RAWEXPR evaluates to RESULT"
-       [def expr [eval rawexpr]]
-       [when [string? result]
-             [set! expr [str/write expr]]]
-       [[if [eq? result expr]
-          test-success
-          test-failure] result expr rawexpr i]]] [def test-run-iter [λ [l i]
-       "Recurse through LIST and runs eatch test"
-       [cond [[nil? l] #t]
-             [#t [test [caar l] [cdar l] i] [test-run-iter [cdr l] [- i 1]]]]]] [def test-run-real [λ []
-       [set! nujel-start [time/milliseconds]]
-       [set! success-count 0]
-       [set! error-count 0]
-       [test-run-iter test-list test-count]
-       [display-results]
-       [when [> error-count 0]
-             [display-errors]
-             [display-results]]
-       error-count]] [set! test-run [λ []
-       "Run through all automated Tests"
-       [set! print-errors #t]
-       [set! print-passes #f]
-       [test-run-real]]] [set! test-run-verbose [λ []
-       "Run through all automated Tests"
-       [set! print-errors #t]
-       [set! print-passes #t]
-       [test-run-real]]]]
-    #nil][do [def ansi-fg [arr "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]]
-    [def ansi-reset "\e[0m"]
-    [def ansi-wrap [λ* [code string]
-        "Wrap STRING in the ansi color CODE"
-        [cat [ansi-fg code] string ansi-reset]]]
-    [def ansi-black [λ* [...args]
-        "Wrap ARGS in black"
-        [ansi-wrap 0 [apply cat ...args]]]]
-    [def ansi-dark-red [λ* [...args]
-        "Wrap ARGS in dark red"
-        [ansi-wrap 1 [apply cat ...args]]]]
-    [def ansi-dark-green [λ* [...args]
-        "Wrap ARGS in dark green"
-        [ansi-wrap 2 [apply cat ...args]]]]
-    [def ansi-brown [λ* [...args]
-        "Wrap ARGS in brown"
-        [ansi-wrap 3 [apply cat ...args]]]]
-    [def ansi-dark-blue [λ* [...args]
-        "Wrap ARGS in dark blue"
-        [ansi-wrap 4 [apply cat ...args]]]]
-    [def ansi-purple [λ* [...args]
-        "Wrap ARGS in purple"
-        [ansi-wrap 5 [apply cat ...args]]]]
-    [def ansi-teal [λ* [...args]
-        "Wrap ARGS in teal"
-        [ansi-wrap 6 [apply cat ...args]]]]
-    [def ansi-dark-gray [λ* [...args]
-        "Wrap ARGS in dark gray"
-        [ansi-wrap 7 [apply cat ...args]]]]
-    [def ansi-gray [λ* [...args]
-        "Wrap ARGS in gray"
-        [ansi-wrap 8 [apply cat ...args]]]]
-    [def ansi-red [λ* [...args]
-        "Wrap ARGS in red"
-        [ansi-wrap 9 [apply cat ...args]]]]
-    [def ansi-green [λ* [...args]
-        "Wrap ARGS in green"
-        [ansi-wrap 10 [apply cat ...args]]]]
-    [def ansi-yellow [λ* [...args]
-        "Wrap ARGS in yellow"
-        [ansi-wrap 11 [apply cat ...args]]]]
-    [def ansi-blue [λ* [...args]
-        "Wrap ARGS in blue"
-        [ansi-wrap 12 [apply cat ...args]]]]
-    [def ansi-pink [λ* [...args]
-        "Wrap ARGS in pink"
-        [ansi-wrap 13 [apply cat ...args]]]]
-    [def ansi-cyan [λ* [...args]
-        "Wrap ARGS in cyan"
-        [ansi-wrap 14 [apply cat ...args]]]]
-    [def ansi-white [λ* [...args]
-        "Wrap ARGS in white"
-        [ansi-wrap 15 [apply cat ...args]]]]
-    [def ansi-rainbow [λ* [...args]
-        "Wrap ARGS in the colors of the rainbow!"
-        [let* [def count 0] [join [map [λ [a]
-           [set! count [logand [+ 1 count] 7]]
-           [ansi-wrap [if [zero? count]
-              7
-              [+ count 8]] a]] [split [apply cat ...args] ""]] ""]]]]][do [def yield-queue [cons "Start of Yield Queue"]]
-    [def yield [λ* [pred expr]
-        "Evaluates EXPR once PRED is true"
-        [do [set-cdr! [last-pair yield-queue] [cons [cons pred expr]]]
-           #t]]]
-    [def yield-run [let* [def yield-try [λ [l]
-       [cond [[eval [car l]] [eval [cdr l]] #t]
-             [#t #f]]]] [def yield-run-iter [λ [l]
-       [cond [[nil? l] #t]
-             [[nil? [cdr l]] #t]
-             [[yield-try [cadr l]] [set-cdr! l [cddr l]] [yield-run-iter l]]
-             [#t [yield-run-iter [cdr l]]]]]] [λ []
-       "Executes pending coroutines if their predicate evaluates to #t"
-       [yield-run-iter yield-queue]]]]
-    [def timeout [λ* [milliseconds]
-        "Returns a function that evaluates to true once MILLISECONDS have passed"
-        [do [def goal [+ [time/milliseconds] milliseconds]]
-           [λ* []
-               ""
-               [> [time/milliseconds] goal]]]]]
-    [def event-bind [λ* [event-name handler]
-        "Binds handler lambda to event-name"
-        [set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]]]
-    [def event-clear [λ* [event-name]
-        "Clears all event handlers for event-name"
-        [set! [str->sym event-name] '[]]]]
-    [def event-fire-iter [λ* [l v]
-        "Iter for event-fire"
-        [cond [[nil? l] #t]
-              [#t [apply [car l] v] [event-fire-iter [cdr l] v]]]]]
-    [def event-fire [λ* [event-name ...val]
-        "Applies ...val to all event handlers associated with event-name"
-        [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def length [λ* [a]
-        "Returns the length of a"
-        [cond [[string? a] [str/length a]]
+; Contains native nujel implementations of some
+; core language constructs and essential macros
+
+[def not [λ [v]
+	"Return true if V is false"
+	[if v #f #t]
+]]
+
+[def list [λ [...arguments]
+	"Return ARGUMENTS as a list"
+	...arguments
+]]
+
+[def default [λ [arg default-value]
+	"Returns ARG or DEFAULT-VALUE if ARG is #nil"
+	[if arg arg default-value]
+]]
+
+[def caar [λ [p]
+	"[car [car p]]"
+	[car [car p]]
+]]
+
+[def cadr [λ [p]
+	"[car [cdr p]]"
+	[car [cdr p]]
+]]
+
+[def cdar [λ [p]
+	"[cdr [car p]]"
+	[cdr [car p]]
+]]
+
+[def cddr [λ [p]
+	"[cdr [cdr p]]"
+	[cdr [cdr p]]
+]]
+
+[def caddr [λ [p]
+	"[car [cdr [cdr p]]]"
+	[car [cdr [cdr p]]]
+]]
+
+[def cdddr [λ [p]
+	"[cdr [cdr [cdr p]]]"
+	[cdr [cdr [cdr p]]]
+]]
+
+[def cadddr [λ [p]
+	"[car [cdr [cdr [cdr p]]]]"
+	[car [cdr [cdr [cdr p]]]]
+]]
+[def test-context "Nujel"]
+
+[def test-run]
+[def test-add]
+[def test-run-verbose]
+[def test-list #nil]
+[def test-count 0]
+[let*
+	[def nujel-start    0]
+	[def success-count  0]
+	[def error-count    0]
+	[def print-errors  #t]
+	[def print-passes  #f]
+
+	[set! test-add [λ [result @...expr]
+		"Add a test where ...EXPR must eval to RESULT"
+		[print [str/write @...expr]]
+		[print "\n"]
+		[set! test-list [cons [cons result [cons 'do @...expr]] test-list]]
+		[set! test-count [+ test-count 1]]
+	]]
+	[def display-results [λ []
+		"Prints the result Message"
+		[error [cat test-context
+			        " ["
+			        [ansi-green success-count]
+			        " / "
+			        [ansi-red error-count]
+			        "] in "
+			        [- [time/milliseconds] nujel-start]
+			        "ms - "
+			        [if [zero? error-count]
+			            [ansi-rainbow "Everything is working, very nice!"]
+			            [ansi-red "Better fix those!"]]
+			        "\n"]]
+	]]
+	[def test-success [λ [res-should res-is expr i]
+		"Should be called after a test has finished successfully"
+		[when print-passes [error [cat "stdlib/tests.nuj:" i ":1: "
+		            [ansi-green "[PASS] -> "]
+				    [ansi-green [str/write res-is]]
+				    " != "
+				    [ansi-green [str/write res-should]]
+				    "\n"
+				    [str/write expr]
+				    "\n\n"]]]
+		[set! success-count [++ success-count]]
+	]]
+	[def test-failure [λ [res-should res-is expr i]
+		"Should be called if EXPR does not equal RES"
+		[when print-errors [error [cat "stdlib/tests.nuj:" i ":1: "
+		            [ansi-red "[FAIL] -> "]
+				    [ansi-red [str/write res-is]]
+				    " != "
+				    [ansi-green [str/write res-should]]
+				    "\n"
+				    [str/write expr]
+				    "\n\n"]]]
+		[set! error-count [++ error-count]]
+	]]
+	[def test [λ [result rawexpr i]
+		"Tests that RAWEXPR evaluates to RESULT"
+		[def expr [eval rawexpr]]
+		[def pred? eq?]
+		[when [string? result]
+		      [set! expr [str/write expr]]]
+		[when [pair? result]
+		      [set! pred? list-equal?]]
+		[[if [pred? result expr] test-success test-failure] result expr rawexpr i]
+	]]
+	[def test-run-iter [λ [l i]
+		"Recurse through LIST and runs eatch test"
+		[cond [[nil? l] #t]
+		       [#t [test [caar l] [cdar l] i]
+		           [test-run-iter [cdr l] [- i 1]]]]
+	]]
+	[def test-run-real [λ []
+		[set! nujel-start    [time/milliseconds]]
+		[set! success-count  0]
+		[set! error-count    0]
+		[test-run-iter test-list test-count]
+		[display-results]
+		[when [> error-count 0]
+		      [display-errors]
+			  [display-results]]
+		error-count
+	]]
+	[set! test-run [λ [] "Run through all automated Tests"
+		[set! print-errors  #t]
+		[set! print-passes  #f]
+		[test-run-real]
+	]]
+	[set! test-run-verbose [λ [] "Run through all automated Tests"
+		[set! print-errors  #t]
+		[set! print-passes  #t]
+		[test-run-real]
+	]]
+]
+
+; [error"Evaluating comments is a terrible Idea!"] [newline] [quit 2]
+;; This File contains various functions generating ansi escape sequences for colorful output
+
+[def ansi-fg #[
+	"\e[0;30m"
+	"\e[0;31m"
+	"\e[0;32m"
+	"\e[0;33m"
+	"\e[0;34m"
+	"\e[0;35m"
+	"\e[0;36m"
+	"\e[0;37m"
+	"\e[1;30m"
+	"\e[1;31m"
+	"\e[1;32m"
+	"\e[1;33m"
+	"\e[1;34m"
+	"\e[1;35m"
+	"\e[1;36m"
+	"\e[1;37m"
+]]
+[def ansi-reset "\e[0m"]
+
+[def ansi-wrap [λ [code string]
+	"Wrap STRING in the ansi color CODE"
+	[cat [ansi-fg code] string ansi-reset]
+]]
+
+[def ansi-black [λ [...args]
+	"Wrap ARGS in black"
+	[ansi-wrap 0 [apply cat ...args]]
+]]
+
+[def ansi-dark-red [λ [...args]
+	"Wrap ARGS in dark red"
+	[ansi-wrap 1 [apply cat ...args]]
+]]
+[def ansi-dark-green [λ [...args]
+	"Wrap ARGS in dark green"
+	[ansi-wrap 2 [apply cat ...args]]
+]]
+
+[def ansi-brown [λ [...args]
+	"Wrap ARGS in brown"
+	[ansi-wrap 3 [apply cat ...args]]
+]]
+
+[def ansi-dark-blue [λ [...args]
+	"Wrap ARGS in dark blue"
+	[ansi-wrap 4 [apply cat ...args]]
+]]
+
+[def ansi-purple [λ [...args]
+	"Wrap ARGS in purple"
+	[ansi-wrap 5 [apply cat ...args]]
+]]
+
+[def ansi-teal [λ [...args]
+	"Wrap ARGS in teal"
+	[ansi-wrap 6 [apply cat ...args]]
+]]
+
+[def ansi-dark-gray [λ [...args]
+	"Wrap ARGS in dark gray"
+	[ansi-wrap 7 [apply cat ...args]]
+]]
+
+[def ansi-gray [λ [...args]
+	"Wrap ARGS in gray"
+	[ansi-wrap 8 [apply cat ...args]]
+]]
+
+[def ansi-red [λ [...args]
+	"Wrap ARGS in red"
+	[ansi-wrap 9 [apply cat ...args]]
+]]
+
+[def ansi-green [λ [...args]
+	"Wrap ARGS in green"
+	[ansi-wrap 10 [apply cat ...args]]
+]]
+
+[def ansi-yellow [λ [...args]
+	"Wrap ARGS in yellow"
+	[ansi-wrap 11 [apply cat ...args]]
+]]
+
+[def ansi-blue [λ [...args]
+	"Wrap ARGS in blue"
+	[ansi-wrap 12 [apply cat ...args]]
+]]
+
+[def ansi-pink [λ [...args]
+	"Wrap ARGS in pink"
+	[ansi-wrap 13 [apply cat ...args]]
+]]
+
+[def ansi-cyan [λ [...args]
+	"Wrap ARGS in cyan"
+	[ansi-wrap 14 [apply cat ...args]]
+]]
+
+[def ansi-white [λ [...args]
+	"Wrap ARGS in white"
+	[ansi-wrap 15 [apply cat ...args]]
+]]
+
+[def ansi-rainbow [λ [...args]
+	"Wrap ARGS in the colors of the rainbow!"
+	[let* [def count 0]
+	      [join [map
+			[λ [a]
+				[set! count [logand [+ 1 count] #x7]]
+				[ansi-wrap [if [zero? count] 7 [+ count 8]] a]
+			]
+			[split [apply cat ...args] ""]]
+		""]
+	]
+]]
+;; Contains everything related to the yield/coroutine system
+
+[def yield-queue #nil]
+
+[def yield [λ [pred fun] "Evaluates FUN once PRED is true"
+	[set! yield-queue [cons [cons pred fun] yield-queue]]
+	#t
+]]
+
+[def yield-run [let*
+	[λ [] "Executes pending coroutines if their predicate evaluates to #t"
+		[def l yield-queue]
+		[def new #nil]
+		[def cur #nil]
+		[set! yield-queue #nil]
+		[while l
+		       [set! cur [car l]]
+		       [if [[car cur]]
+			   [[cdr cur]]
+			   [set! yield-queue [cons cur yield-queue]]]
+		       [set! l [cdr l]]
+		]
+	]
+]]
+
+[def timeout [λ [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed"
+	[def goal [+ [time/milliseconds] milliseconds]]
+	[λ [] [> [time/milliseconds] goal]]
+]]
+
+[def event-bind [λ [event-name handler] "Binds handler lambda to event-name"
+	[set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]
+]]
+
+[def event-clear [λ [event-name] "Clears all event handlers for event-name"
+	[set! [str->sym event-name] '[]]
+]]
+
+[def event-fire-iter [λ [l v] "Iter for event-fire"
+	[cond [[nil? l] #t]
+	      [#t [apply [car l] v] [event-fire-iter [cdr l] v]]
+	]
+]]
+
+[def event-fire [λ [event-name ...val] "Applies ...val to all event handlers associated with event-name"
+	[event-fire-iter [resolve [str->sym event-name]] ...val]
+]]
+;; Contains various little pieces that were implemented in nujel instead of
+;; C because of various reasons
+
+[def length [λ [a]
+	"Returns the length of a"
+	[cond [[string? a] [str/length a]]
               [[pair? a] [list-length a]]
-              [#t 0]]]]
-    [def describe [let* [def describe-fun [λ [fun]
-       [def doc [cl-doc fun]]
-       [cat [str/write [car doc]] " - " [cdr doc]]]] [def describe-string [λ [a]
-       [describe-fun [resolve [str->sym a]]]]] [λ [fun]
-       "Describe FUN, if there is documentation available"
-       [if [string? fun]
-          [describe-string fun]
-          [describe-fun fun]]]]]
-    [def display [λ* [value]
-        "Display VALUE"
-        [print value]]]
-    [def newline [λ* []
-        "Print a single line feed character"
-        [display "\n"]]]
-    [def arr-fill! [λ* [a v i]
-        "Fills array a with value v"
-        [cond [[>= [int i] [arr-length a]] a]
-              [#t [arr-set! a [int i] v] [arr-fill! a v [++ i]]]]]]
-    [def lognand [λ* [...l]
-        "Returns the Nand of its arguments"
-        [lognot [apply logand ...l]]]]
-    [def mem [λ* []
-        "Return some pretty printed memory usage information"
-        [let* [def info [memory-info]] [cat [ansi-white "Memory Info"] "\n" [ansi-green "Values:   "] [getf info :value] "\n" [ansi-blue "Closures: "] [getf info :closure] "\n" [ansi-red "Arrays:   "] [getf info :array] "\n" [ansi-yellow "STrings:  "] [getf info :string] "\n" [ansi-cyan "NFunc:    "] [getf info :native-function] "\n" [ansi-purple "Vectors:  "] [getf info :vector] "\n" [ansi-pink "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]]]]]
-    [def wrap-value [λ* [val min max]
-        "Constrains VAL to be within MIN and MAX, wrapping it around"
-        [+ min [% [- val min] [- max min]]]]]][do [def except-last-pair [let* [def iter [λ [list rest]
-       [if [nil? [cdr list]]
-          [reverse rest]
-          [iter [cdr list] [cons [car list] rest]]]]] [λ [list]
-       "Return a copy of LIST without the last pair"
-       [iter list #nil]]]]
-    [def last-pair [λ* [list]
-        "Return the last pair of l"
-        [if [cdr list]
-           [last-pair [cdr list]]
-           list]]]
-    [def make-list [let* [def iter [λ [number value l]
-       [if [<= number 0]
-          l
-          [iter [- number 1] value [cons value l]]]]] [λ [number value]
-       "Return a list of NUMBER elements containing VALUE in every car"
-       [iter number value #nil]]]]
-    [def reduce [λ* [o l s]
-        "Combine all elements in l using operation o and starting value s"
-        [if [nil? l]
-           s
-           [reduce o [cdr l] [o s [car l]]]]]]
-    [def list-ref [λ* [l i]
-        "Returns the the element of list l at location i"
-        [cond [[nil? l] #nil]
-              [[<= i 0] [car l]]
-              [#t [list-ref [cdr l] [-- i]]]]]]
-    [def join [let* [def iter [λ [str l glue]
-       [cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
-             [#t [iter [cat str [car l] glue] [cdr l] glue]]]]] [λ [l glue]
-       "Join LIST into a string with GLUE in between each element"
-       [iter "" l [string glue]]]]]
-    [def split [let* [def iter [λ [str separator separator-len start slen]
-       [let* [def pos [index-of str separator start]] [if [and [>= pos start] [< pos slen]]
-          [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
-          [cons [substr str start slen]]]]]] [λ [str separator]
-       "Split STR on every SEPARATOR"
-       [iter str separator [max 1 [str/length separator]] 0 [str/length str]]]]]
-    [def reverse [λ* [l r]
-        "Return the list l in reverse order"
-        [if [nil? l]
-           r
-           [reverse [cdr l] [cons [car l] r]]]]]
-    [def list-length [λ* [a t]
-        "Returns the length of list a"
-        [if [nil? a]
-           t
-           [list-length [cdr a] [++ t]]]]]
-    [def filter [λ* [p l]
-        "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-        [cond [[nil? l] #nil]
-              [[p [car l]] [cons [car l] [filter p [cdr l]]]]
-              [#t [filter p [cdr l]]]]]]
-    [def map [λ* [f l]
-        "Runs f over every item in list l and returns the resulting list"
-        [if [nil? l]
-           l
-           [cons [f [car l]] [map f [cdr l]]]]]]
-    [def append [let* [def iter [λ [a b]
-       [if [nil? a]
-          b
-          [iter [cdr a] [cons [car a] b]]]]] [λ [a b]
-       "Appends to two lists a and b together"
-       [iter [reverse a] b]]]]
-    [def sublist [λ* [l start end ret]
-        "Returns a new list containing all elements of l from start to end"
-        [cond [[nil? l] [reverse ret]]
-              [[neg? end] [sublist l start [+ [length l] end]]]
-              [[zero? end] [reverse ret]]
-              [[> start 0] [sublist [cdr l] [-- start] [-- end] #nil]]
-              [[> end 0] [sublist [cdr l] 0 [-- end] [cons [car l] ret]]]]]]
-    [def list-head [λ* [l k]
-        "Returns the first k elemnts of list l"
-        [sublist l 0 k]]]
-    [def list-tail [λ* [l k]
-        "Returns the sublist of l obtained by omitting the first l elements"
-        [sublist l k [length l]]]]
-    [def member [λ* [m l]
-        "Returns the first pair of list l whose car is equal to m"
-        [cond [[nil? l] #f]
-              [[eq? [car l] m] l]
-              [#t [member m [cdr l]]]]]]
-    [def delete [λ* [e l]
-        "Returns a filtered list l with all elements equal to e omitted"
-        [filter [λ [a]
-           [not [eq? a e]]] l]]]
-    [def arg-list [λ* [f]
-        "Return the Argument list of f which can be a Native Function or a Lambda"
-        [cond [[lambda? f] [reduce cat [map [λ [a]
-                 [" " [car a]]] [cl-data f]]]]
-              [[native? f] [reduce cat [map [λ [a]
-                 [" " a]] [car [cl-data f]]]]]
-              [#t ""]]]]
-    [def getf [let* [λ [l key]
-       "Return the value in LIST following KEY"
-       [cond [[nil? l] #nil]
-             [[eq? key [car l]] [cadr l]]
-             [#t [getf [cdr l] key]]]]]]][do [def PI 3.14159]
-    [def π 3.14159]
-    [def ++ [λ* [i]
-        "Increment I by 1"
-        [+ 1 i]]]
-    [def -- [λ* [i]
-        "Decrement I by 1"
-        [+ -1 i]]]
-    [def >> [λ* [val amount]
-        "Shifts VAL by AMOUNT bits to the right"
-        [ash val [- amount]]]]
-    [def min [let* [def iter [λ [a l]
-       [cond [[nil? l] a]
-             [[< a [car l]] [iter a [cdr l]]]
-             [#t [iter [car l] [cdr l]]]]]] [λ [...l]
-       "Returns the minimum value of its arguments"
-       [cond [[nil? ...l] 0]
-             [[nil? [cdr ...l]] [car ...l]]
-             [#t [iter [car ...l] [cdr ...l]]]]]]]
-    [def max [let* [def iter [λ [a l]
-       [cond [[nil? l] a]
-             [[> a [car l]] [iter a [cdr l]]]
-             [#t [iter [car l] [cdr l]]]]]] [λ [...l]
-       "Returns the maximum value of its arguments"
-       [cond [[nil? ...l] 0]
-             [[nil? [cdr ...l]] [car ...l]]
-             [#t [iter [car ...l] [cdr ...l]]]]]]]
-    [def fib [λ* [i]
-        "Terribly inefficient, but useful for testing the GC"
-        [if [< i 2]
-           i
-           [+ [fib [- i 2]] [fib [- i 1]]]]]]][do [def number? [λ* [a]
-        "Return #t if a is a number"
-        [or [int? a] [float? a] [vec? a]]]]
-    [def empty? [λ* [a]
-        "Return #t if a is empty"
-        [nil? a]]]
-    [def last? [λ* [a]
-        "Return #t if a is the last pair in a list"
-        [nil? [cdr a]]]]
-    [def pos? [λ* [a]
-        "Return #t if a is positive"
-        [>= a 0]]]
-    [def zn? [λ* [a]
-        "Return #t if a is zero or negative"
-        [<= a 0]]]
-    [def neg? [λ* [a]
-        "Returns #t if a is negative"
-        [< a 0]]]
-    [def ineq? [λ* [a b]
-        "Returns #t a does not equal b"
-        [not [eq? a b]]]]
-    [def odd? [λ* [a]
-        "Predicate that returns #t if a is odd"
-        [= [% [int a] 2] 1]]]
-    [def even? [λ* [a]
-        "Predicate that returns #t if a is even"
-        [= [% [int a] 2] 0]]]
-    [def zero? [λ* [val]
-        "#t if VAL is a integer"
-        [eq? 0 val]]]
-    [def list-equal? [λ* [a b]
-        "#t if A and B are equal"
-        [cond [[or [nil? a] [nil? b]] [and [nil? a] [nil? b]]]
-              [[or [nil? [car a]] [nil? [car b]]] [and [nil? [car a]] [nil? [car b]]]]
-              [[and [pair? [car a]] [pair? [car b]]] [if [list-equal? [car a] [car b]]
-                 [list-equal? [cdr a] [cdr b]]
-                 #f]]
-              [[equal? [type-of [car a]] [type-of [car b]]] [if [equal? [car a] [car b]]
-                 [list-equal? [cdr a] [cdr b]]
-                 #f]]
-              [#t #f]]]]
-    [def there-exists? [λ* [l pred]
-        "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
-        [cond [[nil? l] #f]
-              [[pred [car l]] #t]
-              [#t [there-exists? [cdr l] pred]]]]]
-    [def for-all? [λ* [l pred]
-        "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
-        [cond [[nil? l] #t]
-              [[not [pred [car l]]] #f]
-              [#t [for-all? [cdr l] pred]]]]]
-    [def int? [λ* [val]
-        "#t if VAL is a integer"
-        [eq? :int [type-of val]]]]
-    [def float? [λ* [val]
-        "#t if VAL is a floating-point number"
-        [eq? :float [type-of val]]]]
-    [def vec? [λ* [val]
-        "#t if VAL is a vector"
-        [eq? :vec [type-of val]]]]
-    [def bool? [λ* [val]
-        "#t if VAL is a boolean"
-        [eq? :bool [type-of val]]]]
-    [def inf? [λ* [val]
-        "#t if VAL is infinite"
-        [eq? :infinity [type-of val]]]]
-    [def pair? [λ* [val]
-        "#t if VAL is a pair"
-        [eq? :pair [type-of val]]]]
-    [def string? [λ* [val]
-        "#t if VAL is a string"
-        [eq? :string [type-of val]]]]
-    [def symbol? [λ* [val]
-        "#t if VAL is a symbol"
-        [eq? :symbol [type-of val]]]]
-    [def lambda? [λ* [val]
-        "#t if VAL is a lambda"
-        [eq? :lambda [type-of val]]]]
-    [def native? [λ* [val]
-        "#t if VAL is a native function"
-        [eq? :native-function [type-of val]]]]
-    [def procedure? [λ* [val]
-        "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val]]]]][do [def br [λ* [num]
-        "Return NUM=1 linebreaks"
-        [if [or [nil? num] [<= [int num] 1]]
-           "\n"
-           ["\n" [br [-- num]]]]]]
-    [def path/without-extension [λ* [path]
-        "Return PATH, but without the fileextension part"
-        [do [def last-period [str/last-index-of path "."]]
-           [if [>= last-period 0]
-              [str/substr path 0 last-period]
-              path]]]]][do [test-add 1073741824 [ash 1 30]]
-    [test-add 2147483647 [lognot [ash 1 31]]]
-    [test-add 39 [+ 42 [- 3]]]
-    [test-add 24 [* 4 [- [+ 1 [+ 1 1]] [- 3 3 3]]]]
-    [test-add 3 [div 9 3]]
-    [test-add 3 [let [[vier -4]]
-         [+ [% 9 4] [/ -9 vier]]]]
-    [test-add 69 [+ [* 2 [/ 32 8] [- 16 8]] 5]]
-    [test-add 3 [define eins 1] [define zwei 2] [+ eins zwei]]
-    [test-add -3 [define eins 1] [define zwei 2] [define drei [+ eins zwei]] [set! eins [- drei drei drei]]]
-    [test-add 128 [define zahl 128] zahl]
-    [test-add 10 [let [[a 10]]
-         a]]
-    [test-add 20 [define b 20] [let [[a b]]
-         a]]
-    [test-add 10 [define b 20] [let [[a b]]
-         [set! a 10]
-         a]]
-    [test-add 20 [define b 20] [let [[a b]]
-         [set! a 10]
-         b]]
-    [test-add 42 [let [[a 12] [b 30]]
-         [+ a b]]]
-    [test-add 16 [define square [lambda [a] [* a a]]] [square 4]]
-    [test-add 0 [- -1 -1]]
-    [test-add #t [or #f [and [> 5 1] [not [< 5 1]] [>= 5 5] [<= 5 5]]]]
-    [test-add #t [and [= #t #t] [= #f #f] [not [= #f #t]] [= 2 2]]]
-    [test-add 11 [length "Hallo, Welt"]]
-    [test-add #t [number? 0.1]]
-    [test-add 14 [define abs [lambda [a] [if [neg? a]
-       [- 0 a]
-       a]]] [+ [abs -7] [abs 7]]]
-    [test-add #t [and [or #f #t] [and #t #t]]]
-    [test-add #t [and [neg? -1] [neg? -0.01] [pos? 0] [pos? 0.01] [not [neg? 0]] [not [pos? -0.01]] [not [neg? #f]]]]
-    [test-add #t [and [number? 1] [number? -1] [number? 0] [number? 0.1]]]
-    [test-add #t [and [number? [vec 1]] [not [number? #f]] [not [number? "123"]]]]
-    [test-add #t [and [number? 1] [number? -1] [number? 0] [number? 0.1] [number? [vec 1]] [not [number? #f]] [not [number? "123"]]]]
-    [test-add 12340 [- [int [cat 12 "3" "45 Test"]] 5]]
-    [test-add 12340 [let [[a [cat 12 "3" 45]]]
-         [- [int a] [length a]]]]
-    [test-add 123 [int [cat "123" "abc" 456]]]
-    [test-add 28 [+ [int 10] [int 10.23] [int "8"]]]
-    [test-add #t [and [not [< 3 2]] [zero? 0] [> 3.1 2.1] [> 3 2] [>= 4 "3"] [>= 3 3] [<= 3 3] [not [>= "2" 3]]]]
-    [test-add 1 [int [float [+ [vec 1] [vec 0 9 9]]]]]
-    [test-add 0 [- #nil]]
-    [test-add #t [and [pair? [cons 1 '[2]]] [not [pair? 1]]]]
-    [test-add 1 [car [cons 1 '[2]]]]
-    [test-add 2 [+ [cadr '[1 2]] [cadr #nil] [cadr '[1]]]]
-    [test-add #t [string? [describe "++"]]]
-    [test-add 3 [++ [-- [length '[1 2 3]]]]]
-    [test-add #t [and [for-all? '[1 2 3] int?] [not [for-all? '[1 2 3.0] int?]]]]
-    [test-add #t [and [there-exists? '[1.0 2 3.0] int?] [not [there-exists? '[1.0 2.0 3.0] int?]]]]
-    [test-add #t [and [eq? "asd" "asd"] [not [eq? "asd" "bsd"]] [not [eq? "asd" "asdasd"]]]]
-    [test-add 23 [+ [reduce + [make-list 10 2] 0] [list-ref '[1 2 3 4] 1] [list-ref '[1 2] 0] [list-ref '[1 2] 3]]]
-    [test-add #t [and [nil? #nil] [not [nil? "NotNil"] [inf? #inf] [not [inf? "NotInf"] [vec? [vec 1]] [not [inf? "NotVec"]]]]]]
-    [test-add 11 [define count [let [[a 0]]
-         [lambda [b] [set! a [+ a [cond [[number? b] b]
-               [#t 1]]]]]]] [count 10] [count]]
-    [test-add 4 [let [[a 10]]
-         [when [when #t
-                     [set! a [+ 2 "2"]]
-                     #f]
-               [set! a -1]]
-         a]]
-    [test-add 6 [eval '[+ 1 2 3]]]
-    [test-add 4 [arr-length [arr 1 2 3 4]]]
-    [test-add 2 [arr-ref [arr 1 2 3 4] 1]]
-    [test-add 3 [arr-length [arr-new 3]]]
-    [test-add 10 [+ [apply + '[1 2 3]] [apply ++ '[3]]]]
-    [test-add 0 [apply +]]
-    [test-add 0 [define cb '+] [apply cb]]
-    [test-add 1 [define cb '++] [apply cb]]
-    [test-add 5 [length "12345"]]
-    [test-add #f [or 0 0]]
-    [test-add 2 [and 1 2]]
-    [test-add #t [bool [and 1 1]]]
-    [test-add #t [bool 1]]
-    [test-add 6 [[lambda [a] [+ a 4]] 2]]
-    [test-add 2 [define test 1] [define test 2] test]
-    [test-add 0 [max]]
-    [test-add 0 [min]]
-    [test-add 1 [max 1]]
-    [test-add 4 [min 4]]
-    [test-add 4 [min 4 9]]
-    [test-add 9 [max 4 9]]
-    [test-add 25 [max 1 4.0 9 25]]
-    [test-add 25 [max 25 4.0 9 1]]
-    [test-add 1 [min 1 4.0 9 25]]
-    [test-add 1 [min 25 4.0 9 1]]
-    [test-add #t [even? 2]]
-    [test-add #f [even? 9]]
-    [test-add #t [odd? 7]]
-    [test-add #f [odd? 4]]
-    [test-add 256 [int [pow 2 8]]]
-    [test-add #f [undefine! testerle]]
-    [test-add 3 [define ein-test-arr [arr 1 2 3]] [ein-test-arr 2]]
-    [test-add 3 [define ein-test-arr [arr 1 2 3]] [ein-test-arr 2 9] [ein-test-arr 2]]
-    [test-add 123 [define i-assaultmegablaster 123] i-assaultmegablaster]
-    [test-add #t [int? [random]]]
-    [test-add #t [random-seed! 123] [define first-value [random]] [random-seed! 123] [= first-value [random]]]
-    [test-add 1 [define a 1] [unless [= 2 2]
-            [set! a 4]] a]
-    [test-add 4 [define a 1] [unless [= 2 3]
-            [set! a 4]] a]
-    [test-add 4 [define a 1] [when [= 2 2]
-          [set! a 4]] a]
-    [test-add 1 [define a 1] [when [= 2 3]
-          [set! a 4]] a]
-    [test-add 3 [define ein-test-arr [arr 1 2 3]] [ein-test-arr 2.2]]
-    [test-add 123 123]
-    [test-add 6 6]
-    [test-add 10 10]
-    [test-add 15 15]
-    [test-add 192 192]
-    [test-add 255 255]
-    [test-add 255 255]
-    [test-add 160 160]
-    [test-add 31 31]
-    [test-add 31 31]
-    [test-add 50 50]
-    [test-add 256 256]
-    [test-add 0 0]
-    [test-add 7 7]
-    [test-add 0 0]
-    [test-add 10 10]
-    [test-add 26 26]
-    [test-add -1 -1]
-    [test-add -1 -1]
-    [test-add 2 [- [+ 1 2] 1]]
-    [test-add 8 [- [+ 1 8] 1]]
-    [test-add 16 [- [+ 1 16] 1]]
-    [test-add 32 [+ 16 16]]
-    [test-add 16 [+ 16 #f]]
-    [test-add 32 [+ 16 "16"]]
-    [test-add 32 [+ 16 [+ 0 16]]]
-    [test-add 0 [logand 240 15]]
-    [test-add 255 [logior 240 15]]
-    [test-add 255 [logior 255 255]]
-    [test-add 255 [logxor 240 15]]
-    [test-add 240 [logxor 255 15]]
-    [test-add -1 [lognot 0]]
-    [test-add 0 [lognot -1]]
-    [test-add 16 [ash 1 4]]
-    [test-add 65536 [ash 1 16]]
-    [test-add -1 [ash -1 -1]]
-    [test-add -16 [lognand 15 15]]
-    [test-add 6 [eval [read "[+ 1 2 3]"]]]
-    [test-add 3 [let [[test-string "3"]]
-         [read test-string]
-         [read test-string]]]
-    [test-add "[vec 1.0 2.0 3.0]" [abs [vec -1 -2 -3]]]
-    [test-add "3.33333" [+ 1.11111 2.22222]]
-    [test-add "\"H#Hallo\"" [let [[a "Hallo, Welt#"]]
-         [cat [substr a 0 1] [substr a -1] [substr a 0 -7]]]]
-    [test-add "\"Test\"" [define a "Test"] a]
-    [test-add "11.6" [+ [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.2]]]
-    [test-add "20.1" [+ [+ 1.1 3] [+ 1 3.3] [+ 3.3 4.1 4.3]]]
-    [test-add "15.54" [add [mul 3.2 3.2] [sub 5.5 1.1 1 1.1] [div 9.9 3.3]]]
-    [test-add "0.7" [% 10 3.1]]
-    [test-add #t [eq? #inf #inf]]
-    [test-add #inf [+ 1 [div 10 0]]]
-    [test-add "11.7" [add [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.3]]]
-    [test-add "11.75" [+ [float 10] [int "10"] [float "-8.25"]]]
-    [test-add "30.3" [+ [abs "-10"] [int 8.2] 12.3]]
-    [test-add "[vec 12.0 12.0 12.0]" [+ [vec 1] 1 10]]
-    [test-add "[vec 3.0 5.0 6.0]" [+ [vec 1] [vec 1 2] [vec 1 2 3]]]
-    [test-add "[vec 3.0 3.0 3.0]" [+ 1 [vec 1] 1.0]]
-    [test-add "[vec 3.0 3.0 3.0]" [+ 1.0 [vec 1] "1"]]
-    [test-add "[vec -1.0 -1.0 -1.0]" [- [vec 1] [vec 1.0] [vec "1"]]]
-    [test-add "2.7" [+ [- 1 -1.0] [- 5 1.1 1] [- 1 1.1 1] [- 1 1.1 [int "1"]]]]
-    [test-add "[vec 3.0 3.0 3.0]" [+ 1 [vec 1] 1.0]]
-    [test-add "[vec -1.0 -1.0 -1.0]" [- 1 [vec 1] 1.0]]
-    [test-add "[vec 8.0 8.0 8.0]" [* [vec 2] "4"]]
-    [test-add "[vec 1.0 1.0 1.0]" [mod [vec 9] 2]]
-    [test-add "1.0" [float [int [+ [vec 1] [vec 0 9 9]]]]]
-    [test-add "[]" [cons]]
-    [test-add "[1]" [cons 1]]
-    [test-add "[1 . 2]" [cons 1 2]]
-    [test-add "[1 2]" [cons 1 '[2]]]
-    [test-add "[4 3 2 1]" [reverse '[1 2 3 4]]]
-    [test-add "[1 2.0 3 1 2.0 3]" [append '[1 2.0 3] '[1 2.0 3]]]
-    [test-add "[1 4]" [filter int? '[1 2.0 #t 4]]]
-    [test-add "[2.0]" [filter float? '[1 2.0 #t 4]]]
-    [test-add "[2.0]" [filter float? '[1 2.0 #t 4]]]
-    [test-add "[#t]" [filter bool? '[1 2.0 #t 4]]]
-    [test-add "[2 3]" [sublist '[1 2 3 4 5 6] 1 3]]
-    [test-add "[1 2 3]" [list-head '[1 2 3 4 5 6] 3]]
-    [test-add "[4 5 6]" [list-tail [list 1 2 3 4 5 6] 3]]
-    [test-add "[3]" [last-pair [list 1 2 3]]]
-    [test-add "[1 2]" [except-last-pair '[1 2 3]]]
-    [test-add "[1.0 #t \"a\"]" [let [[l '[1.0 #t "a"]]]
-         [append [except-last-pair l] [last-pair l]]]]
-    [test-add "[\"asd\" #t #f]" [member "asd" '[123 456 "asd" #t #f]]]
-    [test-add "[[vec 4.0 4.0 4.0] 9 16.0]" [map [λ [a]
-       [* a a]] [cons [vec 2] '[3 4.0]]]]
-    [test-add "\"11.0\"" [cat 1 1.0]]
-    [test-add "[vec 9.0 9.0 9.0]" [div [vec 99] [cat 1 1.0]]]
-    [test-add "#[99 12 3 4]" [let [[cur-arr [arr 1 2 3 4]]]
-         [arr-set! cur-arr 0 99 12]
-         cur-arr]]
-    [test-add "#[42 42 42 42 42 42]" [arr-fill! [arr-new 6] 42]]
-    [test-add "#nil" [apply #nil]]
-    [test-add "[vec 1.0 3.0 9.0]" [define vs [λ [a]
-       [vec [vec/z a] [vec/y a] [vec/x a]]]] [vs [vec 9 3.0 "1"]]]
-    [test-add "3" [define fib [λ [a]
-       [cond [[zero? a] 0]
-             [[= a 1] 1]
-             [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 4]]
-    [test-add "21" [define fib [λ [a]
-       [cond [[zero? a] 0]
-             [[= a 1] 1]
-             [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 8]]
-    [test-add "102334155" [define fib-iter [λ [a b count]
-       [cond [[= count 0] b]
-             [#t [fib-iter [+ a b] a [- count 1]]]]]] [define fib [λ [n]
-       [fib-iter 1 0 n]]] [fib 40]]
-    [test-add 87654321 [let [[ret ""]]
-         [[λ [a]
-            [cond [[zero? a] [int ret]]
-                  [#t [set! ret [cat ret a]] [[cl-lambda 1] [-- a]]]]] 8]]]
-    [test-add "\"ASD123\"" [str/uppercase "asD123"]]
-    [test-add "\"asd123\"" [str/lowercase "aSD123"]]
-    [test-add "\"Asd123\"" [str/capitalize "aSD123"]]
-    [test-add "[vec 1.0 1.0 1.0]" [floor [vec 1.3 1.3 1.3]]]
-    [test-add "2.0" [ceil 1.3]]
-    [test-add "[vec 2.0 2.0 2.0]" [ceil [vec 1.3 1.3 1.3]]]
-    [test-add "1.0" [round 1.3]]
-    [test-add "2.0" [round 1.51]]
-    [test-add "3.0" [sqrt 9]]
-    [test-add "[vec 5.0 5.0 5.0]" [sqrt [vec 25 25 25]]]
-    [test-add "256.0" [pow 2.0 8]]
-    [test-add "[vec 4.0 8.0 16.0]" [pow 2.0 [vec 2.0 3.0 4.0]]]
-    [test-add "\"123\"" [string 123]]
-    [test-add "\"#t\"" [string #t]]
-    [test-add "#nil" testerle]
-    [test-add ":testerle" :testerle]
-    [test-add :testerle :testerle]
-    [test-add "[:asd qwerty]" [:asd qwerty]]
-    [test-add ":asd" [begin [def :asd #t] :asd]]
-    [test-add "#nil" [define testerle 123] [undefine! testerle] testerle]
-    [test-add "[1 . 2]" [define test [cons 1 2]] test]
-    [test-add "\"Eins\"" [define eins [ω [] [define say [λ []
-       "Eins"]]]] [eins [say]]]
-    [test-add "\"Zwei\"" [define eins [ω [] [define say [λ []
-       "Zwei"]]]] [define zwei [eins [ω]]] [zwei [say]]]
-    [test-add "\"Polizei\"" [define eins [ω [] [define say [λ []
-       "Eins"]]]] [define zwei [eins [ω]]] [zwei [def say [λ []
-       "Polizei"]]] [zwei [say]]]
-    [test-add "\"asd\"" ["a" "s" "d"]]
-    [test-add "\"a\"" ["a"]]
-    [test-add "#nil" [define testerle [arr 1 2 3]] [testerle 4]]
-    [test-add "#nil" [define testerle [arr 1 2 3]] [testerle 40000]]
-    [test-add "#[1 2 3]" [define testerle [arr 1 2 3]] [testerle]]
-    [test-add "#nil" [define testerle [arr 1 2 3]] [testerle #t]]
-    [test-add "#nil" [define testerle [arr 1 2 3]] [testerle [vec 1 2 3]]]
-    [test-add "\"Trim Test\"" [trim "   Trim Test    \n"]]
-    [test-add "\"1,asd,3.0,#f\"" [join '[1 "asd" 3.0 #f] ","]]
-    [test-add "[1.0 2.0 3.0]" [map float [split "1,2,3" ","]]]
-    [test-add "[\"dies ist\" \"ein\" \"test\"]" [split "dies ist/ein/test" "/"]]
-    [test-add 1 [index-of "1,2,3" ","]]
-    [test-add 291 [read [join [cons "#x" [split "123" ""]]]]]
-    [test-add 7 [char-at "\a" 0]]
-    [test-add 5 [char-at [from-char-code 5 10 20] 0]]
-    [test-add 2600 [int [from-char-code [char-at "2" 0] 54 48 48]]]
-    [test-add #t [eq? 32 32]]
-    [test-add #t [eq? 8 8]]
-    [test-add #t [eq? 9 [char-at "\t" 0]]]
-    [test-add #t [and [eq? 13 13] [eq? 13 13]]]
-    [test-add #t [and [eq? 10 10] [eq? 10 10]]]
-    [test-add 7 [char-at "\a" 0]]
-    [test-add 8 [char-at "\b" 0]]
-    [test-add 27 [char-at "\e" 0]]
-    [test-add 12 [char-at "\f" 0]]
-    [test-add 10 [char-at "\n" 0]]
-    [test-add 13 [char-at "\r" 0]]
-    [test-add 9 [char-at "\t" 0]]
-    [test-add 11 [char-at "\v" 0]]
-    [test-add 39 [char-at "\'" 0]]
-    [test-add 34 [char-at "\"" 0]]
-    [test-add #t [> [symbol-count] 200]]
-    [test-add #t [pair? [symbol-table]]]
-    [test-add #t [equal? + add]]
-    [test-add #t [eq? min min]]
-    [test-add #t [let [[some-value #f]]
-         [not some-value]]]
-    [test-add 4 [>> 8 1]]
-    [test-add 15 [1 + 2 * [3 + 4]]]
-    [test-add "#inf" [% 4 0]]
-    [test-add 9 [10 - 1]]
-    [test-add 5 [10 / 2]]
-    [test-add 256 [1 << 8]]
-    [test-add #t [eq? :asd :asd]]
-    [test-add #t [eq? :bool [type-of #f]]]
-    [test-add #t [eq? :int [type-of 123]]]
-    [test-add #f [eq? :int [type-of 123.123]]]
-    [test-add #t [eq? :float [type-of 123.123]]]
-    [test-add #t [eq? :vec [type-of [vec 1]]]]
-    [test-add #t [eq? :native-function [type-of +]]]
-    [test-add #t [eq? :lambda [type-of test-add]]]
-    [test-add #t [eq? :string [type-of "asd"]]]
-    [test-add 2 [getf [list :a 1 :b 2 :c 3] :b]]
-    [test-add "#nil" [getf [list :a 1 :b 2 :c 3] :d]]
-    [test-add "\"\\n\"" "\n"]
-    [test-add "\"\\n\"" [br]]
-    [test-add "\"\\n\\n\\n\"" [br 3]]
-    [test-add :dies-ist-ein-test-ob-lange-sym :dies-ist-ein-test-ob-lange-sym]
-    [test-add #t [eq? [+ 2 2] [2 + 2]]]
-    [test-add #t [eq? 4 [2 + 2]]]
-    [test-add #t [eq? 4 [+ 2 2]]]
-    [test-add :int [type-of [+ 2 2]]]
-    [test-add :int [type-of [2 + 2]]]
-    [test-add :float [type-of [+ 2.0 2.1]]]
-    [test-add :float [type-of [2.0 + 2.1]]]
-    [test-add :float [type-of [+ 2 2.1]]]
-    [test-add :float [type-of [2 + 2.1]]]
-    [test-add -1 [-1]]
-    [test-add -1 [- 1]]
-    [test-add -1 [let [[a 1]]
-         [- a]]]
-    [test-add -1 [let [[a 1]]
-         [[[- a]]]]]
-    [test-add -1 [let [[a 1]]
-         [[- a]]]]
-    [test-add 0 [wrap-value 0 0 2]]
-    [test-add 1 [wrap-value 1 0 2]]
-    [test-add 0 [wrap-value 2 0 2]]
-    [test-add 1 [wrap-value 3 0 2]]
-    [test-add 0 [wrap-value 4 0 2]]
-    [test-add #t [zn? 0]]
-    [test-add #t [zn? -4.0]]
-    [test-add #f [zn? 0.1]]
-    [test-add 0 [let [[tmp [vec 0 0 0]]]
-         [+ tmp [vec 1 1 1]]
-         [vec/y tmp]]]
-    [test-add 0 [let [[tmp 0]]
-         [+ tmp 1]
-         tmp]]
-    [test-add #t [list-equal? '[] '[]]]
-    [test-add #f [list-equal? '[] '[1]]]
-    [test-add #f [list-equal? '[1] '[]]]
-    [test-add #t [list-equal? '[1 "asd"] '[1 "asd"]]]
-    [test-add #f [list-equal? '[1 "asd"] '[1 "as"]]]
-    [test-add #f [list-equal? '[1 :asd] '[1 :as]]]
-    [test-add #t [list-equal? '[1 :asd] '[1 :asd]]]
-    [test-add #t [list-equal? '[1 asd] '[1 asd]]]
-    [test-add #t [list-equal? '[1 #f] '[1 #f]]]
-    [test-add #f [list-equal? '[1 #t] '[1 #f]]]
-    [test-add #t [list-equal? '[1 2 3] '[1 2 3]]]
-    [test-add #f [list-equal? '[1 2 3] '[1 2 4]]]
-    [test-add #f [list-equal? '[1 2 3] '[1 2]]]
-    [test-add #f [list-equal? '[1 2 3] '[1 2 [3 4]]]]
-    [test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
-    [test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
-    [test-add "do" 'do]
-    [test-add "[123]" '[123]]
-    [test-add "[123 #t]" '[123 #t]]
-    [test-add "[123 \'do]" '[123 'do]]
-    [test-add "[123 \"asd\"]" '[123 "asd"]]
-    [test-add 2 [wrap-value 2 2 4]]
-    [test-add 3 [wrap-value 3 2 4]]
-    [test-add 2 [wrap-value 4 2 4]]
-    [test-add 3 [wrap-value 5 2 4]]
-    [test-add #f [and #nil]]
-    [test-add #t [eq? #t #t]]
-    [test-add #f [eq? #t #f]]
-    [test-add #t [eq? #f #f]]
-    [test-add #f [eq? '[] #f]]
-    [test-add #f [eq? #f '[]]]
-    [test-add #f [eq? '[] #t]]
-    [test-add #f [eq? #t '[]]]
-    [test-add #t [eq? '[] '[]]]
-    [test-add #f [eq? '[] '[1]]]
-    [test-add #f [eq? '[1] '[1]]]
-    [test-add #t [list-equal? '[1] '[1]]]
-    [test-add #f [eq? '[] #nil]]
-    [test-add #t [eq? λ [resolve [car '[λ asd]]]]]
-    [test-add 100000 [let []
-         [def i 0]
-         [while [< i 100000] [set! i [++ i]]]]]
-    #nil][do [random-seed [logxor [time] [time/millliseconds]]]
-    [def time/seconds [λ* [timestamp]
-        "Return the seconds part of TIMESTAMP, defaults to current time"
-        [% [default timestamp [time]] 60]]]
-    [def time/minutes [λ* [timestamp]
-        "Return the minutes part of TIMESTAMP, defaults to current time"
-        [% [/ [default timestamp [time]] 60] 60]]]
-    [def time/hours [λ* [timestamp]
-        "Return the hours part of TIMESTAMP, defaults to current time"
-        [% [/ [default timestamp [time]] 3600] 24]]]
-    [def profile [λ* [@...body]
-        ""
-        [do [def form [cons 'do @...body]]
-           [def start-time [time/milliseconds]]
-           [def val [eval form]]
-           [def end-time [time/milliseconds]]
-           [display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]]]]][do [def compile [let* [def compile-do-args [λ [args]
-       [if [nil? [cdr args]]
-          [cons [compile [car args]] #nil]
-          [if [pair? [car args]]
-             [let* [def ocar [compile [car args]]] [if [pair? ocar]
-                [cons ocar [compile-do-args [cdr args]]]
+              [#t 0]
+	]
+]]
+
+[def describe [let*
+	[def describe-fun [λ [fun]
+		[def doc [cl-doc fun]]
+		[cat [str/write [car doc]] " - " [cdr doc]]
+	]]
+
+	[def describe-string [λ [a]
+		[describe-fun [resolve [str->sym a]]]
+	]]
+
+	[λ [fun] "Describe FUN, if there is documentation available"
+	   [if [string? fun]
+	       [describe-string fun]
+	       [describe-fun fun]]
+	]
+]]
+
+[def display [λ [value]
+	"Display VALUE"
+	[print value]
+]]
+
+[def newline [λ []
+	"Print a single line feed character"
+	[display "\n"]
+]]
+
+[def arr-fill! [λ [a v i]
+	"Fills array a with value v"
+	[cond [[>= [int i] [arr-length a]] a]
+	      [#t [arr-set! a [int i] v] [arr-fill! a v [++ i]]]
+	]
+]]
+
+[def lognand [λ [...l]
+	"Returns the Nand of its arguments"
+	[lognot [apply logand ...l]]
+]]
+
+[def mem [λ [] "Return some pretty printed memory usage information"
+	[let* [def info [memory-info]]
+	      [cat
+		[ansi-white  "Memory Info"] "\n"
+		[ansi-green  "Values:   "] [getf info :value] "\n"
+		[ansi-blue   "Closures: "] [getf info :closure] "\n"
+		[ansi-red    "Arrays:   "] [getf info :array] "\n"
+		[ansi-yellow "STrings:  "] [getf info :string] "\n"
+		[ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
+		[ansi-purple "Vectors:  "] [getf info :vector] "\n"
+		[ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
+	      ]
+	]
+]]
+
+[def wrap-value [λ [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
+	[+ min [% [- val min] [- max min]]]
+]]
+; Put all the LISt Processing stuff in here
+
+[def except-last-pair [let*
+	[def iter [λ [list rest]
+                     [if [nil? [cdr list]]
+			 [reverse rest]
+			 [iter [cdr list] [cons [car list] rest]]]
+	]]
+
+	[λ [list]
+		"Return a copy of LIST without the last pair"
+		[iter list #nil]
+	]
+]]
+
+[def last-pair [λ [list]
+	"Return the last pair of l"
+	[if [cdr list]
+	    [last-pair [cdr list]]
+	    list]
+]]
+
+[def make-list [let*
+	[def iter [λ [number value l]
+		     [if [<= number 0]
+			 l
+			 [iter [- number 1] value [cons value l]]]
+	]]
+
+	[λ [number value]
+		"Return a list of NUMBER elements containing VALUE in every car"
+		[iter number value #nil]
+	]
+]]
+
+[def reduce [λ [o l s]
+	"Combine all elements in l using operation o and starting value s"
+	[if [nil? l]
+	    s
+	    [reduce o [cdr l] [o s [car l]]]]
+]]
+
+[def list-ref [λ [l i]
+	"Returns the the element of list l at location i"
+	[cond [[nil? l] #nil]
+	      [[<= i 0] [car l]]
+	      [#t [list-ref [cdr l] [-- i]]]
+	]
+]]
+
+[def join [let*
+	[def iter [λ [str l glue]
+		[cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
+		      [#t [iter [cat str [car l] glue] [cdr l] glue]]
+		]
+	]]
+
+	[λ [l glue]
+		"Join LIST into a string with GLUE in between each element"
+		[iter "" l [string glue]]
+	]
+]]
+
+[def split [let*
+	[def iter [λ [str separator separator-len start slen]
+		    [let*
+			[def pos [index-of str separator start]]
+			[if [and [>= pos start] [< pos slen]]
+			    [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
+			    [cons [substr str start slen]]]
+		]
+	]]
+
+	[λ [str separator]
+		"Split STR on every SEPARATOR"
+		[iter str separator [max 1 [str/length separator]] 0 [str/length str]]
+	]
+]]
+
+[def reverse [λ [l r]
+	"Return the list l in reverse order"
+	[if [nil? l]
+	    r
+	    [reverse [cdr l] [cons [car l] r]]]
+]]
+
+[def list-length [λ [a t]
+	"Returns the length of list a"
+	[if [nil? a]
+	    t
+	    [list-length [cdr a] [++ t]]]
+]]
+
+[def filter [λ [p l]
+	"Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
+	[def ret #nil]
+	[if l
+	    [if [p [car l]]
+		[cons [car l] [filter p [cdr l]]]
+		[filter p [cdr l]]
+	    #nil]]
+]]
+
+[def map [λ [f l]
+	"Runs f over every item in list l and returns the resulting list"
+	[if [nil? l]
+	    l
+	    [cons [f [car l]] [map f [cdr l]]]]
+]]
+
+[def append [let*
+	[def iter [λ [a b]
+		     [if [nil? a]
+			 b
+			 [iter [cdr a] [cons [car a] b]]]
+	]]
+
+	[λ [a b]
+		"Appends to two lists a and b together"
+		[iter [reverse a] b]
+	]
+]]
+
+[def sublist [λ [l start end ret]
+	"Returns a new list containing all elements of l from start to end"
+	[cond [[nil?    l] [reverse ret]]
+	      [[neg?  end] [sublist      l      start  [+ [length l] end]]]
+	      [[zero? end] [reverse ret]]
+	      [[> start 0] [sublist [cdr l] [-- start] [-- end] #nil]]
+	      [[> end   0] [sublist [cdr l] 0          [-- end] [cons [car l] ret]]]
+	]
+]]
+
+[def list-head [λ [l k]
+	"Returns the first k elemnts of list l"
+	[sublist l 0 k]
+]]
+
+[def list-tail [λ [l k]
+	"Returns the sublist of l obtained by omitting the first l elements"
+	[sublist l k [length l]]
+]]
+
+[def member [λ [m l]
+	"Returns the first pair of list l whose car is equal to m"
+	[cond [[nil? l] #f]
+	      [[eq? [car l] m] l]
+	      [#t [member m [cdr l]]]
+	]
+]]
+
+[def delete [λ [e l]
+	"Returns a filtered list l with all elements equal to e omitted"
+	[filter [λ [a] [not [eq? a e]]] l]
+]]
+
+[def arg-list [λ [f]
+	"Return the Argument list of f which can be a Native Function or a Lambda"
+	[cond [[lambda? f] [reduce cat [map [λ [a] [" " [car a]]] [cl-data f]]]]
+	      [[native? f] [reduce cat [map [λ [a] [" " a]] [car [cl-data f]]]]]
+	       [#t ""]
+	]
+]]
+
+[def getf [let*
+	[λ [l key]
+		"Return the value in LIST following KEY"
+		[cond [[nil? l] #nil]
+		      [[eq? key [car l]] [cadr l]]
+		      [#t [getf [cdr l] key]]
+		]
+	]
+]]
+[def PI 3.14159]
+[def π  3.14159]
+
+[def ++ [λ [i]
+	"Increment I by 1"
+	[+  1 i]
+]]
+
+[def -- [λ [i]
+	"Decrement I by 1"
+	[+ -1 i]
+]]
+
+[def >> [λ [val amount]
+	"Shifts VAL by AMOUNT bits to the right"
+	[ash val [- amount]]
+]]
+
+[def min [let*
+	[def iter [λ [a l]
+		[cond [[nil? l] a]
+		      [[< a [car l]] [iter a [cdr l]]]
+		      [#t [iter [car l] [cdr l]]]
+		]
+	]]
+
+	[λ [...l]
+		"Returns the minimum value of its arguments"
+		[cond [[nil? ...l] 0]
+		      [[nil? [cdr ...l]] [car ...l]]
+		      [#t [iter [car ...l] [cdr ...l]]]
+		]
+	]
+]]
+
+[def max [let*
+	[def iter [λ [a l]
+		[cond [[nil? l] a]
+		      [[> a [car l]] [iter a [cdr l]]]
+		      [#t [iter [car l] [cdr l]]]
+		]
+	]]
+
+	[λ [...l]
+		"Returns the maximum value of its arguments"
+		[cond [[nil? ...l] 0]
+		      [[nil? [cdr ...l]] [car ...l]]
+		      [#t [iter [car ...l] [cdr ...l]]]
+		]
+	]
+]]
+
+[def fib [λ [i]
+	   "Terribly inefficient, but useful for testing the GC"
+	   [if [< i 2]
+	       i
+	       [+ [fib [- i 2]] [fib [- i 1]]]]
+]]
+;; Some predicates that were simpler to do in nujel
+
+[def number? [λ [a]
+	"Return #t if a is a number"
+	[or [int? a] [float? a] [vec? a]]
+]]
+
+[def empty? [λ [a]
+	"Return #t if a is empty"
+	[nil? a]
+]]
+
+[def last? [λ [a]
+	"Return #t if a is the last pair in a list"
+	[nil? [cdr a]]
+]]
+
+[def pos? [λ [a]
+	"Return #t if a is positive"
+	[>= a 0]
+]]
+
+[def zn? [λ [a]
+	"Return #t if a is zero or negative"
+	[<= a 0]
+]]
+
+[def neg? [λ [a]
+	"Returns #t if a is negative"
+	[< a 0]
+]]
+
+[def ineq? [λ [a b]
+	"Returns #t a does not equal b"
+	[not [eq? a b]]
+]]
+
+[def odd? [λ [a]
+	"Predicate that returns #t if a is odd"
+	[= [% [int a] 2] 1]
+]]
+[def even? [λ [a]
+	"Predicate that returns #t if a is even"
+	[= [% [int a] 2] 0]
+]]
+
+[def zero? [λ [val]
+	"#t if VAL is a integer"
+	[eq? 0 val]
+]]
+
+[def list-equal? [λ [a b]
+	"#t if A and B are equal"
+	;[display ["A:" a "B:" b "\n"]]
+	[cond [[or [nil? a] [nil? b]]
+	       [and [nil? a] [nil? b]]]
+	      [[or [nil? [car a]] [nil? [car b]]]
+	       [and [nil? [car a]] [nil? [car b]]]]
+	      [[and [pair? [car a]] [pair? [car b]]]
+	       [if [list-equal? [car a] [car b]]
+		   [list-equal? [cdr a] [cdr b]]
+		   #f]]
+	      [[equal? [type-of [car a]] [type-of [car b]]]
+	       [if [equal? [car a] [car b]]
+		   [list-equal? [cdr a] [cdr b]]
+		   #f]]
+	      [#t #f]
+	]
+]]
+
+[def there-exists? [λ [l pred]
+	"Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
+	[cond [[nil? l] #f]
+	      [[pred [car l]] #t]
+	      [#t [there-exists? [cdr l] pred]]
+	]
+]]
+
+[def for-all? [λ [l pred]
+	"Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
+	[cond [[nil? l] #t]
+	      [[not [pred [car l]]] #f]
+	      [#t [for-all? [cdr l] pred]]
+	]
+]]
+
+[def int? [λ [val]
+	"#t if VAL is a integer"
+	[eq? :int [type-of val]]
+]]
+
+[def float? [λ [val]
+	"#t if VAL is a floating-point number"
+	[eq? :float [type-of val]]
+]]
+
+[def vec? [λ [val]
+	"#t if VAL is a vector"
+	[eq? :vec [type-of val]]
+]]
+
+[def bool? [λ [val]
+	"#t if VAL is a boolean"
+	[eq? :bool [type-of val]]
+]]
+
+[def inf? [λ [val]
+	"#t if VAL is infinite"
+	[eq? :infinity [type-of val]]
+]]
+
+[def pair? [λ [val]
+	"#t if VAL is a pair"
+	[eq? :pair [type-of val]]
+]]
+
+[def string? [λ [val]
+	"#t if VAL is a string"
+	[eq? :string [type-of val]]
+]]
+
+[def symbol? [λ [val]
+	"#t if VAL is a symbol"
+	[eq? :symbol [type-of val]]
+]]
+
+[def object? [λ [val]
+	"#t if VAL is an object"
+	[eq? :object [type-of val]]
+]]
+
+[def lambda? [λ [val]
+	"#t if VAL is a lambda"
+	[or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]
+]]
+
+[def native? [λ [val]
+	"#t if VAL is a native function"
+	[eq? :native-function [type-of val]]
+]]
+
+[def procedure? [λ [val]
+	"#t if VAL is a native or lisp function"
+	[or [lambda? val] [native? val]]
+]]
+; Some nujel string λs
+
+[def br [λ [num]
+	"Return NUM=1 linebreaks"
+	[if [or [nil? num] [<= [int num] 1]]
+	    "\n"
+	    ["\n" [br [-- num]]]]
+]]
+
+[def path/without-extension [λ [path]
+	"Return PATH, but without the fileextension part"
+	[def last-period [str/last-index-of path "."]]
+	[if [>= last-period 0]
+	    [str/substr path 0 last-period]
+	    path]
+]]
+[test-add 1073741824 [ash 1 30]]
+[test-add 2147483647 [lognot [ash 1 31]]]
+[test-add 39 [+ 42 [- 3]]]
+[test-add 24 [* 4 [- [+ 1 [+ 1 1]] [- 3 3 3]]]]
+[test-add 3 [div 9 3]]
+[test-add 3 [let [[vier -4]] [+ [% 9 4] [/ -9 vier]]]]
+[test-add 69 [+ [* 2 [/ 32 8] [- 16 8]] 5]]
+[test-add 3 [define eins 1] [define zwei 2] [+ eins zwei]]
+[test-add -3 [define eins 1] [define zwei 2] [define drei [+ eins zwei]] [set! eins [- drei drei drei]]]
+[test-add 128 [define zahl 1_2_8] zahl]
+[test-add 10 [let [[a 10]] a]]
+[test-add 20 [define b 20] [let [[a b]] a]]
+[test-add 10 [define b 20] [let [[a b]] [set! a 10] a]]
+[test-add 20 [define b 20] [let [[a b]] [set! a 10] b]]
+[test-add 42 [let [[a 12] [b 30]] [+ a b]]]
+[test-add 16 [define square [lambda [a] [* a a]]] [square 4]]
+[test-add 0 [- -1 -1]]
+[test-add #t [or #f [and [> 5 1] [not [< 5 1]] [>= 5 5] [<= 5 5]]]]
+[test-add #t [and [= #t #t] [= #f #f] [not [= #f #t]] [= 2 2]]]
+[test-add 11 [length "Hallo, Welt"]]
+[test-add #t [number? 0.1]]
+[test-add 14 [define abs [lambda [a] [if [neg? a] [- 0 a] a]]] [+ [abs -7] [abs 7]]]
+[test-add #t [and [or #f #t] [and #t #t]]]
+[test-add #t [and [neg? -1] [neg? -0.01] [pos? 0] [pos? 0.01] [not [neg? 0]] [not [pos? -0.01]] [not [neg? #f]]]]
+[test-add #t [and [number? 1] [number? -1] [number? 0] [number? 0.1]]]
+[test-add #t [and [number? [vec 1]] [not [number? #f]] [not [number? "123"]]]]
+[test-add #t [and [number? 1] [number? -1] [number? 0] [number? 0.1] [number? [vec 1]] [not [number? #f]] [not [number? "123"]]]]
+[test-add 12340 [- [int [cat 12 "3" "45 Test"]] 5]]
+[test-add 12340 [let [[a [cat 12 "3" 45]]] [- [int a] [length a]]]]
+[test-add 123 [int [cat "123" "abc" 456]]]
+[test-add 28 [+ [int 10] [int 10.23] [int "8"]]]
+[test-add #t [and [not [< 3 2]] [zero? 0] [> 3.1 2.1] [> 3 2] [>= 4 "3"] [>= 3 3] [<= 3 3] [not [>= "2" 3]]]]
+[test-add 1 [int [float [+ [vec 1] [vec 0 9 9]]]]]
+[test-add "#nil" [- #nil]]
+[test-add #t [and [pair? [cons 1 '[2]]] [not [pair? 1]]]]
+[test-add 1 [car [cons 1 '[2]]]]
+[test-add 2 [+ [cadr '[1 2]] [cadr #nil] [cadr '[1]]]]
+[test-add #t [string? [describe "++"]]]
+[test-add 3 [++ [-- [length '[1 2 3]]]]]
+[test-add #t [and [for-all? '[1 2 3] int?] [not [for-all? '[1 2 3.0] int?]]]]
+[test-add #t [and [there-exists? '[1.0 2 3.0] int?] [not [there-exists? '[1.0 2.0 3.0] int?]]]]
+[test-add #t [and [eq? "asd" "asd"] [not [eq? "asd" "bsd"]] [not [eq? "asd" "asdasd"]]]]
+[test-add 23 [+ [reduce + [make-list 10 2] 0] [list-ref '[1 2 3 4] 1] [list-ref '[1 2] 0] [list-ref '[1 2] 3]]]
+[test-add #t [and [nil? #nil] [not [nil? "NotNil"] [inf? #inf] [not [inf? "NotInf"] [vec? [vec 1]] [not [inf? "NotVec"]]]]]]
+[test-add 11 [define count [let [[a 0]] [lambda [b] [set! a [+ a [cond [[number? b] b] [#t 1]]]]]]] [count 10] [count]]
+[test-add 4 [let [[a 10]] [when [when #t [set! a [+ 2 "2"]] #f] [set! a -1]] a]]
+[test-add 6 [eval '[+ 1 2 3]]]
+[test-add 4 [arr-length #[1 2 3 4]]]
+[test-add 2 [arr-ref #[1 2 3 4] 1]]
+[test-add 3 [arr-length [arr-new 3]]]
+[test-add 10 [+ [apply + '[1 2 3]] [apply ++ '[3]]]]
+[test-add 0 [apply +]]
+[test-add 0 [define cb '+] [apply cb]]
+[test-add 1 [define cb '++] [apply cb]]
+[test-add 5 [length "12345"]]
+[test-add #f [or 0 0]]
+[test-add 2  [and 1 2]]
+[test-add #t [bool [and 1 1]]]
+[test-add #t [bool 1]]
+[test-add 6 [[lambda [a] [+ a 4]] 2]]
+[test-add 2 [define test 1] [define test 2] test]
+[test-add 0 [max]]
+[test-add 0 [min]]
+[test-add 1 [max 1]]
+[test-add 4 [min 4]]
+[test-add 4 [min 4 9]]
+[test-add 9 [max 4 9]]
+[test-add 25 [max 1 4.0 9 25]]
+[test-add 25 [max 25 4.0 9 1]]
+[test-add 1 [min 1 4.0 9 25]]
+[test-add 1 [min 25 4.0 9 1]]
+[test-add #t [even? 2]]
+[test-add #f [even? 9]]
+[test-add #t [odd? 7]]
+[test-add #f [odd? 4]]
+[test-add 256 [int [pow 2 8]]]
+[test-add 3 [define ein-test-arr #[1 2 3]] [ein-test-arr 2]]
+[test-add 3 [define ein-test-arr #[1 2 3]] [ein-test-arr 2 9] [ein-test-arr 2]]
+[test-add 123 [define i-assaultmegablaster 123] i-assaultmegablaster]
+[test-add #t [int? [random]]]
+[test-add #t [random-seed! 123] [define first-value [random]] [random-seed! 123] [= first-value [random]]]
+[test-add 1 [define a 1] [unless [= 2 2] [set! a 4]] a]
+[test-add 4 [define a 1] [unless [= 2 3] [set! a 4]] a]
+[test-add 4 [define a 1] [when   [= 2 2] [set! a 4]] a]
+[test-add 1 [define a 1] [when   [= 2 3] [set! a 4]] a]
+[test-add 3 [define ein-test-arr #[1 2 3]] [ein-test-arr 2.2]]
+[test-add 123 #d123]
+[test-add 6 #b0110]
+[test-add 10 #b1010]
+[test-add 15 #b11-11]
+[test-add 192 #b1100_0000]
+[test-add 255 #xFF]
+[test-add 255 #xFf]
+[test-add 160 #xa0]
+[test-add 31 #x1-F]
+[test-add 31 #x1_F]
+[test-add 50 #x32]
+[test-add 256 #x100]
+[test-add 0 #o]
+[test-add 7 #o7]
+[test-add 0 #o8]
+[test-add 10 #o12]
+[test-add 26 #o32]
+[test-add -1 #b11111111_11111111_11111111_11111111]
+[test-add -1 #xFFFFFFFF]
+[test-add 2 [- [+ 1 #b10] 1]]
+[test-add 8 [- [+ 1 #o10] 1]]
+[test-add 16 [- [+ 1 #x10] 1]]
+[test-add 32 [+ #x10#x10]]
+[test-add 16 [+ #x10#f]]
+[test-add 32 [+ #x10"16"]]
+[test-add 32 [+ #x10[+ 0#x10]]]
+[test-add 0 [logand #xf0 #x0F]]
+[test-add 255 [logior #xf0 #x0F]]
+[test-add 255 [logior #xfF #xFF]]
+[test-add 255 [logxor #xf0 #x0F]]
+[test-add 240 [logxor #xff #x0F]]
+[test-add -1 [lognot 0]]
+[test-add 0 [lognot -1]]
+[test-add 16 [ash 1 4]]
+[test-add 65536 [ash 1 16]]
+[test-add -1 [ash -1 -1]]
+[test-add -16 [lognand #b1111 #b1111]]
+[test-add 6 [eval [read "[+ 1 2 3]"]]]
+[test-add 3 [let [[test-string "3"]] [read test-string] [read test-string]]]
+[test-add "[vec 1.0 2.0 3.0]" [abs [vec -1 -2 -3]]]
+[test-add "3.33333" [+ 1.11111 2.22222]]
+[test-add "\"H#Hallo\"" [let [[a "Hallo, Welt#"]] [cat [substr a 0 1] [substr a -1] [substr a 0 -7]]]]
+[test-add "\"Test\"" [define a "Test"] a]
+[test-add "11.6" [+ [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.2]]]
+[test-add "20.1" [+ [+ 1.1 3] [+ 1 3.3] [+ 3.3 4.1 4.3]]]
+[test-add "15.54" [add [mul 3.2 3.2] [sub 5.5 1.1 1 1.1] [div 9.9 3.3]]]
+[test-add "0.7" [% 10 3.1]]
+[test-add #t [eq? #inf #inf]]
+[test-add #inf [+ 1 [div 10 0]]]
+[test-add "11.7" [add [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.3]]]
+[test-add "11.75" [+ [float 10] [int "10"] [float "-8.25"]]]
+[test-add "30.3" [+ [abs "-10"] [int 8.2] 12.3]]
+[test-add "[vec 12.0 12.0 12.0]" [+ [vec 1] 1 10]]
+[test-add "[vec 3.0 5.0 6.0]" [+ [vec 1] [vec 1 2] [vec 1 2 3]]]
+[test-add "[vec 3.0 3.0 3.0]" [+ 1 [vec 1] 1.0]]
+[test-add "[vec 3.0 3.0 3.0]" [+ 1.0 [vec 1] "1"]]
+[test-add "[vec -1.0 -1.0 -1.0]" [- [vec 1] [vec 1.0] [vec "1"]]]
+[test-add "2.7" [+ [- 1 -1.0] [- 5 1.1 1] [- 1 1.1 1] [- 1 1.1 [int "1"]]]]
+[test-add "[vec 3.0 3.0 3.0]" [+ 1 [vec 1] 1.0]]
+[test-add "[vec -1.0 -1.0 -1.0]" [- 1 [vec 1] 1.0]]
+[test-add "[vec 8.0 8.0 8.0]" [* [vec 2] "4"]]
+[test-add "[vec 1.0 1.0 1.0]" [mod [vec 9] 2]]
+[test-add "1.0" [float [int [+ [vec 1] [vec 0 9 9]]]]]
+[test-add "[]" [cons]]
+[test-add "[1]" [cons 1]]
+[test-add "[1 . 2]" [cons 1 2]]
+[test-add "[1 2]" [cons 1 '[2]]]
+[test-add "[4 3 2 1]" [reverse '[1 2 3 4]]]
+[test-add "[1 2.0 3 1 2.0 3]" [append '[1 2.0 3] '[1 2.0 3]]]
+[test-add "[1 4]" [filter int?   '[1 2.0 #t 4]]]
+[test-add "[2.0]" [filter float? '[1 2.0 #t 4]]]
+[test-add "[2.0]" [filter float? '[1 2.0 #t 4]]]
+[test-add "[#t]"  [filter bool?  '[1 2.0 #t 4]]]
+[test-add "[2 3]" [sublist '[1 2 3 4 5 6] 1 3]]
+[test-add "[1 2 3]" [list-head '[1 2 3 4 5 6] 3]]
+[test-add "[4 5 6]" [list-tail [list 1 2 3 4 5 6] 3]]
+[test-add "[3]" [last-pair [list 1 2 3]]]
+[test-add "[1 2]" [except-last-pair '[1 2 3]]]
+[test-add "[1.0 #t \"a\"]" [let [[l '[1.0 #t "a"]]] [append [except-last-pair l] [last-pair l]]]]
+[test-add "[\"asd\" #t #f]" [member "asd" '[123 456 "asd" #t #f]]]
+[test-add "[[vec 4.0 4.0 4.0] 9 16.0]" [map [λ [a] [* a a]] [cons [vec 2] '[3 4.0]]]]
+[test-add "\"11.0\"" [cat 1 1.0]]
+[test-add "[vec 9.0 9.0 9.0]" [div [vec 99] [cat 1 1.0]]]
+[test-add "#[99 12 3 4]" [let [[cur-arr #[1 2 3 4]]] [arr-set! cur-arr 0 99 12] cur-arr]]
+[test-add "#[42 42 42 42 42 42]" [arr-fill! [arr-new 6] 42]]
+[test-add "#nil" [apply #nil]]
+[test-add "[vec 1.0 3.0 9.0]" [define vs [λ [a] [vec [vec/z a] [vec/y a] [vec/x a]]]] [vs [vec 9 3.0 "1"]]]
+[test-add "3" [define fib [λ [a] [cond [[zero? a] 0] [[= a 1] 1] [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 4]]
+[test-add "21" [define fib [λ [a] [cond [[zero? a] 0] [[= a 1] 1] [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 8]]
+[test-add "102334155" [define fib-iter [λ [a b count] [cond [[= count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [define fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
+[test-add 87654321 [let [[ret ""]] [[λ [a] [cond [[zero? a] [int ret]] [#t [set! ret [cat ret a]] [[cl-lambda 1] [-- a]]]]] 8]]]
+[test-add "\"ASD123\"" [str/uppercase "asD123"]]
+[test-add "\"asd123\"" [str/lowercase "aSD123"]]
+[test-add "\"Asd123\"" [str/capitalize "aSD123"]]
+[test-add "[vec 1.0 1.0 1.0]" [floor [vec 1.3 1.3 1.3]]]
+[test-add "2.0" [ceil 1.3]]
+[test-add "[vec 2.0 2.0 2.0]" [ceil [vec 1.3 1.3 1.3]]]
+[test-add "1.0" [round 1.3]]
+[test-add "2.0" [round 1.51]]
+[test-add "3.0" [sqrt 9]]
+[test-add "[vec 5.0 5.0 5.0]" [sqrt [vec 25 25 25]]]
+[test-add "256.0" [pow 2.0 8]]
+[test-add "[vec 4.0 8.0 16.0]" [pow 2.0 [vec 2.0 3.0 4.0]]]
+[test-add "\"123\"" [string 123]]
+[test-add "\"#t\"" [string #t]]
+[test-add "#nil" testerle]
+[test-add ":testerle" :testerle]
+[test-add :testerle :testerle]
+[test-add "[:asd qwerty]" [:asd qwerty]]
+[test-add ":asd" [begin [def :asd #t] :asd]]
+;[test-add "#nil" [define testerle 123] [undefine! testerle] testerle]
+[test-add "[1 . 2]" [define test [cons 1 2]] test]
+[test-add "\"Eins\"" [define eins [ω [] [define say [λ [] "Eins"]]]] [eins [say]]]
+[test-add "\"Zwei\"" [define eins [ω [] [define say [λ [] "Zwei"]]]] [define zwei [eins [ω]]] [zwei [say]]]
+[test-add "\"Polizei\"" [define eins [ω [] [define say [λ [] "Eins"]]]] [define zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
+[test-add "\"asd\"" ["a" "s" "d"]]
+[test-add "\"a\"" ["a"]]
+[test-add "#nil" [define testerle #[1 2 3]] [testerle 4]]
+[test-add "#nil" [define testerle #[1 2 3]] [testerle 40000]]
+[test-add "#[1 2 3]" [define testerle #[1 2 3]] [testerle]]
+[test-add "#nil" [define testerle #[1 2 3]] [testerle #t]]
+[test-add "#nil" [define testerle #[1 2 3]] [testerle [vec 1 2 3]]]
+[test-add "\"Trim Test\"" [trim "   Trim Test    \n"]]
+[test-add "\"1,asd,3.0,#f\"" [join '[1 "asd" 3.0 #f] ","]]
+[test-add "[1.0 2.0 3.0]" [map float [split "1,2,3" ","]]]
+[test-add "[\"dies ist\" \"ein\" \"test\"]" [split "dies ist/ein/test" "/"]]
+[test-add 1 [index-of "1,2,3" ","]]
+[test-add #x123 [read [join [cons "#x" [split "123" ""]]]]]
+[test-add 7 [char-at "\a" 0]]
+[test-add 5 [char-at [from-char-code 5 10 20] 0]]
+[test-add 2600 [int [from-char-code [char-at "2" 0] #\6 48 48]]]
+[test-add #t [eq? 32 #\ ]]
+[test-add #t [eq? #\Backspace 8]]
+[test-add #t [eq? #\Tab [char-at "\t" 0]]]
+[test-add #t [and [eq? #\cr 13] [eq? #\Return 13]]]
+[test-add #t [and [eq? #\lf 10] [eq? 10 #\Linefeed]]]
+[test-add #x07 [char-at "\a" 0]]
+[test-add #x08 [char-at "\b" 0]]
+[test-add #x1B [char-at "\e" 0]]
+[test-add #x0c [char-at "\f" 0]]
+[test-add #\lf [char-at "\n" 0]]
+[test-add #\cr [char-at "\r" 0]]
+[test-add #x09 [char-at "\t" 0]]
+[test-add #x0B [char-at "\v" 0]]
+[test-add #x27 [char-at "\'" 0]]
+[test-add #x22 [char-at "\"" 0]]
+[test-add #t [> [symbol-count] 200]] ; Probably not gonna shrink over time
+;[test-add #t [pair? [symbol-table]]]
+[test-add #t [equal? + add]]
+[test-add #t [eq? min min]]
+[test-add #t [let [[some-value #f]] [not some-value]]]
+[test-add 4 [>> 8 1]]
+[test-add 15 [1 + 2 * [3 + 4]]]
+[test-add "#inf" [% 4 0]]
+[test-add 9 [10 - 1]]
+[test-add 5 [10 / 2]]
+[test-add 256 [1 << 8]]
+[test-add #t [eq? :asd :asd]]
+[test-add #t [eq? :bool [type-of #f]]]
+[test-add #t [eq? :int [type-of 123]]]
+[test-add #f [eq? :int [type-of 123.123]]]
+[test-add #t [eq? :float [type-of 123.123]]]
+[test-add #t [eq? :vec [type-of [vec 1]]]]
+[test-add #t [eq? :native-function [type-of +]]]
+[test-add #t [eq? :lambda [type-of test-add]]]
+[test-add #t [eq? :string [type-of "asd"]]]
+[test-add 2 [getf [list :a 1 :b 2 :c 3] :b]]
+[test-add "#nil" [getf [list :a 1 :b 2 :c 3] :d]]
+[test-add "\"\\n\"" "\n"]
+[test-add "\"\\n\"" [br]]
+[test-add "\"\\n\\n\\n\"" [br 3]]
+[test-add :dies-ist-ein-test-ob-lange-symbole-funktionieren :dies-ist-ein-test-ob-lange-symbole-funktionieren]
+[test-add #t [eq? [+ 2 2] [2 + 2]]]
+[test-add #t [eq? 4 [2 + 2]]]
+[test-add #t [eq? 4 [+ 2 2]]]
+[test-add :int [type-of [+ 2 2]]]
+[test-add :int [type-of [2 + 2]]]
+[test-add :float [type-of [+ 2.0 2.1]]]
+[test-add :float [type-of [2.0 + 2.1]]]
+[test-add :float [type-of [+ 2 2.1]]]
+[test-add :float [type-of [2 + 2.1]]]
+[test-add -1 [-1]]
+[test-add -1 [- 1]]
+[test-add -1 [let [[a 1]] [- a]]]
+[test-add -1 [let [[a 1]] [-a]]]
+[test-add -1 [let [[a 1]] -a]]
+[test-add  0 [wrap-value 0 0 2]]
+[test-add  1 [wrap-value 1 0 2]]
+[test-add  0 [wrap-value 2 0 2]]
+[test-add  1 [wrap-value 3 0 2]]
+[test-add  0 [wrap-value 4 0 2]]
+[test-add #t [zn? 0]]
+[test-add #t [zn? -4.0]]
+[test-add #f [zn? 0.1]]
+[test-add  0 [let [[tmp [vec 0 0 0]]] [+ tmp [vec 1 1 1]] [vec/y tmp]]]
+[test-add  0 [let [[tmp 0]] [+ tmp 1] tmp]]
+[test-add #t [list-equal? '[] '[]]]
+[test-add #f [list-equal? '[] '[1]]]
+[test-add #f [list-equal? '[1] '[]]]
+[test-add #t [list-equal? '[1 "asd"] '[1 "asd"]]]
+[test-add #f [list-equal? '[1 "asd"] '[1 "as"]]]
+[test-add #f [list-equal? '[1 :asd] '[1 :as]]]
+[test-add #t [list-equal? '[1 :asd] '[1 :asd]]]
+[test-add #t [list-equal? '[1 asd] '[1 asd]]]
+[test-add #t [list-equal? '[1 #f] '[1 #f]]]
+[test-add #f [list-equal? '[1 #t] '[1 #f]]]
+[test-add #t [list-equal? '[1 2 3] '[1 2 3]]]
+[test-add #f [list-equal? '[1 2 3] '[1 2 4]]]
+[test-add #f [list-equal? '[1 2 3] '[1 2]]]
+[test-add #f [list-equal? '[1 2 3] '[1 2 [3 4]]]]
+[test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
+[test-add #t [list-equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
+[test-add "do" 'do]
+[test-add "[123]" '[123]]
+[test-add "[123 #t]" '[123 #t]]
+[test-add "[123 'do]" '[123 'do]]
+[test-add "[123 \"asd\"]" '[123 "asd"]]
+[test-add 2 [wrap-value 2 2 4]]
+[test-add 3 [wrap-value 3 2 4]]
+[test-add 2 [wrap-value 4 2 4]]
+[test-add 3 [wrap-value 5 2 4]]
+[test-add #f [and #nil #nil]]
+[test-add #t [eq? #t #t]]
+[test-add #f [eq? #t #f]]
+[test-add #t [eq? #f #f]]
+[test-add #f [eq? '[] #f]]
+[test-add #f [eq? #f '[]]]
+[test-add #f [eq? '[] #t]]
+[test-add #f [eq? #t '[]]]
+[test-add #t [eq? '[] '[]]]
+[test-add #f [eq? '[] '[1]]]
+[test-add #f [eq? '[1] '[1]]]
+[test-add #t [list-equal? '[1] '[1]]]
+[test-add #f [eq? '[] #nil]]
+[test-add #t [eq? λ [resolve [car '[λ asd]]]]]
+[test-add 100000 [let [] [def i 0] [while [< i 100000] [set! i [++ i]]]]]
+[test-add '[1 :a "q"] '[1 :a "q"]]
+[test-add 4 [compile '[do "Test" 4]]]
+[test-add '[do [display "Test"] 4] [compile '[do [display "Test"] 4]]]
+[test-add '[do [display "Test"] 4] [compile '[do [display "Test"] 9 4]]]
+[test-add '[λ* [v] "Add 1 to V" [+ 1 v]] [compile '[λ [v] "Add 1 to V" [+ 1 v]]]]
+[test-add '[λ* [v] "" [+ 1 v]] [compile '[λ [v] [+ 1 v]]]]
+[test-add '[λ* [v] "" [do [display v] [+ 1 v]]] [compile '[λ [v] [display v] [+ 1 v]]]]
+[test-add '[1 2] [except-last-pair '[1 2 3]]]
+[test-add '[3] [last-pair '[1 2 3]]]
+[test-add '[1 3 5] [filter odd?  '[1 2 3 4 5 6]]]
+[test-add '[2 4 6] [filter even? '[1 2 3 4 5 6]]]
+[test-add '["vier"] [filter string? '[1 2 3 "vier" 5 6]]]
+[test-add '[1 2 3 5 6] [filter int? '[1 2 3 "vier" 5 6]]]
+[test-add '[2 3 4] [map [λ [v] [+ 1 v]] '[1 2 3]]]
+[test-add '[2 4 6] [map [λ [v] [* 2 v]] '[1 2 3]]]
+[test-add '["1" "2" "3"] [map str/write '[1 2 3]]]
+[test-add "[123 #nil]" '[123 #nil]]
+[test-add '[123 #nil] '[123 #nil]]
+[test-add "@[:asd 123]" [tree/new :asd 123]]
+[test-add "@[:asd 123]" @[:asd 123]]
+[test-add #f [tree/has? @[:a 123] :b]]
+[test-add #t [tree/has? @[:a 123] :a]]
+[test-add 123 [tree/get @[:a 123] :a]]
+[test-add 123 [tree/get @[:b 2 :a 123] :a]]
+[test-add 9 [tree/get [tree/set! @[:b 2 :a 123] :a 9] :a]]
+[test-add 2 [tree/get @[:b 2 :a 123] :b]]
+[test-add #t [let* [def keys [tree/keys @[:b 2 :a 123]]] [or [list-equal? keys '[:b :a]] [list-equal? keys '[:a :b]]]]]
+[test-add #t [let* [def vals [tree/values @[:b 2 :a 123]]] [or [list-equal? vals '[2 123]] [list-equal? vals '[123 2]]]]]
+[test-add 2 [length [tree/keys @[:b 2 :a 123]]]]
+[test-add 2 [length [tree/values @[:b 2 :a 123]]]]
+[test-add '[:asd 123] [read "{:asd 123}"]]
+[test-add '[123 [:asd]] [read "[123[:asd]]"]]
+[test-add '[123 [:asd]] [read "{123{:asd}}"]]
+[test-add '[123 [:asd]] [read "(123(:asd))"]]
+[test-add '[123 [:asd]] [read "(123{:asd})"]]
+[test-add '[:asd [123]] [read "(:asd[123])"]]
+;[test-add "[#nil]" [str/write '[#nil]]]
+
+; [test-add #t [eq? #nil #nil]]
+
+; Has to wait until the new constant system is in place
+;[test-add 3.14159 [set! π 3] π]
+
+; Has to wait until infix operators can be λs
+;[test-add 64 [512 >> 3]]
+
+
+; Edge cases that still need a specified behaviour
+; [test-add "[and #nil #nil]" '[and #nil #nil]]
+; Time related λs
+
+; Initialize the RNG
+[random-seed [logxor [time] [time/millliseconds]]]
+
+[def time/seconds [λ [timestamp]
+	"Return the seconds part of TIMESTAMP, defaults to current time"
+	[% [default timestamp [time]] 60]
+]]
+
+[def time/minutes [λ [timestamp]
+	"Return the minutes part of TIMESTAMP, defaults to current time"
+	[% [/ [default timestamp [time]] 60] 60]
+]]
+
+[def time/hours [λ [timestamp]
+	"Return the hours part of TIMESTAMP, defaults to current time"
+	[% [/ [default timestamp [time]] 3600] 24]
+]]
+
+[def profile [λ [@...body]
+	[def form [cons 'do @...body]]
+	[def start-time [time/milliseconds]]
+	[def val [eval form]]
+	[def end-time [time/milliseconds]]
+	[display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]
+]]
+;; Contains the self-hosting Nujel compiler
+
+[def compile [let*
+    [def compile-do-args [λ [args]
+        ;[display ["[do-args] " [str/write args] "\n\n"]]
+        [if [nil? [cdr args]]
+            [cons [compile [car args]] #nil]
+            [if [pair? [car args]]
+                [let* [def ocar [compile [car args]]]
+                     [if [pair? ocar]
+                         [cons ocar [compile-do-args [cdr args]]]
+                         [compile-do-args [cdr args]]]
+                ]
                 [compile-do-args [cdr args]]]]
-             [compile-do-args [cdr args]]]]]] [def compile-do [λ [source]
-       [let* [def args [compile-do-args source]] [if [nil? [cdr args]]
-          [car args]
-          [cons 'do args]]]]] [def compile-def [λ [source]
-       [list 'def [cadr source] [compile [caddr source]]]]] [def compile-set [λ [source]
-       [list 'set! [cadr source] [compile [caddr source]]]]] [def compile-fun [λ [source]
-       [if [string? [caddr source]]
-          [list 'λ* [cadr source] [caddr source] [compile-do [cddr source]]]
-          [list 'λ* [cadr source] "" [compile-do [cddr source]]]]]] [def compile-let [λ [source]
-       [list 'let [cadr source] [compile-do [cddr source]]]]] [λ [source]
-       "Compile the forms in source"
-       [let* [def op [resolve [car source]]] [cond [[eq? op do] [compile-do source]]
-             [[eq? op def] [compile-def source]]
-             [[eq? op set!] [compile-set source]]
-             [[eq? op let] [compile-let source]]
-             [[eq? op λ] [compile-fun source]]
-             [#t source]]]]]]
-    [def λδ [λ* [@...λδ]
-        "Define a λ with the self-hosting Nujel compiler"
-        [eval [compile [cons 'λ @...λδ]]]]]
-    [def eval [λ* [expr]
-        "Compile, Evaluate and then return the result of EXPR"
-        [eval* [compile expr]]]]]
+        ]]
+
+    [def compile-do [λ [source]
+        ;[display ["[do] " [str/write source] "\n\n"]]
+        [let* [def args [compile-do-args source]]
+              [if [nil? [cdr args]]
+                  [car args]
+                  [cons 'do args]]
+        ]
+    ]]
+
+    [def compile-def [λ [source]
+        ;[display ["[def] " [str/write source] "\n\n"]]
+        [list 'def [cadr source] [compile [caddr source]]]
+    ]]
+
+    [def compile-set! [λ [source]
+        ;[display ["[set] " [str/write source] "\n\n"]]
+        [list 'set! [cadr source] [compile [caddr source]]]
+    ]]
+
+    [def compile-fun [λ [source]
+        ;[display ["[λ] " [str/write source] "\n\n"]]
+        [if [string?  [caddr source]]
+            [list 'λ* [cadr source] [caddr source] [compile-do [cddr source]]]
+            [list 'λ* [cadr source]             "" [compile-do [cddr source]]]]
+    ]]
+
+    [def compile-let [λ [source]
+        ;[display ["[let] " [str/write source] "\n\n"]]
+        [list 'let [cadr source] [compile-do [cddr source]]]
+    ]]
+
+    [def compile-let* [λ [source]
+        ;[display ["[let*] " [str/write source] "\n\n"]]
+        [list 'let* [compile-do [cdr source]]]
+    ]]
+
+    [λ [source]
+        "Compile the forms in source"
+        ;[display ["[opt] " [str/write [resolve [car source]]] "\n"  [str/write source] "\n\n"]]
+        [let* [def op [resolve [car source]]]
+              [cond [[eq? op do]           [compile-do   source]]
+                    [[eq? op def]          [compile-def  source]]
+                    [[eq? op set!]         [compile-set! source]]
+                    [[eq? op let]          [compile-let  source]]
+                    [[eq? op let*]         [compile-let* source]]
+                    [[eq? op λ]            [compile-fun  source]]
+                    [[eq? [car source] 'λ] [compile-fun  source]]
+                    [#t source]]
+	]
+    ]
+]]
+
+[def λδ
+     [λ [@...λδ]
+       "Define a λ with the self-hosting Nujel compiler"
+       [eval [compile [cons 'λ @...λδ]]]]]
+
+[def eval [λ [expr]
+	"Compile, Evaluate and then return the result of EXPR"
+	[eval* [compile expr]]
+]]

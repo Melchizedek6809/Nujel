@@ -107,6 +107,14 @@ lVal *lValBool(bool v){
 	return ret;
 }
 
+lVal *lValTree(lTree *v){
+	lVal *ret = lValAlloc();
+	if(ret == NULL){return ret;}
+	ret->type = ltTree;
+	ret->vTree = v;
+	return ret;
+}
+
 lVal *lValDup(const lVal *v){
 	return v == NULL ? NULL : lValCopy(lValAlloc(),v);
 }

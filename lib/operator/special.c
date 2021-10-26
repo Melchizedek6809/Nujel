@@ -10,6 +10,8 @@
 #include "../type/native-function.h"
 #include "../type/val.h"
 
+#include <stdio.h>
+
 static lVal *lnfAnd(lClosure *c, lVal *v){
 	if(v == NULL){return lValBool(false);}
 	lVal *t = lEval(c,lCar(v));
@@ -69,11 +71,9 @@ lVal *lnfWhile(lClosure *c, lVal *v){
 	lVal *cond = lCar(v);
 	lVal *body = lCdr(v);
 	lVal *ret  = NULL;
-	lRootsValPush(body);
 	while(castToBool(lEval(c,cond))){
 		ret = lnfDo(c,body);
 	}
-	lRootsValPop();
 	return ret;
 }
 

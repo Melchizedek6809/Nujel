@@ -54,7 +54,6 @@ lVal *lnfArrSet(lClosure *c, lVal *v){
 	return arr->vArray->data[key];
 }
 
-
 lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	const int len = castToInt(lCar(v),-1);
@@ -65,8 +64,7 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	r->vArray->length = len;
 	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
 	if(r->vArray->data == NULL){
-		lArrayFree(r->vArray);
-		lValFree(lRootsValPop());
+		lPrintError("lnfArrNew OOM\n");
 		return NULL;
 	}
 	return lRootsValPop();
@@ -82,9 +80,7 @@ lVal *lnfArr(lClosure *c, lVal *v){
 	r->vArray->length = length;
 	r->vArray->data = calloc(length,sizeof(*r->vArray->data));
 	if(r->vArray->data == NULL){
-		r->vArray->length = 0;
-		lArrayFree(r->vArray);
-		lValFree(r);
+		lPrintError("lnfArr OOM\n");
 		return NULL;
 	}
 	int key = 0;

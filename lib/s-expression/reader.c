@@ -281,11 +281,14 @@ lVal *lReadString(lString *s){
 			break;
 		case '\'':
 			s->data++;
+			v->vList.car = lCons(NULL,NULL);
+			v->vList.car->vList.car = lValSymS(symQuote);
+			v->vList.car->vList.cdr = lCons(NULL,NULL);
 			if(*s->data == '['){
 				s->data++;
-				v->vList.car = lCons(lValSymS(symQuote),lCons(lReadString(s),NULL));
+				v->vList.car->vList.cdr->vList.car = lReadString(s);
 			}else{
-				v->vList.car = lCons(lValSymS(symQuote),lCons(lParseSymbol(s),NULL));
+				v->vList.car->vList.cdr->vList.car = lParseSymbol(s);
 			}
 			break;
 		case '"':
@@ -321,7 +324,6 @@ lVal *lReadString(lString *s){
 		}
 	}
 }
-
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
 	lString *s  = lRootsStringPush(lStringAlloc());

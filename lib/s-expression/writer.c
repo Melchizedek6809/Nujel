@@ -9,6 +9,7 @@
 #include "../collection/array.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
+#include "../collection/tree.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -105,7 +106,7 @@ static char *lSWriteTreeRec(lTree *v, char *buf, char *bufEnd, int indentLevel, 
 	return cur;
 }
 
-static char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool display){
+char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool display){
 	char *cur = buf;
 	int t = snprintf(cur,bufEnd-cur,"@[");
 	if(t > 0){cur += t;}
@@ -143,7 +144,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 	case ltObject: {
 		t = snprintf(cur,bufEnd-cur,"[ω\n");
 		if(t > 0){cur += t;}
-		lVal *cloData = v->vClosure->data;
+		lVal *cloData = lTreeToList(v->vClosure->data);
 		indentLevel += 3;
 		forEach(n,cloData){
 			for(int i=indentLevel;i>=0;i--){*cur++=' ';}
@@ -180,7 +181,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		lVal *carSym = lCar(v);
 		if((carSym != NULL) && (carSym->type == ltSymbol) && (lCdr(v) != NULL)){
 			const lSymbol *sym = carSym->vSymbol;
-			if(sym == symQuote){
+			if((sym == symQuote) && (lCddr(v) == NULL)){
 				v = lCadr(v);
 				*cur++ = '\'';
 				cur = lSWriteVal(v,cur,bufEnd,indentLevel,0);

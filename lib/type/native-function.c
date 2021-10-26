@@ -53,13 +53,13 @@ static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *
 	v->type    = ltNativeFunc;
 	lNFunc *fn = lNFuncAlloc();
 	if(fn == NULL){
-		lValFree(v);
 		return NULL;
+	}else{
+		fn->fp     = func;
+		fn->doc    = lCons(args,docString);
+		v->vNFunc  = fn;
+		return v;
 	}
-	fn->fp     = func;
-	fn->doc    = lCons(args,docString);
-	v->vNFunc  = fn;
-	return v;
 }
 
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
