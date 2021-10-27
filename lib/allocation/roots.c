@@ -10,10 +10,8 @@
 #include "../collection/closure.h"
 #include "garbage-collection.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdio.h>
-	#include <stdlib.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
 
 lClosure **rootsClosure = NULL;
 uint rootsClosureSP     = 0;

@@ -8,9 +8,7 @@
 #include "../type-system.h"
 #include "../allocation/garbage-collection.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 lArray   lArrayList[ARR_MAX];
 uint     lArrayActive = 0;

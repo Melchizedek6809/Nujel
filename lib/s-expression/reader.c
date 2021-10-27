@@ -10,12 +10,10 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <math.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <ctype.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 static void lStringAdvanceToNextCharacter(lString *s){
 	for(;(*s->data != 0) && (isspace((u8)*s->data));s->data++){}

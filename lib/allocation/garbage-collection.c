@@ -19,9 +19,7 @@
 #include "../type/val.h"
 #include "../type/vec.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdio.h>
-#endif
+#include <stdio.h>
 
 int lGCRuns = 0;
 

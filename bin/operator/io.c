@@ -6,11 +6,9 @@
 #include "io.h"
 #include "../misc.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	(void)c;

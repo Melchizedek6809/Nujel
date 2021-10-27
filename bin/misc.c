@@ -5,10 +5,8 @@
  */
 #include "misc.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdio.h>
-	#include <stdlib.h>
-#endif
+#include <stdio.h>
+#include <stdlib.h>
 
 void *loadFile(const char *filename,size_t *len){
 	FILE *fp;

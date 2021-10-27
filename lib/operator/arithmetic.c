@@ -13,11 +13,9 @@
 #include "../type/val.h"
 #include "../type/vec.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <math.h>
-	#include <stdlib.h>
-	#include <stdio.h>
-#endif
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 static lVal *lnfAddV(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){

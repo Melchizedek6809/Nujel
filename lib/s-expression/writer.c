@@ -15,12 +15,10 @@
 #include "../type/val.h"
 #include "../type/vec.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int bufPrintFloat(float v, char *buf, int t, int len){
 	t = snprintf(buf,len,"%.5f",v);

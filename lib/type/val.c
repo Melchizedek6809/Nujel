@@ -10,9 +10,7 @@
 #include "../collection/closure.h"
 #include "../allocation/garbage-collection.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;

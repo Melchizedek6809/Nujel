@@ -13,11 +13,9 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <math.h>
-	#include <stdio.h>
-#endif
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
 
 static int lValCompare(lVal *v){
 	if(v == NULL){return 2;}

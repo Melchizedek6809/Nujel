@@ -20,11 +20,9 @@
 #include "type/vec.h"
 #include "operator/string.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include <string.h>
-#endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 /* [inf] - Return infinity */
 lVal *lnfInf(lClosure *c, lVal *v){

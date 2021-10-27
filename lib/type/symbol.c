@@ -7,11 +7,9 @@
 #include "val.h"
 #include "../nujel.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include <string.h>
-#endif
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;

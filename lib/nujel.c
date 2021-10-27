@@ -33,13 +33,11 @@
 #include "operator/tree.h"
 #include "operator/vec.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <math.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 extern u8 stdlib_no_data[];
 

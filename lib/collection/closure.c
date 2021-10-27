@@ -11,10 +11,8 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <string.h>
-#endif
+#include <ctype.h>
+#include <string.h>
 
 lClosure  lClosureList[CLO_MAX];
 uint      lClosureActive = 0;

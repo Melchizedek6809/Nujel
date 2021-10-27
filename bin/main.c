@@ -3,23 +3,20 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#ifndef COSMOPOLITAN_H_
-	#include <stdarg.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <unistd.h>
-	#include <setjmp.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <setjmp.h>
 
-	#ifdef __MINGW32__
-		#include <windows.h>
-		#include <shlobj.h>
-	#else
-		#include "../vendor/bestline/bestline.h"
-	#endif
+#ifdef __MINGW32__
+	#include <windows.h>
+	#include <shlobj.h>
 #else
 	#include "../vendor/bestline/bestline.h"
 #endif
+#include "../vendor/bestline/bestline.h"
 
 #include "../lib/api.h"
 #include "misc.h"

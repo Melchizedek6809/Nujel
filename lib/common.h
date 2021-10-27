@@ -1,10 +1,8 @@
 #pragma once
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdbool.h>
-	#include <stddef.h>
-	#include <stdint.h>
-#endif
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define PI    (3.1415926535897932384626433832795f)
 #define PI180 (3.1415926535897932384626433832795f / 180.f)

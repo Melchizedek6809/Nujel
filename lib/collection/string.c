@@ -16,12 +16,10 @@
 #include "../type/vec.h"
 #include "../type-system.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <ctype.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-#endif
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 lString  lStringList[STR_MAX];
 uint     lStringActive = 0;

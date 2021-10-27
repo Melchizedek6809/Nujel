@@ -9,9 +9,7 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 lTree    lTreeList[TRE_MAX];
 uint     lTreeActive = 0;

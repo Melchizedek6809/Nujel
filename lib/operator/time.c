@@ -10,10 +10,8 @@
 #include "../type/native-function.h"
 #include "../type/val.h"
 
-#ifndef COSMOPOLITAN_H_
-	#include <time.h>
-	#include <sys/time.h>
-#endif
+#include <time.h>
+#include <sys/time.h>
 
 u64 getMSecs(){
 	struct timespec tv;
