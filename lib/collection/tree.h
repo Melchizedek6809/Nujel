@@ -4,9 +4,10 @@
 struct lTree {
 	lTree *left;
 	lTree *right;
-	lVal *value;
+	const lSymbol *key;
+	int height;
 	union {
-		const lSymbol *key;
+		lVal *value;
 		lTree *nextFree;
 	};
 };
@@ -19,8 +20,6 @@ extern uint   lTreeActive;
 extern lTree *lTreeFFree;
 
 void   lTreeInit            ();
-lTree *lTreeAlloc           ();
-lTree *lTreeNew             (const lSymbol *s, lVal *v);
 void   lTreeFree            (      lTree *t);
 
 lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);

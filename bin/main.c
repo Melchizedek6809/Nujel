@@ -140,7 +140,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 		printf("sizeof(lTree): %u\n", (uint)sizeof(lTree));
 		printf("sizeof(jmp_buf): %u\n", (uint)sizeof(jmp_buf));
 		printf("\n\nRoot Closure Data Size: %u\n",lTreeSize(c->data));
-		//lWriteVal(lValTree(c->data));
+		lWriteVal(lValTree(c->data));
 	}
 	return c;
 }

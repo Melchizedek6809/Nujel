@@ -17,11 +17,11 @@ uint     lTreeMax    = 0;
 lTree   *lTreeFFree  = NULL;
 
 void lTreeInit(){
-	lTreeActive  = 0;
-	lTreeMax     = 0;
+	lTreeActive = 0;
+	lTreeMax    = 0;
 }
 
-lTree *lTreeAlloc(){
+static lTree *lTreeAlloc(){
 	lTree *ret;
 	if(lTreeFFree == NULL){
 		if(lTreeMax >= TRE_MAX-1){
@@ -41,15 +41,29 @@ lTree *lTreeAlloc(){
 		lTreeFFree = ret->nextFree;
 	}
 	lTreeActive++;
-	*ret = (lTree){0};
 	return ret;
 }
 
-lTree *lTreeNew(const lSymbol *s, lVal *v){
+static lTree *lTreeNew(const lSymbol *s, lVal *v){
 	lTree *ret = lTreeAlloc();
 	ret->key = s;
+	ret->height = 1;
 	ret->value = v;
+	ret->left = NULL;
+	ret->right = NULL;
 	return ret;
+}
+
+static uint lTreeHeight(const lTree *t){
+	return t == NULL ? 0 : t->height;
+}
+
+static uint lTreeCalcHeight(const lTree *t){
+	return 1 + MAX(lTreeHeight(t->left),lTreeHeight(t->right));
+}
+
+static int lTreeGetBalance(const lTree *t){
+	return t == NULL ? 0 : lTreeHeight(t->left) - lTreeHeight(t->right);
 }
 
 void lTreeFree(lTree *t){
@@ -72,18 +86,65 @@ void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
 	}
 }
 
+static lTree *lTreeRotateLeft(lTree *x){
+	lTree *y = x->right;
+	lTree *T2 = y->left;
+
+	y->left = x;
+	x->right = T2;
+
+	x->height = lTreeCalcHeight(x);
+	y->height = lTreeCalcHeight(y);
+
+	return y;
+}
+
+static lTree *lTreeRotateRight(lTree *y){
+	lTree *x = y->left;
+	lTree *T2 = x->right;
+
+	x->right = y;
+	y->left = T2;
+
+	x->height = lTreeCalcHeight(x);
+	y->height = lTreeCalcHeight(y);
+
+	return x;
+}
+
+static lTree *lTreeBalance(lTree *t, const lSymbol *s){
+	int balance = lTreeGetBalance(t);
+
+	if(balance < -1){
+		if(s < t->right->key){
+			t->right = lTreeRotateRight(t->right);
+		}
+		return lTreeRotateLeft(t);
+	}else if(balance > 1){
+		if(s > t->left->key){
+			t->left = lTreeRotateLeft(t->left);
+		}
+		return lTreeRotateRight(t);
+	}
+	return t;
+}
+
 lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 	if(t == NULL){
 		return lTreeNew(s,v);
 	}else if(t->key == s){
 		t->value = v;
 		return t;
-	}else if(s > t->key){
-		t->right = lTreeInsert(t->right,s,v);
-	}else {
-		t->left = lTreeInsert(t->left,s,v);
+	}else{
+		if(s < t->key){
+			t->left = lTreeInsert(t->left,s,v);
+		}else {
+			t->right = lTreeInsert(t->right,s,v);
+		}
+		t->height = lTreeCalcHeight(t);
+		t = lTreeBalance(t,s);
+		return t;
 	}
-	return t;
 }
 
 lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
