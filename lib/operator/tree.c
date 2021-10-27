@@ -27,7 +27,7 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 		v = lCddr(v);
 	}
 
-	return lRootsValPop();
+	return ret;
 }
 
 static lVal *lnfTreeGetList(lClosure *c, lVal *v){

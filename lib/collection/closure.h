@@ -1,26 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
-typedef enum closureType {
-	closureDefault = 0,
-	closureObject = 1,
-	closureConstant = 2
-} closureType;
-
-struct lClosure {
-	union {
-		lClosure *parent;
-		lClosure *nextFree;
-	};
-	lTree *data;
-	lVal *text;
-	lVal *doc;
-	lVal *args;
-	u8 type;
-};
-
 #define CLO_MAX (1<<16)
-
 extern lClosure lClosureList[CLO_MAX];
 extern uint     lClosureMax;
 extern uint     lClosureActive;

@@ -177,13 +177,11 @@ bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 
 lVal *lTreeAddToList(const lTree *t, lVal *list){
 	if(t == NULL){return list;}
-	if(list != NULL){lRootsValPush(list);}
+	lRootsValPush(list);
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
 	l->vList.cdr->vList.car = t->value;
 	l->vList.car = lValSymS(t->key);
-	if(list != NULL){lRootsValPop();}
-	lRootsValPop();
 	return lTreeAddToList(t->left,l);
 }
 
@@ -195,8 +193,6 @@ lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
 
 	lVal *sym = lRootsValPush(lValSymS(t->key));
 	list = lCons(sym,list);
-	lRootsValPop();
-	lRootsValPop();
 
 	return lTreeAddKeysToList(t->left,list);
 }
@@ -205,9 +201,8 @@ lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
 	if(t == NULL){return list;}
 	list = lTreeAddValuesToList(t->right,list);
 
-	if(list != NULL){lRootsValPush(list);}
+	lRootsValPush(list);
 	lVal *l = lCons(t->value,list);
-	if(list != NULL){lRootsValPop();}
 
 	return lTreeAddValuesToList(t->left,l);
 }

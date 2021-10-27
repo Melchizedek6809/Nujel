@@ -3,28 +3,7 @@
 #include "../collection/list.h"
 #include "../type-system.h"
 
-struct lVal {
-	u8 type;
-	union {
-		bool           vBool;
-		lPair          vList;
-		int            vInt;
-		float          vFloat;
-		lVec          *vVec;
-		lArray        *vArray;
-		lTree         *vTree;
-		lString       *vString;
-		const lSymbol *vSymbol;
-		lClosure      *vClosure;
-		lNFunc        *vNFunc;
-		void          *vPointer;
-
-		lVal          *nextFree;
-	};
-};
-
 #define VAL_MAX (1<<20)
-
 extern lVal  lValList[VAL_MAX];
 extern uint  lValMax;
 extern uint  lValActive;

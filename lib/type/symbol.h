@@ -1,10 +1,6 @@
 #pragma once
 #include "../nujel.h"
 
-struct lSymbol {
-	char c[32];
-};
-
 #define SYM_MAX (1<<14)
 extern lSymbol  lSymbolList [SYM_MAX];
 extern uint     lSymbolMax;

@@ -31,7 +31,7 @@
 [test-add 28 [+ [int 10] [int 10.23] [int "8"]]]
 [test-add #t [and [not [< 3 2]] [zero? 0] [> 3.1 2.1] [> 3 2] [>= 4 "3"] [>= 3 3] [<= 3 3] [not [>= "2" 3]]]]
 [test-add 1 [int [float [+ [vec 1] [vec 0 9 9]]]]]
-[test-add "#nil" [- #nil]]
+[test-add 0 [- #nil]]
 [test-add #t [and [pair? [cons 1 '[2]]] [not [pair? 1]]]]
 [test-add 1 [car [cons 1 '[2]]]]
 [test-add 2 [+ [cadr '[1 2]] [cadr #nil] [cadr '[1]]]]
@@ -135,7 +135,6 @@
 [test-add "15.54" [add [mul 3.2 3.2] [sub 5.5 1.1 1 1.1] [div 9.9 3.3]]]
 [test-add "0.7" [% 10 3.1]]
 [test-add #t [eq? #inf #inf]]
-[test-add #inf [+ 1 [div 10 0]]]
 [test-add "11.7" [add [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.3]]]
 [test-add "11.75" [+ [float 10] [int "10"] [float "-8.25"]]]
 [test-add "30.3" [+ [abs "-10"] [int 8.2] 12.3]]
@@ -238,7 +237,6 @@
 [test-add #t [let [[some-value #f]] [not some-value]]]
 [test-add 4 [>> 8 1]]
 [test-add 15 [1 + 2 * [3 + 4]]]
-[test-add "#inf" [% 4 0]]
 [test-add 9 [10 - 1]]
 [test-add 5 [10 / 2]]
 [test-add 256 [1 << 8]]
@@ -368,6 +366,9 @@
 ;[test-add "[#nil]" [str/write '[#nil]]]
 ;[test-add #f [undefine! testerle]]
 ;[test-add "#nil" [define testerle 123] [undefine! testerle] testerle]
+
+;[test-add "#inf" [% 4 0]]
+;[test-add #inf [+ 1 [div 10 0]]]
 
 ; [test-add #t [eq? #nil #nil]]
 

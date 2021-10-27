@@ -1,17 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
-struct lString{
-	const char *buf,*bufEnd;
-	union {
-		const char *data;
-		lString *nextFree;
-	};
-	u16 flags;
-};
-#define HEAP_ALLOCATED 1
 #define STR_MAX  (1<<14)
-
 extern lString  lStringList [STR_MAX];
 extern uint     lStringActive;
 extern uint     lStringMax;

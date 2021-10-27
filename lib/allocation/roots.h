@@ -2,17 +2,12 @@
 #include "../nujel.h"
 
 lClosure *lRootsClosurePush(lClosure *c);
-lClosure *lRootsClosurePop ();
-void      lRootsClosureMark();
+lVal     *lRootsValPush    (lVal *c);
+lString  *lRootsStringPush (lString *s);
 
-lVal *lRootsValPush(lVal *c);
-lVal *lRootsValPop ();
-void  lRootsValMark();
+void      lRootsMark();
 
-lString *lRootsStringPush(lString *s);
-lString *lRootsStringPop ();
-void     lRootsStringMark();
+extern int rootSP;
 
-extern uint rootsClosureSP;
-extern uint rootsValSP;
-extern uint rootsStringSP;
+static inline void lRootsRet(const int i){ rootSP = i; }
+static inline int lRootsGet(){ return rootSP; }

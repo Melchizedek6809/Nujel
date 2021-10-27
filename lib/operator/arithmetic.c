@@ -17,129 +17,200 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static lVal *lnfAddV(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vVec->v = vecAdd(t->vVec->v,lCar(vv)->vVec->v);
+
+static vec lnfAddV(const lVal *v){
+	vec acc;
+	for(acc = vecZero(); v ; v = v->vList.cdr){
+		acc = vecAdd(acc,v->vList.car->vVec->v);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfAddF(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vFloat += lCar(vv)->vFloat;
+static float lnfAddF(const lVal *v){
+	float acc;
+	for(acc = 0; v ; v = v->vList.cdr){
+		acc += v->vList.car->vFloat;
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfAddI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vInt += lCar(vv)->vInt;
+static int lnfAddI(const lVal *v){
+	int acc;
+	for(acc = 0; v ; v = v->vList.cdr){
+		acc += v->vList.car->vInt;
 	}
-	return t;
+	return acc;
 }
-lVal *lnfAdd(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(0);}
-	lCastApply(lnfAdd,c,v);
+static lVal *lnfAdd(lClosure *c, lVal *v){
+	lVal *t = lCastAuto(c,v);
+	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	lRootsValPush(t);
+	switch(t->vList.car->type){
+		default:      return lValInt(0);
+		case ltInf:   return lValInf();
+		case ltInt:   return lValInt(lnfAddI(t));
+		case ltFloat: return lValFloat(lnfAddF(t));
+		case ltVec:   return lValVec(lnfAddV(t));
+	}
 }
 
 
-static lVal *lnfSubV(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vVec->v = vecSub(t->vVec->v,lCar(vv)->vVec->v);
+static vec lnfSubV(lVal *v){
+	vec acc = v->vList.car->vVec->v;
+	v = v->vList.cdr;
+	if(!v){return vecSub(vecZero(),acc);}
+	for(; v ; v = v->vList.cdr){
+		acc = vecSub(acc,v->vList.car->vVec->v);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfSubF(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vFloat -= lCar(vv)->vFloat;
+static float lnfSubF(lVal *v){
+	float acc = v->vList.car->vFloat;
+	v = v->vList.cdr;
+	if(!v){return -acc;}
+	for(; v ; v = v->vList.cdr){
+		acc -= v->vList.car->vFloat;
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfSubI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vInt -= lCar(vv)->vInt;
+static int lnfSubI(lVal *v){
+	int acc = v->vList.car->vInt;
+	v = v->vList.cdr;
+	if(!v){return -acc;}
+	for(; v ; v = v->vList.cdr){
+		acc -= v->vList.car->vInt;
 	}
-	return t;
+	return acc;
 }
-lVal *lnfSub(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(0);}
-	if((v->type == ltPair) && (lCar(v) != NULL) && (lCdr(v) == NULL)){
-		v = lCons(lValInt(0),v);
+static lVal *lnfSub(lClosure *c, lVal *v){
+	lVal *t = lCastAuto(c,v);
+	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	lRootsValPush(t);
+	switch(t->vList.car->type){
+		default:      return lValInt(0);
+		case ltInf:   return lValInf();
+		case ltInt:   return lValInt(lnfSubI(t));
+		case ltFloat: return lValFloat(lnfSubF(t));
+		case ltVec:   return lValVec(lnfSubV(t));
 	}
-	lCastApply(lnfSub,c,v);
 }
 
-static lVal *lnfMulV(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vVec->v = vecMul(t->vVec->v,lCar(vv)->vVec->v);
+static vec lnfMulV(lVal *v){
+	vec acc;
+	for(acc = vecOne(); v ; v = v->vList.cdr){
+		acc = vecMul(acc,v->vList.car->vVec->v);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfMulF(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){ t->vFloat *= lCar(vv)->vFloat; }
-	return t;
+static float lnfMulF(lVal *v){
+	float acc;
+	for(acc = 1.f; v ; v = v->vList.cdr){
+		acc *= v->vList.car->vFloat;
+	}
+	return acc;
 }
-static lVal *lnfMulI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){ t->vInt *= lCar(vv)->vInt; }
-	return t;
+static int lnfMulI(lVal *v){
+	int acc;
+	for(acc = 1; v ; v = v->vList.cdr){
+		acc *= v->vList.car->vInt;
+	}
+	return acc;
 }
 lVal *lnfMul(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(1);}
-	lCastApply(lnfMul, c , v);
+	lVal *t = lCastAuto(c,v);
+	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	lRootsValPush(t);
+	switch(t->vList.car->type){
+		default:      return lValInt(0);
+		case ltInf:   return lValInf();
+		case ltInt:   return lValInt(lnfMulI(t));
+		case ltFloat: return lValFloat(lnfMulF(t));
+		case ltVec:   return lValVec(lnfMulV(t));
+	}
 }
 
 
-static lVal *lnfDivV(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vVec->v = vecDiv(t->vVec->v,lCar(vv)->vVec->v);
+static vec lnfDivV(lVal *v){
+	vec acc = v->vList.car->vVec->v;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		acc = vecDiv(acc,v->vList.car->vVec->v);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfDivF(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		const float cv = lCar(vv)->vFloat;
-		if(cv == 0){return lValInf();}
-		t->vFloat /= cv;
+static float lnfDivF(lVal *v){
+	float acc = v->vList.car->vFloat;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		acc /= v->vList.car->vFloat;
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfDivI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		if(lCar(vv)->vInt == 0){return lValInf();}
-		t->vInt /= lCar(vv)->vInt;
+static int lnfDivI(lVal *v){
+	int acc = v->vList.car->vInt;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		if(v->vList.car->vInt == 0){
+			lPrintError("/ 0");
+			return 0;
+		}
+		acc /= v->vList.car->vInt;
 	}
-	return t;
+	return acc;
 }
 lVal *lnfDiv(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(1);}
-	lCastApply(lnfDiv, c, v);
+	lVal *t = lCastAuto(c,v);
+	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	lRootsValPush(t);
+	switch(t->vList.car->type){
+		default:      return lValInt(0);
+		case ltInf:   return lValInf();
+		case ltInt:   return lValInt(lnfDivI(t));
+		case ltFloat: return lValFloat(lnfDivF(t));
+		case ltVec:   return lValVec(lnfDivV(t));
+	}
 }
 
 
-
-static lVal *lnfModV(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		t->vVec->v = vecMod(t->vVec->v,lCar(vv)->vVec->v);
+static vec lnfModV(lVal *v){
+	vec acc = v->vList.car->vVec->v;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		acc = vecMod(acc,v->vList.car->vVec->v);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfModF(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		const float cv = lCar(vv)->vFloat;
-		if(cv == 0){return lValInf();}
-		t->vFloat = fmodf(t->vFloat,cv);
+static float lnfModF(lVal *v){
+	float acc = v->vList.car->vFloat;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		acc = fmodf(acc,v->vList.car->vFloat);
 	}
-	return t;
+	return acc;
 }
-static lVal *lnfModI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){
-		const int cv = lCar(vv)->vInt;
-		if(cv == 0){return lValInf();}
-		t->vInt %= cv;
+static int lnfModI(lVal *v){
+	int acc = v->vList.car->vInt;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		if(v->vList.car->vInt == 0){
+			lPrintError("% 0");
+			return 0;
+		}
+		acc = acc % v->vList.car->vInt;
 	}
-	return t;
+	return acc;
 }
 lVal *lnfMod(lClosure *c, lVal *v){
-	lCastApply(lnfMod, c, v);
+	lVal *t = lCastAuto(c,v);
+	if(t == NULL){return lValInt(0);}
+	lRootsValPush(t);
+	switch(t->vList.car->type){
+		default:      return lValInt(0);
+		case ltInf:   return lValInf();
+		case ltInt:   return lValInt(lnfModI(t));
+		case ltFloat: return lValFloat(lnfModF(t));
+		case ltVec:   return lValVec(lnfModV(t));
+	}
 }
+
 
 lVal *lnfAbs(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastNumeric(c,v));
@@ -311,7 +382,6 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 			goto tryAgain;
 		}
 	}
-	lRootsValPop();
 	return lCar(start);
 }
 

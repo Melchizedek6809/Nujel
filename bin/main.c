@@ -16,7 +16,6 @@
 #else
 	#include "../vendor/bestline/bestline.h"
 #endif
-#include "../vendor/bestline/bestline.h"
 
 #include "../lib/api.h"
 #include "misc.h"
@@ -92,10 +91,8 @@ void doRepl(lClosure *c){
 		}
 		lVal *read = lRootsValPush(lRead(str));
 		lVal *expr = lWrap(read);
-		lRootsValPop();
 		lRootsValPush(expr);
 		lVal *v = lEval(c,expr);
-		lRootsValPop();
 		if(v != NULL){
 			lWriteVal(v);
 		}else{

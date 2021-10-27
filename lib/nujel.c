@@ -82,30 +82,31 @@ void lWriteTree(lTree *t){
 
 /* Handler for [λ [...args] ...body] */
 static lVal *lnfLambda(lClosure *c, lVal *v){
-	if((v == NULL) || (lCar(v) == NULL) || (lCdr(v) == NULL)){
+	lVal *car = lCar(v);
+	lVal *cdr = lCdr(v);
+	if((v == NULL) || (car == NULL) || (cdr == NULL)){
 		return NULL;
 	}
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
-	ret->vClosure->text = lWrap(lCdr(v));
-	ret->vClosure->args = lCar(v);
+	ret->vClosure->doc  = lCons(car,lCar(cdr));
+	ret->vClosure->text = lWrap(cdr);
+	ret->vClosure->args = car;
 
-	return lRootsValPop();
+	return ret;
 }
 
 /* Handler for [λ* [..args] docstring body] */
 static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
-	lVal *ret = lValAlloc();
-	lRootsValPush(ret);
+	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
 	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
 	ret->vClosure->text = lCaddr(v);
 	ret->vClosure->args = lCar(v);
 
-	return lRootsValPop();
+	return ret;
 }
 
 /* Handler for [δ [...args] ...body] */
@@ -123,7 +124,6 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	ret->vClosure = lClosureNew(c);
 	ret->vClosure->type = closureObject;
 	lnfDo(ret->vClosure,v);
-	lRootsValPop();
 	return ret;
 }
 
@@ -200,7 +200,6 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
-	lRootsClosurePop();
 	return ret;
 }
 
@@ -212,7 +211,7 @@ lVal *lEval(lClosure *c, lVal *v){
 		return lSymKeyword(v->vSymbol) ? v : lGetClosureSym(c,v->vSymbol);
 	}
 	if(v->type == ltPair){
-		lRootsValPush(v);
+		const int SP = lRootsGet();
 
 		lVal *ret = lRootsValPush(lEval(c,lCar(v)));
 		if(ret == NULL){
@@ -248,12 +247,9 @@ lVal *lEval(lClosure *c, lVal *v){
 					v = (v->vList.cdr == NULL) ? ret : lnfTreeGet(c,nv);
 					break;
 				}
-				lRootsValPop();
 			}
-			lRootsValPop();
 		}
-		lRootsValPop();
-		lRootsValPop();
+		lRootsRet(SP);
 	}
 	return v;
 }
@@ -264,14 +260,14 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	lVal *car = func(c,lCar(v));
 	lRootsValPush(car);
 	lVal *cc = lCons(car,NULL);
-	lRootsValPop();
 	lRootsValPush(cc);
+	lVal *ret = cc;
 	forEach(t,lCdr(v)){
 		cc->vList.cdr = lCons(NULL,NULL);
 		cc = cc->vList.cdr;
 		cc->vList.car = func(c,lCar(t));
 	}
-	return lRootsValPop();
+	return ret;
 }
 
 /* Handler for [apply fn list] */
@@ -383,5 +379,5 @@ lVal *lWrap(lVal *v){
 	lVal *r = lRootsValPush(lCons(NULL,NULL));
 	r->vList.cdr = v;
 	r->vList.car = lValSymS(symDo);
-	return lRootsValPop();
+	return r;
 }

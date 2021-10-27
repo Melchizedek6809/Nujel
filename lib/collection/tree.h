@@ -1,19 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
-struct lTree {
-	lTree *left;
-	lTree *right;
-	const lSymbol *key;
-	int height;
-	union {
-		lVal *value;
-		lTree *nextFree;
-	};
-};
-
 #define TRE_MAX (1<<18)
-
 extern lTree  lTreeList[TRE_MAX];
 extern uint   lTreeMax;
 extern uint   lTreeActive;

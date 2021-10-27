@@ -7,101 +7,70 @@
  * objects on the heap are still reachable.
  */
 #include "roots.h"
+#include "../type-system.h"
+#include "../type/val.h"
+#include "../collection/string.h"
 #include "../collection/closure.h"
 #include "garbage-collection.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-lClosure **rootsClosure = NULL;
-uint rootsClosureSP     = 0;
-uint rootsClosureMax    = 0;
+typedef struct {
+	lType t;
+	union {
+		lClosure *vClosure;
+		lVal     *vVal;
+		lString  *vString;
+		void     *vPointer;
+	};
+} rootEntry;
 
-lVal **rootsVal  = NULL;
-uint rootsValSP  = 0;
-uint rootsValMax = 0;
+rootEntry *rootStack = NULL;
+int rootSP  = 0;
+int rootMax = 0;
 
-lString **rootsString = NULL;
-uint rootsStringSP    = 0;
-uint rootsStringMax   = 0;
+static void lRootsPush(const lType t, void *ptr){
+	if(rootSP >= rootMax){
+		rootMax = MAX(rootMax * 2, 256);
+		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
+		if(rootStack == NULL){
+			fprintf(stderr,"Can't grow rootsStack\n");
+			exit(123);
+		}
+	}
+	rootStack[rootSP++] = (rootEntry){t,{ptr}};
+}
 
 lClosure *lRootsClosurePush(lClosure *c){
-	if(rootsClosureSP >= rootsClosureMax){
-		rootsClosureMax = MAX(rootsClosureMax * 2, 256);
-		rootsClosure = realloc(rootsClosure, rootsClosureMax * sizeof(lClosure *));
-		if(rootsClosure == NULL){
-			fprintf(stderr,"Can't grow rootsClosure\n");
-			exit(123);
-		}
-	}
-	rootsClosure[rootsClosureSP++] = c;
+	lRootsPush(ltLambda,c);
 	return c;
 }
 
-lClosure *lRootsClosurePop(){
-	if(rootsClosureSP == 0){
-		fprintf(stderr,"rootsClosure underflow\n");
-		exit(124);
-	}
-	return rootsClosure[--rootsClosureSP];
-}
-
-void lRootsClosureMark(){
-	for(uint i=0;i<rootsClosureSP;i++){
-		lClosureGCMark(rootsClosure[i]);
-	}
-}
-
-lVal *lRootsValPush(lVal *c){
-	if(rootsValSP >= rootsValMax){
-		rootsValMax = MAX(rootsValMax * 2, 256);
-		rootsVal = realloc(rootsVal, rootsValMax * sizeof(lVal *));
-		if(rootsVal == NULL){
-			fprintf(stderr,"Can't grow rootsVal\n");
-			exit(123);
-		}
-	}
-	rootsVal[rootsValSP++] = c;
-	return c;
-}
-
-lVal *lRootsValPop(){
-	if(rootsValSP == 0){
-		fprintf(stderr,"rootsVal underflow\n");
-		exit(124);
-	}
-	return rootsVal[--rootsValSP];
-}
-
-void lRootsValMark(){
-	for(uint i=0;i<rootsValSP;i++){
-		lValGCMark(rootsVal[i]);
-	}
+lVal *lRootsValPush(lVal *v){
+	lRootsPush(ltPair,v);
+	return v;
 }
 
 lString *lRootsStringPush(lString *s){
-	if(rootsStringSP >= rootsStringMax){
-		rootsStringMax = MAX(rootsStringMax * 2, 256);
-		rootsString = realloc(rootsString, rootsStringMax * sizeof(lString *));
-		if(rootsString == NULL){
-			fprintf(stderr,"Can't grow rootsString\n");
-			exit(123);
-		}
-	}
-	rootsString[rootsStringSP++] = s;
+	lRootsPush(ltString,s);
 	return s;
 }
 
-lString *lRootsStringPop(){
-	if(rootsStringSP == 0){
-		fprintf(stderr,"rootsString underflow\n");
-		exit(124);
-	}
-	return rootsString[--rootsStringSP];
-}
-
-void lRootsStringMark(){
-	for(uint i=0;i<rootsStringSP;i++){
-		lStringGCMark(rootsString[i]);
+void lRootsMark(){
+	for(int i=0;i<rootSP;i++){
+		switch(rootStack[i].t){
+		case ltLambda:
+			lClosureGCMark(rootStack[i].vClosure);
+			break;
+		case ltPair:
+			lValGCMark(rootStack[i].vVal);
+			break;
+		case ltString:
+			lStringGCMark(rootStack[i].vString);
+			break;
+		default:
+			break;
+		}
 	}
 }

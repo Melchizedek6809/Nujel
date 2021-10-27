@@ -65,7 +65,7 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 		lPrintError("lnfArrNew OOM\n");
 		return NULL;
 	}
-	return lRootsValPop();
+	return r;
 }
 
 lVal *lnfArr(lClosure *c, lVal *v){
@@ -85,7 +85,7 @@ lVal *lnfArr(lClosure *c, lVal *v){
 	forEach(cur, v){
 		r->vArray->data[key++] = lCar(cur);
 	}
-	return lRootsValPop();
+	return r;
 }
 
 lVal *lnfArrPred(lClosure *c, lVal *v){

@@ -67,7 +67,6 @@ static lVal *lSymTable(lClosure *c, lVal *v){
 	if(c == NULL){return v;}
 	lRootsValPush(v);
 	v = lTreeAddKeysToList(c->data,v);
-	lRootsValPop();
 	return lSymTable(c->parent,v);
 }
 
@@ -152,6 +151,7 @@ static lVal *lnfClLambda(lClosure *c, lVal *v){
 
 static lVal *lnfLet(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltPair)){return NULL;}
+	int SP = lRootsGet();
 	lClosure *nc = lRootsClosurePush(lClosureNew(c));
 	forEach(n,lCar(v)){
 		lVal *sym = lCaar(n);
@@ -162,14 +162,15 @@ static lVal *lnfLet(lClosure *c, lVal *v){
 	forEach(n,lCdr(v)){
 		ret = lEval(nc,lCar(n));
 	}
-	lRootsClosurePop();
+	lRootsRet(SP);
 	return ret == NULL ? NULL : ret;
 }
 
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
+	const int SP = lRootsGet();
 	lClosure *nc = lRootsClosurePush(lClosureNew(c));
 	lVal *ret = lnfDo(nc,v);
-	lRootsClosurePop();
+	lRootsRet(SP);
 	return ret;
 }
 

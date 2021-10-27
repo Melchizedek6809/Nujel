@@ -261,7 +261,6 @@ lVal *lReadString(lString *s){
 		char c = *s->data;
 		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (c == '}') ||(s->data >= s->bufEnd)){
 			s->data++;
-			lRootsValPop();
 			return ret;
 		}
 
@@ -329,7 +328,6 @@ lVal *lRead(const char *str){
 	s->buf      = str;
 	s->bufEnd   = &str[strlen(str)];
 	lVal *ret   = lReadString(s);
-	lRootsStringPop();
 	return ret;
 }
 
@@ -339,7 +337,6 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	lString *dup = lRootsStringPush(lStringDup(t->vString));
 	t = lReadString(dup);
-	lRootsStringPop();
 	if((t != NULL) && (t->type == ltPair) && (lCar(t) != NULL) && (lCdr(t) == NULL)){
 		return lCar(t);
 	}else{

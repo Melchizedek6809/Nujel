@@ -231,26 +231,6 @@ lTree *castToTree(const lVal *v, lTree *fallback){
 	return v->vTree;
 }
 
-/* Cast the list v to their type of highest precedence */
-lVal *lCastAuto(lClosure *c, lVal *v){
-	lVal *t   = lRootsValPush(lMap(c,v,lEval));
-	lVal *ret = lCast(c,t,lTypecastList(t));
-	lRootsValPop();
-	return ret;
-}
-
-/* Cast v to a value of type */
-lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
-	return lCast(c,v,type);
-}
-
-/* Determine the numeric type with the highest precedence in list v */
-lVal *lCastNumeric(lClosure *c, lVal *v){
-	lType type = lTypecastList(v);
-	if(type == ltString){type = ltFloat;}
-	return lCast(c,v,type);
-}
-
 /* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a,const lType b){
 	if((a == ltInf)   || (b == ltInf))  {return ltInf;}
@@ -263,14 +243,44 @@ lType lTypecast(const lType a,const lType b){
 }
 
 /* Determine the type with the highest precedence in the list a */
-lType lTypecastList(lVal *a){
+static lType lTypecastList(lVal *a, bool *castNeeded){
 	const lVal *car = lCar(a);
 	if(car == NULL){return ltNoAlloc;}
 	lType ret = car->type;
-	forEach(t,lCdr(a)){
+	for(lVal *t=a; t ; t = lCdr(t)){
 		const lVal *tcar = lCar(t);
-		ret = lTypecast(ret,tcar == NULL ? ltNoAlloc : tcar->type);
+		const lType tt = tcar == NULL ? ltNoAlloc : tcar->type;
+		if(tt != ret){
+			*castNeeded = true;
+			ret = lTypecast(ret,tcar == NULL ? ltNoAlloc : tcar->type);
+		}
 	}
+	return ret;
+}
+
+/* Cast the list v to their type of highest precedence */
+lVal *lCastAuto(lClosure *c, lVal *v){
+	lVal *ev = v;
+	bool castNeeded = false;
+	lType t   = lTypecastList(ev, &castNeeded);
+	lVal *ret = castNeeded ? lCast(c,ev,t) : ev;
+	return ret;
+}
+
+/* Cast v to a value of type */
+lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
+	return lCast(c,v,type);
+}
+
+/* Determine the numeric type with the highest precedence in list v */
+lVal *lCastNumeric(lClosure *c, lVal *v){
+	bool castNeeded = false;
+	lType type = lTypecastList(v, &castNeeded);
+	if(type == ltString){
+		type = ltFloat;
+		castNeeded = true;
+	}
+	lVal *ret = castNeeded ? lCast(c,v,type) : v;
 	return ret;
 }
 

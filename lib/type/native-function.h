@@ -1,16 +1,8 @@
 #pragma once
 #include "../nujel.h"
 
-struct lNFunc {
-	union {
-		lVal *(*fp)(lClosure *, lVal *);
-		lNFunc *nextFree;
-	};
-	lVal *doc;
-};
 
 #define NFN_MAX (1<<10)
-
 extern lNFunc   lNFuncList  [NFN_MAX];
 extern uint     lNFuncMax;
 extern uint     lNFuncActive;

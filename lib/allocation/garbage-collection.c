@@ -135,9 +135,7 @@ static void lMarkFree(){
 
 /* Scan through the whole heap so we can mark the roots, terribly inefficient implementation! */
 static void lGCMark(){
-	lRootsClosureMark();
-	lRootsValMark();
-	lRootsStringMark();
+	lRootsMark();
 	lMarkFree();
 }
 
@@ -196,9 +194,9 @@ void lGarbageCollect(){
 	if(lVerbose){
 		const u64 end = getMSecs();
 		printf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(int)(end-start));
-		printf("Vals: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bva,lValActive,(int)lValActive - bva, lValMax, rootsValSP);
-		printf("Clos: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bca,lClosureActive,(int)lClosureActive - bca, lClosureMax,  rootsClosureSP);
-		printf("Strs: %u -> %u [Δ %i]{Σ %i} {Roots: %i}\n",bsa,lStringActive,(int)lStringActive - bsa, lStringMax,  rootsStringSP);
+		printf("Vals: %u -> %u [Δ %i]{Σ %i}\n",bva,lValActive,(int)lValActive - bva, lValMax);
+		printf("Clos: %u -> %u [Δ %i]{Σ %i}\n",bca,lClosureActive,(int)lClosureActive - bca, lClosureMax);
+		printf("Strs: %u -> %u [Δ %i]{Σ %i}\n",bsa,lStringActive,(int)lStringActive - bsa, lStringMax);
 		printf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive, (int)lArrayActive - baa, lArrayMax);
 		printf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive, (int)lTreeActive - bta, lTreeMax);
 		printf("--------------\n\n");
