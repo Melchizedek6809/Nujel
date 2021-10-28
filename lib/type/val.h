@@ -3,7 +3,7 @@
 #include "../collection/list.h"
 #include "../type-system.h"
 
-#define VAL_MAX (1<<20)
+#define VAL_MAX (1<<18)
 extern lVal  lValList[VAL_MAX];
 extern uint  lValMax;
 extern uint  lValActive;
