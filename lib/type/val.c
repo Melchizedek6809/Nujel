@@ -5,7 +5,6 @@
  */
 #include "val.h"
 
-#include "vec.h"
 #include "../collection/string.h"
 #include "../collection/closure.h"
 #include "../allocation/garbage-collection.h"
@@ -49,12 +48,6 @@ lVal *lValAlloc(){
 void lGUIWidgetFree(lVal *v);
 void lValFree(lVal *v){
 	if(v == NULL){return;}
-	if(v->type == ltGUIWidget){
-		lGUIWidgetFree(v);
-	}else if(v->type == ltVec){
-		lVecFree(v->vVec);
-		v->vVec = NULL;
-	}
 	lValActive--;
 	v->nextFree = lValFFree;
 	lValFFree   = v;
@@ -65,9 +58,6 @@ lVal *lValCopy(lVal *dst, const lVal *src){
 	*dst = *src;
 	if(dst->type == ltString){
 		dst->vString = lStringNew(src->vString->buf,lStringLength(src->vString));
-	}else if(dst->type == ltVec){
-		dst->vVec = lVecAlloc();
-		*dst->vVec = *src->vVec;
 	}else if(dst->type == ltPair){
 		dst->vList.car = lValDup(dst->vList.car);
 		dst->vList.cdr = lValDup(dst->vList.cdr);
@@ -97,6 +87,15 @@ lVal *lValFloat(float v){
 	ret->vFloat = v;
 	return ret;
 }
+
+lVal *lValVec(const vec v){
+	lVal *ret = lValAlloc();
+	if(ret == NULL){return ret;}
+	ret->type = ltVec;
+	ret->vVec = v;
+	return ret;
+}
+
 lVal *lValBool(bool v){
 	lVal *ret = lValAlloc();
 	if(ret == NULL){return ret;}

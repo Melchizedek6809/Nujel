@@ -77,7 +77,7 @@ struct lVal {
 		lPair          vList;
 		int            vInt;
 		float          vFloat;
-		lVec          *vVec;
+		vec            vVec;
 		lArray        *vArray;
 		lTree         *vTree;
 		lString       *vString;
@@ -147,11 +147,4 @@ struct lNFunc {
 
 struct lSymbol {
 	char c[32];
-};
-
-struct lVec {
-	union {
-		vec v;
-		lVec *nextFree;
-	};
 };

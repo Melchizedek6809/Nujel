@@ -13,7 +13,6 @@
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
-#include "../type/vec.h"
 #include "../type-system.h"
 
 #include <ctype.h>

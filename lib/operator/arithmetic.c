@@ -11,7 +11,6 @@
 #include "../collection/list.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
-#include "../type/vec.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -19,22 +18,25 @@
 
 
 static vec lnfAddV(const lVal *v){
-	vec acc;
-	for(acc = vecZero(); v ; v = v->vList.cdr){
-		acc = vecAdd(acc,v->vList.car->vVec->v);
+	vec acc = v->vList.car->vVec;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
+		acc = vecAdd(acc,v->vList.car->vVec);
 	}
 	return acc;
 }
 static float lnfAddF(const lVal *v){
-	float acc;
-	for(acc = 0; v ; v = v->vList.cdr){
+	float acc = v->vList.car->vFloat;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
 		acc += v->vList.car->vFloat;
 	}
 	return acc;
 }
 static int lnfAddI(const lVal *v){
-	int acc;
-	for(acc = 0; v ; v = v->vList.cdr){
+	int acc = v->vList.car->vInt;
+	v = v->vList.cdr;
+	for(; v ; v = v->vList.cdr){
 		acc += v->vList.car->vInt;
 	}
 	return acc;
@@ -54,11 +56,11 @@ static lVal *lnfAdd(lClosure *c, lVal *v){
 
 
 static vec lnfSubV(lVal *v){
-	vec acc = v->vList.car->vVec->v;
+	vec acc = v->vList.car->vVec;
 	v = v->vList.cdr;
 	if(!v){return vecSub(vecZero(),acc);}
 	for(; v ; v = v->vList.cdr){
-		acc = vecSub(acc,v->vList.car->vVec->v);
+		acc = vecSub(acc,v->vList.car->vVec);
 	}
 	return acc;
 }
@@ -96,7 +98,7 @@ static lVal *lnfSub(lClosure *c, lVal *v){
 static vec lnfMulV(lVal *v){
 	vec acc;
 	for(acc = vecOne(); v ; v = v->vList.cdr){
-		acc = vecMul(acc,v->vList.car->vVec->v);
+		acc = vecMul(acc,v->vList.car->vVec);
 	}
 	return acc;
 }
@@ -129,10 +131,10 @@ lVal *lnfMul(lClosure *c, lVal *v){
 
 
 static vec lnfDivV(lVal *v){
-	vec acc = v->vList.car->vVec->v;
+	vec acc = v->vList.car->vVec;
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
-		acc = vecDiv(acc,v->vList.car->vVec->v);
+		acc = vecDiv(acc,v->vList.car->vVec);
 	}
 	return acc;
 }
@@ -171,10 +173,10 @@ lVal *lnfDiv(lClosure *c, lVal *v){
 
 
 static vec lnfModV(lVal *v){
-	vec acc = v->vList.car->vVec->v;
+	vec acc = v->vList.car->vVec;
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
-		acc = vecMod(acc,v->vList.car->vVec->v);
+		acc = vecMod(acc,v->vList.car->vVec);
 	}
 	return acc;
 }
@@ -223,7 +225,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	case ltInt:
 		return lValInt(abs(t->vInt));
 	case ltVec:
-		return lValVec(vecAbs(t->vVec->v));
+		return lValVec(vecAbs(t->vVec));
 	}
 }
 
@@ -238,7 +240,7 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(sqrtf(t->vInt));
 	case ltVec:
-		return lValVec(vecSqrt(t->vVec->v));
+		return lValVec(vecSqrt(t->vVec));
 	}
 }
 
@@ -253,7 +255,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecCeil(t->vVec->v));
+		return lValVec(vecCeil(t->vVec));
 	}
 }
 
@@ -268,7 +270,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecFloor(t->vVec->v));
+		return lValVec(vecFloor(t->vVec));
 	}
 }
 
@@ -283,7 +285,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 	case ltInt:
 		return t;
 	case ltVec:
-		return lValVec(vecRound(t->vVec->v));
+		return lValVec(vecRound(t->vVec));
 	}
 }
 
@@ -337,14 +339,14 @@ lVal *lnfPow(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(powf(t->vInt,u->vInt));
 	case ltVec:
-		return lValVec(vecPow(t->vVec->v,u->vVec->v));
+		return lValVec(vecPow(t->vVec,u->vVec));
 	}
 }
 
 lVal *lnfVMag(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastSpecific(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(vecMag(t->vVec->v));
+	return lValFloat(vecMag(t->vVec));
 }
 
 lVal *infixFunctions[32];

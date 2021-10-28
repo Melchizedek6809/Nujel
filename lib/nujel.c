@@ -19,7 +19,6 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
-#include "type/vec.h"
 #include "operator/arithmetic.h"
 #include "operator/array.h"
 #include "operator/binary.h"
@@ -51,7 +50,6 @@ void lInit(){
 	lInitNativeFunctions();
 	lInitStr();
 	lInitVal();
-	lInitVec();
 	lInitSymbol();
 	lTreeInit();
 }
@@ -205,12 +203,11 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 
 /* Evaluate a single value, v, and return the result */
 lVal *lEval(lClosure *c, lVal *v){
-	if((c == NULL) || (v == NULL)){return NULL;}
+	if(v == NULL){return NULL;}
 
 	if(v->type == ltSymbol){
 		return lSymKeyword(v->vSymbol) ? v : lGetClosureSym(c,v->vSymbol);
-	}
-	if(v->type == ltPair){
+	}else if(v->type == ltPair){
 		const int SP = lRootsGet();
 
 		lVal *ret = lRootsValPush(lEval(c,lCar(v)));

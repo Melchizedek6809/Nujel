@@ -13,7 +13,6 @@
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
-#include "../type/vec.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -259,11 +258,11 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		break;
 	case ltVec:
 		t  = snprintf(buf,len,"[vec ");
-		t += bufPrintFloat(v->vVec->v.x,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec.x,&buf[t],t,len);
 		buf[t++] = ' ';
-		t += bufPrintFloat(v->vVec->v.y,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec.y,&buf[t],t,len);
 		buf[t++] = ' ';
-		t += bufPrintFloat(v->vVec->v.z,&buf[t],t,len);
+		t += bufPrintFloat(v->vVec.z,&buf[t],t,len);
 		t += snprintf(&buf[t],len,"]");
 		break;
 	case ltString:

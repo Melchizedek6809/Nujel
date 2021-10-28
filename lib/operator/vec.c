@@ -9,7 +9,6 @@
 #include "../type-system.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
-#include "../type/vec.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){
 	(void)c;

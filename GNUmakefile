@@ -192,4 +192,4 @@ profile: $(NUJEL)
 
 .PHONY: profile-while
 profile-while: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 5,000,000] [set! v [+ 1 v]]] v]]"
+	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 2,000,000] [set! v [+ 1 v]]] v]]"

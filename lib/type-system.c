@@ -17,7 +17,6 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
-#include "type/vec.h"
 #include "operator/string.h"
 
 #include <stdlib.h>
@@ -42,7 +41,7 @@ lVal *lnfInt(lClosure *c, lVal *v){
 	case ltFloat:
 		return lValInt(v->vFloat);
 	case ltVec:
-		return lValInt(v->vVec->v.x);
+		return lValInt(v->vVec.x);
 	case ltString:
 		if(v->vString == NULL){return lValInt(0);}
 		return lValInt(atoi(v->vString->data));
@@ -61,7 +60,7 @@ lVal *lnfFloat(lClosure *c, lVal *v){
 	case ltInt:
 		return lValFloat(v->vInt);
 	case ltVec:
-		return lValFloat(v->vVec->v.x);
+		return lValFloat(v->vVec.x);
 	case ltString:
 		if(v->vString == NULL){return lValFloat(0);}
 		return lValFloat(atof(v->vString->data));
@@ -168,7 +167,7 @@ int castToInt(const lVal *v, int fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
 	case ltVec:
-		return v->vVec->v.x;
+		return v->vVec.x;
 	case ltFloat:
 		return v->vFloat;
 	case ltInt:
@@ -183,7 +182,7 @@ float castToFloat(const lVal *v, float fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
 	case ltVec:
-		return v->vVec->v.x;
+		return v->vVec.x;
 	case ltFloat:
 		return v->vFloat;
 	case ltInt:
@@ -198,7 +197,7 @@ vec castToVec(const lVal *v, vec fallback){
 	if(v == NULL){return fallback;}
 	switch(v->type){
 	case ltVec:
-		return v->vVec->v;
+		return v->vVec;
 	case ltFloat:
 		return vecNew(v->vFloat,v->vFloat,v->vFloat);
 	case ltInt:

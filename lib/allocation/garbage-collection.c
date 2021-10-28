@@ -17,7 +17,6 @@
 #include "../collection/tree.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
-#include "../type/vec.h"
 
 #include <stdio.h>
 
@@ -29,6 +28,7 @@ u8 lClosureMarkMap[CLO_MAX];
 u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
 
+/* Mark v as being in use so it won't get freed by the GC */
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
@@ -36,7 +36,7 @@ void lStringGCMark(const lString *v){
 	lStringMarkMap[ci] = 1;
 }
 
-/* Mark v as being in use so it won't get freed when sweeping */
+/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
@@ -71,6 +71,7 @@ void lValGCMark(lVal *v){
 	}
 }
 
+/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
@@ -81,7 +82,7 @@ void lTreeGCMark(const lTree *v){
 	lValGCMark(v->value);
 }
 
-/* Mark every reference for the GC to ignore contained in c */
+/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
@@ -96,7 +97,7 @@ void lClosureGCMark(const lClosure *c){
 	lClosureGCMark(c->parent);
 }
 
-/* Mark every reference for the GC to ignore contained in v */
+/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
@@ -108,7 +109,8 @@ void lArrayGCMark(const lArray *v){
 }
 
 /* There should be a way to avoid having this procedure alltogether, but for
- * now a solution is not apparent to me
+ * now a solution is not apparent to me. It marks every free object so it won't
+ * get freed again.
  */
 static void lMarkFree(){
 	for(lArray *arr = lArrayFFree;arr != NULL;arr = arr->nextFree){
@@ -133,7 +135,7 @@ static void lMarkFree(){
 	}
 }
 
-/* Scan through the whole heap so we can mark the roots, terribly inefficient implementation! */
+/* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
 	lRootsMark();
 	lMarkFree();
