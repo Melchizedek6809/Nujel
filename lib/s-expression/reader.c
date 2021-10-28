@@ -15,6 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define isopenparen(v) ((v=='[')||(v=='(')||(v=='{'))
+#define iscloseparen(v) ((v==']')||(v==')')||(v=='}'))
+#define isparen(v) (isopenparen(v) || (iscloseparen(v)))
+#define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`'))
+
 static void lStringAdvanceToNextCharacter(lString *s){
 	for(;(*s->data != 0) && (isspace((u8)*s->data));s->data++){}
 }
@@ -308,26 +313,27 @@ lVal *lReadString(lString *s){
 				break;
 			}
 			// fall through
-		default:
-			if((isdigit((u8)c)) || ((c == '-') && (isdigit((u8)s->data[1])))){
+		default: {
+			const u8 n = s->data[1];
+			if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
 				v->vList.car = lParseNumberDecimal(s);
-			}else if((c == '-') && (s->data[1] != '-') && (!isspace((u8)s->data[1])) && (s->data[1] != 0)){
+			}else if((c == '-') && (n != 0) && (n != '-') && (!isspace(n)) && (!isnonsymbol(n))){
 				s->data++;
 				v->vList.car = lCons(lCons(lValSymS(symMinus),lCons(lParseSymbol(s),NULL)),NULL);
 			}else{
 				v->vList.car = lParseSymbol(s);
 			}
-			break;
+			break; }
 		}
 	}
 }
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
-	lString *s  = lRootsStringPush(lStringAlloc());
-	s->data     = str;
-	s->buf      = str;
-	s->bufEnd   = &str[strlen(str)];
-	lVal *ret   = lReadString(s);
+	lString *s = lRootsStringPush(lStringAlloc());
+	s->data    = str;
+	s->buf     = str;
+	s->bufEnd  = &str[strlen(str)];
+	lVal *ret  = lReadString(s);
 	return ret;
 }
 
