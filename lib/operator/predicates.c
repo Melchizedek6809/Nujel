@@ -5,6 +5,7 @@
  */
 #include "predicates.h"
 
+#include "arithmetic.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../collection/list.h"
@@ -106,6 +107,12 @@ static lVal *lnfLess(lClosure *c, lVal *v){
 	return lValBool(cmp == 2 ? false : cmp < 0);
 }
 
+static lVal *lnfUnequal(lClosure *c, lVal *v){
+	(void)c;
+	const int cmp = lValCompare(v);
+	return lValBool(!(cmp == 2 ? false : cmp == 0));
+}
+
 static lVal *lnfEqual(lClosure *c, lVal *v){
 	(void)c;
 	const int cmp = lValCompare(v);
@@ -136,10 +143,11 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 }
 
 void lOperationsPredicate(lClosure *c){
-	lAddNativeFunc(c,"less? <",           "[a b]","#t if A < B",  lnfLess);
-	lAddNativeFunc(c,"less-equal? <=",    "[a b]","#t if A <= B", lnfLessEqual);
-	lAddNativeFunc(c,"equal? eqv? eq? =", "[a b]","#t if A == B", lnfEqual);
-	lAddNativeFunc(c,"greater-equal? >=", "[a b]","#t if A >= B", lnfGreaterEqual);
-	lAddNativeFunc(c,"greater? >",        "[a b]","#t if A > B",  lnfGreater);
+	lAddInfix(lAddNativeFunc(c,"less? <",           "[a b]","#t if A < B",  lnfLess));
+	lAddInfix(lAddNativeFunc(c,"less-equal? <=",    "[a b]","#t if A <= B", lnfLessEqual));
+	lAddInfix(lAddNativeFunc(c,"equal? eq? == =",   "[a b]","#t if A == B", lnfEqual));
+	lAddInfix(lAddNativeFunc(c,"!= <>",             "[a b]","#t if A != B", lnfUnequal));
+	lAddInfix(lAddNativeFunc(c,"greater-equal? >=", "[a b]","#t if A >= B", lnfGreaterEqual));
+	lAddInfix(lAddNativeFunc(c,"greater? >",        "[a b]","#t if A > B",  lnfGreater));
 	lAddNativeFunc(c,"nil?",              "[a]","#t if A #nil",   lnfNilPred);
 }

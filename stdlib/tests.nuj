@@ -323,6 +323,18 @@
 [test-add 3 [wrap-value 3 2 4]]
 [test-add 2 [wrap-value 4 2 4]]
 [test-add 3 [wrap-value 5 2 4]]
+[test-add #t [1 < 10]]
+[test-add #f [1 > 10]]
+[test-add #t [1 <> 10]]
+[test-add #f [1 <> 1]]
+[test-add #t [1 != 10]]
+[test-add #f [1 != 1]]
+[test-add #f [1 = 10]]
+[test-add #t [1 = 1]]
+[test-add #t [1 >= 1]]
+[test-add #t [1 <= 1]]
+[test-add #t [1 <= 4]]
+[test-add #t [4 >= 1]]
 [test-add #f [and #nil #nil]]
 [test-add #t [eq? #nil #nil]]
 [test-add #t [eq? #t #t]]
@@ -414,6 +426,7 @@
 [test-add 2 [cdr '[1 . 2]]]
 [test-add 1 [#[1 2 3] 0]]
 [test-add 2 [@[:asd 1 :bsd 2] :bsd]]
+
 
 ; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]

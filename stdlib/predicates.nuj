@@ -30,11 +30,6 @@
 	[< a 0]
 ]]
 
-[def ineq? [λ [a b]
-	"Returns #t a does not equal b"
-	[not [eq? a b]]
-]]
-
 [def odd? [λ [a]
 	"Predicate that returns #t if a is odd"
 	[= [% [int a] 2] 1]
