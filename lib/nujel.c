@@ -254,14 +254,14 @@ lVal *lEval(lClosure *c, lVal *v){
 /* Evaluate func for every entry in list v and return a list containing the results */
 lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	if((c == NULL) || (v == NULL)){return NULL;}
-	lVal *car = func(c,lCar(v));
-	lRootsValPush(car);
-	lVal *cc = lCons(car,NULL);
-	lRootsValPush(cc);
-	lVal *ret = cc;
-	forEach(t,lCdr(v)){
-		cc->vList.cdr = lCons(NULL,NULL);
-		cc = cc->vList.cdr;
+	lVal *ret=NULL, *cc=NULL;
+	for(lVal *t = v; t ; t = lCdr(t)){
+		if(cc == NULL){
+			ret = cc = lRootsValPush(lCons(NULL,NULL));
+		}else{
+			cc->vList.cdr = lCons(NULL,NULL);
+			cc = cc->vList.cdr;
+		}
 		cc->vList.car = func(c,lCar(t));
 	}
 	return ret;

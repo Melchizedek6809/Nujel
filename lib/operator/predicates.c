@@ -23,7 +23,9 @@ static int lValCompare(lVal *v){
 	v = lCdr(v);
 	if(v == NULL){return 2;}
 	lVal *b = lCar(v);
-	if((a == NULL) || (b == NULL)){return castToBool(a) != castToBool(b);}
+	if((a == NULL) || (b == NULL)){
+		return !((a == NULL) && (b == NULL));
+	}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
 	case ltPair:
