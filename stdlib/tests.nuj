@@ -408,12 +408,12 @@
 [test-add "[]" '[#nil]]
 [test-add "[#nil #nil]" '[#nil #nil]]
 [test-add "[and #nil #nil]" '[and #nil #nil]]
+[test-add '[1 . 2] [cons 1 2]]
+[test-add '[1 . 2] '[1 . 2]]
+[test-add 1 [car '[1 . 2]]]
+[test-add 2 [cdr '[1 . 2]]]
 
-;[test-add '[1 . 2] [cons 1 2]]
-;[test-add '[1 . 2] '[1 . 2]]
-;[test-add 1 [car '[1 . 2]]]
-;[test-add 2 [cdr '[1 . 2]]]
-
+; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]
 ;[test-add "#nil" [def testerle 123] [undefine! testerle] testerle]
 
@@ -426,5 +426,3 @@
 
 ; Has to wait until infix operators can be λs
 ;[test-add 64 [512 >> 3]]
-
-; Edge cases that still need a specified behaviour

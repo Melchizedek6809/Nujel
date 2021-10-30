@@ -266,13 +266,19 @@ lVal *lReadList(lString *s){
 		lStringAdvanceToNextCharacter(s);
 
 		const char c = *s->data;
-		if((c == 0) || (c == ']') || (c == ')') || (c == '}') || (s->data >= s->bufEnd)){
+		if((s->data >= s->bufEnd) || (c == 0) || (c == ']') || (c == ')') || (c == '}')){
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else{
 			if(v == NULL){
 				v = ret = lRootsValPush(lCons(NULL,NULL));
 			}else{
+				if((c == '.') && (isspace(s->data[1]) || isnonsymbol(s->data[1]))){
+					s->data++;
+					lStringAdvanceToNextCharacter(s);
+					v->vList.cdr = lReadValue(s);
+					continue;
+				}
 				v->vList.cdr = lCons(NULL,NULL);
 				v = v->vList.cdr;
 			}
