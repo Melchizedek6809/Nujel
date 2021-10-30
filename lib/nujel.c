@@ -43,7 +43,8 @@ extern u8 stdlib_no_data[];
 char dispWriteBuf[1<<18];
 bool lVerbose = false;
 
-/* Initialize the allocator and symbol table, needs to be called before any other call.*/
+/* Initialize the allocator and symbol table, needs to be called before as
+ * soon as possible, since most procedures depend on it.*/
 void lInit(){
 	lInitArray();
 	lInitClosure();
@@ -176,6 +177,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	if(lambda->type == ltObject){
 		return lnfDo(lambda->vClosure,args);
 	}
+	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = (lambda->type == ltDynamic
 		? lClosureNew(c)
@@ -198,57 +200,65 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
+	lRootsRet(SP);
 	return ret;
+}
+
+/* Run fun with args, evaluating args if necessary  */
+static lVal *lApply(lClosure *c, lVal *args, lVal *fun){
+	switch(fun ? fun->type : ltNoAlloc){
+	case ltObject:
+	case ltLambda:
+	case ltDynamic:
+		return lLambda(c,args,fun);
+	case ltSpecialForm:
+		return fun->vNFunc->fp(c,args);
+	case ltNativeFunc: {
+		lVal *evaledArgs = lMap(c,args,lEval);
+		lVal *ret = fun->vNFunc->fp(c,evaledArgs);
+		return ret;}
+	default:
+		return NULL;
+	}
 }
 
 /* Evaluate a single value, v, and return the result */
 lVal *lEval(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
-
-	if(v->type == ltSymbol){
+	switch(v ? v->type : ltNoAlloc){
+	default:
+		return v;
+	case ltSymbol:
 		return lSymKeyword(v->vSymbol) ? v : lGetClosureSym(c,v->vSymbol);
-	}else if(v->type == ltPair){
-		const int SP = lRootsGet();
-
-		lVal *ret = lRootsValPush(lEval(c,lCar(v)));
-		if(ret == NULL){
-			v = NULL;
-		}else if(ret->type == ltSpecialForm){
-			v = ret->vNFunc->fp(c,lCdr(v));
-		}else if((ret->type == ltLambda) || (ret->type == ltDynamic) || (ret->type == ltObject)){
-			v = lLambda(c,lCdr(v),ret);
-		}else{
-			lVal *args = lMap(c,lCdr(v),lEval);
-			lRootsValPush(args);
-			if(ret->type == ltNativeFunc){
-				v = ret->vNFunc->fp(c,args);
-			}else{
-				lVal *nv = lCons(ret,args);
-				lRootsValPush(nv);
-				switch(ret->type){
-				case ltPair:
-					v = lEval(c,nv);
-					break;
-				case ltString:
-					v = lnfCat(c,nv);
-					break;
-				case ltInt:
-				case ltFloat:
-				case ltVec:
-					v = (v->vList.cdr == NULL) ? ret : lnfInfix(c,nv);
-					break;
-				case ltArray:
-					v = (v->vList.cdr == NULL) ? ret : lnfArrRef(c,nv);
-					break;
-				case ltTree:
-					v = (v->vList.cdr == NULL) ? ret : lnfTreeGet(c,nv);
-					break;
-				}
-			}
-		}
-		lRootsRet(SP);
+	case ltPair: {
+		lVal *car = lCar(v);
+		if(car == NULL){return NULL;}
+		switch(car->type){
+		default:
+			return v;
+		case ltLambda:
+		case ltDynamic:
+		case ltNativeFunc:
+		case ltSpecialForm:
+		case ltObject:
+			return lApply(c,lCdr(v),car);
+		case ltInt:
+		case ltFloat:
+		case ltVec:
+			return lApply(c,v,lnfvInfix);
+		case ltArray:
+			return lApply(c,v,lnfvArrRef);
+		case ltString:
+			return lApply(c,v,lnfvCat);
+		case ltTree:
+			return lApply(c,v,lnfvTreeGet);
+		case ltSymbol:
+			return lSymKeyword(car->vSymbol)
+				? v
+				: lEval(c,lRootsValPush(lCons(lGetClosureSym(c,car->vSymbol),lCdr(v))));
+		case ltPair:
+			return lEval(c,lRootsValPush(lCons(lRootsValPush(lEval(c,car)),lCdr(v))));
+		}}
 	}
-	return v;
 }
 
 /* Evaluate func for every entry in list v and return a list containing the results */

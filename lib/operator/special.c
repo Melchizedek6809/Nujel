@@ -61,8 +61,10 @@ static lVal *lnfQuote(lClosure *c, lVal *v){
 
 lVal *lnfDo(lClosure *c, lVal *v){
 	lVal *ret = NULL;
+	const int SP = lRootsGet();
 	forEach(n,v){
 		ret = lEval(c,lCar(n));
+		lRootsRet(SP);
 	}
 	return ret;
 }
@@ -71,8 +73,10 @@ lVal *lnfWhile(lClosure *c, lVal *v){
 	lVal *cond = lCar(v);
 	lVal *body = lCdr(v);
 	lVal *ret  = NULL;
+	const int SP = lRootsGet();
 	while(castToBool(lEval(c,cond))){
 		ret = lnfDo(c,body);
+		lRootsRet(SP);
 	}
 	return ret;
 }

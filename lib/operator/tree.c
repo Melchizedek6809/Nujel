@@ -12,6 +12,8 @@
 #include "../type/val.h"
 #include "../type-system.h"
 
+lVal *lnfvTreeGet;
+
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
@@ -60,7 +62,7 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	lTree *tre = car->vTree;
 	lVal *vs = lCadr(v);
-	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
+	if((vs == NULL) || (vs->type != ltSymbol)){return car;}
 	return lTreeGet(tre,vs->vSymbol,NULL);
 }
 
@@ -98,7 +100,7 @@ void lOperationsTree(lClosure *c){
 	lAddNativeFunc(c,"tree/values",  "[tree]",         "Return each value of TREE in a list", lnfTreeGetValues);
 	lAddNativeFunc(c,"tree/get-list","[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c,"tree/size",    "[tree]",         "Return the amount of entries in TREE", lnfTreeSize);
-	lAddNativeFunc(c,"tree/get",     "[tree sym]",     "Return the value of SYM in TREE, or #nil", lnfTreeGet);
 	lAddNativeFunc(c,"tree/has?",    "[tree sym]",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
 	lAddNativeFunc(c,"tree/set!",    "[tree sym val]", "Set SYM to VAL in TREE", lnfTreeSet);
+	lnfvTreeGet = lAddNativeFunc(c,"tree/get",     "[tree sym]",     "Return the value of SYM in TREE, or #nil", lnfTreeGet);
 }

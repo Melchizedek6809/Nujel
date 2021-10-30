@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+lVal *lnfvCat;
+
 lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return lValInt(0);}
@@ -318,7 +320,7 @@ lVal *lnfFromCharCode(lClosure *c,lVal *v){
 }
 
 void lOperationsString(lClosure *c){
-	lAddNativeFunc(c,"str/concatenate str/cat cat","[...args]",       "ConCATenates ARGS into a single string",                                                     lnfCat);
+	lnfvCat = lAddNativeFunc(c,"str/concatenate str/cat cat","[...args]",       "ConCATenates ARGS into a single string",                                                     lnfCat);
 	lAddNativeFunc(c,"str/trim trim",              "[str]",           "Trim STR of any excessive whitespace",                                                         lnfTrim);
 	lAddNativeFunc(c,"str/length",                 "[str]",      "Return length of STR",                                                                  lnfStrlen);
 	lAddNativeFunc(c,"str/uppercase uppercase",    "[str]",           "Return STR uppercased",                                                   lnfStrUp);

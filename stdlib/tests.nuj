@@ -412,6 +412,8 @@
 [test-add '[1 . 2] '[1 . 2]]
 [test-add 1 [car '[1 . 2]]]
 [test-add 2 [cdr '[1 . 2]]]
+[test-add 1 [#[1 2 3] 0]]
+[test-add 2 [@[:asd 1 :bsd 2] :bsd]]
 
 ; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]

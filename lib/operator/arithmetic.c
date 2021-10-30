@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+lVal *lnfvInfix;
 
 static vec lnfAddV(const lVal *v){
 	vec acc = v->vList.car->vVec;
@@ -359,6 +360,7 @@ void lAddInfix(lVal *v){
 lVal *lnfInfix (lClosure *c, lVal *v){
 	lVal *l = NULL, *start = NULL;
 	if(v == NULL){return NULL;}
+	if(v->vList.cdr == NULL){return v->vList.car;}
 	start = l = lRootsValPush(lCons(NULL,NULL));
 	start->vList.car = lEval(c,lCar(v));
 	for(lVal *cur=lCdr(v);cur != NULL;cur=lCdr(cur)){
@@ -388,6 +390,7 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 }
 
 void lOperationsArithmetic(lClosure *c){
+	lnfvInfix = lAddNativeFunc(c,"infix",  "[...body]","Evaluate body as an infix expression", lnfInfix);
 	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]","Modulo",        lnfMod));
 	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]","Division",      lnfDiv));
 	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]","Multiplication",lnfMul));

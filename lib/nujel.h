@@ -4,6 +4,11 @@
 
 extern bool lVerbose;
 
+extern lVal *lnfvInfix;
+extern lVal *lnfvArrRef;
+extern lVal *lnfvCat;
+extern lVal *lnfvTreeGet;
+
 void      lInit             ();
 int       lMemUsage         ();
 void      lPrintError       (const char *format, ...);

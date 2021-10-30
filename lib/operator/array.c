@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+lVal *lnfvArrRef;
+
 lVal *lnfArrLength(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
@@ -95,8 +97,8 @@ lVal *lnfArrPred(lClosure *c, lVal *v){
 }
 
 void lOperationsArray(lClosure *c){
+	lnfvArrRef = lAddNativeFunc(c,"arr-ref",    "[array index]",  "Return value of ARRAY at position INDEX",     lnfArrRef);
 	lAddNativeFunc(c,"arr-length", "[array]",    "Return length of ARRAY",                          lnfArrLength);
-	lAddNativeFunc(c,"arr-ref",    "[array index]",  "Return value of ARRAY at position INDEX",     lnfArrRef);
 	lAddNativeFunc(c,"arr-set!",   "[array index &...values]","Set ARRAY at INDEX to &...VALUES",   lnfArrSet);
 	lAddNativeFunc(c,"arr-new",    "[size]",     "Allocate a new array of SIZE",                    lnfArrNew);
 	lAddNativeFunc(c,"arr",        "[...args]",  "Create a new array from ...ARGS",                 lnfArr);
