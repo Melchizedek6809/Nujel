@@ -9,7 +9,7 @@ extern uint  lValMax;
 extern uint  lValActive;
 extern lVal *lValFFree;
 
-void      lInitVal();
+void      lInitVal  ();
 
 lVal     *lValAlloc ();
 void      lValFree  (lVal *v);

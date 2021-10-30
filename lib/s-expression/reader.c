@@ -250,81 +250,88 @@ static lVal *lParseSpecial(lString *s){
 		return lValBool(false);
 	case 'i':
 		s->data+=2; return lValInf();
-	case '[':
-		return lCons(lValSymS(symArr),lReadString(s));
-	}
+	case '[':{
+		lVal *ret = lRootsValPush(lCons(NULL,NULL));
+		ret->vList.car = lValSymS(symArr);
+		ret->vList.cdr = lReadList(s);
+		return ret;
+	}}
 
 }
 
 /* Read the string in s and parse all escape sequences */
-lVal *lReadString(lString *s){
-	lVal *v, *ret;
-	ret = v = lCons(NULL,NULL);
-	lRootsValPush(ret);
+lVal *lReadList(lString *s){
+	lVal *v = NULL, *ret = NULL;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
-		char c = *s->data;
-		if((v == NULL) || (c == 0) || (c == ']') || (c == ')') || (c == '}') ||(s->data >= s->bufEnd)){
+
+		const char c = *s->data;
+		if((c == 0) || (c == ']') || (c == ')') || (c == '}') || (s->data >= s->bufEnd)){
 			s->data++;
+			return ret == NULL ? lCons(NULL,NULL) : ret;
+		}else{
+			if(v == NULL){
+				v = ret = lRootsValPush(lCons(NULL,NULL));
+			}else{
+				v->vList.cdr = lCons(NULL,NULL);
+				v = v->vList.cdr;
+			}
+			v->vList.car = lReadValue(s);
+		}
+
+	}
+}
+
+/* Read the string in s and parse all escape sequences */
+lVal *lReadValue(lString *s){
+	if(s->data >= s->bufEnd){
+		return NULL;
+	}
+	const char c = *s->data;
+
+	switch(c){
+	case 0:
+		return NULL;
+	case '(':
+	case '{':
+	case '[':
+		s->data++;
+		return lReadList(s);
+	case '\'': {
+		s->data++;
+		lVal *ret = lRootsValPush(lCons(NULL,NULL));
+		ret->vList.car = lValSymS(symQuote);
+		ret->vList.cdr = lCons(NULL,NULL);
+		ret->vList.cdr->vList.car = lReadValue(s);
+		return ret; }
+	case '"':
+		s->data++;
+		return lParseString(s);
+	case '#':
+		return lParseSpecial(s);
+	case ';':
+		lStringAdvanceToNextLine(s);
+		return lReadValue(s);
+	case '@':
+		if(isopenparen(s->data[1])){
+			s->data+=2;
+			lVal *ret = lRootsValPush(lCons(NULL,NULL));
+			ret->vList.car = lValSymS(symTreeNew);
+			ret->vList.cdr = lReadList(s);
 			return ret;
 		}
-
-		if(lCar(v) != NULL){
-			v->vList.cdr = lCons(NULL,NULL);
-			v = lCdr(v);
-		}
-
-		switch(c){
-		case '(':
-		case '{':
-		case '[':
-			s->data+=1;
-			v->vList.car = lReadString(s);
-			break;
-		case '\'':
+		// fall through
+	default: {
+		const u8 n = s->data[1];
+		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
+			return lParseNumberDecimal(s);
+		}else if((c == '-') && (n != 0) && (n != '-') && (!isspace(n)) && (!isnonsymbol(n))){
 			s->data++;
-			v->vList.car = lCons(NULL,NULL);
-			v->vList.car->vList.car = lValSymS(symQuote);
-			v->vList.car->vList.cdr = lCons(NULL,NULL);
-			if(*s->data == '['){
-				s->data++;
-				v->vList.car->vList.cdr->vList.car = lReadString(s);
-			}else{
-				v->vList.car->vList.cdr->vList.car = lParseSymbol(s);
-			}
-			break;
-		case '"':
-			s->data++;
-			v->vList.car = lParseString(s);
-			break;
-		case '#':
-			v->vList.car = lParseSpecial(s);
-			break;
-		case ';':
-			lStringAdvanceToNextLine(s);
-			break;
-		case '@':
-			if((s->data[1] == '[') || (s->data[1] == '(') || (s->data[1] == '{')){
-				s->data+=2;
-				v->vList.cdr = lReadString(s);
-				v->vList.car = lValSymS(symTreeNew);
-				v->vList.car = lCons(v->vList.car,v->vList.cdr);
-				v->vList.cdr = NULL;
-				break;
-			}
-			// fall through
-		default: {
-			const u8 n = s->data[1];
-			if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
-				v->vList.car = lParseNumberDecimal(s);
-			}else if((c == '-') && (n != 0) && (n != '-') && (!isspace(n)) && (!isnonsymbol(n))){
-				s->data++;
-				v->vList.car = lCons(lCons(lValSymS(symMinus),lCons(lParseSymbol(s),NULL)),NULL);
-			}else{
-				v->vList.car = lParseSymbol(s);
-			}
-			break; }
+			return lCons(lCons(lValSymS(symMinus),lCons(lParseSymbol(s),NULL)),NULL);
+		}else{
+			return lParseSymbol(s);
 		}
+		return 0; }
 	}
 }
 /* Read the s-expression in str */
@@ -333,7 +340,7 @@ lVal *lRead(const char *str){
 	s->data    = str;
 	s->buf     = str;
 	s->bufEnd  = &str[strlen(str)];
-	lVal *ret  = lReadString(s);
+	lVal *ret  = lReadList(s);
 	return ret;
 }
 
@@ -342,12 +349,8 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	lString *dup = lRootsStringPush(lStringDup(t->vString));
-	t = lReadString(dup);
-	if((t != NULL) && (t->type == ltPair) && (lCar(t) != NULL) && (lCdr(t) == NULL)){
-		return lCar(t);
-	}else{
-		return t;
-	}
+	t = lReadList(dup);
+	return t;
 }
 
 /* Add all reader operators to c */

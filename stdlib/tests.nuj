@@ -140,7 +140,7 @@
 [test-add -1 [ash -1 -1]]
 [test-add -16 [lognand #b1111 #b1111]]
 [test-add 6 [eval [read "[+ 1 2 3]"]]]
-[test-add 3 [let [[test-string "3"]] [read test-string] [read test-string]]]
+[test-add '[3] [let [[test-string "3"]] [read test-string] [read test-string]]]
 [test-add "[vec 1.0 2.0 3.0]" [abs [vec -1 -2 -3]]]
 [test-add "3.33333" [+ 1.11111 2.22222]]
 [test-add "\"H#Hallo\"" [let [[a "Hallo, Welt#"]] [cat [substr a 0 1] [substr a -1] [substr a 0 -7]]]]
@@ -231,7 +231,7 @@
 [test-add "[1.0 2.0 3.0]" [map float [split "1,2,3" ","]]]
 [test-add "[\"dies ist\" \"ein\" \"test\"]" [split "dies ist/ein/test" "/"]]
 [test-add 1 [index-of "1,2,3" ","]]
-[test-add #x123 [read [join [cons "#x" [split "123" ""]]]]]
+[test-add #x123 [car [read [join [cons "#x" [split "123" ""]]]]]]
 [test-add 7 [char-at "\a" 0]]
 [test-add 5 [char-at [from-char-code 5 10 20] 0]]
 [test-add 2600 [int [from-char-code [char-at "2" 0] #\6 48 48]]]
@@ -369,12 +369,12 @@
 [test-add 2 [length [tree/keys @[:b 2 :a 123]]]]
 [test-add 2 [length [tree/values @[:b 2 :a 123]]]]
 [test-add 3 [length [tree/keys @[:b 2 :a 123 :c 7]]]]
-[test-add '[:asd 123] [read "{:asd 123}"]]
-[test-add '[123 [:asd]] [read "[123[:asd]]"]]
-[test-add '[123 [:asd]] [read "{123{:asd}}"]]
-[test-add '[123 [:asd]] [read "(123(:asd))"]]
-[test-add '[123 [:asd]] [read "(123{:asd})"]]
-[test-add '[:asd [123]] [read "(:asd[123])"]]
+[test-add '[:asd 123]   [car [read "{:asd 123}"]]]
+[test-add '[123 [:asd]] [car [read "[123[:asd]]"]]]
+[test-add '[123 [:asd]] [car [read "{123{:asd}}"]]]
+[test-add '[123 [:asd]] [car [read "(123(:asd))"]]]
+[test-add '[123 [:asd]] [car [read "(123{:asd})"]]]
+[test-add '[:asd [123]] [car [read "(:asd[123])"]]]
 [test-add #t [pair? [symbol-table]]]
 [test-add #t [> [length [symbol-table]] 200]]
 [test-add :one [car '[:one :two :three]]]
@@ -403,20 +403,23 @@
 [test-add #t [procedure? [let* [def t -] t]]]
 [test-add #f [when #f 1]]
 [test-add 1 [when #t 1]]
+[test-add "[]" '[]]
+[test-add "[]" '[#nil]]
+[test-add "[#nil #nil]" '[#nil #nil]]
+[test-add "[and #nil #nil]" '[and #nil #nil]]
+;[test-add #t [eq? #nil #nil]]
 
 ;[test-add '[1 . 2] [cons 1 2]]
 ;[test-add '[1 . 2] '[1 . 2]]
 ;[test-add 1 [car '[1 . 2]]]
 ;[test-add 2 [cdr '[1 . 2]]]
 
-;[test-add "[#nil]" [str/write '[#nil]]]
 ;[test-add #f [undefine! testerle]]
 ;[test-add "#nil" [def testerle 123] [undefine! testerle] testerle]
 
+; Has to wait until we have proper exceptions
 ;[test-add "#inf" [% 4 0]]
 ;[test-add #inf [+ 1 [div 10 0]]]
-
-; [test-add #t [eq? #nil #nil]]
 
 ; Has to wait until the new constant system is in place
 ;[test-add 3.14159 [set! π 3] π]
@@ -424,6 +427,4 @@
 ; Has to wait until infix operators can be λs
 ;[test-add 64 [512 >> 3]]
 
-
 ; Edge cases that still need a specified behaviour
-; [test-add "[and #nil #nil]" '[and #nil #nil]]
