@@ -1,19 +1,31 @@
 #pragma once
-/* The API is completely unstable right now and will change
- * a lot from commit to commit!
+/* The API is still very unstable, still this is the
+ * header that should be included if you want to link
+ * Nujel into your program.
  */
 
 #include "nujel.h"
+
+#include "allocation/array.h"
+#include "allocation/closure.h"
 #include "allocation/garbage-collection.h"
 #include "allocation/roots.h"
-#include "collection/array.h"
+#include "allocation/string.h"
+#include "allocation/val.h"
+
 #include "collection/closure.h"
 #include "collection/list.h"
 #include "collection/string.h"
 #include "collection/tree.h"
-#include "operator/string.h"
+
+#include "operation/string.h"
+
 #include "s-expression/reader.h"
+#include "s-expression/writer.h"
+
+#include "display.h"
 #include "type-system.h"
+
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"

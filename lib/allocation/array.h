@@ -7,6 +7,6 @@ extern uint    lArrayActive;
 extern uint    lArrayMax;
 extern lArray *lArrayFFree;
 
-void    lInitArray    ();
+void    lArrayInit    ();
 lArray *lArrayAlloc   ();
 void    lArrayFree    (lArray *v);

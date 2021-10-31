@@ -25,4 +25,4 @@
         "Evaluate a Nujel source file in the current context"
         [do [def source [cons 'do [read [file/read path]]]]
            [eval source]]]]
-    [def test-context "Nujel Standalone"]]
+    [def test-context "Nujel Bootstrap "]]

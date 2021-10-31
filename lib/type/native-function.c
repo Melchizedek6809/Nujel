@@ -5,6 +5,8 @@
  */
 #include "native-function.h"
 #include "val.h"
+#include "../display.h"
+#include "../allocation/val.h"
 #include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../s-expression/reader.h"
@@ -14,7 +16,7 @@ uint     lNFuncActive = 0;
 uint     lNFuncMax    = 0;
 lNFunc  *lNFuncFFree  = NULL;
 
-void lInitNativeFunctions(){
+void lNativeFunctionsInit(){
 	lNFuncActive = 0;
 	lNFuncMax    = 0;
 }

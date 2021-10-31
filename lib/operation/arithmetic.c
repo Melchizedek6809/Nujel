@@ -5,6 +5,7 @@
  */
 #include "arithmetic.h"
 #include "../allocation/roots.h"
+#include "../display.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../misc/vec.h"

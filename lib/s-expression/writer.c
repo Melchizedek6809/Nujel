@@ -5,8 +5,8 @@
  */
 #include "writer.h"
 
+#include "../allocation/array.h"
 #include "../collection/closure.h"
-#include "../collection/array.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"

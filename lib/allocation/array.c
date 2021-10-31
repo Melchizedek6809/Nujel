@@ -5,6 +5,7 @@
  */
 #include "array.h"
 
+#include "../display.h"
 #include "../type-system.h"
 #include "../allocation/garbage-collection.h"
 
@@ -15,7 +16,7 @@ uint     lArrayActive = 0;
 uint     lArrayMax    = 0;
 lArray  *lArrayFFree  = NULL;
 
-void lInitArray(){
+void lArrayInit(){
 	lArrayActive = 0;
 	lArrayMax    = 0;
 }

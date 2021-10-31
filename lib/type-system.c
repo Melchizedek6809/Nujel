@@ -10,6 +10,7 @@
 #include "type-system.h"
 
 #include "nujel.h"
+#include "allocation/val.h"
 #include "collection/closure.h"
 #include "collection/list.h"
 #include "collection/string.h"
@@ -17,7 +18,7 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
-#include "operator/string.h"
+#include "operation/string.h"
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,4 +1,8 @@
 #pragma once
+/* Contains most typedefs and struct definitions
+ * as well as a couple of macros for usage throughout
+ * the codebase
+ */
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -4,45 +4,13 @@
 #include "tree.h"
 
 #include "list.h"
+#include "../allocation/tree.h"
 #include "../allocation/garbage-collection.h"
 #include "../allocation/roots.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 
 #include <stdlib.h>
-
-lTree    lTreeList[TRE_MAX];
-uint     lTreeActive = 0;
-uint     lTreeMax    = 0;
-lTree   *lTreeFFree  = NULL;
-
-void lTreeInit(){
-	lTreeActive = 0;
-	lTreeMax    = 0;
-}
-
-static lTree *lTreeAlloc(){
-	lTree *ret;
-	if(lTreeFFree == NULL){
-		if(lTreeMax >= TRE_MAX-1){
-			lGarbageCollect();
-			if(lTreeFFree == NULL){
-				lPrintError("lTree OOM\n");
-				exit(1);
-			}else{
-				ret       = lTreeFFree;
-				lTreeFFree = ret->nextFree;
-			}
-		}else{
-			ret = &lTreeList[lTreeMax++];
-		}
-	}else{
-		ret       = lTreeFFree;
-		lTreeFFree = ret->nextFree;
-	}
-	lTreeActive++;
-	return ret;
-}
 
 static lTree *lTreeNew(const lSymbol *s, lVal *v){
 	lTree *ret = lTreeAlloc();
@@ -64,13 +32,6 @@ static uint lTreeCalcHeight(const lTree *t){
 
 static int lTreeGetBalance(const lTree *t){
 	return t == NULL ? 0 : lTreeHeight(t->left) - lTreeHeight(t->right);
-}
-
-void lTreeFree(lTree *t){
-	if(t == NULL){return;}
-	lTreeActive--;
-	t->nextFree = lTreeFFree;
-	lTreeFFree = t;
 }
 
 void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){

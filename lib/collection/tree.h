@@ -1,15 +1,6 @@
 #pragma once
 #include "../nujel.h"
 
-#define TRE_MAX (1<<18)
-extern lTree  lTreeList[TRE_MAX];
-extern uint   lTreeMax;
-extern uint   lTreeActive;
-extern lTree *lTreeFFree;
-
-void   lTreeInit            ();
-void   lTreeFree            (      lTree *t);
-
 lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
 bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal **value);
 void   lTreeSet             (      lTree *t, const lSymbol *s, lVal *v, bool *found);

@@ -6,17 +6,20 @@
  * Contains a terrible implementation of a mark-sweep garbage collector, but it
  * is good enough for now.
  */
+#include "array.h"
+#include "closure.h"
 #include "garbage-collection.h"
 #include "roots.h"
+#include "string.h"
+#include "tree.h"
+#include "val.h"
 #include "../nujel.h"
-#include "../collection/array.h"
-#include "../operator/time.h"
+#include "../operation/time.h"
 #include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"
 #include "../type/native-function.h"
-#include "../type/val.h"
 
 #include <stdio.h>
 

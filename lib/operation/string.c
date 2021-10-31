@@ -4,8 +4,11 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "string.h"
+#include "../display.h"
 #include "../nujel.h"
 #include "../type-system.h"
+#include "../allocation/string.h"
+#include "../allocation/val.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../s-expression/writer.h"

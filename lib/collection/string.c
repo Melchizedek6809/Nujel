@@ -5,11 +5,14 @@
  */
 #include "string.h"
 
-#include "array.h"
 #include "closure.h"
 #include "list.h"
+#include "../display.h"
 #include "../nujel.h"
+#include "../allocation/array.h"
 #include "../allocation/garbage-collection.h"
+#include "../allocation/string.h"
+#include "../allocation/val.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -19,71 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-lString  lStringList[STR_MAX];
-uint     lStringActive = 0;
-uint     lStringMax    = 0;
-lString *lStringFFree  = NULL;
-
-char *ansiRS = "\033[0m";
-char *ansiFG[16] = {
-	"\033[0;30m",
-	"\033[0;31m",
-	"\033[0;32m",
-	"\033[0;33m",
-	"\033[0;34m",
-	"\033[0;35m",
-	"\033[0;36m",
-	"\033[0;37m",
-	"\033[1;30m",
-	"\033[1;31m",
-	"\033[1;32m",
-	"\033[1;33m",
-	"\033[1;34m",
-	"\033[1;35m",
-	"\033[1;36m",
-	"\033[1;37m"
-};
-
-void lInitStr(){
-	lStringActive = 0;
-	lStringMax    = 0;
-}
-
-lString *lStringAlloc(){
-	lString *ret;
-	if(lStringFFree == NULL){
-		if(lStringMax >= STR_MAX){
-			lGarbageCollect();
-			if(lStringFFree == NULL){
-				lPrintError("lString OOM ");
-				return 0;
-			}else{
-				ret = lStringFFree;
-				lStringFFree = ret->nextFree;
-			}
-		}else{
-			ret = &lStringList[lStringMax++];
-		}
-	}else{
-		ret = lStringFFree;
-		lStringFFree = ret->nextFree;
-	}
-	lStringActive++;
-	*ret = (lString){0};
-	return ret;
-}
-
-void lStringFree(lString *s){
-	if(s == NULL){return;}
-	lStringActive--;
-	if(s->flags & HEAP_ALLOCATED){
-		free((void *)s->buf);
-	}
-	s->flags = 0;
-	s->nextFree = lStringFFree;
-	lStringFFree = s;
-}
 
 lString *lStringNew(const char *str, uint len){
 	if(str == NULL){return 0;}

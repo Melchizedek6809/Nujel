@@ -4,12 +4,13 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "array.h"
+#include "../display.h"
+#include "../allocation/array.h"
 #include "../allocation/roots.h"
+#include "../allocation/val.h"
 #include "../type-system.h"
-#include "../collection/array.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
-#include "../type/val.h"
 
 #include <stdlib.h>
 #include <string.h>

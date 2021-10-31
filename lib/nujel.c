@@ -5,80 +5,41 @@
  */
 #include "nujel.h"
 
-#include "allocation/garbage-collection.h"
-#include "allocation/roots.h"
-#include "collection/array.h"
-#include "collection/closure.h"
-#include "collection/list.h"
-#include "collection/string.h"
-#include "collection/tree.h"
-#include "misc/random-number-generator.h"
-#include "s-expression/reader.h"
-#include "s-expression/writer.h"
-#include "type-system.h"
+#include "api.h"
+#include "allocation/tree.h"
+#include "operation/allocation.h"
+#include "operation/arithmetic.h"
+#include "operation/array.h"
+#include "operation/binary.h"
+#include "operation/closure.h"
+#include "operation/eval.h"
+#include "operation/list.h"
+#include "operation/predicates.h"
+#include "operation/random.h"
+#include "operation/special.h"
+#include "operation/string.h"
+#include "operation/time.h"
+#include "operation/tree.h"
+#include "operation/vec.h"
 #include "type/native-function.h"
 #include "type/symbol.h"
-#include "type/val.h"
-#include "operator/allocation.h"
-#include "operator/arithmetic.h"
-#include "operator/array.h"
-#include "operator/binary.h"
-#include "operator/closure.h"
-#include "operator/eval.h"
-#include "operator/special.h"
-#include "operator/list.h"
-#include "operator/predicates.h"
-#include "operator/random.h"
-#include "operator/string.h"
-#include "operator/time.h"
-#include "operator/tree.h"
-#include "operator/vec.h"
 
-#include <ctype.h>
-#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 extern u8 stdlib_no_data[];
 
-char dispWriteBuf[1<<18];
 bool lVerbose = false;
 
 /* Initialize the allocator and symbol table, needs to be called before as
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
-	lInitArray();
-	lInitClosure();
-	lInitNativeFunctions();
-	lInitStr();
-	lInitVal();
-	lInitSymbol();
+	lArrayInit();
+	lClosureInit();
+	lNativeFunctionsInit();
+	lStringInit();
+	lValInit();
+	lSymbolInit();
 	lTreeInit();
-}
-
-/* Display v on the default channel, most likely stdout */
-void lDisplayVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
-	printf("%s",dispWriteBuf);
-}
-
-/* Display v on the error channel, most likely stderr */
-void lDisplayErrorVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
-	fprintf(stderr,"%s",dispWriteBuf);
-}
-
-/* Write a machine-readable presentation of v to stdout */
-void lWriteVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,false);
-	printf("%s\n",dispWriteBuf);
-}
-
-/* Write a machine-readable presentation of t to stdout */
-void lWriteTree(lTree *t){
-	lSWriteTree(t, dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,false);
-	printf("%s\n",dispWriteBuf);
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */

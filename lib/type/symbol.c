@@ -5,7 +5,9 @@
  */
 #include "symbol.h"
 #include "val.h"
+#include "../display.h"
 #include "../nujel.h"
+#include "../allocation/val.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,7 +20,7 @@ uint    lSymbolMax    = 0;
 lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic;
 
-void lInitSymbol(){
+void lSymbolInit(){
 	lSymbolActive   = 0;
 	lSymbolMax      = 0;
 

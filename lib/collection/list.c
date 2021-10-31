@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "list.h"
+#include "../allocation/val.h"
 #include "../type/val.h"
 
 lVal *lCons(lVal *car, lVal *cdr){

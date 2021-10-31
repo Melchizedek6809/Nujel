@@ -6,54 +6,15 @@
 #include "closure.h"
 #include "list.h"
 #include "tree.h"
+#include "../display.h"
 #include "../nujel.h"
+#include "../allocation/closure.h"
 #include "../allocation/garbage-collection.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 
 #include <ctype.h>
 #include <string.h>
-
-lClosure  lClosureList[CLO_MAX];
-uint      lClosureActive = 0;
-uint      lClosureMax    = 0;
-lClosure *lClosureFFree  = NULL;
-
-void lInitClosure(){
-	lClosureActive  = 0;
-	lClosureMax     = 0;
-}
-
-lClosure *lClosureAlloc(){
-	lClosure *ret;
-	if(lClosureFFree == NULL){
-		if(lClosureMax >= CLO_MAX-1){
-			lGarbageCollect();
-			if(lClosureFFree == NULL){
-				lPrintError("lClosure OOM ");
-				return 0;
-			}else{
-				ret = lClosureFFree;
-				lClosureFFree = ret->nextFree;
-			}
-		}else{
-			ret = &lClosureList[lClosureMax++];
-		}
-	}else{
-		ret = lClosureFFree;
-		lClosureFFree = ret->nextFree;
-	}
-	lClosureActive++;
-	*ret = (lClosure){0};
-	return ret;
-}
-
-void lClosureFree(lClosure *clo){
-	if(clo == NULL){return;}
-	lClosureActive--;
-	clo->nextFree = lClosureFFree;
-	lClosureFFree = clo;
-}
 
 lClosure *lClosureNew(lClosure *parent){
 	lClosure *c = lClosureAlloc();
@@ -139,8 +100,4 @@ void lSetClosureSym(lClosure *c,const lSymbol *s, lVal *v){
 
 void lDefineVal(lClosure *c, const char *str, lVal *val){
 	lDefineClosureSym(c,lSymS(str),val);
-}
-
-int lClosureID(const lClosure *n){
-	return n - lClosureList;
 }

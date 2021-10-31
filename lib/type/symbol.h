@@ -10,7 +10,7 @@ extern uint     lSymbolMax;
 extern lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 extern lSymbol *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget;
 
-void      lInitSymbol  ();
+void      lSymbolInit  ();
 lVal     *lValSymS     (const lSymbol *s);
 lVal     *lValSym      (const char *s);
 lSymbol  *lSymS        (const char *s);

@@ -106,7 +106,7 @@ $(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
 $(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-#	@$(NUJEL_BOOT) -x "[quit [test-run]]"
+	@$(NUJEL_BOOT) -x "[quit [test-run]]"
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)

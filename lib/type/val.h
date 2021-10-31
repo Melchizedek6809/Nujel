@@ -3,17 +3,6 @@
 #include "../collection/list.h"
 #include "../type-system.h"
 
-#define VAL_MAX (1<<18)
-extern lVal  lValList[VAL_MAX];
-extern uint  lValMax;
-extern uint  lValActive;
-extern lVal *lValFFree;
-
-void      lInitVal  ();
-
-lVal     *lValAlloc ();
-void      lValFree  (lVal *v);
-
 lVal     *lValBool  (bool v);
 lVal     *lValInf   ();
 lVal     *lValInt   (int v);

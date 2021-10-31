@@ -7,6 +7,7 @@
 #include "special.h"
 #include "../type-system.h"
 #include "../allocation/roots.h"
+#include "../allocation/val.h"
 #include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../collection/tree.h"
@@ -264,9 +265,9 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
 	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);
-	
+
 	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
-	
+
 	lAddSpecialForm(c,"lambda fun λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
 	lAddSpecialForm(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
 	lAddSpecialForm(c,"object ω",   "[args ...body]", "Create a new object",                       lnfObject);

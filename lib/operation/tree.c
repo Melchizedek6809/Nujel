@@ -6,6 +6,7 @@
 #include "tree.h"
 #include "../nujel.h"
 #include "../allocation/roots.h"
+#include "../allocation/val.h"
 #include "../collection/list.h"
 #include "../collection/tree.h"
 #include "../type/native-function.h"
