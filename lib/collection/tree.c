@@ -88,6 +88,7 @@ void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
 
 static lTree *lTreeRotateLeft(lTree *x){
 	lTree *y = x->right;
+	if(y == NULL){return x;}
 	lTree *T2 = y->left;
 
 	y->left = x;
@@ -101,6 +102,7 @@ static lTree *lTreeRotateLeft(lTree *x){
 
 static lTree *lTreeRotateRight(lTree *y){
 	lTree *x = y->left;
+	if(x == NULL){return y;}
 	lTree *T2 = x->right;
 
 	x->right = y;
