@@ -19,10 +19,12 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
+#include "operator/allocation.h"
 #include "operator/arithmetic.h"
 #include "operator/array.h"
 #include "operator/binary.h"
 #include "operator/closure.h"
+#include "operator/eval.h"
 #include "operator/special.h"
 #include "operator/list.h"
 #include "operator/predicates.h"
@@ -79,95 +81,6 @@ void lWriteTree(lTree *t){
 	printf("%s\n",dispWriteBuf);
 }
 
-/* Handler for [λ [...args] ...body] */
-static lVal *lnfLambda(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
-	lVal *cdr = lCdr(v);
-	if((v == NULL) || (car == NULL) || (cdr == NULL)){
-		return NULL;
-	}
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type           = ltLambda;
-	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCons(car,lCar(cdr));
-	ret->vClosure->text = lWrap(cdr);
-	ret->vClosure->args = car;
-
-	return ret;
-}
-
-/* Handler for [λ* [..args] docstring body] */
-static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type           = ltLambda;
-	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
-	ret->vClosure->text = lCaddr(v);
-	ret->vClosure->args = lCar(v);
-
-	return ret;
-}
-
-/* Handler for [δ [...args] ...body] */
-static lVal *lnfDynamic(lClosure *c, lVal *v){
-	lVal *ret = lnfLambda(c,v);
-	if(ret == NULL){return NULL;}
-	ret->type = ltDynamic;
-	return ret;
-}
-
-/* Handler for [ω ...body] */
-static lVal *lnfObject(lClosure *c, lVal *v){
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type     = ltObject;
-	ret->vClosure = lClosureNew(c);
-	ret->vClosure->type = closureObject;
-	lnfDo(ret->vClosure,v);
-	return ret;
-}
-
-/* Handler for [memory-info] */
-static lVal *lnfMemInfo(lClosure *c, lVal *v){
-	(void)c; (void)v;
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	lVal *l = ret;
-
-	l->vList.car = lValSym(":value");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lValActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":closure");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lClosureActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":array");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lArrayActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":string");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lStringActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":symbol");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lSymbolMax);
-
-	return ret;
-}
-
 /* Evaluate the Nujel Lambda expression and return the results */
 static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	if(lambda == NULL){
@@ -205,7 +118,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 }
 
 /* Run fun with args, evaluating args if necessary  */
-static lVal *lApply(lClosure *c, lVal *args, lVal *fun){
+lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltObject:
 	case ltLambda:
@@ -277,29 +190,6 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	return ret;
 }
 
-/* Handler for [apply fn list] */
-static lVal *lnfApply(lClosure *c, lVal *v){
-	lVal *func = lCar(v);
-	if(func == NULL){return NULL;}
-	if(func->type == ltSymbol){func = lResolveSym(c,func);}
-	if(func == NULL){return NULL;}
-	switch(func->type){
-	case ltSpecialForm:
-		return func->vNFunc->fp(c,lCadr(v));
-	case ltNativeFunc:
-		return func->vNFunc->fp(c,lCadr(v));
-	case ltObject: {
-		lVal *t = lCadr(v);
-		return lLambda(c,t,func);}
-	case ltDynamic:
-	case ltLambda: {
-		lVal *t = lCadr(v);
-		return lLambda(c,t,func);}
-	default:
-		return NULL;
-	}
-}
-
 /* Add all the platform specific constants to c */
 static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
@@ -329,36 +219,24 @@ static void lAddPlatformVars(lClosure *c){
 	#endif
 }
 
-/* [eval* expr] - Evaluate the already compiled EXPR */
-static lVal *lnfEvalRaw(lClosure *c, lVal *v){
-	return lEval(c,lCar(v));
-}
-
 /* Add all the core native functions to c, without IO or stdlib */
 static void lAddCoreFuncs(lClosure *c){
+	lOperationsAllocation(c);
 	lOperationsArithmetic(c);
-	lOperationsPredicate(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
-	lOperationsTypeSystem(c);
 	lOperationsClosure(c);
-	lOperationsSpecial(c);
+	lOperationsEval(c);
 	lOperationsList(c);
+	lOperationsPredicate(c);
 	lOperationsRandom(c);
 	lOperationsReader(c);
+	lOperationsSpecial(c);
 	lOperationsString(c);
 	lOperationsTime(c);
 	lOperationsTree(c);
+	lOperationsTypeSystem(c);
 	lOperationsVector(c);
-
-	lAddNativeFunc(c,"apply",           "[func list]",    "Evaluate FUNC with LIST as arguments",       lnfApply);
-	lAddNativeFunc(c,"eval*",           "[expr]",         "Evaluate the already compiled EXPR",         lnfEvalRaw);
-	lAddNativeFunc(c,"memory-info",     "[]",             "Return memory usage data",                   lnfMemInfo);
-
-	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
-	lAddSpecialForm(c,"lambda fun λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
-	lAddSpecialForm(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"object ω",   "[args ...body]", "Create a new object",                       lnfObject);
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */

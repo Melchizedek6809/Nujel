@@ -62,7 +62,7 @@
                     [[eq? op λ]            [compile-fun  source]]
                     [[eq? [car source] 'λ] [compile-fun  source]]
                     [#t source]]
-	]
+        ]
     ]
 ]]
 
@@ -72,6 +72,6 @@
        [eval [compile [cons 'λ @...λδ]]]]]
 
 [def eval [λ [expr]
-	"Compile, Evaluate and then return the result of EXPR"
-	[eval* [compile expr]]
+          "Compile, Evaluate and then return the result of EXPR"
+          [eval* [compile expr]]
 ]]
