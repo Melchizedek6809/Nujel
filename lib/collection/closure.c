@@ -80,7 +80,7 @@ static lVal *lGetSym(lClosure *c, const lSymbol *s){
 }
 
 lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
-	if(c == NULL){return NULL;}
+	if((c == NULL) || (s == NULL)){return NULL;}
 	lVal *t = lGetSym(c,s);
 	return t != NULL ? t : lGetClosureSym(c->parent,s);
 }

@@ -28,14 +28,12 @@ lVal *lValDup(const lVal *v){
 
 lVal *lValInf(){
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type = ltInf;
 	return ret;
 }
 
 lVal *lValInt(int v){
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type = ltInt;
 	ret->vInt = v;
 	return ret;
@@ -43,7 +41,6 @@ lVal *lValInt(int v){
 
 lVal *lValFloat(float v){
 	lVal *ret   = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type   = ltFloat;
 	ret->vFloat = v;
 	return ret;
@@ -51,7 +48,6 @@ lVal *lValFloat(float v){
 
 lVal *lValVec(const vec v){
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type = ltVec;
 	ret->vVec = v;
 	return ret;
@@ -59,7 +55,6 @@ lVal *lValVec(const vec v){
 
 lVal *lValBool(bool v){
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type = ltBool;
 	ret->vBool = v;
 	return ret;
@@ -67,7 +62,6 @@ lVal *lValBool(bool v){
 
 lVal *lValTree(lTree *v){
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return ret;}
 	ret->type = ltTree;
 	ret->vTree = v;
 	return ret;

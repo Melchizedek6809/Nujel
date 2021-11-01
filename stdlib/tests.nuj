@@ -401,7 +401,12 @@
 [test-add 102334155 [let* [def i 1] [def a 0] [def b 1] [while [< i 40] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]
 [test-add 832040 [let* [def i 1] [def a 0] [def b 1] [while [< i 30] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]
 [test-add 17711 [let* [def i 1] [def a 0] [def b 1] [while [< i 22] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]
+[test-add 6765  [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 1]] [fib-slow [- v 2]]]]]] [fib-slow 20]]]
+[test-add 6765  [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 2]] [fib-slow [- v 1]]]]]] [fib-slow 20]]]
+[test-add 10946 [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 1]] [fib-slow [- v 2]]]]]] [fib-slow 21]]]
+[test-add 10946 [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 2]] [fib-slow [- v 1]]]]]] [fib-slow 21]]]
 [test-add 17711 [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 1]] [fib-slow [- v 2]]]]]] [fib-slow 22]]]
+[test-add 17711 [let* [def fib-slow [λ [v] [if [< v 2] v [+ [fib-slow [- v 2]] [fib-slow [- v 1]]]]]] [fib-slow 22]]]
 [test-add 4 [[λ [v] [+ v 2]] 2]]
 [test-add 4 [[λ [λ] [+ λ 2]] 2]]
 [test-add 4 [[λ [+ *] [- + *]] 6 2]]
@@ -426,6 +431,10 @@
 [test-add 2 [cdr '[1 . 2]]]
 [test-add 1 [#[1 2 3] 0]]
 [test-add 2 [@[:asd 1 :bsd 2] :bsd]]
+[test-add 0 [+ #nil]]
+[test-add 0 [- #nil]]
+[test-add 0 [* #nil]]
+[test-add 0 [/ #nil]]
 
 
 ; Still have to ponder whether [undefine!] should exist

@@ -165,8 +165,7 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 
 /* Cast v to be an int without memory allocations, or return fallback */
 int castToInt(const lVal *v, int fallback){
-	if(v == NULL){return fallback;}
-	switch(v->type){
+	switch(v ? v->type : ltNoAlloc){
 	case ltVec:
 		return v->vVec.x;
 	case ltFloat:
@@ -180,8 +179,7 @@ int castToInt(const lVal *v, int fallback){
 
 /* Cast v to be a float without memory allocations, or return fallback */
 float castToFloat(const lVal *v, float fallback){
-	if(v == NULL){return fallback;}
-	switch(v->type){
+	switch(v ? v->type : ltNoAlloc){
 	case ltVec:
 		return v->vVec.x;
 	case ltFloat:
@@ -195,8 +193,7 @@ float castToFloat(const lVal *v, float fallback){
 
 /* Cast v to be a vec without memory allocations, or return fallback */
 vec castToVec(const lVal *v, vec fallback){
-	if(v == NULL){return fallback;}
-	switch(v->type){
+	switch(v ? v->type : ltNoAlloc){
 	case ltVec:
 		return v->vVec;
 	case ltFloat:

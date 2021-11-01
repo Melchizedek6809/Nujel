@@ -16,32 +16,8 @@
 #include "../type/val.h"
 
 
-static lVal *lUndefineClosureSym(lClosure *c, lVal *s){
-	(void)c;(void)s;
-	return NULL;
-	/*if(c == NULL){return NULL;}
-	lVal *lastPair = c->data;
-	forEach(v,c->data){
-		lVal *n = lCar(v);
-		if((n == NULL) || (n->type != ltPair))  {break;}
-		const lVal *sym = lCar(n);
-		if(lSymCmp(s,sym) == 0){
-			lastPair->vList.cdr = lCdr(v);
-			return lValBool(true);
-		}
-		lastPair = v;
-	}
-	return lUndefineClosureSym(c->parent,s);*/
-}
-static lVal *lnfUndef(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	lVal *sym = lCar(v);
-	if(sym->type != ltSymbol){sym = lEval(c,sym);}
-	if(sym->type != ltSymbol){return NULL;}
-	return lUndefineClosureSym(c,sym);
-}
 static lVal *lnfDef(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
+	if(v == NULL){return NULL;}
 	lVal *sym = lCar(v);
 	if(sym->type != ltSymbol){sym = lEval(c,sym);}
 	if(sym->type != ltSymbol){return NULL;}
@@ -53,7 +29,7 @@ static lVal *lnfDef(lClosure *c, lVal *v){
 }
 
 static lVal *lnfSet(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
+	if(v == NULL){return NULL;}
 	lVal *sym = lCar(v);
 	if(sym->type != ltSymbol){sym = lEval(c,sym);}
 	if(sym->type != ltSymbol){return NULL;}
@@ -261,7 +237,6 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
 	lAddSpecialForm(c,"define def",    "[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
-	lAddSpecialForm(c,"undefine!",     "[sym]",         "Remove symbol SYM from the first symbol-table it is found in",     lnfUndef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
 	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);

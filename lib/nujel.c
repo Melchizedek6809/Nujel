@@ -44,13 +44,6 @@ void lInit(){
 
 /* Evaluate the Nujel Lambda expression and return the results */
 static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
-	if(lambda == NULL){
-		lPrintError("lLambda: NULL\n");
-		return NULL;
-	}
-	if(lambda->type == ltObject){
-		return lnfDo(lambda->vClosure,args);
-	}
 	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = (lambda->type == ltDynamic
@@ -61,7 +54,7 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	forEach(n,lambda->vClosure->args){
 		if(vn == NULL){break;}
 		lVal *car = lCar(n);
-		if((car == NULL) || (car->type != ltSymbol)){continue;}
+		if(car == NULL){continue;}
 		const lSymbol *csym = lGetSymbol(car);
 		if(lSymVariadic(csym)){
 			lVal *t = lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
@@ -82,15 +75,14 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltObject:
+		return lnfDo(fun->vClosure,args);
 	case ltLambda:
 	case ltDynamic:
 		return lLambda(c,args,fun);
 	case ltSpecialForm:
 		return fun->vNFunc->fp(c,args);
-	case ltNativeFunc: {
-		lVal *evaledArgs = lMap(c,args,lEval);
-		lVal *ret = fun->vNFunc->fp(c,evaledArgs);
-		return ret;}
+	case ltNativeFunc:
+		return fun->vNFunc->fp(c,lMap(c,args,lEval));
 	default:
 		return NULL;
 	}
@@ -105,16 +97,18 @@ lVal *lEval(lClosure *c, lVal *v){
 		return lSymKeyword(v->vSymbol) ? v : lGetClosureSym(c,v->vSymbol);
 	case ltPair: {
 		lVal *car = lCar(v);
-		if(car == NULL){return NULL;}
-		switch(car->type){
+		switch(car ? car->type : ltNoAlloc){
 		default:
 			return v;
+		case ltObject:
+			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
 		case ltDynamic:
-		case ltNativeFunc:
+			return lRootsValPush(lLambda(c,lCdr(v),car));
 		case ltSpecialForm:
-		case ltObject:
-			return lApply(c,lCdr(v),car);
+			return car->vNFunc->fp(c,lCdr(v));
+		case ltNativeFunc:
+			return car->vNFunc->fp(c,lMap(c,lCdr(v),lEval));
 		case ltInt:
 		case ltFloat:
 		case ltVec:
@@ -137,15 +131,11 @@ lVal *lEval(lClosure *c, lVal *v){
 
 /* Evaluate func for every entry in list v and return a list containing the results */
 lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
-	if((c == NULL) || (v == NULL)){return NULL;}
-	lVal *ret=NULL, *cc=NULL;
-	for(lVal *t = v; t ; t = lCdr(t)){
-		if(cc == NULL){
-			ret = cc = lRootsValPush(lCons(NULL,NULL));
-		}else{
-			cc->vList.cdr = lCons(NULL,NULL);
-			cc = cc->vList.cdr;
-		}
+	if(v == NULL){return NULL;}
+	lVal *ret, *cc;
+	ret = cc = lRootsValPush(lCons(func(c,lCar(v)),NULL));
+	for(lVal *t = lCdr(v); t ; t = lCdr(t)){
+		cc = cc->vList.cdr = lCons(NULL,NULL);
 		cc->vList.car = func(c,lCar(t));
 	}
 	return ret;
