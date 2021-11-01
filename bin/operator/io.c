@@ -114,8 +114,8 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	const char *content  = castToString(lCar(v),NULL);
 
 	char buf[32];
-	snprintf(buf,sizeof(buf),"/tmp/nujel-XXXXXX.nuj");
-	int ret = mkstemps(buf,4);
+	snprintf(buf,sizeof(buf),"/tmp/nujel-XXXXXX");
+	int ret = mkstemp(buf);
 	FILE *fd = fdopen(ret,"w");
 
 	if(content){
