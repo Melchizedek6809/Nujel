@@ -95,7 +95,7 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 	struct stat statbuf;
 	int err = stat(filename,&statbuf);
 	if(err){
-		lPrintError("Error while trying to gather stats for %s, errno: %u\n",filename,errno);
+		lPrintError("Error while trying to gather stats for %s, errno: [%u] %s\n",filename,errno,strerror(errno));
 		return NULL;
 	}
 	lVal *ret = lRootsValPush(lValTree(NULL));
