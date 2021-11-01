@@ -38,4 +38,15 @@
 	[eval source]
 ]]
 
+[def eval/forked [λ [nujel-binary raw-expr]
+	"Evaluate @EXPR in a separate process running NUJEL-BINARY"
+	[def expr [cat "[print [str/write " [str/write raw-expr]] "]] "]
+	[def tmp-path [file/temp expr]]
+
+	[def command [cat nujel-binary " " tmp-path]]
+	[def res [popen command]]
+	[file/remove tmp-path]
+	[cons [car res] [cdr res]]
+]]
+
 [def test-context "Nujel Standalone"]

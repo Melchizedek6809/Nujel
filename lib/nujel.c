@@ -119,10 +119,13 @@ lVal *lEval(lClosure *c, lVal *v){
 			return lApply(c,v,lnfvCat);
 		case ltTree:
 			return lApply(c,v,lnfvTreeGet);
-		case ltSymbol:
-			return lSymKeyword(car->vSymbol)
-				? v
-				: lEval(c,lRootsValPush(lCons(lGetClosureSym(c,car->vSymbol),lCdr(v))));
+		case ltSymbol: {
+			lVal *resolved;
+			if(lHasClosureSym(c,car->vSymbol,&resolved)){
+				return lEval(c,lRootsValPush(lCons(resolved,lCdr(v))));
+			}else{
+				return v;
+			}}
 		case ltPair:
 			return lEval(c,lRootsValPush(lCons(lRootsValPush(lEval(c,car)),lCdr(v))));
 		}}

@@ -38,6 +38,15 @@ lString *lStringNew(const char *str, uint len){
 	return s;
 }
 
+lString *lStringNewNoCopy(const char *str, uint len){
+	if(str == NULL){return 0;}
+	lString *s = lStringAlloc();
+	s->buf    = s->data = str;
+	s->flags  = HEAP_ALLOCATED;
+	s->bufEnd = &s->buf[len];
+	return s;
+}
+
 lString *lStringDup(lString *os){
 	uint len = os->bufEnd - os->buf;
 	const char *str = os->data;
@@ -58,9 +67,16 @@ int lStringLength(const lString *s){
 
 lVal *lValString(const char *c){
 	if(c == NULL){return NULL;}
-	lVal *t = lValAlloc();
-	if(t == NULL){return NULL;}
+	lVal *t = lRootsValPush(lValAlloc());
 	t->type = ltString;
 	t->vString = lStringNew(c,strlen(c));
 	return t->vString == NULL ? NULL : t;
+}
+
+lVal *lValStringNoCopy(const char *c,int len){
+	if(c == NULL){return NULL;}
+	lVal *t = lRootsValPush(lValAlloc());
+	t->type = ltString;
+	t->vString = lStringNewNoCopy(c,len);
+	return t;
 }

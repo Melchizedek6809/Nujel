@@ -164,11 +164,11 @@ tmp/binlib.h: tmp/binlib.c
 
 .PHONY: test
 test: $(NUJEL)
-	@$(NUJEL) -x "[quit [test-run]]"
+	@$(NUJEL) -x "[exit [test-run]]"
 
 .PHONY: run
 run: $(NUJEL)
-	@$(NUJEL) -x "[quit [test-run]]"
+	@$(NUJEL) -x "[exit [test-run]]"
 
 .PHONY: rund
 rund: $(NUJEL)

@@ -6,6 +6,8 @@
 #include "io.h"
 #include "../misc.h"
 
+#include <errno.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +45,7 @@ static lVal *lnfError(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfReadFile(lClosure *c, lVal *v){
+static lVal *lnfFileRead(lClosure *c, lVal *v){
 	(void)c;
 	const char *filename = castToString(lCar(v),NULL);
 	if(filename == NULL){return NULL;}
@@ -55,7 +57,7 @@ static lVal *lnfReadFile(lClosure *c, lVal *v){
 
 }
 
-static lVal *lnfWriteFile(lClosure *c, lVal *v){
+static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	(void)c;
 	const char *filename = castToString( lCar(v),NULL);
 	const char *content  = castToString(lCadr(v),NULL);
@@ -64,15 +66,99 @@ static lVal *lnfWriteFile(lClosure *c, lVal *v){
 	size_t len = strnlen(content,1<<20);
 	saveFile(filename,content,len);
 	return NULL;
+}
 
+static lVal *lnfFileRemove(lClosure *c, lVal *v){
+	(void)c;
+	const char *filename = castToString( lCar(v),NULL);
+	if(filename == NULL){return NULL;}
+	unlink(filename);
+	return NULL;
+}
+
+static lVal *lnfFileTemp(lClosure *c, lVal *v){
+	(void)c; (void)v;
+	const char *content  = castToString(lCar(v),NULL);
+
+	char buf[32];
+	snprintf(buf,sizeof(buf),"/tmp/nujel-XXXXXX.nuj");
+	int ret = mkstemps(buf,4);
+	FILE *fd = fdopen(ret,"w");
+
+	if(content){
+		const int len = lStringLength(lCar(v)->vString);
+		int written = 0;
+		while(written < len){
+			int r = fwrite(&content[written],1,len - written,fd);
+			if(r <= 0){
+				if(ferror(fd)){
+					lPrintError("Error while writing to temporary file: %s\n",buf);
+					break;
+				}
+			}else{
+				written += r;
+			}
+		}
+	}
+
+	fclose(fd);
+	return lValString(buf);
+}
+
+static lVal *lnfPopen(lClosure *c, lVal *v){
+	(void) c;
+
+	const char *command = castToString(lCar(v),NULL);
+	if(command == NULL){return NULL;}
+
+	const int readSize = 1<<12;
+	int len   = 0;
+	int bufSize = readSize;
+	char *buf = malloc(readSize);
+
+	FILE *child = popen(command,"r");
+	if(child == NULL){
+		printf("Error openeing %s\n",command);
+	}
+	while(1){
+		int ret = fread(&buf[len],1,readSize,child);
+		if(ret < readSize){
+			if(feof(child)){
+				len += ret;
+				break;
+			}else if(ferror(child)){
+				pclose(child);
+				return NULL;
+			}
+		}
+		if(ret > 0){
+			len += ret;
+		}
+		if((len + readSize) >= bufSize){
+			bufSize += readSize;
+			buf = realloc(buf,bufSize);
+		}
+	}
+	const int exitStatus = pclose(child);
+
+	buf = realloc(buf,len+1);
+	buf[len] = 0;
+
+	lVal *ret = lRootsValPush(lCons(NULL,NULL));
+	ret->vList.car = lValInt(exitStatus);
+	ret->vList.cdr = lValStringNoCopy(buf,len);
+
+	return ret;
 }
 
 void addNativeFuncs(lClosure *c){
-	lAddNativeFunc(c,"error",     "[...args]",         "Prints ...args to stderr",                           lnfError);
-	lAddNativeFunc(c,"print",     "[...args]",         "Displays ...args",                                   lnfPrint);
-	lAddNativeFunc(c,"input",     "[]",                "Reads in a line of user input and returns it",       lnfInput);
-	lAddNativeFunc(c,"quit",      "[a]",               "Exits with code a",                                  lnfQuit);
-	lAddNativeFunc(c,"exit",      "[a]",               "Quits with code a",                                  lnfQuit);
-	lAddNativeFunc(c,"file/read", "[filename]",        "Load FILENAME and return the contents as a string",  lnfReadFile);
-	lAddNativeFunc(c,"file/write","[filename content]","Writes CONTENT into FILENAME",                       lnfWriteFile);
+	lAddNativeFunc(c,"error",      "[...args]",          "Prints ...args to stderr",                           lnfError);
+	lAddNativeFunc(c,"print",      "[...args]",          "Displays ...args",                                   lnfPrint);
+	lAddNativeFunc(c,"input",      "[]",                 "Reads in a line of user input and returns it",       lnfInput);
+	lAddNativeFunc(c,"exit",       "[a]",                "Quits with code a",                                  lnfQuit);
+	lAddNativeFunc(c,"popen",      "[command]",          "Return a list of [exit-code stdout stderr]",         lnfPopen);
+	lAddNativeFunc(c,"file/read",  "[filename]",         "Load FILENAME and return the contents as a string",  lnfFileRead);
+	lAddNativeFunc(c,"file/write", "[filename content]", "Writes CONTENT into FILENAME",                       lnfFileWrite);
+	lAddNativeFunc(c,"file/remove","[filename]",         "Remove FILENAME from the filesystem, if possible",   lnfFileRemove);
+	lAddNativeFunc(c,"file/temp",  "[content]",          "Write CONTENT to a temporary file and return the path to it", lnfFileTemp);
 }

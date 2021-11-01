@@ -74,15 +74,21 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	return NULL;
 }
 
-static lVal *lGetSym(lClosure *c, const lSymbol *s){
-	if((c == NULL) || (s == NULL)){return NULL;}
-	return lTreeGet(c->data,s,NULL);
-}
-
 lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
 	if((c == NULL) || (s == NULL)){return NULL;}
-	lVal *t = lGetSym(c,s);
-	return t != NULL ? t : lGetClosureSym(c->parent,s);
+	bool found = false;
+	lVal *t = lTreeGet(c->data,s,&found);
+	return found ? t : lGetClosureSym(c->parent,s);
+}
+
+bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
+	if((c == NULL) || (s == NULL)){return NULL;}
+	bool found = false;
+	lVal *t = lTreeGet(c->data,s,&found);
+	if(found && (v != NULL)){
+		*v = t;
+	}
+	return found ? true : lHasClosureSym(c->parent,s,v);
 }
 
 void lDefineClosureSym(lClosure *c,const lSymbol *s, lVal *v){

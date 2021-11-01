@@ -435,6 +435,7 @@
 [test-add 0 [- #nil]]
 [test-add 0 [* #nil]]
 [test-add 0 [/ #nil]]
+[test-add '[asdqwe qweasdzxc] [asdqwe qweasdzxc]]
 
 
 ; Still have to ponder whether [undefine!] should exist
