@@ -2,3 +2,4 @@
 #include "../../lib/api.h"
 
 void addNativeFuncs(lClosure *c);
+void setIOSymbols();

@@ -11,6 +11,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+
+lSymbol *lsMode, *lsSize, *lsUserID, *lsGroupID, *lsAccessTime, *lsModificationTime;
+
+void setIOSymbols(){
+	lsMode             = lSymS(":mode");
+	lsSize             = lSymS(":size");
+	lsUserID           = lSymS(":user-id");
+	lsGroupID          = lSymS(":group-id");
+	lsAccessTime       = lSymS(":access-time");
+	lsModificationTime = lSymS(":modification-time");
+}
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	(void)c;
@@ -74,6 +86,27 @@ static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	if(filename == NULL){return NULL;}
 	unlink(filename);
 	return NULL;
+}
+
+static lVal *lnfFileStat(lClosure *c, lVal *v){
+	(void)c;
+	const char *filename = castToString(lCar(v),NULL);
+	if(filename == NULL){return NULL;}
+	struct stat statbuf;
+	int err = stat(filename,&statbuf);
+	if(err){
+		lPrintError("Error while trying to gather stats for %s, errno: %u\n",filename,errno);
+		return NULL;
+	}
+	lVal *ret = lRootsValPush(lValTree(NULL));
+	ret->vTree = lTreeInsert(ret->vTree, lsMode, lValInt(statbuf.st_mode));
+	ret->vTree = lTreeInsert(ret->vTree, lsUserID, lValInt(statbuf.st_uid));
+	ret->vTree = lTreeInsert(ret->vTree, lsGroupID, lValInt(statbuf.st_gid));
+	ret->vTree = lTreeInsert(ret->vTree, lsSize, lValInt(statbuf.st_size));
+	ret->vTree = lTreeInsert(ret->vTree, lsAccessTime, lValInt(statbuf.st_atime));
+	ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(statbuf.st_mtime));
+
+	return ret;
 }
 
 static lVal *lnfFileTemp(lClosure *c, lVal *v){
@@ -152,13 +185,14 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 }
 
 void addNativeFuncs(lClosure *c){
-	lAddNativeFunc(c,"error",      "[...args]",          "Prints ...args to stderr",                           lnfError);
-	lAddNativeFunc(c,"print",      "[...args]",          "Displays ...args",                                   lnfPrint);
-	lAddNativeFunc(c,"input",      "[]",                 "Reads in a line of user input and returns it",       lnfInput);
-	lAddNativeFunc(c,"exit",       "[a]",                "Quits with code a",                                  lnfQuit);
-	lAddNativeFunc(c,"popen",      "[command]",          "Return a list of [exit-code stdout stderr]",         lnfPopen);
-	lAddNativeFunc(c,"file/read",  "[filename]",         "Load FILENAME and return the contents as a string",  lnfFileRead);
-	lAddNativeFunc(c,"file/write", "[filename content]", "Writes CONTENT into FILENAME",                       lnfFileWrite);
-	lAddNativeFunc(c,"file/remove","[filename]",         "Remove FILENAME from the filesystem, if possible",   lnfFileRemove);
-	lAddNativeFunc(c,"file/temp",  "[content]",          "Write CONTENT to a temporary file and return the path to it", lnfFileTemp);
+	lAddNativeFunc(c,"error",      "[...args]",          "Prints ...args to stderr",                          lnfError);
+	lAddNativeFunc(c,"print",      "[...args]",          "Displays ...args",                                  lnfPrint);
+	lAddNativeFunc(c,"input",      "[]",                 "Reads in a line of user input and returns it",      lnfInput);
+	lAddNativeFunc(c,"exit",       "[a]",                "Quits with code a",                                 lnfQuit);
+	lAddNativeFunc(c,"popen",      "[command]",          "Return a list of [exit-code stdout stderr]",        lnfPopen);
+	lAddNativeFunc(c,"file/read",  "[filename]",         "Load FILENAME and return the contents as a string", lnfFileRead);
+	lAddNativeFunc(c,"file/write", "[filename content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
+	lAddNativeFunc(c,"file/remove","[filename]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
+	lAddNativeFunc(c,"file/temp",  "[content]",          "Write CONTENT to a temp file and return its path",  lnfFileTemp);
+	lAddNativeFunc(c,"file/stat",  "[filename]",         "Return some stats about FILENAME",                  lnfFileStat);
 }

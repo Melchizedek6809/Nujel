@@ -148,6 +148,7 @@ int main(int argc, char *argv[]){
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
+	setIOSymbols();
 
 	lClosure *c = parsePreOptions(argc,argv);
 	for(int i=1;i<argc;i++){
