@@ -240,12 +240,17 @@ static lVal *lParseSpecial(lString *s){
 	if(*s->data++ != '#'){return NULL;}
 	switch(*s->data++){
 	default:
+	case '!': // Ignore Shebang's
+		lStringAdvanceToNextLine(s);
+		return lReadValue(s);
 	case '\\':return lParseCharacter(s);
 	case 'x': return lParseNumberHex(s);
 	case 'o': return lParseNumberOctal(s);
 	case 'b': return lParseNumberBinary(s);
 	case 'd': return lParseNumberDecimal(s);
-	case 'n': s->data+=2; return NULL;
+	case 'n':
+		lStringAdvanceToNextSpaceOrSpecial(s);
+		return NULL;
 	case 't':
 		return lValBool(true);
 	case 'f':
