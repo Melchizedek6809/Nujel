@@ -9,6 +9,7 @@
  */
 #include "type-system.h"
 
+#include "api.h"
 #include "nujel.h"
 #include "allocation/val.h"
 #include "collection/closure.h"
@@ -94,10 +95,12 @@ lVal *lnfVec(lClosure *c, lVal *v){
 	return lValVec(nv);
 }
 
+#include <stdio.h>
+
 /* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
-	return lValBool(lCar(v) != NULL);
+	return lValBool(castToBool(lCar(v)));
 }
 
 /* [string v] - Convert v into a printable and readable string */
