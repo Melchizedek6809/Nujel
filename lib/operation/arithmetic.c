@@ -6,6 +6,7 @@
 #include "arithmetic.h"
 #include "../allocation/roots.h"
 #include "../display.h"
+#include "../exception.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../misc/vec.h"
@@ -153,7 +154,7 @@ static int lnfDivI(lVal *v){
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
-			lPrintError("/ 0");
+			lExceptionThrow(":divide-by-zero","Divide by Zero");
 			return 0;
 		}
 		acc /= v->vList.car->vInt;

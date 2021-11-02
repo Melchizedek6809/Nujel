@@ -4,5 +4,5 @@
 
 lVal *lRead             (const char *str);
 lVal *lReadValue        (lString *s);
-lVal *lReadList         (lString *s);
+lVal *lReadList         (lString *s, bool rootForm);
 void  lOperationsReader (lClosure *c);

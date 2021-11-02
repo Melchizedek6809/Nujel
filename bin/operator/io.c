@@ -6,6 +6,7 @@
 #include "io.h"
 #include "../misc.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -184,15 +185,96 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	return ret;
 }
 
+static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
+	(void) c;
+
+	const char *path = castToString(lCar(v),NULL);
+	const bool showHidden = castToBool(lCadr(v));
+	if(path == NULL){
+		path = getcwd(__builtin_alloca(512),512);
+		if(path == NULL){return NULL;}
+	}
+
+	DIR *dp = opendir(path);
+	if(dp == NULL){return NULL;}
+	lVal *ret = NULL;
+	lVal *cur = NULL;
+	for(struct dirent *de = readdir(dp); de ; de = readdir(dp)){
+		if(!showHidden){
+			if(de->d_name[0] == '.'){continue;}
+		}
+		if((de->d_name[0] == '.') && (de->d_name[1] == 0)){continue;}
+		if((de->d_name[0] == '.') && (de->d_name[1] == '.') && (de->d_name[2] == 0)){continue;}
+		if(cur == NULL){
+			ret = cur = lRootsValPush(lCons(NULL,NULL));
+		}else{
+			cur = cur->vList.cdr = lCons(NULL,NULL);
+		}
+		cur->vList.car = lValString(de->d_name);
+	}
+
+	closedir(dp);
+	return ret;
+}
+
+static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
+	(void) c;
+
+	const char *path = castToString(lCar(v),NULL);
+	if(path == NULL){return NULL;}
+	int err = makeDir(path);
+
+	return lValBool(err == 0);
+}
+
+static lVal *lnfDirectoryRemove(lClosure *c, lVal *v){
+	(void) c;
+
+	const char *path = castToString(lCar(v),NULL);
+	if(path == NULL){return NULL;}
+	int err = rmdir(path);
+
+	return lValBool(err == 0);
+}
+
+static lVal *lnfChangeDirectory(lClosure *c, lVal *v){
+	(void) c;
+
+	const char *path = castToString(lCar(v),NULL);
+	if(path == NULL){return NULL;}
+	int err = chdir(path);
+
+	return lValBool(err == 0);
+}
+
+static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
+	(void) c; (void) v;
+
+	char path[512];
+	if(getcwd(path,sizeof(path))){
+		return NULL;
+	}
+
+	return lValString(path);
+}
+
 void addNativeFuncs(lClosure *c){
-	lAddNativeFunc(c,"error",      "[...args]",          "Prints ...args to stderr",                          lnfError);
-	lAddNativeFunc(c,"print",      "[...args]",          "Displays ...args",                                  lnfPrint);
-	lAddNativeFunc(c,"input",      "[]",                 "Reads in a line of user input and returns it",      lnfInput);
-	lAddNativeFunc(c,"exit",       "[a]",                "Quits with code a",                                 lnfQuit);
-	lAddNativeFunc(c,"popen",      "[command]",          "Return a list of [exit-code stdout stderr]",        lnfPopen);
-	lAddNativeFunc(c,"file/read",  "[filename]",         "Load FILENAME and return the contents as a string", lnfFileRead);
-	lAddNativeFunc(c,"file/write", "[filename content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
-	lAddNativeFunc(c,"file/remove","[filename]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
-	lAddNativeFunc(c,"file/temp",  "[content]",          "Write CONTENT to a temp file and return its path",  lnfFileTemp);
-	lAddNativeFunc(c,"file/stat",  "[filename]",         "Return some stats about FILENAME",                  lnfFileStat);
+	lAddNativeFunc(c,"error",            "[...args]",      "Prints ...args to stderr",                          lnfError);
+	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
+	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
+	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
+	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
+
+	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
+	lAddNativeFunc(c,"file/write",       "[path content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
+	lAddNativeFunc(c,"file/remove",      "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
+	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
+	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
+
+	lAddNativeFunc(c,"directory/read",   "[&path &show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
+	lAddNativeFunc(c,"directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
+	lAddNativeFunc(c,"directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
+
+	lAddNativeFunc(c,"path/change",      "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
+	lAddNativeFunc(c,"path/working-directory","[]",        "Return the current working directory",              lnfGetCurrentWorkingDirectory);
 }

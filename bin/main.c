@@ -78,6 +78,8 @@ void doRepl(lClosure *c){
 	if(historyPath){
 		bestlineHistoryLoad(historyPath);
 	}
+	lVal *replHandler;
+	const bool hasHandler = lHasClosureSym(c,lSymS("repl-exception-handler"),&replHandler);
 	const lSymbol *lastlsym = lSymS("last-line");
 	while(1){
 		char *str = bestline("> ");
@@ -90,9 +92,7 @@ void doRepl(lClosure *c){
 			bestlineHistorySave(historyPath);
 		}
 		lVal *read = lRootsValPush(lRead(str));
-		lVal *expr = lWrap(read);
-		lRootsValPush(expr);
-		lVal *v = lEval(c,expr);
+		lVal *v = hasHandler ? lTry(c,replHandler,read) : lnfDo(c,read);
 		if(v != NULL){
 			lWriteVal(v);
 		}else{
@@ -122,7 +122,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	if(loadStdLib){
 		c = lClosureNewRoot();
 		addNativeFuncs(c);
-		lEval(c,lWrap(lRead((const char *)binlib_no_data)));
+		lnfDo(c,lRead((const char *)binlib_no_data));
 		lGarbageCollect();
 	}else{
 		c = lClosureNewRootNoStdLib();
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]){
 		if(!eval){
 			str = loadFile(argv[i],&len);
 		}
-		lVal *v = lEval(c,lWrap(lRead(str)));
+		lVal *v = lnfDo(c,lRead(str));
 		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
 
 		if(!eval){

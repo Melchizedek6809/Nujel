@@ -95,8 +95,6 @@ lVal *lnfVec(lClosure *c, lVal *v){
 	return lValVec(nv);
 }
 
-#include <stdio.h>
-
 /* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
@@ -292,11 +290,11 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 
 /* Add typing and casting operators to c */
 void lOperationsTypeSystem(lClosure *c){
-	lAddNativeFunc(c,"inf",           "[v]","Return infinity", lnfInf);
-	lAddNativeFunc(c,"bool",          "[v]","Convert v into a boolean value, true or false", lnfBool);
-	lAddNativeFunc(c,"int",           "[v]","Convert v into an integer number", lnfInt);
-	lAddNativeFunc(c,"float",         "[v]","Convert v into a floating-point number", lnfFloat);
-	lAddNativeFunc(c,"vec",           "[v]","Convert v into a vector value consistig of 3 floats x,y and z", lnfVec);
-	lAddNativeFunc(c,"string",        "[v]","Convert v into a printable and readable string", lnfCat);
-	lAddNativeFunc(c,"type-of",       "[v]","Return a symbol describing the type of VAL", lnfTypeOf);
+	lAddNativeFunc(c,"inf",     "[v]", "Return infinity", lnfInf);
+	lAddNativeFunc(c,"bool",    "[v]", "Convert v into a boolean value, true or false", lnfBool);
+	lAddNativeFunc(c,"int",     "[v]", "Convert v into an integer number", lnfInt);
+	lAddNativeFunc(c,"float",   "[v]", "Convert v into a floating-point number", lnfFloat);
+	lAddNativeFunc(c,"vec",     "[v]", "Convert v into a vector value consistig of 3 floats x,y and z", lnfVec);
+	lAddNativeFunc(c,"string",  "[v]", "Convert v into a printable and readable string", lnfCat);
+	lAddNativeFunc(c,"type-of", "[v]", "Return a symbol describing the type of VAL", lnfTypeOf);
 }

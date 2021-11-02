@@ -9,6 +9,7 @@
 
 extern bool lVerbose;
 
+extern lVal *lnfvDo;
 extern lVal *lnfvInfix;
 extern lVal *lnfvArrRef;
 extern lVal *lnfvCat;
@@ -22,5 +23,4 @@ lClosure *lClosureNewRootNoStdLib();
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lApply            (lClosure *c, lVal *args, lVal *fun);
-
-lVal     *lWrap             (lVal *v);
+lVal     *lTry              (lClosure *c, lVal *catchRaw, lVal *bodyRaw);

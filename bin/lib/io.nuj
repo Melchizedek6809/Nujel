@@ -49,4 +49,8 @@
 	[cons [car res] [cdr res]]
 ]]
 
+[def repl-exception-handler [λ [error]
+	[display [cat [ansi-red [car error]] "\n" [cdr error] "\n"]]
+]]
+
 [def test-context "Nujel Standalone"]

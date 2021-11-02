@@ -189,7 +189,9 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
 	ret->vClosure->doc  = lCons(car,lCar(cdr));
-	ret->vClosure->text = lWrap(cdr);
+	ret->vClosure->text = lCons(NULL,NULL);
+	ret->vClosure->text->vList.car = lnfvDo;
+	ret->vClosure->text->vList.cdr = cdr;
 	ret->vClosure->args = car;
 
 	return ret;

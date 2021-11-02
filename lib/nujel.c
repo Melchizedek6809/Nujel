@@ -6,6 +6,7 @@
 #include "nujel.h"
 
 #include "api.h"
+#include "exception.h"
 #include "allocation/tree.h"
 #include "operation/allocation.h"
 #include "operation/arithmetic.h"
@@ -25,6 +26,7 @@
 #include "type/symbol.h"
 
 #include <stdio.h>
+#include <string.h>
 
 extern u8 stdlib_no_data[];
 
@@ -35,6 +37,7 @@ bool lVerbose = false;
 void lInit(){
 	lArrayInit();
 	lClosureInit();
+	lExceptionInit();
 	lNativeFunctionsInit();
 	lStringInit();
 	lValInit();
@@ -83,6 +86,16 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 		return fun->vNFunc->fp(c,args);
 	case ltNativeFunc:
 		return fun->vNFunc->fp(c,lMap(c,args,lEval));
+	case ltInt:
+	case ltFloat:
+	case ltVec:
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvInfix);
+	case ltArray:
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvArrRef);
+	case ltString:
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvCat);
+	case ltTree:
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvTreeGet);
 	default:
 		return NULL;
 	}
@@ -122,7 +135,9 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				return lEval(c,lRootsValPush(lCons(resolved,lCdr(v))));
+				//lVal *newV = lRootsValPush(lCons(resolved,lCdr(v)));
+				//return lEval(c,newV);
+				return lApply(c,lCdr(v),resolved);
 			}else{
 				return v;
 			}}
@@ -135,8 +150,8 @@ lVal *lEval(lClosure *c, lVal *v){
 /* Evaluate func for every entry in list v and return a list containing the results */
 lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	if(v == NULL){return NULL;}
-	lVal *ret, *cc;
-	ret = cc = lRootsValPush(lCons(func(c,lCar(v)),NULL));
+	lVal *ret, *cc, *car = lRootsValPush(func(c,lCar(v)));
+	ret = cc = lRootsValPush(lCons(car,NULL));
 	for(lVal *t = lCdr(v); t ; t = lCdr(t)){
 		cc = cc->vList.cdr = lCons(NULL,NULL);
 		cc->vList.car = func(c,lCar(t));
@@ -193,6 +208,38 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsVector(c);
 }
 
+lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
+	lVal *volatile catch = catchRaw;
+	lVal *volatile body  = bodyRaw;
+
+	const int SP = lRootsGet();
+	jmp_buf oldExceptionTarget;
+	lVal *oldExceptionValue = exceptionValue;
+	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
+
+	lVal *doRet;
+	int ret;
+	ret = setjmp(exceptionTarget);
+	if(ret){
+		lRootsRet(SP);
+		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+
+		lVal *args = lRootsValPush(exceptionValue);
+		args = lRootsValPush(lCons(args,NULL));
+
+		doRet = lApply(c,args,catch);
+
+		return doRet;
+	}else{
+		doRet = lnfDo(c,body);
+
+		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+		exceptionValue = oldExceptionValue;
+
+		return doRet;
+	}
+}
+
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
 lClosure *lClosureNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
@@ -207,16 +254,7 @@ lClosure *lClosureNewRootNoStdLib(){
 lClosure *lClosureNewRoot(){
 	lClosure *c = lClosureNewRootNoStdLib();
 	c->text = lRead((const char *)stdlib_no_data);
-	c->text = lWrap(c->text);
-	lEval(c,c->text);
+	lnfDo(c,c->text);
 	c->text = NULL;
 	return c;
-}
-
-/* Append a do to the beginning of v, useful when evaluating user input via a repl, since otherwise we could only accept a single expression. */
-lVal *lWrap(lVal *v){
-	lVal *r = lRootsValPush(lCons(NULL,NULL));
-	r->vList.cdr = v;
-	r->vList.car = lValSymS(symDo);
-	return r;
 }

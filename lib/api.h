@@ -19,6 +19,7 @@
 #include "collection/tree.h"
 
 #include "operation/string.h"
+#include "operation/special.h"
 
 #include "s-expression/reader.h"
 #include "s-expression/writer.h"

@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "reader.h"
+#include "../exception.h"
 #include "../allocation/roots.h"
 #include "../allocation/string.h"
 #include "../allocation/val.h"
@@ -260,20 +261,27 @@ static lVal *lParseSpecial(lString *s){
 	case '[':{
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
 		ret->vList.car = lValSymS(symArr);
-		ret->vList.cdr = lReadList(s);
+		ret->vList.cdr = lReadList(s,false);
 		return ret;
 	}}
 
 }
 
 /* Read the string in s and parse all escape sequences */
-lVal *lReadList(lString *s){
+lVal *lReadList(lString *s, bool rootForm){
 	lVal *v = NULL, *ret = NULL;
+	(void)rootForm;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 
 		const char c = *s->data;
-		if((s->data >= s->bufEnd) || (c == 0) || (c == ']') || (c == ')') || (c == '}')){
+		if((s->data >= s->bufEnd) || (c == 0)){
+			s->data++;
+			return ret == NULL ? lCons(NULL,NULL) : ret;
+		}else if((c == ']') || (c == ')') || (c == '}')){
+			if(rootForm){
+				lExceptionThrow(":unmatched-close-parenthesis", "Unmatched closing parenthesis");
+			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else{
@@ -309,7 +317,7 @@ lVal *lReadValue(lString *s){
 	case '{':
 	case '[':
 		s->data++;
-		return lReadList(s);
+		return lReadList(s,false);
 	case '\'': {
 		s->data++;
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
@@ -330,7 +338,7 @@ lVal *lReadValue(lString *s){
 			s->data+=2;
 			lVal *ret = lRootsValPush(lCons(NULL,NULL));
 			ret->vList.car = lValSymS(symTreeNew);
-			ret->vList.cdr = lReadList(s);
+			ret->vList.cdr = lReadList(s,false);
 			return ret;
 		}
 		// fall through
@@ -353,7 +361,7 @@ lVal *lRead(const char *str){
 	s->data    = str;
 	s->buf     = str;
 	s->bufEnd  = &str[strlen(str)];
-	lVal *ret  = lReadList(s);
+	lVal *ret  = lReadList(s,true);
 	return ret;
 }
 
@@ -362,7 +370,7 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	lString *dup = lRootsStringPush(lStringDup(t->vString));
-	t = lReadList(dup);
+	t = lReadList(dup,true);
 	return t;
 }
 

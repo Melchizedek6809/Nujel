@@ -5,8 +5,18 @@
  */
 #include "misc.h"
 
-#include <stdio.h>
+#include <ctype.h>
+#include <dirent.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#ifdef __MINGW32__
+#include <windows.h>
+#include <shlobj.h>
+#endif
 
 void *loadFile(const char *filename,size_t *len){
 	FILE *fp;
@@ -58,4 +68,61 @@ void saveFile(const char *filename,const void *buf, size_t len){
 		wlen += written;
 	}
 	fclose(fp);
+}
+
+int isDir(const char *name){
+	#if defined (__EMSCRIPTEN__)
+	(void)name;
+	return 0;
+	#endif
+	DIR *dp = opendir(name);
+	if(dp == NULL){return 0;}
+	closedir(dp);
+	return 1;
+}
+
+int makeDir(const char *name){
+	if(isDir(name)){return 1;}
+	#ifdef __MINGW32__
+	return mkdir(name);
+	#elif defined (__EMSCRIPTEN__)
+	(void)name;
+	#else
+	return mkdir(name,0755);
+	#endif
+}
+
+int makeDirR(const char *name){
+	char buf[256];
+	strncpy(buf,name,sizeof(buf));
+	buf[sizeof(buf)-1] = 0;
+	for(int i=0;i<256;i++){
+		if(buf[i] != '/'){continue;}
+		buf[i] = 0;
+		makeDir(buf);
+		buf[i] = '/';
+	}
+	return makeDir(buf);
+}
+
+void rmDirR(const char *name){
+	#if defined (__EMSCRIPTEN__)
+	return;
+	#endif
+	DIR *dp = opendir(name);
+	if(dp == NULL){return;}
+	struct dirent *de = NULL;
+	while((de = readdir(dp)) != NULL){
+		char buf[512];
+		if(de->d_name[0] == '.'){continue;}
+		snprintf(buf,sizeof(buf),"%s/%s",name,de->d_name);
+		if(isDir(buf)){
+			rmDirR(buf);
+			rmdir(buf);
+		}else{
+			unlink(buf);
+		}
+	}
+	closedir(dp);
+	rmdir(name);
 }

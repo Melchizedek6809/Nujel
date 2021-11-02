@@ -9,7 +9,6 @@
 
 lVal *lCons(lVal *car, lVal *cdr){
 	lVal *v = lValAlloc();
-	if(v == NULL){return NULL;}
 	v->type = ltPair;
 	v->vList.car = car;
 	v->vList.cdr = cdr;

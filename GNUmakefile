@@ -106,18 +106,18 @@ $(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
 $(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOT) -x "[quit [test-run]]"
+	@$(NUJEL_BOOT) -x "[exit [test-run]]"
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
-	@$(NUJEL) -x "[quit [test-run]]"
+	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
-	@$(NUJEL) -x "[quit [test-run]]"
+	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
