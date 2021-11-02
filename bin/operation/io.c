@@ -258,7 +258,7 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 	return lValString(path);
 }
 
-void addNativeFuncs(lClosure *c){
+void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"error",            "[...args]",      "Prints ...args to stderr",                          lnfError);
 	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);

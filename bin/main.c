@@ -10,34 +10,13 @@
 #include <unistd.h>
 #include <setjmp.h>
 
-#ifdef __MINGW32__
-	#include <windows.h>
-	#include <shlobj.h>
-#else
-	#include "../vendor/bestline/bestline.h"
-#endif
-
 #include "../lib/api.h"
 #include "misc.h"
-#include "operator/io.h"
+#include "operation/readline.h"
+#include "operation/io.h"
 
 extern char binlib_no_data[];
 
-#ifdef __MINGW32__
-	static void bestlineHistoryLoad(const char *path){(void)path;}
-	static void bestlineHistorySave(const char *path){(void)path;}
-	static void bestlineHistoryAdd (const char *line){(void)line;}
-
-	static char *bestline(const char *prompt){
-		static char buf[4096];
-		printf("%s",prompt);
-		fflush(stdout);
-		if(fgets(buf,sizeof(buf),stdin) == NULL){
-			return NULL;
-		}
-		return buf;
-	}
-#endif
 
 void lGUIWidgetFree(lVal *v){
 	(void)v;
@@ -50,56 +29,10 @@ void lPrintError(const char *format, ...){
 	va_end(ap);
 }
 
-const char *getHistoryPath(){
-	static char buf[512];
-
-	#ifdef __MINGW32__
-	char home[512];
-	HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, home);
-	if(result != S_OK){
-		return NULL;
-	}
-	#else
-	const char* home = getenv("HOME");
-	if(!home){
-		return NULL;
-	}
-	#endif
-
-	if(snprintf(buf,sizeof(buf),"%s/.nujel_history",home) <= 0){ // snprintf instead of strcpy/strcat
-		fprintf(stderr,"Can't create historyPath, maybe your $HOME is too big?\n");
-		return NULL;
-	}
-	return buf;
-}
-
 void doRepl(lClosure *c){
-	const char *historyPath = getHistoryPath();
-	if(historyPath){
-		bestlineHistoryLoad(historyPath);
-	}
-	lVal *replHandler;
-	const bool hasHandler = lHasClosureSym(c,lSymS("repl-exception-handler"),&replHandler);
-	const lSymbol *lastlsym = lSymS("last-line");
-	while(1){
-		char *str = bestline("> ");
-		if(str == NULL){
-			printf("\nBye!\n");
-			return;
-		}
-		bestlineHistoryAdd(str);
-		if(historyPath){
-			bestlineHistorySave(historyPath);
-		}
-		lVal *read = lRootsValPush(lRead(str));
-		lVal *v = hasHandler ? lTry(c,replHandler,read) : lnfDo(c,read);
-		if(v != NULL){
-			lWriteVal(v);
-		}else{
-			printf("\n");
-		}
-		lDefineClosureSym(c, lastlsym, lValString(str));
-	}
+	lVal *cmd = lRootsValPush(lCons(NULL,NULL));
+	cmd->vList.car = lValSym("repl");
+	lEval(c,cmd);
 }
 
 lClosure * parsePreOptions(int argc, char *argv[]){
@@ -121,12 +54,14 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	lClosure *c;
 	if(loadStdLib){
 		c = lClosureNewRoot();
-		addNativeFuncs(c);
+		lOperationsIO(c);
+		lOperationsReadline(c);
 		lnfDo(c,lRead((const char *)binlib_no_data));
 		lGarbageCollect();
 	}else{
 		c = lClosureNewRootNoStdLib();
-		addNativeFuncs(c);
+		lOperationsIO(c);
+		lOperationsReadline(c);
 	}
 
 	if(lVerbose){

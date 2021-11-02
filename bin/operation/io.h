@@ -1,5 +1,5 @@
 #pragma once
 #include "../../lib/api.h"
 
-void addNativeFuncs(lClosure *c);
+void lOperationsIO(lClosure *c);
 void setIOSymbols();

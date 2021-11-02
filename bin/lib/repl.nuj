@@ -1,0 +1,37 @@
+[def repl/exception-handler [λ [error]
+	[display [cat [ansi-red [car error]] "\n" [cdr error] "\n"]]
+]]
+
+[def repl/history #nil]
+
+
+[def repl/prompt [λ []
+	   "> "
+]]
+
+[def repl/readline [λ []
+	[def line [readline [repl/prompt]]]
+	[when [nil? line]
+	      [display " Bye!\n"]
+	      [exit 0]
+	]
+	[readline/history/add line]
+	[def read [read line]]
+	[def result [eval* [cons do read]]]
+	[set! repl/history [cons line repl/history]]
+	[display [cat [if [nil? result]
+			  ""
+			  [str/write result]]
+		      "\n"
+		 ]]
+]]
+
+[def repl [λ []
+	[readline/history/load [readline/history/path]]
+	[while #t
+	       [try repl/exception-handler
+	            [repl/readline]
+	       ]
+	       [readline/history/save [readline/history/path]]
+	]
+]]
