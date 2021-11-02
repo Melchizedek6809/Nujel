@@ -1,6 +1,23 @@
 # Nujel
 A Lisp inspired language for games and other latency sensitive applications.
-Developed to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting layer.
+Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting layer.
+
+# Why Nujel?
+Mostly because I wanted the following for WolkenWelten:
+- A Lisp
+- with static typing
+- embeddable in C
+- designed for beginners
+
+## Infix operations
+One part that is quite different to most Lisps is that one can evaluate `[display [1 + 2 * 3]]` and get `7`,
+as one would expect from other languages. This is due to each type having a convenience function associated to them,
+which is an infix evaluator in the case of the numeric types, or `cat` for strings and `arr-ref` for arrays.
+So you can also write `[display ["The result is: " [1 + 1]]]`. Or `[display [#["Yay" "Nay"] 0]]`.
+
+## Trees / Maps
+Nujel also has built-in support for maps using binary trees, including support by the reader for a convenient
+syntax for defining literals, for example `[@[:one 1 :two 2] :two]` returns `2`.
 
 | Operating System  | Master | Develop |
 |-------------------|-----------|-----------|
@@ -15,15 +32,3 @@ Developed to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a
 | FreeBSD           | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/freebsd.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/freebsd.yml?)|
 | NetBSD            | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/netbsd.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/netbsd.yml?)|
 | OpenBSD           | [![builds.sr.ht status](https://builds.sr.ht/~melchizedek6809/Nujel/commits/openbsd.yml.svg)](https://builds.sr.ht/~melchizedek6809/Nujel/commits/openbsd.yml?)|
-
-
-## Infix operations
-One part that is quite different to most Lisps is that one can evaluate `[display [1 + 2 * 3]]` and get `7`,
-as one would expect from other languages. This is due to each type having a convenience function associated to them,
-which is an infix evaluator in the case of the numeric types, or `cat` for strings and `arr-ref` for arrays.
-So you can also write `[display ["The result is: " [1 + 1]]]`. Or `[display [#["Yay" "Nay"] 0]]`.
-
-## Static Typing
-Nujel will use a static type system, since this makes it much easier to generate
-fast code. By using type inference and multiple dispatch the inconvenience shouldn't
-be too big.
