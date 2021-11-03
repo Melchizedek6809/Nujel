@@ -4,6 +4,7 @@ endif
 
 EMCC        := emcc
 EMAR        := emar
+EMMEM       := -s TOTAL_MEMORY=64MB -s ALLOW_MEMORY_GROWTH=1
 
 LIB_SRCS    := $(shell find lib -type f -name '*.c')
 LIB_HDRS    := $(shell find lib -type f -name '*.h')
@@ -45,6 +46,9 @@ endif
 BIN_OBJS    := $(BIN_SRCS:.c=.o)
 BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
+BIN_WASM_OBJS := $(BIN_SRCS:.c=.wo)
+BIN_WASM_DEPS := $(BIN_SRCS:.c=.wd)
+
 all: $(NUJEL)
 .PHONY: all release release.musl
 
@@ -55,6 +59,7 @@ ifneq ($(MAKECMDGOALS),clean)
 -include $(LIB_DEPS)
 -include $(BIN_DEPS)
 -include $(LIB_WASM_DEPS)
+-include $(BIN_WASM_DEPS)
 endif
 
 ifdef EMSDK
@@ -70,6 +75,7 @@ clean:
 	@rm -f -- $(shell find bin lib -type f -name '*.wd')
 	@rm -f -- $(shell find bin/lib stdlib -type f -name '*.no')
 	@rm -f ./callgrind.out.*
+	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
 	@rm -rf tmp
 	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
 
@@ -83,12 +89,12 @@ clean:
 
 %.wo: %.c
 	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
-	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+	@echo "$(ANSI_GREEN)" "[WCC]" "$(ANSI_RESET)" $@
 
 nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo
 	@rm -rf $@
 	@$(EMAR) cq $@ $^
-	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
+	@echo "$(ANSI_BG_CYAN)" "[WAR]" "$(ANSI_RESET)" $@
 
 $(ASSET): tools/assets.c
 	@$(CC) -o $@    $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
@@ -119,6 +125,12 @@ release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
+web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
+	@mkdir -p releases/wasm/
+	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@
+
+release.wasm: web/index.html
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
 	@$(ASSET) bootstrap/stdlib bootstrap/stdlib.no

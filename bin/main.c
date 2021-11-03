@@ -77,15 +77,9 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	return c;
 }
 
-int main(int argc, char *argv[]){
+void parseOptions(lClosure *c, int argc, char *argv[]){
 	int eval = 0;
 	int repl = 1;
-	setvbuf(stdout, NULL, _IONBF, 0);
-	setvbuf(stderr, NULL, _IONBF, 0);
-	lInit();
-	setIOSymbols();
-
-	lClosure *c = parsePreOptions(argc,argv);
 	for(int i=1;i<argc;i++){
 		size_t len;
 		char *str = argv[i];
@@ -127,6 +121,34 @@ int main(int argc, char *argv[]){
 	if(repl){
 		doRepl(c);
 	}
-	lClosureFree(c);
+}
+
+lClosure *mainClosure;
+
+const char *run(const char *line){
+	const int SP = lRootsGet();
+	lVal *exp = lRootsValPush(lCons(NULL,NULL));
+	exp->vList.car = lValSym("repl/wasm");
+	exp->vList.cdr = lCons(NULL,NULL);
+	exp->vList.cdr->vList.car = lValString(line);
+	lVal *v = lEval(mainClosure,exp);
+	const char *ret = v ? lReturnDisplayVal(v) : "";
+	lRootsRet(SP);
+	return ret;
+}
+
+int main(int argc, char *argv[]){
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+	lInit();
+	setIOSymbols();
+
+	mainClosure = parsePreOptions(argc,argv);
+	#ifndef __EMSCRIPTEN__
+	parseOptions(mainClosure,argc,argv);
+	#else
+	printf("Nujel WASM Runtime initialized, ready for eval\r\n");
+	#endif
+
 	return 0;
 }

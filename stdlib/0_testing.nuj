@@ -30,7 +30,7 @@
 			        [if [zero? error-count]
 			            [ansi-rainbow "Everything is working, very nice!"]
 			            [ansi-red "Better fix those!"]]
-			        "\n"]]
+			        "\r\n"]]
 	]]
 	[def test-success [λ [res-should res-is expr i]
 		"Should be called after a test has finished successfully"
@@ -39,9 +39,9 @@
 				    [ansi-green [str/write res-is]]
 				    " != "
 				    [ansi-green [str/write res-should]]
-				    "\n"
+				    "\r\n"
 				    [str/write expr]
-				    "\n\n"]]]
+				    "\r\n\r\n"]]]
 		[set! success-count [++ success-count]]
 	]]
 	[def test-failure [λ [res-should res-is expr i]
@@ -51,9 +51,9 @@
 				    [ansi-red [str/write res-is]]
 				    " != "
 				    [ansi-green [str/write res-should]]
-				    "\n"
+				    "\r\n"
 				    [str/write expr]
-				    "\n\n"]]]
+				    "\r\n\r\n"]]]
 		[set! error-count [++ error-count]]
 	]]
 	[def test-default [λ [result rawexpr i]

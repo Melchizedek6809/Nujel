@@ -2,6 +2,7 @@
 A Lisp inspired language for games and other latency sensitive applications.
 Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting layer.
 
+
 # Why Nujel?
 Mostly because I wanted the following for WolkenWelten:
 - A Lisp
@@ -17,8 +18,13 @@ So you can also write `[display ["The result is: " [1 + 1]]]`. Or `[display [#["
 
 ## Trees / Maps
 Nujel also has built-in support for maps using binary trees, including support by the reader for a convenient
-syntax for defining literals, for example `[@[:one 1 :two 2] :two]` returns `2`.
+syntax to definie literals with, for example `[@[:one 1 :two 2] :two]` returns `2`.
 
+# Try it out yourself
+You can easily start experimenting with Nujel right in your Browser by using a [WASM Release](https://wolkenwelten.net/nujel/).
+
+
+## Build Status
 | Operating System  | Master | Develop |
 |-------------------|-----------|-----------|
 | Windows           | [![Windows](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml)|[![Windows](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml)|

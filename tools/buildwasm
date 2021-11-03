@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+EMSDK_TESTED_VERSION="2.0.27"
+EMSDK_REPO_URL="https://github.com/emscripten-core/emsdk.git"
+
+cd `git rev-parse --show-toplevel`
+mkdir -p tmp
+DIR=`pwd`
+if [ ! -d "tmp/emsdk" ]; then
+	cd "tmp/"
+	git clone "$EMSDK_REPO_URL" emsdk
+else
+	cd "tmp/"
+fi
+cd emsdk/
+git pull
+./emsdk install "$EMSDK_TESTED_VERSION"
+./emsdk activate "$EMSDK_TESTED_VERSION"
+
+source "emsdk_env.sh"
+cd ../../
+make -j release.wasm

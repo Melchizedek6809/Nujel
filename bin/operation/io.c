@@ -6,6 +6,8 @@
 #include "io.h"
 #include "../misc.h"
 
+#include "../../lib/exception.h"
+
 #include <dirent.h>
 #include <errno.h>
 #include <unistd.h>
@@ -140,8 +142,11 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 }
 
 static lVal *lnfPopen(lClosure *c, lVal *v){
-	(void) c;
-
+	(void)c; (void)v;
+	#ifdef __EMSCRIPTEN__
+		lExceptionThrow(":unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.");
+		return NULL;
+	#else
 	const char *command = castToString(lCar(v),NULL);
 	if(command == NULL){return NULL;}
 
@@ -183,6 +188,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	ret->vList.cdr = lValStringNoCopy(buf,len);
 
 	return ret;
+	#endif
 }
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){

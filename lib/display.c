@@ -36,6 +36,12 @@ void lDisplayVal(lVal *v){
 	printf("%s",dispWriteBuf);
 }
 
+/* Display v on the default channel, most likely stdout */
+const char *lReturnDisplayVal(lVal *v){
+	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
+	return dispWriteBuf;
+}
+
 /* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);

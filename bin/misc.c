@@ -87,6 +87,7 @@ int makeDir(const char *name){
 	return mkdir(name);
 	#elif defined (__EMSCRIPTEN__)
 	(void)name;
+	return 1;
 	#else
 	return mkdir(name,0755);
 	#endif

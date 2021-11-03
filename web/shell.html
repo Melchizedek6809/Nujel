@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Nujel REPL</title>
+		<link rel="stylesheet" href="repl.css"></script>
+	</head>
+	<body>
+		<div id="terminal" class="nujel-repl-wrapper"></div>
+		<script type="text/javascript" src="repl.js"></script>
+		<script type='text/javascript'>
+			var args = window.location.search+'';
+			if(args.charAt(0) == '?'){
+				args = args.substr(1);
+			}
+			args = args.split('&');
+			for(var i=0;i<args.length;i++){
+				args[i] = '-'+args[i];
+			}
+
+			var nujel;
+			var stdoutBuffer = "";
+
+			var Module = {
+				arguments: args,
+				preRun: [],
+				postRun: [function(){
+					const nujelRun = Module.cwrap('run','string',['string']);
+					const nujelRead = () => {
+						const ret = stdoutBuffer;
+						stdoutBuffer = "";
+						return ret;
+					}
+					nujel = (line) => {
+						return nujelRun(line);
+					};
+					NujelREPL(document.getElementById("terminal"),{run: nujelRun, read: nujelRead});
+				}],
+				print: function(text) {
+					stdoutBuffer += text;
+				},
+				printErr: function(text) {
+					stdoutBuffer += text;
+				},
+				setStatus: function(text) {},
+				totalDependencies: 0,
+				monitorRunDependencies: function(left) {
+					this.totalDependencies = Math.max(this.totalDependencies, left);
+				}
+			};
+
+		</script>
+		{{{ SCRIPT }}}
+	</body>
+</html>
