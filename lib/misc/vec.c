@@ -6,7 +6,6 @@
 #define PI    (3.1415926535897932384626433832795f)
 
 #include "vec.h"
-#include "random-number-generator.h"
 
 #include <math.h>
 
@@ -137,10 +136,4 @@ float vecSum(const vec a){
 }
 float vecAbsSum(const vec a){
 	return fabsf(a.x)+fabsf(a.y)+fabsf(a.z);
-}
-vec vecRngAbs(){
-	return (vec){{{rngValf(),rngValf(),rngValf()}}};
-}
-vec vecRng(){
-	return vecMulS(vecSubS(vecRngAbs(),0.5f),2.f);
 }

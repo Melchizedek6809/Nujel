@@ -599,7 +599,7 @@
     [test-add 3 [def ein-test-arr [arr 1 2 3]] [ein-test-arr 2 9] [ein-test-arr 2]]
     [test-add 123 [def i-assaultmegablaster 123] i-assaultmegablaster]
     [test-add #t [int? [random]]]
-    [test-add #t [random-seed! 123] [def first-value [random]] [random-seed! 123] [= first-value [random]]]
+    [test-add #t [random/seed! 123] [def first-value [random]] [random/seed! 123] [= first-value [random]]]
     [test-add 1 [def a 1] [unless [= 2 2]
             [set! a 4]] a]
     [test-add 4 [def a 1] [unless [= 2 3]
@@ -1058,8 +1058,7 @@
        error] [throw :test-exception]]]]
     [test-add #nil [[λ [e]
        [car [e]]] [cons :test "Test"]]]
-    ][do [random-seed [logxor [time] [time/milliseconds]]]
-    [def time/seconds [λ* [timestamp]
+    ][do [def time/seconds [λ* [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]]]
     [def time/minutes [λ* [timestamp]
@@ -1120,6 +1119,51 @@
     [def λδ [λ* [@...λδ]
         "Define a λ with the self-hosting Nujel compiler"
         [eval [compile [cons 'λ @...λδ]]]]]
+
+
+[def random]
+[def random/seed]
+[def random/seed!]
+[def random/seed-initialize!]
+
+[let*
+	[def seed]
+
+	[set! random/seed-initialize! [λ []
+		"Seed the RNG with the current time"
+		[set! [logxor [time] [time/milliseconds]]]
+	]]
+
+	[def rng [λ []
+		[set! seed [+ 12345 [* seed 1103515245]]]
+		[logior [ash [logand seed #xFFFF] 16]
+		       [logand [ash seed -16] #xFFFF]
+		]
+	]]
+
+	[set! random/seed! [λ [new-seed]
+		"Set a new seed value for the RNG"
+		[set! seed new-seed]
+	]]
+
+	[set! random/seed! [λ []
+		"Return the current RNG seed value"
+		seed
+	]]
+
+	[set! random [λ [max]
+		"Return a value from 0 to MAX, or, if left out, up to the maximum possible (int-max)"
+		[if max
+		    [mod [rng] max]
+		    [rng]]
+	]]
+
+	[random/seed-initialize!]
+]
+
+
+
+
     [def eval [λ* [expr]
         "Compile, Evaluate and then return the result of EXPR"
         [eval* [compile expr]]]]]

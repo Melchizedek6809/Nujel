@@ -19,6 +19,7 @@
 	]]
 	[def display-results [λ []
 		"Prints the result Message"
+		[random/seed-initialize!]
 		[error [cat test-context
 			        " ["
 			        [ansi-green success-count]
@@ -98,9 +99,6 @@
 		[set! error-count    0]
 		[test-run-iter test test-list test-count]
 		[display-results]
-		[when [> error-count 0]
-		      [display-errors]
-			  [display-results]]
 		error-count
 	]]
 	[set! test-run [λ [output-passes hide-errors]

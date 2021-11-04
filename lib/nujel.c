@@ -16,7 +16,6 @@
 #include "operation/eval.h"
 #include "operation/list.h"
 #include "operation/predicates.h"
-#include "operation/random.h"
 #include "operation/special.h"
 #include "operation/string.h"
 #include "operation/time.h"
@@ -201,7 +200,6 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsEval(c);
 	lOperationsList(c);
 	lOperationsPredicate(c);
-	lOperationsRandom(c);
 	lOperationsReader(c);
 	lOperationsSpecial(c);
 	lOperationsString(c);

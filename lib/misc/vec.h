@@ -6,8 +6,6 @@ vec   vecNewP     (const float *p);
 vec   vecNOne     ();
 vec   vecZero     ();
 vec   vecOne      ();
-vec   vecRngAbs   ();
-vec   vecRng      ();
 vec   vecInvert   (const vec a);
 vec   vecAdd      (const vec a, const vec   b);
 vec   vecAddS     (const vec a, const float b);
