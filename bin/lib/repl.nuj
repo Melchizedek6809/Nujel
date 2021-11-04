@@ -1,5 +1,27 @@
+[def display/error [let*
+	[def wrap [λ [i text]
+		[cond [[eq? i 0] [ansi-red text]]
+		      [[eq? i 1] text]
+		      [[eq? i 2] [ansi-yellow text]]
+		      [#t text]
+		]
+	]]
+
+	[def iter [λ [error i]
+		[if error
+		    [cons [wrap i [string [car error]]]
+		          [iter [cdr error] [++ i]]]
+		    [cons "" #nil]]
+	]]
+
+	[λ [error]
+		"Display ERROR in a nice, human readable way"
+		[display [join [iter error 0] "\r\n"]]
+	]
+]]
+
 [def repl/exception-handler [λ [error]
-	[display [cat [ansi-red [car error]] "\r\n" [cdr error] "\r\n"]]
+	[display/error error]
 ]]
 
 [def repl/history #nil]
@@ -12,14 +34,14 @@
 [def repl/wasm [λ [line]
 	[try repl/exception-handler
 	     [def expr [read line]]
-		 [eval* [cons do expr]]
+	     [eval* [cons do expr]]
 	]
 ]]
 
 [def repl/readline [λ []
 	[def line [readline [repl/prompt]]]
 	[when [nil? line]
-	      [display " Bye!\r\n"]
+	      [display "Bye!\r\n"]
 	      [exit 0]
 	]
 	[readline/history/add line]
@@ -29,7 +51,7 @@
 	[display [cat [if [nil? result]
 			  ""
 			  [str/write result]]
-		      "\r\n"
+		      "\n"
 		 ]]
 ]]
 

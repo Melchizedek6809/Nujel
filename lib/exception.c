@@ -20,10 +20,30 @@ void lExceptionThrowRaw(lVal *v){
 }
 
 void lExceptionThrow(const char *symbol, const char *error){
-	lVal *v = lRootsValPush(lCons(NULL,NULL));
-	v->vList.car = lValSym(symbol);
-	v->vList.cdr = lValString(error);
-	lExceptionThrowRaw(v);
+	lVal *l = lRootsValPush(lCons(NULL,NULL));
+	lVal *c = l;
+
+	c->vList.car = lValSym(symbol);
+	c->vList.cdr = lCons(NULL,NULL);
+	c = c->vList.cdr;
+	c->vList.car = lValString(error);
+
+	lExceptionThrowRaw(l);
+}
+
+void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
+	lVal *l = lRootsValPush(lCons(NULL,NULL));
+	lVal *c = l;
+
+	c->vList.car = lValSym(symbol);
+	c->vList.cdr = lCons(NULL,NULL);
+	c = c->vList.cdr;
+	c->vList.car = lValString(error);
+	c->vList.cdr = lCons(NULL,NULL);
+	c = c->vList.cdr;
+	c->vList.car = v;
+
+	lExceptionThrowRaw(l);
 }
 
 void lExceptionInit(){

@@ -32,7 +32,9 @@ void lPrintError(const char *format, ...){
 void doRepl(lClosure *c){
 	lVal *cmd = lRootsValPush(lCons(NULL,NULL));
 	cmd->vList.car = lValSym("repl");
-	lEval(c,cmd);
+	while(true){
+		lEval(c,cmd);
+	}
 }
 
 lClosure * parsePreOptions(int argc, char *argv[]){

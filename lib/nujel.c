@@ -139,7 +139,11 @@ lVal *lEval(lClosure *c, lVal *v){
 				//return lEval(c,newV);
 				return lApply(c,lCdr(v),resolved);
 			}else{
-				return v;
+				if(lSymKeyword(car->vSymbol)){
+					return v;
+				}
+				lExceptionThrowVal(":unresolved-procedure", "Can't resolve following symbol into a procedure", car);
+				return NULL;
 			}}
 		case ltPair:
 			return lEval(c,lRootsValPush(lCons(lRootsValPush(lEval(c,car)),lCdr(v))));
@@ -238,6 +242,13 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 
 		return doRet;
 	}
+}
+
+lVal *lQuote(lVal *v){
+	lVal *ret = lRootsValPush(lCons(NULL,NULL));
+	ret->vList.car = lValSymS(symQuote);
+	ret->vList.cdr = lCons(v,NULL);
+	return ret;
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */

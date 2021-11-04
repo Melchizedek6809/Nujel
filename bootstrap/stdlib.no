@@ -969,7 +969,7 @@
     [test-add "[]" '[]]
     [test-add "[#nil #nil]" '[#nil #nil]]
     [test-add "[and #nil #nil]" '[and #nil #nil]]
-    ][do [random-seed [logxor [time] [time/millliseconds]]]
+    ][do [random-seed [logxor [time] [time/milliseconds]]]
     [def time/seconds [λ* [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]]]

@@ -14,6 +14,7 @@ extern lVal *lnfvInfix;
 extern lVal *lnfvArrRef;
 extern lVal *lnfvCat;
 extern lVal *lnfvTreeGet;
+extern lVal *lnfvQuote;
 
 void      lInit             ();
 
@@ -24,3 +25,4 @@ lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lApply            (lClosure *c, lVal *args, lVal *fun);
 lVal     *lTry              (lClosure *c, lVal *catchRaw, lVal *bodyRaw);
+lVal     *lQuote            (lVal *v);

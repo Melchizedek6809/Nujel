@@ -1,7 +1,7 @@
 ; Time related λs
 
 ; Initialize the RNG
-[random-seed [logxor [time] [time/millliseconds]]]
+[random-seed [logxor [time] [time/milliseconds]]]
 
 [def time/seconds [λ [timestamp]
 	"Return the seconds part of TIMESTAMP, defaults to current time"
