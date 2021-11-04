@@ -112,6 +112,7 @@ lVal *lEval(lClosure *c, lVal *v){
 		lVal *car = lCar(v);
 		switch(car ? car->type : ltNoAlloc){
 		default:
+			lExceptionThrowVal(":type-error", "Can't use the following type as a function", lRootsValPush(lValSymS(getTypeSymbol(car))));
 			return v;
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
@@ -135,18 +136,16 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				//lVal *newV = lRootsValPush(lCons(resolved,lCdr(v)));
-				//return lEval(c,newV);
 				return lApply(c,lCdr(v),resolved);
 			}else{
 				if(lSymKeyword(car->vSymbol)){
 					return v;
 				}
-				lExceptionThrowVal(":unresolved-procedure", "Can't resolve following symbol into a procedure", car);
+				lExceptionThrowVal(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car);
 				return NULL;
 			}}
 		case ltPair:
-			return lEval(c,lRootsValPush(lCons(lRootsValPush(lEval(c,car)),lCdr(v))));
+			return lApply(c,lCdr(v),lRootsValPush(lEval(c,car)));
 		}}
 	}
 }

@@ -58,7 +58,7 @@
 	]]
 	[def test-default [λ [result rawexpr i]
 		"Tests that RAWEXPR evaluates to RESULT"
-		[try [λ [err] [test-failure result :unexpected-exception rawexpr i]]
+		[try [λ [err] [test-failure result err rawexpr i]]
 			[def expr [eval rawexpr]]
 			[def pred? eq?]
 			[when [string? result]

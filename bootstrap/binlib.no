@@ -25,4 +25,55 @@
         "Evaluate a Nujel source file in the current context"
         [do [def source [cons 'do [read [file/read path]]]]
            [eval source]]]]
-    [def test-context "Nujel Bootstrap "]]
+    [def eval/forked [λ* [nujel-binary raw-expr]
+        "Evaluate @EXPR in a separate process running NUJEL-BINARY"
+        [do [def expr [cat "[print [str/write " [str/write raw-expr]]]
+           [def tmp-path [file/temp expr]]
+           [def command [cat nujel-binary " " tmp-path]]
+           [def res [popen command]]
+           [file/remove tmp-path]
+           [cons [car res] [cdr res]]]]]
+    [def test-context "Nujel Standalone"]][do [def display/error [let* [do [def wrap [λ* [i text]
+           ""
+           [cond [[eq? i 0] [ansi-red text]]
+                 [[eq? i 1] text]
+                 [[eq? i 2] [ansi-yellow text]]
+                 [#t text]]]]
+       [def iter [λ* [error i]
+           ""
+           [if error
+              [cons [wrap i [string [car error]]] [iter [cdr error] [++ i]]]
+              [cons "" #nil]]]]
+       [λ* [error]
+           "Display ERROR in a nice, human readable way"
+           [display [join [iter error 0] "\r\n"]]]]]]
+    [def repl/exception-handler [λ* [error]
+        ""
+        [display/error error]]]
+    [def repl/history #nil]
+    [def repl/prompt [λ* []
+        "> "
+        "> "]]
+    [def repl/wasm [λ* [line]
+        ""
+        [try repl/exception-handler [def expr [read line]] [eval* [cons do expr]]]]]
+    [def repl/readline [λ* []
+        ""
+        [do [def line [readline [repl/prompt]]]
+           [when [nil? line]
+                 [display "Bye!\r\n"]
+                 [exit 0]]
+           [readline/history/add line]
+           [def read [read line]]
+           [def result [eval* [cons do read]]]
+           [set! repl/history [cons line repl/history]]
+           [display [cat [if [nil? result]
+              ""
+              [str/write result]] "\n"]]]]]
+    [def repl [λ* []
+        ""
+        [do [readline/history/load [readline/history/path]]
+           [while #t [try repl/exception-handler [repl/readline]] [readline/history/save [readline/history/path]]]]]]][unless [eq? OS "Emscripten"]
+         [test-add '[0 . ""] [popen "true"]]
+         [test-add #f [zero? [car [popen "false"]]]]
+         [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]
