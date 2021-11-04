@@ -114,7 +114,7 @@ void rmDirR(const char *name){
 	if(dp == NULL){return;}
 	struct dirent *de = NULL;
 	while((de = readdir(dp)) != NULL){
-		char buf[512];
+		char buf[520];
 		if(de->d_name[0] == '.'){continue;}
 		snprintf(buf,sizeof(buf),"%s/%s",name,de->d_name);
 		if(isDir(buf)){
