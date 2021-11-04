@@ -205,3 +205,8 @@ profile: $(NUJEL)
 .PHONY: profile-while
 profile-while: $(NUJEL)
 	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 2,000,000] [set! v [+ 1 v]]] v]]"
+
+.PHONY: web
+web:
+	./tools/buildwasm
+	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/var/www/html/nujel/
