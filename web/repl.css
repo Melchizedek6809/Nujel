@@ -11,7 +11,7 @@ body,html {
 	position:relative;
 }
 
-.nujel-repl-wrapper {
+#nujel-repl-wrapper {
 	height:100%;
 	background:#282c34;
 	position:relative;
@@ -27,8 +27,8 @@ body,html {
 	outline:none;
 }
 
-.nujel-repl-wrapper::after,
-.nujel-repl-wrapper::before {
+#nujel-repl-wrapper::after,
+#nujel-repl-wrapper::before {
 	content:"λ";
 	position:absolute;
 	left:50%;
@@ -42,7 +42,7 @@ body,html {
 	margin-left:-1vw;
 }
 
-.nujel-repl-wrapper::after {
+#nujel-repl-wrapper::after {
 	color:#f00;
 	margin-left:1vw;
 }
