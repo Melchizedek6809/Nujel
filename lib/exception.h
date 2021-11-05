@@ -5,7 +5,6 @@
 extern jmp_buf exceptionTarget;
 extern lVal *exceptionValue;
 
-void lExceptionThrowRaw(lVal *v);
-void lExceptionThrow(const char *symbol, const char *error);
-void lExceptionThrowVal(const char *symbol, const char *error, lVal *v);
-void lExceptionInit();
+void lExceptionThrowRaw(lVal *v) __attribute__((noreturn));
+void lExceptionThrow(const char *symbol, const char *error) __attribute__((noreturn));
+void lExceptionThrowVal(const char *symbol, const char *error, lVal *v) __attribute__((noreturn));

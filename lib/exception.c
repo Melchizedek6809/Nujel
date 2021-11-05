@@ -14,12 +14,13 @@ jmp_buf exceptionTarget;
 lVal *exceptionValue;
 
 
-void lExceptionThrowRaw(lVal *v){
+__attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 	exceptionValue = v;
 	longjmp(exceptionTarget, 1);
+	while(1);
 }
 
-void lExceptionThrow(const char *symbol, const char *error){
+__attribute__((noreturn)) void lExceptionThrow(const char *symbol, const char *error){
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	lVal *c = l;
 
@@ -31,7 +32,7 @@ void lExceptionThrow(const char *symbol, const char *error){
 	lExceptionThrowRaw(l);
 }
 
-void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
+__attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	lVal *c = l;
 
@@ -44,15 +45,4 @@ void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
 	c->vList.car = v;
 
 	lExceptionThrowRaw(l);
-}
-
-void lExceptionInit(){
-	int ret;
-	exceptionValue = NULL;
-	ret = setjmp(exceptionTarget);
-	if(ret){
-		lWriteVal(exceptionValue);
-		fprintf(stderr,"Unhandled exception, exiting immediately!\n");
-		exit(1);
-	}
 }

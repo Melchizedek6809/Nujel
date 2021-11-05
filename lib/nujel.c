@@ -36,7 +36,6 @@ bool lVerbose = false;
 void lInit(){
 	lArrayInit();
 	lClosureInit();
-	lExceptionInit();
 	lNativeFunctionsInit();
 	lStringInit();
 	lValInit();

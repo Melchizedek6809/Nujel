@@ -45,6 +45,7 @@ static void lStringAdvanceToNextLine(lString *s){
 	for(;(*s->data != 0) && (*s->data != '\n');s->data++){}
 }
 
+/* Parse the string literal in s and return the resulting ltString lVal */
 static lVal *lParseString(lString *s){
 	static char *buf = NULL;
 	static uint bufSize = 1<<12; // Start with 4K
@@ -113,6 +114,7 @@ static lVal *lParseString(lString *s){
 	return NULL;
 }
 
+/* Parse s as a decimal number, and return a ltInt or ltFloat lVal */
 static lVal *lParseNumberDecimal(lString *s){
 	lVal *v      = lValInt(0);
 	char c       = *s->data;
@@ -153,16 +155,13 @@ static lVal *lParseNumberDecimal(lString *s){
 	return v;
 }
 
+/* Parse s as a symbol and return the ltSymbol lVal */
 static lVal *lParseSymbol(lString *s){
 	uint i;
 	char buf[128];
 	for(i=0;i<4096;i++){
 		char c = *s->data++;
-		if(isspace((u8)c)  || (c == 0)   ||
-			(c == '[') || (c == ']') ||
-			(c == '(') || (c == ')') ||
-			(c == '{') || (c == '}'))
-		{
+		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
 			s->data--;
 			break;
 		}
@@ -178,53 +177,52 @@ static lVal *lParseSymbol(lString *s){
 	return lValSym(buf);
 }
 
+/* Parse s as a binary number and return it as an ltInt lVal */
 static lVal *lParseNumberBinary(lString *s){
 	int ret;
 	for(ret = 0;;s->data++){
-		if (*s->data <= ' ')                       {break;}
-		if((*s->data == '[')  || (*s->data == ']')){break;}
-		if((*s->data == '(')  || (*s->data == ')')){break;}
-		if((*s->data == '{')  || (*s->data == '}')){break;}
-		if((*s->data == '\'') || (*s->data == '"')){break;}
-		if((*s->data == '#')  || (*s->data == '`')){break;}
+		const u8 c = *s->data;
+		if((c <= ' ') || isnonsymbol(c)){break;}
 		if((*s->data == '0')  || (*s->data == '1')){
 			ret <<= 1;
 			if(*s->data == '1'){ret |= 1;}
+		}else{
+			lExceptionThrow(":invalid-binary-literal", "Unexpected character found in binary literal");
 		}
 	}
 	return lValInt(ret);
 }
 
+/* Parse s as a hexadecimal number and return it as an ltInt lVal */
 static lVal *lParseNumberHex(lString *s){
 	int ret;
 	for(ret = 0;;s->data++){
-		if (*s->data <= ' ')                       {break;}
-		if((*s->data == '[')  || (*s->data == ']')){break;}
-		if((*s->data == '(')  || (*s->data == ')')){break;}
-		if((*s->data == '{')  || (*s->data == '}')){break;}
-		if((*s->data == '\'') || (*s->data == '"')){break;}
-		if((*s->data == '#')  || (*s->data == '`')){break;}
-		if((*s->data >= '0')  && (*s->data <= '9')){ret = (ret << 4) |  (*s->data - '0');}
-		if((*s->data >= 'A')  && (*s->data <= 'F')){ret = (ret << 4) | ((*s->data - 'A')+0xA);}
-		if((*s->data >= 'a')  && (*s->data <= 'f')){ret = (ret << 4) | ((*s->data - 'a')+0xA);}
+		const u8 c = *s->data;
+		if((c <= ' ') || isnonsymbol(c)){break;}
+		if((*s->data >= '0')  && (*s->data <= '9')){ret = (ret << 4) |  (*s->data - '0'); continue;}
+		if((*s->data >= 'A')  && (*s->data <= 'F')){ret = (ret << 4) | ((*s->data - 'A')+0xA); continue;}
+		if((*s->data >= 'a')  && (*s->data <= 'f')){ret = (ret << 4) | ((*s->data - 'a')+0xA); continue;}
+		lExceptionThrow(":invalid-hex-literal", "Unexpected character found in hex literal");
 	}
 	return lValInt(ret);
 }
 
+/* Parse s as an octal number and return it as an ltInt lVal */
 static lVal *lParseNumberOctal(lString *s){
 	int ret;
 	for(ret = 0;;s->data++){
-		if (*s->data <= ' ')                       {break;}
-		if((*s->data == '[')  || (*s->data == ']')){break;}
-		if((*s->data == '(')  || (*s->data == ')')){break;}
-		if((*s->data == '{')  || (*s->data == '}')){break;}
-		if((*s->data == '\'') || (*s->data == '"')){break;}
-		if((*s->data == '#')  |  (*s->data == '`')){break;}
-		if((*s->data >= '0')  && (*s->data <= '7')){ret = (ret << 3) |  (*s->data - '0');}
+		const u8 c = *s->data;
+		if((*s->data <= ' ') || isnonsymbol(c)){break;}
+		if((*s->data >= '0')  && (*s->data <= '7')){
+			ret = (ret << 3) |  (*s->data - '0');
+		}else{
+			lExceptionThrow(":invalid-octal-literal", "Unexpected character found in octal literal");
+		}
 	}
 	return lValInt(ret);
 }
 
+/* Parse s as a character constant and return it's value as an ltInt lVal */
 static lVal *lParseCharacter(lString *s){
 	int ret = s->data[0];
 	if((s->data[0] == 'B') && (s->data[1] == 'a')){ret = '\b';}
@@ -237,10 +235,13 @@ static lVal *lParseCharacter(lString *s){
 	return lValInt(ret);
 }
 
+/* Parse the special value in s starting with a # and return the resulting lVal */
 static lVal *lParseSpecial(lString *s){
 	if(*s->data++ != '#'){return NULL;}
 	switch(*s->data++){
 	default:
+		lExceptionThrow(":invalid-special-literal", "Unexpected character found in special literal");
+		return NULL;
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
@@ -277,13 +278,13 @@ lVal *lReadList(lString *s, bool rootForm){
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				lExceptionThrow(":unmatched-open-parenthesis", "Unmatched opening parenthesis");
+				lExceptionThrow(":unmatched-opening-bracket", "Unmatched opening bracket");
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else if((c == ']') || (c == ')') || (c == '}')){
 			if(rootForm){
-				lExceptionThrow(":unmatched-close-parenthesis", "Unmatched closing parenthesis");
+				lExceptionThrow(":unmatched-closing-bracket", "Unmatched closing bracket");
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
@@ -379,5 +380,5 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 
 /* Add all reader operators to c */
 void lOperationsReader(lClosure *c){
-	lAddNativeFunc(c,"read","[str]","Read and Parses STR as an S-Expression", lnfRead);
+	lAddNativeFunc(c,"read", "[str]", "Read and Parses STR as an S-Expression", lnfRead);
 }
