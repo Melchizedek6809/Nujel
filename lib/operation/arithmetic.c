@@ -392,22 +392,22 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 }
 
 void lOperationsArithmetic(lClosure *c){
-	lnfvInfix = lAddNativeFunc(c,"infix",  "[...body]","Evaluate body as an infix expression", lnfInfix);
-	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]","Modulo",        lnfMod));
-	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]","Division",      lnfDiv));
-	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]","Multiplication",lnfMul));
-	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]","Substraction",  lnfSub));
-	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]","Addition",      lnfAdd));
-	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",    "Return a raised to the power of b",lnfPow));
+	lnfvInfix = lAddNativeFunc(c,"infix","[...body]", "Evaluate body as an infix expression", lnfInfix);
+	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]", "Modulo",        lnfMod));
+	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]", "Division",      lnfDiv));
+	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]", "Multiplication",lnfMul));
+	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]", "Substraction",  lnfSub));
+	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]", "Addition",      lnfAdd));
+	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",     "Return A raised to the power of B",lnfPow));
 
-	lAddNativeFunc(c,"abs","[a]",  "Return the absolute value of a",   lnfAbs);
-	lAddNativeFunc(c,"sqrt","[a]", "Return the squareroot of a",       lnfSqrt);
-	lAddNativeFunc(c,"floor","[a]","Round a down",                     lnfFloor);
-	lAddNativeFunc(c,"ceil","[a]", "Round a up",                       lnfCeil);
-	lAddNativeFunc(c,"round","[a]","Round a",                          lnfRound);
-	lAddNativeFunc(c,"sin","[a]",  "Sin A",                            lnfSin);
-	lAddNativeFunc(c,"cos","[a]",  "Cos A",                            lnfCos);
-	lAddNativeFunc(c,"tan","[a]",  "Tan A",                            lnfTan);
+	lAddNativeFunc(c,"abs","[a]",   "Return the absolute value of a",  lnfAbs);
+	lAddNativeFunc(c,"sqrt","[a]",  "Return the squareroot of a",      lnfSqrt);
+	lAddNativeFunc(c,"floor","[a]", "Round a down",                    lnfFloor);
+	lAddNativeFunc(c,"ceil","[a]",  "Round a up",                      lnfCeil);
+	lAddNativeFunc(c,"round","[a]", "Round a",                         lnfRound);
+	lAddNativeFunc(c,"sin","[a]",   "Sin A",                           lnfSin);
+	lAddNativeFunc(c,"cos","[a]",   "Cos A",                           lnfCos);
+	lAddNativeFunc(c,"tan","[a]",   "Tan A",                           lnfTan);
 
-	lAddNativeFunc(c,"vec/length vec/magnitude","[vec]","Return the length of VEC",lnfVMag);
+	lAddNativeFunc(c,"vec/magnitude","[vec]","Return the magnitude of VEC", lnfVMag);
 }

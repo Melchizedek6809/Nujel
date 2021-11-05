@@ -48,9 +48,10 @@
               [set! test-count [+ test-count 1]]]]]
        [def display-results [λ* []
            "Prints the result Message"
-           [error [cat test-context " [" [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
-              [ansi-rainbow "Everything is working, very nice!"]
-              [ansi-red "Better fix those!"]] "\r\n"]]]]
+           [do [random/seed-initialize!]
+              [error [cat test-context " [" [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
+                 [ansi-rainbow "Everything is working, very nice!"]
+                 [ansi-red "Better fix those!"]] "\r\n"]]]]]
        [def test-success [λ* [res-should res-is expr i]
            "Should be called after a test has finished successfully"
            [do [when print-passes
@@ -94,9 +95,6 @@
               [set! error-count 0]
               [test-run-iter test test-list test-count]
               [display-results]
-              [when [> error-count 0]
-                    [display-errors]
-                    [display-results]]
               error-count]]]
        [set! test-run [λ* [output-passes hide-errors]
            "Run through all automated Tests"
@@ -460,16 +458,40 @@
         [eq? :native-function [type-of val]]]]
     [def procedure? [λ* [val]
         "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val]]]]][do [def br [λ* [num]
+        [or [lambda? val] [native? val]]]]][do [def random #nil]
+    [def random/rng! #nil]
+    [def random/seed #nil]
+    [def random/seed! #nil]
+    [def random/seed-initialize! #nil]
+    [let* [do [def seed 0]
+       [set! random/seed-initialize! [λ* []
+           ""
+           [set! seed [logxor [time] [time/milliseconds]]]]]
+       [set! random/rng! [λ* []
+           ""
+           [do [set! seed [+ 12345 [* seed 1103515245]]]
+              [logior [ash [logand seed 65535] 16] [logand [ash seed -16] 65535]]]]]
+       [set! random/seed! [λ* [new-seed]
+           "Set a new seed value for the RNG"
+           [set! seed new-seed]]]
+       [set! random/seed [λ* []
+           "Return the current RNG seed value"
+           seed]]
+       [set! random [λ* [max]
+           "Return a value from 0 to MAX, or, if left out, a random int"
+           [if [number? max]
+              [mod [abs [random/rng!]] max]
+              [random/rng!]]]]
+       [random/seed-initialize!]]]][do [def br [λ* [num]
         "Return NUM=1 linebreaks"
         [if [or [nil? num] [<= [int num] 1]]
            "\n"
            ["\n" [br [-- num]]]]]]
     [def path/without-extension [λ* [path]
         "Return PATH, but without the fileextension part"
-        [do [def last-period [str/last-index-of path "."]]
+        [do [def last-period [last-index-of path "."]]
            [if [>= last-period 0]
-              [str/substr path 0 last-period]
+              [substr path 0 last-period]
               path]]]]][do [test-add 1073741824 [ash 1 30]]
     [test-add 2147483647 [lognot [ash 1 31]]]
     [test-add 1 1]
@@ -599,7 +621,8 @@
     [test-add 3 [def ein-test-arr [arr 1 2 3]] [ein-test-arr 2 9] [ein-test-arr 2]]
     [test-add 123 [def i-assaultmegablaster 123] i-assaultmegablaster]
     [test-add #t [int? [random]]]
-    [test-add #t [random/seed! 123] [def first-value [random]] [random/seed! 123] [= first-value [random]]]
+    [test-add #t [random/seed! 123] [def first-value [random]] [random/seed! 123] [eq? first-value [random]]]
+    [test-add #t [random/seed! 123] [!= [random] [random]]]
     [test-add 1 [def a 1] [unless [= 2 2]
             [set! a 4]] a]
     [test-add 4 [def a 1] [unless [= 2 3]
@@ -723,9 +746,9 @@
          [[λ [a]
             [cond [[zero? a] [int ret]]
                   [#t [set! ret [cat ret a]] [[cl-lambda 1] [-- a]]]]] 8]]]
-    [test-add "\"ASD123\"" [str/uppercase "asD123"]]
-    [test-add "\"asd123\"" [str/lowercase "aSD123"]]
-    [test-add "\"Asd123\"" [str/capitalize "aSD123"]]
+    [test-add "\"ASD123\"" [uppercase "asD123"]]
+    [test-add "\"asd123\"" [lowercase "aSD123"]]
+    [test-add "\"Asd123\"" [capitalize "aSD123"]]
     [test-add "[vec 1.0 1.0 1.0]" [floor [vec 1.3 1.3 1.3]]]
     [test-add "2.0" [ceil 1.3]]
     [test-add "[vec 2.0 2.0 2.0]" [ceil [vec 1.3 1.3 1.3]]]
@@ -741,7 +764,8 @@
     [test-add ":testerle" :testerle]
     [test-add :testerle :testerle]
     [test-add '[:asd qwerty] [:asd qwerty]]
-    [test-add :asd [begin [def :asd #t] :asd]]
+    [test-add :asd [do [def :asd #t]
+       :asd]]
     [test-add "[1 . 2]" [def test [cons 1 2]] test]
     [test-add "\"Eins\"" [def eins [ω [def say [λ []
        "Eins"]]]] [eins [say]]]
@@ -1119,51 +1143,6 @@
     [def λδ [λ* [@...λδ]
         "Define a λ with the self-hosting Nujel compiler"
         [eval [compile [cons 'λ @...λδ]]]]]
-
-
-[def random]
-[def random/seed]
-[def random/seed!]
-[def random/seed-initialize!]
-
-[let*
-	[def seed]
-
-	[set! random/seed-initialize! [λ []
-		"Seed the RNG with the current time"
-		[set! [logxor [time] [time/milliseconds]]]
-	]]
-
-	[def rng [λ []
-		[set! seed [+ 12345 [* seed 1103515245]]]
-		[logior [ash [logand seed #xFFFF] 16]
-		       [logand [ash seed -16] #xFFFF]
-		]
-	]]
-
-	[set! random/seed! [λ [new-seed]
-		"Set a new seed value for the RNG"
-		[set! seed new-seed]
-	]]
-
-	[set! random/seed! [λ []
-		"Return the current RNG seed value"
-		seed
-	]]
-
-	[set! random [λ [max]
-		"Return a value from 0 to MAX, or, if left out, up to the maximum possible (int-max)"
-		[if max
-		    [mod [rng] max]
-		    [rng]]
-	]]
-
-	[random/seed-initialize!]
-]
-
-
-
-
     [def eval [λ* [expr]
         "Compile, Evaluate and then return the result of EXPR"
         [eval* [compile expr]]]]]

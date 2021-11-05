@@ -9,8 +9,8 @@
 
 [def path/without-extension [λ [path]
 	"Return PATH, but without the fileextension part"
-	[def last-period [str/last-index-of path "."]]
+	[def last-period [last-index-of path "."]]
 	[if [>= last-period 0]
-	    [str/substr path 0 last-period]
+	    [substr path 0 last-period]
 	    path]
 ]]

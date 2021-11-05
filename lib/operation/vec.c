@@ -29,7 +29,7 @@ static lVal *lnfVZ(lClosure *c, lVal *v){
 }
 
 void lOperationsVector(lClosure *c){
-	lAddNativeFunc(c,"vec/x","[vec]","Return x part of VEC",lnfVX);
-	lAddNativeFunc(c,"vec/y","[vec]","Return y part of VEC",lnfVY);
-	lAddNativeFunc(c,"vec/z","[vec]","Return z part of VEC",lnfVZ);
+	lAddNativeFunc(c,"vec/x", "[vec]", "Return x part of VEC", lnfVX);
+	lAddNativeFunc(c,"vec/y", "[vec]", "Return y part of VEC", lnfVY);
+	lAddNativeFunc(c,"vec/z", "[vec]", "Return z part of VEC", lnfVZ);
 }

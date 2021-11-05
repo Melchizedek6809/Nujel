@@ -149,5 +149,5 @@ void lOperationsPredicate(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"!= <>",             "[a b]","#t if A != B", lnfUnequal));
 	lAddInfix(lAddNativeFunc(c,"greater-equal? >=", "[a b]","#t if A >= B", lnfGreaterEqual));
 	lAddInfix(lAddNativeFunc(c,"greater? >",        "[a b]","#t if A > B",  lnfGreater));
-	lAddNativeFunc(c,"nil?",              "[a]","#t if A #nil",   lnfNilPred);
+	lAddNativeFunc(c,"nil?",                        "[a]",  "#t if A #nil", lnfNilPred);
 }
