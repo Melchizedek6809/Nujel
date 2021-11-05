@@ -10,26 +10,6 @@
 
 char dispWriteBuf[1<<18];
 
-char *ansiRS = "\033[0m";
-char *ansiFG[16] = {
-	"\033[0;30m",
-	"\033[0;31m",
-	"\033[0;32m",
-	"\033[0;33m",
-	"\033[0;34m",
-	"\033[0;35m",
-	"\033[0;36m",
-	"\033[0;37m",
-	"\033[1;30m",
-	"\033[1;31m",
-	"\033[1;32m",
-	"\033[1;33m",
-	"\033[1;34m",
-	"\033[1;35m",
-	"\033[1;36m",
-	"\033[1;37m"
-};
-
 /* Display v on the default channel, most likely stdout */
 void lDisplayVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],0,true);
