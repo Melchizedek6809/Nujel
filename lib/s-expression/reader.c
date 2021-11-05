@@ -276,6 +276,9 @@ lVal *lReadList(lString *s, bool rootForm){
 
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
+			if(!rootForm){
+				lExceptionThrow(":unmatched-open-parenthesis", "Unmatched opening parenthesis");
+			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else if((c == ']') || (c == ')') || (c == '}')){
