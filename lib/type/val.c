@@ -4,7 +4,9 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "val.h"
+#include <math.h>
 
+#include "../exception.h"
 #include "../allocation/val.h"
 #include "../collection/string.h"
 #include "../collection/closure.h"
@@ -40,6 +42,11 @@ lVal *lValInt(int v){
 }
 
 lVal *lValFloat(float v){
+	if(isnan(v)){
+		lExceptionThrow(":float-nan","NaN is disallowed in Nujel, please check you calculations");
+	}else if(isinf(v)){
+		lExceptionThrow(":float-inf","INF is disallowed in Nujel, please check you calculations");
+	}
 	lVal *ret   = lValAlloc();
 	ret->type   = ltFloat;
 	ret->vFloat = v;
