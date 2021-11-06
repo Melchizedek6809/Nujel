@@ -214,7 +214,6 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 
 	const int SP = lRootsGet();
 	jmp_buf oldExceptionTarget;
-	lVal *oldExceptionValue = exceptionValue;
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 
 	lVal *doRet;
@@ -234,7 +233,6 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 		doRet = lnfDo(c,body);
 
 		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
-		exceptionValue = oldExceptionValue;
 
 		return doRet;
 	}
@@ -257,11 +255,16 @@ lClosure *lClosureNewRootNoStdLib(){
 	return c;
 }
 
-/* Create a new root closure with the default included stdlib */
-lClosure *lClosureNewRoot(){
+static void *lClosureNewRootReal(void *a, void *b){
+	(void)a; (void)b;
 	lClosure *c = lClosureNewRootNoStdLib();
 	c->text = lRead((const char *)stdlib_no_data);
 	lnfDo(c,c->text);
 	c->text = NULL;
 	return c;
+}
+
+/* Create a new root closure with the default included stdlib */
+lClosure *lClosureNewRoot(){
+	return lExceptionTry(lClosureNewRootReal,NULL,NULL);
 }

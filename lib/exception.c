@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <setjmp.h>
 
 jmp_buf exceptionTarget;
@@ -45,4 +46,20 @@ __attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char
 	c->vList.car = v;
 
 	lExceptionThrowRaw(l);
+}
+
+void *lExceptionTry(void *(*body)(void *,void *), void *a, void *b){
+	jmp_buf oldExceptionTarget;
+	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
+
+	int ret = setjmp(exceptionTarget);
+	if(ret){
+		lWriteVal(exceptionValue);
+		exit(200);
+		return NULL;
+	}else{
+		void *doRet = body(a, b);
+		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+		return doRet;
+	}
 }
