@@ -34,7 +34,7 @@ VERSION_ARCH         := $(shell uname -m)
 
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
-BINLIB_NUJS := $(shell find bin/lib -type f -name '*.nuj' | sort)
+BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
@@ -73,7 +73,7 @@ clean:
 	@rm -f -- $(shell find bin lib -type f -name '*.wo')
 	@rm -f -- $(shell find bin lib -type f -name '*.d')
 	@rm -f -- $(shell find bin lib -type f -name '*.wd')
-	@rm -f -- $(shell find bin/lib stdlib -type f -name '*.no')
+	@rm -f -- $(shell find binlib stdlib -type f -name '*.no')
 	@rm -f ./callgrind.out.*
 	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
 	@rm -rf tmp

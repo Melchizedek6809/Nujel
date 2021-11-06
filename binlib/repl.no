@@ -1,0 +1,43 @@
+[do [def display/error [let* [do [def wrap [λ* [i text]
+           ""
+           [cond [[eq? i 0] [ansi-red text]]
+                 [[eq? i 1] text]
+                 [[eq? i 2] [ansi-yellow text]]
+                 [#t text]]]]
+       [def iter [λ* [error i]
+           ""
+           [if error
+              [cons [wrap i [string [car error]]] [iter [cdr error] [++ i]]]
+              [cons "" #nil]]]]
+       [λ* [error]
+           "Display ERROR in a nice, human readable way"
+           [display [join [iter error 0] "\r\n"]]]]]]
+    [def repl/exception-handler [λ* [error]
+        ""
+        [display/error error]]]
+    [def repl/history #nil]
+    [def repl/prompt [λ* []
+        "> "
+        "> "]]
+    [def repl/wasm [λ* [line]
+        ""
+        [do [def ctx [ω]]
+           [try repl/exception-handler [def expr [read line]] [apply ctx [cons do expr]]]]]]
+    [def repl/readline [λ* [ctx]
+        ""
+        [do [def line [readline [repl/prompt]]]
+           [when [nil? line]
+                 [display "Bye!\r\n"]
+                 [exit 0]]
+           [readline/history/add line]
+           [def read [read line]]
+           [def result [apply ctx [cons do read]]]
+           [set! repl/history [cons line repl/history]]
+           [display [cat [if [nil? result]
+              ""
+              [str/write result]] "\n"]]]]]
+    [def repl [λ* []
+        ""
+        [do [readline/history/load [readline/history/path]]
+           [def ctx [ω]]
+           [while #t [try repl/exception-handler [repl/readline ctx]] [readline/history/save [readline/history/path]]]]]]]

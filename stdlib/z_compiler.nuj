@@ -69,7 +69,7 @@
 [def λδ
      [λ [@...λδ]
        "Define a λ with the self-hosting Nujel compiler"
-       [eval [compile [cons 'λ @...λδ]]]]]
+       [eval* [compile [cons 'λ @...λδ]]]]]
 
 [def eval [λ [expr]
           "Compile, Evaluate and then return the result of EXPR"

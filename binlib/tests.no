@@ -1,0 +1,4 @@
+[unless [eq? OS "Emscripten"]
+         [test-add '[0 . ""] [popen "true"]]
+         [test-add #f [zero? [car [popen "false"]]]]
+         [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]

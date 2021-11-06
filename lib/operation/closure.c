@@ -231,21 +231,21 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
 	lAddNativeFunc(c,"cl-lambda",      "[i]",           "Return closure as a lambda",                 lnfClLambda);
-	lAddNativeFunc(c,"cl-text disasm", "[f]",           "Return closures text segment",               lnfClText);
+	lAddNativeFunc(c,"cl-text",        "[f]",           "Return closures text segment",               lnfClText);
 	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
 	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymbolTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
-	lAddSpecialForm(c,"define def",    "[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
+	lAddSpecialForm(c,"def",           "[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
 	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);
 
-	lAddSpecialForm(c,"λ*",             "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
+	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
 
-	lAddSpecialForm(c,"lambda fun λ \\","[args ...body]", "Create a new lambda",                       lnfLambda);
-	lAddSpecialForm(c,"dynamic dyn δ",  "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"object ω",   "[...body]", "Create a new object",                       lnfObject);
+	lAddSpecialForm(c,"lambda fun λ \\", "[args ...body]", "Create a new lambda",                       lnfLambda);
+	lAddSpecialForm(c,"dynamic dyn δ",   "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
+	lAddSpecialForm(c,"object ω",        "[...body]", "Create a new object",                       lnfObject);
 }
