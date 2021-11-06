@@ -80,3 +80,41 @@ lVal *lValStringNoCopy(const char *c,int len){
 	t->vString = lStringNewNoCopy(c,len);
 	return t;
 }
+
+lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd){
+	char buf[512];
+	const char *lineStart, *lineEnd;
+	for(lineStart = errStart; (lineStart > bufStart) && (*lineStart != '\n'); lineStart--){}
+	if(*lineStart == '\n'){lineStart++;}
+	for(lineEnd = errEnd; (lineEnd < bufEnd) && (*lineEnd != '\n'); lineEnd++){}
+
+	char *data = buf;
+	if((errStart - lineStart) > 30){
+		*data++ = '.';
+		*data++ = '.';
+		*data++ = '.';
+		lineStart = errStart - 30;
+	}
+	while(lineStart < err){*data++ = *lineStart++;}
+	*data = 0;
+	const int sret = snprintf(data,sizeof(buf) - (data-buf), "\033[41m%c\033[49m",*err);
+	if(sret > 0){
+		data += sret;
+	}else{
+		return NULL;
+	}
+	bool endAbbreviated = false;
+	if((lineEnd - errEnd) > 30){
+		lineEnd = errEnd + 30;
+		endAbbreviated = true;
+	}
+	lineStart = err+1;
+	while(lineStart < lineEnd){*data++ = *lineStart++;}
+	if(endAbbreviated){
+		*data++ = '.';
+		*data++ = '.';
+		*data++ = '.';
+	}
+	*data = 0;
+	return lValString(buf);
+}

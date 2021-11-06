@@ -22,6 +22,13 @@
 #define iscloseparen(v) ((v==']')||(v==')')||(v=='}'))
 #define isparen(v) (isopenparen(v) || (iscloseparen(v)))
 #define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`'))
+#define isnumericseparator(v) ((v=='_') || (v==','))
+
+static float createFloat(int value, int mantissa){
+	if(mantissa == 0){return value;}
+	const float mant = mantissa * powf(10, -(floorf(log10f(mantissa)) + 1));
+	return value + mant;
+}
 
 static void lStringAdvanceToNextCharacter(lString *s){
 	for(;(*s->data != 0) && (isspace((u8)*s->data));s->data++){}
@@ -29,14 +36,8 @@ static void lStringAdvanceToNextCharacter(lString *s){
 
 static void lStringAdvanceToNextSpaceOrSpecial(lString *s){
 	for(;(*s->data != 0) && (!isspace((u8)*s->data));s->data++){
-		if(*s->data == '['){break;}
-		if(*s->data == ']'){break;}
-		if(*s->data == '('){break;}
-		if(*s->data == ')'){break;}
-		if(*s->data == '{'){break;}
-		if(*s->data == '}'){break;}
-		if(*s->data == '"'){break;}
-		if(*s->data == '#'){break;}
+		const u8 c = *s->data;
+		if(isnonsymbol(c)){break;}
 		if(*s->data == ':'){break;}
 	}
 }
@@ -99,6 +100,12 @@ static lVal *lParseString(lString *s){
 			case '\\':
 				*b++ = '\\';
 				break;
+			default: {
+				const char *start, *end;
+				for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
+				for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
+				lExceptionThrowVal(":invalid-literal", "Unknown escape character found in string literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+				break; }
 			}
 			s->data++;
 		}else if(*s->data == '"'){
@@ -112,47 +119,6 @@ static lVal *lParseString(lString *s){
 		}
 	}
 	return NULL;
-}
-
-/* Parse s as a decimal number, and return a ltInt or ltFloat lVal */
-static lVal *lParseNumberDecimal(lString *s){
-	lVal *v      = lValInt(0);
-	char c       = *s->data;
-	char fc      = c;
-	bool isFloat = false;
-	int cval     = 0;
-	int digits   = 0;
-	if(fc == '-'){c = *++s->data;}
-	while(!isspace((u8)c)){
-		if(c == 0){break;}
-		if(isdigit((int)c)){
-			cval *= 10;
-			cval += c - '0';
-			if(++digits > 9){break;}
-		}else if(c == '.'){
-			isFloat = true;
-			v->vInt = cval;
-			cval    = 0;
-			digits  = 0;
-		}else if((c != ',') && (c != '_')){
-			break;
-		}
-		c = *++s->data;
-	}
-	if(isFloat){
-		int t     = v->vInt;
-		v->type   = ltFloat;
-		float tv  = cval / powf(10.f,digits);
-		v->vFloat = fc == '-' ? -(t + tv) : (t + tv);
-	}else{
-		v->vInt   = fc == '-' ? -cval : cval;
-	}
-	while(c){
-		if(isspace((u8)c)){break;}
-		if(!isdigit((int)c) && c != '.' && c != ',' && c != '_'){break;}
-		c = *++s->data;
-	}
-	return v;
 }
 
 /* Parse s as a symbol and return the ltSymbol lVal */
@@ -178,48 +144,103 @@ static lVal *lParseSymbol(lString *s){
 }
 
 /* Parse s as a binary number and return it as an ltInt lVal */
-static lVal *lParseNumberBinary(lString *s){
-	int ret;
-	for(ret = 0;;s->data++){
+static int lParseNumberBinary(lString *s){
+	int ret = 0;
+	const char *start = s->data;
+	for(;(s->data < s->bufEnd);s->data++){
 		const u8 c = *s->data;
 		if((c <= ' ') || isnonsymbol(c)){break;}
-		if((*s->data == '0')  || (*s->data == '1')){
+		if((c == '0')  || (c == '1')){
 			ret <<= 1;
-			if(*s->data == '1'){ret |= 1;}
-		}else{
-			lExceptionThrow(":invalid-binary-literal", "Unexpected character found in binary literal");
+			if(c == '1'){ret |= 1;}
+		}else if(!isnumericseparator(c)){
+			const char *end;
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected character found in binary literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 		}
 	}
-	return lValInt(ret);
-}
-
-/* Parse s as a hexadecimal number and return it as an ltInt lVal */
-static lVal *lParseNumberHex(lString *s){
-	int ret;
-	for(ret = 0;;s->data++){
-		const u8 c = *s->data;
-		if((c <= ' ') || isnonsymbol(c)){break;}
-		if((*s->data >= '0')  && (*s->data <= '9')){ret = (ret << 4) |  (*s->data - '0'); continue;}
-		if((*s->data >= 'A')  && (*s->data <= 'F')){ret = (ret << 4) | ((*s->data - 'A')+0xA); continue;}
-		if((*s->data >= 'a')  && (*s->data <= 'f')){ret = (ret << 4) | ((*s->data - 'a')+0xA); continue;}
-		lExceptionThrow(":invalid-hex-literal", "Unexpected character found in hex literal");
-	}
-	return lValInt(ret);
+	return ret;
 }
 
 /* Parse s as an octal number and return it as an ltInt lVal */
-static lVal *lParseNumberOctal(lString *s){
-	int ret;
-	for(ret = 0;;s->data++){
+static int lParseNumberOctal(lString *s){
+	int ret = 0;
+	const char *start = s->data;
+	for(;(s->data < s->bufEnd);s->data++){
 		const u8 c = *s->data;
-		if((*s->data <= ' ') || isnonsymbol(c)){break;}
-		if((*s->data >= '0')  && (*s->data <= '7')){
-			ret = (ret << 3) |  (*s->data - '0');
-		}else{
-			lExceptionThrow(":invalid-octal-literal", "Unexpected character found in octal literal");
+		if((c <= ' ') || isnonsymbol(c)){break;}
+		if((c >= '0')  && (c <= '7')){
+			ret = (ret << 3) |  (c - '0');
+		}else if(!isnumericseparator(c)){
+			const char *end;
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected character found in octal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 		}
 	}
-	return lValInt(ret);
+	return ret;
+}
+
+/* Parse s as an decimal number and return it as an int */
+static int lParseNumberDecimal(lString *s){
+	int ret = 0;
+	const char *start = s->data;
+
+	for(;(s->data < s->bufEnd);s->data++){
+		const u8 c = *s->data;
+		if((c <= ' ') || isnonsymbol(c) || (c == '.')){break;}
+		if((c >= '0')  && (c <= '9')){
+			ret = (ret * 10) + (c - '0');
+		}else if(!isnumericseparator(c)){
+			const char *end;
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected character found in decimal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+		}
+	}
+	return ret;
+}
+
+/* Parse s as a hexadecimal number and return it as an ltInt lVal */
+static int lParseNumberHex(lString *s){
+	int ret = 0;
+	const char *start = s->data;
+	for(;s->data < s->bufEnd;s->data++){
+		const u8 c = *s->data;
+		if((c <= ' ') || isnonsymbol(c)){break;}
+		if((c >= '0')  && (c <= '9')){ret = (ret << 4) |  (c - '0'); continue;}
+		if((c >= 'A')  && (c <= 'F')){ret = (ret << 4) | ((c - 'A')+0xA); continue;}
+		if((c >= 'a')  && (c <= 'f')){ret = (ret << 4) | ((c - 'a')+0xA); continue;}
+		if(!isnumericseparator(c)){
+			const char *end;
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected character found in hex literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+		}
+	}
+	return ret;
+}
+
+/* Parse s as a decimal number and return it as an lVal */
+static lVal *lParseNumber(lString *s, int (*parser)(lString *)){
+	const char *start = s->data;
+	bool negative = false;
+	if(*start == '-'){
+		s->data++;
+		negative = true;
+	}
+	const int val = parser(s);
+	if(*s->data == '.'){
+		s->data++;
+		const int mantissaVal = parser(s);
+		if(*s->data == '.'){
+			const char *end;
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+		}else{
+			const float valf = createFloat(val,mantissaVal);
+			return lValFloat(negative ? -valf : valf);
+		}
+	}else{
+		return lValInt(negative ? -val : val);
+	}
 }
 
 /* Parse s as a character constant and return it's value as an ltInt lVal */
@@ -239,17 +260,20 @@ static lVal *lParseCharacter(lString *s){
 static lVal *lParseSpecial(lString *s){
 	if(*s->data++ != '#'){return NULL;}
 	switch(*s->data++){
-	default:
-		lExceptionThrow(":invalid-special-literal", "Unexpected character found in special literal");
-		return NULL;
+	default: {
+		const char *start, *end;
+			for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
+			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+			lExceptionThrowVal(":invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+		return NULL; }
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
 	case '\\':return lParseCharacter(s);
-	case 'x': return lParseNumberHex(s);
-	case 'o': return lParseNumberOctal(s);
-	case 'b': return lParseNumberBinary(s);
-	case 'd': return lParseNumberDecimal(s);
+	case 'x': return lParseNumber(s,lParseNumberHex);
+	case 'o': return lParseNumber(s,lParseNumberOctal);
+	case 'b': return lParseNumber(s,lParseNumberBinary);
+	case 'd': return lParseNumber(s,lParseNumberDecimal);
 	case 'n':
 		lStringAdvanceToNextSpaceOrSpecial(s);
 		return NULL;
@@ -349,7 +373,7 @@ lVal *lReadValue(lString *s){
 	default: {
 		const u8 n = s->data[1];
 		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
-			return lParseNumberDecimal(s);
+			return lParseNumber(s,lParseNumberDecimal);
 		}else if((c == '-') && (n != 0) && (n != '-') && (!isspace(n)) && (!isnonsymbol(n))){
 			s->data++;
 			return lCons(lCons(lValSymS(symMinus),lCons(lParseSymbol(s),NULL)),NULL);

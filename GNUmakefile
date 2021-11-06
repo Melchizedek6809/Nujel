@@ -84,7 +84,7 @@ clean:
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 %.no: %.nuj | $(NUJEL_BOOT)
-	@$(NUJEL_BOOT) -x "[file/compile \"$^\"]"
+	@$(NUJEL_BOOT) -x "[try display/error [file/compile \"$^\"]]"
 	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.wo: %.c
@@ -190,13 +190,6 @@ rund: $(NUJEL)
 runn: $(NUJEL)
 	$(NUJEL)
 
-.PHONY: runn
-runng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
-	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no --
-
-.PHONY: runn
-testng: $(NUJEL) tmp/stdlib.no tmp/binlib.no
-	$(NUJEL) -n tmp/stdlib.no tmp/binlib.no -x "[quit [test-run]]"
 
 .PHONY: profile
 profile: $(NUJEL)
