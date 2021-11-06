@@ -247,11 +247,11 @@ static lVal *lParseNumber(lString *s, int (*parser)(lString *)){
 static lVal *lParseCharacter(lString *s){
 	int ret = s->data[0];
 	if((s->data[0] == 'B') && (s->data[1] == 'a')){ret = '\b';}
-	if((s->data[0] == 'T') && (s->data[1] == 'a')){ret = '\t';}
-	if((s->data[0] == 'L') && (s->data[1] == 'i')){ret = '\n';}
-	if((s->data[0] == 'R') && (s->data[1] == 'e')){ret = '\r';}
-	if((s->data[0] == 'l') && (s->data[1] == 'f')){ret = '\n';}
-	if((s->data[0] == 'c') && (s->data[1] == 'r')){ret = '\r';}
+	else if((s->data[0] == 'T') && (s->data[1] == 'a')){ret = '\t';}
+	else if((s->data[0] == 'L') && (s->data[1] == 'i')){ret = '\n';}
+	else if((s->data[0] == 'R') && (s->data[1] == 'e')){ret = '\r';}
+	else if((s->data[0] == 'l') && (s->data[1] == 'f')){ret = '\n';}
+	else if((s->data[0] == 'c') && (s->data[1] == 'r')){ret = '\r';}
 	lStringAdvanceToNextSpaceOrSpecial(s);
 	return lValInt(ret);
 }
@@ -386,8 +386,7 @@ lVal *lReadValue(lString *s){
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
 	lString *s = lRootsStringPush(lStringAlloc());
-	s->data    = str;
-	s->buf     = str;
+	s->buf = s->data = str;
 	s->bufEnd  = &str[strlen(str)];
 	lVal *ret  = lReadList(s,true);
 	return ret;

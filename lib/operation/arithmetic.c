@@ -154,7 +154,7 @@ static int lnfDivI(lVal *v){
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
-			lExceptionThrow(":divide-by-zero","Divide by Zero");
+			lExceptionThrow(":division-by-zero","Dividing by zero is probably not what you wanted");
 			return 0;
 		}
 		acc /= v->vList.car->vInt;

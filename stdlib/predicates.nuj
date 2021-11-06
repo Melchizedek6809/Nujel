@@ -40,8 +40,13 @@
 ]]
 
 [def zero? [λ [val]
-	"#t if VAL is a integer"
+	"#t if VAL is zero"
 	[eq? 0 val]
+]]
+
+[def not-zero? [λ [val]
+	"#t if VAL is not zero"
+	[ineq? 0 val]
 ]]
 
 [def list-equal? [λ [a b]
