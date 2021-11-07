@@ -13,9 +13,14 @@
 
 jmp_buf exceptionTarget;
 lVal *exceptionValue;
-
+int exceptionTargetDepth = 0;
 
 __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
+	if(exceptionTargetDepth <= 0){
+		lPrintError("Exception without a handler!!! Exiting!\n");
+		lWriteVal(v);
+		exit(201);
+	}
 	exceptionValue = v;
 	longjmp(exceptionTarget, 1);
 	while(1);
@@ -52,14 +57,17 @@ void *lExceptionTry(void *(*body)(void *,void *), void *a, void *b){
 	jmp_buf oldExceptionTarget;
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 
+	exceptionTargetDepth++;
 	int ret = setjmp(exceptionTarget);
 	if(ret){
 		lWriteVal(exceptionValue);
+		exceptionTargetDepth--;
 		exit(200);
 		return NULL;
 	}else{
 		void *doRet = body(a, b);
 		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+		exceptionTargetDepth--;
 		return doRet;
 	}
 }

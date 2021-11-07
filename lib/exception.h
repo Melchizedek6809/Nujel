@@ -4,6 +4,7 @@
 
 extern jmp_buf exceptionTarget;
 extern lVal *exceptionValue;
+extern int exceptionTargetDepth;
 
 void lExceptionThrowRaw(lVal *v) __attribute__((noreturn));
 void lExceptionThrow(const char *symbol, const char *error) __attribute__((noreturn));

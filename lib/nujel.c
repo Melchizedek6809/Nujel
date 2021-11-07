@@ -136,7 +136,7 @@ lVal *lEval(lClosure *c, lVal *v){
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
 				return lApply(c,lCdr(v),resolved);
 			}else{
-				if(lSymKeyword(car->vSymbol)){
+				if(car->vSymbol && lSymKeyword(car->vSymbol)){
 					return v;
 				}
 				lExceptionThrowVal(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car);
@@ -218,10 +218,12 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 
 	lVal *doRet;
 	int ret;
+	exceptionTargetDepth++;
 	ret = setjmp(exceptionTarget);
 	if(ret){
 		lRootsRet(SP);
 		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+		exceptionTargetDepth--;
 
 		lVal *args = lRootsValPush(exceptionValue);
 		args = lRootsValPush(lCons(args,NULL));
@@ -233,6 +235,7 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 		doRet = lnfDo(c,body);
 
 		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
+		exceptionTargetDepth--;
 
 		return doRet;
 	}
