@@ -1,4 +1,3 @@
-
 [def random]
 [def random/rng!]
 [def random/seed]
@@ -6,35 +5,35 @@
 [def random/seed-initialize!]
 
 [let*
-	[def seed 0]
+        [def seed 0]
 
-	[set! random/seed-initialize! [λ []
-		[set! seed [logxor [time] [time/milliseconds]]]
-	]]
+        [set! random/seed-initialize! [λ []
+                [set! seed [logxor [time] [time/milliseconds]]]
+        ]]
 
-	[set! random/rng! [λ []
-		[set! seed [+ 12345 [* seed 1103515245]]]
-		[logior [ash [logand seed #xFFFF] 16]
-		       [logand [ash seed -16] #xFFFF]
-		]
-	]]
+        [set! random/rng! [λ []
+                [set! seed [+ 12345 [* seed 1103515245]]]
+                [logior [ash [logand seed #xFFFF] 16]
+                       [logand [ash seed -16] #xFFFF]
+                ]
+        ]]
 
-	[set! random/seed! [λ [new-seed]
-		"Set a new seed value for the RNG"
-		[set! seed new-seed]
-	]]
+        [set! random/seed! [λ [new-seed]
+                "Set a new seed value for the RNG"
+                [set! seed new-seed]
+        ]]
 
-	[set! random/seed [λ []
-		"Return the current RNG seed value"
-		seed
-	]]
+        [set! random/seed [λ []
+                "Return the current RNG seed value"
+                seed
+        ]]
 
-	[set! random [λ [max]
-		"Return a value from 0 to MAX, or, if left out, a random int"
-		[if [number? max]
-		    [mod [abs [random/rng!]] max]
-		    [random/rng!]]
-	]]
+        [set! random [λ [max]
+                "Return a value from 0 to MAX, or, if left out, a random int"
+                [if [number? max]
+                    [mod [abs [random/rng!]] max]
+                    [random/rng!]]
+        ]]
 
-	[random/seed-initialize!]
+        [random/seed-initialize!]
 ]

@@ -2,67 +2,67 @@
 ;; C because of various reasons
 
 [def length [λ [a]
-	"Returns the length of a"
-	[cond [[string? a] [str/length a]]
+        "Returns the length of a"
+        [cond [[string? a] [str/length a]]
               [[pair? a] [list-length a]]
               [#t 0]
-	]
+        ]
 ]]
 
 [def describe [let*
-	[def describe-fun [λ [fun]
-		[def doc [cl-doc fun]]
-		[cat [str/write [car doc]] " - " [cdr doc]]
-	]]
+        [def describe-fun [λ [fun]
+                [def doc [cl-doc fun]]
+                [cat [str/write [car doc]] " - " [cdr doc]]
+        ]]
 
-	[def describe-string [λ [a]
-		[describe-fun [resolve [str->sym a]]]
-	]]
+        [def describe-string [λ [a]
+                [describe-fun [resolve [str->sym a]]]
+        ]]
 
-	[λ [fun] "Describe FUN, if there is documentation available"
-	   [if [string? fun]
-	       [describe-string fun]
-	       [describe-fun fun]]
-	]
+        [λ [fun] "Describe FUN, if there is documentation available"
+           [if [string? fun]
+               [describe-string fun]
+               [describe-fun fun]]
+        ]
 ]]
 
 [def display [λ [value]
-	"Display VALUE"
-	[print value]
+        "Display VALUE"
+        [print value]
 ]]
 
 [def newline [λ []
-	"Print a single line feed character"
-	[display "\n"]
+        "Print a single line feed character"
+        [display "\n"]
 ]]
 
 [def arr-fill! [λ [a v i]
-	"Fills array a with value v"
-	[cond [[>= [int i] [arr-length a]] a]
-	      [#t [arr-set! a [int i] v] [arr-fill! a v [++ i]]]
-	]
+        "Fills array a with value v"
+        [cond [[>= [int i] [arr-length a]] a]
+              [#t [arr-set! a [int i] v] [arr-fill! a v [++ i]]]
+        ]
 ]]
 
 [def lognand [λ [...l]
-	"Returns the Nand of its arguments"
-	[lognot [apply logand ...l]]
+        "Returns the Nand of its arguments"
+        [lognot [apply logand ...l]]
 ]]
 
 [def mem [λ [] "Return some pretty printed memory usage information"
-	[let* [def info [memory-info]]
-	      [cat
-		[ansi-white  "Memory Info"] "\n"
-		[ansi-green  "Values:   "] [getf info :value] "\n"
-		[ansi-blue   "Closures: "] [getf info :closure] "\n"
-		[ansi-red    "Arrays:   "] [getf info :array] "\n"
-		[ansi-yellow "STrings:  "] [getf info :string] "\n"
-		[ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
-		[ansi-purple "Vectors:  "] [getf info :vector] "\n"
-		[ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
-	      ]
-	]
+        [let* [def info [memory-info]]
+              [cat
+                [ansi-white  "Memory Info"] "\n"
+                [ansi-green  "Values:   "] [getf info :value] "\n"
+                [ansi-blue   "Closures: "] [getf info :closure] "\n"
+                [ansi-red    "Arrays:   "] [getf info :array] "\n"
+                [ansi-yellow "STrings:  "] [getf info :string] "\n"
+                [ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
+                [ansi-purple "Vectors:  "] [getf info :vector] "\n"
+                [ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
+              ]
+        ]
 ]]
 
 [def wrap-value [λ [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
-	[+ min [% [- val min] [- max min]]]
+        [+ min [% [- val min] [- max min]]]
 ]]

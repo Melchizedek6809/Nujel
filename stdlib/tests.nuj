@@ -527,14 +527,11 @@
 [test-add #t [macro? +1]]
 [test-add #f [macro? min]]
 [test-add #f [macro? 123]]
+[test-add 4 [let* [defun double [α] [* α 2]] [double 2]]]
 
 ; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]
 ;[test-add "#nil" [def testerle 123] [undefine! testerle] testerle]
-
-; Has to wait until we have proper exceptions
-;[test-add "#inf" [% 4 0]]
-;[test-add #inf [+ 1 [div 10 0]]]
 
 ; Has to wait until the new constant system is in place
 ;[test-add 3.14159 [set! π 3] π]

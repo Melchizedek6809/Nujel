@@ -40,6 +40,11 @@
             [list 'λ* [cadr source]             "" [compile-do [cddr source]]]]
     ]]
 
+    [def compile-try [λ [source]
+        ;[display ["[let] " [str/write source] "\n\n"]]
+        [list 'try [compile [cadr source]] [compile-do [cddr source]]]
+    ]]
+
     [def compile-let [λ [source]
         ;[display ["[let] " [str/write source] "\n\n"]]
         [list 'let [cadr source] [compile-do [cddr source]]]
@@ -51,9 +56,9 @@
     ]]
 
     [def compile-macro [λ [macro source]
-	;[display [cat [str/write macro] "\n"]]
-	;[display [cat [str/write source] "\n"]]
-	[macro-apply macro [cdr source]]
+        ;[display [cat [str/write macro] "\n"]]
+        ;[display [cat [str/write source] "\n"]]
+        [macro-apply macro [cdr source]]
     ]]
 
     [λ [source]
@@ -66,6 +71,7 @@
                     [[eq? op let]          [compile-let  source]]
                     [[eq? op let*]         [compile-let* source]]
                     [[eq? op λ]            [compile-fun  source]]
+                    [[eq? op try]          [compile-try  source]]
                     [[eq? [car source] 'λ] [compile-fun  source]]
                     [[macro? op]           [compile-macro op source]]
                     [#t source]]
@@ -74,8 +80,8 @@
 ]]
 
 [def λδ [λ [@...λδ]
-	"Define a λ with the self-hosting Nujel compiler"
-	[eval* [compile [cons 'λ @...λδ]]]
+        "Define a λ with the self-hosting Nujel compiler"
+        [eval* [compile [cons 'λ @...λδ]]]
 ]]
 
 [def eval [λ [expr]
@@ -84,5 +90,13 @@
 ]]
 
 [def +1 [μ [v]
-	   `[+ 1 ,v]
+           `[+ 1 ,v]
+]]
+
+[def defun [μ [name args ...body]
+	      `[def ,name ,[compile `[λ ,args ,@...body]]]
+]]
+
+[def defmacro [μ [name args ...body]
+	      `[def ,name ,[compile `[μ ,args ,@...body]]]
 ]]

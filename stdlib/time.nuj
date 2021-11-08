@@ -1,24 +1,24 @@
 ; Time related λs
 
 [def time/seconds [λ [timestamp]
-	"Return the seconds part of TIMESTAMP, defaults to current time"
-	[% [default timestamp [time]] 60]
+        "Return the seconds part of TIMESTAMP, defaults to current time"
+        [% [default timestamp [time]] 60]
 ]]
 
 [def time/minutes [λ [timestamp]
-	"Return the minutes part of TIMESTAMP, defaults to current time"
-	[% [/ [default timestamp [time]] 60] 60]
+        "Return the minutes part of TIMESTAMP, defaults to current time"
+        [% [/ [default timestamp [time]] 60] 60]
 ]]
 
 [def time/hours [λ [timestamp]
-	"Return the hours part of TIMESTAMP, defaults to current time"
-	[% [/ [default timestamp [time]] 3600] 24]
+        "Return the hours part of TIMESTAMP, defaults to current time"
+        [% [/ [default timestamp [time]] 3600] 24]
 ]]
 
 [def profile [λ [@...body]
-	[def form [cons 'do @...body]]
-	[def start-time [time/milliseconds]]
-	[def val [eval form]]
-	[def end-time [time/milliseconds]]
-	[display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]
+        [def form [cons 'do @...body]]
+        [def start-time [time/milliseconds]]
+        [def val [eval form]]
+        [def end-time [time/milliseconds]]
+        [display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]
 ]]

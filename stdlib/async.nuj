@@ -3,45 +3,45 @@
 [def yield-queue #nil]
 
 [def yield [λ [pred fun] "Evaluates FUN once PRED is true"
-	[set! yield-queue [cons [cons pred fun] yield-queue]]
-	#t
+        [set! yield-queue [cons [cons pred fun] yield-queue]]
+        #t
 ]]
 
 [def yield-run [let*
-	[λ [] "Executes pending coroutines if their predicate evaluates to #t"
-		[def l yield-queue]
-		[def new #nil]
-		[def cur #nil]
-		[set! yield-queue #nil]
-		[while l
-		       [set! cur [car l]]
-		       [if [[car cur]]
-			   [[cdr cur]]
-			   [set! yield-queue [cons cur yield-queue]]]
-		       [set! l [cdr l]]
-		]
-	]
+        [λ [] "Executes pending coroutines if their predicate evaluates to #t"
+                [def l yield-queue]
+                [def new #nil]
+                [def cur #nil]
+                [set! yield-queue #nil]
+                [while l
+                       [set! cur [car l]]
+                       [if [[car cur]]
+                           [[cdr cur]]
+                           [set! yield-queue [cons cur yield-queue]]]
+                       [set! l [cdr l]]
+                ]
+        ]
 ]]
 
 [def timeout [λ [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed"
-	[def goal [+ [time/milliseconds] milliseconds]]
-	[λ [] [> [time/milliseconds] goal]]
+        [def goal [+ [time/milliseconds] milliseconds]]
+        [λ [] [> [time/milliseconds] goal]]
 ]]
 
 [def event-bind [λ [event-name handler] "Binds handler lambda to event-name"
-	[set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]
+        [set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]
 ]]
 
 [def event-clear [λ [event-name] "Clears all event handlers for event-name"
-	[set! [str->sym event-name] '[]]
+        [set! [str->sym event-name] '[]]
 ]]
 
 [def event-fire-iter [λ [l v] "Iter for event-fire"
-	[cond [[nil? l] #t]
-	      [#t [apply [car l] v] [event-fire-iter [cdr l] v]]
-	]
+        [cond [[nil? l] #t]
+              [#t [apply [car l] v] [event-fire-iter [cdr l] v]]
+        ]
 ]]
 
 [def event-fire [λ [event-name ...val] "Applies ...val to all event handlers associated with event-name"
-	[event-fire-iter [resolve [str->sym event-name]] ...val]
+        [event-fire-iter [resolve [str->sym event-name]] ...val]
 ]]

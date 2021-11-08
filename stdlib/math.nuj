@@ -2,57 +2,57 @@
 [def π  3.14159]
 
 [def ++ [λ [i]
-	"Increment I by 1"
-	[+  1 i]
+        "Increment I by 1"
+        [+  1 i]
 ]]
 
 [def -- [λ [i]
-	"Decrement I by 1"
-	[+ -1 i]
+        "Decrement I by 1"
+        [+ -1 i]
 ]]
 
 [def >> [λ [val amount]
-	"Shifts VAL by AMOUNT bits to the right"
-	[ash val [- amount]]
+        "Shifts VAL by AMOUNT bits to the right"
+        [ash val [- amount]]
 ]]
 
 [def min [let*
-	[def iter [λ [a l]
-		[cond [[nil? l] a]
-		      [[< a [car l]] [iter a [cdr l]]]
-		      [#t [iter [car l] [cdr l]]]
-		]
-	]]
+        [def iter [λ [a l]
+                [cond [[nil? l] a]
+                      [[< a [car l]] [iter a [cdr l]]]
+                      [#t [iter [car l] [cdr l]]]
+                ]
+        ]]
 
-	[λ [...l]
-		"Returns the minimum value of its arguments"
-		[cond [[nil? ...l] 0]
-		      [[nil? [cdr ...l]] [car ...l]]
-		      [#t [iter [car ...l] [cdr ...l]]]
-		]
-	]
+        [λ [...l]
+                "Returns the minimum value of its arguments"
+                [cond [[nil? ...l] 0]
+                      [[nil? [cdr ...l]] [car ...l]]
+                      [#t [iter [car ...l] [cdr ...l]]]
+                ]
+        ]
 ]]
 
 [def max [let*
-	[def iter [λ [a l]
-		[cond [[nil? l] a]
-		      [[> a [car l]] [iter a [cdr l]]]
-		      [#t [iter [car l] [cdr l]]]
-		]
-	]]
+        [def iter [λ [a l]
+                [cond [[nil? l] a]
+                      [[> a [car l]] [iter a [cdr l]]]
+                      [#t [iter [car l] [cdr l]]]
+                ]
+        ]]
 
-	[λ [...l]
-		"Returns the maximum value of its arguments"
-		[cond [[nil? ...l] 0]
-		      [[nil? [cdr ...l]] [car ...l]]
-		      [#t [iter [car ...l] [cdr ...l]]]
-		]
-	]
+        [λ [...l]
+                "Returns the maximum value of its arguments"
+                [cond [[nil? ...l] 0]
+                      [[nil? [cdr ...l]] [car ...l]]
+                      [#t [iter [car ...l] [cdr ...l]]]
+                ]
+        ]
 ]]
 
 [def fib [λ [i]
-	   "Terribly inefficient, but useful for testing the GC"
-	   [if [< i 2]
-	       i
-	       [+ [fib [- i 2]] [fib [- i 1]]]]
+           "Terribly inefficient, but useful for testing the GC"
+           [if [< i 2]
+               i
+               [+ [fib [- i 2]] [fib [- i 1]]]]
 ]]

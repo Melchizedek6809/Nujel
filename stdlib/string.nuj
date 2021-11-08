@@ -1,58 +1,58 @@
 ; Some nujel string λs
 
 [def br [λ [num]
-	"Return NUM=1 linebreaks"
-	[if [or [nil? num] [<= [int num] 1]]
-	    "\n"
-	    ["\n" [br [-- num]]]]
+        "Return NUM=1 linebreaks"
+        [if [or [nil? num] [<= [int num] 1]]
+            "\n"
+            ["\n" [br [-- num]]]]
 ]]
 
 [def path/without-extension [λ [path]
-	"Return PATH, but without the fileextension part"
-	[def last-period [last-index-of path "."]]
-	[if [>= last-period 0]
-	    [substr path 0 last-period]
-	    path]
+        "Return PATH, but without the fileextension part"
+        [def last-period [last-index-of path "."]]
+        [if [>= last-period 0]
+            [substr path 0 last-period]
+            path]
 ]]
 
 [def int->string/binary [λ [v]
-	[def ret ""]
-	[unless v [def v 0]]
-	[when [zero? v] [set! ret "0"]]
-	[while [not-zero? v]
-	       [set! ret [cat [from-char-code [+ #\0 [logand v #b1]]] ret]]
-	       [set! v [ash v -1]]
-	]
-	ret
+        [def ret ""]
+        [unless v [def v 0]]
+        [when [zero? v] [set! ret "0"]]
+        [while [not-zero? v]
+               [set! ret [cat [from-char-code [+ #\0 [logand v #b1]]] ret]]
+               [set! v [ash v -1]]
+        ]
+        ret
 ]]
 
 [def int->string/octal [λ [v]
-	[def ret ""]
-	[unless v [def v 0]]
-	[when [zero? v] [set! ret "0"]]
-	[while [not-zero? v]
-	       [set! ret [cat [from-char-code [+ #\0 [logand v #b111]]] ret]]
-	       [set! v [ash v -3]]
-	]
-	ret
+        [def ret ""]
+        [unless v [def v 0]]
+        [when [zero? v] [set! ret "0"]]
+        [while [not-zero? v]
+               [set! ret [cat [from-char-code [+ #\0 [logand v #b111]]] ret]]
+               [set! v [ash v -3]]
+        ]
+        ret
 ]]
 
 
 [def int->string/hex [let*
-	[def conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
+        [def conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
 
-	[λ [v]
-		[def ret ""]
-		[unless v [def v 0]]
-		[when [zero? v] [set! ret "0"]]
-		[while [not-zero? v]
-		       [set! ret [cat [conversion-arr [logand v #b1111]] ret]]
-		       [set! v [ash v -4]]
-		]
-		ret
+        [λ [v]
+                [def ret ""]
+                [unless v [def v 0]]
+                [when [zero? v] [set! ret "0"]]
+                [while [not-zero? v]
+                       [set! ret [cat [conversion-arr [logand v #b1111]] ret]]
+                       [set! v [ash v -4]]
+                ]
+                ret
 ]]]
 
 [def int->string/decimal [λ [v]
-	[string v]
+        [string v]
 ]]
 [def int->string int->string/decimal]
