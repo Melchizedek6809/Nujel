@@ -507,7 +507,20 @@
 [test-add "0.1001"   [car [read "0.1001"]]]
 [test-add "0.913"     [car [read "0.913"]]]
 [test-add "0.00012" [car [read "0.00012"]]]
-
+[test-add 1 `1]
+[test-add '[1] `[1]]
+[test-add '[1 2] `[1 2]]
+[test-add '[1 "asd"] `[1 "asd"]]
+[test-add '[1 :asd] `[1 :asd]]
+[test-add '[@[:asd 123]] `[@[:asd 123]]]
+[test-add '[#[1 2 3]] `[#[1 2 3]]]
+[test-add '[1.0001] `[1.0001]]
+[test-add '[:asd] `[:asd]]
+[test-add '[1 2 3] `[1 ,[1 + 1] 3]]
+[test-add '[1 2 3 4] `[1 ,[1 + 1] ,@[read "3 4"]]]
+[test-add '[1 2 3] `[1 ,@`[2 3]]]
+[test-add '[1 [quasiquote [2 [unquote [3 4]]]]] `[1 `[2 ,[3 ,[+ 2 2]]]]]
+[test-add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]
 
 ; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]

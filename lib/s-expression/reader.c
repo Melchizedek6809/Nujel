@@ -344,6 +344,14 @@ lVal *lReadList(lString *s, bool rootForm){
 	}
 }
 
+static lVal *lReadQuote(lString *s, lSymbol *carSym){
+	lVal *ret = lRootsValPush(lCons(NULL,NULL));
+	ret->vList.car = lValSymS(carSym);
+	ret->vList.cdr = lCons(NULL,NULL);
+	ret->vList.cdr->vList.car = lReadValue(s);
+	return ret;
+}
+
 /* Read the string in s and parse all escape sequences */
 lVal *lReadValue(lString *s){
 	if(s->data >= s->bufEnd){
@@ -359,13 +367,20 @@ lVal *lReadValue(lString *s){
 	case '[':
 		s->data++;
 		return lReadList(s,false);
-	case '\'': {
+	case ',':
 		s->data++;
-		lVal *ret = lRootsValPush(lCons(NULL,NULL));
-		ret->vList.car = lValSymS(symQuote);
-		ret->vList.cdr = lCons(NULL,NULL);
-		ret->vList.cdr->vList.car = lReadValue(s);
-		return ret; }
+		if(*s->data == '@'){
+			s->data++;
+			return lReadQuote(s,symUnquoteSplicing);
+		}else{
+			return lReadQuote(s,symUnquote);
+		}
+	case '`':
+		s->data++;
+		return lReadQuote(s,symQuasiquote);
+	case '\'':
+		s->data++;
+		return lReadQuote(s,symQuote);
 	case '"':
 		s->data++;
 		return lParseString(s);

@@ -17,26 +17,29 @@ lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 0;
 
-lSymbol *symNull,*symQuote,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
+lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic;
 
 void lSymbolInit(){
 	lSymbolActive   = 0;
 	lSymbolMax      = 0;
 
-	symNull     = lSymS("");
-	symQuote    = lSymS("quote");
-	symArr      = lSymS("arr");
-	symIf       = lSymS("if");
-	symCond     = lSymS("cond");
-	symWhen     = lSymS("when");
-	symUnless   = lSymS("unless");
-	symLet      = lSymS("let");
-	symDo       = lSymS("do");
-	symMinus    = lSymS("-");
-	symLambda   = lSymS("λ");
-	symLambdAst = lSymS("λ*");
-	symTreeNew  = lSymS("tree/new");
+	symNull            = lSymS("");
+	symQuote           = lSymS("quote");
+	symArr             = lSymS("arr");
+	symIf              = lSymS("if");
+	symCond            = lSymS("cond");
+	symWhen            = lSymS("when");
+	symUnless          = lSymS("unless");
+	symLet             = lSymS("let");
+	symDo              = lSymS("do");
+	symMinus           = lSymS("-");
+	symLambda          = lSymS("λ");
+	symLambdAst        = lSymS("λ*");
+	symTreeNew         = lSymS("tree/new");
+	symQuasiquote      = lSymS("quasiquote");
+	symUnquote         = lSymS("unquote");
+	symUnquoteSplicing = lSymS("unquote-splicing");
 
 	lSymLTNil            = lSymS(":nil");
 	lSymLTNoAlloc        = lSymS(":no-alloc");
