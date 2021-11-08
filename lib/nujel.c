@@ -44,7 +44,7 @@ void lInit(){
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
-static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
+lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = (lambda->type == ltDynamic
@@ -58,11 +58,11 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		if(car == NULL){continue;}
 		const lSymbol *csym = lGetSymbol(car);
 		if(lSymVariadic(csym)){
-			lVal *t = lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
+			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
 			lDefineClosureSym(tmpc,csym,t);
 			break;
 		}else{
-			lVal *t = lSymNoEval(csym) ? lCar(vn) : lEval(c,lCar(vn));
+			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? lCar(vn) : lEval(c,lCar(vn));
 			lDefineClosureSym(tmpc,csym,t);
 			if(vn != NULL){vn = lCdr(vn);}
 		}
@@ -75,6 +75,8 @@ static lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
+	case ltMacro:
+		lExceptionThrow(":runtime-macro", "Can't use macros as functions");
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
@@ -95,6 +97,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	case ltTree:
 		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvTreeGet);
 	default:
+		lExceptionThrowVal(":type-error", "Can't apply to following val", fun);
 		return NULL;
 	}
 }
@@ -117,6 +120,8 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltLambda:
 		case ltDynamic:
 			return lRootsValPush(lLambda(c,lCdr(v),car));
+		case ltMacro:
+			lExceptionThrowVal(":runtime-macro", "Can't use macros as functions", v);
 		case ltSpecialForm:
 			return car->vNFunc->fp(c,lCdr(v));
 		case ltNativeFunc:

@@ -55,6 +55,7 @@ typedef enum lType {
 	ltLambda,
 	ltDynamic,
 	ltObject,
+	ltMacro,
 	ltNativeFunc,
 	ltSpecialForm,
 

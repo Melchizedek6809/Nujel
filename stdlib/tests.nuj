@@ -457,8 +457,8 @@
 [test-add "\"asd\"" [try [λ [error] error] [throw "asd"] #nil]]
 [test-add :test-exception [try [λ [error] [car error]] [throw [list :test-exception "Testing the exception system"]] #nil]]
 [test-add #t [try [λ [error] [string? [cadr error]]] [throw [list :test-exception "Testing the exception system"]] #nil]]
-[test-add #nil [try [λ [err] [car [err]]] [try [λ [err] [/ 3 0] err] [throw :test-exception]]]]
-[test-add #nil [[λ [e] [car [e]]] [cons :test "Test"]]]
+[test-add :division-by-zero [try [λ [err] [car err]] [try [λ [err] [/ 3 0] err] [throw :test-exception]]]]
+[test-add :test [[λ [e] [car e]] [cons :test "Test"]]]
 [test-add 10 #d10]
 [test-add 10.1 #d10.1]
 [test-add -10.1 #d-10.1]
@@ -521,6 +521,12 @@
 [test-add '[1 2 3] `[1 ,@`[2 3]]]
 [test-add '[1 [quasiquote [2 [unquote [3 4]]]]] `[1 `[2 ,[3 ,[+ 2 2]]]]]
 [test-add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]
+[test-add '[1 2 3] [let* [def v 2] `[1 ,v 3]]]
+[test-add '[+ 1 2] [compile '[+1 2]]]
+[test-add #t [macro? [μ [] #f]]]
+[test-add #t [macro? +1]]
+[test-add #f [macro? min]]
+[test-add #f [macro? 123]]
 
 ; Still have to ponder whether [undefine!] should exist
 ;[test-add #f [undefine! testerle]]

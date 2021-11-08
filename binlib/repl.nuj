@@ -34,11 +34,14 @@
 [def repl/wasm [let*
 	[def ctx [ω]]
 
-	[λ [line]
-		[try repl/exception-handler
-		     [def expr [read line]]
-		     [apply ctx [cons do expr]]
-		]
+        [λ [line]
+           "Evaluate LINE in the wasm context"
+	   [try repl/exception-handler
+	        [def raw [read line]]
+	        [def expr [cons 'do raw]]
+	        [def cexpr [cons [compile expr]]]
+	        [apply ctx cexpr]
+           ]
 	]
 ]]
 
@@ -49,8 +52,10 @@
 	      [exit 0]
 	]
 	[readline/history/add line]
-	[def read [read line]]
-	[def result [apply ctx [cons do read]]]
+	[def raw [read line]]
+	[def expr [cons 'do raw]]
+	[def cexpr [cons [compile expr]]]
+	[def result [apply ctx cexpr]]
 	[set! repl/history [cons line repl/history]]
 	[display [cat [if [nil? result]
 			  ""

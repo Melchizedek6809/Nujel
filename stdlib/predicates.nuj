@@ -125,6 +125,11 @@
 	[eq? :object [type-of val]]
 ]]
 
+[def macro? [λ [val]
+	"#t if VAL is an object"
+	[eq? :macro [type-of val]]
+]]
+
 [def lambda? [λ [val]
 	"#t if VAL is a lambda"
 	[or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]

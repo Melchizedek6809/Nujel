@@ -217,6 +217,14 @@ static lVal *lnfDynamic(lClosure *c, lVal *v){
 	return ret;
 }
 
+/* Handler for [μ [...args] ...body] */
+static lVal *lnfMacro(lClosure *c, lVal *v){
+	lVal *ret = lnfLambda(c,v);
+	if(ret == NULL){return NULL;}
+	ret->type = ltMacro;
+	return ret;
+}
+
 /* Handler for [ω ...body] */
 static lVal *lnfObject(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
@@ -247,5 +255,6 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"lambda fun λ \\", "[args ...body]", "Create a new lambda",                       lnfLambda);
 	lAddSpecialForm(c,"dynamic dyn δ",   "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"object ω",        "[...body]", "Create a new object",                       lnfObject);
+	lAddSpecialForm(c,"macro μ",         "[args ...body]", "Create a new object",                       lnfMacro);
+	lAddSpecialForm(c,"object ω",        "[...body]",      "Create a new object",                       lnfObject);
 }

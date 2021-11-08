@@ -25,6 +25,7 @@
 #include "s-expression/writer.h"
 
 #include "display.h"
+#include "exception.h"
 #include "type-system.h"
 
 #include "type/native-function.h"
