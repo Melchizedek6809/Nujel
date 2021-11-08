@@ -31,11 +31,14 @@
 	   "> "
 ]]
 
-[def repl/wasm [λ [line]
+[def repl/wasm [let*
 	[def ctx [ω]]
-	[try repl/exception-handler
-	     [def expr [read line]]
-	     [apply ctx [cons do expr]]
+
+	[λ [line]
+		[try repl/exception-handler
+		     [def expr [read line]]
+		     [apply ctx [cons do expr]]
+		]
 	]
 ]]
 
