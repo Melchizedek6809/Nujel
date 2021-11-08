@@ -105,6 +105,11 @@
 	[eq? :pair [type-of val]]
 ]]
 
+[def arr? [λ [val]
+	"#t if VAL is an array"
+	[eq? :array [type-of val]]
+]]
+
 [def string? [λ [val]
 	"#t if VAL is a string"
 	[eq? :string [type-of val]]
