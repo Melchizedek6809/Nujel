@@ -1,24 +1,27 @@
 ; Time related λs
 
-[def time/seconds [λ [timestamp]
+[defun time/seconds [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]
-]]
+]
 
-[def time/minutes [λ [timestamp]
+[defun time/minutes [timestamp]
         "Return the minutes part of TIMESTAMP, defaults to current time"
         [% [/ [default timestamp [time]] 60] 60]
-]]
+]
 
-[def time/hours [λ [timestamp]
+[defun time/hours [timestamp]
         "Return the hours part of TIMESTAMP, defaults to current time"
         [% [/ [default timestamp [time]] 3600] 24]
-]]
+]
 
-[def profile [λ [@...body]
-        [def form [cons 'do @...body]]
-        [def start-time [time/milliseconds]]
-        [def val [eval form]]
-        [def end-time [time/milliseconds]]
-        [display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]
-]]
+[defun profile-form [raw]
+       [def start-time [time/milliseconds]]
+       [def val [eval raw]]
+       [def end-time [time/milliseconds]]
+       [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]
+]
+
+[defmacro profile [...body]
+          `[profile-form ',[cons 'do ...body]]
+]

@@ -1,18 +1,18 @@
 [def display/error [let*
-        [def wrap [λ [i text]
+        [defun wrap [i text]
                 [cond [[eq? i 0] [ansi-red text]]
                       [[eq? i 1] text]
                       [[eq? i 2] [ansi-yellow text]]
                       [#t text]
                 ]
-        ]]
+        ]
 
-        [def iter [λ [error i]
+        [defun iter [error i]
                 [if error
                     [cons [wrap i [string [car error]]]
                           [iter [cdr error] [++ i]]]
                     [cons "" #nil]]
-        ]]
+        ]
 
         [λ [error]
                 "Display ERROR in a nice, human readable way"
@@ -20,16 +20,16 @@
         ]
 ]]
 
-[def repl/exception-handler [λ [error]
+[defun repl/exception-handler [error]
         [display/error error]
-]]
+]
 
 [def repl/history #nil]
 
 
-[def repl/prompt [λ []
+[defun repl/prompt []
            "> "
-]]
+]
 
 [def repl/wasm [let*
 	[def ctx [ω]]
@@ -45,7 +45,7 @@
 	]
 ]]
 
-[def repl/readline [λ [ctx]
+[defun repl/readline [ctx]
         [def line [readline [repl/prompt]]]
         [when [nil? line]
               [display "Bye!\r\n"]
@@ -62,9 +62,9 @@
                           [str/write result]]
                       "\n"
                  ]]
-]]
+]
 
-[def repl [λ []
+[defun repl []
         [readline/history/load [readline/history/path]]
         [def ctx [ω]]
         [while #t
@@ -73,4 +73,4 @@
                ]
                [readline/history/save [readline/history/path]]
         ]
-]]
+]

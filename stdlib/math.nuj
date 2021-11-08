@@ -1,20 +1,20 @@
 [def PI 3.14159]
 [def π  3.14159]
 
-[def ++ [λ [i]
+[defun ++ [i]
         "Increment I by 1"
         [+  1 i]
-]]
+]
 
-[def -- [λ [i]
+[defun -- [i]
         "Decrement I by 1"
         [+ -1 i]
-]]
+]
 
-[def >> [λ [val amount]
+[defun >> [val amount]
         "Shifts VAL by AMOUNT bits to the right"
         [ash val [- amount]]
-]]
+]
 
 [def min [let*
         [def iter [λ [a l]
@@ -50,9 +50,9 @@
         ]
 ]]
 
-[def fib [λ [i]
+[defun fib [i]
            "Terribly inefficient, but useful for testing the GC"
            [if [< i 2]
                i
                [+ [fib [- i 2]] [fib [- i 1]]]]
-]]
+]

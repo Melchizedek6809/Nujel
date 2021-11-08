@@ -1,7 +1,7 @@
 ;; Contains the self-hosting Nujel compiler
 
 [def compile [let*
-    [def compile-do-args [λ [args]
+    [defun compile-do-args [args]
         ;[display ["[do-args] " [str/write args] "\n\n"]]
         [if [nil? [cdr args]]
             [cons [compile [car args]] #nil]
@@ -12,54 +12,54 @@
                          [compile-do-args [cdr args]]]
                 ]
                 [compile-do-args [cdr args]]]]
-        ]]
+    ]
 
-    [def compile-do [λ [source]
+    [defun compile-do [source]
         ;[display ["[do] " [str/write source] "\n\n"]]
         [let* [def args [compile-do-args source]]
               [if [nil? [cdr args]]
                   [car args]
                   [cons 'do args]]
         ]
-    ]]
+    ]
 
-    [def compile-def [λ [source]
+    [defun compile-def [source]
         ;[display ["[def] " [str/write source] "\n\n"]]
         [list 'def [cadr source] [compile [caddr source]]]
-    ]]
+    ]
 
-    [def compile-set! [λ [source]
+    [defun compile-set! [source]
         ;[display ["[set] " [str/write source] "\n\n"]]
         [list 'set! [cadr source] [compile [caddr source]]]
-    ]]
+    ]
 
-    [def compile-fun [λ [source]
+    [defun compile-fun [source]
         ;[display ["[λ] " [str/write source] "\n\n"]]
         [if [string?  [caddr source]]
             [list 'λ* [cadr source] [caddr source] [compile-do [cddr source]]]
             [list 'λ* [cadr source]             "" [compile-do [cddr source]]]]
-    ]]
+    ]
 
-    [def compile-try [λ [source]
+    [defun compile-try [source]
         ;[display ["[let] " [str/write source] "\n\n"]]
         [list 'try [compile [cadr source]] [compile-do [cddr source]]]
-    ]]
+    ]
 
-    [def compile-let [λ [source]
+    [defun compile-let [source]
         ;[display ["[let] " [str/write source] "\n\n"]]
         [list 'let [cadr source] [compile-do [cddr source]]]
-    ]]
+    ]
 
-    [def compile-let* [λ [source]
+    [defun compile-let* [source]
         ;[display ["[let*] " [str/write source] "\n\n"]]
         [list 'let* [compile-do [cdr source]]]
-    ]]
+    ]
 
-    [def compile-macro [λ [macro source]
+    [defun compile-macro [macro source]
         ;[display [cat [str/write macro] "\n"]]
         ;[display [cat [str/write source] "\n"]]
         [macro-apply macro [cdr source]]
-    ]]
+    ]
 
     [λ [source]
         "Compile the forms in source"
@@ -79,15 +79,15 @@
     ]
 ]]
 
-[def λδ [λ [@...λδ]
+[defmacro \ [...body]
         "Define a λ with the self-hosting Nujel compiler"
-        [eval* [compile [cons 'λ @...λδ]]]
-]]
+        [compile [cons 'λ ...body]]
+]
 
-[def eval [λ [expr]
+[defun eval [expr]
           "Compile, Evaluate and then return the result of EXPR"
           [eval* [compile expr]]
-]]
+]
 
 [def +1 [μ [v]
            `[+ 1 ,v]

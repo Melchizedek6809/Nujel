@@ -25,10 +25,10 @@
         [quasiquote-real @list 0]
 ]]
 
-[def unquote [λ [expr]
+[defun unquote [expr]
         [throw [list :unquote-without-quasiquote "unquote should only occure inside a quasiquote, never evaluated directly"]]
-]]
+]
 
-[def unquote-splicing [λ [expr]
+[defun unquote-splicing [expr]
         [throw [list :unquote-splicing-without-quasiquote "unquote-splicing should only occure inside a quasiquote, never evaluated directly"]]
-]]
+]

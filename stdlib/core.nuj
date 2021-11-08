@@ -1,13 +1,13 @@
 ;; Contains various little pieces that were implemented in nujel instead of
 ;; C because of various reasons
 
-[def length [λ [a]
+[defun length [a]
         "Returns the length of a"
         [cond [[string? a] [str/length a]]
               [[pair? a] [list-length a]]
               [#t 0]
         ]
-]]
+]
 
 [def describe [let*
         [def describe-fun [λ [fun]
@@ -26,29 +26,29 @@
         ]
 ]]
 
-[def display [λ [value]
+[defun display [value]
         "Display VALUE"
         [print value]
-]]
+]
 
-[def newline [λ []
+[defun newline []
         "Print a single line feed character"
         [display "\n"]
-]]
+]
 
-[def arr-fill! [λ [a v i]
+[defun arr-fill! [a v i]
         "Fills array a with value v"
         [cond [[>= [int i] [arr-length a]] a]
               [#t [arr-set! a [int i] v] [arr-fill! a v [++ i]]]
         ]
-]]
+]
 
-[def lognand [λ [...l]
+[defun lognand [...l]
         "Returns the Nand of its arguments"
         [lognot [apply logand ...l]]
-]]
+]
 
-[def mem [λ [] "Return some pretty printed memory usage information"
+[defun mem [] "Return some pretty printed memory usage information"
         [let* [def info [memory-info]]
               [cat
                 [ansi-white  "Memory Info"] "\n"
@@ -61,8 +61,8 @@
                 [ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
               ]
         ]
-]]
+]
 
-[def wrap-value [λ [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
+[defun wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
         [+ min [% [- val min] [- max min]]]
-]]
+]

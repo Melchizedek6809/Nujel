@@ -1,55 +1,56 @@
 ;; Some predicates that were simpler to do in nujel
 
-[def number? [λ [a]
+[defun number? [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]
-]]
+]
 
-[def empty? [λ [a]
+[defun empty? [a]
         "Return #t if a is empty"
         [nil? a]
-]]
+]
 
-[def last? [λ [a]
+[defun last? [a]
         "Return #t if a is the last pair in a list"
         [nil? [cdr a]]
-]]
+]
 
-[def pos? [λ [a]
+[defun pos? [a]
         "Return #t if a is positive"
         [>= a 0]
-]]
+]
 
-[def zn? [λ [a]
+[defun zn? [a]
         "Return #t if a is zero or negative"
         [<= a 0]
-]]
+]
 
-[def neg? [λ [a]
+[defun neg? [a]
         "Returns #t if a is negative"
         [< a 0]
-]]
+]
 
-[def odd? [λ [a]
+[defun odd? [a]
         "Predicate that returns #t if a is odd"
         [= [% [int a] 2] 1]
-]]
-[def even? [λ [a]
+]
+
+[defun even? [a]
         "Predicate that returns #t if a is even"
         [= [% [int a] 2] 0]
-]]
+]
 
-[def zero? [λ [val]
+[defun zero? [val]
         "#t if VAL is zero"
         [eq? 0 val]
-]]
+]
 
-[def not-zero? [λ [val]
+[defun not-zero? [val]
         "#t if VAL is not zero"
         [ineq? 0 val]
-]]
+]
 
-[def list-equal? [λ [a b]
+[defun list-equal? [a b]
         "#t if A and B are equal"
         [when [eq? [type-of a] [type-of b]]
               [if [pair? a]
@@ -57,90 +58,90 @@
                       [list-equal? [cdr a] [cdr b]]]
                   [eq? a b]]
         ]
-]]
+]
 
-[def there-exists? [λ [l pred]
+[defun there-exists? [l pred]
         "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
         [cond [[nil? l] #f]
               [[pred [car l]] #t]
               [#t [there-exists? [cdr l] pred]]
         ]
-]]
+]
 
-[def for-all? [λ [l pred]
+[defun for-all? [l pred]
         "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
         [cond [[nil? l] #t]
               [[not [pred [car l]]] #f]
               [#t [for-all? [cdr l] pred]]
         ]
-]]
+]
 
-[def int? [λ [val]
+[defun int? [val]
         "#t if VAL is a integer"
         [eq? :int [type-of val]]
-]]
+]
 
-[def float? [λ [val]
+[defun float? [val]
         "#t if VAL is a floating-point number"
         [eq? :float [type-of val]]
-]]
+]
 
-[def vec? [λ [val]
+[defun vec? [val]
         "#t if VAL is a vector"
         [eq? :vec [type-of val]]
-]]
+]
 
-[def bool? [λ [val]
+[defun bool? [val]
         "#t if VAL is a boolean"
         [eq? :bool [type-of val]]
-]]
+]
 
-[def inf? [λ [val]
+[defun inf? [val]
         "#t if VAL is infinite"
         [eq? :infinity [type-of val]]
-]]
+]
 
-[def pair? [λ [val]
+[defun pair? [val]
         "#t if VAL is a pair"
         [eq? :pair [type-of val]]
-]]
+]
 
-[def arr? [λ [val]
+[defun arr? [val]
 	"#t if VAL is an array"
 	[eq? :array [type-of val]]
-]]
+]
 
-[def string? [λ [val]
+[defun string? [val]
         "#t if VAL is a string"
         [eq? :string [type-of val]]
-]]
+]
 
-[def symbol? [λ [val]
+[defun symbol? [val]
         "#t if VAL is a symbol"
         [eq? :symbol [type-of val]]
-]]
+]
 
-[def object? [λ [val]
+[defun object? [val]
         "#t if VAL is an object"
         [eq? :object [type-of val]]
-]]
+]
 
-[def macro? [λ [val]
+[defun macro? [val]
         "#t if VAL is an object"
         [eq? :macro [type-of val]]
-]]
+]
 
-[def lambda? [λ [val]
+[defun lambda? [val]
         "#t if VAL is a lambda"
         [or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]
-]]
+]
 
-[def native? [λ [val]
+[defun native? [val]
         "#t if VAL is a native function"
         [eq? :native-function [type-of val]]
-]]
+]
 
-[def procedure? [λ [val]
+[defun procedure? [val]
         "#t if VAL is a native or lisp function"
         [or [lambda? val] [native? val]]
-]]
+]

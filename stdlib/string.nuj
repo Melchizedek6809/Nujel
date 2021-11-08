@@ -1,21 +1,21 @@
 ; Some nujel string λs
 
-[def br [λ [num]
+[defun br [num]
         "Return NUM=1 linebreaks"
         [if [or [nil? num] [<= [int num] 1]]
             "\n"
             ["\n" [br [-- num]]]]
-]]
+]
 
-[def path/without-extension [λ [path]
+[defun path/without-extension [path]
         "Return PATH, but without the fileextension part"
         [def last-period [last-index-of path "."]]
         [if [>= last-period 0]
             [substr path 0 last-period]
             path]
-]]
+]
 
-[def int->string/binary [λ [v]
+[defun int->string/binary [v]
         [def ret ""]
         [unless v [def v 0]]
         [when [zero? v] [set! ret "0"]]
@@ -24,9 +24,9 @@
                [set! v [ash v -1]]
         ]
         ret
-]]
+]
 
-[def int->string/octal [λ [v]
+[defun int->string/octal [v]
         [def ret ""]
         [unless v [def v 0]]
         [when [zero? v] [set! ret "0"]]
@@ -35,7 +35,7 @@
                [set! v [ash v -3]]
         ]
         ret
-]]
+]
 
 
 [def int->string/hex [let*
@@ -52,7 +52,7 @@
                 ret
 ]]]
 
-[def int->string/decimal [λ [v]
+[defun int->string/decimal [v]
         [string v]
-]]
+]
 [def int->string int->string/decimal]
