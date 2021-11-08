@@ -26,7 +26,7 @@
 
 static float createFloat(int value, int mantissa, int mantissaLeadingZeroes){
 	if(mantissa == 0){return value;}
-	const float mant = mantissa * powf(10, -(floorf(log10f(mantissa)) + 1 + mantissaLeadingZeroes));
+	const float mant = mantissa * pow(10, -(floor(log10f(mantissa)) + 1 + mantissaLeadingZeroes));
 	return value + mant;
 }
 

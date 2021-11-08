@@ -1,0 +1,31 @@
+[do [def help [let* [do [def iter [λ* [l]
+           ""
+           [cond [[nil? l] #t]
+                 [#t [display [describe [car l]]] [newline] [iter [cdr l]]]]]]
+       [λ* [i]
+           "Describe 10 functions at offset 1"
+           [do [def off [* [int i] 10]]
+              [iter [map cat [symbol-table off 10]]]
+              [display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
+              [newline]
+              #t]]]]]
+    [def file/compile [λ* [path no-write]
+        "Compile a Nujel source file into optimized object code"
+        [do [def source [read [file/read path]]]
+           [def object-code [compile [cons 'do source] source]]
+           [unless no-write
+                   [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
+           object-code]]]
+    [def file/eval [λ* [path]
+        "Evaluate a Nujel source file in the current context"
+        [do [def source [cons 'do [read [file/read path]]]]
+           [eval source]]]]
+    [def eval/forked [λ* [nujel-binary raw-expr]
+        "Evaluate @EXPR in a separate process running NUJEL-BINARY"
+        [do [def expr [cat "[print [str/write " [str/write raw-expr]]]
+           [def tmp-path [file/temp expr]]
+           [def command [cat nujel-binary " " tmp-path]]
+           [def res [popen command]]
+           [file/remove tmp-path]
+           [cons [car res] [cdr res]]]]]
+    [def test-context "Nujel Standalone"]]

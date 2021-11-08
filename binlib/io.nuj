@@ -15,15 +15,6 @@
 	]
 ]]
 
-[def repl-prompt [let*
-	[def repl-count -1]
-	[λ [i]
-		"Display the REPL prompt"
-		[set! repl-count [++ repl-count]]
-		[display [cat "[" repl-count "]" [ansi-fg 1] "λ" [ansi-fg 12] ">" [ansi-reset] " "]]
-	]
-]]
-
 [def file/compile [λ [path no-write]
 	"Compile a Nujel source file into optimized object code"
 	[def source [read [file/read path]]]
