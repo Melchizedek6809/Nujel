@@ -235,6 +235,14 @@ static lVal *lnfObject(lClosure *c, lVal *v){
 	return ret;
 }
 
+static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
+	(void)v;
+	lVal *ret = lValAlloc();
+	ret->type = ltObject;
+	ret->vClosure = c;
+	return ret;
+}
+
 void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
@@ -243,6 +251,7 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
 	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
+	lAddNativeFunc(c,"current-closure","[n]",           "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymbolTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 
@@ -255,6 +264,6 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"lambda fun λ", "[args ...body]", "Create a new lambda",                       lnfLambda);
 	lAddSpecialForm(c,"dynamic dyn δ",   "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"macro μ",         "[args ...body]", "Create a new object",                       lnfMacro);
+	lAddSpecialForm(c,"macro μ",         "[args ...body]", "Create a new macro",                       lnfMacro);
 	lAddSpecialForm(c,"object ω",        "[...body]",      "Create a new object",                       lnfObject);
 }
