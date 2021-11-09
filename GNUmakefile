@@ -83,10 +83,6 @@ clean:
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-%.no: %.nuj | $(NUJEL_BOOT)
-	@$(NUJEL_BOOT) -x "[try display/error [file/compile \"$^\"]]"
-	@echo "$(ANSI_PINK)" "[NUJ]" "$(ANSI_RESET)" $@
-
 %.wo: %.c
 	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[WCC]" "$(ANSI_RESET)" $@
@@ -140,25 +136,15 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/stdlib.nuj: $(STDLIB_NUJS)
+tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOT)
 	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+	@$(NUJEL_BOOT) tools/bootstrap.nuj
+	@cat $(STDLIB_NOBS) > tmp/stdlib.no
+	@cat $(BINLIB_NOBS) > tmp/binlib.no
+	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" $@
 
-tmp/stdlib.no: $(STDLIB_NOBS)
-	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
-
-tmp/binlib.nuj: $(BINLIB_NUJS)
-	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
-
-tmp/binlib.no: $(BINLIB_NOBS)
-	@mkdir -p tmp/
-	@cat $^ > $@
-	@echo "$(ANSI_GREY)" "[CAT]" "$(ANSI_RESET)" $@
+tmp/binlib.no: tmp/stdlib.no
+	@true
 
 tmp/stdlib.c: tmp/stdlib.no $(ASSET)
 	@mkdir -p tmp/

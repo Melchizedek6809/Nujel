@@ -61,21 +61,26 @@
         ]
 ]]
 
-[def split [let*
-        [def iter [λ [str separator separator-len start slen]
-                    [let*
-                        [def pos [index-of str separator start]]
-                        [if [and [>= pos start] [< pos slen]]
-                            [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
-                            [cons [substr str start slen]]]
-                ]
-        ]]
-
-        [λ [str separator]
-                "Split STR on every SEPARATOR"
-                [iter str separator [max 1 [str/length separator]] 0 [str/length str]]
-        ]
-]]
+[defun split [str separator]
+       [def separator-len [str/length separator]]
+       [def slen [str/length str]]
+       [def start 0]
+       [def ret #nil]
+       [while [< start slen]
+              [def pos-found [index-of str separator start]]
+              [if [>= pos-found 0]
+                  [do [def pos-found [max pos-found [+ start 1]]]
+                      [set! ret [cons [substr str start pos-found]
+                                      ret]]
+                      [set! start [+ separator-len pos-found]]
+                  ]
+                  [do [set! ret [cons [substr str start slen]
+                                      ret]]
+                      [set! start slen]
+                  ]]
+       ]
+       [reverse ret]
+]
 
 [defun reverse [l r]
         "Return the list l in reverse order"
@@ -99,6 +104,14 @@
                 [cons [car l] [filter p [cdr l]]]
                 [filter p [cdr l]]
             #nil]]
+]
+
+[defun for-each [f l]
+        "Runs f over every item in list l and returns the resulting list"
+        [while l
+               [f [car l]]
+               [set! l [cdr l]]
+        ]
 ]
 
 [defun map [f l]
@@ -158,7 +171,7 @@
         "Return the Argument list of f which can be a Native Function or a Lambda"
         [cond [[lambda? f] [reduce cat [map [λ [a] [" " [car a]]] [cl-data f]]]]
               [[native? f] [reduce cat [map [λ [a] [" " a]] [car [cl-data f]]]]]
-               [#t ""]
+              [#t ""]
         ]
 ]
 

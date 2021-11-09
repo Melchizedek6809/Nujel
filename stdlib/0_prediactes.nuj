@@ -145,3 +145,7 @@
         "#t if VAL is a native or lisp function"
         [or [lambda? val] [native? val]]
 ]
+
+[defun in-range? [v min max]
+       [and [>= v min] [<= v max]]
+]

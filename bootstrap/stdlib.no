@@ -31,7 +31,121 @@
         [cdr [cdr [cdr p]]]]]
     [def cadddr [λ* [p]
         "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr p]]]]]]][do [def test-context "Nujel"]
+        [car [cdr [cdr [cdr p]]]]]]
+    [def println [λ* [str]
+        ""
+        [print [cat str "\n"]]]]][do [def number? [λ* [a]
+        "Return #t if a is a number"
+        [or [int? a] [float? a] [vec? a]]]]
+    [def empty? [λ* [a]
+        "Return #t if a is empty"
+        [nil? a]]]
+    [def last? [λ* [a]
+        "Return #t if a is the last pair in a list"
+        [nil? [cdr a]]]]
+    [def pos? [λ* [a]
+        "Return #t if a is positive"
+        [>= a 0]]]
+    [def zn? [λ* [a]
+        "Return #t if a is zero or negative"
+        [<= a 0]]]
+    [def neg? [λ* [a]
+        "Returns #t if a is negative"
+        [< a 0]]]
+    [def odd? [λ* [a]
+        "Predicate that returns #t if a is odd"
+        [= [% [int a] 2] 1]]]
+    [def even? [λ* [a]
+        "Predicate that returns #t if a is even"
+        [= [% [int a] 2] 0]]]
+    [def zero? [λ* [val]
+        "#t if VAL is zero"
+        [eq? 0 val]]]
+    [def not-zero? [λ* [val]
+        "#t if VAL is not zero"
+        [ineq? 0 val]]]
+    [def list-equal? [λ* [a b]
+        "#t if A and B are equal"
+        [when [eq? [type-of a] [type-of b]]
+              [if [pair? a]
+                 [and [list-equal? [car a] [car b]] [list-equal? [cdr a] [cdr b]]]
+                 [eq? a b]]]]]
+    [def there-exists? [λ* [l pred]
+        "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
+        [cond [[nil? l] #f]
+              [[pred [car l]] #t]
+              [#t [there-exists? [cdr l] pred]]]]]
+    [def for-all? [λ* [l pred]
+        "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
+        [cond [[nil? l] #t]
+              [[not [pred [car l]]] #f]
+              [#t [for-all? [cdr l] pred]]]]]
+    [def int? [λ* [val]
+        "#t if VAL is a integer"
+        [eq? :int [type-of val]]]]
+    [def float? [λ* [val]
+        "#t if VAL is a floating-point number"
+        [eq? :float [type-of val]]]]
+    [def vec? [λ* [val]
+        "#t if VAL is a vector"
+        [eq? :vec [type-of val]]]]
+    [def bool? [λ* [val]
+        "#t if VAL is a boolean"
+        [eq? :bool [type-of val]]]]
+    [def inf? [λ* [val]
+        "#t if VAL is infinite"
+        [eq? :infinity [type-of val]]]]
+    [def pair? [λ* [val]
+        "#t if VAL is a pair"
+        [eq? :pair [type-of val]]]]
+    [def string? [λ* [val]
+        "#t if VAL is a string"
+        [eq? :string [type-of val]]]]
+    [def symbol? [λ* [val]
+        "#t if VAL is a symbol"
+        [eq? :symbol [type-of val]]]]
+    [def object? [λ* [val]
+        "#t if VAL is an object"
+        [eq? :object [type-of val]]]]
+    [def macro? [λ* [val]
+        "#t if VAL is an object"
+        [eq? :macro [type-of val]]]]
+    [def lambda? [λ* [val]
+        "#t if VAL is a lambda"
+        [or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]]]
+    [def native? [λ* [val]
+        "#t if VAL is a native function"
+        [eq? :native-function [type-of val]]]]
+    [def procedure? [λ* [val]
+        "#t if VAL is a native or lisp function"
+        [or [lambda? val] [native? val]]]]
+    [def in-range? [λ* [v min max]
+        ""
+        [and [>= v min] [<= v max]]]]][do [def quasiquote-real [δ [l depth] [if [pair? l]
+       [do [def lcar [car l]]
+          [if l
+             [cond [[pair? lcar] [if [eq? [car lcar] 'unquote-splicing]
+                      [if [zero? depth]
+                         [do [def result [eval* [cadr lcar]]]
+                            [if [pair? result]
+                               [append result [quasiquote-real [cdr l] depth]]
+                               [throw [list :unquote-splicing-wrong-type "unquote splicing operations must return a list, not a single value" result]]]]
+                         [cons [quasiquote-real lcar depth] [quasiquote-real [cdr l] depth]]]
+                      [cons [quasiquote-real lcar depth] [quasiquote-real [cdr l] depth]]]]
+                   [[eq? lcar 'unquote] [if [zero? depth]
+                      [eval* [cadr l]]
+                      [cons lcar [quasiquote-real [cdr l] [- depth 1]]]]]
+                   [[eq? lcar 'quasiquote] [cons lcar [quasiquote-real [cdr l] [+ 1 depth]]]]
+                   [#t [cons lcar [quasiquote-real [cdr l] depth]]]]
+             #nil]]
+       l]]]
+    [def quasiquote [δ [@list] "Quasiquote" [quasiquote-real @list 0]]]
+    [def unquote [λ* [expr]
+        ""
+        [throw [list :unquote-without-quasiquote "unquote should only occure inside a quasiquote, never evaluated directly"]]]]
+    [def unquote-splicing [λ* [expr]
+        ""
+        [throw [list :unquote-splicing-without-quasi "unquote-splicing should only occure inside a quasiquote, never evaluated directly"]]]]][do [def test-context "Nujel"]
     [def test-add #nil]
     [def test-run #nil]
     [def test-run-forked #nil]
@@ -64,12 +178,17 @@
               [set! error-count [++ error-count]]]]]
        [def test-default [λ* [result rawexpr i]
            "Tests that RAWEXPR evaluates to RESULT"
-           [try [λ [err]
-              [test-failure result err rawexpr i]] [def expr [eval rawexpr]] [def pred? eq?] [when [string? result]
-                 [set! expr [str/write expr]]] [when [pair? result]
-                 [set! pred? list-equal?]] [[if [pred? result expr]
-              test-success
-              test-failure] result expr rawexpr i]]]]
+           [try [λ* [err]
+               ""
+               [test-failure result err rawexpr i]] [do [def expr [eval rawexpr]]
+              [def pred? eq?]
+              [when [string? result]
+                    [set! expr [str/write expr]]]
+              [when [pair? result]
+                    [set! pred? list-equal?]]
+              [[if [pred? result expr]
+                 test-success
+                 test-failure] result expr rawexpr i]]]]]
        [def test-forked [λ* [nujel-runtime]
            ""
            [λ* [result rawexpr i]
@@ -107,71 +226,68 @@
               [set! print-passes [bool output-passes]]
               [test-run-real [test-forked nujel-runtime]]]]]]]
     ][do [def ansi-fg [arr "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]]
+    [def ansi-bg [arr "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]]
+    [def ansi-names [arr "black" "dark red" "dark green" "brown" "dark blue" "purple" "teal" "dark gray" "gray" "red" "green" "yellow" "blue" "pink" "cyan" "white"]]
     [def ansi-reset "\e[0m"]
-    [def ansi-wrap [λ* [code string]
+    [def ansi-fg-reset "\e[0;39m"]
+    [def ansi-bg-reset "\e[49m"]
+    [def ansi-wrap [λ* [code docstring]
         "Wrap STRING in the ansi color CODE"
-        [cat [ansi-fg code] string ansi-reset]]]
-    [def ansi-black [λ* [...args]
-        "Wrap ARGS in black"
-        [ansi-wrap 0 [apply cat ...args]]]]
-    [def ansi-dark-red [λ* [...args]
-        "Wrap ARGS in dark red"
-        [ansi-wrap 1 [apply cat ...args]]]]
-    [def ansi-dark-green [λ* [...args]
-        "Wrap ARGS in dark green"
-        [ansi-wrap 2 [apply cat ...args]]]]
-    [def ansi-brown [λ* [...args]
-        "Wrap ARGS in brown"
-        [ansi-wrap 3 [apply cat ...args]]]]
-    [def ansi-dark-blue [λ* [...args]
-        "Wrap ARGS in dark blue"
-        [ansi-wrap 4 [apply cat ...args]]]]
-    [def ansi-purple [λ* [...args]
-        "Wrap ARGS in purple"
-        [ansi-wrap 5 [apply cat ...args]]]]
-    [def ansi-teal [λ* [...args]
-        "Wrap ARGS in teal"
-        [ansi-wrap 6 [apply cat ...args]]]]
-    [def ansi-dark-gray [λ* [...args]
-        "Wrap ARGS in dark gray"
-        [ansi-wrap 7 [apply cat ...args]]]]
-    [def ansi-gray [λ* [...args]
-        "Wrap ARGS in gray"
-        [ansi-wrap 8 [apply cat ...args]]]]
-    [def ansi-red [λ* [...args]
-        "Wrap ARGS in red"
-        [ansi-wrap 9 [apply cat ...args]]]]
-    [def ansi-green [λ* [...args]
-        "Wrap ARGS in green"
-        [ansi-wrap 10 [apply cat ...args]]]]
-    [def ansi-yellow [λ* [...args]
-        "Wrap ARGS in yellow"
-        [ansi-wrap 11 [apply cat ...args]]]]
-    [def ansi-blue [λ* [...args]
-        "Wrap ARGS in blue"
-        [ansi-wrap 12 [apply cat ...args]]]]
-    [def ansi-pink [λ* [...args]
-        "Wrap ARGS in pink"
-        [ansi-wrap 13 [apply cat ...args]]]]
-    [def ansi-cyan [λ* [...args]
-        "Wrap ARGS in cyan"
-        [ansi-wrap 14 [apply cat ...args]]]]
-    [def ansi-white [λ* [...args]
-        "Wrap ARGS in white"
-        [ansi-wrap 15 [apply cat ...args]]]]
+        [do [def docstring [cat "Wrap ...STRING in a " [ansi-names code] " foreground"]]
+           [eval* [quasiquote [λ [...string]
+              [unquote docstring]
+              [apply cat [quasiquote [[ansi-fg [unquote code]] [unquote-splicing ...string] ansi-fg-reset]]]]]]]]]
+    [def ansi-bg-wrap [λ* [code]
+        "Wrap STRING in the ansi color CODE"
+        [do [def docstring [cat "Wrap ...STRING in a " [ansi-names code] " background"]]
+           [eval* [quasiquote [λ [...string]
+              [unquote docstring]
+              [apply cat [quasiquote [[ansi-bg [unquote code]] [unquote-splicing ...string] ansi-bg-reset]]]]]]]]]
+    [def ansi-black [ansi-wrap 0]]
+    [def ansi-dark-red [ansi-wrap 1]]
+    [def ansi-dark-green [ansi-wrap 2]]
+    [def ansi-brown [ansi-wrap 3]]
+    [def ansi-dark-blue [ansi-wrap 4]]
+    [def ansi-purple [ansi-wrap 5]]
+    [def ansi-teal [ansi-wrap 6]]
+    [def ansi-dark-gray [ansi-wrap 7]]
+    [def ansi-gray [ansi-wrap 8]]
+    [def ansi-red [ansi-wrap 9]]
+    [def ansi-green [ansi-wrap 10]]
+    [def ansi-yellow [ansi-wrap 11]]
+    [def ansi-blue [ansi-wrap 12]]
+    [def ansi-pink [ansi-wrap 13]]
+    [def ansi-cyan [ansi-wrap 14]]
+    [def ansi-white [ansi-wrap 15]]
+    [def ansi-bg-gray [ansi-bg-wrap 0]]
+    [def ansi-bg-red [ansi-bg-wrap 1]]
+    [def ansi-bg-green [ansi-bg-wrap 2]]
+    [def ansi-bg-yellow [ansi-bg-wrap 3]]
+    [def ansi-bg-blue [ansi-bg-wrap 4]]
+    [def ansi-bg-pink [ansi-bg-wrap 5]]
+    [def ansi-bg-cyan [ansi-bg-wrap 6]]
+    [def ansi-bg-white [ansi-bg-wrap 7]]
     [def ansi-rainbow [λ* [...args]
         "Wrap ARGS in the colors of the rainbow!"
         [let* [do [def count 0]
            [cat [join [map [λ [a]
               [set! count [logand [+ 1 count] 7]]
-              [ansi-wrap [if [zero? count]
+              [cat [ansi-fg [if [zero? count]
                  7
-                 [+ count 8]] a]] [split [apply cat ...args] ""]] ""] ansi-reset]]]]]][do [def yield-queue #nil]
+                 [+ count 8]]] a]] [split [apply cat ...args] ""]] ""] ansi-fg-reset]]]]]
+    [def ansi-rainbow-bg [λ* [...args]
+        "Wrap ARGS in the colors of the rainbow!"
+        [do [def count 0]
+           [def split-args [split [apply cat ...args] ""]]
+           [def colored-list [map [λ [a]
+              [set! count [logand [+ 1 count] 7]]
+              [cat [ansi-fg [logand [+ 2 count] 7]] [ansi-bg count] a]] split-args]]
+           [cat [join colored-list ""] ansi-reset]]]]][do [def yield-queue #nil]
     [def yield [λ* [pred fun]
         "Evaluates FUN once PRED is true"
         [do [set! yield-queue [cons [cons pred fun] yield-queue]]
            #t]]]
-    [def yield-run [let* [λ* []
+    [def yield-run [λ* []
         "Executes pending coroutines if their predicate evaluates to #t"
         [do [def l yield-queue]
            [def new #nil]
@@ -179,7 +295,7 @@
            [set! yield-queue #nil]
            [while l [set! cur [car l]] [if [[car cur]]
               [[cdr cur]]
-              [set! yield-queue [cons cur yield-queue]]] [set! l [cdr l]]]]]]]
+              [set! yield-queue [cons cur yield-queue]]] [set! l [cdr l]]]]]]
     [def timeout [λ* [milliseconds]
         "Returns a function that evaluates to true once MILLISECONDS have passed"
         [do [def goal [+ [time/milliseconds] milliseconds]]
@@ -272,15 +388,19 @@
        [λ* [l glue]
            "Join LIST into a string with GLUE in between each element"
            [iter "" l [string glue]]]]]]
-    [def split [let* [do [def iter [λ* [str separator separator-len start slen]
-           ""
-           [let* [do [def pos [index-of str separator start]]
-              [if [and [>= pos start] [< pos slen]]
-                 [cons [substr str start [max [+ start 1] pos]] [iter str separator separator-len [max [+ pos 1] [+ pos [int separator-len]]] slen]]
-                 [cons [substr str start slen]]]]]]]
-       [λ* [str separator]
-           "Split STR on every SEPARATOR"
-           [iter str separator [max 1 [str/length separator]] 0 [str/length str]]]]]]
+    [def split [λ* [str separator]
+        ""
+        [do [def separator-len [str/length separator]]
+           [def slen [str/length str]]
+           [def start 0]
+           [def ret #nil]
+           [while [< start slen] [def pos-found [index-of str separator start]] [if [>= pos-found 0]
+              [do [def pos-found [max pos-found [+ start 1]]]
+                 [set! ret [cons [substr str start pos-found] ret]]
+                 [set! start [+ separator-len pos-found]]]
+              [do [set! ret [cons [substr str start slen] ret]]
+                 [set! start slen]]]]
+           [reverse ret]]]]
     [def reverse [λ* [l r]
         "Return the list l in reverse order"
         [if [nil? l]
@@ -299,6 +419,9 @@
                  [cons [car l] [filter p [cdr l]]]
                  [filter p [cdr l]]
                  #nil]]]]]
+    [def for-each [λ* [f l]
+        "Runs f over every item in list l and returns the resulting list"
+        [while l [f [car l]] [set! l [cdr l]]]]]
     [def map [λ* [f l]
         "Runs f over every item in list l and returns the resulting list"
         [if [nil? l]
@@ -341,11 +464,11 @@
               [[native? f] [reduce cat [map [λ [a]
                  [" " a]] [car [cl-data f]]]]]
               [#t ""]]]]
-    [def getf [let* [λ* [l key]
+    [def getf [λ* [l key]
         "Return the value in LIST following KEY"
         [cond [[nil? l] #nil]
               [[eq? key [car l]] [cadr l]]
-              [#t [getf [cdr l] key]]]]]]][do [def PI 3.14159]
+              [#t [getf [cdr l] key]]]]]][do [def PI 3.14159]
     [def π 3.14159]
     [def ++ [λ* [i]
         "Increment I by 1"
@@ -380,115 +503,7 @@
         "Terribly inefficient, but useful for testing the GC"
         [if [< i 2]
            i
-           [+ [fib [- i 2]] [fib [- i 1]]]]]]][do [def number? [λ* [a]
-        "Return #t if a is a number"
-        [or [int? a] [float? a] [vec? a]]]]
-    [def empty? [λ* [a]
-        "Return #t if a is empty"
-        [nil? a]]]
-    [def last? [λ* [a]
-        "Return #t if a is the last pair in a list"
-        [nil? [cdr a]]]]
-    [def pos? [λ* [a]
-        "Return #t if a is positive"
-        [>= a 0]]]
-    [def zn? [λ* [a]
-        "Return #t if a is zero or negative"
-        [<= a 0]]]
-    [def neg? [λ* [a]
-        "Returns #t if a is negative"
-        [< a 0]]]
-    [def odd? [λ* [a]
-        "Predicate that returns #t if a is odd"
-        [= [% [int a] 2] 1]]]
-    [def even? [λ* [a]
-        "Predicate that returns #t if a is even"
-        [= [% [int a] 2] 0]]]
-    [def zero? [λ* [val]
-        "#t if VAL is zero"
-        [eq? 0 val]]]
-    [def not-zero? [λ* [val]
-        "#t if VAL is not zero"
-        [ineq? 0 val]]]
-    [def list-equal? [λ* [a b]
-        "#t if A and B are equal"
-        [when [eq? [type-of a] [type-of b]]
-              [if [pair? a]
-                 [and [list-equal? [car a] [car b]] [list-equal? [cdr a] [cdr b]]]
-                 [eq? a b]]]]]
-    [def there-exists? [λ* [l pred]
-        "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
-        [cond [[nil? l] #f]
-              [[pred [car l]] #t]
-              [#t [there-exists? [cdr l] pred]]]]]
-    [def for-all? [λ* [l pred]
-        "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
-        [cond [[nil? l] #t]
-              [[not [pred [car l]]] #f]
-              [#t [for-all? [cdr l] pred]]]]]
-    [def int? [λ* [val]
-        "#t if VAL is a integer"
-        [eq? :int [type-of val]]]]
-    [def float? [λ* [val]
-        "#t if VAL is a floating-point number"
-        [eq? :float [type-of val]]]]
-    [def vec? [λ* [val]
-        "#t if VAL is a vector"
-        [eq? :vec [type-of val]]]]
-    [def bool? [λ* [val]
-        "#t if VAL is a boolean"
-        [eq? :bool [type-of val]]]]
-    [def inf? [λ* [val]
-        "#t if VAL is infinite"
-        [eq? :infinity [type-of val]]]]
-    [def pair? [λ* [val]
-        "#t if VAL is a pair"
-        [eq? :pair [type-of val]]]]
-    [def string? [λ* [val]
-        "#t if VAL is a string"
-        [eq? :string [type-of val]]]]
-    [def symbol? [λ* [val]
-        "#t if VAL is a symbol"
-        [eq? :symbol [type-of val]]]]
-    [def object? [λ* [val]
-        "#t if VAL is an object"
-        [eq? :object [type-of val]]]]
-    [def macro? [λ* [val]
-        "#t if VAL is an object"
-        [eq? :macro [type-of val]]]]
-    [def lambda? [λ* [val]
-        "#t if VAL is a lambda"
-        [or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]]]
-    [def native? [λ* [val]
-        "#t if VAL is a native function"
-        [eq? :native-function [type-of val]]]]
-    [def procedure? [λ* [val]
-        "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val]]]]][do [def quasiquote-real [δ [l depth] [if [pair? l]
-       [do [def lcar [car l]]
-          [if l
-             [cond [[pair? lcar] [if [eq? [car lcar] 'unquote-splicing]
-                      [if [zero? depth]
-                         [do [def result [eval* [cadr lcar]]]
-                            [if [pair? result]
-                               [append result [quasiquote-real [cdr l] depth]]
-                               [throw [list :unquote-splicing-wrong-type "unquote splicing operations must return a list, not a single value" result]]]]
-                         [cons [quasiquote-real lcar depth] [quasiquote-real [cdr l] depth]]]
-                      [cons [quasiquote-real lcar depth] [quasiquote-real [cdr l] depth]]]]
-                   [[eq? lcar 'unquote] [if [zero? depth]
-                      [eval* [cadr l]]
-                      [cons lcar [quasiquote-real [cdr l] [- depth 1]]]]]
-                   [[eq? lcar 'quasiquote] [cons lcar [quasiquote-real [cdr l] [+ 1 depth]]]]
-                   [#t [cons lcar [quasiquote-real [cdr l] depth]]]]
-             #nil]]
-       l]]]
-    [def quasiquote [δ [@list] "Quasiquote" [quasiquote-real @list 0]]]
-    [def unquote [λ* [expr]
-        ""
-        [throw [list :unquote-without-quasiquote "unquote should only occure inside a quasiquote, never evaluated directly"]]]]
-    [def unquote-splicing [λ* [expr]
-        ""
-        [throw [list :unquote-splicing-without-quasi "unquote-splicing should only occure inside a quasiquote, never evaluated directly"]]]]][do [def random #nil]
+           [+ [fib [- i 2]] [fib [- i 1]]]]]]][do [def random #nil]
     [def random/rng! #nil]
     [def random/seed #nil]
     [def random/seed! #nil]
@@ -517,8 +532,19 @@
         [if [or [nil? num] [<= [int num] 1]]
            "\n"
            ["\n" [br [-- num]]]]]]
+    [def path/ext?! [λ* [ext]
+        "Return a predicate that checks if a path ends on EXT"
+        [λ* [path]
+            ""
+            [eq? ext [lowercase [path/extension path]]]]]]
+    [def path/extension [λ* [path]
+        "Return the extension of PATH"
+        [do [def last-period [last-index-of path "."]]
+           [if [>= last-period 0]
+              [substr path [+ 1 last-period] [str/length path]]
+              path]]]]
     [def path/without-extension [λ* [path]
-        "Return PATH, but without the fileextension part"
+        "Return PATH, but without the extension part"
         [do [def last-period [last-index-of path "."]]
            [if [>= last-period 0]
               [substr path 0 last-period]
@@ -1215,6 +1241,20 @@
     [test-add #f [macro? min]]
     [test-add #f [macro? 123]]
     [test-add 4 [let* [defun double [α] [* α 2]] [double 2]]]
+    [test-add #t [in-range? 3 1 5]]
+    [test-add #f [in-range? -3 1 5]]
+    [test-add #f [in-range? 9 1 5]]
+    [test-add #t [in-range? -3 -10 5]]
+    [test-add #t [in-range? -3 -10.0 5]]
+    [test-add #t [in-range? -3 -10.0 5.0]]
+    [test-add #t [in-range? -3.0 -10.0 5.0]]
+    [test-add 6 [let* [def sum 0] [for-each [λ [a]
+       [set! sum [+ sum a]]] '[1 2 3]] sum]]
+    [test-add "\"nuj\"" [path/extension "test.nuj"]]
+    [test-add "\"nuj\"" [path/extension "Another/test.nuj"]]
+    [test-add "\"NUJ\"" [uppercase [path/extension "Another/test.nuj"]]]
+    [test-add "\"no\"" [path/extension "asd/test.nuj.no"]]
+    [test-add "\"asd/test.nuj\"" [path/without-extension "asd/test.nuj.no"]]
     ][do [def time/seconds [λ* [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]]]
@@ -1224,13 +1264,13 @@
     [def time/hours [λ* [timestamp]
         "Return the hours part of TIMESTAMP, defaults to current time"
         [% [/ [default timestamp [time]] 3600] 24]]]
-    [def profile [λ* [@...body]
+    [def profile-form [λ* [raw]
         ""
-        [do [def form [cons 'do @...body]]
-           [def start-time [time/milliseconds]]
-           [def val [eval form]]
+        [do [def start-time [time/milliseconds]]
+           [def val [eval raw]]
            [def end-time [time/milliseconds]]
-           [display [cat "Evaluating " [str/write form] " to " [str/write val] " took " [- end-time start-time] " milliseconds."]]]]]][do [def compile [let* [do [def compile-do-args [λ* [args]
+           [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
+    [def profile [μ [...body] [quasiquote [profile-form '[unquote [cons 'do ...body]]]]]]][do [def compile [let* [do [def compile-do-args [λ* [args]
            ""
            [if [nil? [cdr args]]
               [cons [compile [car args]] #nil]
@@ -1281,9 +1321,7 @@
                     [[eq? [car source] 'λ] [compile-fun source]]
                     [[macro? op] [compile-macro op source]]
                     [#t source]]]]]]]]
-    [def λδ [λ* [@...λδ]
-        "Define a λ with the self-hosting Nujel compiler"
-        [eval* [compile [cons 'λ @...λδ]]]]]
+    [def \ [μ [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body]]]]
     [def eval [λ* [expr]
         "Compile, Evaluate and then return the result of EXPR"
         [eval* [compile expr]]]]

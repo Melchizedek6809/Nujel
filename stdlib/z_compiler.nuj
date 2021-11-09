@@ -100,3 +100,8 @@
 [def defmacro [μ [name args ...body]
 	      `[def ,name ,[compile `[μ ,args ,@...body]]]
 ]]
+
+
+[defun test [a] [+2 a]]
+
+[defmacro +2 [v] `[+ 2 ,v]]

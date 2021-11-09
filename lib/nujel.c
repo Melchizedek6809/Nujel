@@ -73,10 +73,10 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 }
 
 /* Run fun with args, evaluating args if necessary  */
-lVal *lApply(lClosure *c, lVal *args, lVal *fun){
+lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
-		lExceptionThrow(":runtime-macro", "Can't use macros as functions");
+		lExceptionThrowVal(":runtime-macro", "Can't use macros as functions", funSym);
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
@@ -89,13 +89,13 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	case ltInt:
 	case ltFloat:
 	case ltVec:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvInfix);
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvInfix, NULL);
 	case ltArray:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvArrRef);
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvArrRef, NULL);
 	case ltString:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvCat);
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvCat, NULL);
 	case ltTree:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvTreeGet);
+		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvTreeGet, NULL);
 	default:
 		lExceptionThrowVal(":type-error", "Can't apply to following val", fun);
 		return NULL;
@@ -129,17 +129,17 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltInt:
 		case ltFloat:
 		case ltVec:
-			return lApply(c,v,lnfvInfix);
+			return lApply(c,v,lnfvInfix, NULL);
 		case ltArray:
-			return lApply(c,v,lnfvArrRef);
+			return lApply(c,v,lnfvArrRef, NULL);
 		case ltString:
-			return lApply(c,v,lnfvCat);
+			return lApply(c,v,lnfvCat, NULL);
 		case ltTree:
-			return lApply(c,v,lnfvTreeGet);
+			return lApply(c,v,lnfvTreeGet, NULL);
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				return lApply(c,lCdr(v),resolved);
+				return lApply(c,lCdr(v),resolved, car);
 			}else{
 				if(car->vSymbol && lSymKeyword(car->vSymbol)){
 					return v;
@@ -148,7 +148,7 @@ lVal *lEval(lClosure *c, lVal *v){
 				return NULL;
 			}}
 		case ltPair:
-			return lApply(c,lCdr(v),lRootsValPush(lEval(c,car)));
+			return lApply(c,lCdr(v),lRootsValPush(lEval(c,car)),car);
 		}}
 	}
 }
@@ -233,7 +233,7 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 		lVal *args = lRootsValPush(exceptionValue);
 		args = lRootsValPush(lCons(args,NULL));
 
-		doRet = lApply(c,args,catch);
+		doRet = lApply(c,args,catch, NULL);
 
 		return doRet;
 	}else{

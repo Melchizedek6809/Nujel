@@ -16,10 +16,11 @@ static lVal *lnfEvalRaw(lClosure *c, lVal *v){
 static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
 	if(fun == NULL){return NULL;}
+	lVal *resolved = fun;
 	if(fun->type == ltSymbol){
-		fun = lResolveSym(c,fun);
+		resolved = lResolveSym(c,fun);
 	}
-	return lApply(c,lCadr(v),fun);
+	return lApply(c,lCadr(v),resolved, fun);
 }
 
 /* Handler for [apply fn list] */
