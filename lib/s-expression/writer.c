@@ -117,6 +117,24 @@ char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool displ
 	return cur;
 }
 
+// char *lSIndent(char *buf, char *bufEnd, int indentLevel)
+
+char *lSWriteTreeDef(lTree *v, char *buf, char *bufEnd, int indentLevel){
+	if(v == NULL){return buf;}
+	buf = lSWriteTreeDef(v->left, buf, bufEnd, indentLevel);
+
+	int t = snprintf(buf,bufEnd-buf,"[def %s ",v->key->c);
+	if(t > 0){buf += t;}
+	buf = lSWriteVal(v->value, buf, bufEnd, indentLevel, 0);
+	t = snprintf(buf,bufEnd-buf,"]\n");
+	if(t > 0){buf += t;}
+	if(v->right){
+		buf = lSIndent(buf, bufEnd, indentLevel);
+	}
+
+	return lSWriteTreeDef(v->right, buf, bufEnd, indentLevel);
+}
+
 char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display){
 	*buf = 0;
 	if(v == NULL){
@@ -139,22 +157,9 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		}
 		break;
 	case ltObject: {
-		t = snprintf(cur,bufEnd-cur,"[ω\n");
+		t = snprintf(cur,bufEnd-cur,"[ω ");
 		if(t > 0){cur += t;}
-		lVal *cloData = lTreeToList(v->vClosure->data);
-		indentLevel += 3;
-		forEach(n,cloData){
-			for(int i=indentLevel;i>=0;i--){*cur++=' ';}
-			t = snprintf(cur,bufEnd-cur,"[def ");
-			if(t > 0){cur += t;}
-			cur = lSWriteVal(lCaar(n),cur,bufEnd,indentLevel,0);
-			t = snprintf(cur,bufEnd-cur," ");
-			if(t > 0){cur += t;}
-			cur = lSWriteVal(lCadar(n),cur,bufEnd,indentLevel,0);
-			t = snprintf(cur,bufEnd-cur,"]\n");
-			if(t > 0){cur += t;}
-		}
-		indentLevel -= 3;
+		cur = lSWriteTreeDef(v->vClosure->data, cur, bufEnd, indentLevel);
 		t = snprintf(cur,bufEnd-cur,"]");
 		break; }
 	case ltMacro:
