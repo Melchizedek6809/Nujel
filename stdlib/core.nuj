@@ -50,15 +50,15 @@
 
 [defun mem [] "Return some pretty printed memory usage information"
         [let* [def info [memory-info]]
-              [cat
-                [ansi-white  "Memory Info"] "\n"
-                [ansi-green  "Values:   "] [getf info :value] "\n"
-                [ansi-blue   "Closures: "] [getf info :closure] "\n"
-                [ansi-red    "Arrays:   "] [getf info :array] "\n"
-                [ansi-yellow "STrings:  "] [getf info :string] "\n"
-                [ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
-                [ansi-purple "Vectors:  "] [getf info :vector] "\n"
-                [ansi-pink   "Symbols:  "] [getf info :symbol] "\n" [ansi-reset]
+              [cat [ansi-white  "Memory Info"] "\n"
+                   [ansi-green  "Values:   "] [getf info :value]   "\n"
+                   [ansi-blue   "Closures: "] [getf info :closure] "\n"
+                   [ansi-red    "Arrays:   "] [getf info :array]   "\n"
+                   [ansi-yellow "STrings:  "] [getf info :string]  "\n"
+                   [ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
+                   [ansi-purple "Vectors:  "] [getf info :vector] "\n"
+                   [ansi-pink   "Symbols:  "] [getf info :symbol] "\n"
+                   ansi-reset
               ]
         ]
 ]

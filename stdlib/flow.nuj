@@ -1,0 +1,3 @@
+[def when-not [μ [p ...body]
+                 `[if ,p #nil [do ,...body]]
+]]

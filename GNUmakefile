@@ -141,7 +141,8 @@ tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOT)
 	@$(NUJEL_BOOT) tools/bootstrap.nuj
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
-	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" $@
+	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
+	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
 
 tmp/binlib.no: tmp/stdlib.no
 	@true
