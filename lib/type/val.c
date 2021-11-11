@@ -73,3 +73,10 @@ lVal *lValTree(lTree *v){
 	ret->vTree = v;
 	return ret;
 }
+
+lVal *lValObject(lClosure *v){
+	lVal *ret = lValAlloc();
+	ret->type = ltObject;
+	ret->vClosure = v;
+	return ret;
+}

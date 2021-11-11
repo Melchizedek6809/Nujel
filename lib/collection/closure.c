@@ -23,19 +23,6 @@ lClosure *lClosureNew(lClosure *parent){
 	return c;
 }
 
-lVal *lSearchClosureSym(lClosure *c, lVal *ret, const char *str, uint len){
-	(void)str;(void)len;
-	if(c == NULL){return ret;}
-	return NULL;/*
-	forEach(n, c->data){
-		lVal *e = lCaar(n);
-		if((e == NULL) || (e->type != ltSymbol)){continue;}
-		if(strncmp(e->vSymbol->c,str,len)){continue;}
-		ret = lCons(e,ret);
-	}
-	return lSearchClosureSym(c->parent,ret,str,len);*/
-}
-
 lVal *lResolve(lClosure *c, lVal *v){
 	v = lCar(v);
 	for(int i=0;i<16;i++){

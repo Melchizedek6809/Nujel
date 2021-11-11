@@ -50,18 +50,14 @@ lNFunc *lNFuncAlloc(){
 }
 
 static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
-	lVal *v = lValAlloc();
-	if(v == NULL){return NULL;}
-	v->type    = ltNativeFunc;
-	lNFunc *fn = lNFuncAlloc();
-	if(fn == NULL){
-		return NULL;
-	}else{
-		fn->fp     = func;
-		fn->doc    = lCons(args,docString);
-		v->vNFunc  = fn;
-		return v;
-	}
+	lVal *v = lRootsValPush(lValAlloc());
+	v->type   = ltNativeFunc;
+	v->vNFunc = lNFuncAlloc();
+
+	v->vNFunc->fp   = func;
+	v->vNFunc->doc  = docString;
+	v->vNFunc->args = args;
+	return v;
 }
 
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){

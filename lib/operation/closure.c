@@ -62,68 +62,28 @@ static lVal *lnfSymCount(lClosure *c, lVal *v){
 	return lValInt(lSymCount(c,0));
 }
 
-static lVal *lCl(lClosure *c, int stepsLeft){
-	if(c == NULL){return NULL;}
-	if(stepsLeft > 0){
-		return lCl(c->parent,stepsLeft-1);
-	}
-	return c->data != NULL ? lValTree(c->data) : lCons(NULL,NULL);
-}
-
-static lVal *lnfCl(lClosure *c, lVal *v){
-	return lCl(c,castToInt(lCar(v),0));
-}
-
-static lVal *lnfClText(lClosure *c, lVal *v){
+static lVal *lnfClosure(lClosure *c, lVal *v){
 	(void)c;
-	lVal *t = lCar(v);
-	if(t == NULL){return NULL;}
-	if(t->type == ltLambda){
-		return t->vClosure->text;
-	}else if(t->type == ltNativeFunc){
-		return lCons(lCdr(t->vNFunc->doc),NULL);
+	lVal *car = lCar(v);
+	if(car == NULL){return NULL;}
+	if((car->type == ltSpecialForm) || (car->type == ltNativeFunc)){
+		lNFunc *nf = car->vNFunc;
+		lVal *ret = lRootsValPush(lValTree(NULL));
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),nf->doc);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),nf->args);
+		return ret;
+	}else if((car->type == ltLambda) || (car->type == ltDynamic) || (car->type == ltObject) || (car->type == ltMacro)){
+		lClosure *clo = car->vClosure;
+		lVal *ret = lRootsValPush(lValTree(NULL));
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),clo->doc);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),clo->args);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":data"), lRootsValPush(lValTree(clo->data)));
+		return ret;
 	}
-	return NULL;
-}
-
-static lVal *lnfClDoc(lClosure *c, lVal *v){
-	(void)c;
-	lVal *t = lCar(v);
-	if(t == NULL){return NULL;}
-	if(t->type == ltLambda){
-		return t->vClosure->doc;
-	}else if((t->type == ltNativeFunc) || (t->type == ltSpecialForm)){
-		return t->vNFunc->doc;
-	}
-	return NULL;
-}
-
-static lVal *lnfClData(lClosure *c, lVal *v){
-	(void)c;
-	lVal *t = lCar(v);
-	if(t == NULL){return NULL;}
-	if(t->type == ltLambda){
-		return lValTree(t->vClosure->data);
-	}else if(t->type == ltNativeFunc){
-		return lCar(t->vNFunc->doc);
-	}
-	return NULL;
-}
-
-static lVal *lClLambda(lClosure *c, int stepsLeft){
-	if(c == NULL){return NULL;}
-	if(stepsLeft > 0){
-		return lClLambda(c->parent,stepsLeft-1);
-	}
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
-	ret->type = ltLambda;
-	ret->vClosure = c;
-	return ret;
-}
-
-static lVal *lnfClLambda(lClosure *c, lVal *v){
-	return lClLambda(c,castToInt(lCar(v),0));
+	return false;
 }
 
 static lVal *lnfLet(lClosure *c, lVal *v){
@@ -177,6 +137,10 @@ static lVal *lnfResolve(lClosure *c, lVal *v){
 	return lResolve(c,v);
 }
 
+static lVal *lnfResolvesPred(lClosure *c, lVal *v){
+	const lSymbol *sym = castToSymbol(lCar(v),NULL);
+	return lValBool(sym ? lHasClosureSym(c,sym,NULL) : false);
+}
 
 /* Handler for [λ [...args] ...body] */
 static lVal *lnfLambda(lClosure *c, lVal *v){
@@ -188,7 +152,7 @@ static lVal *lnfLambda(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCons(car,lCar(cdr));
+	ret->vClosure->doc  = lCar(cdr);
 	ret->vClosure->text = lCons(NULL,NULL);
 	ret->vClosure->text->vList.car = lnfvDo;
 	ret->vClosure->text->vList.cdr = cdr;
@@ -202,7 +166,7 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCons(lCar(v),lCadr(v));
+	ret->vClosure->doc  = lCadr(v);
 	ret->vClosure->text = lCaddr(v);
 	ret->vClosure->args = lCar(v);
 
@@ -243,15 +207,23 @@ static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
 	return ret;
 }
 
+static lVal *lnfSymbolSearch(lClosure *c, lVal *v){
+	(void)c;
+	const lVal *car = lCar(v);
+	if((car == NULL) || (car->type != ltString)){return NULL;}
+	const int len = castToInt(lCadr(v), car->vString->bufEnd - car->vString->data);
+	return lSymbolSearch(car->vString->data, len);
+}
+
 void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lnfResolve);
-	lAddNativeFunc(c,"cl",             "[i]",           "Return closure",                             lnfCl);
-	lAddNativeFunc(c,"cl-lambda",      "[i]",           "Return closure as a lambda",                 lnfClLambda);
-	lAddNativeFunc(c,"cl-text",        "[f]",           "Return closures text segment",               lnfClText);
-	lAddNativeFunc(c,"cl-doc",         "[f]",           "Return documentation pair for F",            lnfClDoc);
-	lAddNativeFunc(c,"cl-data",        "[f]",           "Return closures data segment",               lnfClData);
+	lAddNativeFunc(c,"resolves?",      "[sym]",         "Check if SYM resolves to a value",           lnfResolvesPred);
+
+	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
+
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"current-closure","[n]",           "Return the current closure as an object",    lnfCurrentClosure);
+	lAddNativeFunc(c,"symbol-search",  "[str len]",     "Return a list of all symbols starting with STR",lnfSymbolSearch);
 	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymbolTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 

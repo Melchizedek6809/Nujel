@@ -10,19 +10,19 @@
 ]
 
 [def describe [let*
-        [def describe-fun [λ [fun]
-                [def doc [cl-doc fun]]
-                [cat [str/write [car doc]] " - " [cdr doc]]
+        [def describe-thing [λ [o]
+                [def doc [closure o]]
+                [cat [str/write [doc :arguments]] " - " [doc :documentation]]
         ]]
 
         [def describe-string [λ [a]
-                [describe-fun [resolve [str->sym a]]]
+                [describe-thing [resolve [str->sym a]]]
         ]]
 
         [λ [fun] "Describe FUN, if there is documentation available"
            [if [string? fun]
                [describe-string fun]
-               [describe-fun fun]]
+               [describe-thing fun]]
         ]
 ]]
 

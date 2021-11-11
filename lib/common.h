@@ -148,6 +148,7 @@ struct lNFunc {
 		lNFunc *nextFree;
 	};
 	lVal *doc;
+	lVal *args;
 };
 
 struct lSymbol {

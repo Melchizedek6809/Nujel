@@ -229,6 +229,12 @@ lTree *castToTree(const lVal *v, lTree *fallback){
 	return v->vTree;
 }
 
+/* Return the tree in V if possible, otherwise fallback. */
+const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback){
+	if((v == NULL) || (v->type != ltSymbol)){return fallback;}
+	return v->vSymbol;
+}
+
 /* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a,const lType b){
 	if((a == ltInf)   || (b == ltInf))  {return ltInf;}

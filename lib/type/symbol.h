@@ -23,3 +23,5 @@ int       lSymEq       (const lSymbol *a,const lSymbol *b);
 bool      lSymVariadic (const lSymbol *s);
 bool      lSymNoEval   (const lSymbol *s);
 bool      lSymKeyword  (const lSymbol *s);
+
+lVal     *lSymbolSearch(const char *s, uint len);

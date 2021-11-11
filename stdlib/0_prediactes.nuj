@@ -126,6 +126,11 @@
         [eq? :object [type-of val]]
 ]
 
+[defun tree? [val]
+        "#t if VAL is an object"
+        [eq? :tree [type-of val]]
+]
+
 [defun macro? [val]
         "#t if VAL is an object"
         [eq? :macro [type-of val]]

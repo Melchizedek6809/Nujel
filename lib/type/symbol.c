@@ -18,7 +18,7 @@ uint    lSymbolActive = 0;
 uint    lSymbolMax    = 0;
 
 lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
-lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro;
+lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTInfinity, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree;
 
 void lSymbolInit(){
 	lSymbolActive   = 0;
@@ -59,6 +59,7 @@ void lSymbolInit(){
 	lSymLTArray          = lSymS(":array");
 	lSymLTGUIWidget      = lSymS(":gui-widget");
 	lSymLTMacro          = lSymS(":macro");
+	lSymLTTree           = lSymS(":tree");
 }
 
 lSymbol *lSymSL(const char *str, uint len){
@@ -146,5 +147,22 @@ lSymbol *getTypeSymbol(const lVal* v){
 	case ltArray:      return lSymLTArray;
 	case ltGUIWidget:  return lSymLTGUIWidget;
 	case ltMacro:      return lSymLTMacro;
+	case ltTree:       return lSymLTTree;
 	}
+}
+
+lVal *lSymbolSearch(const char *str, uint len){
+	lVal *ret,*l;
+	ret = l = NULL;
+	if(str == NULL){return NULL;}
+	for(uint i=0;i<lSymbolMax;i++){
+		if(strncmp(lSymbolList[i].c,str,len)){continue;}
+		if(l == NULL){
+			ret = l = lRootsValPush(lCons(NULL,NULL));
+		}else{
+			l = l->vList.cdr = lCons(NULL,NULL);
+		}
+		l->vList.car = lValSymS(&lSymbolList[i]);
+	}
+	return ret;
 }
