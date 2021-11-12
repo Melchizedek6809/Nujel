@@ -15,6 +15,7 @@ jmp_buf exceptionTarget;
 lVal *exceptionValue;
 int exceptionTargetDepth = 0;
 
+/* Cause an exception, passing V directly to the closest exception handler */
 __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 	if(exceptionTargetDepth <= 0){
 		lPrintError("Exception without a handler!!! Exiting!\n");
@@ -26,6 +27,7 @@ __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 	while(1);
 }
 
+/* Cause an exception, passing a list of SYMBOL and ERROR to the exception handler */
 __attribute__((noreturn)) void lExceptionThrow(const char *symbol, const char *error){
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	lVal *c = l;
@@ -38,6 +40,7 @@ __attribute__((noreturn)) void lExceptionThrow(const char *symbol, const char *e
 	lExceptionThrowRaw(l);
 }
 
+/* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 __attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	lVal *c = l;
@@ -53,6 +56,7 @@ __attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char
 	lExceptionThrowRaw(l);
 }
 
+/* Execute BODY(A,B) with a fallback exception handler set that writes everything to stdout before exiting. */
 void *lExceptionTry(void *(*body)(void *,void *), void *a, void *b){
 	jmp_buf oldExceptionTarget;
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));

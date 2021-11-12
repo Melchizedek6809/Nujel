@@ -17,26 +17,14 @@
 
 lVal *lnfvArrRef;
 
-lVal *lnfArrLength(lClosure *c, lVal *v){
+static lVal *lnfArrLength(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){return lValInt(0);}
 	return lValInt(arr->vArray->length);
 }
 
-lVal *lnfArrRef(lClosure *c, lVal *v){
-	(void)c;
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){return NULL;}
-	lVal *t = lCadr(v);
-	if(t == NULL){return arr;}
-	if((t->type != ltInt) && (t->type != ltFloat)){return NULL;}
-	const int key = castToInt(t,-1);
-	if((key < 0) || (key >= arr->vArray->length)){return NULL;}
-	return arr->vArray->data[key];
-}
-
-lVal *lnfArrSet(lClosure *c, lVal *v){
+static lVal *lnfArrSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray) || (v == NULL)){return NULL;}
@@ -55,7 +43,7 @@ lVal *lnfArrSet(lClosure *c, lVal *v){
 	return arr->vArray->data[key];
 }
 
-lVal *lnfArrNew(lClosure *c, lVal *v){
+static lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	const int len = castToInt(lCar(v),-1);
 	if(len < 0){return NULL;}
@@ -71,7 +59,7 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	return r;
 }
 
-lVal *lnfArr(lClosure *c, lVal *v){
+static lVal *lnfArr(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	int length = lListLength(v);
@@ -89,6 +77,18 @@ lVal *lnfArr(lClosure *c, lVal *v){
 		r->vArray->data[key++] = lCar(cur);
 	}
 	return r;
+}
+
+lVal *lnfArrRef(lClosure *c, lVal *v){
+	(void)c;
+	lVal *arr = lCar(v);
+	if((arr == NULL) || (arr->type != ltArray)){return NULL;}
+	lVal *t = lCadr(v);
+	if(t == NULL){return arr;}
+	if((t->type != ltInt) && (t->type != ltFloat)){return NULL;}
+	const int key = castToInt(t,-1);
+	if((key < 0) || (key >= arr->vArray->length)){return NULL;}
+	return arr->vArray->data[key];
 }
 
 void lOperationsArray(lClosure *c){

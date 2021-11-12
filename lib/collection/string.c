@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Create a new string containing a copy of STR[0] - STR[LEN] */
 lString *lStringNew(const char *str, uint len){
 	if(str == NULL){return 0;}
 	lString *s = lStringAlloc();
@@ -38,6 +39,8 @@ lString *lStringNew(const char *str, uint len){
 	return s;
 }
 
+/* Create a new string containing a direct reference to STR, STR will be
+ * freed by the GC if it ever goes out of scope */
 lString *lStringNewNoCopy(const char *str, uint len){
 	if(str == NULL){return 0;}
 	lString *s = lStringAlloc();
@@ -47,6 +50,7 @@ lString *lStringNewNoCopy(const char *str, uint len){
 	return s;
 }
 
+/* Return a duplicate of OS */
 lString *lStringDup(lString *os){
 	uint len = os->bufEnd - os->buf;
 	const char *str = os->data;
@@ -61,10 +65,12 @@ lString *lStringDup(lString *os){
 	return s;
 }
 
+/* Return the length of the String S */
 int lStringLength(const lString *s){
 	return s->bufEnd - s->buf;
 }
 
+/* Create a new string value out of S */
 lVal *lValString(const char *c){
 	if(c == NULL){return NULL;}
 	lVal *t = lRootsValPush(lValAlloc());
@@ -73,6 +79,8 @@ lVal *lValString(const char *c){
 	return t->vString == NULL ? NULL : t;
 }
 
+/* Create a new string value out of S, using C directly, which will be
+ * freed once the value leaves scope  */
 lVal *lValStringNoCopy(const char *c,int len){
 	if(c == NULL){return NULL;}
 	lVal *t = lRootsValPush(lValAlloc());
@@ -81,6 +89,8 @@ lVal *lValStringNoCopy(const char *c,int len){
 	return t;
 }
 
+/* Return a string value, containing a mark from ERR to ERREND,
+ * which has to be within BUF and BUFSTART */
 lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd){
 	char buf[512];
 	const char *lineStart, *lineEnd;

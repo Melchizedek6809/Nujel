@@ -134,7 +134,8 @@ static lVal *lnfClSelf(lClosure *c, lVal *v){
 }
 
 static lVal *lnfResolve(lClosure *c, lVal *v){
-	return lResolve(c,v);
+	const lSymbol *sym = castToSymbol(lCar(v),NULL);
+	return sym ? lGetClosureSym(c,sym) : NULL;
 }
 
 static lVal *lnfResolvesPred(lClosure *c, lVal *v){

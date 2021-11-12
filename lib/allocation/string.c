@@ -27,11 +27,13 @@ uint     lStringActive = 0;
 uint     lStringMax    = 0;
 lString *lStringFFree  = NULL;
 
+/* Initialize the string allocator */
 void lStringInit(){
 	lStringActive = 0;
 	lStringMax    = 0;
 }
 
+/* Return a newly allocated, empty string */
 lString *lStringAlloc(){
 	lString *ret;
 	if(lStringFFree == NULL){
@@ -56,6 +58,7 @@ lString *lStringAlloc(){
 	return ret;
 }
 
+/* Free the lString S, should never be called directly outside the GC */
 void lStringFree(lString *s){
 	if(s == NULL){return;}
 	lStringActive--;

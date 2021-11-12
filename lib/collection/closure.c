@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <string.h>
 
+/* Return a new closure, setting the parent field */
 lClosure *lClosureNew(lClosure *parent){
 	lClosure *c = lClosureAlloc();
 	if(c == NULL){return NULL;}
@@ -23,23 +24,7 @@ lClosure *lClosureNew(lClosure *parent){
 	return c;
 }
 
-lVal *lResolve(lClosure *c, lVal *v){
-	v = lCar(v);
-	for(int i=0;i<16;i++){
-		if((v == NULL) || (v->type != ltSymbol)){break;}
-		v = lResolveSym(c,v);
-	}
-	return v;
-}
-
-lVal *lResolveSym(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltSymbol)){return NULL;}
-	const lSymbol *sym = v->vSymbol;
-	if(lSymKeyword(sym)){return v;}
-	lVal *ret = lGetClosureSym(c,sym);
-	return ret == NULL ? NULL : ret;
-}
-
+/* Define the NFunc LNF in C with all the space separated symbols in SYM */
 lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	const char *cur = sym;
 
@@ -61,13 +46,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	return NULL;
 }
 
-lVal *lGetClosureSym(lClosure *c,const lSymbol *s){
-	if((c == NULL) || (s == NULL)){return NULL;}
-	bool found = false;
-	lVal *t = lTreeGet(c->data,s,&found);
-	return found ? t : lGetClosureSym(c->parent,s);
-}
-
+/* Return TRUE if C contains a binding for S, storing the value in V */
 bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
 	if((c == NULL) || (s == NULL)){return NULL;}
 	bool found = false;
@@ -78,17 +57,24 @@ bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
 	return found ? true : lHasClosureSym(c->parent,s,v);
 }
 
-void lDefineClosureSym(lClosure *c,const lSymbol *s, lVal *v){
+/* Return the value bound to S in C */
+lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
+	lVal *ret;
+	return lHasClosureSym(c,s,&ret) ? ret : NULL;
+}
+
+/* Bind the value V to the Symbol S in the closure C, defining it if necessary */
+void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	c->data = lTreeInsert(c->data,s,v);
 }
 
-void lSetClosureSym(lClosure *c,const lSymbol *s, lVal *v){
+/* Set the value bound to S in C to V, if it has already been bounbd */
+void lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	if(c == NULL){return;}
 	bool found = false;
 	lTreeSet(c->data,s,v,&found);
-	if(!found){
-		lSetClosureSym(c->parent,s,v);
-	}
+	if(found){return;}
+	lSetClosureSym(c->parent,s,v);
 }
 
 void lDefineVal(lClosure *c, const char *str, lVal *val){

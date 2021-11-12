@@ -18,7 +18,7 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 	if(fun == NULL){return NULL;}
 	lVal *resolved = fun;
 	if(fun->type == ltSymbol){
-		resolved = lResolveSym(c,fun);
+		resolved = lGetClosureSym(c,fun->vSymbol);
 	}
 	return lApply(c,lCadr(v),resolved, fun);
 }
@@ -27,7 +27,7 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
 	if(fun == NULL){return NULL;}
-	if(fun->type == ltSymbol){ fun = lResolveSym(c,fun); }
+	if(fun->type == ltSymbol){ fun = lGetClosureSym(c,fun->vSymbol); }
 	if(fun->type != ltMacro){
 		lExceptionThrow(":not-a-macro","Trying to use macro-apply on anything but a macro is an error, please fix it");
 	}
@@ -36,7 +36,7 @@ static lVal *lnfMacroApply(lClosure *c, lVal *v){
 }
 
 void lOperationsEval(lClosure *c){
-	lAddNativeFunc(c,"apply", "[func list]", "Evaluate FUNC with LIST as arguments", lnfApply);
+	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
 	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
-	lAddNativeFunc(c,"eval*", "[expr]",      "Evaluate the already compiled EXPR",   lnfEvalRaw);
+	lAddNativeFunc(c,"eval*",       "[expr]",       "Evaluate the already compiled EXPR",    lnfEvalRaw);
 }

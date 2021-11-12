@@ -3,7 +3,6 @@
 #include "../type/val.h"
 
 lVal     *lCons       (lVal *car,lVal *cdr);
-lVal     *lLastCar    (lVal *v);
 int       lListLength (lVal *v);
 
 static inline lVal *lCar(lVal *v){

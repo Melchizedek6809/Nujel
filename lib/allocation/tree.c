@@ -17,11 +17,13 @@ uint     lTreeActive = 0;
 uint     lTreeMax    = 0;
 lTree   *lTreeFFree  = NULL;
 
+/* Initialize the tree allocator */
 void lTreeInit(){
 	lTreeActive = 0;
 	lTreeMax    = 0;
 }
 
+/* Return a freshly allocated tree */
 lTree *lTreeAlloc(){
 	lTree *ret;
 	if(lTreeFFree == NULL){
@@ -45,6 +47,7 @@ lTree *lTreeAlloc(){
 	return ret;
 }
 
+/* Free the Tree T, should never be called outside of the GC */
 void lTreeFree(lTree *t){
 	if(t == NULL){return;}
 	lTreeActive--;

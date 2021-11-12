@@ -16,11 +16,13 @@ uint     lArrayActive = 0;
 uint     lArrayMax    = 0;
 lArray  *lArrayFFree  = NULL;
 
+/* Initialize the array allocator */
 void lArrayInit(){
 	lArrayActive = 0;
 	lArrayMax    = 0;
 }
 
+/* Return a newly allocated lArray */
 lArray *lArrayAlloc(){
 	lArray *ret;
 	if(lArrayFFree == NULL){
@@ -44,6 +46,7 @@ lArray *lArrayAlloc(){
 	return ret;
 }
 
+/* Free the array V, should never be called outside of the GC! */
 void lArrayFree(lArray *v){
 	if(v == NULL){return;}
 	lArrayActive--;

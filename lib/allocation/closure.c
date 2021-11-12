@@ -20,11 +20,13 @@ uint      lClosureActive = 0;
 uint      lClosureMax    = 0;
 lClosure *lClosureFFree  = NULL;
 
+/* Initialize the closure allocator */
 void lClosureInit(){
 	lClosureActive  = 0;
 	lClosureMax     = 0;
 }
 
+/* Return a newly allocated lClosure */
 lClosure *lClosureAlloc(){
 	lClosure *ret;
 	if(lClosureFFree == NULL){
@@ -49,6 +51,7 @@ lClosure *lClosureAlloc(){
 	return ret;
 }
 
+/* Free the lClosure CLO, should never be called outside of the GC! */
 void lClosureFree(lClosure *clo){
 	if(clo == NULL){return;}
 	lClosureActive--;
@@ -56,6 +59,7 @@ void lClosureFree(lClosure *clo){
 	lClosureFFree = clo;
 }
 
+/* Return a unique INT for the lClosure N */
 int lClosureID(const lClosure *n){
 	return n - lClosureList;
 }

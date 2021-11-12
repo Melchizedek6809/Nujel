@@ -17,11 +17,13 @@ lVal    *lValFFree  = NULL;
 
 #include <stdlib.h>
 
+/* Initialize the val allocator */
 void lValInit(){
 	lValActive = 0;
 	lValMax    = 0;
 }
 
+/* Return a newly allocated value */
 lVal *lValAlloc(){
 	lVal *ret;
 	if(lValFFree == NULL){
@@ -46,7 +48,7 @@ lVal *lValAlloc(){
 	return ret;
 }
 
-void lGUIWidgetFree(lVal *v);
+/* Free the value V, should only be called by the GC */
 void lValFree(lVal *v){
 	if(v == NULL){return;}
 	lValActive--;

@@ -4,8 +4,6 @@
 lClosure *lClosureNew       (lClosure *parent);
 
 lVal     *lSearchClosureSym (lClosure *c, lVal *ret, const char *str, uint len);
-lVal     *lResolve          (lClosure *c, lVal *v);
-lVal     *lResolveSym       (lClosure *c, lVal *v);
 lVal     *lDefineAliased    (lClosure *c, lVal *lNF, const char *sym);
 
 lVal     *lSearchClosureSym (lClosure *c, lVal *v, const char *str, uint len);

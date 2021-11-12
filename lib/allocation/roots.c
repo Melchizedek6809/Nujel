@@ -30,6 +30,7 @@ rootEntry *rootStack = NULL;
 int rootSP  = 0;
 int rootMax = 0;
 
+/* Push a new pointer onto the root stack */
 static void lRootsPush(const lType t, void *ptr){
 	if(rootSP >= rootMax){
 		rootMax = MAX(rootMax * 2, 256);
@@ -42,21 +43,25 @@ static void lRootsPush(const lType t, void *ptr){
 	rootStack[rootSP++] = (rootEntry){t,{ptr}};
 }
 
+/* Push an lClosure onto the root stack, protecting it from being freed by the GC */
 lClosure *lRootsClosurePush(lClosure *c){
 	lRootsPush(ltLambda,c);
 	return c;
 }
 
+/* Push an lVal onto the root stack, protecting it from being freed by the GC */
 lVal *lRootsValPush(lVal *v){
 	lRootsPush(ltPair,v);
 	return v;
 }
 
+/* Push an lString onto the root stack, protecting it from being freed by the GC */
 lString *lRootsStringPush(lString *s){
 	lRootsPush(ltString,s);
 	return s;
 }
 
+/* Mark every single root and everything they point to */
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){

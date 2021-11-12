@@ -14,7 +14,8 @@ static lVal *lnfLogAndI(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){ t->vInt &= lCar(vv)->vInt; }
 	return t;
 }
-lVal *lnfLogAnd (lClosure *c, lVal *v){
+
+static lVal *lnfLogAnd (lClosure *c, lVal *v){
 	lCastIApply(lnfLogAndI,c,v);
 }
 
@@ -22,7 +23,8 @@ static lVal *lnfLogIorI(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){ t->vInt |= lCar(vv)->vInt; }
 	return t;
 }
-lVal *lnfLogIor (lClosure *c, lVal *v){
+
+static lVal *lnfLogIor (lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lCastIApply(lnfLogIorI,c,v);
 }
@@ -31,18 +33,19 @@ static lVal *lnfLogXorI(lVal *t, lVal *v){
 	forEach(vv,lCdr(v)){ t->vInt ^= lCar(vv)->vInt; }
 	return t;
 }
-lVal *lnfLogXor (lClosure *c, lVal *v){
+
+static lVal *lnfLogXor (lClosure *c, lVal *v){
 	lCastIApply(lnfLogXorI,c,v);
 }
 
-lVal *lnfLogNot (lClosure *c, lVal *v){
+static lVal *lnfLogNot (lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCastSpecific(c,v,ltInt);
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
 	return lValInt(~lCar(t)->vInt);
 }
 
-lVal *lnfAsh(lClosure *c, lVal *v){
+static lVal *lnfAsh(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltPair)){return lValInt(0);}
 	lVal *vals  = lCastSpecific(c,v,ltInt);
 	if(vals == NULL){return lValInt(0);}
