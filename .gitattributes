@@ -2,3 +2,7 @@
 *.h linguist-language=C
 *.s linguist-language=Assembly
 *.nuj linguist-language=Lisp
+
+vendor/ linguist-vendored
+tools/ linguist-vendored
+web/ linguist-vendored
