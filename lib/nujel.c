@@ -213,7 +213,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsVector(c);
 }
 
-/* Run BODYRAW and catch all exceptions in CATCHRAW */
+/* Evaluate BODYRAW IN C while using CATCHRAW as an exception handler */
 lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 	lVal *volatile catch = catchRaw;
 	lVal *volatile body  = bodyRaw;
@@ -247,7 +247,7 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 	}
 }
 
-/* Quote V, making it be return verbatim */
+/* Quote V, enabling it to be used verbatim, without being evaluated. */
 lVal *lQuote(lVal *v){
 	lVal *ret = lRootsValPush(lCons(NULL,NULL));
 	ret->vList.car = lValSymS(symQuote);
@@ -265,6 +265,7 @@ lClosure *lClosureNewRootNoStdLib(){
 	return c;
 }
 
+/* Create a new root closure with the default included stdlib */
 static void *lClosureNewRootReal(void *a, void *b){
 	(void)a; (void)b;
 	lClosure *c = lClosureNewRootNoStdLib();
@@ -274,7 +275,8 @@ static void *lClosureNewRootReal(void *a, void *b){
 	return c;
 }
 
-/* Create a new root closure with the default included stdlib */
+/* Create a new root closure with the default stdlib using the
+ * fallback exception handler */
 lClosure *lClosureNewRoot(){
 	return lExceptionTry(lClosureNewRootReal,NULL,NULL);
 }
