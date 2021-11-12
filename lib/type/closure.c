@@ -77,6 +77,7 @@ void lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	lSetClosureSym(c->parent,s,v);
 }
 
+/* Turn STR into a symbol, and bind VAL to it within C */
 void lDefineVal(lClosure *c, const char *str, lVal *val){
 	lDefineClosureSym(c,lSymS(str),val);
 }
