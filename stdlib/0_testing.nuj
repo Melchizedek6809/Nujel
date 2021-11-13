@@ -20,7 +20,7 @@
         [defun display-results []
                 "Prints the result Message"
                 [random/seed-initialize!]
-                [error [cat test-context
+                [error [cat test-context " [" OS " " ARCH "]"
                                 " ["
                                 [ansi-green success-count]
                                 " / "
