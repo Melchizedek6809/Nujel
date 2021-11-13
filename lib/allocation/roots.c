@@ -61,6 +61,7 @@ lString *lRootsStringPush(lString *s){
 	return s;
 }
 
+void (*rootsMarkerChain)() = NULL;
 /* Mark every single root and everything they point to */
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
@@ -78,4 +79,5 @@ void lRootsMark(){
 			break;
 		}
 	}
+	if(rootsMarkerChain){rootsMarkerChain();}
 }
