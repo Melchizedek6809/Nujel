@@ -176,9 +176,23 @@ static void lAddPlatformVars(lClosure *c){
 	#elif defined(__MINGW32__)
 	lDefineVal(c, "OS", lValString("Windows"));
 	#elif defined(__linux__)
-	lDefineVal(c, "OS", lValString("Linux"));
+		#if defined(__MUSL__)
+		lDefineVal(c, "OS", lValString("MUSL/Linux"));
+		#elif defined(__GLIBC__)
+		lDefineVal(c, "OS", lValString("GNU/Linux"));
+		#else
+		lDefineVal(c, "OS", lValString("?/Linux"));
+		#endif
+	#elif defined(__FreeBSD__)
+	lDefineVal(c, "OS", lValString("FreeBSD"));
+	#elif defined(__OpenBSD__)
+	lDefineVal(c, "OS", lValString("OpenBSD"));
+	#elif defined(__NetBSD__)
+	lDefineVal(c, "OS", lValString("NetBSD"));
+	#elif defined(__DragonFly__)
+	lDefineVal(c, "OS", lValString("DragonFlyBSD"));
 	#else
-	lDefineVal(c, "OS", lValString("*nix"));
+	lDefineVal(c, "OS", lValString("Unknown"));
 	#endif
 
 	#if defined(__arm__)
