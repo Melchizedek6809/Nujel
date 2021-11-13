@@ -11,43 +11,12 @@
 /* Handler for [memory-info] */
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	lVal *l = ret;
-
-	l->vList.car = lValSym(":value");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lValActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":closure");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lClosureActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":array");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lArrayActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":string");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lStringActive);
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-
-	l->vList.car = lValSym(":symbol");
-	l->vList.cdr = lCons(NULL,NULL);
-	l = l->vList.cdr;
-	l->vList.car = lValInt(lSymbolMax);
-
-	return ret;
+	return lList(10,
+		RVP(lValSym(":value")),  RVP(lValInt(lValActive)),
+		RVP(lValSym(":closure")),RVP(lValInt(lClosureActive)),
+		RVP(lValSym(":array")),  RVP(lValInt(lArrayActive)),
+		RVP(lValSym(":string")), RVP(lValInt(lStringActive)),
+		RVP(lValSym(":symbol")), RVP(lValInt(lSymbolMax)));
 }
 
 void lOperationsAllocation(lClosure *c){

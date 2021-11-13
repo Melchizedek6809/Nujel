@@ -1,4 +1,4 @@
-;; Some predicates that were simpler to do in nujel
+;; Some predica tes that were simpler to do in nujel
 
 [defun number? [a]
         "Return #t if a is a number"

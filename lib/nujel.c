@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 extern u8 stdlib_no_data[];
 
@@ -293,4 +294,21 @@ static void *lClosureNewRootReal(void *a, void *b){
  * fallback exception handler */
 lClosure *lClosureNewRoot(){
 	return lExceptionTry(lClosureNewRootReal,NULL,NULL);
+}
+
+lVal *lList(int length, ...){
+	lVal *ret = NULL, *l;
+	va_list varArgs;
+	va_start(varArgs,length);
+	for(;length;length--){
+		lVal *t = va_arg(varArgs, lVal *);
+		if(ret == NULL){
+			ret = l = lRootsValPush(lCons(NULL,NULL));
+		}else{
+			l = l->vList.cdr = lCons(NULL,NULL);
+		}
+		l->vList.car = t;
+	}
+	va_end(varArgs);
+	return ret;
 }

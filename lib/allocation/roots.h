@@ -11,3 +11,5 @@ extern int rootSP;
 
 static inline void lRootsRet(const int i){ rootSP = i; }
 static inline int lRootsGet(){ return rootSP; }
+
+#define RVP(c) lRootsValPush(c)
