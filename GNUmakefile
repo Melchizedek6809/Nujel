@@ -1,7 +1,3 @@
-ifneq (, $(shell which dash))
-	SHELL   := $(shell which dash)
-endif
-
 EMCC        := emcc
 EMAR        := emar
 EMMEM       := -s TOTAL_MEMORY=64MB -s ALLOW_MEMORY_GROWTH=1
