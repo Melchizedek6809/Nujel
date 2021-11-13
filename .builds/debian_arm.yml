@@ -1,6 +1,5 @@
 image: debian/sid
-environment:
-  arch: arm64
+arch: arm64
 packages:
   - build-essential
 sources:
