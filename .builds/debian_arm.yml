@@ -1,4 +1,8 @@
-image: archlinux
+image: debian/sid
+environment:
+  arch: arm64
+packages:
+  - build-essential
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
