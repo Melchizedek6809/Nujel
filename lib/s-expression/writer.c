@@ -6,10 +6,10 @@
 #include "writer.h"
 
 #include "../allocation/array.h"
-#include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"
+#include "../type/closure.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -286,9 +286,6 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		break;
 	case ltNativeFunc:
 		t = snprintf(buf,len,"#cfn_%u",lNFuncID(v->vNFunc));
-		break;
-	case ltInf:
-		t = snprintf(buf,len,"#inf");
 		break;
 	case ltGUIWidget:
 		t = snprintf(buf,len,"#gui_%p",v->vPointer);

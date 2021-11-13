@@ -96,11 +96,6 @@
         [eq? :bool [type-of val]]
 ]
 
-[defun inf? [val]
-        "#t if VAL is infinite"
-        [eq? :infinity [type-of val]]
-]
-
 [defun pair? [val]
         "#t if VAL is a pair"
         [eq? :pair [type-of val]]

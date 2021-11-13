@@ -181,9 +181,6 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		restart:
 		switch(t->type){
 		default: break;
-		case ltInf:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"#inf");
-			break;
 		case ltSymbol:
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vSymbol->c);
 			break;

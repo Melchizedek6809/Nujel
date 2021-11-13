@@ -1,4 +1,4 @@
-## Error Handling
+ ## Error Handling
 Nujel uses 2 different systems for error handling, depending on the
 broad category that the error belongs to:
 

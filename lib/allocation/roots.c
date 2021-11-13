@@ -8,10 +8,10 @@
  */
 #include "roots.h"
 #include "../type-system.h"
-#include "../type/val.h"
+#include "../allocation/garbage-collection.h"
 #include "../collection/string.h"
-#include "../collection/closure.h"
-#include "garbage-collection.h"
+#include "../type/closure.h"
+#include "../type/val.h"
 
 #include <stdio.h>
 #include <stdlib.h>

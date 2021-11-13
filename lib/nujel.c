@@ -213,6 +213,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsVector(c);
 }
 
+/* Run BODYRAW and catch all exceptions in CATCHRAW */
 lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 	lVal *volatile catch = catchRaw;
 	lVal *volatile body  = bodyRaw;
@@ -246,6 +247,7 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 	}
 }
 
+/* Quote V, making it be return verbatim */
 lVal *lQuote(lVal *v){
 	lVal *ret = lRootsValPush(lCons(NULL,NULL));
 	ret->vList.car = lValSymS(symQuote);

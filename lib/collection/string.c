@@ -5,7 +5,6 @@
  */
 #include "string.h"
 
-#include "closure.h"
 #include "list.h"
 #include "../display.h"
 #include "../nujel.h"
@@ -13,6 +12,7 @@
 #include "../allocation/garbage-collection.h"
 #include "../allocation/string.h"
 #include "../allocation/val.h"
+#include "../type/closure.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"

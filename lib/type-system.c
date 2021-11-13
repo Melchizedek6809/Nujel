@@ -12,10 +12,10 @@
 #include "api.h"
 #include "nujel.h"
 #include "allocation/val.h"
-#include "collection/closure.h"
 #include "collection/list.h"
 #include "collection/string.h"
 #include "misc/vec.h"
+#include "type/closure.h"
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
@@ -24,12 +24,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-/* [inf] - Return infinity */
-lVal *lnfInf(lClosure *c, lVal *v){
-	(void)c; (void)v;
-	return lValInf();
-}
 
 /* [int v] - Convert v into an integer number */
 lVal *lnfInt(lClosure *c, lVal *v){
@@ -111,11 +105,6 @@ lVal *lnfString(lClosure *c, lVal *t){
 
 	switch(t->type){
 	default: break;
-	case ltInf: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"#inf");
-		len += clen;
-		buf += clen;
-		break; }
 	case ltFloat: {
 		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%f",t->vFloat);
 		len += clen;
@@ -155,8 +144,6 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 		return lMap(c,v,lnfFloat);
 	case ltVec:
 		return lMap(c,v,lnfVec);
-	case ltInf:
-		return lMap(c,v,lnfInf);
 	case ltBool:
 		return lMap(c,v,lnfBool);
 	case ltNoAlloc:
@@ -237,7 +224,6 @@ const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback){
 
 /* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a,const lType b){
-	if((a == ltInf)   || (b == ltInf))  {return ltInf;}
 	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
 	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
 	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
@@ -271,23 +257,6 @@ lVal *lCastAuto(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* Cast v to a value of type */
-lVal *lCastSpecific(lClosure *c, lVal *v, const lType type){
-	return lCast(c,v,type);
-}
-
-/* Determine the numeric type with the highest precedence in list v */
-lVal *lCastNumeric(lClosure *c, lVal *v){
-	bool castNeeded = false;
-	lType type = lTypecastList(v, &castNeeded);
-	if(type == ltString){
-		type = ltFloat;
-		castNeeded = true;
-	}
-	lVal *ret = castNeeded ? lCast(c,v,type) : v;
-	return ret;
-}
-
 /* [type-of v] - Return a symbol describing the type of VAL*/
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	(void)c;
@@ -296,7 +265,6 @@ static lVal *lnfTypeOf(lClosure *c, lVal *v){
 
 /* Add typing and casting operators to c */
 void lOperationsTypeSystem(lClosure *c){
-	lAddNativeFunc(c,"inf",     "[v]", "Return infinity", lnfInf);
 	lAddNativeFunc(c,"bool",    "[v]", "Convert v into a boolean value, true or false", lnfBool);
 	lAddNativeFunc(c,"int",     "[v]", "Convert v into an integer number", lnfInt);
 	lAddNativeFunc(c,"float",   "[v]", "Convert v into a floating-point number", lnfFloat);

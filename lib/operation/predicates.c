@@ -46,11 +46,6 @@ static int lValCompare(lVal *v){
 		if(a->type   != b->type)  {return -1;}
 		if(b->vNFunc != a->vNFunc){return -1;}
 		return 0;
-	case ltInf:
-		if((a == NULL) || (b == NULL)){return  2;}
-		if((a->type == ltInf) && (b->type == ltInf)){return 0;}
-		if(a->type == ltInf){return 1;}
-		return -1;
 	case ltBool:
 		if((b->type != ltBool) || (a->type != ltBool)){
 			return -1;

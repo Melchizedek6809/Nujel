@@ -4,7 +4,6 @@
 #include "../type-system.h"
 
 lVal     *lValBool  (bool v);
-lVal     *lValInf   ();
 lVal     *lValInt   (int v);
 lVal     *lValFloat (float v);
 lVal     *lValVec   (const vec v);

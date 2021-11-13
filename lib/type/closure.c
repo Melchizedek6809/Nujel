@@ -3,13 +3,13 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "closure.h"
-#include "list.h"
-#include "tree.h"
 #include "../display.h"
 #include "../nujel.h"
 #include "../allocation/closure.h"
 #include "../allocation/garbage-collection.h"
+#include "../collection/list.h"
+#include "../collection/tree.h"
+#include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 

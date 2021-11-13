@@ -10,44 +10,64 @@
 #include "../type/native-function.h"
 #include "../type/val.h"
 
-static lVal *lnfLogAndI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){ t->vInt &= lCar(vv)->vInt; }
-	return t;
+static int lnfLogAndI(const lVal *l){
+	int acc = l->vList.car->vInt;
+	l = l->vList.cdr;
+	for(; l; l = l->vList.cdr){
+		acc &= l->vList.car->vInt;
+	}
+	return acc;
 }
 
 static lVal *lnfLogAnd (lClosure *c, lVal *v){
-	lCastIApply(lnfLogAndI,c,v);
+	lVal *t = lCast(c,v,ltInt);
+	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
+	lRootsValPush(t);
+	return lValInt(lnfLogAndI(t));
 }
 
-static lVal *lnfLogIorI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){ t->vInt |= lCar(vv)->vInt; }
-	return t;
+static int lnfLogIorI(const lVal *l){
+	int acc = l->vList.car->vInt;
+	l = l->vList.cdr;
+	for(; l; l = l->vList.cdr){
+		acc |= l->vList.car->vInt;
+	}
+	return acc;
 }
 
 static lVal *lnfLogIor (lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(0);}
-	lCastIApply(lnfLogIorI,c,v);
+	lVal *t = lCast(c,v,ltInt);
+	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
+	lRootsValPush(t);
+	return lValInt(lnfLogIorI(t));
 }
 
-static lVal *lnfLogXorI(lVal *t, lVal *v){
-	forEach(vv,lCdr(v)){ t->vInt ^= lCar(vv)->vInt; }
-	return t;
+static int lnfLogXorI(const lVal *l){
+	int acc = l->vList.car->vInt;
+	l = l->vList.cdr;
+	for(; l; l = l->vList.cdr){
+		acc ^= l->vList.car->vInt;
+	}
+	return acc;
 }
 
 static lVal *lnfLogXor (lClosure *c, lVal *v){
-	lCastIApply(lnfLogXorI,c,v);
+	lVal *t = lCast(c,v,ltInt);
+	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
+	lRootsValPush(t);
+	return lValInt(lnfLogXorI(t));
 }
 
 static lVal *lnfLogNot (lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lVal *t = lCastSpecific(c,v,ltInt);
+	lVal *t = lCast(c,v,ltInt);
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
 	return lValInt(~lCar(t)->vInt);
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltPair)){return lValInt(0);}
-	lVal *vals  = lCastSpecific(c,v,ltInt);
+	lVal *vals  = lCast(c,v,ltInt);
 	if(vals == NULL){return lValInt(0);}
 	lVal *val   = lCar(vals);
 	lVal *shift = lCadr(vals);
@@ -64,6 +84,6 @@ void lOperationsBinary(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"logand &","[...args]","And ...ARGS together",             lnfLogAnd));
 	lAddInfix(lAddNativeFunc(c,"logior |","[...args]","Or ...ARGS",                       lnfLogIor));
 	lAddInfix(lAddNativeFunc(c,"logxor ^","[...args]","Xor ...ARGS",                      lnfLogXor));
-	lAddNativeFunc(c,"lognot ~","[val]",    "Binary not of VAL",                          lnfLogNot);
+	          lAddNativeFunc(c,"lognot ~","[val]",    "Binary not of VAL",                lnfLogNot);
 	lAddInfix(lAddNativeFunc(c,"ash <<",  "[value amount]","Shift VALUE left AMOUNT bits",lnfAsh));
 }

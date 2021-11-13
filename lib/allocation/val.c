@@ -6,9 +6,9 @@
 #include "val.h"
 
 #include "../display.h"
-#include "../collection/string.h"
-#include "../collection/closure.h"
 #include "../allocation/garbage-collection.h"
+#include "../collection/string.h"
+#include "../type/closure.h"
 
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;

@@ -15,10 +15,10 @@
 #include "val.h"
 #include "../nujel.h"
 #include "../operation/time.h"
-#include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"
+#include "../type/closure.h"
 #include "../type/native-function.h"
 
 #include <stdio.h>

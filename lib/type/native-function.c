@@ -7,9 +7,9 @@
 #include "val.h"
 #include "../display.h"
 #include "../allocation/val.h"
-#include "../collection/closure.h"
 #include "../collection/list.h"
 #include "../s-expression/reader.h"
+#include "../type/closure.h"
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;

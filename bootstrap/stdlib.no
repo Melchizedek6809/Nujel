@@ -92,9 +92,6 @@
     [def bool? [λ* [val]
         "#t if VAL is a boolean"
         [eq? :bool [type-of val]]]]
-    [def inf? [λ* [val]
-        "#t if VAL is infinite"
-        [eq? :infinity [type-of val]]]]
     [def pair? [λ* [val]
         "#t if VAL is a pair"
         [eq? :pair [type-of val]]]]
@@ -658,7 +655,7 @@
     [test-add #t [and [there-exists? '[1.0 2 3.0] int?] [not [there-exists? '[1.0 2.0 3.0] int?]]]]
     [test-add #t [and [eq? "asd" "asd"] [not [eq? "asd" "bsd"]] [not [eq? "asd" "asdasd"]]]]
     [test-add 23 [+ [reduce + [make-list 10 2] 0] [list-ref '[1 2 3 4] 1] [list-ref '[1 2] 0] [list-ref '[1 2] 3]]]
-    [test-add #t [and [nil? #nil] [not [nil? "NotNil"] [inf? #inf] [not [inf? "NotInf"] [vec? [vec 1]] [not [inf? "NotVec"]]]]]]
+    [test-add #t [and [nil? #nil] [not [nil? "NotNil"] [vec? [vec 1]] [not [vec? "NotVec"]]]]]
     [test-add 11 [def count [let [[a 0]]
          [λ [b]
             [set! a [+ a [cond [[number? b] b]
@@ -769,10 +766,9 @@
     [test-add "20.1" [+ [+ 1.1 3] [+ 1 3.3] [+ 3.3 4.1 4.3]]]
     [test-add "15.54" [add [mul 3.2 3.2] [sub 5.5 1.1 1 1.1] [div 9.9 3.3]]]
     [test-add "0.7" [% 10 3.1]]
-    [test-add #t [eq? #inf #inf]]
     [test-add "11.7" [add [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.3]]]
     [test-add "11.75" [+ [float 10] [int "10"] [float "-8.25"]]]
-    [test-add "30.3" [+ [abs "-10"] [int 8.2] 12.3]]
+    [test-add "30.3" [+ [abs [int "-10"]] [int 8.2] 12.3]]
     [test-add "[vec 12.0 12.0 12.0]" [+ [vec 1] 1 10]]
     [test-add "[vec 3.0 5.0 6.0]" [+ [vec 1] [vec 1 2] [vec 1 2 3]]]
     [test-add "[vec 3.0 3.0 3.0]" [+ 1 [vec 1] 1.0]]

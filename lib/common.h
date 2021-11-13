@@ -45,7 +45,6 @@ typedef enum lType {
 	ltInt,
 	ltFloat,
 	ltVec,
-	ltInf,
 
 	ltPair,
 	ltString,

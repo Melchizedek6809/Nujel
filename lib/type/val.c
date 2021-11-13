@@ -7,32 +7,11 @@
 #include <math.h>
 
 #include "../exception.h"
+#include "../allocation/garbage-collection.h"
 #include "../allocation/val.h"
 #include "../collection/string.h"
-#include "../collection/closure.h"
-#include "../allocation/garbage-collection.h"
+#include "../type/closure.h"
 
-lVal *lValCopy(lVal *dst, const lVal *src){
-	if((dst == NULL) || (src == NULL)){return NULL;}
-	*dst = *src;
-	if(dst->type == ltString){
-		dst->vString = lStringNew(src->vString->buf,lStringLength(src->vString));
-	}else if(dst->type == ltPair){
-		dst->vList.car = lValDup(dst->vList.car);
-		dst->vList.cdr = lValDup(dst->vList.cdr);
-	}
-	return dst;
-}
-
-lVal *lValDup(const lVal *v){
-	return v == NULL ? NULL : lValCopy(lValAlloc(),v);
-}
-
-lVal *lValInf(){
-	lVal *ret = lValAlloc();
-	ret->type = ltInf;
-	return ret;
-}
 
 lVal *lValInt(int v){
 	lVal *ret = lValAlloc();

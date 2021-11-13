@@ -294,8 +294,6 @@ static lVal *lParseSpecial(lString *s){
 		return lValBool(true);
 	case 'f':
 		return lValBool(false);
-	case 'i':
-		s->data+=2; return lValInf();
 	case '[':{
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
 		ret->vList.car = lValSymS(symArr);
