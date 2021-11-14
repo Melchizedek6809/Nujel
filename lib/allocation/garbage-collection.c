@@ -70,6 +70,9 @@ void lValGCMark(lVal *v){
 	case ltTree:
 		lTreeGCMark(v->vTree);
 		break;
+	case ltGUIWidget:
+		lWidgetMarkI(v->vInt);
+		break;
 	default:
 		break;
 	}
@@ -145,6 +148,7 @@ static void lGCMark(){
 	lMarkFree();
 }
 
+void (*sweeperChain)() = NULL;
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	for(uint i=0;i<lValMax;i++){
@@ -182,6 +186,7 @@ static void lGCSweep(){
 			lTreeFree(&lTreeList[i]);
 		}
 	}
+	if(sweeperChain != NULL){sweeperChain();}
 }
 
 /* Force a garbage collection cycle, shouldn't need to be called manually since

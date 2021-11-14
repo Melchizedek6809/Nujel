@@ -2,6 +2,9 @@
 #include "../nujel.h"
 
 extern int lGCRuns;
+extern void (*sweeperChain)();
+
+void lWidgetMarkI  (uint i);
 
 void lValGCMark    (lVal *v);
 void lTreeGCMark   (const lTree *v);

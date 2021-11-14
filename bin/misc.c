@@ -18,6 +18,10 @@
 #include <shlobj.h>
 #endif
 
+void lWidgetMarkI(uint i){
+	(void)i;
+}
+
 void *loadFile(const char *filename,size_t *len){
 	FILE *fp;
 	size_t filelen,readlen,read;

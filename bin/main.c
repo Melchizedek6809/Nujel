@@ -18,10 +18,6 @@
 extern char binlib_no_data[];
 
 
-void lGUIWidgetFree(lVal *v){
-	(void)v;
-}
-
 void lPrintError(const char *format, ...){
 	va_list ap;
 	va_start(ap,format);
