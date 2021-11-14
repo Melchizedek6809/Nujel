@@ -235,8 +235,8 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
 
-	lAddSpecialForm(c,"lambda fun λ", "[args ...body]", "Create a new lambda",                       lnfLambda);
-	lAddSpecialForm(c,"dynamic dyn δ",   "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
-	lAddSpecialForm(c,"macro μ",         "[args ...body]", "Create a new macro",                       lnfMacro);
-	lAddSpecialForm(c,"object ω",        "[...body]",      "Create a new object",                       lnfObject);
+	lAddSpecialForm(c,"lambda fun λ",  "[args ...body]", "Create a new lambda",                       lnfLambda);
+	lAddSpecialForm(c,"dynamic dyn δ", "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
+	lAddSpecialForm(c,"macro μ",       "[args ...body]", "Create a new macro",                       lnfMacro);
+	lAddSpecialForm(c,"object ω",      "[...body]",      "Create a new object",                       lnfObject);
 }

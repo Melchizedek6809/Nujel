@@ -29,6 +29,9 @@ static int lValCompare(lVal *v){
 	}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){
+	case ltNoAlloc:
+	default:
+		return 2;
 	case ltPair:
 		if(b->type != ltPair){
 			return -1;
@@ -36,9 +39,6 @@ static int lValCompare(lVal *v){
 			return !((a->vList.car == b->vList.car)
 				&& (a->vList.cdr == b->vList.cdr));
 		}
-	case ltNoAlloc:
-	default:
-		return 2;
 	case ltSymbol:
 	case ltLambda:
 	case ltNativeFunc:
@@ -52,8 +52,15 @@ static int lValCompare(lVal *v){
 		}else{
 			return castToBool(a) != castToBool(b);
 		}
+        case ltGUIWidget:
+		if(a->vInt == b->vInt){
+			return  0;
+		} else if(a->vInt < b->vInt) {
+			return -1;
+		} else {
+			return  1;
+		}
 	case ltInt: {
-		if((a == NULL) || (b == NULL)){return  2;}
 		const int av = castToInt(a,0);
 		const int bv = castToInt(b,0);
 		if(bv == av){
@@ -64,7 +71,6 @@ static int lValCompare(lVal *v){
 			return  1;
 		}}
 	case ltFloat: {
-		if((a == NULL) || (b == NULL)) {return  2;}
 		const float av = castToFloat(a,0.f);
 		const float bv = castToFloat(b,0.f);
 		if(bv == av){

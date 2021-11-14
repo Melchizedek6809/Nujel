@@ -14,4 +14,3 @@ void lArrayGCMark  (const lArray *v);
 void lNFuncGCMark  (const lNFunc *f);
 
 void lGarbageCollect();
-void lGarbageCollectForce();
