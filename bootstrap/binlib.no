@@ -16,7 +16,7 @@
         [do [def source [read [file/read path]]]
            [def object-code [compile [cons 'do source] source]]
            [if no-write
-              #f
+              #nil
               [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
            object-code]]]
     [def file/eval [λ* [path]
@@ -62,9 +62,10 @@
     [def repl/readline [λ* [ctx]
         ""
         [do [def line [readline [repl/prompt]]]
-           [when [nil? line]
-                 [do [display "Bye!\r\n"]
-                    [exit 0]]]
+           [if [nil? line]
+              [do [display "Bye!\r\n"]
+                 [exit 0]]
+              #nil]
            [readline/history/add line]
            [def raw [read line]]
            [def expr [cons 'do raw]]
@@ -80,7 +81,7 @@
            [def ctx [ω #nil]]
            [while #t [do [try repl/exception-handler [repl/readline ctx]]
               [readline/history/save [readline/history/path]]]]]]]][if [eq? OS "Emscripten"]
-    #f
+    #nil
     [do [test-add '[0 . ""] [popen "true"]]
        [test-add #f [zero? [car [popen "false"]]]]
        [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]]

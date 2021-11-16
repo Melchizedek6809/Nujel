@@ -1,3 +1,7 @@
 [defmacro when-not [pred ...body]
-                 `[if ,pred #f [do ,@...body]]
+          `[if ,pred #nil [do ,@...body]]
+]
+
+[defmacro when [pred ...body]
+          `[if ,pred [do ,@...body] #nil]
 ]

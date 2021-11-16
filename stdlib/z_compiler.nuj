@@ -164,7 +164,6 @@
                               [[eq? op if]     [compile/if     source]]
                               [[eq? op try]    [compile/try    source]]
                               [[eq? op cond]   [compile/cond   source]]
-                              [[eq? op when]   [compile/when   source]]
                               [[eq? op and]    [compile/and    source]]
                               [[eq? op or]     [compile/or     source]]
                               [[eq? op while]  [compile/while  source]]
