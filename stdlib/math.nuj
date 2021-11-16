@@ -2,18 +2,18 @@
 [def π  3.14159]
 
 [defun ++ [i]
-        "Increment I by 1"
-        [+  1 i]
+       "Increment I by 1"
+       [+  1 i]
 ]
 
 [defun -- [i]
-        "Decrement I by 1"
-        [+ -1 i]
+       "Decrement I by 1"
+       [+ -1 i]
 ]
 
 [defun >> [val amount]
-        "Shifts VAL by AMOUNT bits to the right"
-        [ash val [- amount]]
+       "Shifts VAL by AMOUNT bits to the right"
+       [ash val [- amount]]
 ]
 
 [def min [let*
@@ -51,7 +51,7 @@
 ]]
 
 [defun fib [i]
-           "Terribly inefficient, but useful for testing the GC"
+           "Terribly inefficient, but, useful for testing the GC"
            [if [< i 2]
                i
                [+ [fib [- i 2]] [fib [- i 1]]]]

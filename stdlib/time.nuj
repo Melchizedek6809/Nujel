@@ -23,5 +23,8 @@
 ]
 
 [defmacro profile [...body]
-          `[profile-form ',[cons 'do ...body]]
+          "Measure and display how much time and ressources it takes for BODY to be evaluated"
+          `[profile-form ',[if [last? ...body]
+                               [car ...body]
+                               [cons 'do ...body]]]
 ]

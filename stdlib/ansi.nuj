@@ -24,6 +24,17 @@
 ]]
 [def ansi-reset "\e[0m"]
 
+[def ansi-bg #[
+	"\e[40m"
+	"\e[41m"
+	"\e[42m"
+	"\e[43m"
+	"\e[44m"
+	"\e[45m"
+	"\e[46m"
+	"\e[47m"
+]]
+
 [def ansi-wrap [λ [code string]
 	"Wrap STRING in the ansi color CODE"
 	[cat [ansi-fg code] string ansi-reset]
@@ -128,7 +139,29 @@
 	[def colored-list [map
 			  [λ [a]
 			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [ansi-fg [logand [+ 2 count] #x7]] [ansi-bg count] a]
+			     [cat [ansi-fg [logxor count #x7]] [ansi-bg count] a]
 			  ] split-args]]
         [cat [join colored-list ""] ansi-reset]
+]
+
+[defun reprint-line [text width]
+       [when-not width [set! width 20]]
+       [print "\r"]
+       [def i 0]
+       [while [< i width]
+              [print " "]
+              [set! i [++ i]]
+       ]
+       [print "\r"]
+       [print text]
+]
+
+[defun test-reprint-line []
+       [def i 0]
+       [print "\r\n"]
+       [while [i < 100000]
+              [reprint-line [string i]]
+              [set! i [++ i]]
+       ]
+       [print " Done!\r\n"]
 ]

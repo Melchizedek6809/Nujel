@@ -71,21 +71,6 @@
        [list 'if [compile [cadr source]] [compile [caddr source]] [compile [cadddr source]]]
 ]
 
-[defun compile/let/arg [source]
-       source
-       [list [car source] [compile [cadr source]]]
-]
-
-[defun compile/let/args [source]
-       [if source
-           [cons [compile/let/arg  [car source]]
-                 [compile/let/args [cdr source]]]]
-]
-
-[defun compile/let [source]
-       [list 'let [compile/let/args [cadr source]] [compile/do [cddr source]]]
-]
-
 [defun compile/let* [source]
        [list 'let* [compile/do [cdr source]]]
 ]
@@ -104,10 +89,6 @@
 
 [defun compile/cond [source]
        [cons 'cond [compile/cond/clauses [cdr source]]]
-]
-
-[defun compile/when [source]
-       [list 'when [compile [cadr source]] [compile/do [cddr source]]]
 ]
 
 [defun compile/and [source]
