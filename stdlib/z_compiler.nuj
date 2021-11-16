@@ -114,9 +114,6 @@
            [list 'when [compile [cadr source]] [compile/do [cddr source]]]
     ]
 
-    [defun compile/unless [source]
-           [list 'unless [compile [cadr source]] [compile/do [cddr source]]]
-    ]
 
     [defun compile/and [source]
            [compile/procedure/arg source]
@@ -168,7 +165,6 @@
                               [[eq? op try]    [compile/try    source]]
                               [[eq? op cond]   [compile/cond   source]]
                               [[eq? op when]   [compile/when   source]]
-                              [[eq? op unless] [compile/unless source]]
                               [[eq? op and]    [compile/and    source]]
                               [[eq? op or]     [compile/or     source]]
                               [[eq? op while]  [compile/while  source]]
@@ -186,20 +182,6 @@
            ]
     ]
 
-[defmacro \ [...body]
-        "Define a λ with the self-hosting Nujel compiler"
-        [compile [cons 'λ ...body]]
-]
-
-[defun eval [expr]
-          "Compile, Evaluate and then return the result of EXPR"
-          [eval* [compile expr]]
-]
-
-[def +1 [μ [v]
-           `[+ 1 ,v]
-]]
-
 [def defun [μ [name args ...body]
 	      [list 'def name [compile [cons 'λ [cons args ...body]]]]
 ]]
@@ -208,6 +190,19 @@
               [list 'def name [compile [cons 'μ [cons args ...body]]]]
 ]]
 
+[defmacro \ [...body]
+        "Define a λ with the self-hosting Nujel compiler"
+        [compile [cons 'λ ...body]]
+]
+
+[defmacro eval [expr]
+          "Compile, Evaluate and then return the result of EXPR"
+          `[eval* [compile ,expr]]
+]
+
+[defmacro +1 [v]
+           `[+ 1 ,v]
+]
 
 [defun test [a] [+2 a]]
 

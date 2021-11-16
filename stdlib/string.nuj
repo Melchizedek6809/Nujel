@@ -32,7 +32,7 @@
 
 [defun int->string/binary [v]
         [def ret ""]
-        [unless v [def v 0]]
+        [when-not v [def v 0]]
         [when [zero? v] [set! ret "0"]]
         [while [not-zero? v]
                [set! ret [cat [from-char-code [+ #\0 [logand v #b1]]] ret]]
@@ -43,7 +43,7 @@
 
 [defun int->string/octal [v]
         [def ret ""]
-        [unless v [def v 0]]
+        [when-not v [def v 0]]
         [when [zero? v] [set! ret "0"]]
         [while [not-zero? v]
                [set! ret [cat [from-char-code [+ #\0 [logand v #b111]]] ret]]
@@ -58,7 +58,7 @@
 
         [λ [v]
                 [def ret ""]
-                [unless v [def v 0]]
+                [when-not v [def v 0]]
                 [when [zero? v] [set! ret "0"]]
                 [while [not-zero? v]
                        [set! ret [cat [conversion-arr [logand v #b1111]] ret]]

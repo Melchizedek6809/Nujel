@@ -1,6 +1,11 @@
 ; Contains native nujel implementations of some
 ; core language constructs and essential macros
 
+[defmacro comment [...body]
+          "Does nothing"
+          0
+]
+
 [defun not [v]
            "Return true if V is false"
            [if v #f #t]
@@ -53,8 +58,4 @@
 
 [defun println [str]
        [print [cat str "\n"]]
-]
-
-[defmacro comment []
-          0
 ]

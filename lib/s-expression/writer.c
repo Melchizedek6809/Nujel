@@ -195,9 +195,6 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			}else if(sym == symWhen){
 				indentStyle = 1;
 				indentLevel += 6;
-			}else if(sym == symUnless){
-				indentStyle = 1;
-				indentLevel += 8;
 			}else if(sym == symIf){
 				indentStyle = 1;
 				indentLevel += 3;

@@ -3,7 +3,12 @@
            #nil
            [if [pair? l]
                [if [eq? [caar l] 'unquote-splicing]
-                   [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]]
+                   [if [zero? depth]
+                       [list 'append
+                             [cadr [car l]]
+                             [quasiquote-real [cdr l] depth]]
+                       [list 'unquote-splicing
+                             [quasiquote-real [cadr l] [-- depth]]]]
                    [if [eq? [car l] 'unquote]
                        [if [zero? depth]
                            [cadr l]

@@ -75,7 +75,7 @@
                         [def eval-result [eval/forked nujel-runtime rawexpr]]
                         [def expr [cdr eval-result]]
                         [def pred? eq?]
-                        [unless [string? result]
+                        [when-not [string? result]
                                 [set! expr [car [read expr]]]
                         ]
                         [when [pair? result]

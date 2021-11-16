@@ -1,4 +1,5 @@
-[do [def not [λ* [v]
+[do [def comment [μ* [...body] "Does nothing" 0]]
+    [def not [λ* [v]
         "Return true if V is false"
         [if v
            #f
@@ -34,8 +35,7 @@
         [car [cdr [cdr [cdr p]]]]]]
     [def println [λ* [str]
         ""
-        [print [cat str "\n"]]]]
-    [def comment [μ* [] "" 0]]][do [def numeric? [λ* [a]
+        [print [cat str "\n"]]]]][do [def numeric? [λ* [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]]]
     [def empty? [λ* [a]
@@ -134,7 +134,9 @@
            #nil
            [if [pair? l]
               [if [eq? [caar l] 'unquote-splicing]
-                 [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]]
+                 [if [zero? depth]
+                    [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]]
+                    [list 'unquote-splicing [quasiquote-real [cadr l] [-- depth]]]]
                  [if [eq? [car l] 'unquote]
                     [if [zero? depth]
                        [cadr l]
@@ -188,7 +190,7 @@
            "Tests that RAWEXPR evaluates to RESULT"
            [try [λ* [err]
                ""
-               [test-failure result err rawexpr i]] [do [def expr [eval rawexpr]]
+               [test-failure result err rawexpr i]] [do [def expr [eval* [compile rawexpr]]]
               [def pred? eq?]
               [when [string? result]
                     [set! expr [str/write expr]]]
@@ -204,8 +206,9 @@
                [do [def eval-result [eval/forked nujel-runtime rawexpr]]
                   [def expr [cdr eval-result]]
                   [def pred? eq?]
-                  [unless [string? result]
-                          [set! expr [car [read expr]]]]
+                  [if [string? result]
+                     #f
+                     [set! expr [car [read expr]]]]
                   [when [pair? result]
                         [set! pred? list-equal?]]
                   [[if [and [zero? [car eval-result]] [pred? result expr]]
@@ -379,7 +382,7 @@
            [cat [ansi-white "Memory Info"] "\n" [ansi-green "Values:   "] [getf info :value] "\n" [ansi-blue "Closures: "] [getf info :closure] "\n" [ansi-red "Arrays:   "] [getf info :array] "\n" [ansi-yellow "STrings:  "] [getf info :string] "\n" [ansi-cyan "NFunc:    "] [getf info :native-function] "\n" [ansi-purple "Vectors:  "] [getf info :vector] "\n" [ansi-pink "Symbols:  "] [getf info :symbol] "\n" ansi-reset]]]]]
     [def wrap-value [λ* [val min max]
         "Constrains VAL to be within MIN and MAX, wrapping it around"
-        [+ min [% [- val min] [- max min]]]]]][def when-not [μ* [p ...body] "" [cons 'if [cons p [cons #nil [cons [cons 'do [cons ...body #nil]] #nil]]]]]][do [def except-last-pair [let* [do [def iter [λ* [list rest]
+        [+ min [% [- val min] [- max min]]]]]][def when-not [μ* [pred ...body] "" [cons 'if [cons pred [cons #f [cons [cons 'do [append ...body #nil]] #nil]]]]]][do [def except-last-pair [let* [do [def iter [λ* [list rest]
            ""
            [if [nil? [cdr list]]
               [reverse rest]
@@ -586,8 +589,9 @@
     [def int->string/binary [λ* [v]
         ""
         [do [def ret ""]
-           [unless v
-                   [def v 0]]
+           [if v
+              #f
+              [def v 0]]
            [when [zero? v]
                  [set! ret "0"]]
            [while [not-zero? v] [do [set! ret [cat [from-char-code [+ 48 [logand v 1]]] ret]]
@@ -596,8 +600,9 @@
     [def int->string/octal [λ* [v]
         ""
         [do [def ret ""]
-           [unless v
-                   [def v 0]]
+           [if v
+              #f
+              [def v 0]]
            [when [zero? v]
                  [set! ret "0"]]
            [while [not-zero? v] [do [set! ret [cat [from-char-code [+ 48 [logand v 7]]] ret]]
@@ -607,8 +612,9 @@
        [λ* [v]
            ""
            [do [def ret ""]
-              [unless v
-                      [def v 0]]
+              [if v
+                 #f
+                 [def v 0]]
               [when [zero? v]
                     [set! ret "0"]]
               [while [not-zero? v] [do [set! ret [cat [conversion-arr [logand v 15]] ret]]
@@ -710,7 +716,7 @@
                            #f]]
                   [set! a -1]]
             a]]]
-    [test-add 6 [eval '[+ 1 2 3]]]
+    [test-add 6 [eval* [compile '[+ 1 2 3]]]]
     [test-add 4 [arr-length [arr 1 2 3 4]]]
     [test-add 2 [arr-ref [arr 1 2 3 4] 1]]
     [test-add 3 [arr-length [arr-new 3]]]
@@ -757,10 +763,12 @@
     [test-add #t [int? [random]]]
     [test-add #t [random/seed! 123] [def first-value [random]] [random/seed! 123] [eq? first-value [random]]]
     [test-add #t [random/seed! 123] [!= [random] [random]]]
-    [test-add 1 [def a 1] [unless [= 2 2]
-            [set! a 4]] a]
-    [test-add 4 [def a 1] [unless [= 2 3]
-            [set! a 4]] a]
+    [test-add 1 [def a 1] [if [= 2 2]
+       #f
+       [set! a 4]] a]
+    [test-add 4 [def a 1] [if [= 2 3]
+       #f
+       [set! a 4]] a]
     [test-add 4 [def a 1] [when [= 2 2]
           [set! a 4]] a]
     [test-add 1 [def a 1] [when [= 2 3]
@@ -803,7 +811,7 @@
     [test-add 65536 [ash 1 16]]
     [test-add -1 [ash -1 -1]]
     [test-add -16 [lognand 15 15]]
-    [test-add 6 [eval [read "[+ 1 2 3]"]]]
+    [test-add 6 [eval* [compile [read "[+ 1 2 3]"]]]]
     [test-add '[3] [let [[test-string "3"]]
          [do [read test-string]
             [read test-string]]]]
@@ -1420,7 +1428,7 @@
     [def profile-form [λ* [raw]
         ""
         [do [def start-time [time/milliseconds]]
-           [def val [eval raw]]
+           [def val [eval* [compile raw]]]
            [def end-time [time/milliseconds]]
            [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
     [def profile [μ* [...body] "" [cons 'profile-form [cons [cons 'quote [cons [cons 'do ...body] #nil]] #nil]]]]][do [def compile/do/args [λ* [args]
@@ -1564,13 +1572,11 @@
                  [[string? op] [compile/procedure/arg source]]
                  [[tree? op] [compile/procedure/arg source]]
                  [#t source]]]]]]
-    [def \ [μ* [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body]]]]
-    [def eval [λ* [expr]
-        "Compile, Evaluate and then return the result of EXPR"
-        [eval* [compile expr]]]]
-    [def +1 [μ* [v] "" [cons '+ [cons 1 [cons v #nil]]]]]
     [def defun [μ* [name args ...body] "" [list 'def name [compile [cons 'λ [cons args ...body]]]]]]
     [def defmacro [μ* [name args ...body] "" [list 'def name [compile [cons 'μ [cons args ...body]]]]]]
+    [def \ [μ* [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body]]]]
+    [def eval [μ* [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr #nil]] #nil]]]]
+    [def +1 [μ* [v] "" [cons '+ [cons 1 [cons v #nil]]]]]
     [def test [λ* [a]
         ""
         [+2 a]]]

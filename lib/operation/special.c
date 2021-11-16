@@ -49,12 +49,6 @@ static lVal *lnfWhen(lClosure *c, lVal *v){
 	return lnfDo(c,lCdr(v));
 }
 
-static lVal *lnfUnless(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
-	if(castToBool(lEval(c,lCar(v)))){return NULL;}
-	return lnfDo(c,lCdr(v));
-}
-
 static lVal *lnfIf(lClosure *c, lVal *v){
 	if(v == NULL){return NULL;}
 	const bool pred = castToBool(lEval(c,lCar(v)));
@@ -112,7 +106,6 @@ void lOperationsSpecial(lClosure *c){
 	lAddSpecialForm(c,"if",      "[cond then else]","Evalute then if pred? is #t, otherwise evaluates ...else", lnfIf);
 	lAddSpecialForm(c,"cond",    "[...c]",          "Contain at least 1 cond block of form (pred? ...body) and evaluates and returns the first where pred? is #t", lnfCond);
 	lAddSpecialForm(c,"when",    "[cond ...body]",  "Evaluates BODY if CONDITION is #t", lnfWhen);
-	lAddSpecialForm(c,"unless",  "[cond ...body]",  "Evaluates BODY if CONDITION is #f", lnfUnless);
 	lAddSpecialForm(c,"and",     "[...args]",       "#t if all ARGS evaluate to true",   lnfAnd);
 	lAddSpecialForm(c,"or" ,     "[...args]",       "#t if one member of ARGS evaluates to true", lnfOr);
 	lAddSpecialForm(c,"while",   "[cond ...body]",  "Evaluate ...BODY for as long as COND is true, return the value of the last iteration of ...BODY or #nil when COND was false from the start", lnfWhile);

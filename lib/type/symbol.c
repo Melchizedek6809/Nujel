@@ -17,7 +17,7 @@ lSymbol lSymbolList[SYM_MAX];
 uint    lSymbolActive = 0;
 uint    lSymbolMax    = 0;
 
-lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symWhen,*symUnless,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
+lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symWhen,*symLet,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree;
 
 void lSymbolInit(){
@@ -30,7 +30,6 @@ void lSymbolInit(){
 	symIf              = lSymS("if");
 	symCond            = lSymS("cond");
 	symWhen            = lSymS("when");
-	symUnless          = lSymS("unless");
 	symLet             = lSymS("let");
 	symDo              = lSymS("do");
 	symMinus           = lSymS("-");

@@ -15,13 +15,14 @@
         "Compile a Nujel source file into optimized object code"
         [do [def source [read [file/read path]]]
            [def object-code [compile [cons 'do source] source]]
-           [unless no-write
-                   [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
+           [if no-write
+              #f
+              [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
            object-code]]]
     [def file/eval [λ* [path]
         "Evaluate a Nujel source file in the current context"
         [do [def source [cons 'do [read [file/read path]]]]
-           [eval source]]]]
+           [eval* [compile source]]]]]
     [def eval/forked [λ* [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
         [do [def expr [cat "[print [str/write " [str/write raw-expr]]]
@@ -78,7 +79,8 @@
         [do [readline/history/load [readline/history/path]]
            [def ctx [ω #nil]]
            [while #t [do [try repl/exception-handler [repl/readline ctx]]
-              [readline/history/save [readline/history/path]]]]]]]][unless [eq? OS "Emscripten"]
-         [do [test-add '[0 . ""] [popen "true"]]
-            [test-add #f [zero? [car [popen "false"]]]]
-            [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]]
+              [readline/history/save [readline/history/path]]]]]]]][if [eq? OS "Emscripten"]
+    #f
+    [do [test-add '[0 . ""] [popen "true"]]
+       [test-add #f [zero? [car [popen "false"]]]]
+       [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]]
