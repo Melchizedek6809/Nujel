@@ -5,11 +5,6 @@
         [or [int? a] [float? a] [vec? a]]
 ]
 
-[defun empty? [a]
-        "Return #t if a is empty"
-        [nil? a]
-]
-
 [defun last? [a]
         "Return #t if a is the last pair in a list"
         [nil? [cdr a]]
@@ -20,7 +15,7 @@
         [>= a 0]
 ]
 
-[defun zn? [a]
+[defun zero-neg? [a]
         "Return #t if a is zero or negative"
         [<= a 0]
 ]

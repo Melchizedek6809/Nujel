@@ -61,9 +61,18 @@
         [car [cdr [cdr [cdr p]]]]
 ]
 
-[defun println [str]
-       "Print STR on a single line"
-       [print [cat str "\n"]]
+[defmacro if-not [pred then else]
+          `[if ,pred ,else ,then]
+]
+
+[defmacro if-let [binding then else]
+          `[let* [def ,[car binding] ,[cadr binding]]
+                 [if ,[car binding] ,then ,else]
+           ]
+]
+
+[defmacro when-let [binding ...body]
+          `[if-let ,binding ,[cons 'do ...body] #nil]
 ]
 
 [defmacro when-not [pred ...body]
@@ -77,6 +86,8 @@
 ]
 
 [defun let/arg [arg]
+       [when-not [pair? arg] [throw `[:invalid-let-form "Please fix the structure of the let form" ,arg]]]
+       [when-not [symbol? [car arg]] [throw `[:invalid-let-form "Please fix the structure of the let form" ,arg]]]
        `[def ,[car arg] ,[cadr arg]]
 ]
 [defun let/args [args]
@@ -88,4 +99,10 @@
 [defmacro let [bindings ...body]
           "Evalutes to BODY if PRED is true"
           `[let* [do ,@[let/args bindings] ,@...body]]
+]
+
+[def gensym/counter 0]
+[defun gensym []
+       [set! gensym/counter [+ 1 gensym/counter]]
+       [str->sym ["GenSym-" gensym/counter]]
 ]

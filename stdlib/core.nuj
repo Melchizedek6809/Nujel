@@ -26,16 +26,6 @@
         ]
 ]]
 
-[defun display [value]
-        "Display VALUE"
-        [print value]
-]
-
-[defun newline []
-        "Print a single line feed character"
-        [display "\n"]
-]
-
 [defun arr-fill! [a v i]
         "Fills array a with value v"
         [cond [[>= [int i] [arr-length a]] a]

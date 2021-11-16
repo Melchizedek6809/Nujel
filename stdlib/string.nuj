@@ -1,5 +1,20 @@
 ; Some nujel string λs
 
+[defun println [str]
+       "Print STR on a single line"
+       [print [cat str "\n"]]
+]
+
+[defun display [value]
+        "Display VALUE"
+        [print value]
+]
+
+[defun newline []
+        "Print a single line feed character"
+        [display "\n"]
+]
+
 [defun br [num]
         "Return NUM=1 linebreaks"
         [if [or [nil? num] [<= [int num] 1]]

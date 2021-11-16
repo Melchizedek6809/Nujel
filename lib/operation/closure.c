@@ -17,8 +17,8 @@
 
 
 static lVal *lnfDef(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
 	lVal *sym = lCar(v);
+	if(sym == NULL){return NULL;}
 	if(sym->type != ltSymbol){sym = lEval(c,sym);}
 	if(sym->type != ltSymbol){return NULL;}
 	const lSymbol *s = sym->vSymbol;
@@ -29,8 +29,8 @@ static lVal *lnfDef(lClosure *c, lVal *v){
 }
 
 static lVal *lnfSet(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
 	lVal *sym = lCar(v);
+	if(sym == NULL){return NULL;}
 	if(sym->type != ltSymbol){sym = lEval(c,sym);}
 	if(sym->type != ltSymbol){return NULL;}
 	const lSymbol *s = sym->vSymbol;

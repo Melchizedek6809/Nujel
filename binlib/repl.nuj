@@ -1,3 +1,5 @@
+[def ctx [current-closure]]
+
 [def display/error [let*
         [defun wrap [i text]
                 [cond [[eq? i 0] [ansi-red text]]
@@ -32,17 +34,15 @@
 ]
 
 [def repl/wasm [let*
-	[def ctx [ω]]
-
         [λ [line]
            "Evaluate LINE in the wasm context"
-	   [try repl/exception-handler
-	        [def raw [read line]]
-	        [def expr [cons 'do raw]]
-	        [def cexpr [cons [compile expr]]]
-	        [apply ctx cexpr]
+           [try repl/exception-handler
+                [def raw [read line]]
+                [def expr [cons 'do raw]]
+                [def cexpr [cons [compile expr]]]
+                [apply ctx cexpr]
            ]
-	]
+        ]
 ]]
 
 [defun repl/readline [ctx]
@@ -66,7 +66,6 @@
 
 [defun repl []
         [readline/history/load [readline/history/path]]
-        [def ctx [ω]]
         [while #t
                [try repl/exception-handler
                     [repl/readline ctx]
