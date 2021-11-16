@@ -204,9 +204,6 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 			}else if(sym == symDo){
 				indentStyle = 1;
 				indentLevel += 3;
-			}else if(sym == symLet){
-				indentStyle = 1;
-				indentLevel += 5;
 			}
 		}
 		t = snprintf(cur,bufEnd-cur,"[");

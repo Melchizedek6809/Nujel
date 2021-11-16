@@ -89,9 +89,10 @@
         ]]
         [defun test-run-iter [test l i]
                 "Recurse through LIST and runs eatch test"
-                [cond [[nil? l] #t]
-                       [#t [test [caar l] [cdar l] i]
-                           [test-run-iter test [cdr l] [- i 1]]]]
+                [if l
+                    [do [test [caar l] [cdar l] i]
+                        [test-run-iter test [cdr l] [- i 1]]]
+                    #t]
         ]
         [defun test-run-real [test]
                 [set! nujel-start    [time/milliseconds]]

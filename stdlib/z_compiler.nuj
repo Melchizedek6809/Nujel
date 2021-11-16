@@ -154,7 +154,6 @@
                               [[eq? op set!]   [compile/set!   source]]
                               [[eq? op let]    [compile/let    source]]
                               [[eq? op let*]   [compile/let*   source]]
-                              [[eq? op δ]      [compile/δ      source]]
                               [[eq? op δ*]     [compile/δ*     source]]
                               [[eq? op λ]      [compile/λ      source]]
                               [[eq? op λ*]     [compile/λ*     source]]
@@ -194,6 +193,11 @@
         [compile [cons 'λ ...body]]
 ]
 
+[defmacro δ [...body]
+        "Define a δ with the self-hosting Nujel compiler"
+        [compile [cons 'δ ...body]]
+]
+
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"
           `[eval* [compile ,expr]]
@@ -202,7 +206,3 @@
 [defmacro +1 [v]
            `[+ 1 ,v]
 ]
-
-[defun test [a] [+2 a]]
-
-;[defmacro +2 [v] `[+ 2 ,v]]

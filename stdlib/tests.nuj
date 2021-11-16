@@ -562,6 +562,7 @@
 [test-add '[1 2 3] `[1 ,@`[2 3]]]
 [test-add '[+ 1 2] [compile '[+1 2]]]
 [test-add '[1 [2 [3 4]]] `[1 `[2 ,[3 ,[+ 2 2]]]]]
+[test-add 2 [cadar '[[1 2 3] 4 5]]]
 
 ; This would interfere with quasiquote as a macro, still have to think about the consequences
 ;[test-add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]

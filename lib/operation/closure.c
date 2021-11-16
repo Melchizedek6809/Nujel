@@ -86,23 +86,6 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 	return false;
 }
 
-static lVal *lnfLet(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return NULL;}
-	int SP = lRootsGet();
-	lClosure *nc = lRootsClosurePush(lClosureNew(c));
-	forEach(n,lCar(v)){
-		lVal *sym = lCaar(n);
-		if((sym == NULL) || (sym->type != ltSymbol)){continue;}
-		lDefineClosureSym(nc,sym->vSymbol,lEval(c,lCadar(n)));
-	}
-	lVal *ret = NULL;
-	forEach(n,lCdr(v)){
-		ret = lEval(nc,lCar(n));
-	}
-	lRootsRet(SP);
-	return ret == NULL ? NULL : ret;
-}
-
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	const int SP = lRootsGet();
 	lClosure *nc = lRootsClosurePush(lClosureNew(c));
@@ -174,13 +157,6 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* Handler for [δ [...args] ...body] */
-static lVal *lnfDynamic(lClosure *c, lVal *v){
-	lVal *ret = lnfLambda(c,v);
-	if(ret){ ret->type = ltDynamic; }
-	return ret;
-}
-
 /* Handler for [δ* [..args] docstring body] */
 static lVal *lnfDynamicRaw(lClosure *c, lVal *v){
 	lVal *ret = lnfLambdaRaw(c,v);
@@ -242,7 +218,6 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"def",           "[sym val]",     "Define a new symbol SYM and link it to value VAL",                 lnfDef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",                   lnfSet);
-	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);
 
 	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda", lnfLambdaRaw);
@@ -250,7 +225,6 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"μ*",            "[args source body]", "Create a new, raw, macro",  lnfMacroRaw);
 
 	lAddSpecialForm(c,"lambda fun λ",  "[args ...body]", "Create a new lambda",                       lnfLambda);
-	lAddSpecialForm(c,"dynamic dyn δ", "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);
 	lAddSpecialForm(c,"macro μ",       "[args ...body]", "Create a new macro",                       lnfMacro);
 	lAddSpecialForm(c,"object ω",      "[...body]",      "Create a new object",                       lnfObject);
 }

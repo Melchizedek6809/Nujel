@@ -41,6 +41,11 @@
         [cdr [cdr p]]
 ]
 
+[defun cadar [p]
+        "[cdr [car p]]"
+        [car [cdr [car p]]]
+]
+
 [defun caddr [p]
         "[car [cdr [cdr p]]]"
         [car [cdr [cdr p]]]
@@ -57,5 +62,30 @@
 ]
 
 [defun println [str]
+       "Print STR on a single line"
        [print [cat str "\n"]]
+]
+
+[defmacro when-not [pred ...body]
+          "Evalutes to BODY if PRED is false"
+          `[if ,pred #nil [do ,@...body]]
+]
+
+[defmacro when [pred ...body]
+          "Evalutes to BODY if PRED is true"
+          `[if ,pred [do ,@...body] #nil]
+]
+
+[defun let/arg [arg]
+       `[def ,[car arg] ,[cadr arg]]
+]
+[defun let/args [args]
+       [if args
+           [cons [let/arg [car args]]
+                 [let/args [cdr args]]]
+           #nil]
+]
+[defmacro let [bindings ...body]
+          "Evalutes to BODY if PRED is true"
+          `[let* [do ,@[let/args bindings] ,@...body]]
 ]
