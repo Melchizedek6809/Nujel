@@ -177,16 +177,28 @@ static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
 /* Handler for [δ [...args] ...body] */
 static lVal *lnfDynamic(lClosure *c, lVal *v){
 	lVal *ret = lnfLambda(c,v);
-	if(ret == NULL){return NULL;}
-	ret->type = ltDynamic;
+	if(ret){ ret->type = ltDynamic; }
+	return ret;
+}
+
+/* Handler for [δ* [..args] docstring body] */
+static lVal *lnfDynamicRaw(lClosure *c, lVal *v){
+	lVal *ret = lnfLambdaRaw(c,v);
+	if(ret){ ret->type = ltDynamic; }
 	return ret;
 }
 
 /* Handler for [μ [...args] ...body] */
 static lVal *lnfMacro(lClosure *c, lVal *v){
 	lVal *ret = lnfLambda(c,v);
-	if(ret == NULL){return NULL;}
-	ret->type = ltMacro;
+	if(ret){ ret->type = ltMacro; }
+	return ret;
+}
+
+/* Handler for [μ* [...args] ...body] */
+static lVal *lnfMacroRaw(lClosure *c, lVal *v){
+	lVal *ret = lnfLambdaRaw(c,v);
+	if(ret){ ret->type = ltMacro; }
 	return ret;
 }
 
@@ -233,7 +245,9 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"let",           "[args ...body]","Create a new closure with args bound in which to evaluate ...body",lnfLet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",lnfLetRaw);
 
-	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda",             lnfLambdaRaw);
+	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda", lnfLambdaRaw);
+	lAddSpecialForm(c,"δ*",            "[args source body]", "Create a new, raw, delta",  lnfDynamicRaw);
+	lAddSpecialForm(c,"μ*",            "[args source body]", "Create a new, raw, macro",  lnfMacroRaw);
 
 	lAddSpecialForm(c,"lambda fun λ",  "[args ...body]", "Create a new lambda",                       lnfLambda);
 	lAddSpecialForm(c,"dynamic dyn δ", "[args ...body]", "New Dynamic scoped lambda",                 lnfDynamic);

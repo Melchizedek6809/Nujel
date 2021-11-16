@@ -186,3 +186,8 @@ profile-while: $(NUJEL)
 web:
 	./tools/buildwasm
 	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/var/www/html/nujel/
+
+update-bootstrap: tmp/stdlib.no tmp/binlib.no
+	cp -f tmp/stdlib.no bootstrap/stdlib.no
+	cp -f tmp/binlib.no bootstrap/binlib.no
+	sed -i 's/\[def test-context \"Nujel Standalone\"\]/\[def test-context \"Nujel Bootstrap\"\]/g' bootstrap/binlib.no

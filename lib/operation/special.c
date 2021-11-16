@@ -89,7 +89,7 @@ lVal *lnfWhile(lClosure *c, lVal *v){
 }
 
 lVal *lnfTry(lClosure *c, lVal *v){
-	const int SPOuter = lRootsGet();
+	const int SPOuter    = lRootsGet();
 	lVal *volatile catch = lRootsValPush(lEval(c,lCar(v)));
 	lVal *volatile body  = lCdr(v);
 
@@ -117,5 +117,6 @@ void lOperationsSpecial(lClosure *c){
 	lAddSpecialForm(c,"or" ,     "[...args]",       "#t if one member of ARGS evaluates to true", lnfOr);
 	lAddSpecialForm(c,"while",   "[cond ...body]",  "Evaluate ...BODY for as long as COND is true, return the value of the last iteration of ...BODY or #nil when COND was false from the start", lnfWhile);
 	lAddSpecialForm(c,"try",     "[catch ...body]", "Try evaluating ...BODY, and if an exception is thrown handle it using CATCH", lnfTry);
-	lAddSpecialForm(c,"throw",   "[v]",             "Throw V to the closest exception handler", lnfThrow);
+
+	lAddNativeFunc(c,"throw",   "[v]",             "Throw V to the closest exception handler", lnfThrow);
 }

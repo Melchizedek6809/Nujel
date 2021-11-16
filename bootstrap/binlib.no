@@ -1,7 +1,9 @@
 [do [def help [let* [do [def iter [λ* [l]
            ""
            [cond [[nil? l] #t]
-                 [#t [display [describe [car l]]] [newline] [iter [cdr l]]]]]]
+                 [#t [do [display [describe [car l]]]
+                    [newline]
+                    [iter [cdr l]]]]]]]
        [λ* [i]
            "Describe 10 functions at offset 1"
            [do [def off [* [int i] 10]]
@@ -31,13 +33,13 @@
     [def test-context "Nujel Bootstrap"]][do [def display/error [let* [do [def wrap [λ* [i text]
            ""
            [cond [[eq? i 0] [ansi-red text]]
-                 [[eq? i 1] text]
-                 [[eq? i 2] [ansi-yellow text]]
+                 [[eq? i 1] [string text]]
+                 [[eq? i 2] [ansi-yellow [str/write text]]]
                  [#t text]]]]
        [def iter [λ* [error i]
            ""
            [if error
-              [cons [wrap i [string [car error]]] [iter [cdr error] [++ i]]]
+              [cons [wrap i [car error]] [iter [cdr error] [++ i]]]
               [cons "" #nil]]]]
        [λ* [error]
            "Display ERROR in a nice, human readable way"
@@ -49,19 +51,19 @@
     [def repl/prompt [λ* []
         "> "
         "> "]]
-    [def repl/wasm [λ* [line]
-        ""
-        [do [def ctx [ω]]
+    [def repl/wasm [let* [do [def ctx [ω #nil]]
+       [λ* [line]
+           "Evaluate LINE in the wasm context"
            [try repl/exception-handler [do [def raw [read line]]
               [def expr [cons 'do raw]]
               [def cexpr [cons [compile expr]]]
-              [apply ctx cexpr]]]]]]
+              [apply ctx cexpr]]]]]]]
     [def repl/readline [λ* [ctx]
         ""
         [do [def line [readline [repl/prompt]]]
            [when [nil? line]
-                 [display "Bye!\r\n"]
-                 [exit 0]]
+                 [do [display "Bye!\r\n"]
+                    [exit 0]]]
            [readline/history/add line]
            [def raw [read line]]
            [def expr [cons 'do raw]]
@@ -74,8 +76,9 @@
     [def repl [λ* []
         ""
         [do [readline/history/load [readline/history/path]]
-           [def ctx [ω]]
-           [while #t [try repl/exception-handler [repl/readline ctx]] [readline/history/save [readline/history/path]]]]]]][unless [eq? OS "Emscripten"]
-         [test-add '[0 . ""] [popen "true"]]
-         [test-add #f [zero? [car [popen "false"]]]]
-         [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]
+           [def ctx [ω #nil]]
+           [while #t [do [try repl/exception-handler [repl/readline ctx]]
+              [readline/history/save [readline/history/path]]]]]]]][unless [eq? OS "Emscripten"]
+         [do [test-add '[0 . ""] [popen "true"]]
+            [test-add #f [zero? [car [popen "false"]]]]
+            [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]]

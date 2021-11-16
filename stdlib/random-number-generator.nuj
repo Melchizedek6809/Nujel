@@ -30,7 +30,7 @@
 
         [set! random [λ [max]
                 "Return a value from 0 to MAX, or, if left out, a random int"
-                [if [number? max]
+                [if [numeric? max]
                     [mod [abs [random/rng!]] max]
                     [random/rng!]]
         ]]

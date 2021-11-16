@@ -1,6 +1,6 @@
 ;; Some predica tes that were simpler to do in nujel
 
-[defun number? [a]
+[defun numeric? [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]
 ]
@@ -139,6 +139,11 @@
 [defun native? [val]
         "#t if VAL is a native function"
         [eq? :native-function [type-of val]]
+]
+
+[defun special-form? [val]
+        "#t if VAL is a native function"
+        [eq? :special-form [type-of val]]
 ]
 
 [defun procedure? [val]

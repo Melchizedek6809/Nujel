@@ -75,9 +75,10 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
+	(void)funSym;
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
-		lExceptionThrowVal(":runtime-macro", "Can't use macros as functions", funSym);
+		lExceptionThrowVal(":runtime-macro", "Can't use macros as functions", lCons(funSym,args));
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
@@ -114,7 +115,7 @@ lVal *lEval(lClosure *c, lVal *v){
 		lVal *car = lCar(v);
 		switch(car ? car->type : ltNoAlloc){
 		default:
-			lExceptionThrowVal(":type-error", "Can't use the following type as a function", lRootsValPush(lValSymS(getTypeSymbol(car))));
+			lExceptionThrowVal(":type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)));
 			return v;
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));

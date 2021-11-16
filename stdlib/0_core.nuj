@@ -54,3 +54,7 @@
 [defun println [str]
        [print [cat str "\n"]]
 ]
+
+[defmacro comment []
+          0
+]

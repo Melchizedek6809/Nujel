@@ -1,98 +1,112 @@
 ;; This File contains various functions generating ansi escape sequences for colorful output
 
-[def ansi-fg #[
-        "\e[0;30m"
-        "\e[0;31m"
-        "\e[0;32m"
-        "\e[0;33m"
-        "\e[0;34m"
-        "\e[0;35m"
-        "\e[0;36m"
-        "\e[0;37m"
-        "\e[1;30m"
-        "\e[1;31m"
-        "\e[1;32m"
-        "\e[1;33m"
-        "\e[1;34m"
-        "\e[1;35m"
-        "\e[1;36m"
-        "\e[1;37m"
-]]
-[def ansi-bg #[
-        "\e[40m"
-        "\e[41m"
-        "\e[42m"
-        "\e[43m"
-        "\e[44m"
-        "\e[45m"
-        "\e[46m"
-        "\e[47m"
-]]
-
-[def ansi-names #["black"
-                 "dark red"
-                 "dark green"
-                 "brown"
-                 "dark blue"
-                 "purple"
-                 "teal"
-                 "dark gray"
-                 "gray"
-                 "red"
-                 "green"
-                 "yellow"
-                 "blue"
-                 "pink"
-                 "cyan"
-                 "white"
-]]
-
 [def ansi-reset "\e[0m"]
 [def ansi-fg-reset "\e[0;39m"]
 [def ansi-bg-reset "\e[49m"]
 
-[defun ansi-wrap [code docstring]
-                 "Wrap STRING in the ansi color CODE"
-                 [def docstring [cat "Wrap ...STRING in a " [ansi-names code] " foreground"]]
-                 [eval* `[λ [...string]
-			   ,docstring
-		           [apply cat `[[ansi-fg ,code] ,@...string ansi-fg-reset]]
-	         ]]
-]
+[def ansi-fg #[
+	"\e[0;30m"
+	"\e[0;31m"
+	"\e[0;32m"
+	"\e[0;33m"
+	"\e[0;34m"
+	"\e[0;35m"
+	"\e[0;36m"
+	"\e[0;37m"
+	"\e[1;30m"
+	"\e[1;31m"
+	"\e[1;32m"
+	"\e[1;33m"
+	"\e[1;34m"
+	"\e[1;35m"
+	"\e[1;36m"
+	"\e[1;37m"
+]]
+[def ansi-reset "\e[0m"]
 
-[defun ansi-bg-wrap [code]
-                    "Wrap STRING in the ansi color CODE"
-                    [def docstring [cat "Wrap ...STRING in a " [ansi-names code] " background"]]
-                    [eval* `[λ [...string]
-			      ,docstring
-		              [apply cat `[[ansi-bg ,code] ,@...string ansi-bg-reset]]
-		    ]]
-]
-[def ansi-black      [ansi-wrap 0 ]]
-[def ansi-dark-red   [ansi-wrap 1 ]]
-[def ansi-dark-green [ansi-wrap 2 ]]
-[def ansi-brown      [ansi-wrap 3 ]]
-[def ansi-dark-blue  [ansi-wrap 4 ]]
-[def ansi-purple     [ansi-wrap 5 ]]
-[def ansi-teal       [ansi-wrap 6 ]]
-[def ansi-dark-gray  [ansi-wrap 7 ]]
-[def ansi-gray       [ansi-wrap 8 ]]
-[def ansi-red        [ansi-wrap 9 ]]
-[def ansi-green      [ansi-wrap 10]]
-[def ansi-yellow     [ansi-wrap 11]]
-[def ansi-blue       [ansi-wrap 12]]
-[def ansi-pink       [ansi-wrap 13]]
-[def ansi-cyan       [ansi-wrap 14]]
-[def ansi-white      [ansi-wrap 15]]
+[def ansi-wrap [λ [code string]
+	"Wrap STRING in the ansi color CODE"
+	[cat [ansi-fg code] string ansi-reset]
+]]
 
-[def ansi-bg-gray       [ansi-bg-wrap 0]]
-[def ansi-bg-red        [ansi-bg-wrap 1]]
-[def ansi-bg-green      [ansi-bg-wrap 2]]
-[def ansi-bg-yellow     [ansi-bg-wrap 3]]
-[def ansi-bg-blue       [ansi-bg-wrap 4]]
-[def ansi-bg-pink       [ansi-bg-wrap 5]]
-[def ansi-bg-cyan       [ansi-bg-wrap 6]]
-[def ansi-bg-white      [ansi-bg-wrap 7]]
+[def ansi-black [λ [...args]
+	"Wrap ARGS in black"
+	[ansi-wrap 0 [apply cat ...args]]
+]]
+
+[def ansi-dark-red [λ [...args]
+	"Wrap ARGS in dark red"
+	[ansi-wrap 1 [apply cat ...args]]
+]]
+[def ansi-dark-green [λ [...args]
+	"Wrap ARGS in dark green"
+	[ansi-wrap 2 [apply cat ...args]]
+]]
+
+[def ansi-brown [λ [...args]
+	"Wrap ARGS in brown"
+	[ansi-wrap 3 [apply cat ...args]]
+]]
+
+[def ansi-dark-blue [λ [...args]
+	"Wrap ARGS in dark blue"
+	[ansi-wrap 4 [apply cat ...args]]
+]]
+
+[def ansi-purple [λ [...args]
+	"Wrap ARGS in purple"
+	[ansi-wrap 5 [apply cat ...args]]
+]]
+
+[def ansi-teal [λ [...args]
+	"Wrap ARGS in teal"
+	[ansi-wrap 6 [apply cat ...args]]
+]]
+
+[def ansi-dark-gray [λ [...args]
+	"Wrap ARGS in dark gray"
+	[ansi-wrap 7 [apply cat ...args]]
+]]
+
+[def ansi-gray [λ [...args]
+	"Wrap ARGS in gray"
+	[ansi-wrap 8 [apply cat ...args]]
+]]
+
+[def ansi-red [λ [...args]
+	"Wrap ARGS in red"
+	[ansi-wrap 9 [apply cat ...args]]
+]]
+
+[def ansi-green [λ [...args]
+	"Wrap ARGS in green"
+	[ansi-wrap 10 [apply cat ...args]]
+]]
+
+[def ansi-yellow [λ [...args]
+	"Wrap ARGS in yellow"
+	[ansi-wrap 11 [apply cat ...args]]
+]]
+
+[def ansi-blue [λ [...args]
+	"Wrap ARGS in blue"
+	[ansi-wrap 12 [apply cat ...args]]
+]]
+
+[def ansi-pink [λ [...args]
+	"Wrap ARGS in pink"
+	[ansi-wrap 13 [apply cat ...args]]
+]]
+
+[def ansi-cyan [λ [...args]
+	"Wrap ARGS in cyan"
+	[ansi-wrap 14 [apply cat ...args]]
+]]
+
+[def ansi-white [λ [...args]
+	"Wrap ARGS in white"
+	[ansi-wrap 15 [apply cat ...args]]
+]]
 
 [defun ansi-rainbow [...args]
         "Wrap ARGS in the colors of the rainbow!"
