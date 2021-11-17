@@ -13,26 +13,30 @@
 #include <time.h>
 #include <sys/time.h>
 
+/* Return monotonic time in milliseconds */
 u64 getMSecs(){
 	struct timespec tv;
 	clock_gettime(CLOCK_MONOTONIC,&tv);
 	return (tv.tv_nsec / 1000000) + (tv.tv_sec * 1000);
 }
 
+/* [time] - Return the current unix time */
 static lVal *lnfTime(lClosure *c, lVal *v){
 	(void)c;(void)v;
 	return lValInt(time(NULL));
 }
 
+/* [time/milliseconds] - Return monotonic msecs */
 static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	return lValInt(getMSecs());
 }
 
+/* [time/strftime ts format] - eturn TS as a date using FORMAT */
 static lVal *lnfStrftime(lClosure *c, lVal *v){
 	(void)c;
 	const int timestamp = castToInt(lCar(v),time(NULL));
-	const char *format = castToString(lCadr(v),"%Y-%m-%d %H:%M:%S");
+	const char *format  = castToString(lCadr(v),"%Y-%m-%d %H:%M:%S");
 
 	char buf[4096];
 	time_t ts = timestamp;
@@ -43,7 +47,7 @@ static lVal *lnfStrftime(lClosure *c, lVal *v){
 }
 
 void lOperationsTime(lClosure *c){
-	lAddNativeFunc(c,"time",             "[]",         "Returns unix time",lnfTime);
-	lAddNativeFunc(c,"strftime",         "[ts format]","Returns TS as a date using FORMAT (uses strftime)",lnfStrftime);
-	lAddNativeFunc(c,"time/milliseconds","[]",         "Returns monotonic msecs",lnfTimeMsecs);
+	lAddNativeFunc(c,"time",             "[]",         "Return the current unix time",lnfTime);
+	lAddNativeFunc(c,"time/strftime",    "[ts format]","Return TS as a date using FORMAT (uses strftime)",lnfStrftime);
+	lAddNativeFunc(c,"time/milliseconds","[]",         "Return monotonic msecs",lnfTimeMsecs);
 }

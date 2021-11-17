@@ -23,7 +23,7 @@
 
 lVal *lnfvCat;
 
-lVal *lnfStrlen(lClosure *c, lVal *v){
+static lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCar(v);
@@ -31,7 +31,7 @@ lVal *lnfStrlen(lClosure *c, lVal *v){
 	return lValInt(lStringLength(t->vString));
 }
 
-lVal *lnfTrim(lClosure *c, lVal *v){
+static lVal *lnfTrim(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
@@ -52,7 +52,7 @@ lVal *lnfTrim(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfStrDown(lClosure *c, lVal *v){
+static lVal *lnfStrDown(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
@@ -72,7 +72,7 @@ lVal *lnfStrDown(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfStrUp(lClosure *c, lVal *v){
+static lVal *lnfStrUp(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
@@ -92,7 +92,7 @@ lVal *lnfStrUp(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfStrCap(lClosure *c, lVal *v){
+static lVal *lnfStrCap(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return NULL;}
 	lVal *t = lCar(v);
@@ -123,7 +123,7 @@ lVal *lnfStrCap(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfSubstr(lClosure *c, lVal *v){
+static lVal *lnfSubstr(lClosure *c, lVal *v){
 	(void)c;
 	const char *buf;
 	int start = 0;
@@ -221,14 +221,14 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	return lValString(tmpStringBuf);
 }
 
-lVal *lnfIndexOf(lClosure *c, lVal *v){
+static lVal *lnfIndexOf(lClosure *c, lVal *v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
-	const char *needle = castToString(lCadr(v),NULL);
+	const char *needle   = castToString(lCadr(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}
-	if(needle == NULL)   {return lValInt(-2);}
+	if(needle   == NULL) {return lValInt(-2);}
 	const int haystackLength = strlen(haystack);
-	const int needleLength = strlen(needle);
+	const int needleLength   = strlen(needle);
 
 	const int pos = castToInt(lCaddr(v),0);
 	if(pos > haystackLength-needleLength){return lValInt(-3);}
@@ -238,34 +238,32 @@ lVal *lnfIndexOf(lClosure *c, lVal *v){
 	if(needleLength <= 0){return lValInt(pos);}
 
 	for(const char *s = &haystack[pos]; *s != 0; s++){
-		if(strncmp(s,needle,needleLength) == 0){
-			return lValInt(s-haystack);
-		}
+		if(strncmp(s,needle,needleLength)){continue;}
+		return lValInt(s-haystack);
 	}
 	return lValInt(-4);
 }
 
-lVal *lnfLastIndexOf(lClosure *c, lVal *v){
+static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
-	const char *needle = castToString(lCadr(v),NULL);
+	const char *needle   = castToString(lCadr(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}
-	if(needle == NULL)   {return lValInt(-2);}
+	if(needle   == NULL) {return lValInt(-2);}
 	const int haystackLength = strlen(haystack);
-	const int needleLength = strlen(needle);
+	const int needleLength   = strlen(needle);
 
 	if(needleLength <= 0){return lValInt(-3);}
 	const int pos = castToInt(lCaddr(v),haystackLength - needleLength - 1);
 
 	for(const char *s = &haystack[pos]; s > haystack; s--){
-		if(strncmp(s,needle,needleLength) == 0){
-			return lValInt(s-haystack);
-		}
+		if(strncmp(s,needle,needleLength)){continue;}
+		return lValInt(s-haystack);
 	}
 	return lValInt(-4);
 }
 
-lVal *lnfStrSym(lClosure *c, lVal *v){
+static lVal *lnfStrSym(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
 	if(v == NULL){return NULL;}
@@ -273,7 +271,7 @@ lVal *lnfStrSym(lClosure *c, lVal *v){
 	return lValSym(v->vString->data);
 }
 
-lVal *lnfSymStr(lClosure *c, lVal *v){
+static lVal *lnfSymStr(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
 	if(v == NULL){return NULL;}
@@ -281,7 +279,7 @@ lVal *lnfSymStr(lClosure *c, lVal *v){
 	return lValString(v->vSymbol->c);
 }
 
-lVal *lnfWriteStr(lClosure *c, lVal *v){
+static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
 	static char *buf = NULL;
 	if(v == NULL){
@@ -293,7 +291,7 @@ lVal *lnfWriteStr(lClosure *c, lVal *v){
 	return lValString(buf);
 }
 
-lVal *lnfCharAt(lClosure *c,lVal *v){
+static lVal *lnfCharAt(lClosure *c,lVal *v){
 	(void)c;
 	const char *str = castToString(lCar(v),NULL);
 	const int pos = castToInt(lCadr(v),0);
@@ -303,7 +301,7 @@ lVal *lnfCharAt(lClosure *c,lVal *v){
 	return lValInt(str[pos]);
 }
 
-lVal *lnfFromCharCode(lClosure *c,lVal *v){
+static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 	(void)c;
 	int len = lListLength(v)+1;
 	char *buf = __builtin_alloca(len);

@@ -29,30 +29,13 @@ __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 
 /* Cause an exception, passing a list of SYMBOL and ERROR to the exception handler */
 __attribute__((noreturn)) void lExceptionThrow(const char *symbol, const char *error){
-	lVal *l = lRootsValPush(lCons(NULL,NULL));
-	lVal *c = l;
-
-	c->vList.car = lValSym(symbol);
-	c->vList.cdr = lCons(NULL,NULL);
-	c = c->vList.cdr;
-	c->vList.car = lValString(error);
-
+	lVal *l = lList(2,RVP(lValSym(symbol)),RVP(lValString(error)));
 	lExceptionThrowRaw(l);
 }
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 __attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
-	lVal *l = lRootsValPush(lCons(NULL,NULL));
-	lVal *c = l;
-
-	c->vList.car = lValSym(symbol);
-	c->vList.cdr = lCons(NULL,NULL);
-	c = c->vList.cdr;
-	c->vList.car = lValString(error);
-	c->vList.cdr = lCons(NULL,NULL);
-	c = c->vList.cdr;
-	c->vList.car = v;
-
+	lVal *l = lList(3,RVP(lValSym(symbol)),RVP(lValString(error)),RVP(v));
 	lExceptionThrowRaw(l);
 }
 

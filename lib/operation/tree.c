@@ -15,6 +15,7 @@
 
 lVal *lnfvTreeGet;
 
+/* [tree/new ...plist] - Return a new tree, initialized with PLIST */
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
@@ -33,6 +34,7 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	return ret;
 }
 
+/* [tree/list tree] - eturn a TREE as a plist */
 static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -41,6 +43,7 @@ static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 	return lTreeToList(tre);
 }
 
+/* [tree/keys tree] - Return each key of TREE in a list */
 static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -49,6 +52,7 @@ static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
 	return lTreeKeysToList(tre);
 }
 
+/* [tree/values tree] - Return each value of TREE in a list */
 static lVal *lnfTreeGetValues(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -57,6 +61,7 @@ static lVal *lnfTreeGetValues(lClosure *c, lVal *v){
 	return lTreeValuesToList(tre);
 }
 
+/* [tree/get tree sym] - Return the value of SYM in TREE, or #nil */
 lVal *lnfTreeGet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -67,6 +72,7 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	return lTreeGet(tre,vs->vSymbol,NULL);
 }
 
+/* [tree/has? tree sym] - Return #t if TREE contains a value for SYM */
 static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -77,6 +83,7 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	return lValBool(lTreeHas(tre,vs->vSymbol,NULL));
 }
 
+/* [tree/set! tree sym val] - Set SYM to VAL in TREE */
 static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -88,6 +95,7 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	return car;
 }
 
+/* [tree/size tree] - Return the amount of entries in TREE */
 static lVal *lnfTreeSize(lClosure *c, lVal *v){
 	(void)c;
 	lTree *tree = castToTree(lCar(v),NULL);

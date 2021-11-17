@@ -191,11 +191,11 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
-	const int bva = lValActive;
-	const int bca = lClosureActive;
-	const int baa = lArrayActive;
-	const int bsa = lStringActive;
-	const int bta = lTreeActive;
+	const int bva   = lValActive;
+	const int bca   = lClosureActive;
+	const int baa   = lArrayActive;
+	const int bsa   = lStringActive;
+	const int bta   = lTreeActive;
 	const u64 start = getMSecs();
 
 	lGCRuns++;
@@ -204,11 +204,11 @@ void lGarbageCollect(){
 	if(lVerbose){
 		const u64 end = getMSecs();
 		printf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(int)(end-start));
-		printf("Vals: %u -> %u [Δ %i]{Σ %i}\n",bva,lValActive,(int)lValActive - bva, lValMax);
+		printf("Vals: %u -> %u [Δ %i]{Σ %i}\n",bva,lValActive,    (int)lValActive     - bva, lValMax);
 		printf("Clos: %u -> %u [Δ %i]{Σ %i}\n",bca,lClosureActive,(int)lClosureActive - bca, lClosureMax);
-		printf("Strs: %u -> %u [Δ %i]{Σ %i}\n",bsa,lStringActive,(int)lStringActive - bsa, lStringMax);
-		printf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive, (int)lArrayActive - baa, lArrayMax);
-		printf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive, (int)lTreeActive - bta, lTreeMax);
+		printf("Strs: %u -> %u [Δ %i]{Σ %i}\n",bsa,lStringActive, (int)lStringActive  - bsa, lStringMax);
+		printf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive,  (int)lArrayActive   - baa, lArrayMax);
+		printf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive,   (int)lTreeActive    - bta, lTreeMax);
 		printf("--------------\n\n");
 	}
 }

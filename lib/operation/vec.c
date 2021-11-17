@@ -10,18 +10,21 @@
 #include "../type/native-function.h"
 #include "../type/val.h"
 
+/* [vec/x vec] - Return x part of VEC */
 static lVal *lnfVX(lClosure *c, lVal *v){
 	(void)c;
 	const vec val = castToVec(lCar(v), vecZero());
 	return lValFloat(val.x);
 }
 
+/* [vec/y vec] - Return y part of VEC */
 static lVal *lnfVY(lClosure *c, lVal *v){
 	(void)c;
 	const vec val = castToVec(lCar(v), vecZero());
 	return lValFloat(val.y);
 }
 
+/* [vec/z vec] - Return z part of VEC */
 static lVal *lnfVZ(lClosure *c, lVal *v){
 	(void)c;
 	const vec val = castToVec(lCar(v), vecZero());

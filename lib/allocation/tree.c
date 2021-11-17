@@ -33,14 +33,14 @@ lTree *lTreeAlloc(){
 				lPrintError("lTree OOM\n");
 				exit(1);
 			}else{
-				ret       = lTreeFFree;
+				ret        = lTreeFFree;
 				lTreeFFree = ret->nextFree;
 			}
 		}else{
 			ret = &lTreeList[lTreeMax++];
 		}
 	}else{
-		ret       = lTreeFFree;
+		ret        = lTreeFFree;
 		lTreeFFree = ret->nextFree;
 	}
 	lTreeActive++;

@@ -64,7 +64,7 @@ lVal *lnfDo(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfWhile(lClosure *c, lVal *v){
+static lVal *lnfWhile(lClosure *c, lVal *v){
 	lVal *cond = lCar(v);
 	lVal *body = lCdr(v);
 	lVal *ret  = NULL;
@@ -88,7 +88,7 @@ lVal *lnfTry(lClosure *c, lVal *v){
 	return ret;
 }
 
-lVal *lnfThrow(lClosure *c, lVal *v){
+static lVal *lnfThrow(lClosure *c, lVal *v){
 	(void)c;
 	lExceptionThrowRaw(lCar(v));
 	return NULL;

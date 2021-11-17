@@ -163,7 +163,7 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 	return ret;
 }
 
-/* Add all the platform specific constants to c */
+/* Add all the platform specific constants to C */
 static void lAddPlatformVars(lClosure *c){
 	#if defined(__HAIKU__)
 	lDefineVal(c, "OS", lValString("Haiku"));
@@ -174,12 +174,14 @@ static void lAddPlatformVars(lClosure *c){
 	#elif defined(__MINGW32__)
 	lDefineVal(c, "OS", lValString("Windows"));
 	#elif defined(__linux__)
-		#if defined(__MUSL__)
-		lDefineVal(c, "OS", lValString("MUSL/Linux"));
+		#if defined(__UCLIBC__)
+		lDefineVal(c, "OS", lValString("uClibc/Linux"));
 		#elif defined(__GLIBC__)
 		lDefineVal(c, "OS", lValString("GNU/Linux"));
+		#elif defined(__BIONIC__)
+		lDefineVal(c, "OS", lValString("Android"));
 		#else
-		lDefineVal(c, "OS", lValString("?/Linux"));
+		lDefineVal(c, "OS", lValString("musl?/Linux"));
 		#endif
 	#elif defined(__FreeBSD__)
 	lDefineVal(c, "OS", lValString("FreeBSD"));
@@ -197,8 +199,10 @@ static void lAddPlatformVars(lClosure *c){
 	lDefineVal(c, "ARCH", lValString("armv7l"));
 	#elif defined(__aarch64__)
 	lDefineVal(c, "ARCH", lValString("aarch64"));
-	#elif defined(__x86_64__)
+	#elif defined(__x86_64__) || defined(__amd64__)
 	lDefineVal(c, "ARCH", lValString("x86_64"));
+	#elif defined(__i386__)
+	lDefineVal(c, "ARCH", lValString("x86"));
 	#elif defined(__EMSCRIPTEN__)
 	lDefineVal(c, "ARCH", lValString("wasm"));
 	#else
@@ -300,7 +304,7 @@ lVal *lList(int length, ...){
 	for(;length;length--){
 		lVal *t = va_arg(varArgs, lVal *);
 		if(ret == NULL){
-			ret = l = lRootsValPush(lCons(NULL,NULL));
+			ret = l = RVP(lCons(NULL,NULL));
 		}else{
 			l = l->vList.cdr = lCons(NULL,NULL);
 		}
