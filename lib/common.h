@@ -52,7 +52,6 @@ typedef enum lType {
 	ltTree,
 
 	ltLambda,
-	ltDynamic,
 	ltObject,
 	ltMacro,
 	ltNativeFunc,

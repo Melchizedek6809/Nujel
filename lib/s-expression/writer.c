@@ -163,7 +163,6 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		t = snprintf(cur,bufEnd-cur,"]");
 		break; }
 	case ltMacro:
-	case ltDynamic:
 	case ltLambda: {
 		*cur++ = '[';
 		int syms = 0;

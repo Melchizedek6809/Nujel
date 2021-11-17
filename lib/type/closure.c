@@ -45,7 +45,6 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	lPrintError("Quite the amount of aliases we have there (%s)\n",sym);
 	return NULL;
 }
-#include <stdio.h>
 
 /* Return TRUE if C contains a binding for S, storing the value in V */
 bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){

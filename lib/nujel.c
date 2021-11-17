@@ -48,9 +48,7 @@ void lInit(){
 lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lVal *vn = args;
-	lClosure *tmpc = (lambda->type == ltDynamic
-		? lClosureNew(c)
-		: lClosureNew(lambda->vClosure));
+	lClosure *tmpc = lClosureNew(lambda->vClosure);
 	lRootsClosurePush(tmpc);
 	tmpc->text = lambda->vClosure->text;
 	forEach(n,lambda->vClosure->args){
@@ -82,7 +80,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
-	case ltDynamic:
 		return lLambda(c,args,fun);
 	case ltSpecialForm:
 		return fun->vNFunc->fp(c,args);
@@ -120,7 +117,6 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
-		case ltDynamic:
 			return lRootsValPush(lLambda(c,lCdr(v),car));
 		case ltMacro:
 			lExceptionThrowVal(":runtime-macro", "Can't use macros as functions", v);

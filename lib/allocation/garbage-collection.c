@@ -53,7 +53,6 @@ void lValGCMark(lVal *v){
 		break;
 	case ltMacro:
 	case ltObject:
-	case ltDynamic:
 	case ltLambda:
 		lClosureGCMark(v->vClosure);
 		break;

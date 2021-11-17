@@ -43,7 +43,6 @@ void lSymbolInit(){
 	lSymLTBool           = lSymS(":bool");
 	lSymLTPair           = lSymS(":pair");
 	lSymLTObject         = lSymS(":object");
-	lSymLTDynamic        = lSymS(":dynamic");
 	lSymLTLambda         = lSymS(":lambda");
 	lSymLTInt            = lSymS(":int");
 	lSymLTFloat          = lSymS(":float");
@@ -130,7 +129,6 @@ lSymbol *getTypeSymbol(const lVal* v){
 	case ltBool:       return lSymLTBool;
 	case ltPair:       return lSymLTPair;
 	case ltObject:     return lSymLTObject;
-	case ltDynamic:    return lSymLTDynamic;
 	case ltLambda:     return lSymLTLambda;
 	case ltInt:        return lSymLTInt;
 	case ltFloat:      return lSymLTFloat;

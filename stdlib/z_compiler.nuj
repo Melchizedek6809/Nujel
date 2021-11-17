@@ -39,16 +39,6 @@
        source
 ]
 
-[defun compile/δ [source]
-       [if [string?  [caddr source]]
-           [list 'δ* [cadr source] [caddr source] [compile/do [cddr source]]]
-           [list 'δ* [cadr source]             "" [compile/do [cddr source]]]]
-]
-
-[defun compile/δ* [source]
-       source
-]
-
 [defun compile/μ [source]
        [if [string?  [caddr source]]
            [list 'μ* [cadr source] [caddr source] [compile/do [cddr source]]]
@@ -129,7 +119,6 @@
                       [[eq? op set!]   [compile/set!   source]]
                       [[eq? op let]    [compile/let    source]]
                       [[eq? op let*]   [compile/let*   source]]
-                      [[eq? op δ*]     [compile/δ*     source]]
                       [[eq? op λ]      [compile/λ      source]]
                       [[eq? op λ*]     [compile/λ*     source]]
                       [[eq? op μ]      [compile/μ      source]]
@@ -166,11 +155,6 @@
 [defmacro \ [...body]
         "Define a λ with the self-hosting Nujel compiler"
         [compile [cons 'λ ...body]]
-]
-
-[defmacro δ [...body]
-        "Define a δ with the self-hosting Nujel compiler"
-        [compile [cons 'δ ...body]]
 ]
 
 [defmacro eval [expr]
