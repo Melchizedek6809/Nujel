@@ -365,7 +365,7 @@ lVal *lReadValue(lString *s){
 	case '[':
 		s->data++;
 		return lReadList(s,false);
-	case ',':
+	case '~':
 		s->data++;
 		if(*s->data == '@'){
 			s->data++;

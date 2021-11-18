@@ -159,9 +159,9 @@
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"
-          `[eval* [compile ,expr]]
+          `[eval* [compile ~expr]]
 ]
 
 [defmacro +1 [v]
-           `[+ 1 ,v]
+           `[+ 1 ~v]
 ]

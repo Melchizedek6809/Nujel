@@ -14,7 +14,7 @@
 ]
 [defmacro test/add [result ...expr]
        "Add a test where ...EXPR must eval to RESULT"
-       `[test/add* ,result ,[list 'quote [cons 'do ...expr]]]
+       `[test/add* ~result ~[list 'quote [cons 'do ...expr]]]
 ]
 
 [defun test-add [result @...expr]
