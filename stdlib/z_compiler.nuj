@@ -1,6 +1,5 @@
 ;; Contains the self-hosting Nujel compiler
 
-
 [defun compile/do/args [args]
        [if [last? args]
            [cons [compile [car args]] #nil]

@@ -48,7 +48,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 
 /* Return TRUE if C contains a binding for S, storing the value in V */
 bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
-	if((c == NULL) || (s == NULL)){return NULL;}
+	if(c == NULL){return NULL;}
 	bool found = false;
 	lVal *t = lTreeGet(c->data,s,&found);
 	if(found && (v != NULL)){

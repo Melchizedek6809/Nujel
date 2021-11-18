@@ -52,18 +52,19 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	lRootsClosurePush(tmpc);
 	tmpc->text = lambda->vClosure->text;
 	forEach(n,lambda->vClosure->args){
-		if(vn == NULL){break;}
 		lVal *car = lCar(n);
 		if(car == NULL){continue;}
 		const lSymbol *csym = lGetSymbol(car);
-		if(lSymVariadic(csym)){
+		if(vn == NULL){
+			lDefineClosureSym(tmpc,csym,NULL);
+		}else if(lSymVariadic(csym)){
 			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
 			lDefineClosureSym(tmpc,csym,t);
 			break;
 		}else{
 			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? lCar(vn) : lEval(c,lCar(vn));
 			lDefineClosureSym(tmpc,csym,t);
-			if(vn != NULL){vn = lCdr(vn);}
+			vn = lCdr(vn);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
@@ -141,9 +142,10 @@ lVal *lEval(lClosure *c, lVal *v){
 			}else{
 				if(car->vSymbol && lSymKeyword(car->vSymbol)){
 					return v;
+				}else{
+					lExceptionThrowVal(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car);
+					return NULL;
 				}
-				lExceptionThrowVal(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car);
-				return NULL;
 			}}
 		case ltPair:
 			return lApply(c,lCdr(v),lRootsValPush(lEval(c,car)),car);

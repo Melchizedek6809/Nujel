@@ -5,6 +5,7 @@
  */
 #include "closure.h"
 #include "special.h"
+#include "../exception.h"
 #include "../type-system.h"
 #include "../allocation/roots.h"
 #include "../allocation/val.h"
@@ -15,6 +16,11 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
+const lSymbol *symType;
+const lSymbol *symDocumentation;
+const lSymbol *symArguments;
+const lSymbol *symCode;
+const lSymbol *symData;
 
 static lVal *lnfDef(lClosure *c, lVal *v){
 	lVal *sym = lCar(v);
@@ -65,25 +71,64 @@ static lVal *lnfSymCount(lClosure *c, lVal *v){
 static lVal *lnfClosure(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	if(car == NULL){return NULL;}
+	if((car == NULL)
+		|| !((car->type == ltSpecialForm)
+		||   (car->type == ltNativeFunc)
+		||   (car->type == ltLambda)
+		||   (car->type == ltObject)
+		||   (car->type == ltMacro))){
+		return NULL;
+	}
+	lVal *ret = lRootsValPush(lValTree(NULL));
+	ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
 	if((car->type == ltSpecialForm) || (car->type == ltNativeFunc)){
 		lNFunc *nf = car->vNFunc;
-		lVal *ret = lRootsValPush(lValTree(NULL));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),nf->doc);
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),nf->args);
-		return ret;
-	}else if((car->type == ltLambda) || (car->type == ltObject) || (car->type == ltMacro)){
+		ret->vTree = lTreeInsert(ret->vTree,symDocumentation,nf->doc);
+		ret->vTree = lTreeInsert(ret->vTree,symArguments,nf->args);
+	}else{
 		lClosure *clo = car->vClosure;
-		lVal *ret = lRootsValPush(lValTree(NULL));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),clo->doc);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),clo->args);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":data"), lRootsValPush(lValTree(clo->data)));
-		return ret;
 	}
-	return false;
+	return ret;
+}
+
+static void lClosureSetRec(lClosure *clo, lTree *data){
+	if(data == NULL){return;}
+	const lSymbol *sym = data->key;
+	if(data->key == symDocumentation){
+		clo->doc = data->value;
+	}else if(data->key == symArguments){
+		clo->args = data->value;
+	}else if(data->key == symCode){
+		clo->text = data->value;
+	}else if(data->key == symData){
+		lTree *newData = castToTree(data->value,NULL);
+		if(newData){
+			clo->data = newData;
+		}
+	}else {
+		lExceptionThrowVal(":invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym));
+	}
+	lClosureSetRec(clo,data->left);
+	lClosureSetRec(clo,data->right);
+}
+
+static lVal *lnfClosureSet(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	lTree *data = castToTree(lCadr(v),NULL);
+	if((car == NULL) || (data == NULL)
+		|| !((car->type == ltLambda)
+		||   (car->type == ltObject)
+		||   (car->type == ltMacro))){
+		return NULL;
+	}
+	lClosure *clo = car->vClosure;
+	lClosureSetRec(clo,data);
+	return NULL;
 }
 
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
@@ -198,10 +243,17 @@ static lVal *lnfSymbolSearch(lClosure *c, lVal *v){
 }
 
 void lOperationsClosure(lClosure *c){
+	symType          = lSymS(":type");
+	symDocumentation = lSymS(":documentation");
+	symArguments     = lSymS(":arguments");
+	symCode          = lSymS(":code");
+	symData          = lSymS(":data");
+
 	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym]",         "Check if SYM resolves to a value",           lnfResolvesPred);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
+	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
 
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"current-closure","[n]",           "Return the current closure as an object",    lnfCurrentClosure);

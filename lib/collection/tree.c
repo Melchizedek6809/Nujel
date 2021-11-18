@@ -123,12 +123,11 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 	}
 }
 
-/* Get whatevery value is associated in T to S,
+/* Get whatever value is associated in T to S,
  * setting FOUND to true if successful */
 lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
 	const lTree *c = t;
 	while(c != NULL){
-		if(c->key == NULL){break;}
 		if(s == c->key){
 			if(found != NULL){*found = true;}
 			return c->value;
