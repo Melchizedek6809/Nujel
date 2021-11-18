@@ -5,6 +5,7 @@
  */
 #include "closure.h"
 #include "special.h"
+#include "../display.h"
 #include "../exception.h"
 #include "../type-system.h"
 #include "../allocation/roots.h"
