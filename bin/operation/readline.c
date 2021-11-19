@@ -26,9 +26,12 @@
 	static void bestlineHistoryAdd (const char *line){(void)line;}
 
 	static char *bestline(const char *prompt){
-		static char buf[4096];
+		char *buf = malloc(1<<12);
+		if(buf == NULL){
+			fprintf(stderr,"Unable to allocate readline buf, exiting!\n");
+			exit(3);
+		}
 		printf("%s",prompt);
-		fflush(stdout);
 		if(fgets(buf,sizeof(buf),stdin) == NULL){
 			return NULL;
 		}
