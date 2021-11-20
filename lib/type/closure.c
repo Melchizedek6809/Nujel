@@ -7,6 +7,7 @@
 #include "../nujel.h"
 #include "../allocation/closure.h"
 #include "../allocation/garbage-collection.h"
+#include "../allocation/symbol.h"
 #include "../collection/list.h"
 #include "../collection/tree.h"
 #include "../type/closure.h"

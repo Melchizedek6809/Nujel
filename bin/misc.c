@@ -5,6 +5,7 @@
  */
 #include "misc.h"
 
+#include <stdarg.h>
 #include <ctype.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -18,9 +19,14 @@
 #include <shlobj.h>
 #endif
 
-void lWidgetMarkI(uint i){
-	(void)i;
+void lWidgetMarkI(uint i){(void)i;}
+void lPrintError(const char *format, ...){
+	va_list ap;
+	va_start(ap,format);
+	vfprintf(stderr,format,ap);
+	va_end(ap);
 }
+
 
 void *loadFile(const char *filename,size_t *len){
 	FILE *fp;

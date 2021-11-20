@@ -7,7 +7,9 @@
 
 #include "api.h"
 #include "exception.h"
+#include "allocation/native-function.h"
 #include "allocation/tree.h"
+#include "allocation/symbol.h"
 #include "operation/allocation.h"
 #include "operation/arithmetic.h"
 #include "operation/array.h"

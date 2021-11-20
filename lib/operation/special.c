@@ -70,9 +70,10 @@ static lVal *lnfWhile(lClosure *c, lVal *v){
 	lVal *ret  = NULL;
 	const int SP = lRootsGet();
 	while(castToBool(lEval(c,cond))){
-		ret = lnfDo(c,body);
 		lRootsRet(SP);
+		ret = RVP(lnfDo(c,body));
 	}
+	lRootsRet(SP);
 	return ret;
 }
 

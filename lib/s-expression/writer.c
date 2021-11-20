@@ -6,6 +6,8 @@
 #include "writer.h"
 
 #include "../allocation/array.h"
+#include "../allocation/native-function.h"
+#include "../allocation/symbol.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"

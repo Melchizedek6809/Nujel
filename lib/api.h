@@ -11,6 +11,7 @@
 #include "allocation/garbage-collection.h"
 #include "allocation/roots.h"
 #include "allocation/string.h"
+#include "allocation/symbol.h"
 #include "allocation/val.h"
 
 #include "collection/list.h"

@@ -3,7 +3,6 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,13 +16,6 @@
 
 extern char binlib_no_data[];
 lClosure *mainClosure;
-
-void lPrintError(const char *format, ...){
-	va_list ap;
-	va_start(ap,format);
-	vfprintf(stderr,format,ap);
-	va_end(ap);
-}
 
 void doRepl(lClosure *c){
 	lVal *cmd = lRootsValPush(lCons(NULL,NULL));
