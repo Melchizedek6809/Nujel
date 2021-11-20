@@ -16,7 +16,7 @@
 #include "operation/io.h"
 
 extern char binlib_no_data[];
-
+lClosure *mainClosure;
 
 void lPrintError(const char *format, ...){
 	va_list ap;
@@ -119,20 +119,6 @@ void parseOptions(lClosure *c, int argc, char *argv[]){
 	if(repl){
 		doRepl(c);
 	}
-}
-
-lClosure *mainClosure;
-
-const char *run(const char *line){
-	const int SP = lRootsGet();
-	lVal *exp = lRootsValPush(lCons(NULL,NULL));
-	exp->vList.car = lValSym("repl/wasm");
-	exp->vList.cdr = lCons(NULL,NULL);
-	exp->vList.cdr->vList.car = lValString(line);
-	lVal *v = lEval(mainClosure,exp);
-	const char *ret = v ? lReturnDisplayVal(v) : "";
-	lRootsRet(SP);
-	return ret;
 }
 
 int main(int argc, char *argv[]){

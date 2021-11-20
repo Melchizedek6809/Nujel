@@ -31,7 +31,8 @@
            [def res [popen command]]
            [file/remove tmp-path]
            [cons [car res] [cdr res]]]]]
-    [def test-context "Nujel Bootstrap"]][do [def display/error [let* [do [def wrap [λ* [i text]
+    [def test-context "Nujel Bootstrap"]][do [def ctx [current-closure]]
+    [def display/error [let* [do [def wrap [λ* [i text]
            ""
            [cond [[eq? i 0] [ansi-red text]]
                  [[eq? i 1] [string text]]
@@ -52,13 +53,12 @@
     [def repl/prompt [λ* []
         "> "
         "> "]]
-    [def repl/wasm [let* [do [def ctx [ω #nil]]
-       [λ* [line]
-           "Evaluate LINE in the wasm context"
-           [try repl/exception-handler [do [def raw [read line]]
-              [def expr [cons 'do raw]]
-              [def cexpr [cons [compile expr]]]
-              [apply ctx cexpr]]]]]]]
+    [def repl/wasm [let* [λ* [line]
+        "Evaluate LINE in the wasm context"
+        [try repl/exception-handler [do [def raw [read line]]
+           [def expr [cons 'do raw]]
+           [def cexpr [cons [compile expr]]]
+           [apply ctx cexpr]]]]]]
     [def repl/readline [λ* [ctx]
         ""
         [do [def line [readline [repl/prompt]]]
@@ -78,10 +78,9 @@
     [def repl [λ* []
         ""
         [do [readline/history/load [readline/history/path]]
-           [def ctx [ω #nil]]
            [while #t [do [try repl/exception-handler [repl/readline ctx]]
               [readline/history/save [readline/history/path]]]]]]]][if [eq? OS "Emscripten"]
     #nil
-    [do [test-add '[0 . ""] [popen "true"]]
-       [test-add #f [zero? [car [popen "false"]]]]
-       [test-add '[0 . "testerle\n"] [popen "echo testerle"]]]]
+    [do [test/add* '[0 . ""] '[do [popen "true"]]]
+       [test/add* #f '[do [zero? [car [popen "false"]]]]]
+       [test/add* '[0 . "testerle\n"] '[do [popen "echo testerle"]]]]]
