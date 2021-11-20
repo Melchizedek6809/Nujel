@@ -17,12 +17,6 @@
        `[test/add* ~result ~[list 'quote [cons 'do ...expr]]]
 ]
 
-[defun test-add [result @...expr]
-       "Add a test where ...EXPR must eval to RESULT"
-       [set! test-list [cons [cons result [cons 'do @...expr]] test-list]]
-       [set! test-count [+ test-count 1]]
-]
-
 [defun display-results []
        "Prints the result Message"
        [random/seed-initialize!]

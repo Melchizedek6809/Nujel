@@ -44,6 +44,36 @@ void lInit(){
 	lTreeInit();
 }
 
+/* Evaluate the Nujel Macro and return the results */
+lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
+	(void)c;
+	if(lambda->type != ltMacro){
+		lExceptionThrowVal(":macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lambda);
+	}
+	const int SP = lRootsGet();
+	lVal *vn = args;
+	lClosure *tmpc = lClosureNew(lambda->vClosure);
+	lRootsClosurePush(tmpc);
+	tmpc->text = lambda->vClosure->text;
+	forEach(n,lambda->vClosure->args){
+		lVal *car = lCar(n);
+		if(car == NULL){continue;}
+		const lSymbol *csym = lGetSymbol(car);
+		if(vn == NULL){
+			lDefineClosureSym(tmpc,csym,NULL);
+		}else if(lSymVariadic(csym)){
+			lDefineClosureSym(tmpc,csym,vn);
+			break;
+		}else{
+			lDefineClosureSym(tmpc,csym,lCar(vn));
+			vn = lCdr(vn);
+		}
+	}
+	lVal *ret = lEval(tmpc,lambda->vClosure->text);
+	lRootsRet(SP);
+	return ret;
+}
+
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
@@ -58,12 +88,10 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 		if(vn == NULL){
 			lDefineClosureSym(tmpc,csym,NULL);
 		}else if(lSymVariadic(csym)){
-			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? vn : lMap(c,vn,lEval);
-			lDefineClosureSym(tmpc,csym,t);
+			lDefineClosureSym(tmpc,csym,lMap(c,vn,lEval));
 			break;
 		}else{
-			lVal *t = (lambda->type == ltMacro) || lSymNoEval(csym) ? lCar(vn) : lEval(c,lCar(vn));
-			lDefineClosureSym(tmpc,csym,t);
+			lDefineClosureSym(tmpc,csym,lEval(c,lCar(vn)));
 			vn = lCdr(vn);
 		}
 	}

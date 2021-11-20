@@ -101,12 +101,6 @@ lVal *lValSym(const char *s){
 	return false;
 }
 
-bool lSymNoEval(const lSymbol *s){
-	if(s->c[0] == '@'){return true;}
-	if((s->c[0] == '&') && (s->c[1] == '@')){return true;}
-	return false;
-}
-
 bool lSymKeyword(const lSymbol *s){
 	return s->c[0] == ':';
 }

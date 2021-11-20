@@ -26,17 +26,13 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 /* Handler for [apply fn list] */
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
-	//lWriteVal(fun);
 	if(fun == NULL){return NULL;}
 	if(fun->type == ltSymbol){ fun = lGetClosureSym(c,fun->vSymbol); }
 	if(fun->type != ltMacro){
 		fun = lEval(c,fun);
 	}
-	if(fun->type != ltMacro){
-		lExceptionThrowVal(":macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lCons(lValSymS(getTypeSymbol(fun)),v));
-	}
 
-	return lLambda(c,lCadr(v),fun);
+	return lMacro(c,lCadr(v),fun);
 }
 
 void lOperationsEval(lClosure *c){
