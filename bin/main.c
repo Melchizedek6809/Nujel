@@ -17,7 +17,23 @@
 extern char binlib_no_data[];
 lClosure *mainClosure;
 
-void doRepl(lClosure *c){
+#ifdef __EMSCRIPTEN__
+/* To be used for the WASM REPL, since we don't run continuously there */
+const char *run(const char *line){
+	const int SP = lRootsGet();
+	lVal *exp = lRootsValPush(lCons(NULL,NULL));
+	exp->vList.car = lValSym("repl/wasm");
+	exp->vList.cdr = lCons(NULL,NULL);
+	exp->vList.cdr->vList.car = lValString(line);
+	lVal *v = lEval(mainClosure,exp);
+	const char *ret = v ? lReturnDisplayVal(v) : "";
+	lRootsRet(SP);
+	return ret;
+}
+#endif
+
+/* Start the Nujel REPL, does not return! */
+__attribute__((noreturn)) void doRepl(lClosure *c){
 	lVal *cmd = lRootsValPush(lCons(NULL,NULL));
 	cmd->vList.car = lValSym("repl");
 	while(true){
@@ -25,6 +41,9 @@ void doRepl(lClosure *c){
 	}
 }
 
+/* Parse options that might radically alter runtime behaviour, like running
+ * without the stdlib (probably for using an alternative build of the stdlib )
+ */
 lClosure * parsePreOptions(int argc, char *argv[]){
 	bool loadStdLib = true;
 	for(int i=1;i<argc;i++){
@@ -67,6 +86,7 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	return c;
 }
 
+/* Parse normal options, should be rewritten in nujel soon */
 void parseOptions(lClosure *c, int argc, char *argv[]){
 	int eval = 0;
 	int repl = 1;
