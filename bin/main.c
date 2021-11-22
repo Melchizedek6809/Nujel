@@ -32,34 +32,18 @@ const char *run(const char *line){
 }
 #endif
 
-/* Start the Nujel REPL, does not return! */
-__attribute__((noreturn)) void doRepl(lClosure *c){
-	lVal *cmd = lRootsValPush(lCons(NULL,NULL));
-	cmd->vList.car = lValSym("repl");
-	while(true){
-		lEval(c,cmd);
-	}
+void *readEvalStringRaw(void *cl, void *str){
+	lClosure *c = (lClosure *)cl;
+	const char *expr = str;
+	lVal *v = lnfDo(c,lRead(expr));
+	return v;
 }
 
-/* Parse options that might radically alter runtime behaviour, like running
- * without the stdlib (probably for using an alternative build of the stdlib )
- */
-lClosure * parsePreOptions(int argc, char *argv[]){
-	bool loadStdLib = true;
-	for(int i=1;i<argc;i++){
-		if(argv[i][0] == '-'){
-			for(const char *opts = &argv[i][1];*opts;opts++){
-				switch(*opts){
-				case 'n':
-					loadStdLib = false;
-					break;
-				case 'v':
-					lVerbose = true;
-					break;
-				}
-			}
-		}
-	}
+void *evalRaw(void *cl, void *body){
+	return lEval((lClosure *)cl,(lVal *)body);
+}
+
+lClosure *createRoolClosure(bool loadStdLib){
 	lClosure *c;
 	if(loadStdLib){
 		c = lClosureNewRoot();
@@ -72,6 +56,41 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 		lOperationsIO(c);
 		lOperationsReadline(c);
 	}
+	return c;
+}
+
+/* Parse options that might radically alter runtime behaviour, like running
+ * without the stdlib (probably for using an alternative build of the stdlib )
+ */
+lClosure *parsePreOptions(int argc, char *argv[]){
+	bool loadStdLib = true;
+	bool readNext   = false;
+	lClosure *c     = NULL;
+	for(int i=1;i<argc;i++){
+		if(readNext){
+			if(c == NULL){c = createRoolClosure(loadStdLib);}
+			size_t len = 0;
+			char *str = loadFile(argv[i],&len);
+			lExceptionTry(readEvalStringRaw,c,str);
+			free(str);
+			readNext = false;
+		}else if(argv[i][0] == '-'){
+			for(const char *opts = &argv[i][1];*opts;opts++){
+				switch(*opts){
+				case 'r':
+					readNext = true;
+					break;
+				case 'n':
+					loadStdLib = false;
+					break;
+				case 'v':
+					lVerbose = true;
+					break;
+				}
+			}
+		}
+	}
+	if(c == NULL){c = createRoolClosure(loadStdLib);}
 
 	if(lVerbose){
 		printf("sizeof(lClosure): %u\n",(uint)sizeof(lClosure));
@@ -86,51 +105,20 @@ lClosure * parsePreOptions(int argc, char *argv[]){
 	return c;
 }
 
-/* Parse normal options, should be rewritten in nujel soon */
-void parseOptions(lClosure *c, int argc, char *argv[]){
-	int eval = 0;
-	int repl = 1;
-	for(int i=1;i<argc;i++){
-		size_t len;
-		char *str = argv[i];
-		if(argv[i][0] == '-'){
-			for(int ii=1;argv[i][ii];ii++){
-				switch(argv[i][ii]){
-				case 'e':
-					eval = 1;
-					continue;
-				case 'x':
-					eval = 2;
-					continue;
-				case '-':
-					repl = 1;
-					continue;
-				case 'n':
-				case 'v':
-					continue;
-				default:
-					fprintf(stderr,"Unknown option '%c', exiting.", argv[i][ii]);
-					exit(1);
-				}
-			}
-			continue;
-		}
-		if(!eval){
-			str = loadFile(argv[i],&len);
-		}
-		lVal *v = lnfDo(c,lRead(str));
-		if((i == argc-1) && !repl && (eval != 2)){lWriteVal(v);}
 
-		if(!eval){
-			free(str);
-			eval = 0;
-		}
-		repl = 0;
-	}
 
-	if(repl){
-		doRepl(c);
+void initNujel(int argc, char *argv[], lClosure *c){
+	lVal *ret = NULL;
+	const int SP = lRootsGet();
+	for(int i = argc-1; i >= 0; i--){
+		ret = lCons(lValString(argv[i]), ret);
 	}
+	lRootsRet(SP);
+	RVP(ret);
+	ret = lCons(lValSym("repl/init"), ret);
+	lRootsRet(SP);
+	RVP(ret);
+	lExceptionTry(evalRaw,c,ret);
 }
 
 int main(int argc, char *argv[]){
@@ -139,12 +127,6 @@ int main(int argc, char *argv[]){
 	lInit();
 	setIOSymbols();
 
-	mainClosure = parsePreOptions(argc,argv);
-	#ifndef __EMSCRIPTEN__
-	parseOptions(mainClosure,argc,argv);
-	#else
-	printf("Nujel WASM Runtime initialized, ready for eval\r\n");
-	#endif
-
+	initNujel(argc,argv,parsePreOptions(argc,argv));
 	return 0;
 }

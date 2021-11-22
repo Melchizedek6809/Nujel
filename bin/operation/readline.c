@@ -13,29 +13,30 @@
 #ifdef __MINGW32__
 	#include <windows.h>
 	#include <shlobj.h>
-
-	#include <readline/readline.h>
-	#include <readline/history.h>
-#else
-	#include "../../vendor/bestline/bestline.h"
-#endif
-
-#ifdef __MINGW32__
+	#include "../../vendor/getline/getline.h"
 	/* Since bestline does not support windows,
 	 * these serve as a simple replacement.
 	 */
-	static void bestlineHistoryLoad(const char *path){
-		read_history(path);
-	}
-	static void bestlineHistorySave(const char *path){
-		write_history(path);
-	}
-	static void bestlineHistoryAdd (const char *line){
-		add_history(line);
-	}
+	#define BUF_SIZE (1 << 14)
+	static void bestlineHistoryLoad(const char *path){(void)path;}
+	static void bestlineHistorySave(const char *path){(void)path;}
+	static void bestlineHistoryAdd (const char *line){(void)line;}
 	static char *bestline(const char *prompt){
-		return readline(prompt);
+		char *buf = NULL;
+		size_t bufsize = 0;
+
+		fputs(prompt, stdout);
+		const ssize_t ret = getline(&buf,&bufsize,stdin);
+
+		if(ret >= 0){
+			buf[MIN(bufsize-1,(size_t)ret)] = 0;
+			return buf;
+		}else{
+			return NULL;
+		}
 	}
+#else
+	#include "../../vendor/bestline/bestline.h"
 #endif
 
 const char *getHistoryPath(){

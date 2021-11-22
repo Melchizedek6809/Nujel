@@ -13,7 +13,8 @@ LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 NUJEL       := ./nujel
-NUJEL_BOOT  := ./nujel-bootstrap
+#NUJEL_BOOT  := ./nujel-bootstrap
+NUJEL_BOOT  := /usr/local/bin/nujel
 ASSET       := ./tools/assets
 
 CC                   := cc
@@ -28,6 +29,7 @@ LIBS                 := -lm
 RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
 
+STATIC_LIBS := -static
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
@@ -35,7 +37,7 @@ BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
-	LIBS  += -lpthread -lreadline
+	BIN_SRCS += vendor/getline/getline.c
 else
 	BIN_SRCS += vendor/bestline/bestline.c
 endif
@@ -101,14 +103,14 @@ $(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-$(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
-	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
-	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOT) -x "[exit [test-run]]"
+#$(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
+#	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+#	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+#	@$(NUJEL_BOOT) -x "[exit [test-run]]"
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
 	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 

@@ -76,6 +76,12 @@
            [display [cat [if [nil? result]
               ""
               [str/write result]] "\n"]]]]]
+    [def repl/init [λ*
+         [...args]
+         ""
+       [do [println [str/write ...args]]
+       [repl]]
+       ]]
     [def repl [λ* []
         ""
         [do [readline/history/load [readline/history/path]]

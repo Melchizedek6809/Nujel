@@ -106,3 +106,5 @@
        [set! gensym/counter [+ 1 gensym/counter]]
        [str->sym ["GenSym-" gensym/counter]]
 ]
+
+[def root-closure [current-closure]]

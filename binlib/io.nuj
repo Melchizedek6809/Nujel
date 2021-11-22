@@ -26,7 +26,7 @@
 [defun file/eval [path]
         "Evaluate a Nujel source file in the current context"
         [def source [cons 'do [read [file/read path]]]]
-        [eval source]
+        [apply root-closure [cons [compile source]]]
 ]
 
 [defun eval/forked [nujel-binary raw-expr]
