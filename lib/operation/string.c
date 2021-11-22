@@ -320,7 +320,7 @@ static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 void lOperationsString(lClosure *c){
 	lnfvCat = lAddNativeFunc(c,"cat", "[...args]",                "ConCATenates ARGS into a single string",                     lnfCat);
 	lAddNativeFunc(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
-	lAddNativeFunc(c,"str/length",    "[str]",                    "Return length of STR",                                       lnfStrlen);
+	lAddNativeFunc(c,"string/length", "[str]",                    "Return length of STR",                                       lnfStrlen);
 	lAddNativeFunc(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
 	lAddNativeFunc(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
 	lAddNativeFunc(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);

@@ -606,6 +606,12 @@
 [test/add #nil [def]]
 [test/add #nil [set! #nil #nil]]
 [test/add #nil [set!]]
+[test/add "\"   1\"" [string/pad-start "1" 4]]
+[test/add "\"0001\"" [string/pad-start "1" 4 "0"]]
+[test/add "\"asd1\"" [string/pad-start "1" 4 "asdasd"]]
+[test/add "\"1   \"" [string/pad-end "1" 4]]
+[test/add "\"1000\"" [string/pad-end "1" 4 "0"]]
+[test/add "\"1asd\"" [string/pad-end "1" 4 "asdasd"]]
 
 ; This would interfere with quasiquote as a macro, still have to think about the consequences
 ;[test/add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]

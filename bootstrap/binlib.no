@@ -67,6 +67,7 @@
                  [exit 0]]
               #nil]
            [readline/history/add line]
+           [println line]
            [def raw [read line]]
            [def expr [cons 'do raw]]
            [def cexpr [cons [compile expr]]]

@@ -3,7 +3,7 @@
 
 [defun length [a]
         "Returns the length of a"
-        [cond [[string? a] [str/length a]]
+        [cond [[string? a] [string/length a]]
               [[pair? a] [list-length a]]
               [#t 0]
         ]

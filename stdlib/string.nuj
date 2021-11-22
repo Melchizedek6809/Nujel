@@ -33,7 +33,7 @@
        "Return the extension of PATH"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
-           [substr path [+ 1 last-period] [str/length path]]
+           [substr path [+ 1 last-period] [string/length path]]
            path]
 ]
 
@@ -89,3 +89,23 @@
         [string α]
 ]
 [def int->string int->string/decimal]
+
+[defun string/pad-start [text goal-length char]
+       [when-not char [set! char " "]]
+       [while [< [string/length text] goal-length]
+              [set! text [cat char text]]
+       ]
+       [if [> [string/length text] goal-length]
+           [substr text [- [string/length text] goal-length] [string/length text]]
+           text]
+]
+
+[defun string/pad-end [text goal-length char]
+       [when-not char [set! char " "]]
+       [while [< [string/length text] goal-length]
+              [set! text [cat text char]]
+       ]
+       [if [> [string/length text] goal-length]
+           [substr text 0 goal-length]
+           text]
+]

@@ -50,7 +50,7 @@
 
 [def join [let*
         [def iter [λ [str l glue]
-                [cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
+                [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
                       [#t [iter [cat str [car l] glue] [cdr l] glue]]
                 ]
         ]]
@@ -62,8 +62,8 @@
 ]]
 
 [defun split [str separator]
-       [def separator-len [str/length separator]]
-       [def slen [str/length str]]
+       [def separator-len [string/length separator]]
+       [def slen [string/length str]]
        [def start 0]
        [def ret #nil]
        [while [< start slen]

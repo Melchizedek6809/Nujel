@@ -191,10 +191,6 @@
         [do [set! test-list [cons [cons result expr] test-list]]
            [set! test-count [+ test-count 1]]]]]
     [def test/add [μ* [result ...expr] "Add a test where ...EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do ...expr]] #nil]]]]]
-    [def test-add [λ* [result @...expr]
-        "Add a test where ...EXPR must eval to RESULT"
-        [do [set! test-list [cons [cons result [cons 'do @...expr]] test-list]]
-           [set! test-count [+ test-count 1]]]]]
     [def display-results [λ* []
         "Prints the result Message"
         [do [random/seed-initialize!]
@@ -399,7 +395,7 @@
         "Applies ...val to all event handlers associated with event-name"
         [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def length [λ* [a]
         "Returns the length of a"
-        [cond [[string? a] [str/length a]]
+        [cond [[string? a] [string/length a]]
               [[pair? a] [list-length a]]
               [#t 0]]]]
     [def describe [let* [do [def describe-thing [λ* [o]
@@ -461,15 +457,15 @@
               [#t [list-ref [cdr l] [-- i]]]]]]
     [def join [let* [do [def iter [λ* [str l glue]
            ""
-           [cond [[nil? l] [substr str 0 [- [str/length str] [str/length glue]]]]
+           [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
                  [#t [iter [cat str [car l] glue] [cdr l] glue]]]]]
        [λ* [l glue]
            "Join LIST into a string with GLUE in between each element"
            [iter "" l [string glue]]]]]]
     [def split [λ* [str separator]
         ""
-        [do [def separator-len [str/length separator]]
-           [def slen [str/length str]]
+        [do [def separator-len [string/length separator]]
+           [def slen [string/length str]]
            [def start 0]
            [def ret #nil]
            [while [< start slen] [do [def pos-found [index-of str separator start]]
@@ -633,7 +629,7 @@
         "Return the extension of PATH"
         [do [def last-period [last-index-of path "."]]
            [if [>= last-period 0]
-              [substr path [+ 1 last-period] [str/length path]]
+              [substr path [+ 1 last-period] [string/length path]]
               path]]]]
     [def path/without-extension [λ* [path]
         "Return PATH, but without the extension part"
@@ -681,7 +677,14 @@
     [def int->string/decimal [λ* [α]
         "Turn α into a its **decimal** string representation"
         [string α]]]
-    [def int->string int->string/decimal]][do [test/add* 1073741824 '[do [ash 1 30]]]
+    [def int->string int->string/decimal]
+    [def string/pad-start [λ* [text goal-length char]
+        ""
+        [do [if char
+              #nil
+              [set! char " "]]
+           [while [< [string/length text] goal-length] [set! text [cat char text]]]
+           text]]]][do [test/add* 1073741824 '[do [ash 1 30]]]
     [test/add* 2147483647 '[do [lognot [ash 1 31]]]]
     [test/add* 1 '[do 1]]
     [test/add* 3 '[do [+ 1 2]]]
@@ -1042,7 +1045,7 @@
     [test/add* #t '[do [eq? :float [type-of 123.123]]]]
     [test/add* #t '[do [eq? :vec [type-of [vec 1]]]]]
     [test/add* #t '[do [eq? :native-function [type-of +]]]]
-    [test/add* #t '[do [eq? :lambda [type-of test-add]]]]
+    [test/add* #t '[do [eq? :lambda [type-of test/add*]]]]
     [test/add* #t '[do [eq? :string [type-of "asd"]]]]
     [test/add* 2 '[do [getf [list :a 1 :b 2 :c 3] :b]]]
     [test/add* "#nil" '[do [getf [list :a 1 :b 2 :c 3] :d]]]
@@ -1587,19 +1590,18 @@
               [cons [resolve [car code]] [optimize/code/rest [cdr code]]]
               [cons [optimize/code [car code]] [optimize/code/rest [cdr code]]]]
            code]]]
-    [def optimize [λ* [fun]
+    [def optimize! [λ* [fun]
         "Optimize FUN via mutation"
-        [closure! fun [tree/new :code [optimize/code [[closure fun] :code]]]]]]
+        [if [lambda? fun]
+           [closure! fun [tree/new :code [optimize/code [[closure fun] :code]]]]
+           #f]]]
+    [def optimize-all! [λ* []
+        "Return a list of all lambdas in CTX"
+        [for-each optimize! [filter lambda? [map resolve [symbol-table]]]]]]
     [def bench-while [λ* []
         ""
         [do [def i 0]
            [while [< i 10000000] [set! i [+ 1 i]]]
            [println i]
            i]]]
-    [def bench-while-opt [λ* []
-        ""
-        [do [def i 0]
-           [while [< i 10000000] [set! i [+ 1 i]]]
-           [println i]
-           i]]]
-    [optimize bench-while-opt]]
+    [optimize-all!]]
