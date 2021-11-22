@@ -35,7 +35,7 @@ BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
-	LIBS  += -lpthread
+	LIBS  += -lpthread -lreadline
 else
 	BIN_SRCS += vendor/bestline/bestline.c
 endif

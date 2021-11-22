@@ -13,6 +13,9 @@
 #ifdef __MINGW32__
 	#include <windows.h>
 	#include <shlobj.h>
+
+	#include <readline/readline.h>
+	#include <readline/history.h>
 #else
 	#include "../../vendor/bestline/bestline.h"
 #endif
@@ -21,21 +24,17 @@
 	/* Since bestline does not support windows,
 	 * these serve as a simple replacement.
 	 */
-	static void bestlineHistoryLoad(const char *path){(void)path;}
-	static void bestlineHistorySave(const char *path){(void)path;}
-	static void bestlineHistoryAdd (const char *line){(void)line;}
-
+	static void bestlineHistoryLoad(const char *path){
+		read_history(path);
+	}
+	static void bestlineHistorySave(const char *path){
+		write_history(path);
+	}
+	static void bestlineHistoryAdd (const char *line){
+		add_history(line);
+	}
 	static char *bestline(const char *prompt){
-		char *buf = malloc(1<<12);
-		if(buf == NULL){
-			fprintf(stderr,"Unable to allocate readline buf, exiting!\n");
-			exit(3);
-		}
-		printf("%s",prompt);
-		if(fgets(buf,sizeof(buf),stdin) == NULL){
-			return NULL;
-		}
-		return buf;
+		return readline(prompt);
 	}
 #endif
 
