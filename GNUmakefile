@@ -28,7 +28,7 @@ LIBS                 := -lm
 RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
 
-STATIC_LIBS := -static
+STATIC_LIBS := -static -lpthread
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
@@ -37,6 +37,7 @@ ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
 	BIN_SRCS += vendor/getline/getline.c
+	LIBS += -lpthread
 else
 	BIN_SRCS += vendor/bestline/bestline.c
 endif
