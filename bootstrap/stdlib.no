@@ -60,7 +60,8 @@
     [def gensym [λ* []
         ""
         [do [set! gensym/counter [+ 1 gensym/counter]]
-           [str->sym ["GenSym-" gensym/counter]]]]]][do [def numeric? [λ* [a]
+           [str->sym ["GenSym-" gensym/counter]]]]]
+    [def root-closure [current-closure]]][do [def numeric? [λ* [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]]]
     [def last? [λ* [a]
@@ -194,7 +195,9 @@
     [def display-results [λ* []
         "Prints the result Message"
         [do [random/seed-initialize!]
-           [error [cat test-context " [" OS " " ARCH "]" " [" [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
+           [error [cat test-context " [" OS " " ARCH "] - " [if [zero? error-count]
+              "Success - ["
+              "Failed! - ["] [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
               [ansi-rainbow "Everything is working, very nice!"]
               [ansi-red "Better fix those!"]] "\r\n"]]]]]
     [def test-success [λ* [res-should res-is expr i]
@@ -213,7 +216,7 @@
         "Tests that RAWEXPR evaluates to RESULT"
         [try [λ* [err]
             ""
-            [test-failure result err rawexpr i]] [do [def expr [eval* [compile rawexpr]]]
+            [test-failure result err rawexpr i]] [do [def expr [eval* [compile rawexpr [current-closure]]]]
            [def pred? eq?]
            [if [string? result]
               [set! expr [str/write expr]]
@@ -684,7 +687,18 @@
               #nil
               [set! char " "]]
            [while [< [string/length text] goal-length] [set! text [cat char text]]]
-           text]]]][do [test/add* 1073741824 '[do [ash 1 30]]]
+           [if [> [string/length text] goal-length]
+              [substr text [- [string/length text] goal-length] [string/length text]]
+              text]]]]
+    [def string/pad-end [λ* [text goal-length char]
+        ""
+        [do [if char
+              #nil
+              [set! char " "]]
+           [while [< [string/length text] goal-length] [set! text [cat text char]]]
+           [if [> [string/length text] goal-length]
+              [substr text 0 goal-length]
+              text]]]]][do [test/add* 1073741824 '[do [ash 1 30]]]
     [test/add* 2147483647 '[do [lognot [ash 1 31]]]]
     [test/add* 1 '[do 1]]
     [test/add* 3 '[do [+ 1 2]]]
@@ -1347,6 +1361,8 @@
     [test/add* '[1 2 3] '[do [quasiquote [1 [unquote [1 + 1]] 3]]]]
     [test/add* '[1 2 3 4] '[do [quasiquote [1 [unquote [1 + 1]] [unquote-splicing [read "3 4"]]]]]]
     [test/add* '[1 2 3] '[do [let* [def v 2] [quasiquote [1 [unquote v] 3]]]]]
+    [test/add* '[resolve 123] '[do [do [let [[source [cons 123] #nil]] [quasiquote [resolve [unquote [car source]]]]]]]]
+    [test/add* '[resolve asd] '[do [do [let [[source [cons 'asd #nil]]] [quasiquote [resolve [unquote [car source]]]]]]]]
     [test/add* #t '[do [macro? [μ [] #f]]]]
     [test/add* #t '[do [macro? +1]]]
     [test/add* #f '[do [macro? min]]]
@@ -1444,6 +1460,15 @@
     [test/add* #nil '[do [def]]]
     [test/add* #nil '[do [set! #nil #nil]]]
     [test/add* #nil '[do [set!]]]
+    [test/add* "\"   1\"" '[do [string/pad-start "1" 4]]]
+    [test/add* "\"0001\"" '[do [string/pad-start "1" 4 "0"]]]
+    [test/add* "\"asd1\"" '[do [string/pad-start "1" 4 "asdasd"]]]
+    [test/add* "\"1   \"" '[do [string/pad-end "1" 4]]]
+    [test/add* "\"1000\"" '[do [string/pad-end "1" 4 "0"]]]
+    [test/add* "\"1asd\"" '[do [string/pad-end "1" 4 "asdasd"]]]
+    [test/add* 128 '[do oneTwoThreeTest]]
+    [def oneTwoThreeTest [+ 123 5]]
+    [def +123 [μ* [v] "" [cons '+ [cons 123 [cons v #nil]]]]]
     ][do [def time/seconds [λ* [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]]]
@@ -1456,127 +1481,165 @@
     [def profile-form [λ* [raw]
         ""
         [do [def start-time [time/milliseconds]]
-           [def val [eval* [compile raw]]]
+           [def val [eval* [compile raw [current-closure]]]]
            [def end-time [time/milliseconds]]
            [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
     [def profile [μ* [...body] "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? ...body]
        [car ...body]
-       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile/do/args [λ* [args]
-        ""
-        [if [last? args]
-           [cons [compile [car args]] #nil]
-           [if [pair? [car args]]
-              [let* [do [def ocar [compile [car args]]]
-                 [if [pair? ocar]
-                    [cons ocar [compile/do/args [cdr args]]]
-                    [compile/do/args [cdr args]]]]]
-              [compile/do/args [cdr args]]]]]]
-    [def compile/do [λ* [source]
-        ""
-        [let* [do [def args [compile/do/args source]]
+       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile #nil]
+    [let* [do [def environment [current-closure]]
+       [def verbose #f]
+       [def compile/do/args [λ* [args]
+           ""
            [if [last? args]
-              [car args]
-              [cons 'do args]]]]]]
-    [def compile/def [λ* [source]
-        ""
-        [list 'def [cadr source] [compile [caddr source]]]]]
-    [def compile/set! [λ* [source]
-        ""
-        [list 'set! [cadr source] [compile [caddr source]]]]]
-    [def compile/λ [λ* [source]
-        ""
-        [if [string? [caddr source]]
-           [list 'λ* [cadr source] [caddr source] [compile/do [cddr source]]]
-           [list 'λ* [cadr source] "" [compile/do [cddr source]]]]]]
-    [def compile/λ* [λ* [source]
-        ""
-        source]]
-    [def compile/μ [λ* [source]
-        ""
-        [if [string? [caddr source]]
-           [list 'μ* [cadr source] [caddr source] [compile/do [cddr source]]]
-           [list 'μ* [cadr source] "" [compile/do [cddr source]]]]]]
-    [def compile/μ* [λ* [source]
-        ""
-        source]]
-    [def compile/ω [λ* [source]
-        ""
-        [list 'ω [compile/do [cdr source]]]]]
-    [def compile/try [λ* [source]
-        ""
-        [list 'try [compile [cadr source]] [compile/do [cddr source]]]]]
-    [def compile/if [λ* [source]
-        ""
-        [list 'if [compile [cadr source]] [compile [caddr source]] [compile [cadddr source]]]]]
-    [def compile/let* [λ* [source]
-        ""
-        [list 'let* [compile/do [cdr source]]]]]
-    [def compile/cond/clause [λ* [source]
-        ""
-        [cons [compile [car source]] [cons [compile/do [cdr source]]]]]]
-    [def compile/cond/clauses [λ* [source]
-        ""
-        [if source
-           [cons [compile/cond/clause [car source]] [compile/cond/clauses [cdr source]]]
-           #nil]]]
-    [def compile/cond [λ* [source]
-        ""
-        [cons 'cond [compile/cond/clauses [cdr source]]]]]
-    [def compile/and [λ* [source]
-        ""
-        [compile/procedure/arg source]]]
-    [def compile/or [λ* [source]
-        ""
-        [compile/procedure/arg source]]]
-    [def compile/while [λ* [source]
-        ""
-        [list 'while [compile [cadr source]] [compile/do [cddr source]]]]]
-    [def compile/macro [λ* [macro source]
-        ""
-        [compile [macro-apply macro [cdr source]]]]]
-    [def compile/procedure/arg [λ* [source]
-        ""
-        [if [pair? source]
-           [cons [compile [car source]] [compile/procedure/arg [cdr source]]]
-           #nil]]]
-    [def compile/procedure [λ* [proc source]
-        ""
-        [compile/procedure/arg source]]]
-    [def compile [λ* [source environment]
-        "Compile the forms in source"
-        [let* [do [def op [if [resolves? [car source]]
-              [resolve [car source]]
-              [car source]]]
-           [cond [[special-form? op] [cond [[eq? op do] [compile/do source]]
-                       [[eq? op def] [compile/def source]]
-                       [[eq? op set!] [compile/set! source]]
-                       [[eq? op let] [compile/let source]]
-                       [[eq? op let*] [compile/let* source]]
-                       [[eq? op λ] [compile/λ source]]
-                       [[eq? op λ*] [compile/λ* source]]
-                       [[eq? op μ] [compile/μ source]]
-                       [[eq? op μ*] [compile/μ* source]]
-                       [[eq? op ω] [compile/ω source]]
-                       [[eq? op if] [compile/if source]]
-                       [[eq? op try] [compile/try source]]
-                       [[eq? op cond] [compile/cond source]]
-                       [[eq? op and] [compile/and source]]
-                       [[eq? op or] [compile/or source]]
-                       [[eq? op while] [compile/while source]]
-                       [[eq? op quote] source]
-                       [#t [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
-                 [[macro? op] [compile/macro op source]]
-                 [[procedure? op] [compile/procedure op source]]
-                 [[pair? op] [compile/procedure/arg source]]
-                 [[numeric? op] [compile/procedure/arg source]]
-                 [[arr? op] [compile/procedure/arg source]]
-                 [[string? op] [compile/procedure/arg source]]
-                 [[tree? op] [compile/procedure/arg source]]
-                 [#t source]]]]]]
-    [def defmacro [μ* [name args ...body] "" [list 'def name [compile [cons 'μ [cons args ...body]]]]]]
-    [def defun [μ* [name args ...body] "" [list 'def name [compile [cons 'λ [cons args ...body]]]]]]
-    [def \ [μ* [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body]]]]
-    [def eval [μ* [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr #nil]] #nil]]]]
+              [cons [compile* [car args]] #nil]
+              [if [pair? [car args]]
+                 [let* [do [def ocar [compile* [car args]]]
+                    [if [pair? ocar]
+                       [cons ocar [compile/do/args [cdr args]]]
+                       [compile/do/args [cdr args]]]]]
+                 [compile/do/args [cdr args]]]]]]
+       [def compile/do [λ* [source]
+           ""
+           [let* [do [def args [compile/do/args source]]
+              [if [last? args]
+                 [car args]
+                 [cons 'do args]]]]]]
+       [def compile/def [λ* [source]
+           ""
+           [list 'def [cadr source] [compile* [caddr source]]]]]
+       [def compile/set! [λ* [source]
+           ""
+           [list 'set! [cadr source] [compile* [caddr source]]]]]
+       [def compile/λ [λ* [source]
+           ""
+           [if [string? [caddr source]]
+              [list 'λ* [cadr source] [caddr source] [compile/do [cddr source]]]
+              [list 'λ* [cadr source] "" [compile/do [cddr source]]]]]]
+       [def compile/λ* [λ* [source]
+           ""
+           source]]
+       [def compile/μ [λ* [source]
+           ""
+           [if [string? [caddr source]]
+              [list 'μ* [cadr source] [caddr source] [compile/do [cddr source]]]
+              [list 'μ* [cadr source] "" [compile/do [cddr source]]]]]]
+       [def compile/μ* [λ* [source]
+           ""
+           source]]
+       [def compile/ω [λ* [source]
+           ""
+           [list 'ω [compile/do [cdr source]]]]]
+       [def compile/try [λ* [source]
+           ""
+           [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]]
+       [def compile/if [λ* [source]
+           ""
+           [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]]
+       [def compile/let* [λ* [source]
+           ""
+           [list 'let* [compile/do [cdr source]]]]]
+       [def compile/cond/clause [λ* [source]
+           ""
+           [cons [compile* [car source]] [cons [compile/do [cdr source]]]]]]
+       [def compile/cond/clauses [λ* [source]
+           ""
+           [if source
+              [cons [compile/cond/clause [car source]] [compile/cond/clauses [cdr source]]]
+              #nil]]]
+       [def compile/cond [λ* [source]
+           ""
+           [cons 'cond [compile/cond/clauses [cdr source]]]]]
+       [def compile/and [λ* [source]
+           ""
+           [compile/procedure/arg source]]]
+       [def compile/or [λ* [source]
+           ""
+           [compile/procedure/arg source]]]
+       [def compile/while [λ* [source]
+           ""
+           [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]]
+       [def compile/macro [λ* [macro source]
+           ""
+           [compile* [macro-apply macro [cdr source]]]]]
+       [def compile/procedure/arg [λ* [source]
+           ""
+           [if [pair? source]
+              [cons [compile* [car source]] [compile/procedure/arg [cdr source]]]
+              #nil]]]
+       [def compile/procedure [λ* [proc source]
+           ""
+           [compile/procedure/arg source]]]
+       [def compile* [λ* [source]
+           "Compile the forms in source"
+           [let* [do [def op [if [apply environment [cons [cons 'resolves? [cons [list 'quote [car source]] #nil]] #nil]]
+                 [apply environment [cons [cons 'resolve [cons [list 'quote [car source]] #nil]] #nil]]
+                 [car source]]]
+              [cond [[special-form? op] [cond [[eq? op do] [compile/do source]]
+                          [[eq? op def] [compile/def source]]
+                          [[eq? op set!] [compile/set! source]]
+                          [[eq? op let] [compile/let source]]
+                          [[eq? op let*] [compile/let* source]]
+                          [[eq? op λ] [compile/λ source]]
+                          [[eq? op λ*] [compile/λ* source]]
+                          [[eq? op μ] [compile/μ source]]
+                          [[eq? op μ*] [compile/μ* source]]
+                          [[eq? op ω] [compile/ω source]]
+                          [[eq? op if] [compile/if source]]
+                          [[eq? op try] [compile/try source]]
+                          [[eq? op cond] [compile/cond source]]
+                          [[eq? op and] [compile/and source]]
+                          [[eq? op or] [compile/or source]]
+                          [[eq? op while] [compile/while source]]
+                          [[eq? op quote] source]
+                          [#t [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
+                    [[macro? op] [compile/macro op source]]
+                    [[procedure? op] [compile/procedure op source]]
+                    [[pair? op] [compile/procedure/arg source]]
+                    [[numeric? op] [compile/procedure/arg source]]
+                    [[arr? op] [compile/procedure/arg source]]
+                    [[string? op] [compile/procedure/arg source]]
+                    [[tree? op] [compile/procedure/arg source]]
+                    [#t source]]]]]]
+       [set! compile [λ* [source new-environment new-verbose]
+           ""
+           [do [if new-environment
+                 #nil
+                 [set! new-environment [current-closure]]]
+              [if new-verbose
+                 #nil
+                 [set! new-verbose #f]]
+              [set! environment new-environment]
+              [set! verbose new-verbose]
+              [compile* source]]]]]]
+    [def compile/forms [λ* [source-raw]
+        "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+        [do [def source #nil]
+           [def source-next source-raw]
+           [def environment [ω #nil]]
+           [def passes 0]
+           [def max-passes 100]
+           [def try-again [λ* [source]
+               ""
+               [set! source-next [cons source source-next]]]]
+           [while source-next [do [set! source source-next]
+              [set! source-next #nil]
+              [while source [do [try [λ* [err]
+                     ""
+                     [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
+                           [[eq? [car err] :runtime-macro] [try-again [car source]]]
+                           [#t [throw err]]]] [do [def compiled-form [compile [car source] environment #t]]
+                    [apply environment [cons [cons 'eval* [cons compiled-form #nil]] #nil]]]]
+                 [set! source [cdr source]]]]
+              [set! source-next [reverse source-next]]
+              [if [> [set! passes [+ 1 passes]] max-passes]
+                 [throw [list :too-many-passes "The compiler couldn\'t produce a valid result in a 100 passes, probably something wrong with the code."]]
+                 #nil]]]
+           [compile source-raw environment]]]]
+    [def defmacro [μ* [name args ...body] "" [list 'def name [compile [cons 'μ [cons args ...body]] [current-closure]]]]]
+    [def defun [μ* [name args ...body] "" [list 'def name [compile [cons 'λ [cons args ...body]] [current-closure]]]]]
+    [def \ [μ* [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body] [current-closure]]]]
+    [def eval [μ* [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]]
     [def +1 [μ* [v] "" [cons '+ [cons 1 [cons v #nil]]]]]
     [def optimize/code/rest [λ* [code]
         ""

@@ -18,7 +18,7 @@
 [defun file/compile [path no-write]
         "Compile a Nujel source file into optimized object code"
         [def source [read [file/read path]]]
-        [def object-code [compile [cons 'do source] source]]
+        [def object-code [compile/forms [cons 'do source]]]
         [when-not no-write [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
         object-code
 ]
@@ -26,7 +26,7 @@
 [defun file/eval [path]
         "Evaluate a Nujel source file in the current context"
         [def source [cons 'do [read [file/read path]]]]
-        [apply root-closure [cons [compile source]]]
+        [apply root-closure [cons [compile [cons 'do source]]]]
 ]
 
 [defun eval/forked [nujel-binary raw-expr]
@@ -39,5 +39,4 @@
         [file/remove tmp-path]
         [cons [car res] [cdr res]]
 ]
-
 [def test-context "Nujel Standalone"]

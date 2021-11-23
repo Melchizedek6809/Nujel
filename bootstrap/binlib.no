@@ -14,7 +14,7 @@
     [def file/compile [λ* [path no-write]
         "Compile a Nujel source file into optimized object code"
         [do [def source [read [file/read path]]]
-           [def object-code [compile [cons 'do source] source]]
+           [def object-code [compile/forms [cons 'do source]]]
            [if no-write
               #nil
               [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
@@ -22,7 +22,7 @@
     [def file/eval [λ* [path]
         "Evaluate a Nujel source file in the current context"
         [do [def source [cons 'do [read [file/read path]]]]
-           [eval* [compile source]]]]]
+           [apply root-closure [cons [compile [cons 'do source]]]]]]]
     [def eval/forked [λ* [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
         [do [def expr [cat "[print [str/write " [str/write raw-expr]]]
@@ -67,7 +67,6 @@
                  [exit 0]]
               #nil]
            [readline/history/add line]
-           [println line]
            [def raw [read line]]
            [def expr [cons 'do raw]]
            [def cexpr [cons [compile expr]]]
@@ -76,18 +75,57 @@
            [display [cat [if [nil? result]
               ""
               [str/write result]] "\n"]]]]]
-    [def repl/init [λ*
-         [...args]
-         ""
-       [do [println [str/write ...args]]
-       [repl]]
-       ]]
     [def repl [λ* []
         ""
         [do [readline/history/load [readline/history/path]]
            [while #t [do [try repl/exception-handler [repl/readline ctx]]
-              [readline/history/save [readline/history/path]]]]]]]][if [eq? OS "Emscripten"]
+              [readline/history/save [readline/history/path]]]]]]]
+    [def repl/print-help [λ* []
+        ""
+        [do [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
+           [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]\n"]]
+           [println [cat [ansi-blue "n"] " - do not load any stdlib"]]
+           [println [cat [ansi-blue "v"] " - be verbose"]]
+           [println [cat [ansi-blue "r"] " - eval following file without compilation/expansion"]]
+           [println [cat [ansi-blue "x"] " - Run the expression following this argument directly"]]]]]
+    [def repl/run-forked* [λ* [expr]
+        ""
+        [do [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
+           [popen command]]]]
+    [def repl/run-forked [μ* [expr] "" [cons 'repl/run-forked* [cons [list 'quote expr] #nil]]]]
+    [def repl/executable-name "nujel"]
+    [def repl/parse-args [let* [do [def eval-next #f]
+       [def run-repl #t]
+       [def parse-option [λ* [option]
+           ""
+           [cond [[eq? option "x"] [do [set! eval-next #t]
+                    [set! run-repl #f]]]
+                 [[eq? option "h"] [do [repl/print-help]
+                    [set! run-repl #f]]]]]]
+       [def parse-options [λ* [options]
+           ""
+           [for-each parse-option [split options ""]]]]
+       [def parse-arg [λ* [arg]
+           ""
+           [cond [eval-next [do [apply root-closure [cons [compile [cons 'do [read arg]]]]]
+                    [set! eval-next #f]]]
+                 [[eq? [char-at arg 0] 45] [parse-options [substr arg 1]]]
+                 [#t [do [file/eval arg]
+                    [set! run-repl #f]]]]]]
+       [def parse-args [λ* [args]
+           ""
+           [if args
+              [do [parse-arg [car args]]
+                 [parse-args [cdr args]]]
+              run-repl]]]
+       parse-args]]]
+    [def repl/init [λ* [...args]
+        ""
+        [do [set! repl/executable-name [car ...args]]
+           [if [repl/parse-args [cdr ...args]]
+              [repl]
+              #nil]]]]][if [eq? OS "Emscripten"]
     #nil
-    [do [test/add* '[0 . ""] '[do [popen "true"]]]
-       [test/add* #f '[do [zero? [car [popen "false"]]]]]
-       [test/add* '[0 . "testerle\n"] '[do [popen "echo testerle"]]]]]
+    [do [test/add* '[0 . ""] '[do [repl/run-forked 1]]]
+       [test/add* '[123 . ""] '[do [repl/run-forked [exit 123]]]]
+       [test/add* '[0 . "123"] '[do [repl/run-forked [display 123]]]]]]

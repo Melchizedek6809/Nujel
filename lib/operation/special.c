@@ -51,7 +51,11 @@ static lVal *lnfIf(lClosure *c, lVal *v){
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
 	(void)c;
-	return lCar(v);
+	if(v->type == ltPair){
+		return lCar(v);
+	}
+	lExceptionThrowVal(":invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v);
+	return NULL;
 }
 
 lVal *lnfDo(lClosure *c, lVal *v){

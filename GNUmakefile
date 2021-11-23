@@ -13,8 +13,7 @@ LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 NUJEL       := ./nujel
-#NUJEL_BOOT  := ./nujel-bootstrap
-NUJEL_BOOT  := /usr/local/bin/nujel
+NUJEL_BOOT  := ./nujel-bootstrap
 ASSET       := ./tools/assets
 
 CC                   := cc
@@ -103,14 +102,14 @@ $(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-#$(NUJEL_BOOT): $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
-#	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
-#	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-#	@$(NUJEL_BOOT) -x "[exit [test-run]]"
+nujel-bootstrap: $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
+	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+	@$(NUJEL_BOOT) -x "[exit [test-run]]"
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
+	@$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
 	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
@@ -136,7 +135,7 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 
 tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOT)
 	@mkdir -p tmp/
-	@$(NUJEL_BOOT) tools/bootstrap.nuj
+	$(NUJEL_BOOT) tools/bootstrap.nuj
 
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no

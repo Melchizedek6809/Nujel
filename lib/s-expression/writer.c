@@ -120,7 +120,6 @@ char *lSWriteTree(lTree *v, char *buf, char *bufEnd, int indentLevel, bool displ
 }
 
 // char *lSIndent(char *buf, char *bufEnd, int indentLevel)
-
 char *lSWriteTreeDef(lTree *v, char *buf, char *bufEnd, int indentLevel){
 	if(v == NULL){return buf;}
 	buf = lSWriteTreeDef(v->left, buf, bufEnd, indentLevel);
@@ -144,8 +143,8 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		return t ? buf + t : buf;
 	}
 	char *cur = buf;
-	int t = 0;
-	int len = bufEnd-buf;
+	int t     = 0;
+	int len   = bufEnd-buf;
 
 	switch(v->type){
 	case ltNoAlloc:

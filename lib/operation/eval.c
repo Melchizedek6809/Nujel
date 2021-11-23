@@ -6,6 +6,7 @@
 #include "eval.h"
 
 #include "../api.h"
+#include <stdio.h>
 
 /* [eval* expr] - Evaluate the already compiled EXPR */
 static lVal *lnfEvalRaw(lClosure *c, lVal *v){
@@ -17,7 +18,7 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
 	if(fun == NULL){return NULL;}
 	lVal *resolved = fun;
-	if(fun->type == ltSymbol){
+	if(resolved->type == ltSymbol){
 		resolved = lGetClosureSym(c,fun->vSymbol);
 	}
 	return lApply(c,lCadr(v),resolved, fun);

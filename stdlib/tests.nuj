@@ -524,6 +524,8 @@
 [test/add '[1 2 3] `[1 ~[1 + 1] 3]]
 [test/add '[1 2 3 4] `[1 ~[1 + 1] ~@[read "3 4"]]]
 [test/add '[1 2 3] [let* [def v 2] `[1 ~v 3]]]
+[test/add '[resolve 123] [do [let [[source [cons 123] #nil]] `[resolve ~[car source]]]]]
+[test/add '[resolve asd] [do [let [[source [cons 'asd #nil]]] `[resolve ~[car source]]]]]
 [test/add #t [macro? [μ [] #f]]]
 [test/add #t [macro? +1]]
 [test/add #f [macro? min]]
@@ -612,7 +614,13 @@
 [test/add "\"1   \"" [string/pad-end "1" 4]]
 [test/add "\"1000\"" [string/pad-end "1" 4 "0"]]
 [test/add "\"1asd\"" [string/pad-end "1" 4 "asdasd"]]
+[test/add 128 oneTwoThreeTest]
 
+
+[def oneTwoThreeTest [+123 5]]
+[defmacro +123 [v]
+  `[+ 123 ~v]
+]
 ; This would interfere with quasiquote as a macro, still have to think about the consequences
 ;[test/add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]
 
