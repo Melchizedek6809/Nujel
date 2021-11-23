@@ -157,10 +157,11 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 	FILE *child = popen(command,"r");
 	if(child == NULL){
-		printf("Error openeing %s\n",command);
+		fprintf(stderr,"Error openeing %s\n",command);
+		return NULL;
 	}
 	while(1){
-		int ret = fread(&buf[len],1,readSize,child);
+		const int ret = fread(&buf[len],1,readSize,child);
 		if(ret < readSize){
 			if(feof(child)){
 				len += ret;
@@ -170,21 +171,25 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 				return NULL;
 			}
 		}
-		if(ret > 0){
-			len += ret;
-		}
+		if(ret > 0){len += ret;}
+
 		if((len + readSize) >= bufSize){
 			bufSize += readSize;
 			buf = realloc(buf,bufSize);
 		}
 	}
-	const int exitStatus = pclose(child);
+	#ifdef __MINGW32__
+	int exitCode = pclose(child);
+	#else
+	int exitStatus = pclose(child);
+	int exitCode = WEXITSTATUS(exitStatus);
+	#endif
 
 	buf = realloc(buf,len+1);
 	buf[len] = 0;
 
 	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	ret->vList.car = lValInt(exitStatus);
+	ret->vList.car = lValInt(exitCode);
 	ret->vList.cdr = lValStringNoCopy(buf,len);
 
 	return ret;

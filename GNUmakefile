@@ -135,8 +135,7 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 
 tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOT)
 	@mkdir -p tmp/
-	$(NUJEL_BOOT) tools/bootstrap.nuj
-
+	@$(NUJEL_BOOT) tools/bootstrap.nuj
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
