@@ -83,6 +83,15 @@
        [println [cat [ansi-blue "x"] " - Run the expression following this argument directly"]]
 ]
 
+[defun repl/run-forked* [expr]
+       [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
+       [popen command]
+]
+
+[defmacro repl/run-forked [expr]
+          `[repl/run-forked* ~[list 'quote expr]]
+]
+
 [def repl/executable-name "nujel"]
 [def repl/parse-args [let*
        [def eval-next #f]
