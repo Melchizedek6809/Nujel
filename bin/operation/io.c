@@ -15,7 +15,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
+
+#ifndef __MINGW32__
+	#include <sys/wait.h>
+#endif
 
 lSymbol *lsMode, *lsSize, *lsUserID, *lsGroupID, *lsAccessTime, *lsModificationTime;
 
