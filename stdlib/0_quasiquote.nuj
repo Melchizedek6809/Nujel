@@ -8,14 +8,14 @@
                              [cadr [car l]]
                              [quasiquote-real [cdr l] depth]]
                        [list 'unquote-splicing
-                             [quasiquote-real [cadr l] [-- depth]]]]
+                             [quasiquote-real [cadr l] [+ -1 depth]]]]
                    [if [eq? [car l] 'unquote]
                        [if [zero? depth]
                            [cadr l]
                            [list 'unquote
-                                 [quasiquote-real [cadr l] [-- depth]]]]
+                                 [quasiquote-real [cadr l] [+ -1 depth]]]]
                        [if [eq? [car l] 'quasiquote]
-                           [quasiquote-real [quasiquote-real [cadr l] [++ depth]] depth]
+                           [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth]
                            [if [zero? depth]
                                [list 'cons
                                      [quasiquote-real [car l] depth]

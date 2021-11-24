@@ -19,7 +19,7 @@
        "Return NUM=1 linebreaks"
        [if [or [nil? num] [<= [int num] 1]]
            "\n"
-           ["\n" [br [-- num]]]]
+           ["\n" [br [+ -1 num]]]]
 ]
 
 [defun path/ext?! [ext]
@@ -91,6 +91,7 @@
 [def int->string int->string/decimal]
 
 [defun string/pad-start [text goal-length char]
+       "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
        [while [< [string/length text] goal-length]
               [set! text [cat char text]]
@@ -101,6 +102,7 @@
 ]
 
 [defun string/pad-end [text goal-length char]
+       "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
        [while [< [string/length text] goal-length]
               [set! text [cat text char]]

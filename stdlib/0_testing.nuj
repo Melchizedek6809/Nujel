@@ -46,7 +46,7 @@
                                       "\r\n"
                                       [str/write expr]
                                       "\r\n\r\n"]]]
-       [set! success-count [++ success-count]]
+       [set! success-count [+ 1 success-count]]
 ]
 
 [defun test-failure [res-should res-is expr i]
@@ -59,7 +59,7 @@
                                       "\r\n"
                                       [str/write expr]
                                       "\r\n\r\n"]]]
-       [set! error-count [++ error-count]]
+       [set! error-count [+ 1 error-count]]
 ]
 
 [defun test-default [result rawexpr i]

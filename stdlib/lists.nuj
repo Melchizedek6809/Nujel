@@ -44,7 +44,7 @@
         "Returns the the element of list l at location i"
         [cond [[nil? l] #nil]
               [[<= i 0] [car l]]
-              [#t [list-ref [cdr l] [-- i]]]
+              [#t [list-ref [cdr l] [+ -1 i]]]
         ]
 ]
 
@@ -93,7 +93,7 @@
         "Returns the length of list a"
         [if [nil? a]
             t
-            [list-length [cdr a] [++ t]]]
+            [list-length [cdr a] [+ 1 t]]]
 ]
 
 [defun filter [p l]
@@ -139,8 +139,8 @@
         [cond [[nil?    l] [reverse ret]]
               [[neg?  end] [sublist      l      start  [+ [length l] end]]]
               [[zero? end] [reverse ret]]
-              [[> start 0] [sublist [cdr l] [-- start] [-- end] #nil]]
-              [[> end   0] [sublist [cdr l] 0          [-- end] [cons [car l] ret]]]
+              [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
+              [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]
         ]
 ]
 

@@ -1,14 +1,19 @@
 [def PI 3.14159]
 [def π  3.14159]
 
-[defun ++ [i]
-       "Increment I by 1"
-       [+  1 i]
+[defmacro ++ [i]
+          "Increment I by 1 and store the result in I"
+          `[set! ~i [+ 1 ~i]]
 ]
 
-[defun -- [i]
-       "Decrement I by 1"
-       [+ -1 i]
+[defmacro -- [i]
+          "Decrement I by 1 and store the result in I"
+          `[set! ~i [+ -1 ~i]]
+]
+
+[defun +x [α]
+       "Return a function that adds α to it's argument, useful for mapping"
+       [λ [β] [+ α β]]
 ]
 
 [defun >> [val amount]
