@@ -615,6 +615,8 @@
 [test/add "\"1000\"" [string/pad-end "1" 4 "0"]]
 [test/add "\"1asd\"" [string/pad-end "1" 4 "asdasd"]]
 [test/add 128 oneTwoThreeTest]
+[test/add "[quote . 123]" [cons 'quote 123]]
+[test/add "[quote . asd]" [cons 'quote 'asd]]
 
 
 [def oneTwoThreeTest [+123 5]]

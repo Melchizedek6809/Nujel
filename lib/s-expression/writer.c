@@ -184,7 +184,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		lVal *carSym = lCar(v);
 		if((carSym != NULL) && (carSym->type == ltSymbol) && (lCdr(v) != NULL)){
 			const lSymbol *sym = carSym->vSymbol;
-			if((sym == symQuote) && (lCddr(v) == NULL)){
+			if((sym == symQuote) && (lCddr(v) == NULL) && (lCadr(v) != NULL)){
 				v = lCadr(v);
 				*cur++ = '\'';
 				cur = lSWriteVal(v,cur,bufEnd,indentLevel,0);
