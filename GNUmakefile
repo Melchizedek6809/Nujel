@@ -67,10 +67,10 @@ endif
 .PHONY: clean
 clean:
 	@rm -f -- nujel nujel.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
-	@rm -f -- $(shell find bin lib -type f -name '*.o')
-	@rm -f -- $(shell find bin lib -type f -name '*.wo')
-	@rm -f -- $(shell find bin lib -type f -name '*.d')
-	@rm -f -- $(shell find bin lib -type f -name '*.wd')
+	@rm -f -- $(shell find bin lib vendor -type f -name '*.o')
+	@rm -f -- $(shell find bin lib vendor -type f -name '*.wo')
+	@rm -f -- $(shell find bin lib vendor -type f -name '*.d')
+	@rm -f -- $(shell find bin lib vendor -type f -name '*.wd')
 	@rm -f -- $(shell find binlib stdlib -type f -name '*.no')
 	@rm -f ./callgrind.out.*
 	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
