@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+cd ../
+
+scc --exclude-dir="vendor,bootstrap,web,releases,.builds,.github,tools,.gitignore"

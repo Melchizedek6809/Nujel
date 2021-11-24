@@ -148,7 +148,8 @@
              ]
       ]
 
-      [set! compile [lambda [source new-environment new-verbose]
+      [set! compile [λ [source new-environment new-verbose]
+            "Compile the forms in source"
             [when-not new-environment [set! new-environment [current-closure]]]
             [when-not new-verbose [set! new-verbose #f]]
             [set! environment new-environment]
@@ -157,11 +158,11 @@
       ]]
 ]
 
-[defun compile/forms [source-raw]
+[defun compile/forms [source-raw environment]
         "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+        [when-not environment [set! environment [ω]]]
         [def source #nil]
         [def source-next source-raw]
-        [def environment [object]]
         [def passes 0]
         [def max-passes 100]
         [defun try-again [source]
@@ -171,7 +172,7 @@
                [set! source source-next]
                [set! source-next #nil]
                [while source
-                      [try [lambda [err] [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
+                      [try [λ [err] [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
                                                [[eq? [car err] :runtime-macro] [try-again [car source]]]
                                                [#t [throw err]]]]
                            [def compiled-form [compile [car source] environment #t]]
@@ -205,6 +206,10 @@
 
 [defmacro +1 [v]
            `[+ 1 ~v]
+]
+
+[defmacro +99 [v]
+           `[+ 99 ~v]
 ]
 
 [defun optimize/code/rest [code]

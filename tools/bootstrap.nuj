@@ -1,19 +1,46 @@
 #!/usr/bin/env nujel
+; In here we use our bootstrap runtime to load, eval and finally precompile
+; the Nujel standard library, the eval is necessary so we can make use of macros
+; that are not within our bootstrap runtime (which is just using an old
+; precompiled stdlib).
 
-[def new-env [ω]]
+[def environment [ω]]
 [def ext-nuj? [path/ext?! "nuj"]]
-[def directory/read-relative [λ [path]
+[defun directory/read-relative [path]
        [map [λ [α] [cat path "/" α]]
             [directory/read path]]
-]]
-
+]
 [def stdlib-files [filter ext-nuj? [append [directory/read-relative "stdlib"]
                                            [directory/read-relative "binlib"]]]]
 
-[try [λ [err] [println "Exception during stdlib compilation"] [display/error err] [exit 2]]
+; If something happens, we just print the responsible error and exit immediatly,
+; since we can't really fix things, we could only make things worse.
+[try [λ [err]
+        [println "Exception during stdlib compilation"]
+        [display/error err] [exit 2]]
+     [def file-queue-new stdlib-files]
+     [def tries 0]
+     [while file-queue-new
+            [when [> tries 1000]
+                  [throw [list :too-many-passes "Tried too many times, maybe some strance circular dependencies going on, you are on your own, exiting."]]]
+            [set! tries [+ 1 tries]]
+            [def file-queue file-queue-new]
+            [set! file-queue-new #nil]
+            [while file-queue
+                   [def cur-path [car file-queue]]
+                   [try [λ [err]
+                           [if [eq? [car err] :too-many-passes]
+                               [set! file-queue-new [cons cur-path file-queue-new]]
+                               [throw err]]]
+                        [println [cat [ansi-yellow " [EVA]  "] cur-path]]
+                        [file/compile cur-path #t environment]
+                   ]
+                   [set! file-queue [cdr file-queue]]
+            ]
+     ]
      [for-each [λ [cur-path]
                   [println [cat [ansi-green " [NUJ]  "] cur-path]]
-                  [file/compile cur-path]
+                  [file/compile cur-path #f environment]
                ]
                stdlib-files]
 ]

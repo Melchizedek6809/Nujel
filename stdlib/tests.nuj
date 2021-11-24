@@ -621,6 +621,10 @@
 [defmacro +123 [v]
   `[+ 123 ~v]
 ]
+
+; Having test defined somehow breaks the whole testing system, how come?
+; [def test [+99 1]]
+
 ; This would interfere with quasiquote as a macro, still have to think about the consequences
 ;[test/add '[quasiquote [quasiquote [1 2 [unquote [unquote 3]]]]] ```[1 2 ,,,[+ 2 1]]]
 
