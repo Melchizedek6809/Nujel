@@ -12,7 +12,7 @@
         [defun iter [error i]
                 [if error
                     [cons [wrap i [car error]]
-                          [iter [cdr error] [++ i]]]
+                          [iter [cdr error] [+ 1 i]]]
                     [cons "" #nil]]
         ]
 
