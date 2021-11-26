@@ -9,6 +9,9 @@
 
 #include <math.h>
 
+vec vecCbrt(const vec a){
+	return (vec){{{cbrtf(a.x),cbrtf(a.y),cbrtf(a.z)}}};
+}
 vec vecSqrt(const vec a){
 	return (vec){{{sqrtf(a.x),sqrtf(a.y),sqrtf(a.z)}}};
 }

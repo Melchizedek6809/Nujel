@@ -160,13 +160,13 @@
               [if [eq? [caar l] 'unquote-splicing]
                  [if [zero? depth]
                     [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]]
-                    [list 'unquote-splicing [quasiquote-real [cadr l] [-- depth]]]]
+                    [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]]
                  [if [eq? [car l] 'unquote]
                     [if [zero? depth]
                        [cadr l]
-                       [list 'unquote [quasiquote-real [cadr l] [-- depth]]]]
+                       [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]]
                     [if [eq? [car l] 'quasiquote]
-                       [quasiquote-real [quasiquote-real [cadr l] [++ depth]] depth]
+                       [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth]
                        [if [zero? depth]
                           [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]
                           [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]]
@@ -205,13 +205,13 @@
         [do [if print-passes
               [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-green "[PASS] -> "] [ansi-green [str/write res-is]] " != " [ansi-green [str/write res-should]] "\r\n" [str/write expr] "\r\n\r\n"]]
               #nil]
-           [set! success-count [++ success-count]]]]]
+           [set! success-count [+ 1 success-count]]]]]
     [def test-failure [λ* [res-should res-is expr i]
         "Should be called if EXPR does not equal RES"
         [do [if print-errors
               [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-red "[FAIL] -> "] [ansi-red [str/write res-is]] " != " [ansi-green [str/write res-should]] "\r\n" [str/write expr] "\r\n\r\n"]]
               #nil]
-           [set! error-count [++ error-count]]]]]
+           [set! error-count [+ 1 error-count]]]]]
     [def test-default [λ* [result rawexpr i]
         "Tests that RAWEXPR evaluates to RESULT"
         [try [λ* [err]
@@ -248,7 +248,7 @@
         [if l
            [do [test [caar l] [cdar l] i]
               [test-run-iter test [cdr l] [- i 1]]]
-           #t]]]
+           #nil]]]
     [def test-run-real [λ* [test]
         ""
         [do [set! nujel-start [time/milliseconds]]
@@ -352,7 +352,7 @@
            [print "\r"]
            [def i 0]
            [while [< i width] [do [print " "]
-              [set! i [++ i]]]]
+              [set! i [+ 1 i]]]]
            [print "\r"]
            [print text]]]]
     [def test-reprint-line [λ* []
@@ -360,7 +360,7 @@
         [do [def i 0]
            [print "\r\n"]
            [while [i < 100000] [do [reprint-line [string i]]
-              [set! i [++ i]]]]
+              [set! i [+ 1 i]]]]
            [print " Done!\r\n"]]]]][do [def yield-queue #nil]
     [def yield [λ* [pred fun]
         "Evaluates FUN once PRED is true"
@@ -417,7 +417,7 @@
         "Fills array a with value v"
         [cond [[>= [int i] [arr-length a]] a]
               [#t [do [arr-set! a [int i] v]
-                 [arr-fill! a v [++ i]]]]]]]
+                 [arr-fill! a v [+ 1 i]]]]]]]
     [def lognand [λ* [...l]
         "Returns the Nand of its arguments"
         [lognot [apply logand ...l]]]]
@@ -457,7 +457,7 @@
         "Returns the the element of list l at location i"
         [cond [[nil? l] #nil]
               [[<= i 0] [car l]]
-              [#t [list-ref [cdr l] [-- i]]]]]]
+              [#t [list-ref [cdr l] [+ -1 i]]]]]]
     [def join [let* [do [def iter [λ* [str l glue]
            ""
            [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
@@ -488,7 +488,7 @@
         "Returns the length of list a"
         [if [nil? a]
            t
-           [list-length [cdr a] [++ t]]]]]
+           [list-length [cdr a] [+ 1 t]]]]]
     [def filter [λ* [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [do [def ret #nil]
@@ -519,8 +519,8 @@
         [cond [[nil? l] [reverse ret]]
               [[neg? end] [sublist l start [+ [length l] end]]]
               [[zero? end] [reverse ret]]
-              [[> start 0] [sublist [cdr l] [-- start] [-- end] #nil]]
-              [[> end 0] [sublist [cdr l] 0 [-- end] [cons [car l] ret]]]]]]
+              [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
+              [[> end 0] [sublist [cdr l] 0 [+ -1 end] [cons [car l] ret]]]]]]
     [def list-head [λ* [l k]
         "Returns the first k elemnts of list l"
         [sublist l 0 k]]]
@@ -552,12 +552,13 @@
               [[eq? key [car l]] [cadr l]]
               [#t [getf [cdr l] key]]]]]][do [def PI 3.14159]
     [def π 3.14159]
-    [def ++ [λ* [i]
-        "Increment I by 1"
-        [+ 1 i]]]
-    [def -- [λ* [i]
-        "Decrement I by 1"
-        [+ -1 i]]]
+    [def ++ [μ* [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]]
+    [def -- [μ* [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]]
+    [def +x [λ* [α]
+        "Return a function that adds α to it\'s argument, useful for mapping"
+        [λ* [β]
+            ""
+            [+ α β]]]]
     [def >> [λ* [val amount]
         "Shifts VAL by AMOUNT bits to the right"
         [ash val [- amount]]]]
@@ -622,7 +623,7 @@
         "Return NUM=1 linebreaks"
         [if [or [nil? num] [<= [int num] 1]]
            "\n"
-           ["\n" [br [-- num]]]]]]
+           ["\n" [br [+ -1 num]]]]]]
     [def path/ext?! [λ* [ext]
         "Return a predicate that checks if a path ends on EXT"
         [λ* [path]
@@ -682,7 +683,7 @@
         [string α]]]
     [def int->string int->string/decimal]
     [def string/pad-start [λ* [text goal-length char]
-        ""
+        "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
         [do [if char
               #nil
               [set! char " "]]
@@ -691,7 +692,7 @@
               [substr text [- [string/length text] goal-length] [string/length text]]
               text]]]]
     [def string/pad-end [λ* [text goal-length char]
-        ""
+        "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
         [do [if char
               #nil
               [set! char " "]]
@@ -780,8 +781,8 @@
     [test/add* #t '[do [and [pair? [cons 1 '[2]]] [not [pair? 1]]]]]
     [test/add* 1 '[do [car [cons 1 '[2]]]]]
     [test/add* 2 '[do [+ [cadr '[1 2]] [cadr #nil] [cadr '[1]]]]]
-    [test/add* #t '[do [string? [describe "++"]]]]
-    [test/add* 3 '[do [++ [-- [length '[1 2 3]]]]]]
+    [test/add* #t '[do [string? [describe "min"]]]]
+    [test/add* 3 '[do [+ 1 [- [length '[1 2 3]] 1]]]]
     [test/add* #t '[do [and [for-all? '[1 2 3] int?] [not [for-all? '[1 2 3.0] int?]]]]]
     [test/add* #t '[do [and [there-exists? '[1.0 2 3.0] int?] [not [there-exists? '[1.0 2.0 3.0] int?]]]]]
     [test/add* #t '[do [and [eq? "asd" "asd"] [not [eq? "asd" "bsd"]] [not [eq? "asd" "asdasd"]]]]]
@@ -801,15 +802,20 @@
     [test/add* #t '[do [arr? [arr-new 3]]]]
     [test/add* #f '[do [arr? '[1 2 3]]]]
     [test/add* #f '[do [arr? [tree/new :a 1 :b 2 :c 3]]]]
-    [test/add* 10 '[do [+ [apply + '[1 2 3]] [apply ++ '[3]]]]]
+    [test/add* 10 '[do [+ [apply + '[1 2 3]] [apply [λ [α]
+          [+ 1 α]] '[3]]]]]
     [test/add* 0 '[do [apply +]]]
     [test/add* 0 '[do [def cb '+]
        [apply cb]]]
-    [test/add* 1 '[do [apply ++]]]
-    [test/add* 1 '[do [def cb '++]
+    [test/add* 1 '[do [apply [λ [α]
+          [+ 1 α]]]]]
+    [test/add* 1 '[do [def cb [λ [α]
+          [+ 1 α]]]
        [apply cb]]]
-    [test/add* 1 '[do [let [[cb '++]] [apply cb]]]]
-    [test/add* 1 '[do [let* [def cb '++] [apply cb]]]]
+    [test/add* 1 '[do [let [[cb [λ [α]
+          [+ 1 α]]]] [apply cb]]]]
+    [test/add* 1 '[do [let* [def cb [λ [α]
+          [+ 1 α]]] [apply cb]]]]
     [test/add* 5 '[do [length "12345"]]]
     [test/add* #f '[do [or 0 0]]]
     [test/add* 2 '[do [and 1 2]]]
@@ -1143,7 +1149,7 @@
     [test/add* #t '[do [list-equal? '[1] '[1]]]]
     [test/add* #f '[do [eq? '[] #nil]]]
     [test/add* #t '[do [eq? λ [resolve [car '[λ asd]]]]]]
-    [test/add* 10000 '[do [let [] [def i 0] [while [< i 10000] [set! i [++ i]]]]]]
+    [test/add* 10000 '[do [let [] [def i 0] [while [< i 10000] [set! i [+ 1 i]]]]]]
     [test/add* '[1 :a "q"] '[do '[1 :a "q"]]]
     [test/add* 4 '[do [compile '[do "Test"
           4]]]]
@@ -1216,9 +1222,9 @@
     [test/add* 'two '[do [cadr '[:one two :three]]]]
     [test/add* :value '[do [car [memory-info]]]]
     [test/add* #t '[do [int? [cadr [memory-info]]]]]
-    [test/add* 102334155 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 40] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]]
-    [test/add* 832040 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 30] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]]
-    [test/add* 17711 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 22] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [++ i] new]]] b]]]
+    [test/add* 102334155 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 40] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i] new]]] b]]]
+    [test/add* 832040 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 30] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i] new]]] b]]]
+    [test/add* 17711 '[do [let* [def i 1] [def a 0] [def b 1] [while [< i 22] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i] new]]] b]]]
     [test/add* 6765 '[do [let* [def fib-slow [λ [v]
           [if [< v 2]
              v
@@ -1382,6 +1388,8 @@
     [test/add* "\"NUJ\"" '[do [uppercase [path/extension "Another/test.nuj"]]]]
     [test/add* "\"no\"" '[do [path/extension "asd/test.nuj.no"]]]
     [test/add* "\"asd/test.nuj\"" '[do [path/without-extension "asd/test.nuj.no"]]]
+    [test/add* #t '[do [[path/ext?! "nuj"] "tests.nuj"]]]
+    [test/add* #f '[do [[path/ext?! "nuj"] "tests.nu"]]]
     [test/add* #t '[do [resolves? '+]]]
     [test/add* #t '[do [resolves? 'map]]]
     [test/add* #t '[do [resolves? 'π]]]
@@ -1396,7 +1404,7 @@
     [test/add* #f '[do [tree? "asd"]]]
     [test/add* #f '[do [tree? #t]]]
     [test/add* #t '[do [tree? [closure +]]]]
-    [test/add* 'i '[do [car [[closure ++] :arguments]]]]
+    [test/add* 'source '[do [car [[closure compile] :arguments]]]]
     [test/add* :invalid-literal '[do [try [λ [e]
           [car e]] [read "#inf"]]]]
     [test/add* 3 '[do [+ '1 '[2]]]]
@@ -1467,6 +1475,18 @@
     [test/add* "\"1000\"" '[do [string/pad-end "1" 4 "0"]]]
     [test/add* "\"1asd\"" '[do [string/pad-end "1" 4 "asdasd"]]]
     [test/add* 128 '[do oneTwoThreeTest]]
+    [test/add* "[quote . 123]" '[do [cons 'quote 123]]]
+    [test/add* "[quote . asd]" '[do [cons 'quote 'asd]]]
+    [test/add* "[quote . asd]" '[do [cons 'quote 'asd]]]
+    [test/add* 34 '[do [time/seconds 1637755714]]]
+    [test/add* 8 '[do [time/minutes 1637755714]]]
+    [test/add* 12 '[do [time/hours 1637755714]]]
+    [test/add* 59 '[do [time/seconds 1637755739]]]
+    [test/add* 0 '[do [time/seconds 1637755740]]]
+    [test/add* '[4 5 6] '[do [map [+x 3] '[1 2 3]]]]
+    [test/add* 4 '[do [def α 3]
+       [++ α]
+       α]]
     [def oneTwoThreeTest [+ 123 5]]
     [def +123 [μ* [v] "" [cons '+ [cons 123 [cons v #nil]]]]]
     ][do [def time/seconds [λ* [timestamp]
@@ -1486,8 +1506,7 @@
            [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
     [def profile [μ* [...body] "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? ...body]
        [car ...body]
-       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile #nil]
-    [let* [do [def environment [current-closure]]
+       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile [let* [do [def environment [current-closure]]
        [def verbose #f]
        [def compile/do/args [λ* [args]
            ""
@@ -1601,8 +1620,8 @@
                     [[string? op] [compile/procedure/arg source]]
                     [[tree? op] [compile/procedure/arg source]]
                     [#t source]]]]]]
-       [set! compile [λ* [source new-environment new-verbose]
-           ""
+       [λ* [source new-environment new-verbose]
+           "Compile the forms in source"
            [do [if new-environment
                  #nil
                  [set! new-environment [current-closure]]]
@@ -1612,11 +1631,13 @@
               [set! environment new-environment]
               [set! verbose new-verbose]
               [compile* source]]]]]]
-    [def compile/forms [λ* [source-raw]
+    [def compile/forms [λ* [source-raw environment]
         "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
-        [do [def source #nil]
+        [do [if environment
+              #nil
+              [set! environment [ω #nil]]]
+           [def source #nil]
            [def source-next source-raw]
-           [def environment [ω #nil]]
            [def passes 0]
            [def max-passes 100]
            [def try-again [λ* [source]
@@ -1629,7 +1650,9 @@
                      [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
                            [[eq? [car err] :runtime-macro] [try-again [car source]]]
                            [#t [throw err]]]] [do [def compiled-form [compile [car source] environment #t]]
-                    [apply environment [cons [cons 'eval* [cons compiled-form #nil]] #nil]]]]
+                    [if compiled-form
+                       [apply environment [cons [cons 'eval* [cons compiled-form #nil]] #nil]]
+                       #nil]]]
                  [set! source [cdr source]]]]
               [set! source-next [reverse source-next]]
               [if [> [set! passes [+ 1 passes]] max-passes]

@@ -1,7 +1,7 @@
 ;; Contains the self-hosting Nujel compiler
 
-[def compile]
-[let* [def environment [current-closure]]
+[def compile [let*
+      [def environment [current-closure]]
       [def verbose #f]
 
       [defun compile/do/args [args]
@@ -148,15 +148,15 @@
              ]
       ]
 
-      [set! compile [λ [source new-environment new-verbose]
+      [λ [source new-environment new-verbose]
             "Compile the forms in source"
             [when-not new-environment [set! new-environment [current-closure]]]
             [when-not new-verbose [set! new-verbose #f]]
             [set! environment new-environment]
             [set! verbose new-verbose]
             [compile* source]
-      ]]
-]
+      ]
+]]
 
 [defun compile/forms [source-raw environment]
         "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
@@ -173,10 +173,10 @@
                [set! source-next #nil]
                [while source
                       [try [λ [err] [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
-                                               [[eq? [car err] :runtime-macro] [try-again [car source]]]
-                                               [#t [throw err]]]]
+                                          [[eq? [car err] :runtime-macro] [try-again [car source]]]
+                                          [#t [throw err]]]]
                            [def compiled-form [compile [car source] environment #t]]
-                           [apply environment `[[eval* ~compiled-form]]]
+                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]]
                       ]
                       [set! source [cdr source]]
                ]
@@ -206,10 +206,6 @@
 
 [defmacro +1 [v]
            `[+ 1 ~v]
-]
-
-[defmacro +99 [v]
-           `[+ 99 ~v]
 ]
 
 [defun optimize/code/rest [code]

@@ -234,6 +234,17 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	}
 }
 
+lVal *lnfCbrt(lClosure *c, lVal *v){
+	lVal *t = lCar(lCastAuto(c,v));
+	if(t == NULL){return lValInt(0);}
+	switch(t->type){
+		default:      return exceptionThrow(v,"squareroot");
+		case ltFloat: return lValFloat(cbrtf(t->vFloat));
+		case ltInt:   return lValFloat(cbrtf(t->vInt));
+		case ltVec:   return lValVec(vecCbrt(t->vVec));
+	}
+}
+
 lVal *lnfSqrt(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastAuto(c,v));
 	if(t == NULL){return lValInt(0);}
@@ -373,14 +384,15 @@ void lOperationsArithmetic(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]", "Addition",      lnfAdd));
 	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",     "Return A raised to the power of B",lnfPow));
 
-	lAddNativeFunc(c,"abs","[a]",   "Return the absolute value of a",  lnfAbs);
-	lAddNativeFunc(c,"sqrt","[a]",  "Return the squareroot of a",      lnfSqrt);
-	lAddNativeFunc(c,"floor","[a]", "Round a down",                    lnfFloor);
-	lAddNativeFunc(c,"ceil","[a]",  "Round a up",                      lnfCeil);
-	lAddNativeFunc(c,"round","[a]", "Round a",                         lnfRound);
-	lAddNativeFunc(c,"sin","[a]",   "Sin A",                           lnfSin);
-	lAddNativeFunc(c,"cos","[a]",   "Cos A",                           lnfCos);
-	lAddNativeFunc(c,"tan","[a]",   "Tan A",                           lnfTan);
+	lAddNativeFunc(c,"abs",  "[a]", "Return the absolute value of a", lnfAbs);
+	lAddNativeFunc(c,"sqrt", "[a]", "Return the square root of a",    lnfSqrt);
+	lAddNativeFunc(c,"cbrt", "[a]", "Return the cube root of a",      lnfCbrt);
+	lAddNativeFunc(c,"floor","[a]", "Round a down",                   lnfFloor);
+	lAddNativeFunc(c,"ceil", "[a]", "Round a up",                     lnfCeil);
+	lAddNativeFunc(c,"round","[a]", "Round a",                        lnfRound);
+	lAddNativeFunc(c,"sin",  "[a]", "Sin A",                          lnfSin);
+	lAddNativeFunc(c,"cos",  "[a]", "Cos A",                          lnfCos);
+	lAddNativeFunc(c,"tan",  "[a]", "Tan A",                          lnfTan);
 
 	lAddNativeFunc(c,"vec/magnitude","[vec]","Return the magnitude of VEC", lnfVMag);
 }

@@ -11,10 +11,10 @@
               [display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
               [newline]
               #t]]]]]
-    [def file/compile [λ* [path no-write]
+    [def file/compile [λ* [path no-write environment]
         "Compile a Nujel source file into optimized object code"
         [do [def source [read [file/read path]]]
-           [def object-code [compile/forms [cons 'do source]]]
+           [def object-code [compile/forms [cons 'do source] environment]]
            [if no-write
               #nil
               [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
@@ -41,7 +41,7 @@
        [def iter [λ* [error i]
            ""
            [if error
-              [cons [wrap i [car error]] [iter [cdr error] [++ i]]]
+              [cons [wrap i [car error]] [iter [cdr error] [+ 1 i]]]
               [cons "" #nil]]]]
        [λ* [error]
            "Display ERROR in a nice, human readable way"

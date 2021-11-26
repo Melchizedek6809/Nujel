@@ -627,6 +627,11 @@
 [test/add  0 [time/seconds 1637755740]]
 [test/add '[4 5 6] [map [+x 3] '[1 2 3]]]
 [test/add 4 [def α 3] [++ α] α]
+[test/add 2 [cbrt  8]]
+[test/add 3 [cbrt 27]]
+[test/add 2.0 [cbrt 8.0]]
+[test/add 3.0 [cbrt 27.0]]
+[test/add 2.0 [vec/x [cbrt [vec 8]]]]
 
 
 [def oneTwoThreeTest [+123 5]]
