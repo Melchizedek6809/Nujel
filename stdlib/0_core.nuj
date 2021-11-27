@@ -104,7 +104,32 @@
 [def gensym/counter 0]
 [defun gensym []
        [set! gensym/counter [+ 1 gensym/counter]]
-       [str->sym ["GenSym-" gensym/counter]]
+       [str->sym ["ΓεnΣym-" gensym/counter]]
+]
+
+[defun case/clauses/multiple [key-sym cases]
+       [when cases
+             [cons [list 'eq? key-sym [car cases]]
+                   [case/clauses/multiple key-sym [cdr cases]]]]
+]
+
+[defun case/clauses [key-sym clauses]
+       [when clauses
+             [if [eq? [caar clauses] 'otherwise]
+                 [cons 'do [cdar clauses]]
+                 [list 'if
+                       [if [pair? [caar clauses]]
+                           [cons 'or [case/clauses/multiple key-sym [caar clauses]]]
+                           [list 'eq? key-sym [caar clauses]]]
+                       [cons 'do [cdar clauses]]
+                       [case/clauses key-sym [cdr clauses]]]]]
+]
+
+[defmacro case [key-form ...clauses]
+          [def key-sym [gensym]]
+          [list 'let*
+                [list 'def key-sym key-form]
+                [case/clauses key-sym ...clauses]]
 ]
 
 [def root-closure [current-closure]]
