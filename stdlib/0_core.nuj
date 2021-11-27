@@ -3,7 +3,7 @@
 
 [defmacro comment [...body]
           "Does nothing"
-          0
+          #nil
 ]
 
 [defun not [v]

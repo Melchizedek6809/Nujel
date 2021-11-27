@@ -1,5 +1,14 @@
 ;; Contains the self-hosting Nujel compiler
 
+;[defmacro cond [...body]
+;          "Cond as a macro"
+;          [when ...body
+;                [list 'if
+;                      [caar ...body]
+;                      [cons 'do [cdar ...body]]
+;                      [macro-apply cond [cdr ...body]]]]
+;]
+
 [def compile [let*
       [def environment [current-closure]]
       [def verbose #f]
@@ -80,7 +89,17 @@
              ]
       ]
 
+      [defun compile/cond/body [source]
+             [if source
+                 [list 'if
+                       [compile* [caar source]]
+                       [compile/do [cdar source]]
+                       [compile/cond/body [cdr source]]]]
+      ]
+
       [defun compile/cond [source]
+             ;[compile* [macro-apply cond* [cdr source]]]
+             ;[compile/cond/body [cdr source]]
              [cons 'cond [compile/cond/clauses [cdr source]]]
       ]
 
