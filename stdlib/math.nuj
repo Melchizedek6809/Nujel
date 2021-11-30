@@ -13,7 +13,7 @@
 
 [defun +x [α]
        "Return a function that adds α to it's argument, useful for mapping"
-       [λ [β] [+ α β]]
+       [\ [β] [+ α β]]
 ]
 
 [defun >> [val amount]
@@ -21,39 +21,35 @@
        [ash val [- amount]]
 ]
 
-[def min [let*
-        [def iter [λ [a l]
-                [cond [[nil? l] a]
-                      [[< a [car l]] [iter a [cdr l]]]
-                      [#t [iter [car l] [cdr l]]]
-                ]
-        ]]
+[defun min/iter [a l]
+       [cond [[nil? l] a]
+             [[< a [car l]] [min/iter a [cdr l]]]
+             [#t [min/iter [car l] [cdr l]]]
+       ]
+]
 
-        [λ [...l]
-                "Returns the minimum value of its arguments"
-                [cond [[nil? ...l] 0]
-                      [[nil? [cdr ...l]] [car ...l]]
-                      [#t [iter [car ...l] [cdr ...l]]]
-                ]
-        ]
-]]
+[defun min [...l]
+       "Returns the minimum value of its arguments"
+       [cond [[nil? ...l] 0]
+             [[nil? [cdr ...l]] [car ...l]]
+             [#t [min/iter [car ...l] [cdr ...l]]]
+       ]
+]
 
-[def max [let*
-        [def iter [λ [a l]
-                [cond [[nil? l] a]
-                      [[> a [car l]] [iter a [cdr l]]]
-                      [#t [iter [car l] [cdr l]]]
-                ]
-        ]]
+[defun max/iter [a l]
+       [cond [[nil? l] a]
+             [[> a [car l]] [max/iter a [cdr l]]]
+             [#t [max/iter [car l] [cdr l]]]
+       ]
+]
 
-        [λ [...l]
-                "Returns the maximum value of its arguments"
-                [cond [[nil? ...l] 0]
-                      [[nil? [cdr ...l]] [car ...l]]
-                      [#t [iter [car ...l] [cdr ...l]]]
-                ]
-        ]
-]]
+[defun max [...l]
+       "Returns the maximum value of its arguments"
+       [cond [[nil? ...l] 0]
+             [[nil? [cdr ...l]] [car ...l]]
+             [#t [max/iter [car ...l] [cdr ...l]]]
+       ]
+]
 
 [defun fib [i]
            "Terribly inefficient, but, useful for testing the GC"

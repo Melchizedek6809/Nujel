@@ -1,47 +1,63 @@
-[do [def comment [μ* [...body] "Does nothing" 0]]
-    [def not [λ* [v]
+[do [def comment [μ* comment [...body] "Does nothing" #nil]]
+    [def not [λ* not
+        [v]
         "Return true if V is false"
         [if v
            #f
            #t]]]
-    [def list [λ* [...arguments]
+    [def list [λ* list
+        [...arguments]
         "Return ARGUMENTS as a list"
         ...arguments]]
-    [def default [λ* [arg default-value]
+    [def default [λ* default
+        [arg default-value]
         "Returns ARG or DEFAULT-VALUE if ARG is #nil"
         [if arg
            arg
            default-value]]]
-    [def caar [λ* [p]
+    [def caar [λ* caar
+        [p]
         "[car [car p]]"
         [car [car p]]]]
-    [def cadr [λ* [p]
+    [def cadr [λ* cadr
+        [p]
         "[car [cdr p]]"
         [car [cdr p]]]]
-    [def cdar [λ* [p]
+    [def cdar [λ* cdar
+        [p]
         "[cdr [car p]]"
         [cdr [car p]]]]
-    [def cddr [λ* [p]
+    [def cddr [λ* cddr
+        [p]
         "[cdr [cdr p]]"
         [cdr [cdr p]]]]
-    [def cadar [λ* [p]
+    [def cadar [λ* cadar
+        [p]
         "[cdr [car p]]"
         [car [cdr [car p]]]]]
-    [def caddr [λ* [p]
+    [def caddr [λ* caddr
+        [p]
         "[car [cdr [cdr p]]]"
         [car [cdr [cdr p]]]]]
-    [def cdddr [λ* [p]
+    [def cdddr [λ* cdddr
+        [p]
         "[cdr [cdr [cdr p]]]"
         [cdr [cdr [cdr p]]]]]
-    [def cadddr [λ* [p]
+    [def cadddr [λ* cadddr
+        [p]
         "[car [cdr [cdr [cdr p]]]]"
         [car [cdr [cdr [cdr p]]]]]]
-    [def if-not [μ* [pred then else] "" [cons 'if [cons pred [cons else [cons then #nil]]]]]]
-    [def if-let [μ* [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]]
-    [def when-let [μ* [binding ...body] "" [cons 'if-let [cons binding [cons [cons 'do ...body] [cons #nil #nil]]]]]]
-    [def when-not [μ* [pred ...body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append ...body #nil]] #nil]]]]]]
-    [def when [μ* [pred ...body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append ...body #nil]] [cons #nil #nil]]]]]]
-    [def let/arg [λ* [arg]
+    [def caddddr [λ* caddddr
+        [p]
+        "[car [cdr [cdr [cdr p]]]]"
+        [car [cdr [cdr [cdr [cdr p]]]]]]]
+    [def if-not [μ* if-not [pred then else] "" [cons 'if [cons pred [cons else [cons then #nil]]]]]]
+    [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]]
+    [def when-let [μ* when-let [binding ...body] "" [cons 'if-let [cons binding [cons [cons 'do ...body] [cons #nil #nil]]]]]]
+    [def when-not [μ* when-not [pred ...body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append ...body #nil]] #nil]]]]]]
+    [def when [μ* when [pred ...body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append ...body #nil]] [cons #nil #nil]]]]]]
+    [def let/arg [λ* let/arg
+        [arg]
         ""
         [do [if [pair? arg]
               #nil
@@ -50,109 +66,158 @@
               #nil
               [throw [cons ':invalid-let-form [cons "Please fix the structure of the let form" [cons arg #nil]]]]]
            [cons 'def [cons [car arg] [cons [cadr arg] #nil]]]]]]
-    [def let/args [λ* [args]
+    [def let/args [λ* let/args
+        [args]
         ""
         [if args
            [cons [let/arg [car args]] [let/args [cdr args]]]
            #nil]]]
-    [def let [μ* [bindings ...body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append ...body #nil]]] #nil]]]]
+    [def let [μ* let [bindings ...body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append ...body #nil]]] #nil]]]]
     [def gensym/counter 0]
-    [def gensym [λ* []
+    [def gensym [λ* gensym
+        []
         ""
         [do [set! gensym/counter [+ 1 gensym/counter]]
-           [str->sym ["GenSym-" gensym/counter]]]]]
-    [def root-closure [current-closure]]][do [def numeric? [λ* [a]
+           [str->sym ["ΓεnΣym-" gensym/counter]]]]]
+    [def case/clauses/multiple [λ* case/clauses/multiple
+        [key-sym cases]
+        ""
+        [if cases
+           [cons [list 'eq? key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]]
+           #nil]]]
+    [def case/clauses [λ* case/clauses
+        [key-sym clauses]
+        ""
+        [if clauses
+           [if [eq? [caar clauses] 'otherwise]
+              [cons 'do [cdar clauses]]
+              [list 'if [if [pair? [caar clauses]]
+                 [cons 'or [case/clauses/multiple key-sym [caar clauses]]]
+                 [list 'eq? key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]
+           #nil]]]
+    [def case [μ* case [key-form ...clauses] "" [do [def key-sym [gensym]]
+       [list 'let* [list 'def key-sym key-form] [case/clauses key-sym ...clauses]]]]]
+    [def root-closure [current-closure]]][do [def numeric? [λ* numeric?
+        [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]]]
-    [def last? [λ* [a]
+    [def last? [λ* last?
+        [a]
         "Return #t if a is the last pair in a list"
         [nil? [cdr a]]]]
-    [def pos? [λ* [a]
+    [def pos? [λ* pos?
+        [a]
         "Return #t if a is positive"
         [>= a 0]]]
-    [def zero-neg? [λ* [a]
+    [def zero-neg? [λ* zero-neg?
+        [a]
         "Return #t if a is zero or negative"
         [<= a 0]]]
-    [def neg? [λ* [a]
+    [def neg? [λ* neg?
+        [a]
         "Returns #t if a is negative"
         [< a 0]]]
-    [def odd? [λ* [a]
+    [def odd? [λ* odd?
+        [a]
         "Predicate that returns #t if a is odd"
         [= [% [int a] 2] 1]]]
-    [def even? [λ* [a]
+    [def even? [λ* even?
+        [a]
         "Predicate that returns #t if a is even"
         [= [% [int a] 2] 0]]]
-    [def zero? [λ* [val]
+    [def zero? [λ* zero?
+        [val]
         "#t if VAL is zero"
         [eq? 0 val]]]
-    [def not-zero? [λ* [val]
+    [def not-zero? [λ* not-zero?
+        [val]
         "#t if VAL is not zero"
         [ineq? 0 val]]]
-    [def list-equal? [λ* [a b]
+    [def list-equal? [λ* list-equal?
+        [a b]
         "#t if A and B are equal"
         [if [eq? [type-of a] [type-of b]]
            [if [pair? a]
               [and [list-equal? [car a] [car b]] [list-equal? [cdr a] [cdr b]]]
               [eq? a b]]
            #nil]]]
-    [def there-exists? [λ* [l pred]
+    [def there-exists? [λ* there-exists?
+        [l pred]
         "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
         [cond [[nil? l] #f]
               [[pred [car l]] #t]
               [#t [there-exists? [cdr l] pred]]]]]
-    [def for-all? [λ* [l pred]
+    [def for-all? [λ* for-all?
+        [l pred]
         "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
         [cond [[nil? l] #t]
               [[not [pred [car l]]] #f]
               [#t [for-all? [cdr l] pred]]]]]
-    [def int? [λ* [val]
+    [def int? [λ* int?
+        [val]
         "#t if VAL is a integer"
         [eq? :int [type-of val]]]]
-    [def float? [λ* [val]
+    [def float? [λ* float?
+        [val]
         "#t if VAL is a floating-point number"
         [eq? :float [type-of val]]]]
-    [def vec? [λ* [val]
+    [def vec? [λ* vec?
+        [val]
         "#t if VAL is a vector"
         [eq? :vec [type-of val]]]]
-    [def bool? [λ* [val]
+    [def bool? [λ* bool?
+        [val]
         "#t if VAL is a boolean"
         [eq? :bool [type-of val]]]]
-    [def pair? [λ* [val]
+    [def pair? [λ* pair?
+        [val]
         "#t if VAL is a pair"
         [eq? :pair [type-of val]]]]
-    [def arr? [λ* [val]
+    [def arr? [λ* arr?
+        [val]
         "#t if VAL is an array"
         [eq? :array [type-of val]]]]
-    [def string? [λ* [val]
+    [def string? [λ* string?
+        [val]
         "#t if VAL is a string"
         [eq? :string [type-of val]]]]
-    [def symbol? [λ* [val]
+    [def symbol? [λ* symbol?
+        [val]
         "#t if VAL is a symbol"
         [eq? :symbol [type-of val]]]]
-    [def object? [λ* [val]
+    [def object? [λ* object?
+        [val]
         "#t if VAL is an object"
         [eq? :object [type-of val]]]]
-    [def tree? [λ* [val]
+    [def tree? [λ* tree?
+        [val]
         "#t if VAL is an object"
         [eq? :tree [type-of val]]]]
-    [def macro? [λ* [val]
+    [def macro? [λ* macro?
+        [val]
         "#t if VAL is an object"
         [eq? :macro [type-of val]]]]
-    [def lambda? [λ* [val]
+    [def lambda? [λ* lambda?
+        [val]
         "#t if VAL is a lambda"
         [or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]]]
-    [def native? [λ* [val]
+    [def native? [λ* native?
+        [val]
         "#t if VAL is a native function"
         [eq? :native-function [type-of val]]]]
-    [def special-form? [λ* [val]
+    [def special-form? [λ* special-form?
+        [val]
         "#t if VAL is a native function"
         [eq? :special-form [type-of val]]]]
-    [def procedure? [λ* [val]
+    [def procedure? [λ* procedure?
+        [val]
         "#t if VAL is a native or lisp function"
         [or [lambda? val] [native? val]]]]
-    [def in-range? [λ* [v min max]
+    [def in-range? [λ* in-range?
+        [v min max]
         ""
-        [and [>= v min] [<= v max]]]]][do [def quasiquote-real [λ* [l depth]
+        [and [>= v min] [<= v max]]]]][do [def quasiquote-real [λ* quasiquote-real
+        [l depth]
         ""
         [if [nil? l]
            #nil
@@ -173,11 +238,13 @@
               [if [and [zero? depth] [symbol? l]]
                  [cons 'quote [cons l]]
                  l]]]]]
-    [def quasiquote [μ* [l] "" [quasiquote-real l 0]]]
-    [def unquote [λ* [expr]
+    [def quasiquote [μ* quasiquote [l] "" [quasiquote-real l 0]]]
+    [def unquote [λ* unquote
+        [expr]
         ""
         [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]]
-    [def unquote-splicing [λ* [expr]
+    [def unquote-splicing [λ* unquote-splicing
+        [expr]
         ""
         [throw [list :unquote-splicing-without-quasi "unquote-splicing should only occur inside a quasiquote, never evaluated directly"]]]]][do [def test-context "Nujel"]
     [def test-list #nil]
@@ -187,34 +254,40 @@
     [def error-count 0]
     [def print-errors #t]
     [def print-passes #f]
-    [def test/add* [λ* [result expr]
+    [def test/add* [λ* test/add*
+        [result expr]
         ""
         [do [set! test-list [cons [cons result expr] test-list]]
            [set! test-count [+ test-count 1]]]]]
-    [def test/add [μ* [result ...expr] "Add a test where ...EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do ...expr]] #nil]]]]]
-    [def display-results [λ* []
+    [def test/add [μ* test/add [result ...expr] "Add a test where ...EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do ...expr]] #nil]]]]]
+    [def display-results [λ* display-results
+        []
         "Prints the result Message"
         [do [random/seed-initialize!]
-           [error [cat test-context " [" OS " " ARCH "] - " [if [zero? error-count]
+           [error [cat test-context " [" OS " " ARCH "] - " [if [and [zero? error-count] [> test-count 0]]
               "Success - ["
-              "Failed! - ["] [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [zero? error-count]
+              "Failed! - ["] [ansi-green success-count] " / " [ansi-red error-count] "] in " [- [time/milliseconds] nujel-start] "ms - " [if [and [zero? error-count] [> test-count 0]]
               [ansi-rainbow "Everything is working, very nice!"]
               [ansi-red "Better fix those!"]] "\r\n"]]]]]
-    [def test-success [λ* [res-should res-is expr i]
+    [def test-success [λ* test-success
+        [res-should res-is expr i]
         "Should be called after a test has finished successfully"
         [do [if print-passes
               [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-green "[PASS] -> "] [ansi-green [str/write res-is]] " != " [ansi-green [str/write res-should]] "\r\n" [str/write expr] "\r\n\r\n"]]
               #nil]
            [set! success-count [+ 1 success-count]]]]]
-    [def test-failure [λ* [res-should res-is expr i]
+    [def test-failure [λ* test-failure
+        [res-should res-is expr i]
         "Should be called if EXPR does not equal RES"
         [do [if print-errors
               [error [cat "stdlib/tests.nuj:" i ":1: " [ansi-red "[FAIL] -> "] [ansi-red [str/write res-is]] " != " [ansi-green [str/write res-should]] "\r\n" [str/write expr] "\r\n\r\n"]]
               #nil]
            [set! error-count [+ 1 error-count]]]]]
-    [def test-default [λ* [result rawexpr i]
+    [def test-default [λ* test-default
+        [result rawexpr i]
         "Tests that RAWEXPR evaluates to RESULT"
-        [try [λ* [err]
+        [try [λ* #nil
+            [err]
             ""
             [test-failure result err rawexpr i]] [do [def expr [eval* [compile rawexpr [current-closure]]]]
            [def pred? eq?]
@@ -227,9 +300,11 @@
            [if [pred? result expr]
               [test-success result expr rawexpr i]
               [test-failure result expr rawexpr i]]]]]]
-    [def test-forked [λ* [nujel-runtime]
+    [def test-forked [λ* test-forked
+        [nujel-runtime]
         ""
-        [λ* [result rawexpr i]
+        [λ* #nil
+            [result rawexpr i]
             "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
             [do [def eval-result [eval/forked nujel-runtime rawexpr]]
                [def expr [cdr eval-result]]
@@ -243,13 +318,15 @@
                [if [and [zero? [car eval-result]] [pred? result expr]]
                   [test-success result expr rawexpr i]
                   [test-failure result expr rawexpr i]]]]]]
-    [def test-run-iter [λ* [test l i]
+    [def test-run-iter [λ* test-run-iter
+        [test l i]
         "Recurse through LIST and runs eatch test"
         [if l
            [do [test [caar l] [cdar l] i]
               [test-run-iter test [cdr l] [- i 1]]]
            #nil]]]
-    [def test-run-real [λ* [test]
+    [def test-run-real [λ* test-run-real
+        [test]
         ""
         [do [set! nujel-start [time/milliseconds]]
            [set! success-count 0]
@@ -257,94 +334,114 @@
            [test-run-iter test test-list test-count]
            [display-results]
            error-count]]]
-    [def test-run [λ* [output-passes hide-errors]
+    [def test-run [λ* test-run
+        [output-passes hide-errors]
         "Run through all automated Tests"
         [do [set! print-errors [not [bool hide-errors]]]
            [set! print-passes [bool output-passes]]
            [test-run-real test-default]]]]
-    [def test-run-forked [λ* [λ [nujel-runtime output-passes hide-errors]
-           "Run through all automated Tests in a separate runtime"
-           [set! print-errors [not [bool hide-errors]]]
-           [set! print-passes [bool output-passes]]
-           [test-run-real [test-forked nujel-runtime]]]
+    [def test-run-forked [λ* test-run-forked
+        [\ [nujel-runtime output-passes hide-errors] "Run through all automated Tests in a separate runtime" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [test-run-real [test-forked nujel-runtime]]]
         ""
-        #nil]]
+        do]]
     ][do [def ansi-reset "\e[0m"]
     [def ansi-fg-reset "\e[0;39m"]
     [def ansi-bg-reset "\e[49m"]
     [def ansi-fg [arr "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]]
     [def ansi-reset "\e[0m"]
     [def ansi-bg [arr "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]]
-    [def ansi-wrap [λ* [code string]
+    [def ansi-wrap [λ* ansi-wrap
+        [code string]
         "Wrap STRING in the ansi color CODE"
         [cat [ansi-fg code] string ansi-reset]]]
-    [def ansi-black [λ* [...args]
+    [def ansi-black [λ* ansi-black
+        [...args]
         "Wrap ARGS in black"
         [ansi-wrap 0 [apply cat ...args]]]]
-    [def ansi-dark-red [λ* [...args]
+    [def ansi-dark-red [λ* ansi-dark-red
+        [...args]
         "Wrap ARGS in dark red"
         [ansi-wrap 1 [apply cat ...args]]]]
-    [def ansi-dark-green [λ* [...args]
+    [def ansi-dark-green [λ* ansi-dark-green
+        [...args]
         "Wrap ARGS in dark green"
         [ansi-wrap 2 [apply cat ...args]]]]
-    [def ansi-brown [λ* [...args]
+    [def ansi-brown [λ* ansi-brown
+        [...args]
         "Wrap ARGS in brown"
         [ansi-wrap 3 [apply cat ...args]]]]
-    [def ansi-dark-blue [λ* [...args]
+    [def ansi-dark-blue [λ* ansi-dark-blue
+        [...args]
         "Wrap ARGS in dark blue"
         [ansi-wrap 4 [apply cat ...args]]]]
-    [def ansi-purple [λ* [...args]
+    [def ansi-purple [λ* ansi-purple
+        [...args]
         "Wrap ARGS in purple"
         [ansi-wrap 5 [apply cat ...args]]]]
-    [def ansi-teal [λ* [...args]
+    [def ansi-teal [λ* ansi-teal
+        [...args]
         "Wrap ARGS in teal"
         [ansi-wrap 6 [apply cat ...args]]]]
-    [def ansi-dark-gray [λ* [...args]
+    [def ansi-dark-gray [λ* ansi-dark-gray
+        [...args]
         "Wrap ARGS in dark gray"
         [ansi-wrap 7 [apply cat ...args]]]]
-    [def ansi-gray [λ* [...args]
+    [def ansi-gray [λ* ansi-gray
+        [...args]
         "Wrap ARGS in gray"
         [ansi-wrap 8 [apply cat ...args]]]]
-    [def ansi-red [λ* [...args]
+    [def ansi-red [λ* ansi-red
+        [...args]
         "Wrap ARGS in red"
         [ansi-wrap 9 [apply cat ...args]]]]
-    [def ansi-green [λ* [...args]
+    [def ansi-green [λ* ansi-green
+        [...args]
         "Wrap ARGS in green"
         [ansi-wrap 10 [apply cat ...args]]]]
-    [def ansi-yellow [λ* [...args]
+    [def ansi-yellow [λ* ansi-yellow
+        [...args]
         "Wrap ARGS in yellow"
         [ansi-wrap 11 [apply cat ...args]]]]
-    [def ansi-blue [λ* [...args]
+    [def ansi-blue [λ* ansi-blue
+        [...args]
         "Wrap ARGS in blue"
         [ansi-wrap 12 [apply cat ...args]]]]
-    [def ansi-pink [λ* [...args]
+    [def ansi-pink [λ* ansi-pink
+        [...args]
         "Wrap ARGS in pink"
         [ansi-wrap 13 [apply cat ...args]]]]
-    [def ansi-cyan [λ* [...args]
+    [def ansi-cyan [λ* ansi-cyan
+        [...args]
         "Wrap ARGS in cyan"
         [ansi-wrap 14 [apply cat ...args]]]]
-    [def ansi-white [λ* [...args]
+    [def ansi-white [λ* ansi-white
+        [...args]
         "Wrap ARGS in white"
         [ansi-wrap 15 [apply cat ...args]]]]
-    [def ansi-rainbow [λ* [...args]
+    [def ansi-rainbow [λ* ansi-rainbow
+        [...args]
         "Wrap ARGS in the colors of the rainbow!"
         [let* [do [def count 0]
-           [cat [join [map [λ* [a]
+           [cat [join [map [λ* #nil
+               [a]
                ""
                [do [set! count [logand [+ 1 count] 7]]
                   [cat [ansi-fg [if [zero? count]
                      7
                      [+ count 8]]] a]]] [split [apply cat ...args] ""]] ""] ansi-fg-reset]]]]]
-    [def ansi-rainbow-bg [λ* [...args]
+    [def ansi-rainbow-bg [λ* ansi-rainbow-bg
+        [...args]
         "Wrap ARGS in the colors of the rainbow!"
         [do [def count 0]
            [def split-args [split [apply cat ...args] ""]]
-           [def colored-list [map [λ* [a]
+           [def colored-list [map [λ* #nil
+               [a]
                ""
                [do [set! count [logand [+ 1 count] 7]]
                   [cat [ansi-fg [logxor count 7]] [ansi-bg count] a]]] split-args]]
            [cat [join colored-list ""] ansi-reset]]]]
-    [def reprint-line [λ* [text width]
+    [def reprint-line [λ* reprint-line
+        [text width]
         ""
         [do [if width
               #nil
@@ -355,18 +452,21 @@
               [set! i [+ 1 i]]]]
            [print "\r"]
            [print text]]]]
-    [def test-reprint-line [λ* []
+    [def test-reprint-line [λ* test-reprint-line
+        []
         ""
         [do [def i 0]
            [print "\r\n"]
            [while [i < 100000] [do [reprint-line [string i]]
               [set! i [+ 1 i]]]]
            [print " Done!\r\n"]]]]][do [def yield-queue #nil]
-    [def yield [λ* [pred fun]
+    [def yield [λ* yield
+        [pred fun]
         "Evaluates FUN once PRED is true"
         [do [set! yield-queue [cons [cons pred fun] yield-queue]]
            #t]]]
-    [def yield-run [λ* []
+    [def yield-run [λ* yield-run
+        []
         "Executes pending coroutines if their predicate evaluates to #t"
         [do [def l yield-queue]
            [def new #nil]
@@ -377,95 +477,132 @@
                  [[cdr cur]]
                  [set! yield-queue [cons cur yield-queue]]]
               [set! l [cdr l]]]]]]]
-    [def timeout [λ* [milliseconds]
+    [def timeout [λ* timeout
+        [milliseconds]
         "Returns a function that evaluates to true once MILLISECONDS have passed"
         [do [def goal [+ [time/milliseconds] milliseconds]]
-           [λ* []
+           [λ* #nil
+               []
                ""
                [> [time/milliseconds] goal]]]]]
-    [def event-bind [λ* [event-name handler]
+    [def event-bind [λ* event-bind
+        [event-name handler]
         "Binds handler lambda to event-name"
         [set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]]]
-    [def event-clear [λ* [event-name]
+    [def event-clear [λ* event-clear
+        [event-name]
         "Clears all event handlers for event-name"
         [set! [str->sym event-name] '[]]]]
-    [def event-fire-iter [λ* [l v]
+    [def event-fire-iter [λ* event-fire-iter
+        [l v]
         "Iter for event-fire"
         [cond [[nil? l] #t]
               [#t [do [apply [car l] v]
                  [event-fire-iter [cdr l] v]]]]]]
-    [def event-fire [λ* [event-name ...val]
+    [def event-fire [λ* event-fire
+        [event-name ...val]
         "Applies ...val to all event handlers associated with event-name"
-        [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def length [λ* [a]
+        [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def length [λ* length
+        [a]
         "Returns the length of a"
         [cond [[string? a] [string/length a]]
               [[pair? a] [list-length a]]
               [#t 0]]]]
-    [def describe [let* [do [def describe-thing [λ* [o]
-           ""
-           [do [def doc [closure o]]
-              [cat [str/write [doc :arguments]] " - " [doc :documentation]]]]]
-       [def describe-string [λ* [a]
-           ""
-           [describe-thing [resolve [str->sym a]]]]]
-       [λ* [fun]
-           "Describe FUN, if there is documentation available"
-           [if [string? fun]
-              [describe-string fun]
-              [describe-thing fun]]]]]]
-    [def arr-fill! [λ* [a v i]
+    [def describe/thing [λ* describe/thing
+        [o]
+        "Describe a specific value O"
+        [do [def doc [closure o]]
+           [cat [str/write [doc :arguments]] " - " [doc :documentation]]]]]
+    [def describe/string [λ* describe/string
+        [a]
+        "Descibe whatever value string A resolves to"
+        [describe/thing [resolve [str->sym a]]]]]
+    [def describe [λ* describe
+        [fun]
+        "Describe FUN, if there is documentation available"
+        [if [string? fun]
+           [describe/string fun]
+           [describe/thing fun]]]]
+    [def arr-fill! [λ* arr-fill!
+        [a v i]
         "Fills array a with value v"
         [cond [[>= [int i] [arr-length a]] a]
               [#t [do [arr-set! a [int i] v]
                  [arr-fill! a v [+ 1 i]]]]]]]
-    [def lognand [λ* [...l]
+    [def lognand [λ* lognand
+        [...l]
         "Returns the Nand of its arguments"
         [lognot [apply logand ...l]]]]
-    [def mem [λ* []
+    [def mem [λ* mem
+        []
         "Return some pretty printed memory usage information"
-        [let* [do [def info [memory-info]]
-           [cat [ansi-white "Memory Info"] "\n" [ansi-green "Values:   "] [getf info :value] "\n" [ansi-blue "Closures: "] [getf info :closure] "\n" [ansi-red "Arrays:   "] [getf info :array] "\n" [ansi-yellow "STrings:  "] [getf info :string] "\n" [ansi-cyan "NFunc:    "] [getf info :native-function] "\n" [ansi-purple "Vectors:  "] [getf info :vector] "\n" [ansi-pink "Symbols:  "] [getf info :symbol] "\n" ansi-reset]]]]]
-    [def wrap-value [λ* [val min max]
+        [do [def info [memory-info]]
+           [cat [ansi-white "Memory Info"] "\n" [ansi-green "Values:   "] [getf info :value] "\n" [ansi-blue "Closures: "] [getf info :closure] "\n" [ansi-red "Arrays:   "] [getf info :array] "\n" [ansi-yellow "STrings:  "] [getf info :string] "\n" [ansi-cyan "NFunc:    "] [getf info :native-function] "\n" [ansi-purple "Vectors:  "] [getf info :vector] "\n" [ansi-pink "Symbols:  "] [getf info :symbol] "\n" ansi-reset]]]]
+    [def wrap-value [λ* wrap-value
+        [val min max]
         "Constrains VAL to be within MIN and MAX, wrapping it around"
-        [+ min [% [- val min] [- max min]]]]]][do [def except-last-pair [let* [do [def iter [λ* [list rest]
-           ""
-           [if [nil? [cdr list]]
-              [reverse rest]
-              [iter [cdr list] [cons [car list] rest]]]]]
-       [λ* [list]
-           "Return a copy of LIST without the last pair"
-           [iter list #nil]]]]]
-    [def last-pair [λ* [list]
+        [+ min [% [- val min] [- max min]]]]]
+    [def symbol-table [λ* symbol-table
+        [off len environment]
+        "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
+        [do [if environment
+              #nil
+              [set! environment root-closure]]
+           [if off
+              #nil
+              [set! off 0]]
+           [if len
+              #nil
+              [set! len 9999999]]
+           [sublist [environment [symbol-table*]] off [+ off len] #nil]]]]][do [def except-last-pair/iter [λ* except-last-pair/iter
+        [list rest]
+        "Iterator for except-last-pair"
+        [if [nil? [cdr list]]
+           [reverse rest]
+           [except-last-pair/iter [cdr list] [cons [car list] rest]]]]]
+    [def except-last-pair [λ* except-last-pair
+        [list]
+        "Return a copy of LIST without the last pair"
+        [except-last-pair/iter list #nil]]]
+    [def last-pair [λ* last-pair
+        [list]
         "Return the last pair of l"
         [if [cdr list]
            [last-pair [cdr list]]
            list]]]
-    [def make-list [let* [do [def iter [λ* [number value l]
-           ""
-           [if [<= number 0]
-              l
-              [iter [- number 1] value [cons value l]]]]]
-       [λ* [number value]
-           "Return a list of NUMBER elements containing VALUE in every car"
-           [iter number value #nil]]]]]
-    [def reduce [λ* [o l s]
+    [def make-list/iter [λ* make-list/iter
+        [number value l]
+        "Iterator for make-list"
+        [if [<= number 0]
+           l
+           [make-list/iter [- number 1] value [cons value l]]]]]
+    [def make-list [λ* make-list
+        [number value]
+        "Return a list of NUMBER elements containing VALUE in every car"
+        [make-list/iter number value #nil]]]
+    [def reduce [λ* reduce
+        [o l s]
         "Combine all elements in l using operation o and starting value s"
         [if [nil? l]
            s
            [reduce o [cdr l] [o s [car l]]]]]]
-    [def list-ref [λ* [l i]
+    [def list-ref [λ* list-ref
+        [l i]
         "Returns the the element of list l at location i"
         [cond [[nil? l] #nil]
               [[<= i 0] [car l]]
               [#t [list-ref [cdr l] [+ -1 i]]]]]]
-    [def join [let* [do [def iter [λ* [str l glue]
-           ""
-           [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
-                 [#t [iter [cat str [car l] glue] [cdr l] glue]]]]]
-       [λ* [l glue]
-           "Join LIST into a string with GLUE in between each element"
-           [iter "" l [string glue]]]]]]
-    [def split [λ* [str separator]
+    [def join/iter [λ* join/iter
+        [str l glue]
+        "Iterator for join/iter"
+        [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
+              [#t [join/iter [cat str [car l] glue] [cdr l] glue]]]]]
+    [def join [λ* join
+        [l glue]
+        "Join LIST into a string with GLUE in between each element"
+        [join/iter "" l [string glue]]]]
+    [def split [λ* split
+        [str separator]
         ""
         [do [def separator-len [string/length separator]]
            [def slen [string/length str]]
@@ -479,17 +616,20 @@
                  [do [set! ret [cons [substr str start slen] ret]]
                     [set! start slen]]]]]
            [reverse ret]]]]
-    [def reverse [λ* [l r]
+    [def reverse [λ* reverse
+        [l r]
         "Return the list l in reverse order"
         [if [nil? l]
            r
            [reverse [cdr l] [cons [car l] r]]]]]
-    [def list-length [λ* [a t]
+    [def list-length [λ* list-length
+        [a t]
         "Returns the length of list a"
         [if [nil? a]
            t
            [list-length [cdr a] [+ 1 t]]]]]
-    [def filter [λ* [p l]
+    [def filter [λ* filter
+        [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [do [def ret #nil]
            [if l
@@ -497,151 +637,182 @@
                  [cons [car l] [filter p [cdr l]]]
                  [filter p [cdr l]]]
               #nil]]]]
-    [def for-each [λ* [f l]
+    [def for-each [λ* for-each
+        [f l]
         "Runs f over every item in list l and returns the resulting list"
         [while l [do [f [car l]]
            [set! l [cdr l]]]]]]
-    [def map [λ* [f l]
+    [def map [λ* map
+        [f l]
         "Runs f over every item in list l and returns the resulting list"
         [if [nil? l]
            l
            [cons [f [car l]] [map f [cdr l]]]]]]
-    [def append [let* [do [def iter [λ* [a b]
-           ""
-           [if [nil? a]
-              b
-              [iter [cdr a] [cons [car a] b]]]]]
-       [λ* [a b]
-           "Appends to two lists a and b together"
-           [iter [reverse a] b]]]]]
-    [def sublist [λ* [l start end ret]
+    [def append/iter [λ* append/iter
+        [a b]
+        "Iterator for append"
+        [if [nil? a]
+           b
+           [append/iter [cdr a] [cons [car a] b]]]]]
+    [def append [λ* append
+        [a b]
+        "Appends to two lists a and b together"
+        [append/iter [reverse a] b]]]
+    [def sublist [λ* sublist
+        [l start end ret]
         "Returns a new list containing all elements of l from start to end"
         [cond [[nil? l] [reverse ret]]
               [[neg? end] [sublist l start [+ [length l] end]]]
               [[zero? end] [reverse ret]]
               [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
               [[> end 0] [sublist [cdr l] 0 [+ -1 end] [cons [car l] ret]]]]]]
-    [def list-head [λ* [l k]
+    [def list-head [λ* list-head
+        [l k]
         "Returns the first k elemnts of list l"
         [sublist l 0 k]]]
-    [def list-tail [λ* [l k]
+    [def list-tail [λ* list-tail
+        [l k]
         "Returns the sublist of l obtained by omitting the first l elements"
         [sublist l k [length l]]]]
-    [def member [λ* [m l]
+    [def member [λ* member
+        [m l]
         "Returns the first pair of list l whose car is equal to m"
         [cond [[nil? l] #f]
               [[eq? [car l] m] l]
               [#t [member m [cdr l]]]]]]
-    [def delete [λ* [e l]
+    [def delete [λ* delete
+        [e l]
         "Returns a filtered list l with all elements equal to e omitted"
-        [filter [λ* [a]
+        [filter [λ* #nil
+            [a]
             ""
             [not [eq? a e]]] l]]]
-    [def arg-list [λ* [f]
+    [def arg-list [λ* arg-list
+        [f]
         "Return the Argument list of f which can be a Native Function or a Lambda"
-        [cond [[lambda? f] [reduce cat [map [λ* [a]
+        [cond [[lambda? f] [reduce cat [map [λ* #nil
+                  [a]
                   ""
                   [" " [car a]]] [cl-data f]]]]
-              [[native? f] [reduce cat [map [λ* [a]
+              [[native? f] [reduce cat [map [λ* #nil
+                  [a]
                   ""
                   [" " a]] [car [cl-data f]]]]]
               [#t ""]]]]
-    [def getf [λ* [l key]
+    [def getf [λ* getf
+        [l key]
         "Return the value in LIST following KEY"
         [cond [[nil? l] #nil]
               [[eq? key [car l]] [cadr l]]
               [#t [getf [cdr l] key]]]]]][do [def PI 3.14159]
     [def π 3.14159]
-    [def ++ [μ* [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]]
-    [def -- [μ* [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]]
-    [def +x [λ* [α]
+    [def ++ [μ* ++ [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]]
+    [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]]
+    [def +x [λ* +x
+        [α]
         "Return a function that adds α to it\'s argument, useful for mapping"
-        [λ* [β]
+        [λ* #nil
+            [β]
             ""
             [+ α β]]]]
-    [def >> [λ* [val amount]
+    [def >> [λ* >>
+        [val amount]
         "Shifts VAL by AMOUNT bits to the right"
         [ash val [- amount]]]]
-    [def min [let* [do [def iter [λ* [a l]
-           ""
-           [cond [[nil? l] a]
-                 [[< a [car l]] [iter a [cdr l]]]
-                 [#t [iter [car l] [cdr l]]]]]]
-       [λ* [...l]
-           "Returns the minimum value of its arguments"
-           [cond [[nil? ...l] 0]
-                 [[nil? [cdr ...l]] [car ...l]]
-                 [#t [iter [car ...l] [cdr ...l]]]]]]]]
-    [def max [let* [do [def iter [λ* [a l]
-           ""
-           [cond [[nil? l] a]
-                 [[> a [car l]] [iter a [cdr l]]]
-                 [#t [iter [car l] [cdr l]]]]]]
-       [λ* [...l]
-           "Returns the maximum value of its arguments"
-           [cond [[nil? ...l] 0]
-                 [[nil? [cdr ...l]] [car ...l]]
-                 [#t [iter [car ...l] [cdr ...l]]]]]]]]
-    [def fib [λ* [i]
+    [def min/iter [λ* min/iter
+        [a l]
+        ""
+        [cond [[nil? l] a]
+              [[< a [car l]] [min/iter a [cdr l]]]
+              [#t [min/iter [car l] [cdr l]]]]]]
+    [def min [λ* min
+        [...l]
+        "Returns the minimum value of its arguments"
+        [cond [[nil? ...l] 0]
+              [[nil? [cdr ...l]] [car ...l]]
+              [#t [min/iter [car ...l] [cdr ...l]]]]]]
+    [def max/iter [λ* max/iter
+        [a l]
+        ""
+        [cond [[nil? l] a]
+              [[> a [car l]] [max/iter a [cdr l]]]
+              [#t [max/iter [car l] [cdr l]]]]]]
+    [def max [λ* max
+        [...l]
+        "Returns the maximum value of its arguments"
+        [cond [[nil? ...l] 0]
+              [[nil? [cdr ...l]] [car ...l]]
+              [#t [max/iter [car ...l] [cdr ...l]]]]]]
+    [def fib [λ* fib
+        [i]
         "Terribly inefficient, but, useful for testing the GC"
         [if [< i 2]
            i
-           [+ [fib [- i 2]] [fib [- i 1]]]]]]][do [def random #nil]
-    [def random/rng! #nil]
-    [def random/seed #nil]
-    [def random/seed! #nil]
-    [def random/seed-initialize! #nil]
-    [let* [do [def seed 0]
-       [set! random/seed-initialize! [λ* []
-           ""
-           [set! seed [logxor [time] [time/milliseconds]]]]]
-       [random/seed-initialize!]
-       [set! random/rng! [λ* []
-           ""
-           [do [set! seed [+ 12345 [* seed 1103515245]]]
-              [logior [ash [logand seed 65535] 16] [logand [ash seed -16] 65535]]]]]
-       [set! random/seed! [λ* [new-seed]
-           "Set a new seed value for the RNG"
-           [set! seed new-seed]]]
-       [set! random/seed [λ* []
-           "Return the current RNG seed value"
-           seed]]
-       [set! random [λ* [max]
-           "Return a value from 0 to MAX, or, if left out, a random int"
-           [if [numeric? max]
-              [mod [abs [random/rng!]] max]
-              [random/rng!]]]]]]][do [def println [λ* [str]
+           [+ [fib [- i 2]] [fib [- i 1]]]]]]][do [def random/seed 0]
+    [def random/seed-initialize! [λ* random/seed-initialize!
+        []
+        ""
+        [set! random/seed [logxor [time] [time/milliseconds]]]]]
+    [def random/rng! [λ* random/rng!
+        []
+        ""
+        [do [set! random/seed [+ 12345 [* random/seed 1103515245]]]
+           [logior [ash [logand random/seed 65535] 16] [logand [ash random/seed -16] 65535]]]]]
+    [def random/seed! [λ* random/seed!
+        [new-seed]
+        "Set a new seed value for the RNG"
+        [set! seed new-seed]]]
+    [def random/seed [λ* random/seed
+        []
+        "Return the current RNG seed value"
+        seed]]
+    [def random [λ* random
+        [max]
+        "Return a value from 0 to MAX, or, if left out, a random int"
+        [if [numeric? max]
+           [mod [abs [random/rng!]] max]
+           [random/rng!]]]]
+    [random/seed-initialize!]][do [def println [λ* println
+        [str]
         "Print STR on a single line"
         [print [cat str "\n"]]]]
-    [def display [λ* [value]
+    [def display [λ* display
+        [value]
         "Display VALUE"
         [print value]]]
-    [def newline [λ* []
+    [def newline [λ* newline
+        []
         "Print a single line feed character"
         [display "\n"]]]
-    [def br [λ* [num]
+    [def br [λ* br
+        [num]
         "Return NUM=1 linebreaks"
         [if [or [nil? num] [<= [int num] 1]]
            "\n"
            ["\n" [br [+ -1 num]]]]]]
-    [def path/ext?! [λ* [ext]
+    [def path/ext?! [λ* path/ext?!
+        [ext]
         "Return a predicate that checks if a path ends on EXT"
-        [λ* [path]
+        [λ* #nil
+            [path]
             ""
             [eq? ext [lowercase [path/extension path]]]]]]
-    [def path/extension [λ* [path]
+    [def path/extension [λ* path/extension
+        [path]
         "Return the extension of PATH"
         [do [def last-period [last-index-of path "."]]
            [if [>= last-period 0]
               [substr path [+ 1 last-period] [string/length path]]
               path]]]]
-    [def path/without-extension [λ* [path]
+    [def path/without-extension [λ* path/without-extension
+        [path]
         "Return PATH, but without the extension part"
         [do [def last-period [last-index-of path "."]]
            [if [>= last-period 0]
               [substr path 0 last-period]
               path]]]]
-    [def int->string/binary [λ* [α]
+    [def int->string/binary [λ* int->string/binary
+        [α]
         "Turn α into a its **binary** string representation"
         [do [def ret ""]
            [if α
@@ -653,7 +824,8 @@
            [while [not-zero? α] [do [set! ret [cat [from-char-code [+ 48 [logand α 1]]] ret]]
               [set! α [ash α -1]]]]
            ret]]]
-    [def int->string/octal [λ* [α]
+    [def int->string/octal [λ* int->string/octal
+        [α]
         "Turn α into a its **octal** string representation"
         [do [def ret ""]
            [if α
@@ -666,7 +838,8 @@
               [set! α [ash α -3]]]]
            ret]]]
     [def int->string/hex [let* [do [def conversion-arr [arr "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
-       [λ* [α]
+       [λ* #nil
+           [α]
            ""
            [do [def ret ""]
               [if α
@@ -678,11 +851,13 @@
               [while [not-zero? α] [do [set! ret [cat [conversion-arr [logand α 15]] ret]]
                  [set! α [ash α -4]]]]
               ret]]]]]
-    [def int->string/decimal [λ* [α]
+    [def int->string/decimal [λ* int->string/decimal
+        [α]
         "Turn α into a its **decimal** string representation"
         [string α]]]
     [def int->string int->string/decimal]
-    [def string/pad-start [λ* [text goal-length char]
+    [def string/pad-start [λ* string/pad-start
+        [text goal-length char]
         "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
         [do [if char
               #nil
@@ -691,7 +866,8 @@
            [if [> [string/length text] goal-length]
               [substr text [- [string/length text] goal-length] [string/length text]]
               text]]]]
-    [def string/pad-end [λ* [text goal-length char]
+    [def string/pad-end [λ* string/pad-end
+        [text goal-length char]
         "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
         [do [if char
               #nil
@@ -849,12 +1025,11 @@
     [test/add* 123 '[do [def i-assaultmegablaster 123]
        i-assaultmegablaster]]
     [test/add* #t '[do [int? [random]]]]
-    [test/add* #t '[do [random/seed! 123]
+    [test/add* #t '[do [set! random/seed 123]
        [def first-value [random]]
-       [random/seed! 123]
+       [set! random/seed 123]
        [eq? first-value [random]]]]
-    [test/add* #t '[do [random/seed! 123]
-       [!= [random] [random]]]]
+    [test/add* #t '[do [!= [random] [random]]]]
     [test/add* 1 '[do [def a 1]
        [when-not [= 2 2] [set! a 4]]
        a]]
@@ -1007,12 +1182,6 @@
           "Zwei"]]]]
        [def zwei [eins [ω]]]
        [zwei [say]]]]
-    [test/add* "\"Polizei\"" '[do [def eins [ω [def say [λ []
-          "Eins"]]]]
-       [def zwei [eins [ω]]]
-       [zwei [def say [λ []
-          "Polizei"]]]
-       [zwei [say]]]]
     [test/add* "\"asd\"" '[do ["a" "s" "d"]]]
     [test/add* "\"a\"" '[do ["a"]]]
     [test/add* "#nil" '[do [def testerle [arr 1 2 3]]
@@ -1148,7 +1317,6 @@
     [test/add* #f '[do [eq? '[1] '[1]]]]
     [test/add* #t '[do [list-equal? '[1] '[1]]]]
     [test/add* #f '[do [eq? '[] #nil]]]
-    [test/add* #t '[do [eq? λ [resolve [car '[λ asd]]]]]]
     [test/add* 10000 '[do [let [] [def i 0] [while [< i 10000] [set! i [+ 1 i]]]]]]
     [test/add* '[1 :a "q"] '[do '[1 :a "q"]]]
     [test/add* 4 '[do [compile '[do "Test"
@@ -1160,16 +1328,19 @@
        4] '[do [compile '[do [display "Test"]
           9
           4]]]]
-    [test/add* '[λ* [v]
+    [test/add* '[λ* #nil
+        [v]
         "Add 1 to V"
         [+ 1 v]] '[do [compile '[λ [v]
           "Add 1 to V"
           [+ 1 v]]]]]
-    [test/add* '[λ* [v]
+    [test/add* '[λ* #nil
+        [v]
         ""
         [+ 1 v]] '[do [compile '[λ [v]
           [+ 1 v]]]]]
-    [test/add* '[λ* [v]
+    [test/add* '[λ* #nil
+        [v]
         ""
         [do [display v]
            [+ 1 v]]] '[do [compile '[λ [v]
@@ -1487,151 +1658,185 @@
     [test/add* 4 '[do [def α 3]
        [++ α]
        α]]
+    [test/add* 2 '[do [cbrt 8]]]
+    [test/add* 3 '[do [cbrt 27]]]
+    [test/add* 2.0 '[do [cbrt 8.0]]]
+    [test/add* 3.0 '[do [cbrt 27.0]]]
+    [test/add* 2.0 '[do [vec/x [cbrt [vec 8]]]]]
+    [test/add* #t '[do [case [+ 1 2] [1 #f] [[2 3] #t]]]]
+    [test/add* #t '[do [case [+ 1 1] [1 #f] [[2 3] #t]]]]
+    [test/add* #f '[do [case [+ 0 1] [1 #f] [[2 3] #t]]]]
+    [test/add* #nil '[do [case [+ 2 2] [1 #f] [[2 3] #t]]]]
+    [test/add* 123 '[do [case [+ 2 2] [1 #f] [[2 3] #t] [otherwise 123]]]]
+    [test/add* #t '[do [def i 1]
+       [case [++ i] [9 #f] [4 #f] [2 #t]]]]
+    [test/add* :too-many-args '[do [try [\ [err] [car err]] [cons 123 234 345]]]]
+    [test/add* #t '[do [eq? λ [resolve [car '[λ asd]]]]]]
     [def oneTwoThreeTest [+ 123 5]]
-    [def +123 [μ* [v] "" [cons '+ [cons 123 [cons v #nil]]]]]
-    ][do [def time/seconds [λ* [timestamp]
+    [def +123 [μ* +123 [v] "" [cons '+ [cons 123 [cons v #nil]]]]]
+    ][do [def time/seconds [λ* time/seconds
+        [timestamp]
         "Return the seconds part of TIMESTAMP, defaults to current time"
         [% [default timestamp [time]] 60]]]
-    [def time/minutes [λ* [timestamp]
+    [def time/minutes [λ* time/minutes
+        [timestamp]
         "Return the minutes part of TIMESTAMP, defaults to current time"
         [% [/ [default timestamp [time]] 60] 60]]]
-    [def time/hours [λ* [timestamp]
+    [def time/hours [λ* time/hours
+        [timestamp]
         "Return the hours part of TIMESTAMP, defaults to current time"
         [% [/ [default timestamp [time]] 3600] 24]]]
-    [def profile-form [λ* [raw]
+    [def profile-form [λ* profile-form
+        [raw]
         ""
         [do [def start-time [time/milliseconds]]
            [def val [eval* [compile raw [current-closure]]]]
            [def end-time [time/milliseconds]]
            [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
-    [def profile [μ* [...body] "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? ...body]
+    [def profile [μ* profile [...body] "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? ...body]
        [car ...body]
-       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile [let* [do [def environment [current-closure]]
-       [def verbose #f]
-       [def compile/do/args [λ* [args]
-           ""
+       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile/environment [current-closure]]
+    [def compile/verbose #f]
+    [def compile/do/args [λ* compile/do/args
+        [args]
+        ""
+        [if [last? args]
+           [cons [compile* [car args]] #nil]
+           [if [pair? [car args]]
+              [let* [do [def ocar [compile* [car args]]]
+                 [if [pair? ocar]
+                    [cons ocar [compile/do/args [cdr args]]]
+                    [compile/do/args [cdr args]]]]]
+              [compile/do/args [cdr args]]]]]]
+    [def compile/do [λ* compile/do
+        [source]
+        ""
+        [let* [do [def args [compile/do/args source]]
            [if [last? args]
-              [cons [compile* [car args]] #nil]
-              [if [pair? [car args]]
-                 [let* [do [def ocar [compile* [car args]]]
-                    [if [pair? ocar]
-                       [cons ocar [compile/do/args [cdr args]]]
-                       [compile/do/args [cdr args]]]]]
-                 [compile/do/args [cdr args]]]]]]
-       [def compile/do [λ* [source]
-           ""
-           [let* [do [def args [compile/do/args source]]
-              [if [last? args]
-                 [car args]
-                 [cons 'do args]]]]]]
-       [def compile/def [λ* [source]
-           ""
-           [list 'def [cadr source] [compile* [caddr source]]]]]
-       [def compile/set! [λ* [source]
-           ""
-           [list 'set! [cadr source] [compile* [caddr source]]]]]
-       [def compile/λ [λ* [source]
-           ""
-           [if [string? [caddr source]]
-              [list 'λ* [cadr source] [caddr source] [compile/do [cddr source]]]
-              [list 'λ* [cadr source] "" [compile/do [cddr source]]]]]]
-       [def compile/λ* [λ* [source]
-           ""
-           source]]
-       [def compile/μ [λ* [source]
-           ""
-           [if [string? [caddr source]]
-              [list 'μ* [cadr source] [caddr source] [compile/do [cddr source]]]
-              [list 'μ* [cadr source] "" [compile/do [cddr source]]]]]]
-       [def compile/μ* [λ* [source]
-           ""
-           source]]
-       [def compile/ω [λ* [source]
-           ""
-           [list 'ω [compile/do [cdr source]]]]]
-       [def compile/try [λ* [source]
-           ""
-           [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]]
-       [def compile/if [λ* [source]
-           ""
-           [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]]
-       [def compile/let* [λ* [source]
-           ""
-           [list 'let* [compile/do [cdr source]]]]]
-       [def compile/cond/clause [λ* [source]
-           ""
-           [cons [compile* [car source]] [cons [compile/do [cdr source]]]]]]
-       [def compile/cond/clauses [λ* [source]
-           ""
-           [if source
-              [cons [compile/cond/clause [car source]] [compile/cond/clauses [cdr source]]]
-              #nil]]]
-       [def compile/cond [λ* [source]
-           ""
-           [cons 'cond [compile/cond/clauses [cdr source]]]]]
-       [def compile/and [λ* [source]
-           ""
-           [compile/procedure/arg source]]]
-       [def compile/or [λ* [source]
-           ""
-           [compile/procedure/arg source]]]
-       [def compile/while [λ* [source]
-           ""
-           [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]]
-       [def compile/macro [λ* [macro source]
-           ""
-           [compile* [macro-apply macro [cdr source]]]]]
-       [def compile/procedure/arg [λ* [source]
-           ""
-           [if [pair? source]
-              [cons [compile* [car source]] [compile/procedure/arg [cdr source]]]
-              #nil]]]
-       [def compile/procedure [λ* [proc source]
-           ""
-           [compile/procedure/arg source]]]
-       [def compile* [λ* [source]
-           "Compile the forms in source"
-           [let* [do [def op [if [apply environment [cons [cons 'resolves? [cons [list 'quote [car source]] #nil]] #nil]]
-                 [apply environment [cons [cons 'resolve [cons [list 'quote [car source]] #nil]] #nil]]
-                 [car source]]]
-              [cond [[special-form? op] [cond [[eq? op do] [compile/do source]]
-                          [[eq? op def] [compile/def source]]
-                          [[eq? op set!] [compile/set! source]]
-                          [[eq? op let] [compile/let source]]
-                          [[eq? op let*] [compile/let* source]]
-                          [[eq? op λ] [compile/λ source]]
-                          [[eq? op λ*] [compile/λ* source]]
-                          [[eq? op μ] [compile/μ source]]
-                          [[eq? op μ*] [compile/μ* source]]
-                          [[eq? op ω] [compile/ω source]]
-                          [[eq? op if] [compile/if source]]
-                          [[eq? op try] [compile/try source]]
-                          [[eq? op cond] [compile/cond source]]
-                          [[eq? op and] [compile/and source]]
-                          [[eq? op or] [compile/or source]]
-                          [[eq? op while] [compile/while source]]
-                          [[eq? op quote] source]
-                          [#t [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
-                    [[macro? op] [compile/macro op source]]
-                    [[procedure? op] [compile/procedure op source]]
-                    [[pair? op] [compile/procedure/arg source]]
-                    [[numeric? op] [compile/procedure/arg source]]
-                    [[arr? op] [compile/procedure/arg source]]
-                    [[string? op] [compile/procedure/arg source]]
-                    [[tree? op] [compile/procedure/arg source]]
-                    [#t source]]]]]]
-       [λ* [source new-environment new-verbose]
-           "Compile the forms in source"
-           [do [if new-environment
-                 #nil
-                 [set! new-environment [current-closure]]]
-              [if new-verbose
-                 #nil
-                 [set! new-verbose #f]]
-              [set! environment new-environment]
-              [set! verbose new-verbose]
-              [compile* source]]]]]]
-    [def compile/forms [λ* [source-raw environment]
+              [car args]
+              [cons 'do args]]]]]]
+    [def compile/def [λ* compile/def
+        [source]
+        ""
+        [list 'def [cadr source] [compile* [caddr source]]]]]
+    [def compile/set! [λ* compile/set!
+        [source]
+        ""
+        [list 'set! [cadr source] [compile* [caddr source]]]]]
+    [def compile/λ* [λ* compile/λ*
+        [source]
+        ""
+        [list 'λ* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]]
+    [def compile/μ* [λ* compile/μ*
+        [source]
+        ""
+        [list 'μ* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]]
+    [def compile/ω [λ* compile/ω
+        [source]
+        ""
+        [list 'ω [compile/do [cdr source]]]]]
+    [def compile/try [λ* compile/try
+        [source]
+        ""
+        [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]]
+    [def compile/if [λ* compile/if
+        [source]
+        ""
+        [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]]
+    [def compile/let* [λ* compile/let*
+        [source]
+        ""
+        [list 'let* [compile/do [cdr source]]]]]
+    [def compile/cond/clause [λ* compile/cond/clause
+        [source]
+        ""
+        [cons [compile* [car source]] [cons [compile/do [cdr source]]]]]]
+    [def compile/cond/clauses [λ* compile/cond/clauses
+        [source]
+        ""
+        [if source
+           [cons [compile/cond/clause [car source]] [compile/cond/clauses [cdr source]]]
+           #nil]]]
+    [def compile/cond/body [λ* compile/cond/body
+        [source]
+        ""
+        [if source
+           [list 'if [compile* [caar source]] [compile/do [cdar source]] [compile/cond/body [cdr source]]]
+           #nil]]]
+    [def compile/cond [λ* compile/cond
+        [source]
+        ""
+        [cons 'cond [compile/cond/clauses [cdr source]]]]]
+    [def compile/and [λ* compile/and
+        [source]
+        ""
+        [compile/procedure/arg source]]]
+    [def compile/or [λ* compile/or
+        [source]
+        ""
+        [compile/procedure/arg source]]]
+    [def compile/while [λ* compile/while
+        [source]
+        ""
+        [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]]
+    [def compile/macro [λ* compile/macro
+        [macro source]
+        ""
+        [compile* [macro-apply macro [cdr source]]]]]
+    [def compile/procedure/arg [λ* compile/procedure/arg
+        [source]
+        ""
+        [if [pair? source]
+           [cons [compile* [car source]] [compile/procedure/arg [cdr source]]]
+           #nil]]]
+    [def compile/procedure [λ* compile/procedure
+        [proc source]
+        ""
+        [compile/procedure/arg source]]]
+    [def compile* [λ* compile*
+        [source]
+        "Compile the forms in source"
+        [let* [do [def op [if [apply compile/environment [cons [cons 'resolves? [cons [list 'quote [car source]] #nil]] #nil]]
+              [apply compile/environment [cons [cons 'resolve [cons [list 'quote [car source]] #nil]] #nil]]
+              [car source]]]
+           [cond [[special-form? op] [cond [[eq? op do] [compile/do source]]
+                       [[eq? op def] [compile/def source]]
+                       [[eq? op set!] [compile/set! source]]
+                       [[eq? op let] [compile/let source]]
+                       [[eq? op let*] [compile/let* source]]
+                       [[eq? op λ*] [compile/λ* source]]
+                       [[eq? op μ*] [compile/μ* source]]
+                       [[eq? op ω] [compile/ω source]]
+                       [[eq? op if] [compile/if source]]
+                       [[eq? op try] [compile/try source]]
+                       [[eq? op cond] [compile/cond source]]
+                       [[eq? op and] [compile/and source]]
+                       [[eq? op or] [compile/or source]]
+                       [[eq? op while] [compile/while source]]
+                       [[eq? op quote] source]
+                       [#t [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
+                 [[macro? op] [compile/macro op source]]
+                 [[procedure? op] [compile/procedure op source]]
+                 [[pair? op] [compile/procedure/arg source]]
+                 [[numeric? op] [compile/procedure/arg source]]
+                 [[arr? op] [compile/procedure/arg source]]
+                 [[string? op] [compile/procedure/arg source]]
+                 [[tree? op] [compile/procedure/arg source]]
+                 [#t source]]]]]]
+    [def compile [λ* compile
+        [source new-environment new-verbose]
+        "Compile the forms in source"
+        [do [if new-environment
+              #nil
+              [set! new-environment [current-closure]]]
+           [if new-verbose
+              #nil
+              [set! new-verbose #f]]
+           [set! compile/environment new-environment]
+           [set! compile/verbose new-verbose]
+           [compile* source]]]]
+    [def compile/forms [λ* compile/forms
+        [source-raw environment]
         "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
         [do [if environment
               #nil
@@ -1640,12 +1845,14 @@
            [def source-next source-raw]
            [def passes 0]
            [def max-passes 100]
-           [def try-again [λ* [source]
+           [def try-again [λ* try-again
+               [source]
                ""
                [set! source-next [cons source source-next]]]]
            [while source-next [do [set! source source-next]
               [set! source-next #nil]
-              [while source [do [try [λ* [err]
+              [while source [do [try [λ* #nil
+                     [err]
                      ""
                      [cond [[eq? [car err] :unresolved-procedure] [try-again [car source]]]
                            [[eq? [car err] :runtime-macro] [try-again [car source]]]
@@ -1659,32 +1866,51 @@
                  [throw [list :too-many-passes "The compiler couldn\'t produce a valid result in a 100 passes, probably something wrong with the code."]]
                  #nil]]]
            [compile source-raw environment]]]]
-    [def defmacro [μ* [name args ...body] "" [list 'def name [compile [cons 'μ [cons args ...body]] [current-closure]]]]]
-    [def defun [μ* [name args ...body] "" [list 'def name [compile [cons 'λ [cons args ...body]] [current-closure]]]]]
-    [def \ [μ* [...body] "Define a λ with the self-hosting Nujel compiler" [compile [cons 'λ ...body] [current-closure]]]]
-    [def eval [μ* [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]]
-    [def +1 [μ* [v] "" [cons '+ [cons 1 [cons v #nil]]]]]
-    [def optimize/code/rest [λ* [code]
+    [def defmacro [μ* defmacro [name args ...body] "Define a new macro" [do [def doc-string [if [string? [car ...body]]
+          [car ...body]
+          ""]]
+       [list 'def name [compile [list 'μ* name args doc-string [cons 'do ...body]] [current-closure]]]]]]
+    [def defun [μ* defun [name args ...body] "Define a new function" [do [def doc-string [if [string? [car ...body]]
+          [car ...body]
+          ""]]
+       [list 'def name [compile [list 'λ* name args doc-string [cons 'do ...body]] [current-closure]]]]]]
+    [def μ [μ* μ [args ...body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car ...body]]
+          [car ...body]
+          ""]]
+       [compile [list 'μ* #nil args doc-string [cons 'do ...body]] [current-closure]]]]]
+    [def \ [μ* \ [args ...body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car ...body]]
+          [car ...body]
+          ""]]
+       [compile [list 'λ* #nil args doc-string [cons 'do ...body]] [current-closure]]]]]
+    [def λ \]
+    [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]]
+    [def +1 [μ* +1 [v] "" [cons '+ [cons 1 [cons v #nil]]]]]
+    [def optimize/code/rest [λ* optimize/code/rest
+        [code]
         ""
         [if [pair? code]
            [cons [optimize/code [car code]] [optimize/code/rest [cdr code]]]
            code]]]
-    [def optimize/code [λ* [code]
+    [def optimize/code [λ* optimize/code
+        [code]
         ""
         [if [pair? code]
            [if [and [symbol? [car code]] [resolves? [car code]]]
               [cons [resolve [car code]] [optimize/code/rest [cdr code]]]
               [cons [optimize/code [car code]] [optimize/code/rest [cdr code]]]]
            code]]]
-    [def optimize! [λ* [fun]
+    [def optimize! [λ* optimize!
+        [fun]
         "Optimize FUN via mutation"
         [if [lambda? fun]
            [closure! fun [tree/new :code [optimize/code [[closure fun] :code]]]]
            #f]]]
-    [def optimize-all! [λ* []
+    [def optimize-all! [λ* optimize-all!
+        []
         "Return a list of all lambdas in CTX"
         [for-each optimize! [filter lambda? [map resolve [symbol-table]]]]]]
-    [def bench-while [λ* []
+    [def bench-while [λ* bench-while
+        []
         ""
         [do [def i 0]
            [while [< i 10000000] [set! i [+ 1 i]]]

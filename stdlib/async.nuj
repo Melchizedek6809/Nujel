@@ -24,7 +24,7 @@
 
 [defun timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed"
         [def goal [+ [time/milliseconds] milliseconds]]
-        [λ [] [> [time/milliseconds] goal]]
+        [\ [] [> [time/milliseconds] goal]]
 ]
 
 [defun event-bind [event-name handler] "Binds handler lambda to event-name"

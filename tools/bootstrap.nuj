@@ -7,7 +7,7 @@
 [def environment [ω]]
 [def ext-nuj? [path/ext?! "nuj"]]
 [defun directory/read-relative [path]
-       [map [λ [α] [cat path "/" α]]
+       [map [\ [α] [cat path "/" α]]
             [directory/read path]]
 ]
 [def stdlib-files [filter ext-nuj? [append [directory/read-relative "stdlib"]
@@ -15,7 +15,7 @@
 
 ; If something happens, we just print the responsible error and exit immediatly,
 ; since we can't really fix things, we could only make things worse.
-[try [λ [err]
+[try [\ [err]
         [println "Exception during stdlib compilation"]
         [display/error err] [exit 2]]
      [def file-queue-new stdlib-files]
@@ -28,7 +28,7 @@
             [set! file-queue-new #nil]
             [while file-queue
                    [def cur-path [car file-queue]]
-                   [try [λ [err]
+                   [try [\ [err]
                            [if [eq? [car err] :too-many-passes]
                                [set! file-queue-new [cons cur-path file-queue-new]]
                                [throw err]]]
@@ -38,7 +38,7 @@
                    [set! file-queue [cdr file-queue]]
             ]
      ]
-     [for-each [λ [cur-path]
+     [for-each [\ [cur-path]
                   [println [cat [ansi-green " [NUJ]  "] cur-path]]
                   [file/compile cur-path #f environment]
                ]

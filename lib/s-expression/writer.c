@@ -164,20 +164,13 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		t = snprintf(cur,bufEnd-cur,"]");
 		break; }
 	case ltMacro:
-	case ltLambda: {
-		*cur++ = '[';
-		int syms = 0;
-		lVal *cloText = v->vClosure->text;
-		forEach(n,cloText){
-			if(++syms > 2){ *cur++ = '\n';}
-			if(syms > 1){
-				for(int i=indentLevel;i>=0;i--){*cur++=' ';}
-			}
-			cur = lSWriteVal(lCar(n),cur,bufEnd,indentLevel,0);
+	case ltLambda:
+		if(v->vClosure->name){
+			t = snprintf(buf,len,"%s",v->vClosure->name->c);
+		}else{
+			t = snprintf(buf,len,"#%s_%u",v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
 		}
-		indentLevel -= 2;
-		t = snprintf(cur,bufEnd-cur,"]");
-		break; }
+		break;
 	case ltPair: {
 		int indentStyle = 0;
 		int oldIndent = indentLevel;
@@ -273,10 +266,12 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		t = snprintf(buf,len,"%s",v->vSymbol->c);
 		break;
 	case ltSpecialForm:
-		t = snprintf(buf,len,"#sfo_%u",lNFuncID(v->vNFunc));
-		break;
 	case ltNativeFunc:
-		t = snprintf(buf,len,"#cfn_%u",lNFuncID(v->vNFunc));
+		if(v->vNFunc->name){
+			t = snprintf(buf,len,"%s",v->vNFunc->name->c);
+		}else{
+			t = snprintf(buf,len,"#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
+		}
 		break;
 	case ltGUIWidget:
 		t = snprintf(buf,len,"#gui_%p",v->vPointer);

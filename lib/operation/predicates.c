@@ -40,12 +40,17 @@ static int lValCompare(lVal *v){
 				&& (a->vList.cdr == b->vList.cdr));
 		}
 	case ltSymbol:
+		if(a->type    != b->type)    {return -1;}
+		return (b->vSymbol != a->vSymbol) ? -1 : 0;
+	case ltObject:
+	case ltMacro:
 	case ltLambda:
+		if(a->type     != b->type)     {return -1;}
+		return (b->vClosure != a->vClosure) ? -1 : 0;
 	case ltNativeFunc:
 	case ltSpecialForm:
 		if(a->type   != b->type)  {return -1;}
-		if(b->vNFunc != a->vNFunc){return -1;}
-		return 0;
+		return (b->vNFunc != a->vNFunc) ? -1 : 0;
 	case ltBool:
 		if((b->type != ltBool) || (a->type != ltBool)){
 			return -1;

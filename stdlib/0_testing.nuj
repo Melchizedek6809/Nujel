@@ -21,7 +21,7 @@
        "Prints the result Message"
        [random/seed-initialize!]
        [error [cat test-context " [" OS " " ARCH "] - "
-                   [if [zero? error-count]
+                   [if [and [zero? error-count] [> test-count 0]]
                        "Success - ["
                        "Failed! - ["]
                    [ansi-green success-count]
@@ -30,7 +30,7 @@
                    "] in "
                    [- [time/milliseconds] nujel-start]
                    "ms - "
-                   [if [zero? error-count]
+                   [if [and [zero? error-count] [> test-count 0]]
                        [ansi-rainbow "Everything is working, very nice!"]
                        [ansi-red "Better fix those!"]]
                    "\r\n"]]
@@ -64,7 +64,7 @@
 
 [defun test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
-       [try [λ [err] [test-failure result err rawexpr i]]
+       [try [\ [err] [test-failure result err rawexpr i]]
             [def expr [eval rawexpr]]
             [def pred? eq?]
             [when [string? result]
@@ -78,7 +78,7 @@
 ]
 
 [defun test-forked [nujel-runtime]
-       [λ [result rawexpr i]
+       [\ [result rawexpr i]
          "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
           [def eval-result [eval/forked nujel-runtime rawexpr]]
           [def expr [cdr eval-result]]
@@ -119,7 +119,7 @@
        [test-run-real test-default]
 ]
 
-[defun test-run-forked [λ [nujel-runtime output-passes hide-errors]
+[defun test-run-forked [\ [nujel-runtime output-passes hide-errors]
        "Run through all automated Tests in a separate runtime"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]

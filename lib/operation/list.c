@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "list.h"
+#include "../exception.h"
 #include "../nujel.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
@@ -21,6 +22,9 @@ static lVal *lnfCdr(lClosure *c, lVal *v){
 
 static lVal *lnfCons(lClosure *c, lVal *v){
 	(void)c;
+	if(lCddr(v) != NULL){
+		lExceptionThrowVal(":too-many-args","Cons should only be called with 2 arguments!", v);
+	}
 	return lCons(lCar(v),lCadr(v));
 }
 

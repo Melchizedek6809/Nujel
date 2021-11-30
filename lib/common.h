@@ -116,6 +116,7 @@ struct lClosure {
 	lVal *text;
 	lVal *doc;
 	lVal *args;
+	const lSymbol *name;
 	u8 type;
 };
 
@@ -147,6 +148,7 @@ struct lNFunc {
 	};
 	lVal *doc;
 	lVal *args;
+	lSymbol *name;
 };
 
 struct lSymbol {

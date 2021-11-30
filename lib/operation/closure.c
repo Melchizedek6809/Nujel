@@ -87,8 +87,10 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		lNFunc *nf = car->vNFunc;
 		ret->vTree = lTreeInsert(ret->vTree,symDocumentation,nf->doc);
 		ret->vTree = lTreeInsert(ret->vTree,symArguments,nf->args);
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
+		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(clo->name));
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),clo->doc);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),clo->args);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
@@ -173,47 +175,29 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	return lValBool(sym ? lHasClosureSym(c,sym,NULL) : false);
 }
 
-/* Handler for [λ [...args] ...body] */
-static lVal *lnfLambda(lClosure *c, lVal *v){
+/* Handler for [λ$ [..args] docstring body] */
+static lVal *lnfLambdaAst(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
-	lVal *cdr = lCdr(v);
-	if((v == NULL) || (car == NULL) || (cdr == NULL)){
+	if((v == NULL)){
+		lExceptionThrow(":invalid-lambda","Lambdas do need to have a name, some arguments a docstring and a body");
 		return NULL;
 	}
+	const lSymbol *name = (car && car->type == ltSymbol) ? car->vSymbol : NULL;
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type           = ltLambda;
 	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCar(cdr);
-	ret->vClosure->text = lCons(NULL,NULL);
-	ret->vClosure->text->vList.car = lnfvDo;
-	ret->vClosure->text->vList.cdr = cdr;
-	ret->vClosure->args = car;
 
-	return ret;
-}
+	ret->vClosure->name = name;
+	ret->vClosure->args = lCadr(v);
+	ret->vClosure->doc  = lCaddr(v);
+	ret->vClosure->text = lCadddr(v);
 
-/* Handler for [λ* [..args] docstring body] */
-static lVal *lnfLambdaRaw(lClosure *c, lVal *v){
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type           = ltLambda;
-	ret->vClosure       = lClosureNew(c);
-	ret->vClosure->doc  = lCadr(v);
-	ret->vClosure->text = lCaddr(v);
-	ret->vClosure->args = lCar(v);
-
-	return ret;
-}
-
-/* Handler for [μ [...args] ...body] */
-static lVal *lnfMacro(lClosure *c, lVal *v){
-	lVal *ret = lnfLambda(c,v);
-	if(ret){ ret->type = ltMacro; }
 	return ret;
 }
 
 /* Handler for [μ* [...args] ...body] */
-static lVal *lnfMacroRaw(lClosure *c, lVal *v){
-	lVal *ret = lnfLambdaRaw(c,v);
+static lVal *lnfMacroAst(lClosure *c, lVal *v){
+	lVal *ret = lnfLambdaAst(c,v);
 	if(ret){ ret->type = ltMacro; }
 	return ret;
 }
@@ -260,18 +244,14 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"current-closure","[n]",           "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"symbol-search",  "[str len]",     "Return a list of all symbols starting with STR",lnfSymbolSearch);
-	lAddNativeFunc(c,"symbol-table",   "[off len]",     "Return a list of len symbols defined, accessible from the current closure from offset off",lnfSymbolTable);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
+	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 
 	lAddSpecialForm(c,"def",           "[sym val]",     "Define a new symbol SYM and link it to value VAL", lnfDef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",   lnfSet);
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",  lnfLetRaw);
 
-	lAddSpecialForm(c,"λ*",            "[args source body]", "Create a new, raw, lambda", lnfLambdaRaw);
-	lAddSpecialForm(c,"lambda fun λ",  "[args ...body]", "Create a new lambda",           lnfLambda);
-
-	lAddSpecialForm(c,"macro μ",       "[args ...body]", "Create a new macro",            lnfMacro);
-	lAddSpecialForm(c,"μ*",            "[args source body]", "Create a new, raw, macro",  lnfMacroRaw);
-
-	lAddSpecialForm(c,"object ω",      "[...body]",      "Create a new object",           lnfObject);
+	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
+	lAddSpecialForm(c,"μ*",           "[name args source body]", "Create a new, raw, macro",  lnfMacroAst);
+	lAddSpecialForm(c,"object ω",     "[...body]",               "Create a new object",       lnfObject);
 }

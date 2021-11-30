@@ -377,11 +377,11 @@ lVal *lnfInfix (lClosure *c, lVal *v){
 
 void lOperationsArithmetic(lClosure *c){
 	lnfvInfix = lAddNativeFunc(c,"infix","[...body]", "Evaluate body as an infix expression", lnfInfix);
-	lAddInfix(lAddNativeFunc(c,"mod %",  "[...args]", "Modulo",        lnfMod));
-	lAddInfix(lAddNativeFunc(c,"div /",  "[...args]", "Division",      lnfDiv));
-	lAddInfix(lAddNativeFunc(c,"mul *",  "[...args]", "Multiplication",lnfMul));
-	lAddInfix(lAddNativeFunc(c,"sub -",  "[...args]", "Substraction",  lnfSub));
-	lAddInfix(lAddNativeFunc(c,"add +",  "[...args]", "Addition",      lnfAdd));
+	lAddInfix(lAddNativeFunc(c,"% mod",  "[...args]", "Modulo",        lnfMod));
+	lAddInfix(lAddNativeFunc(c,"/ div",  "[...args]", "Division",      lnfDiv));
+	lAddInfix(lAddNativeFunc(c,"* mul",  "[...args]", "Multiplication",lnfMul));
+	lAddInfix(lAddNativeFunc(c,"- sub",  "[...args]", "Substraction",  lnfSub));
+	lAddInfix(lAddNativeFunc(c,"+ add",  "[...args]", "Addition",      lnfAdd));
 	lAddInfix(lAddNativeFunc(c,"pow",    "[a b]",     "Return A raised to the power of B",lnfPow));
 
 	lAddNativeFunc(c,"abs",  "[a]", "Return the absolute value of a", lnfAbs);

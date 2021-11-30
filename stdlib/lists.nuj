@@ -1,17 +1,16 @@
 ; Put all the LISt Processing stuff in here
 
-[def except-last-pair [let*
-        [def iter [λ [list rest]
-                     [if [nil? [cdr list]]
-                         [reverse rest]
-                         [iter [cdr list] [cons [car list] rest]]]
-        ]]
+[defun except-last-pair/iter [list rest]
+       "Iterator for except-last-pair"
+       [if [nil? [cdr list]]
+           [reverse rest]
+           [except-last-pair/iter [cdr list] [cons [car list] rest]]]
+]
 
-        [λ [list]
-                "Return a copy of LIST without the last pair"
-                [iter list #nil]
-        ]
-]]
+[defun except-last-pair [list]
+       "Return a copy of LIST without the last pair"
+       [except-last-pair/iter list #nil]
+]
 
 [defun last-pair [list]
         "Return the last pair of l"
@@ -20,46 +19,44 @@
             list]
 ]
 
-[def make-list [let*
-        [def iter [λ [number value l]
-                     [if [<= number 0]
-                         l
-                         [iter [- number 1] value [cons value l]]]
-        ]]
+[defun make-list/iter [number value l]
+       "Iterator for make-list"
+       [if [<= number 0]
+           l
+           [make-list/iter [- number 1] value [cons value l]]]
+]
 
-        [λ [number value]
-                "Return a list of NUMBER elements containing VALUE in every car"
-                [iter number value #nil]
-        ]
-]]
+[defun make-list [number value]
+       "Return a list of NUMBER elements containing VALUE in every car"
+       [make-list/iter number value #nil]
+]
 
 [defun reduce [o l s]
-        "Combine all elements in l using operation o and starting value s"
-        [if [nil? l]
-            s
-            [reduce o [cdr l] [o s [car l]]]]
+       "Combine all elements in l using operation o and starting value s"
+       [if [nil? l]
+           s
+           [reduce o [cdr l] [o s [car l]]]]
 ]
 
 [defun list-ref [l i]
-        "Returns the the element of list l at location i"
-        [cond [[nil? l] #nil]
-              [[<= i 0] [car l]]
-              [#t [list-ref [cdr l] [+ -1 i]]]
-        ]
+       "Returns the the element of list l at location i"
+       [cond [[nil? l] #nil]
+             [[<= i 0] [car l]]
+             [#t [list-ref [cdr l] [+ -1 i]]]
+       ]
 ]
 
-[def join [let*
-        [def iter [λ [str l glue]
-                [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
-                      [#t [iter [cat str [car l] glue] [cdr l] glue]]
-                ]
-        ]]
+[defun join/iter [str l glue]
+       "Iterator for join/iter"
+       [cond [[nil? l] [substr str 0 [- [string/length str] [string/length glue]]]]
+             [#t [join/iter [cat str [car l] glue] [cdr l] glue]]
+       ]
+]
 
-        [λ [l glue]
-                "Join LIST into a string with GLUE in between each element"
-                [iter "" l [string glue]]
-        ]
-]]
+[defun join [l glue]
+       "Join LIST into a string with GLUE in between each element"
+       [join/iter "" l [string glue]]
+]
 
 [defun split [str separator]
        [def separator-len [string/length separator]]
@@ -121,18 +118,17 @@
             [cons [f [car l]] [map f [cdr l]]]]
 ]
 
-[def append [let*
-        [def iter [λ [a b]
-                     [if [nil? a]
-                         b
-                         [iter [cdr a] [cons [car a] b]]]
-        ]]
+[defun append/iter [a b]
+       "Iterator for append"
+       [if [nil? a]
+           b
+           [append/iter [cdr a] [cons [car a] b]]]
+]
 
-        [λ [a b]
-                "Appends to two lists a and b together"
-                [iter [reverse a] b]
-        ]
-]]
+[defun append [a b]
+       "Appends to two lists a and b together"
+       [append/iter [reverse a] b]
+]
 
 [defun sublist [l start end ret]
         "Returns a new list containing all elements of l from start to end"
@@ -164,13 +160,13 @@
 
 [defun delete [e l]
         "Returns a filtered list l with all elements equal to e omitted"
-        [filter [λ [a] [not [eq? a e]]] l]
+        [filter [\ [a] [not [eq? a e]]] l]
 ]
 
 [defun arg-list [f]
         "Return the Argument list of f which can be a Native Function or a Lambda"
-        [cond [[lambda? f] [reduce cat [map [λ [a] [" " [car a]]] [cl-data f]]]]
-              [[native? f] [reduce cat [map [λ [a] [" " a]] [car [cl-data f]]]]]
+        [cond [[lambda? f] [reduce cat [map [\ [a] [" " [car a]]] [cl-data f]]]]
+              [[native? f] [reduce cat [map [\ [a] [" " a]] [car [cl-data f]]]]]
               [#t ""]
         ]
 ]

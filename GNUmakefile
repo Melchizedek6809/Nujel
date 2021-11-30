@@ -14,6 +14,7 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 NUJEL       := ./nujel
 NUJEL_BOOT  := ./nujel-bootstrap
+#NUJEL_BOOT  := /usr/local/bin/nujel.exe
 ASSET       := ./tools/assets
 
 CC                   := cc
@@ -66,7 +67,7 @@ endif
 
 .PHONY: clean
 clean:
-	@rm -f -- nujel nujel.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
+	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.o')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wo')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.d')

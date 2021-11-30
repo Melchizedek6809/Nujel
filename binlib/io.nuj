@@ -1,19 +1,11 @@
-[def help [let*
-        [defun iter [l]
-                [cond [[nil? l] #t]
-                      [#t [display [describe [car l]]] [newline] [iter [cdr l]]
-                ]]
-        ]
-
-        [λ [i]
-                "Describe 10 functions at offset 1"
-                [def off [* [int i] 10]]
-                [iter [map cat [symbol-table off 10]]]
-                [display [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
-                [newline]
-                #t
-        ]
-]]
+[defun help [i]
+       "Describe 10 functions at offset 1"
+       [def off [* [int i] 10]]
+       [for-each [\ [l] [println [cat l " " [describe l]]]]
+                 [map cat [symbol-table off 10]]]
+       [println [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
+       #t
+]
 
 [defun file/compile [path no-write environment]
         "Compile a Nujel source file into optimized object code"

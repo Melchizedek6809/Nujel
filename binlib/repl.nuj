@@ -1,26 +1,22 @@
-[def ctx [current-closure]]
+[defun display/error/wrap [i text]
+       [cond [[eq? i 0] [ansi-red text]]
+             [[eq? i 1] [string text]]
+             [[eq? i 2] [ansi-yellow [str/write text]]]
+             [#t text]
+       ]
+]
 
-[def display/error [let*
-        [defun wrap [i text]
-                [cond [[eq? i 0] [ansi-red text]]
-                      [[eq? i 1] [string text]]
-                      [[eq? i 2] [ansi-yellow [str/write text]]]
-                      [#t text]
-                ]
-        ]
+[defun display/error/iter [error i]
+       [if error
+           [cons [display/error/wrap i [car error]]
+                 [display/error/iter [cdr error] [+ 1 i]]]
+           [cons "" #nil]]
+]
 
-        [defun iter [error i]
-                [if error
-                    [cons [wrap i [car error]]
-                          [iter [cdr error] [+ 1 i]]]
-                    [cons "" #nil]]
-        ]
-
-        [λ [error]
+[defun display/error [error]
                 "Display ERROR in a nice, human readable way"
-                [display [join [iter error 0] "\r\n"]]
-        ]
-]]
+                [display [join [display/error/iter error 0] "\r\n"]]
+]
 
 [defun repl/exception-handler [error]
         [display/error error]
@@ -33,17 +29,15 @@
            "> "
 ]
 
-[def repl/wasm [let*
-        [λ [line]
-           "Evaluate LINE in the wasm context"
-           [try repl/exception-handler
-                [def raw [read line]]
-                [def expr [cons 'do raw]]
-                [def cexpr [cons [compile expr]]]
-                [apply ctx cexpr]
-           ]
-        ]
-]]
+[defun repl/wasm [line]
+       "Evaluate LINE in the wasm context"
+       [try repl/exception-handler
+            [def raw [read line]]
+            [def expr [cons 'do raw]]
+            [def cexpr [cons [compile expr]]]
+            [apply root-closure cexpr]
+       ]
+]
 
 [defun repl/readline [ctx]
         [def line [readline [repl/prompt]]]
@@ -68,7 +62,7 @@
         [readline/history/load [readline/history/path]]
         [while #t
                [try repl/exception-handler
-                    [repl/readline ctx]
+                    [repl/readline root-closure]
                ]
                [readline/history/save [readline/history/path]]
         ]
@@ -92,40 +86,40 @@
           `[repl/run-forked* ~[list 'quote expr]]
 ]
 
+
 [def repl/executable-name "nujel"]
-[def repl/parse-args [let*
-       [def eval-next #f]
-       [def run-repl #t]
+[def repl/parse-args/eval-next #f]
+[def repl/parse-args/run-repl #t]
 
-       [defun parse-option [option]
-              [cond [[eq? option "x"] [set! eval-next #t]
-                                      [set! run-repl #f]]
-                    [[eq? option "h"] [repl/print-help]
-                                      [set! run-repl #f]]
-              ]
+[defun repl/parse-option [option]
+       [cond [[eq? option "x"]
+              [set! repl/parse-args/eval-next #t]
+              [set! repl/parse-args/run-repl #f]]
+             [[eq? option "h"]
+              [repl/print-help]
+              [set! repl/parse-args/run-repl #f]]
        ]
+]
 
-       [defun parse-options [options]
-              [for-each parse-option [split options ""]]
-       ]
+[defun repl/parse-options [options]
+       [for-each repl/parse-option [split options ""]]
+]
 
-       [defun parse-arg [arg]
-              [cond [eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
-                               [set! eval-next #f]]
-                    [[eq? [char-at arg 0] #\-] [parse-options [substr arg 1]]]
-                    [#t [file/eval arg]
-                        [set! run-repl #f]]
-         ]
+[defun repl/parse-arg [arg]
+       [cond [repl/parse-args/eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
+                        [set! repl/eval-next #f]]
+             [[eq? [char-at arg 0] #\-] [repl/parse-options [substr arg 1]]]
+             [#t [file/eval arg]
+                 [set! repl/parse-args/run-repl #f]]
        ]
+]
 
-       [defun parse-args [args]
-              [if args
-                  [do [parse-arg [car args]]
-                      [parse-args [cdr args]]]
-                    run-repl]
-       ]
-       parse-args
-]]
+[defun repl/parse-args [args]
+       [if args
+           [do [repl/parse-arg [car args]]
+               [repl/parse-args [cdr args]]]
+           repl/parse-args/run-repl]
+]
 
 [defun repl/init [...args]
        [set! repl/executable-name [car ...args]]

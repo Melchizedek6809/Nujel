@@ -61,6 +61,11 @@
         [car [cdr [cdr [cdr p]]]]
 ]
 
+[defun caddddr [p]
+        "[car [cdr [cdr [cdr p]]]]"
+        [car [cdr [cdr [cdr [cdr p]]]]]
+]
+
 [defmacro if-not [pred then else]
           `[if ~pred ~else ~then]
 ]
