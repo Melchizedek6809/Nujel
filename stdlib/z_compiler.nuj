@@ -1,14 +1,5 @@
 ;; Contains the self-hosting Nujel compiler
 
-;[defmacro cond [...body]
-;          "Cond as a macro"
-;          [when ...body
-;                [list 'if
-;                      [caar ...body]
-;                      [cons 'do [cdar ...body]]
-;                      [macro-apply cond [cdr ...body]]]]
-;]
-
 [def compile/environment [current-closure]]
 [def compile/verbose #f]
 
@@ -72,32 +63,6 @@
        [list 'let* [compile/do [cdr source]]]
 ]
 
-[defun compile/cond/clause [source]
-       [cons [compile* [car source]]
-             [cons [compile/do [cdr source]]]]
-]
-
-[defun compile/cond/clauses [source]
-       [when source
-             [cons [compile/cond/clause [car source]]
-                   [compile/cond/clauses [cdr source]]]
-       ]
-]
-
-[defun compile/cond/body [source]
-       [if source
-           [list 'if
-                 [compile* [caar source]]
-                 [compile/do [cdar source]]
-                 [compile/cond/body [cdr source]]]]
-]
-
-[defun compile/cond [source]
-       ;[compile* [macro-apply cond* [cdr source]]]
-       ;[compile/cond/body [cdr source]]
-       [cons 'cond [compile/cond/clauses [cdr source]]]
-]
-
 [defun compile/and [source]
        [compile/procedure/arg source]
 ]
@@ -127,8 +92,8 @@
 
 [defun compile* [source]
        "Compile the forms in source"
-       [let* [def op [if [apply compile/environment `[[resolves? ~[list 'quote [car source]]]]]
-                         [apply compile/environment `[[resolve ~[list 'quote [car source]]]]]
+       [let* [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
+                         [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
                          [car source]]]
 
        [case [type-of op]
@@ -142,7 +107,6 @@
                     [ω      [compile/ω      source]]
                     [if     [compile/if     source]]
                     [try    [compile/try    source]]
-                    [cond   [compile/cond   source]]
                     [and    [compile/and    source]]
                     [or     [compile/or     source]]
                     [while  [compile/while  source]]

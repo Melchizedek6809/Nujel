@@ -34,11 +34,17 @@
     [def test-context "Nujel Bootstrap"]][do [def display/error/wrap [λ* display/error/wrap
         [i text]
         ""
-        [cond [[eq? i 0] [ansi-red text]]
-              [[eq? i 1] [string text]]
-              [[eq? i 2] [ansi-yellow [str/write text]]]
-              [[eq? i 3] [describe/closure text]]
-              [#t text]]]]
+        [if [eq? i 0]
+           [ansi-red text]
+           [if [eq? i 1]
+              [string text]
+              [if [eq? i 2]
+                 [ansi-yellow [str/write text]]
+                 [if [eq? i 3]
+                    [describe/closure text]
+                    [if #t
+                       text
+                       #nil]]]]]]]
     [def display/error/iter [λ* display/error/iter
         [error i]
         ""
@@ -109,10 +115,13 @@
     [def repl/parse-option [λ* repl/parse-option
         [option]
         ""
-        [cond [[eq? option "x"] [do [set! repl/parse-args/eval-next #t]
-                 [set! repl/parse-args/run-repl #f]]]
-              [[eq? option "h"] [do [repl/print-help]
-                 [set! repl/parse-args/run-repl #f]]]]]]
+        [if [eq? option "x"]
+           [do [set! repl/parse-args/eval-next #t]
+              [set! repl/parse-args/run-repl #f]]
+           [if [eq? option "h"]
+              [do [repl/print-help]
+                 [set! repl/parse-args/run-repl #f]]
+              #nil]]]]
     [def repl/parse-options [λ* repl/parse-options
         [options]
         ""
@@ -120,11 +129,15 @@
     [def repl/parse-arg [λ* repl/parse-arg
         [arg]
         ""
-        [cond [repl/parse-args/eval-next [do [apply root-closure [cons [compile [cons 'do [read arg]]]]]
-                 [set! repl/eval-next #f]]]
-              [[eq? [char-at arg 0] 45] [repl/parse-options [substr arg 1]]]
-              [#t [do [file/eval arg]
-                 [set! repl/parse-args/run-repl #f]]]]]]
+        [if repl/parse-args/eval-next
+           [do [apply root-closure [cons [compile [cons 'do [read arg]]]]]
+              [set! repl/eval-next #f]]
+           [if [eq? [char-at arg 0] 45]
+              [repl/parse-options [substr arg 1]]
+              [if #t
+                 [do [file/eval arg]
+                    [set! repl/parse-args/run-repl #f]]
+                 #nil]]]]]
     [def repl/parse-args [λ* repl/parse-args
         [args]
         ""

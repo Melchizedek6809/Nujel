@@ -137,4 +137,13 @@
                 [case/clauses key-sym ...clauses]]
 ]
 
+[defmacro cond [...body]
+          "Contains multiple cond clauses"
+          [when ...body
+                [list 'if
+                      [caar ...body]
+                      [cons 'do [cdar ...body]]
+                      [macro-apply cond [cdr ...body]]]]
+]
+
 [def root-closure [current-closure]]
