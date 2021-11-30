@@ -6,9 +6,6 @@
 lVal     *lValSymS     (const lSymbol *s);
 lVal     *lValSym      (const char *s);
 
-int       lSymCmp      (const lVal *a,const lVal *b);
-int       lSymEq       (const lSymbol *a,const lSymbol *b);
-
 bool      lSymVariadic (const lSymbol *s);
 bool      lSymKeyword  (const lSymbol *s);
 

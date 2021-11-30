@@ -337,6 +337,7 @@ lClosure *lClosureNewRoot(){
 	return lExceptionTry(lClosureNewRootReal,NULL,NULL);
 }
 
+/* A convenient way to generate a list */
 lVal *lList(int length, ...){
 	lVal *ret = NULL, *l;
 	va_list varArgs;

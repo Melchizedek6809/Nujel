@@ -12,7 +12,7 @@
 #include "../collection/string.h"
 #include "../type/closure.h"
 
-
+/* Return a newly allocated Nujel int of value V */
 lVal *lValInt(int v){
 	lVal *ret = lValAlloc();
 	ret->type = ltInt;
@@ -20,6 +20,7 @@ lVal *lValInt(int v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel float of value V */
 lVal *lValFloat(float v){
 	if(isnan(v)){
 		lExceptionThrow(":float-nan","NaN is disallowed in Nujel, please check you calculations");
@@ -32,6 +33,7 @@ lVal *lValFloat(float v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel vec of value V */
 lVal *lValVec(const vec v){
 	lVal *ret = lValAlloc();
 	ret->type = ltVec;
@@ -39,6 +41,7 @@ lVal *lValVec(const vec v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel bool of value V */
 lVal *lValBool(bool v){
 	lVal *ret = lValAlloc();
 	ret->type = ltBool;
@@ -46,6 +49,7 @@ lVal *lValBool(bool v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel tree of value V */
 lVal *lValTree(lTree *v){
 	lVal *ret = lValAlloc();
 	ret->type = ltTree;
@@ -53,6 +57,7 @@ lVal *lValTree(lTree *v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel object of value V */
 lVal *lValObject(lClosure *v){
 	lVal *ret = lValAlloc();
 	ret->type = ltObject;
@@ -60,6 +65,7 @@ lVal *lValObject(lClosure *v){
 	return ret;
 }
 
+/* Return a newly allocated Nujel lambda of value V */
 lVal *lValLambda(lClosure *v){
 	lVal *ret = lValAlloc();
 	ret->type = ltLambda;

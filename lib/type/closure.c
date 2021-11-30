@@ -21,7 +21,6 @@
 /* Return a new closure, setting the parent field */
 lClosure *lClosureNew(lClosure *parent){
 	lClosure *c = lClosureAlloc();
-	if(c == NULL){return NULL;}
 	c->parent = parent;
 	return c;
 }

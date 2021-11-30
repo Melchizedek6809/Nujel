@@ -14,43 +14,35 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Return a newly allocated nujel symbol of value S */
 lVal *lValSymS(const lSymbol *s){
 	if(s == NULL){return NULL;}
 	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
 	ret->type = ltSymbol;
 	ret->vSymbol = s;
 	return ret;
 }
 
+/* Return a nujel value for the symbol within S */
 lVal *lValSym(const char *s){
 	return lValSymS(lSymS(s));
 }
 
- bool lSymVariadic(const lSymbol *s){
+/* Return true if S is a symbol for a variadic argument */
+bool lSymVariadic(const lSymbol *s){
 	const char *p = s->c;
-	if((*p == '@') || (*p == '&')){p++;}
-	if((*p == '@') || (*p == '&')){p++;}
 	if((p[0] == '.') && (p[1] == '.') && (p[2] == '.')){
 		return true;
 	}
 	return false;
 }
 
+/* Return true if S is a keyword symbol */
 bool lSymKeyword(const lSymbol *s){
 	return s->c[0] == ':';
 }
 
-int lSymCmp(const lVal *a,const lVal *b){
-	if((a == NULL) || (b == NULL)){return 2;}
-	if((a->type != ltSymbol) || (b->type != ltSymbol) || (a->vSymbol == NULL)){return 2;}
-	return a->vSymbol == b->vSymbol ? 0 : -1;
-}
-
-int lSymEq(const lSymbol *a,const lSymbol *b){
-	return a == b ? 0 : -1;
-}
-
+/* Search the global symbol table for STR */
 lVal *lSymbolSearch(const char *str, uint len){
 	lVal *ret,*l;
 	ret = l = NULL;
