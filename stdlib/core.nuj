@@ -64,3 +64,14 @@
        [when-not len [set! len 9999999]]
        [sublist [environment [symbol-table*]] off [+ off len] #nil]
 ]
+
+[defun describe/closure [c]
+       [when c
+             [def info [closure c]]
+             [when [and info [info :call]]
+                   [cat [ansi-blue [str/write c]]
+                                 " - "
+                                 [str/write [info :data]]
+                                 "\r\n"
+                                 [describe/closure [closure-parent c]]]]]
+]

@@ -59,3 +59,10 @@ lVal *lValObject(lClosure *v){
 	ret->vClosure = v;
 	return ret;
 }
+
+lVal *lValLambda(lClosure *v){
+	lVal *ret = lValAlloc();
+	ret->type = ltLambda;
+	ret->vClosure = v;
+	return ret;
+}

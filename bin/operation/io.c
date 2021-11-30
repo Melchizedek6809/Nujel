@@ -148,7 +148,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 static lVal *lnfPopen(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	#ifdef __EMSCRIPTEN__
-		lExceptionThrow(":unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.");
+		lExceptionThrowValClo(":unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.",v,c);
 		return NULL;
 	#else
 	const char *command = castToString(lCar(v),NULL);

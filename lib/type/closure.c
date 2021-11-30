@@ -30,7 +30,7 @@ lClosure *lClosureNew(lClosure *parent){
 lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	const char *cur = sym;
 	if((lNF->type != ltNativeFunc) && (lNF->type != ltSpecialForm)){
-		lExceptionThrowVal(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF);
+		lExceptionThrowValClo(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF, c);
 	}
 
 	// Run at most 64 times, just a precaution

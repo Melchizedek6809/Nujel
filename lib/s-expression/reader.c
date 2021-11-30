@@ -25,6 +25,8 @@
 #define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`'))
 #define isnumericseparator(v) ((v=='_') || (v==','))
 
+lClosure *readClosure = NULL;
+
 static float createFloat(int value, int mantissa, int mantissaLeadingZeroes){
 	if(mantissa == 0){return value;}
 	const float mant = mantissa * pow(10, -(floor(log10f(mantissa)) + 1 + mantissaLeadingZeroes));
@@ -105,7 +107,7 @@ static lVal *lParseString(lString *s){
 				const char *start, *end;
 				for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 				for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
-				lExceptionThrowVal(":invalid-literal", "Unknown escape character found in string literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+				lExceptionThrowValClo(":invalid-literal", "Unknown escape character found in string literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 				break; }
 			}
 			s->data++;
@@ -159,7 +161,7 @@ static int lParseNumberBinary(lString *s, int *leadingZeroes){
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected character found in binary literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in binary literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -180,7 +182,7 @@ static int lParseNumberOctal(lString *s, int *leadingZeroes){
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected character found in octal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in octal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -202,7 +204,7 @@ static int lParseNumberDecimal(lString *s, int *leadingZeroes){
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected character found in decimal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in decimal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -224,7 +226,7 @@ static int lParseNumberHex(lString *s, int *leadingZeroes){
 		if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected character found in hex literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in hex literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -247,7 +249,7 @@ static lVal *lParseNumber(lString *s, int (*parser)(lString *, int *)){
 		if(*s->data == '.'){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}else{
 			const float valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
 			return lValFloat(negative ? -valf : valf);
@@ -278,7 +280,7 @@ static lVal *lParseSpecial(lString *s){
 		const char *start, *end;
 			for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowVal(":invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		return NULL; }
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
@@ -314,13 +316,13 @@ lVal *lReadList(lString *s, bool rootForm){
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				lExceptionThrow(":unmatched-opening-bracket", "Unmatched opening bracket");
+				lExceptionThrowValClo(":unmatched-opening-bracket", "Unmatched opening bracket",NULL,readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else if((c == ']') || (c == ')') || (c == '}')){
 			if(rootForm){
-				lExceptionThrow(":unmatched-closing-bracket", "Unmatched closing bracket");
+				lExceptionThrowValClo(":unmatched-closing-bracket", "Unmatched closing bracket",NULL,readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
@@ -424,7 +426,9 @@ static lVal *lnfRead(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	lString *dup = lRootsStringPush(lStringDup(t->vString));
+	readClosure = c;
 	t = lReadList(dup,true);
+	readClosure = NULL;
 	return t;
 }
 

@@ -638,6 +638,7 @@
 [test/add #t [def i 1] [case [++ i] [9 #f] [4 #f] [2 #t]]]
 [test/add :too-many-args [try [\ [err] [car err]] [cons 123 234 345]]]
 [test/add #t [eq? λ [resolve [car '[λ asd]]]]]
+[test/add #t [pos? [index-of [describe/closure [[defun stackTraceTest [] [current-lambda]]]] "stackTraceTest"]]]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
 [def oneTwoThreeTest [+123 5]]

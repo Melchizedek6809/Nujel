@@ -104,7 +104,8 @@ struct lArray {
 typedef enum closureType {
 	closureDefault = 0,
 	closureObject = 1,
-	closureConstant = 2
+	closureConstant = 2,
+	closureCall = 3
 } closureType;
 
 struct lClosure {

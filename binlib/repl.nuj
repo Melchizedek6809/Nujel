@@ -2,6 +2,7 @@
        [cond [[eq? i 0] [ansi-red text]]
              [[eq? i 1] [string text]]
              [[eq? i 2] [ansi-yellow [str/write text]]]
+             [[eq? i 3] [describe/closure text]]
              [#t text]
        ]
 ]

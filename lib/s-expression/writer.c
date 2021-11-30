@@ -165,7 +165,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		break; }
 	case ltMacro:
 	case ltLambda:
-		if(v->vClosure->name){
+		if(v->vClosure && v->vClosure->name){
 			t = snprintf(buf,len,"%s",v->vClosure->name->c);
 		}else{
 			t = snprintf(buf,len,"#%s_%u",v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));

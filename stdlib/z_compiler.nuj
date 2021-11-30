@@ -135,7 +135,6 @@
               [cond [[eq? op do]     [compile/do     source]]
                     [[eq? op def]    [compile/def    source]]
                     [[eq? op set!]   [compile/set!   source]]
-                    [[eq? op let]    [compile/let    source]]
                     [[eq? op let*]   [compile/let*   source]]
                     [[eq? op λ*]     [compile/λ*     source]]
                     [[eq? op μ*]     [compile/μ*     source]]

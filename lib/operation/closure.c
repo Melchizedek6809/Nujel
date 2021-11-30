@@ -95,8 +95,29 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),clo->args);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":data"), lRootsValPush(lValTree(clo->data)));
+		if(clo->type == closureCall){
+			ret->vTree = lTreeInsert(ret->vTree,lSymS(":call"), lRootsValPush(lValBool(true)));
+		}
 	}
 	return ret;
+}
+
+static lVal *lnfClosureParent(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if((car == NULL)
+		|| !((car->type == ltLambda)
+		||   (car->type == ltObject)
+		||   (car->type == ltMacro))){
+		return NULL;
+	}else if(car->vClosure->parent == NULL){
+		return NULL;
+	}else{
+		lVal *ret = lValAlloc();
+		ret->vClosure = car->vClosure->parent;
+		ret->type = ret->vClosure->type == closureObject ? ltObject : ltLambda;
+		return ret;
+	}
 }
 
 static void lClosureSetRec(lClosure *clo, lTree *data){
@@ -114,7 +135,7 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 			clo->data = newData;
 		}
 	}else {
-		lExceptionThrowVal(":invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym));
+		lExceptionThrowValClo(":invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
 	}
 	lClosureSetRec(clo,data->left);
 	lClosureSetRec(clo,data->right);
@@ -178,8 +199,8 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 /* Handler for [λ$ [..args] docstring body] */
 static lVal *lnfLambdaAst(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
-	if((v == NULL)){
-		lExceptionThrow(":invalid-lambda","Lambdas do need to have a name, some arguments a docstring and a body");
+	if(v == NULL){
+		lExceptionThrowValClo(":invalid-lambda","Lambdas do need to have a name, some arguments a docstring and a body",NULL, c);
 		return NULL;
 	}
 	const lSymbol *name = (car && car->type == ltSymbol) ? car->vSymbol : NULL;
@@ -220,6 +241,14 @@ static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
 	return ret;
 }
 
+static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
+	(void)v;
+	lVal *ret = lValAlloc();
+	ret->type = ltLambda;
+	ret->vClosure = c;
+	return ret;
+}
+
 static lVal *lnfSymbolSearch(lClosure *c, lVal *v){
 	(void)c;
 	const lVal *car = lCar(v);
@@ -239,10 +268,12 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"resolves?",      "[sym]",         "Check if SYM resolves to a value",           lnfResolvesPred);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
+	lAddNativeFunc(c,"closure-parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
 	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
+	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
+	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
 
 	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
-	lAddNativeFunc(c,"current-closure","[n]",           "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"symbol-search",  "[str len]",     "Return a list of all symbols starting with STR",lnfSymbolSearch);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
