@@ -18,6 +18,7 @@ gmon.out
 /nujel
 /nujel-bootstrap
 /tools/assets
+/tools/emsdk
 *.out
 *.a
 *.com
