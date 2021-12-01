@@ -59,6 +59,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
+	tmpc->caller = c;
 	forEach(n,lambda->vClosure->args){
 		lVal *car = lCar(n);
 		if(car == NULL){continue;}
@@ -87,6 +88,7 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
+	tmpc->caller = c;
 	forEach(n,lambda->vClosure->args){
 		lVal *car = lCar(n);
 		if(car == NULL){continue;}

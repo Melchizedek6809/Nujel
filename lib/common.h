@@ -117,6 +117,7 @@ struct lClosure {
 	lVal *text;
 	lVal *doc;
 	lVal *args;
+	lClosure *caller;
 	const lSymbol *name;
 	u8 type;
 };

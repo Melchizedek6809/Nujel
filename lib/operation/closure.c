@@ -120,6 +120,24 @@ static lVal *lnfClosureParent(lClosure *c, lVal *v){
 	}
 }
 
+static lVal *lnfClosureCaller(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if((car == NULL)
+		|| !((car->type == ltLambda)
+		||   (car->type == ltObject)
+		||   (car->type == ltMacro))){
+		return NULL;
+	}else if(car->vClosure->caller == NULL){
+		return NULL;
+	}else{
+		lVal *ret = lValAlloc();
+		ret->vClosure = car->vClosure->caller;
+		ret->type = ret->vClosure->type == closureObject ? ltObject : ltLambda;
+		return ret;
+	}
+}
+
 static void lClosureSetRec(lClosure *clo, lTree *data){
 	if(data == NULL){return;}
 	const lSymbol *sym = data->key;
@@ -159,7 +177,10 @@ static lVal *lnfClosureSet(lClosure *c, lVal *v){
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	const int SP = lRootsGet();
 	lClosure *nc = lRootsClosurePush(lClosureNew(c));
-	lVal *ret = lnfDo(nc,v);
+	nc->name     = c->name;
+	nc->caller   = c->caller;
+	nc->type     = c->type;
+	lVal *ret    = lnfDo(nc,v);
 	lRootsRet(SP);
 	return ret;
 }
@@ -269,6 +290,7 @@ void lOperationsClosure(lClosure *c){
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
 	lAddNativeFunc(c,"closure-parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
+	lAddNativeFunc(c,"closure-caller", "[clo]",         "Return the caller of CLO",                   lnfClosureCaller);
 	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
