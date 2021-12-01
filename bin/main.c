@@ -17,6 +17,10 @@
 extern char binlib_no_data[];
 lClosure *mainClosure;
 
+void *evalRaw(void *cl, void *body){
+	return lEval((lClosure *)cl,(lVal *)body);
+}
+
 #ifdef __EMSCRIPTEN__
 /* To be used for the WASM REPL, since we don't run continuously there */
 const char *run(const char *line){
@@ -25,7 +29,7 @@ const char *run(const char *line){
 	exp->vList.car = lValSym("repl/wasm");
 	exp->vList.cdr = lCons(NULL,NULL);
 	exp->vList.cdr->vList.car = lValString(line);
-	lVal *v = lEval(mainClosure,exp);
+	lVal *v = lExceptionTry(evalRaw,mainClosure,exp);
 	const char *ret = v ? lReturnDisplayVal(v) : "";
 	lRootsRet(SP);
 	return ret;
@@ -37,10 +41,6 @@ void *readEvalStringRaw(void *cl, void *str){
 	const char *expr = str;
 	lVal *v = lnfDo(c,lRead(expr));
 	return v;
-}
-
-void *evalRaw(void *cl, void *body){
-	return lEval((lClosure *)cl,(lVal *)body);
 }
 
 lClosure *createRoolClosure(bool loadStdLib){
@@ -128,5 +128,6 @@ int main(int argc, char *argv[]){
 	setIOSymbols();
 
 	initNujel(argc,argv,parsePreOptions(argc,argv));
+
 	return 0;
 }

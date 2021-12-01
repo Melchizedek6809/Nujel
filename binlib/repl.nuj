@@ -122,7 +122,17 @@
            repl/parse-args/run-repl]
 ]
 
+[defun repl/init/wasm [args]
+       [println [cat [ansi-rainbow "Nujel"] " wasm/REPL ready for input"]]
+]
+
+[defun repl/init/bin [args]
+       [set! repl/executable-name [car args]]
+       [when [repl/parse-args [cdr args]] [repl]]
+]
+
 [defun repl/init [...args]
-       [set! repl/executable-name [car ...args]]
-       [when [repl/parse-args [cdr ...args]] [repl]]
+       [if [eq? ARCH "wasm"]
+           [repl/init/wasm ...args]
+           [repl/init/bin ...args]]
 ]
