@@ -97,6 +97,9 @@
            #nil]]]
     [def case [μ* case [key-form ...clauses] "" [do [def key-sym [gensym]]
        [list 'let* [list 'def key-sym key-form] [case/clauses key-sym ...clauses]]]]]
+    [def cond [μ* cond [...body] "Contains multiple cond clauses" [if ...body
+       [list 'if [caar ...body] [cons 'do [cdar ...body]] [macro-apply cond [cdr ...body]]]
+       #nil]]]
     [def root-closure [current-closure]]][do [def numeric? [λ* numeric?
         [a]
         "Return #t if a is a number"
@@ -572,16 +575,7 @@
            [if len
               #nil
               [set! len 9999999]]
-           [sublist [environment [symbol-table*]] off [+ off len] #nil]]]]
-    [def describe/closure [λ* describe/closure
-        [c]
-        ""
-        [if c
-           [do [def info [closure c]]
-              [if [and info [info :call]]
-                 [cat [ansi-blue [str/write c]] " - " [str/write [info :data]] "\r\n" [describe/closure [closure-parent c]]]
-                 #nil]]
-           #nil]]]][do [def except-last-pair/iter [λ* except-last-pair/iter
+           [sublist [environment [symbol-table*]] off [+ off len] #nil]]]]][do [def except-last-pair/iter [λ* except-last-pair/iter
         [list rest]
         "Iterator for except-last-pair"
         [if [nil? [cdr list]]
@@ -840,7 +834,19 @@
         [if [numeric? max]
            [mod [abs [random/rng!]] max]
            [random/rng!]]]]
-    [random/seed-initialize!]][do [def println [λ* println
+    [random/seed-initialize!]][do [def describe/closure [λ* describe/closure
+        [c i]
+        ""
+        [if c
+           [do [def info [closure c]]
+              [if [and info [info :call]]
+                 [cat [ansi-blue [cat [int i] "# " [str/write c]]] " - " [str/write [info :data]] "\r\n" [describe/closure [closure-caller c] [+ [int i] 1]]]
+                 #nil]]
+           #nil]]]
+    [def stacktrace [λ* stacktrace
+        []
+        ""
+        [display [describe/closure [closure-caller [current-lambda]]]]]]][do [def println [λ* println
         [str]
         "Print STR on a single line"
         [print [cat str "\n"]]]]
@@ -1731,16 +1737,20 @@
     [test/add* 2.0 '[do [cbrt 8.0]]]
     [test/add* 3.0 '[do [cbrt 27.0]]]
     [test/add* 2.0 '[do [vec/x [cbrt [vec 8]]]]]
-    [test/add* #t '[do [case [+ 1 2] [1 #f] [[2 3] #t]]]]
-    [test/add* #t '[do [case [+ 1 1] [1 #f] [[2 3] #t]]]]
-    [test/add* #f '[do [case [+ 0 1] [1 #f] [[2 3] #t]]]]
-    [test/add* #nil '[do [case [+ 2 2] [1 #f] [[2 3] #t]]]]
-    [test/add* 123 '[do [case [+ 2 2] [1 #f] [[2 3] #t] [otherwise 123]]]]
+    [test/add* #t '[do [case "1" [[1] #f] [['1] #f] [["1"] #t]]]]
+    [test/add* #t '[do [case "asd" [["as"] #f] [["qwe"] #f] [["asd"] #t]]]]
+    [test/add* #t '[do [case [+ 1 2] [[3.1] #f] [[3.0] #t] [[3] #f]]]]
+    [test/add* #t '[do [case [+ 1 2] [[1] #f] [[2 3] #t]]]]
+    [test/add* #t '[do [case [+ 1 1] [[1] #f] [[2 3] #t]]]]
+    [test/add* #f '[do [case [+ 0 1] [[1] #f] [[2 3] #t]]]]
+    [test/add* #nil '[do [case [+ 2 2] [[1] #f] [[2 3] #t]]]]
+    [test/add* 123 '[do [case [+ 2 2] [[1] #f] [[2 3] #t] [otherwise 123]]]]
     [test/add* #t '[do [def i 1]
-       [case [++ i] [9 #f] [4 #f] [2 #t]]]]
+       [case [++ i] [[9] #f] [[4] #f] [[2] #t]]]]
     [test/add* :too-many-args '[do [try [\ [err] [car err]] [cons 123 234 345]]]]
     [test/add* #t '[do [eq? λ [resolve [car '[λ asd]]]]]]
     [test/add* #t '[do [pos? [index-of [describe/closure [[defun stackTraceTest [] [current-lambda]]]] "stackTraceTest"]]]]
+    [test/add* 2 '[do [case 'asd [['qwe] 1] [['asd] 2] [otherwise 3]]]]
     [def oneTwoThreeTest [+ 123 5]]
     [def +123 [μ* +123 [v] "" [cons '+ [cons 123 [cons v #nil]]]]]
     ][do [def time/seconds [λ* time/seconds
@@ -1764,10 +1774,7 @@
            [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]]
     [def profile [μ* profile [...body] "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? ...body]
        [car ...body]
-       [cons 'do ...body]] #nil]] #nil]]]]][do [def cond [μ* cond [...body] "Cond as a macro" [if ...body
-       [list 'if [caar ...body] [cons 'do [cdar ...body]] [macro-apply cond [cdr ...body]]]
-       #nil]]]
-    [def compile/environment [current-closure]]
+       [cons 'do ...body]] #nil]] #nil]]]]][do [def compile/environment [current-closure]]
     [def compile/verbose #f]
     [def compile/do/args [λ* compile/do/args
         [args]
@@ -1819,26 +1826,6 @@
         [source]
         ""
         [list 'let* [compile/do [cdr source]]]]]
-    [def compile/cond/clause [λ* compile/cond/clause
-        [source]
-        ""
-        [cons [compile* [car source]] [cons [compile/do [cdr source]]]]]]
-    [def compile/cond/clauses [λ* compile/cond/clauses
-        [source]
-        ""
-        [if source
-           [cons [compile/cond/clause [car source]] [compile/cond/clauses [cdr source]]]
-           #nil]]]
-    [def compile/cond/body [λ* compile/cond/body
-        [source]
-        ""
-        [if source
-           [list 'if [compile* [caar source]] [compile/do [cdar source]] [compile/cond/body [cdr source]]]
-           #nil]]]
-    [def compile/cond [λ* compile/cond
-        [source]
-        ""
-        [cons 'cond [compile/cond/clauses [cdr source]]]]]
     [def compile/and [λ* compile/and
         [source]
         ""
@@ -1892,17 +1879,15 @@
                                             [compile/if source]
                                             [if [eq? ΓεnΣym-5 try]
                                                [compile/try source]
-                                               [if [eq? ΓεnΣym-5 #nil]
-                                                  do
-                                                  [if [eq? ΓεnΣym-5 and]
-                                                     [compile/and source]
-                                                     [if [eq? ΓεnΣym-5 or]
-                                                        [compile/or source]
-                                                        [if [eq? ΓεnΣym-5 while]
-                                                           [compile/while source]
-                                                           [if [eq? ΓεnΣym-5 quote]
-                                                              source
-                                                              [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]]]]]]]]]]]]]]
+                                               [if [eq? ΓεnΣym-5 and]
+                                                  [compile/and source]
+                                                  [if [eq? ΓεnΣym-5 or]
+                                                     [compile/or source]
+                                                     [if [eq? ΓεnΣym-5 while]
+                                                        [compile/while source]
+                                                        [if [eq? ΓεnΣym-5 quote]
+                                                           source
+                                                           [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]]]]]]]]]]]]]
                  [if [eq? ΓεnΣym-4 :macro]
                     [compile/macro op source]
                     [if [or [eq? ΓεnΣym-4 :lambda] [eq? ΓεnΣym-4 :native-function]]

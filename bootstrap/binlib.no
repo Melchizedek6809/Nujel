@@ -11,8 +11,8 @@
     [def file/compile [λ* file/compile
         [path no-write environment]
         "Compile a Nujel source file into optimized object code"
-        [do [def source [read [file/read path]]]
-           [def object-code [compile/forms [cons 'do source] environment]]
+        [do [def source [cons 'do [read [file/read path]]]]
+           [def object-code [compile/forms source environment]]
            [if no-write
               #nil
               [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
@@ -21,7 +21,8 @@
         [path]
         "Evaluate a Nujel source file in the current context"
         [do [def source [cons 'do [read [file/read path]]]]
-           [apply root-closure [cons [compile [cons 'do source]]]]]]]
+           [def object-code [compile/forms [cons 'do source] environment]]
+           [apply root-form [list object-code]]]]]
     [def eval/forked [λ* eval/forked
         [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
@@ -68,8 +69,7 @@
         [line]
         "Evaluate LINE in the wasm context"
         [try repl/exception-handler [do [def raw [read line]]
-           [def expr [cons 'do raw]]
-           [def cexpr [cons [compile expr]]]
+           [def cexpr [list [compile [cons 'do raw]]]]
            [apply root-closure cexpr]]]]]
     [def repl/readline [λ* repl/readline
         [ctx]
@@ -145,13 +145,23 @@
            [do [repl/parse-arg [car args]]
               [repl/parse-args [cdr args]]]
            repl/parse-args/run-repl]]]
+    [def repl/init/wasm [λ* repl/init/wasm
+        [args]
+        ""
+        [println [cat [ansi-rainbow "Nujel"] " wasm/REPL ready for input"]]]]
+    [def repl/init/bin [λ* repl/init/bin
+        [args]
+        ""
+        [do [set! repl/executable-name [car args]]
+           [if [repl/parse-args [cdr args]]
+              [repl]
+              #nil]]]]
     [def repl/init [λ* repl/init
         [...args]
         ""
-        [do [set! repl/executable-name [car ...args]]
-           [if [repl/parse-args [cdr ...args]]
-              [repl]
-              #nil]]]]][if [eq? OS "Emscripten"]
+        [if [eq? ARCH "wasm"]
+           [repl/init/wasm ...args]
+           [repl/init/bin ...args]]]]][if [eq? ARCH "wasm"]
     #nil
     [do [test/add* '[0 . ""] '[do [repl/run-forked 1]]]
        [test/add* '[123 . ""] '[do [repl/run-forked [exit 123]]]]

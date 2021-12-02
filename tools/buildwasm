@@ -18,4 +18,5 @@ git pull
 
 source "emsdk_env.sh"
 cd ../../
+rm -f web/index.html web/index.js web/index.wasm
 make -j release.wasm

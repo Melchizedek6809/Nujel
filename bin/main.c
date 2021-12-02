@@ -17,33 +17,30 @@
 extern char binlib_no_data[];
 lClosure *mainClosure;
 
-void *evalRaw(void *cl, void *body){
-	return lEval((lClosure *)cl,(lVal *)body);
+#ifdef __EMSCRIPTEN__
+void *runRaw(void *cl, void *body){
+	return lEval((lClosure *)cl,(lVal *) body);
 }
 
-#ifdef __EMSCRIPTEN__
 /* To be used for the WASM REPL, since we don't run continuously there */
 const char *run(const char *line){
 	const int SP = lRootsGet();
-	lVal *exp = lRootsValPush(lCons(NULL,NULL));
-	exp->vList.car = lValSym("repl/wasm");
-	exp->vList.cdr = lCons(NULL,NULL);
-	exp->vList.cdr->vList.car = lValString(line);
-	lVal *v = lExceptionTry(evalRaw,mainClosure,exp);
+	lVal *exp = RVP(lList(2,RVP(lValSym("repl/wasm")),RVP(lValString(line))));
+	lVal *v = lExceptionTry(runRaw,mainClosure,exp);
 	const char *ret = v ? lReturnDisplayVal(v) : "";
 	lRootsRet(SP);
 	return ret;
 }
 #endif
 
-void *readEvalStringRaw(void *cl, void *str){
+static void *readEvalStringRaw(void *cl, void *str){
 	lClosure *c = (lClosure *)cl;
 	const char *expr = str;
 	lVal *v = lnfDo(c,lRead(expr));
 	return v;
 }
 
-lClosure *createRoolClosure(bool loadStdLib){
+static lClosure *createRoolClosure(bool loadStdLib){
 	lClosure *c;
 	if(loadStdLib){
 		c = lClosureNewRoot();
@@ -62,7 +59,7 @@ lClosure *createRoolClosure(bool loadStdLib){
 /* Parse options that might radically alter runtime behaviour, like running
  * without the stdlib (probably for using an alternative build of the stdlib )
  */
-lClosure *parsePreOptions(int argc, char *argv[]){
+static lClosure *parsePreOptions(int argc, char *argv[]){
 	bool loadStdLib = true;
 	bool readNext   = false;
 	lClosure *c     = NULL;
@@ -97,7 +94,7 @@ lClosure *parsePreOptions(int argc, char *argv[]){
 		printf("sizeof(lVal): %u\n",    (uint)sizeof(lVal));
 		printf("sizeof(lArray): %u\n",  (uint)sizeof(lArray));
 		printf("sizeof(lString): %u\n", (uint)sizeof(lString));
-		printf("sizeof(lTree): %u\n", (uint)sizeof(lTree));
+		printf("sizeof(lTree): %u\n",   (uint)sizeof(lTree));
 		printf("sizeof(jmp_buf): %u\n", (uint)sizeof(jmp_buf));
 		printf("\n\nRoot Closure Data Size: %u\n",lTreeSize(c->data));
 		lWriteVal(lValTree(c->data));
@@ -105,6 +102,9 @@ lClosure *parsePreOptions(int argc, char *argv[]){
 	return c;
 }
 
+static void *evalRaw(void *cl, void *body){
+	return lEval((lClosure *)cl,(lVal *)body);
+}
 
 
 void initNujel(int argc, char *argv[], lClosure *c){
@@ -122,6 +122,7 @@ void initNujel(int argc, char *argv[], lClosure *c){
 }
 
 int main(int argc, char *argv[]){
+	(void)argc; (void)argv;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
