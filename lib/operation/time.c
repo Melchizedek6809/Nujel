@@ -47,7 +47,7 @@ static lVal *lnfStrftime(lClosure *c, lVal *v){
 }
 
 void lOperationsTime(lClosure *c){
-	lAddNativeFunc(c,"time",             "[]",         "Return the current unix time",lnfTime);
+	lAddNativeFunc(c,"time time/unix",   "[]",         "Return the current unix time",lnfTime);
 	lAddNativeFunc(c,"time/strftime",    "[ts format]","Return TS as a date using FORMAT (uses strftime)",lnfStrftime);
 	lAddNativeFunc(c,"time/milliseconds","[]",         "Return monotonic msecs",lnfTimeMsecs);
 }

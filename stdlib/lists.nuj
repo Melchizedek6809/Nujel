@@ -12,23 +12,21 @@
        [except-last-pair/iter list #nil]
 ]
 
-[defun last-pair [list]
-        "Return the last pair of l"
-        [if [cdr list]
-            [last-pair [cdr list]]
-            list]
-]
-
-[defun make-list/iter [number value l]
-       "Iterator for make-list"
-       [if [<= number 0]
-           l
-           [make-list/iter [- number 1] value [cons value l]]]
+[defun last-pair [l]
+       "Return the last pair of l"
+       [while [cdr l]
+              [cdr! l]
+       ]
+       l
 ]
 
 [defun make-list [number value]
        "Return a list of NUMBER elements containing VALUE in every car"
-       [make-list/iter number value #nil]
+       [def l #nil]
+       [while [>= [-- number] 0]
+              [set! l [cons value l]]
+       ]
+       l
 ]
 
 [defun list/reduce [o l s]

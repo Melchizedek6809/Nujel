@@ -33,8 +33,10 @@
 [defun length [α]
        "Returns the length of collection α"
        [case [type-of α]
+             [[:array]  [array/length  α]]
              [[:pair]   [list/length   α]]
              [[:string] [string/length α]]
+             [[:tree]   [tree/size     α]]
              [otherwise [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]
        ]
 ]

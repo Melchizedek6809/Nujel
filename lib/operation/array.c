@@ -92,9 +92,9 @@ lVal *lnfArrRef(lClosure *c, lVal *v){
 }
 
 void lOperationsArray(lClosure *c){
-	lnfvArrRef = lAddNativeFunc(c,"arr-ref",    "[array index]",  "Return value of ARRAY at position INDEX",     lnfArrRef);
-	lAddNativeFunc(c,"arr-length", "[array]",    "Return length of ARRAY",                          lnfArrLength);
-	lAddNativeFunc(c,"arr-set!",   "[array index &...values]","Set ARRAY at INDEX to &...VALUES",   lnfArrSet);
-	lAddNativeFunc(c,"arr-new",    "[size]",     "Allocate a new array of SIZE",                    lnfArrNew);
-	lAddNativeFunc(c,"arr",        "[...args]",  "Create a new array from ...ARGS",                 lnfArr);
+	lnfvArrRef = lAddNativeFunc(c,"array/ref",      "[array index]",  "Return value of ARRAY at position INDEX",     lnfArrRef);
+	             lAddNativeFunc(c,"array/length",   "[array]",    "Return length of ARRAY",                          lnfArrLength);
+	             lAddNativeFunc(c,"array/set!",     "[array index &...values]","Set ARRAY at INDEX to &...VALUES",   lnfArrSet);
+	             lAddNativeFunc(c,"array/allocate", "[size]",     "Allocate a new array of SIZE",                    lnfArrNew);
+	             lAddNativeFunc(c,"array/new",      "[...args]",  "Create a new array from ...ARGS",                 lnfArr);
 }

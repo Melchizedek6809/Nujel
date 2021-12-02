@@ -29,7 +29,7 @@ static lVal *lnfCons(lClosure *c, lVal *v){
 }
 
 void lOperationsList(lClosure *c){
-	lAddNativeFunc(c,"car",     "[list]",     "Returs the head of LIST",          lnfCar);
-	lAddNativeFunc(c,"cdr",     "[list]",     "Return the rest of LIST",          lnfCdr);
-	lAddNativeFunc(c,"cons",    "[car cdr]",  "Return a new pair of CAR and CDR", lnfCons);
+	lAddNativeFunc(c,"car",  "[list]",     "Returs the head of LIST",          lnfCar);
+	lAddNativeFunc(c,"cdr",  "[list]",     "Return the rest of LIST",          lnfCdr);
+	lAddNativeFunc(c,"cons", "[car cdr]",  "Return a new pair of CAR and CDR", lnfCons);
 }

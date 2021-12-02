@@ -18,10 +18,10 @@
            [describe/thing fun]]
 ]
 
-[defun arr-fill! [a v i]
+[defun array/fill! [a v i]
         "Fills array a with value v"
-        [cond [[>= [int i] [arr-length a]] a]
-              [#t [arr-set! a [int i] v] [arr-fill! a v [+ 1 i]]]
+        [cond [[>= [int i] [array/length a]] a]
+              [#t [array/set! a [int i] v] [array/fill! a v [+ 1 i]]]
         ]
 ]
 

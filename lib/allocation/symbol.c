@@ -26,7 +26,7 @@ void lSymbolInit(){
 
 	symNull            = lSymS("");
 	symQuote           = lSymS("quote");
-	symArr             = lSymS("arr");
+	symArr             = lSymS("array/new");
 	symIf              = lSymS("if");
 	symCond            = lSymS("cond");
 	symDo              = lSymS("do");

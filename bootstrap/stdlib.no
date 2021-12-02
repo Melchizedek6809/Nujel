@@ -359,9 +359,9 @@
     ][do [def ansi-reset "\e[0m"]
     [def ansi-fg-reset "\e[0;39m"]
     [def ansi-bg-reset "\e[49m"]
-    [def ansi-fg [arr "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]]
+    [def ansi-fg [array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]]
     [def ansi-reset "\e[0m"]
-    [def ansi-bg [arr "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]]
+    [def ansi-bg [array/new "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]]
     [def ansi-wrap [λ* ansi-wrap
         [code string]
         "Wrap STRING in the ansi color CODE"
@@ -583,11 +583,15 @@
         [α]
         "Returns the length of collection α"
         [let* [do [def ΓεnΣym-9 [type-of α]]
-           [if [or [eq? ΓεnΣym-9 :pair]]
-              [list/length α]
-              [if [or [eq? ΓεnΣym-9 :string]]
-                 [string/length α]
-                 [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]]]]]]
+           [if [or [eq? ΓεnΣym-9 :array]]
+              [array/length α]
+              [if [or [eq? ΓεnΣym-9 :pair]]
+                 [list/length α]
+                 [if [or [eq? ΓεnΣym-9 :string]]
+                    [string/length α]
+                    [if [or [eq? ΓεnΣym-9 :tree]]
+                       [tree/size α]
+                       [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]]]]]]]]
     [def map [λ* map
         [f α]
         "Runs f over every item in collection l and returns the resulting list"
@@ -611,14 +615,14 @@
         [if [string? fun]
            [describe/string fun]
            [describe/thing fun]]]]
-    [def arr-fill! [λ* arr-fill!
+    [def array/fill! [λ* array/fill!
         [a v i]
         "Fills array a with value v"
-        [if [>= [int i] [arr-length a]]
+        [if [>= [int i] [array/length a]]
            a
            [if #t
-              [do [arr-set! a [int i] v]
-                 [arr-fill! a v [+ 1 i]]]
+              [do [array/set! a [int i] v]
+                 [array/fill! a v [+ 1 i]]]
               #nil]]]]
     [def lognand [λ* lognand
         [...l]
@@ -656,32 +660,21 @@
         "Return a copy of LIST without the last pair"
         [except-last-pair/iter list #nil]]]
     [def last-pair [λ* last-pair
-        [list]
+        [l]
         "Return the last pair of l"
-        [if [cdr list]
-           [last-pair [cdr list]]
-           list]]]
-    [def make-list/iter [λ* make-list/iter
-        [number value l]
-        "Iterator for make-list"
-        [if [<= number 0]
-           l
-           [make-list/iter [- number 1] value [cons value l]]]]]
+        [do [while [cdr l] [set! l [cdr l]]]
+           l]]]
     [def make-list [λ* make-list
         [number value]
         "Return a list of NUMBER elements containing VALUE in every car"
-        [make-list/iter number value #nil]]]
-    [def list/reduce* [λ* list/reduce*
+        [do [def l #nil]
+           [while [>= [set! number [+ -1 number]] 0] [set! l [cons value l]]]
+           l]]]
+    [def list/reduce [λ* list/reduce
         [o l s]
         "Combine all elements in l using operation o and starting value s"
         [do [while l [do [set! s [o s [car l]]]
               [set! l [cdr l]]]]
-           s]]]
-    [def list/reduce [λ* list/reduce
-        [o l s]
-        "Combine all elements in l using operation o and starting value s"
-        [if l
-           [list/reduce o [cdr l] [o s [car l]]]
            s]]]
     [def list/ref [λ* list/ref
         [l i]
@@ -711,11 +704,12 @@
            r
            [reverse [cdr l] [cons [car l] r]]]]]
     [def list/length [λ* list/length
-        [a t]
-        "Returns the length of list a"
-        [if [nil? a]
-           t
-           [list/length [cdr a] [+ 1 t]]]]]
+        [l]
+        "Returns the length of list l"
+        [do [def ret 0]
+           [while l [do [set! l [cdr l]]
+              [set! ret [+ 1 ret]]]]
+           ret]]]
     [def list/filter [λ* list/filter
         [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
@@ -966,7 +960,7 @@
            [while [not-zero? α] [do [set! ret [cat [from-char-code [+ 48 [logand α 7]]] ret]]
               [set! α [ash α -3]]]]
            ret]]]
-    [def int->string/hex [let* [do [def conversion-arr [arr "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
+    [def int->string/hex [let* [do [def conversion-arr [array/new "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
        [λ* #nil
            [α]
            ""
@@ -1071,7 +1065,7 @@
     [test/add* #t '[do [numeric? 0]]]
     [test/add* #t '[do [numeric? 0.1]]]
     [test/add* #t '[do [numeric? [vec 1 2 3]]]]
-    [test/add* #f '[do [numeric? [arr 1 2 3]]]]
+    [test/add* #f '[do [numeric? [array/new 1 2 3]]]]
     [test/add* #f '[do [numeric? '[1 2 3]]]]
     [test/add* #f '[do [numeric? [tree/new :a 1 :b 2 :c 3]]]]
     [test/add* #t '[do [and [numeric? [vec 1]] [not [numeric? #f]] [not [numeric? "123"]]]]]
@@ -1106,11 +1100,11 @@
        [count]]]
     [test/add* 4 '[do [let [[a 10]] [when [when #t [set! a [+ 2 "2"]] #f] [set! a -1]] a]]]
     [test/add* 6 '[do [eval '[+ 1 2 3]]]]
-    [test/add* 4 '[do [arr-length [arr 1 2 3 4]]]]
-    [test/add* 2 '[do [arr-ref [arr 1 2 3 4] 1]]]
-    [test/add* 3 '[do [arr-length [arr-new 3]]]]
-    [test/add* #t '[do [arr? [arr 1 2 3]]]]
-    [test/add* #t '[do [arr? [arr-new 3]]]]
+    [test/add* 4 '[do [array/length [array/new 1 2 3 4]]]]
+    [test/add* 2 '[do [array/ref [array/new 1 2 3 4] 1]]]
+    [test/add* 3 '[do [array/length [array/allocate 3]]]]
+    [test/add* #t '[do [arr? [array/new 1 2 3]]]]
+    [test/add* #t '[do [arr? [array/allocate 3]]]]
     [test/add* #f '[do [arr? '[1 2 3]]]]
     [test/add* #f '[do [arr? [tree/new :a 1 :b 2 :c 3]]]]
     [test/add* 10 '[do [+ [apply + '[1 2 3]] [apply [λ [α]
@@ -1152,9 +1146,9 @@
     [test/add* #t '[do [odd? 7]]]
     [test/add* #f '[do [odd? 4]]]
     [test/add* 256 '[do [int [pow 2 8]]]]
-    [test/add* 3 '[do [def ein-test-arr [arr 1 2 3]]
+    [test/add* 3 '[do [def ein-test-arr [array/new 1 2 3]]
        [ein-test-arr 2]]]
-    [test/add* 3 '[do [def ein-test-arr [arr 1 2 3]]
+    [test/add* 3 '[do [def ein-test-arr [array/new 1 2 3]]
        [ein-test-arr 2 9]
        [ein-test-arr 2]]]
     [test/add* 123 '[do [def i-assaultmegablaster 123]
@@ -1177,7 +1171,7 @@
     [test/add* 1 '[do [def a 1]
        [when [= 2 3] [set! a 4]]
        a]]
-    [test/add* 3 '[do [def ein-test-arr [arr 1 2 3]]
+    [test/add* 3 '[do [def ein-test-arr [array/new 1 2 3]]
        [ein-test-arr 2.2]]]
     [test/add* 123 '[do 123]]
     [test/add* 6 '[do 6]]
@@ -1274,8 +1268,8 @@
           [* a a]] [cons [vec 2] '[3 4.0]]]]]
     [test/add* "\"11.0\"" '[do [cat 1 1.0]]]
     [test/add* "[vec 9.0 9.0 9.0]" '[do [div [vec 99] [cat 1 1.0]]]]
-    [test/add* "#[99 12 3 4]" '[do [let [[cur-arr [arr 1 2 3 4]]] [arr-set! cur-arr 0 99 12] cur-arr]]]
-    [test/add* "#[42 42 42 42 42 42]" '[do [arr-fill! [arr-new 6] 42]]]
+    [test/add* "#[99 12 3 4]" '[do [let [[cur-arr [array/new 1 2 3 4]]] [array/set! cur-arr 0 99 12] cur-arr]]]
+    [test/add* "#[42 42 42 42 42 42]" '[do [array/fill! [array/allocate 6] 42]]]
     [test/add* "#nil" '[do [apply #nil]]]
     [test/add* "[vec 1.0 3.0 9.0]" '[do [def vs [λ [a]
           [vec [vec/z a] [vec/y a] [vec/x a]]]]
@@ -1327,15 +1321,15 @@
        [zwei [say]]]]
     [test/add* "\"asd\"" '[do ["a" "s" "d"]]]
     [test/add* "\"a\"" '[do ["a"]]]
-    [test/add* "#nil" '[do [def testerle [arr 1 2 3]]
+    [test/add* "#nil" '[do [def testerle [array/new 1 2 3]]
        [testerle 4]]]
-    [test/add* "#nil" '[do [def testerle [arr 1 2 3]]
+    [test/add* "#nil" '[do [def testerle [array/new 1 2 3]]
        [testerle 40000]]]
-    [test/add* "#[1 2 3]" '[do [def testerle [arr 1 2 3]]
+    [test/add* "#[1 2 3]" '[do [def testerle [array/new 1 2 3]]
        [testerle]]]
-    [test/add* "#nil" '[do [def testerle [arr 1 2 3]]
+    [test/add* "#nil" '[do [def testerle [array/new 1 2 3]]
        [testerle #t]]]
-    [test/add* "#nil" '[do [def testerle [arr 1 2 3]]
+    [test/add* "#nil" '[do [def testerle [array/new 1 2 3]]
        [testerle [vec 1 2 3]]]]
     [test/add* "\"Trim Test\"" '[do [trim "   Trim Test    \n"]]]
     [test/add* "\"1,asd,3.0,#f\"" '[do [join '[1 "asd" 3.0 #f] ","]]]
@@ -1568,7 +1562,7 @@
     [test/add* '[1 . 2] '[do '[1 . 2]]]
     [test/add* 1 '[do [car '[1 . 2]]]]
     [test/add* 2 '[do [cdr '[1 . 2]]]]
-    [test/add* 1 '[do [[arr 1 2 3] 0]]]
+    [test/add* 1 '[do [[array/new 1 2 3] 0]]]
     [test/add* 2 '[do [[tree/new :asd 1 :bsd 2] :bsd]]]
     [test/add* 0 '[do [+ #nil]]]
     [test/add* 0 '[do [- #nil]]]
@@ -1671,7 +1665,7 @@
     [test/add* '[1 "asd"] '[do [quasiquote [1 "asd"]]]]
     [test/add* '[1 :asd] '[do [quasiquote [1 :asd]]]]
     [test/add* '[[tree/new :asd 123]] '[do [quasiquote [[tree/new :asd 123]]]]]
-    [test/add* '[[arr 1 2 3]] '[do [quasiquote [[arr 1 2 3]]]]]
+    [test/add* '[[array/new 1 2 3]] '[do [quasiquote [[array/new 1 2 3]]]]]
     [test/add* '[1.0001] '[do [quasiquote [1.0001]]]]
     [test/add* '[:asd] '[do [quasiquote [:asd]]]]
     [test/add* '[1 2 3] '[do [quasiquote [1 [unquote [1 + 1]] 3]]]]
@@ -1707,7 +1701,7 @@
     [test/add* #f '[do [resolves? 'asdqwe]]]
     [test/add* #t '[do [[length [symbol-search "abs"]] > 0]]]
     [test/add* #t '[do [tree? [tree/new :asd 123]]]]
-    [test/add* #f '[do [tree? [arr 123]]]]
+    [test/add* #f '[do [tree? [array/new 123]]]]
     [test/add* #f '[do [tree? '[:asd 123]]]]
     [test/add* #f '[do [tree? #nil]]]
     [test/add* #f '[do [tree? 123]]]
@@ -1752,7 +1746,7 @@
     [test/add* #t '[do [ineq? [gensym] [gensym]]]]
     [test/add* #f '[do [symbol? 123]]]
     [test/add* #f '[do [symbol? "asd"]]]
-    [test/add* #f '[do [symbol? [arr 123 'asd]]]]
+    [test/add* #f '[do [symbol? [array/new 123 'asd]]]]
     [test/add* #f '[do [symbol? [tree/new :a 123]]]]
     [test/add* 1 '[do [if #t
           1
