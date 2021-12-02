@@ -86,14 +86,14 @@
             [reverse [cdr l] [cons [car l] r]]]
 ]
 
-[defun list-length [a t]
+[defun list/length [a t]
         "Returns the length of list a"
         [if [nil? a]
             t
-            [list-length [cdr a] [+ 1 t]]]
+            [list/length [cdr a] [+ 1 t]]]
 ]
 
-[defun filter [p l]
+[defun list/filter [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [def ret #nil]
         [if l
@@ -103,7 +103,7 @@
             #nil]]
 ]
 
-[defun for-each [f l]
+[defun list/for-each [f l]
         "Runs f over every item in list l and returns the resulting list"
         [while l
                [f [car l]]
@@ -111,7 +111,7 @@
         ]
 ]
 
-[defun map [f l]
+[defun list/map [f l]
         "Runs f over every item in list l and returns the resulting list"
         [if [nil? l]
             l

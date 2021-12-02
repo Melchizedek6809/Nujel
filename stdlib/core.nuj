@@ -1,13 +1,5 @@
 ;; Contains various little pieces that were implemented in nujel instead of
-;; C because of various reasons
-
-[defun length [a]
-        "Returns the length of a"
-        [cond [[string? a] [string/length a]]
-              [[pair? a] [list-length a]]
-              [#t 0]
-        ]
-]
+;; C because of various reasons]
 
 [defun describe/thing [o]
        "Describe a specific value O"
