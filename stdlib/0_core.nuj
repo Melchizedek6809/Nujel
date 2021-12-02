@@ -6,6 +6,11 @@
           #nil
 ]
 
+[defmacro cdr! [l]
+          "[set! l [cdr l]]"
+          `[set! ~l [cdr ~l]]
+]
+
 [defun not [v]
            "Return true if V is false"
            [if v #f #t]

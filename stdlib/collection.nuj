@@ -1,37 +1,19 @@
-; A bunch of procedurs working on procedures, using type specialized λs
+; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
-[defun length [α]
-       "Returns the length of collection α"
-       [case [type-of α]
-             [[:pair]   [list/length   α]]
-             [[:string] [string/length α]]
-             [otherwise [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]
-       ]
+[defun join [l glue]
+       "Join every element of α together into a string with GLUE inbetween"
+       [when-not glue [set! glue ""]]
+       [if l
+           [reduce [λ [a b] [if a [cat a glue b] b]] l #nil]
+           ""]
 ]
 
-[defun filter [p α]
-       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-       [case [type-of α]
-             [[:pair] [list/filter p α]]
-             [[:nil] #nil]
-             [otherwise [throw [list :invalid-type "You can only use filter with a collection" α [current-lambda]]]]
-       ]
+[defun for-each [f l]
+       "Runs F over every item in collection L and returns the resulting list"
+       [reduce [λ [a b] [f b]] l #nil]
 ]
 
-[defun for-each [f α]
-       "Runs f over every item in collection l and returns the resulting list"
-       [case [type-of α]
-             [[:pair] [list/for-each f α]]
-             [[:nil] #nil]
-             [otherwise [throw [list :invalid-type "You can only use for-each with a collection" α [current-lambda]]]]
-       ]
-]
-
-[defun map [f α]
-       "Runs f over every item in collection l and returns the resulting list"
-       [case [type-of α]
-             [[:pair] [list/map f α]]
-             [[:nil] #nil]
-             [otherwise [throw [list :invalid-type "You can only use map with a collection" α [current-lambda]]]]
-       ]
+[defun count [p l]
+       "Count the number of items in L where P is true"
+       [reduce [λ [a b] [+ a [if [p b] 1 0]]] l 0]
 ]

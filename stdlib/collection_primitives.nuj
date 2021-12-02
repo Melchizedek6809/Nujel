@@ -1,0 +1,49 @@
+; A bunch of procedurs working on procedures, using type specialized λs
+
+[defun ref [l i]
+       "Return whatver is at position I in L"
+       [case [type-of l]
+             [[:tree]   [tree/ref  l i]]
+             [[:string] [char-at   l i]]
+             [[:array]  [array/ref l i]]
+             [[:pair]   [list/ref  l i]]
+             [[:nil]               #nil]
+             [otherwise [throw [list :invalid-type "You can only use ref with a collection" α [current-lambda]]]]
+       ]
+]
+
+[defun filter [p α]
+       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
+       [case [type-of α]
+             [[:pair] [list/filter p α]]
+             [[:nil] #nil]
+             [otherwise [throw [list :invalid-type "You can only use filter with a collection" α [current-lambda]]]]
+       ]
+]
+
+[defun reduce [f l α]
+       "Combine all elements in collection l using operation F and starting value α"
+       [case [type-of l]
+             [[:nil]    α]
+             [[:pair]   [list/reduce f l α]]
+             [otherwise [throw [list :invalid-type "You can only use reduce with a collection" l [current-lambda]]]]
+       ]
+]
+
+[defun length [α]
+       "Returns the length of collection α"
+       [case [type-of α]
+             [[:pair]   [list/length   α]]
+             [[:string] [string/length α]]
+             [otherwise [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]
+       ]
+]
+
+[defun map [f α]
+       "Runs f over every item in collection l and returns the resulting list"
+       [case [type-of α]
+             [[:pair] [list/map f α]]
+             [[:nil] #nil]
+             [otherwise [throw [list :invalid-type "You can only use map with a collection" α [current-lambda]]]]
+       ]
+]

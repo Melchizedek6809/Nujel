@@ -1,4 +1,5 @@
 [do [def comment [μ* comment [...body] "Does nothing" #nil]]
+    [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]]
     [def not [λ* not
         [v]
         "Return true if V is false"
@@ -516,17 +517,86 @@
     [def event-fire [λ* event-fire
         [event-name ...val]
         "Applies ...val to all event handlers associated with event-name"
-        [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def length [λ* length
-        [a]
-        "Returns the length of a"
-        [if [string? a]
-           [string/length a]
-           [if [pair? a]
-              [list-length a]
-              [if #t
-                 0
-                 #nil]]]]]
-    [def describe/thing [λ* describe/thing
+        [event-fire-iter [resolve [str->sym event-name]] ...val]]]][do [def join [λ* join
+        [l glue]
+        "Join every element of α together into a string with GLUE inbetween"
+        [do [if glue
+              #nil
+              [set! glue ""]]
+           [if l
+              [reduce [λ* #nil
+                  [a b]
+                  ""
+                  [if a
+                     [cat a glue b]
+                     b]] l #nil]
+              ""]]]]
+    [def for-each [λ* for-each
+        [f l]
+        "Runs F over every item in collection L and returns the resulting list"
+        [reduce [λ* #nil
+            [a b]
+            ""
+            [f b]] l #nil]]]
+    [def count [λ* count
+        [p l]
+        "Count the number of items in L where P is true"
+        [reduce [λ* #nil
+            [a b]
+            ""
+            [+ a [if [p b]
+               1
+               0]]] l 0]]]][do [def ref [λ* ref
+        [l i]
+        "Return whatver is at position I in L"
+        [let* [do [def ΓεnΣym-6 [type-of l]]
+           [if [or [eq? ΓεnΣym-6 :tree]]
+              [tree/ref l i]
+              [if [or [eq? ΓεnΣym-6 :string]]
+                 [char-at l i]
+                 [if [or [eq? ΓεnΣym-6 :array]]
+                    [array/ref l i]
+                    [if [or [eq? ΓεnΣym-6 :pair]]
+                       [list/ref l i]
+                       [if [or [eq? ΓεnΣym-6 :nil]]
+                          #nil
+                          [throw [list :invalid-type "You can only use ref with a collection" α [current-lambda]]]]]]]]]]]]
+    [def filter [λ* filter
+        [p α]
+        "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
+        [let* [do [def ΓεnΣym-7 [type-of α]]
+           [if [or [eq? ΓεnΣym-7 :pair]]
+              [list/filter p α]
+              [if [or [eq? ΓεnΣym-7 :nil]]
+                 #nil
+                 [throw [list :invalid-type "You can only use filter with a collection" α [current-lambda]]]]]]]]]
+    [def reduce [λ* reduce
+        [f l α]
+        "Combine all elements in collection l using operation F and starting value α"
+        [let* [do [def ΓεnΣym-8 [type-of l]]
+           [if [or [eq? ΓεnΣym-8 :nil]]
+              α
+              [if [or [eq? ΓεnΣym-8 :pair]]
+                 [list/reduce f l α]
+                 [throw [list :invalid-type "You can only use reduce with a collection" l [current-lambda]]]]]]]]]
+    [def length [λ* length
+        [α]
+        "Returns the length of collection α"
+        [let* [do [def ΓεnΣym-9 [type-of α]]
+           [if [or [eq? ΓεnΣym-9 :pair]]
+              [list/length α]
+              [if [or [eq? ΓεnΣym-9 :string]]
+                 [string/length α]
+                 [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]]]]]]
+    [def map [λ* map
+        [f α]
+        "Runs f over every item in collection l and returns the resulting list"
+        [let* [do [def ΓεnΣym-10 [type-of α]]
+           [if [or [eq? ΓεnΣym-10 :pair]]
+              [list/map f α]
+              [if [or [eq? ΓεnΣym-10 :nil]]
+                 #nil
+                 [throw [list :invalid-type "You can only use map with a collection" α [current-lambda]]]]]]]]]][do [def describe/thing [λ* describe/thing
         [o]
         "Describe a specific value O"
         [do [def doc [closure o]]
@@ -601,34 +671,24 @@
         [number value]
         "Return a list of NUMBER elements containing VALUE in every car"
         [make-list/iter number value #nil]]]
-    [def reduce [λ* reduce
+    [def list/reduce* [λ* list/reduce*
         [o l s]
         "Combine all elements in l using operation o and starting value s"
-        [if [nil? l]
-           s
-           [reduce o [cdr l] [o s [car l]]]]]]
-    [def list-ref [λ* list-ref
+        [do [while l [do [set! s [o s [car l]]]
+              [set! l [cdr l]]]]
+           s]]]
+    [def list/reduce [λ* list/reduce
+        [o l s]
+        "Combine all elements in l using operation o and starting value s"
+        [if l
+           [list/reduce o [cdr l] [o s [car l]]]
+           s]]]
+    [def list/ref [λ* list/ref
         [l i]
         "Returns the the element of list l at location i"
-        [if [nil? l]
-           #nil
-           [if [<= i 0]
-              [car l]
-              [if #t
-                 [list-ref [cdr l] [+ -1 i]]
-                 #nil]]]]]
-    [def join/iter [λ* join/iter
-        [str l glue]
-        "Iterator for join/iter"
-        [if [nil? l]
-           [substr str 0 [- [string/length str] [string/length glue]]]
-           [if #t
-              [join/iter [cat str [car l] glue] [cdr l] glue]
-              #nil]]]]
-    [def join [λ* join
-        [l glue]
-        "Join LIST into a string with GLUE in between each element"
-        [join/iter "" l [string glue]]]]
+        [do [while [and l [> i 0]] [do [set! i [+ -1 i]]
+              [set! l [cdr l]]]]
+           [car l]]]]
     [def split [λ* split
         [str separator]
         ""
@@ -650,13 +710,13 @@
         [if [nil? l]
            r
            [reverse [cdr l] [cons [car l] r]]]]]
-    [def list-length [λ* list-length
+    [def list/length [λ* list/length
         [a t]
         "Returns the length of list a"
         [if [nil? a]
            t
-           [list-length [cdr a] [+ 1 t]]]]]
-    [def filter [λ* filter
+           [list/length [cdr a] [+ 1 t]]]]]
+    [def list/filter [λ* list/filter
         [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [do [def ret #nil]
@@ -665,12 +725,7 @@
                  [cons [car l] [filter p [cdr l]]]
                  [filter p [cdr l]]]
               #nil]]]]
-    [def for-each [λ* for-each
-        [f l]
-        "Runs f over every item in list l and returns the resulting list"
-        [while l [do [f [car l]]
-           [set! l [cdr l]]]]]]
-    [def map [λ* map
+    [def list/map [λ* list/map
         [f l]
         "Runs f over every item in list l and returns the resulting list"
         [if [nil? l]
@@ -1036,7 +1091,13 @@
     [test/add* #t '[do [and [for-all? '[1 2 3] int?] [not [for-all? '[1 2 3.0] int?]]]]]
     [test/add* #t '[do [and [there-exists? '[1.0 2 3.0] int?] [not [there-exists? '[1.0 2.0 3.0] int?]]]]]
     [test/add* #t '[do [and [eq? "asd" "asd"] [not [eq? "asd" "bsd"]] [not [eq? "asd" "asdasd"]]]]]
-    [test/add* 23 '[do [+ [reduce + [make-list 10 2] 0] [list-ref '[1 2 3 4] 1] [list-ref '[1 2] 0] [list-ref '[1 2] 3]]]]
+    [test/add* #nil '[do [list/ref '[1 2] 3]]]
+    [test/add* 1 '[do [list/ref '[1 2] 0]]]
+    [test/add* 2 '[do [list/ref '[1 2 3 4] 1]]]
+    [test/add* #nil '[do [ref '[1 2] 3]]]
+    [test/add* 1 '[do [ref '[1 2] 0]]]
+    [test/add* 2 '[do [ref '[1 2 3 4] 1]]]
+    [test/add* 20 '[do [reduce + [make-list 10 2] 0]]]
     [test/add* #t '[do [and [nil? #nil] [not [nil? "NotNil"] [vec? [vec 1]] [not [vec? "NotVec"]]]]]]
     [test/add* 11 '[do [def count [let [[a 0]] [λ [b]
           [set! a [+ a [cond [[numeric? b] b]
@@ -1194,6 +1255,14 @@
     [test/add* "[2.0]" '[do [filter float? '[1 2.0 #t 4]]]]
     [test/add* "[2.0]" '[do [filter float? '[1 2.0 #t 4]]]]
     [test/add* "[#t]" '[do [filter bool? '[1 2.0 #t 4]]]]
+    [test/add* '[1 3 5] '[do [filter odd? '[1 2 3 4 5 6]]]]
+    [test/add* 3 '[do [count odd? '[1 2 3 4 5 6]]]]
+    [test/add* 3 '[do [count even? '[1 2 3 4 5 6]]]]
+    [test/add* 6 '[do [count int? '[1 2 3 4 5 6]]]]
+    [test/add* 0 '[do [count float? '[1 2 3 4 5 6]]]]
+    [test/add* '[2 4 6] '[do [filter even? '[1 2 3 4 5 6]]]]
+    [test/add* '["vier"] '[do [filter string? '[1 2 3 "vier" 5 6]]]]
+    [test/add* '[1 2 3 5 6] '[do [filter int? '[1 2 3 "vier" 5 6]]]]
     [test/add* "[2 3]" '[do [sublist '[1 2 3 4 5 6] 1 3]]]
     [test/add* "[1 2 3]" '[do [list-head '[1 2 3 4 5 6] 3]]]
     [test/add* "[4 5 6]" '[do [list-tail [list 1 2 3 4 5 6] 3]]]
@@ -1422,10 +1491,6 @@
           [+ 1 v]]]]]
     [test/add* '[1 2] '[do [except-last-pair '[1 2 3]]]]
     [test/add* '[3] '[do [last-pair '[1 2 3]]]]
-    [test/add* '[1 3 5] '[do [filter odd? '[1 2 3 4 5 6]]]]
-    [test/add* '[2 4 6] '[do [filter even? '[1 2 3 4 5 6]]]]
-    [test/add* '["vier"] '[do [filter string? '[1 2 3 "vier" 5 6]]]]
-    [test/add* '[1 2 3 5 6] '[do [filter int? '[1 2 3 "vier" 5 6]]]]
     [test/add* '[2 3 4] '[do [map [λ [v]
           [+ 1 v]] '[1 2 3]]]]
     [test/add* '[2 4 6] '[do [map [λ [v]
