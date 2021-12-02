@@ -25,7 +25,7 @@
 [defun path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
        [\ [path]
-          [eq? ext [lowercase [path/extension path]]]
+          [== ext [lowercase [path/extension path]]]
        ]
 ]
 

@@ -27,31 +27,31 @@
 
 [defun odd? [a]
         "Predicate that returns #t if a is odd"
-        [= [% [int a] 2] 1]
+        [== [% [int a] 2] 1]
 ]
 
 [defun even? [a]
         "Predicate that returns #t if a is even"
-        [= [% [int a] 2] 0]
+        [== [% [int a] 2] 0]
 ]
 
 [defun zero? [val]
         "#t if VAL is zero"
-        [eq? 0 val]
+        [== 0 val]
 ]
 
 [defun not-zero? [val]
         "#t if VAL is not zero"
-        [ineq? 0 val]
+        [!= 0 val]
 ]
 
 [defun list-equal? [a b]
         "#t if A and B are equal"
-        [when [eq? [type-of a] [type-of b]]
+        [when [== [type-of a] [type-of b]]
               [if [pair? a]
                   [and [list-equal? [car a] [car b]]
                       [list-equal? [cdr a] [cdr b]]]
-                  [eq? a b]]
+                  [== a b]]
         ]
 ]
 
@@ -73,72 +73,72 @@
 
 [defun int? [val]
         "#t if VAL is a integer"
-        [eq? :int [type-of val]]
+        [== :int [type-of val]]
 ]
 
 [defun float? [val]
         "#t if VAL is a floating-point number"
-        [eq? :float [type-of val]]
+        [== :float [type-of val]]
 ]
 
 [defun vec? [val]
         "#t if VAL is a vector"
-        [eq? :vec [type-of val]]
+        [== :vec [type-of val]]
 ]
 
 [defun bool? [val]
         "#t if VAL is a boolean"
-        [eq? :bool [type-of val]]
+        [== :bool [type-of val]]
 ]
 
 [defun pair? [val]
         "#t if VAL is a pair"
-        [eq? :pair [type-of val]]
+        [== :pair [type-of val]]
 ]
 
 [defun arr? [val]
 	"#t if VAL is an array"
-	[eq? :array [type-of val]]
+	[== :array [type-of val]]
 ]
 
 [defun string? [val]
         "#t if VAL is a string"
-        [eq? :string [type-of val]]
+        [== :string [type-of val]]
 ]
 
 [defun symbol? [val]
         "#t if VAL is a symbol"
-        [eq? :symbol [type-of val]]
+        [== :symbol [type-of val]]
 ]
 
 [defun object? [val]
         "#t if VAL is an object"
-        [eq? :object [type-of val]]
+        [== :object [type-of val]]
 ]
 
 [defun tree? [val]
         "#t if VAL is an object"
-        [eq? :tree [type-of val]]
+        [== :tree [type-of val]]
 ]
 
 [defun macro? [val]
         "#t if VAL is an object"
-        [eq? :macro [type-of val]]
+        [== :macro [type-of val]]
 ]
 
 [defun lambda? [val]
         "#t if VAL is a lambda"
-        [or [eq? :lambda [type-of val]] [eq? :dynamic [type-of val]]]
+        [or [== :lambda [type-of val]] [== :dynamic [type-of val]]]
 ]
 
 [defun native? [val]
         "#t if VAL is a native function"
-        [eq? :native-function [type-of val]]
+        [== :native-function [type-of val]]
 ]
 
 [defun special-form? [val]
         "#t if VAL is a native function"
-        [eq? :special-form [type-of val]]
+        [== :special-form [type-of val]]
 ]
 
 [defun procedure? [val]

@@ -29,7 +29,7 @@
             [while file-queue
                    [def cur-path [car file-queue]]
                    [try [\ [err]
-                           [if [eq? [car err] :too-many-passes]
+                           [if [== [car err] :too-many-passes]
                                [set! file-queue-new [cons cur-path file-queue-new]]
                                [throw err]]]
                         [println [cat [ansi-yellow " [EVA]  "] cur-path]]

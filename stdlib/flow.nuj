@@ -1,75 +1,4 @@
-; Contains native nujel implementations of some
-; core language constructs and essential macros
-
-[defmacro comment [...body]
-          "Does nothing"
-          #nil
-]
-
-[defmacro cdr! [l]
-          "[set! l [cdr l]]"
-          `[set! ~l [cdr ~l]]
-]
-
-[defun not [v]
-           "Return true if V is false"
-           [if v #f #t]
-]
-
-[defun list [...arguments]
-        "Return ARGUMENTS as a list"
-        ...arguments
-]
-
-[defun default [arg default-value]
-        "Returns ARG or DEFAULT-VALUE if ARG is #nil"
-        [if arg arg default-value]
-]
-
-[defun caar [p]
-        "[car [car p]]"
-        [car [car p]]
-]
-
-[defun cadr [p]
-        "[car [cdr p]]"
-        [car [cdr p]]
-]
-
-[defun cdar [p]
-        "[cdr [car p]]"
-        [cdr [car p]]
-]
-
-[defun cddr [p]
-        "[cdr [cdr p]]"
-        [cdr [cdr p]]
-]
-
-[defun cadar [p]
-        "[cdr [car p]]"
-        [car [cdr [car p]]]
-]
-
-[defun caddr [p]
-        "[car [cdr [cdr p]]]"
-        [car [cdr [cdr p]]]
-]
-
-[defun cdddr [p]
-        "[cdr [cdr [cdr p]]]"
-        [cdr [cdr [cdr p]]]
-]
-
-[defun cadddr [p]
-        "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr p]]]]
-]
-
-[defun caddddr [p]
-        "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr [cdr p]]]]]
-]
+; Mostly macros implementing different control flow constructs
 
 [defmacro if-not [pred then else]
           `[if ~pred ~else ~then]
@@ -111,26 +40,20 @@
           `[let* [do ~@[let/args bindings] ~@...body]]
 ]
 
-[def gensym/counter 0]
-[defun gensym []
-       [set! gensym/counter [+ 1 gensym/counter]]
-       [str->sym ["ΓεnΣym-" gensym/counter]]
-]
-
 [defun case/clauses/multiple [key-sym cases]
        [when cases
-             [cons [list 'eq? key-sym [car cases]]
+             [cons [list '== key-sym [car cases]]
                    [case/clauses/multiple key-sym [cdr cases]]]]
 ]
 
 [defun case/clauses [key-sym clauses]
        [when clauses
-             [if [eq? [caar clauses] 'otherwise]
+             [if [== [caar clauses] 'otherwise]
                  [cons 'do [cdar clauses]]
                  [list 'if
                        [if [pair? [caar clauses]]
                            [cons 'or [case/clauses/multiple key-sym [caar clauses]]]
-                           [list 'eq? key-sym [caar clauses]]]
+                           [list '== key-sym [caar clauses]]]
                        [cons 'do [cdar clauses]]
                        [case/clauses key-sym [cdr clauses]]]]]
 ]
@@ -150,5 +73,3 @@
                       [cons 'do [cdar ...body]]
                       [macro-apply cond [cdr ...body]]]]
 ]
-
-[def root-closure [current-closure]]

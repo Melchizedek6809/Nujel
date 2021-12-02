@@ -1,0 +1,6 @@
+; Some functions manipulating binary date
+
+[defun lognand [...l]
+        "Returns the Nand of its arguments"
+        [lognot [apply logand ...l]]
+]

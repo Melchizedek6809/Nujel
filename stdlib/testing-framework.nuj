@@ -12,6 +12,7 @@
        [set! test-list [cons [cons result expr] test-list]]
        [set! test-count [+ test-count 1]]
 ]
+
 [defmacro test/add [result ...expr]
        "Add a test where ...EXPR must eval to RESULT"
        `[test/add* ~result ~[list 'quote [cons 'do ...expr]]]
@@ -66,7 +67,7 @@
        "Tests that RAWEXPR evaluates to RESULT"
        [try [\ [err] [test-failure result err rawexpr i]]
             [def expr [eval rawexpr]]
-            [def pred? eq?]
+            [def pred? ==]
             [when [string? result]
                   [set! expr [str/write expr]]]
             [when [pair? result]
@@ -82,7 +83,7 @@
          "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
           [def eval-result [eval/forked nujel-runtime rawexpr]]
           [def expr [cdr eval-result]]
-          [def pred? eq?]
+          [def pred? ==]
           [when-not [string? result]
                     [set! expr [car [read expr]]]
           ]

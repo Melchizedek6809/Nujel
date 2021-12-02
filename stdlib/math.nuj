@@ -57,3 +57,11 @@
                i
                [+ [fib [- i 2]] [fib [- i 1]]]]
 ]
+
+[defun wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
+        [+ min [% [- val min] [- max min]]]
+]
+
+[defmacro +1 [v]
+          `[+ 1 ~v]
+]

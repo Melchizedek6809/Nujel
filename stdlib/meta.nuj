@@ -1,0 +1,49 @@
+; Introspection and procedures returning info about the runtime
+
+[defun describe/thing [o]
+       "Describe a specific value O"
+       [def doc [closure o]]
+       [cat [str/write [doc :arguments]] " - " [doc :documentation]]
+]
+
+[defun describe/string [a]
+       "Descibe whatever value string A resolves to"
+       [describe/thing [resolve [str->sym a]]]
+]
+
+[defun describe [fun] "Describe FUN, if there is documentation available"
+       [if [string? fun]
+           [describe/string fun]
+           [describe/thing fun]]
+]
+
+[defun mem []
+       "Return some pretty printed memory usage information"
+       [def info [memory-info]]
+       [cat [ansi-white  "Memory Info"] "\n"
+            [ansi-green  "Values:   "] [getf info :value]   "\n"
+            [ansi-blue   "Closures: "] [getf info :closure] "\n"
+            [ansi-red    "Arrays:   "] [getf info :array]   "\n"
+            [ansi-yellow "STrings:  "] [getf info :string]  "\n"
+            [ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
+            [ansi-purple "Vectors:  "] [getf info :vector] "\n"
+            [ansi-pink   "Symbols:  "] [getf info :symbol] "\n"
+            ansi-reset
+       ]
+]
+
+[defun symbol-table [off len environment]
+       "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
+       [when-not environment [set! environment root-closure]]
+       [when-not off [set! off 0]]
+       [when-not len [set! len 9999999]]
+       [sublist [environment [symbol-table*]] off [+ off len] #nil]
+]
+
+[def gensym/counter 0]
+[defun gensym []
+       [set! gensym/counter [+ 1 gensym/counter]]
+       [str->sym ["ΓεnΣym-" gensym/counter]]
+]
+
+[def root-closure [current-closure]]

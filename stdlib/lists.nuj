@@ -134,14 +134,14 @@
 [defun member [m l]
         "Returns the first pair of list l whose car is equal to m"
         [cond [[nil? l] #f]
-              [[eq? [car l] m] l]
+              [[== [car l] m] l]
               [#t [member m [cdr l]]]
         ]
 ]
 
 [defun delete [e l]
         "Returns a filtered list l with all elements equal to e omitted"
-        [filter [\ [a] [not [eq? a e]]] l]
+        [filter [\ [a] [not [== a e]]] l]
 ]
 
 [defun arg-list [f]
@@ -155,7 +155,7 @@
 [defun getf [l key]
        "Return the value in LIST following KEY"
        [cond [[nil? l] #nil]
-             [[eq? key [car l]] [cadr l]]
+             [[== key [car l]] [cadr l]]
              [#t [getf [cdr l] key]]
        ]
 ]

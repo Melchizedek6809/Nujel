@@ -1,0 +1,3 @@
+; Contains code that should be run last, after all the definitions
+
+[optimize-all!]

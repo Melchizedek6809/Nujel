@@ -1,0 +1,8 @@
+; Some functions dealing with arrays
+
+[defun array/fill! [a v i]
+        "Fills array a with value v"
+        [cond [[>= [int i] [array/length a]] a]
+              [#t [array/set! a [int i] v] [array/fill! a v [+ 1 i]]]
+        ]
+]
