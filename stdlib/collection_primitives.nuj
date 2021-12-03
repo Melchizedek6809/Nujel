@@ -3,21 +3,22 @@
 [defun ref [l i]
        "Return whatver is at position I in L"
        [case [type-of l]
+             [[:nil]               #nil]
              [[:tree]   [tree/ref  l i]]
              [[:string] [char-at   l i]]
              [[:array]  [array/ref l i]]
              [[:pair]   [list/ref  l i]]
-             [[:nil]               #nil]
-             [otherwise [throw [list :invalid-type "You can only use ref with a collection" α [current-lambda]]]]
+             [otherwise [throw [list :invalid-type "You can only use ref with a collection" l [current-lambda]]]]
        ]
 ]
 
-[defun filter [p α]
-       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-       [case [type-of α]
-             [[:pair] [list/filter p α]]
+[defun filter [p l]
+       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
+       [case [type-of l]
              [[:nil] #nil]
-             [otherwise [throw [list :invalid-type "You can only use filter with a collection" α [current-lambda]]]]
+             [[:pair] [list/filter p l]]
+             [[:array] [array/filter p l]]
+             [otherwise [throw [list :invalid-type "You can only use filter with a collection" l [current-lambda]]]]
        ]
 ]
 
@@ -26,6 +27,7 @@
        [case [type-of l]
              [[:nil]    α]
              [[:pair]   [list/reduce f l α]]
+             [[:array]  [array/reduce f l α]]
              [otherwise [throw [list :invalid-type "You can only use reduce with a collection" l [current-lambda]]]]
        ]
 ]
@@ -33,6 +35,7 @@
 [defun length [α]
        "Returns the length of collection α"
        [case [type-of α]
+             [[:nil]                    0]
              [[:array]  [array/length  α]]
              [[:pair]   [list/length   α]]
              [[:string] [string/length α]]
@@ -41,11 +44,12 @@
        ]
 ]
 
-[defun map [f α]
+[defun map [f l]
        "Runs f over every item in collection l and returns the resulting list"
-       [case [type-of α]
-             [[:pair] [list/map f α]]
+       [case [type-of l]
              [[:nil] #nil]
-             [otherwise [throw [list :invalid-type "You can only use map with a collection" α [current-lambda]]]]
+             [[:pair] [list/map f l]]
+             [[:array] [array/map f l]]
+             [otherwise [throw [list :invalid-type "You can only use map with a collection" l [current-lambda]]]]
        ]
 ]

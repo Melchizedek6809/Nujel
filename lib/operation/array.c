@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 lVal *lnfvArrRef;
 
@@ -22,6 +23,21 @@ static lVal *lnfArrLength(lClosure *c, lVal *v){
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){return lValInt(0);}
 	return lValInt(arr->vArray->length);
+}
+
+static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
+	(void)c;
+	lVal *arr = lCar(v);
+	if((arr == NULL) || (arr->type != ltArray)){return NULL;}
+	const int length =castToInt(lCadr(v),-1);
+	if(length >= 0){
+		arr->vArray->data = realloc(arr->vArray->data,length * sizeof(lVal *));
+		if(length > arr->vArray->length){
+			memset(&arr->vArray->data[arr->vArray->length], 0, (length - arr->vArray->length) * sizeof(lVal *));
+		}
+		arr->vArray->length = length;
+	}
+	return arr;
 }
 
 static lVal *lnfArrSet(lClosure *c, lVal *v){
@@ -92,9 +108,10 @@ lVal *lnfArrRef(lClosure *c, lVal *v){
 }
 
 void lOperationsArray(lClosure *c){
-	lnfvArrRef = lAddNativeFunc(c,"array/ref",      "[array index]",  "Return value of ARRAY at position INDEX",     lnfArrRef);
-	             lAddNativeFunc(c,"array/length",   "[array]",    "Return length of ARRAY",                          lnfArrLength);
-	             lAddNativeFunc(c,"array/set!",     "[array index &...values]","Set ARRAY at INDEX to &...VALUES",   lnfArrSet);
-	             lAddNativeFunc(c,"array/allocate", "[size]",     "Allocate a new array of SIZE",                    lnfArrNew);
-	             lAddNativeFunc(c,"array/new",      "[...args]",  "Create a new array from ...ARGS",                 lnfArr);
+	lnfvArrRef = lAddNativeFunc(c,"array/ref",      "[array index]", "Return value of ARRAY at position INDEX",     lnfArrRef);
+	             lAddNativeFunc(c,"array/length",   "[array]",       "Return length of ARRAY",                      lnfArrLength);
+	             lAddNativeFunc(c,"array/length!",  "[array size]",  "Set a new LENGTH for ARRAY",                  lnfArrLengthSet);
+	             lAddNativeFunc(c,"array/set!",     "[array index &...values]","Set ARRAY at INDEX to &...VALUES",  lnfArrSet);
+	             lAddNativeFunc(c,"array/allocate", "[size]",     "Allocate a new array of SIZE",                   lnfArrNew);
+	             lAddNativeFunc(c,"array/new",      "[...args]",  "Create a new array from ...ARGS",                lnfArr);
 }
