@@ -43,13 +43,7 @@ static lVal *lnfTrim(lClosure *c, lVal *v){
 	char *buf = malloc(len+1);
 	memcpy(buf,s,len);
 	buf[len] = 0;
-	lVal *ret = lValAlloc();
-	ret->type = ltString;
-	ret->vString = lStringAlloc();
-	if(ret->vString == NULL){return NULL;}
-	ret->vString->buf = ret->vString->data = buf;
-	ret->vString->bufEnd = &ret->vString->buf[len];
-	return ret;
+	return lValStringLen(buf, len);
 }
 
 static lVal *lnfStrDown(lClosure *c, lVal *v){
@@ -63,13 +57,7 @@ static lVal *lnfStrDown(lClosure *c, lVal *v){
 		buf[i] = tolower((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
-	lVal *ret = lValAlloc();
-	ret->type = ltString;
-	ret->vString = lStringAlloc();
-	if(ret->vString == NULL){return NULL;}
-	ret->vString->buf = ret->vString->data = buf;
-	ret->vString->bufEnd = &ret->vString->buf[len];
-	return ret;
+	return lValStringLen(buf, len);
 }
 
 static lVal *lnfStrUp(lClosure *c, lVal *v){
@@ -83,13 +71,7 @@ static lVal *lnfStrUp(lClosure *c, lVal *v){
 		buf[i] = toupper((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
-	lVal *ret = lValAlloc();
-	ret->type = ltString;
-	ret->vString = lStringAlloc();
-	if(ret->vString == NULL){return NULL;}
-	ret->vString->buf = ret->vString->data = buf;
-	ret->vString->bufEnd = &ret->vString->buf[len];
-	return ret;
+	return lValStringLen(buf, len);
 }
 
 static lVal *lnfStrCap(lClosure *c, lVal *v){
@@ -114,53 +96,25 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 		}
 	}
 	buf[len] = 0;
-	lVal *ret = lValAlloc();
-	ret->type = ltString;
-	ret->vString = lStringAlloc();
-	if(ret->vString == 0){return NULL;}
-	ret->vString->buf = ret->vString->data = buf;
-	ret->vString->bufEnd = &ret->vString->buf[len];
-	return ret;
+	return lValStringLen(buf, len);
 }
 
 static lVal *lnfSubstr(lClosure *c, lVal *v){
 	(void)c;
-	const char *buf;
-	int start = 0;
-	int len   = 0;
-	int slen  = 0;
-	if(v == NULL){return NULL;}
+	int start, slen, len;
 	lVal *str = lCar(v);
-	if(str == NULL)          {return NULL;}
-	if(str->type != ltString){return NULL;}
-	if(str->vString == 0)    {return NULL;}
-	buf  = str->vString->data;
+	if((str == NULL) || (str->type != ltString)){ return NULL;}
+	const char *buf = str->vString->data;
 	slen = len = lStringLength(str->vString);
+	start = castToInt(lCadr(v), 0);
+	len   = MIN(len,castToInt(lCaddr(v), len));
 
-	if(lCdr(v) != NULL){
-		v = lCdr(v);
-		lVal *lStart = lCar(v);
-		if((lStart != NULL) && (lStart->type == ltInt)){
-			start = lStart->vInt;
-		}
-		if(lCdr(v) != NULL){
-			v = lCdr(v);
-			lVal *lLen = lCar(v);
-			if((lLen != NULL) && (lLen->type == ltInt)){
-				len = lLen->vInt;
-			}
-		}
-	}
-	if(start >= slen){return NULL;}
+	if(start >= slen){return lValString("");}
 	if(start < 0){start = slen + start;}
 	if(len < 0)  {len   = slen + len;}
 	len = MIN(slen,len-start);
 
-	lVal *ret = lValAlloc();
-	if(ret == NULL){return NULL;}
-	ret->type = ltString;
-	ret->vString = lStringNew(&buf[start], len);
-	return ret;
+	return lValStringLen(&buf[start], len);
 }
 
 lVal *lnfCat(lClosure *c, lVal *v){

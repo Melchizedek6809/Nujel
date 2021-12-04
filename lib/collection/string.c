@@ -71,12 +71,17 @@ int lStringLength(const lString *s){
 }
 
 /* Create a new string value out of S */
-lVal *lValString(const char *c){
+lVal *lValStringLen(const char *c, int len){
 	if(c == NULL){return NULL;}
 	lVal *t = lRootsValPush(lValAlloc());
 	t->type = ltString;
-	t->vString = lStringNew(c,strlen(c));
+	t->vString = lStringNew(c,len);
 	return t->vString == NULL ? NULL : t;
+}
+
+/* Create a new string value out of S */
+lVal *lValString(const char *c){
+	return lValStringLen(c, strlen(c));
 }
 
 /* Create a new string value out of S, using C directly, which will be

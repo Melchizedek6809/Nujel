@@ -1,3 +1,5 @@
+INSTALL_BIN_DIR := ~/bin/
+
 EMCC        := emcc
 EMAR        := emar
 EMMEM       := -s TOTAL_MEMORY=64MB -s ALLOW_MEMORY_GROWTH=1
@@ -181,6 +183,9 @@ rund: $(NUJEL)
 runn: $(NUJEL)
 	$(NUJEL)
 
+.PHONY: install
+install: release.musl
+	cp $(NUJEL) $(INSTALL_BIN_DIR)
 
 .PHONY: profile
 profile: $(NUJEL)
