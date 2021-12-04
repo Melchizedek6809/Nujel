@@ -169,7 +169,7 @@ tmp/binlib.h: tmp/binlib.c
 
 .PHONY: test
 test: $(NUJEL)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) tools/tests.nuj
 
 .PHONY: run
 run: $(NUJEL)

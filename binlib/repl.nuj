@@ -1,24 +1,3 @@
-[defun display/error/wrap [i text]
-       [cond [[== i 0] [ansi-red text]]
-             [[== i 1] [string text]]
-             [[== i 2] [ansi-yellow [str/write text]]]
-             [[== i 3] [describe/closure text]]
-             [#t text]
-       ]
-]
-
-[defun display/error/iter [error i]
-       [if error
-           [cons [display/error/wrap i [car error]]
-                 [display/error/iter [cdr error] [+ 1 i]]]
-           [cons "" #nil]]
-]
-
-[defun display/error [error]
-                "Display ERROR in a nice, human readable way"
-                [display [join [display/error/iter error 0] "\r\n"]]
-]
-
 [defun repl/exception-handler [error]
         [display/error error]
 ]
@@ -109,7 +88,8 @@
        [cond [repl/parse-args/eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
                         [set! repl/eval-next #f]]
              [[== [char-at arg 0] #\-] [repl/parse-options [substr arg 1]]]
-             [#t [file/eval arg]
+             [#t [try display/error
+		      [file/eval arg]]
                  [set! repl/parse-args/run-repl #f]]
        ]
 ]

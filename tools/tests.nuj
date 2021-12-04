@@ -1,0 +1,32 @@
+#!/usr/bin/env nujel
+
+[def test/beginning [time/milliseconds]]
+[test-run]
+[path/change "tests/"]
+
+[def ext-nuj? [path/ext?! "nuj"]]
+[defun directory/read-relative [path]
+       [map [\ [α] [cat path "/" α]]
+            [directory/read path]]
+]
+
+[def test/start [time/milliseconds]]
+[def test/success 0]
+[def test/errors 0]
+[defun file/test [path]
+       [try [\ [err]
+	       [println [ansi-red path]]
+	       [++ test/errors]
+	       [display/error err]]
+            [file/eval path [ω]]
+            [++ test/success]
+       ]
+]
+[for-each file/test [filter ext-nuj? [directory/read-relative "."]]]
+[def dur [- [time/milliseconds] test/start]]
+[if [and [> test/success 0] [zero? test/errors]]
+    [do [println [cat [ansi-green "AoC Tests succeeded"] " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]
+    [do [println [cat [ansi-red "AoC Tests failed"] " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]]
+
+[println [cat "Running everything took " [ansi-blue [- [time/milliseconds] test/beginning]] "ms"]]
+[exit test/errors]

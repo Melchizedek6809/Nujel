@@ -81,7 +81,7 @@ lVal *lValStringLen(const char *c, int len){
 
 /* Create a new string value out of S */
 lVal *lValString(const char *c){
-	return lValStringLen(c, strlen(c));
+	return lValStringLen(c, c == NULL ? 0 : strlen(c));
 }
 
 /* Create a new string value out of S, using C directly, which will be

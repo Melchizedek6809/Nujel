@@ -15,11 +15,11 @@
         object-code
 ]
 
-[defun file/eval [path]
-        "Evaluate a Nujel source file in the current context"
-        [def source [cons 'do [read [file/read path]]]]
-        [def object-code [compile/forms [cons 'do source] environment]]
-        [apply root-form [list object-code]]
+[defun file/eval [path environment]
+       "Evaluate a Nujel source file in the current context"
+       [when-not environmnet [set! environment root-closure]]
+       [def source [cons 'do [read [file/read path]]]]
+       [compile/forms [cons 'do source] environment]
 ]
 
 [defun eval/forked [nujel-binary raw-expr]

@@ -1,0 +1,64 @@
+#!/usr/bin/env nujel
+
+[def example-data "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"]
+[def input-data [file/read "day3.input"]]
+
+[defun read-data [lines]
+       [map [λ [line]
+               [car [read [cat "#b" line]]]]
+            [split lines "\n"]]
+]
+
+[defun calc-γε [numbers bit-count]
+       [def γ 0]
+       [def ε 0]
+       [def i 0]
+       [def threshold [/ [length numbers] 2]]
+       [while [< i bit-count]
+              [if [> [count [bit-set?! i] numbers] threshold]
+                  [set! γ [logior γ [ash 1 i]]]
+                  [set! ε [logior ε [ash 1 i]]]]
+              [++ i]
+       ]
+       @[:γ γ :ε ε :power-consumption [* γ ε]]
+]
+
+[defun calc-real [numbers bit p]
+       [if [<= [length numbers] 1]
+           [car numbers]
+           [do [when [< bit 0] [stacktrace] [throw [:we-dun-goof]]]
+               [def bits [count [bit-set?! bit] numbers]]
+               [def rest [- [length numbers] bits]]
+               [if [p bits rest]
+                   [calc-real [filter [bit-set?!   bit] numbers] [- bit 1] p]
+                   [if [== bits rest]
+                       [if [== p >]
+                           [calc-real [filter [bit-set?!   bit] numbers] [- bit 1] p]
+                           [calc-real [filter [bit-clear?! bit] numbers] [- bit 1] p]]
+                       [calc-real [filter [bit-clear?! bit] numbers] [- bit 1] p]]
+       ]]]
+]
+
+[defun calc-oxy-co [numbers bit-count]
+       [def oxy [calc-real numbers [- bit-count 1] >]]
+       [def co  [calc-real numbers [- bit-count 1] <]]
+
+       @[:oxy oxy :co co :power-consumption [* oxy co]]
+]
+
+
+[def result [calc-γε [read-data example-data] 5]]
+[when [!= [result :power-consumption] 198]
+      [throw [list :wrong-result "Wrong result" result]]]
+
+[def result [calc-γε [read-data input-data] 12]]
+[when [!= [result :power-consumption] 4103154]
+      [throw [list :wrong-result "Wrong result" result]]]
+
+[def result [calc-oxy-co [read-data example-data] 5]]
+[when [!= [result :power-consumption] 230]
+      [throw [list :wrong-result "Wrong result" result]]]
+
+[def result [calc-oxy-co [read-data input-data] 12]]
+[when [!= [result :power-consumption] 4245351]
+      [throw [list :wrong-result "Wrong result" result]]]
