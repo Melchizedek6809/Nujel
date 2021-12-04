@@ -266,7 +266,7 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 	(void) c; (void) v;
 
 	char path[512];
-	if(getcwd(path,sizeof(path))){
+	if(getcwd(path,sizeof(path)) == NULL){
 		return NULL;
 	}
 
