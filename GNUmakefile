@@ -173,7 +173,7 @@ test: $(NUJEL)
 
 .PHONY: run
 run: $(NUJEL)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) tools/tests.nuj
 
 .PHONY: rund
 rund: $(NUJEL)
