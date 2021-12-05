@@ -47,14 +47,14 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 	v = lCdr(v);
 	lVal *t = lCar(v);
 	if(t == NULL){return NULL;}
-	if((t->type != ltInt) && (t->type != ltFloat)){return NULL;}
+	if((t->type != ltInt) && (t->type != ltFloat)){return arr;}
 	int key = castToInt(t,0);
-	if((key < 0) || (key >= arr->vArray->length)){return NULL;}
+	if((key < 0) || (key >= arr->vArray->length)){return arr;}
 	v = lCdr(v);
 	forEach(cur,v){
 		lVal *cv = lCar(cur);
 		arr->vArray->data[key++] = cv;
-		if(key >= arr->vArray->length){return NULL;}
+		if(key >= arr->vArray->length){return arr;}
 	}
 	return arr;
 }
