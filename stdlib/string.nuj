@@ -139,3 +139,7 @@
              [otherwise [split/string str separator 0]]
        ]
 ]
+
+[defun read/single [text]
+       [car [read text]]
+]

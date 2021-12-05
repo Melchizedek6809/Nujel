@@ -676,6 +676,12 @@
 [test/add '["" "" "" ""] [split "\n\n\n" "\n"]]
 [test/add '["1" "2" "3" "4"] [split "1\n2\n3\n4" "\n"]]
 [test/add "\"\"" [substr "\n" 1 1]]
+[test/add "@[:a 1 :b 2]" [tree/zip '[:a :b] '[1 2]]]
+[test/add "@[:a #nil :b #nil]" [tree/zip '[:a :b] '[]]]
+[test/add "@[]" [tree/zip '[] '[1 2]]]
+[test/add "123" [read/single "123;asd"]]
+[test/add '[123] [read "123"]]
+[test/add '[123] [read "123;asd"]]
 ;[test/add 10 [def arr #[1 2 3]] [array/length! arr 4] [array/set! 3 4] [reduce + arr 0]]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 

@@ -22,7 +22,7 @@
 #define isopenparen(v) ((v=='[')||(v=='(')||(v=='{'))
 #define iscloseparen(v) ((v==']')||(v==')')||(v=='}'))
 #define isparen(v) (isopenparen(v) || (iscloseparen(v)))
-#define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`'))
+#define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`')||(v==';'))
 #define isnumericseparator(v) ((v=='_') || (v==','))
 
 lClosure *readClosure = NULL;
@@ -314,6 +314,10 @@ lVal *lReadList(lString *s, bool rootForm){
 		lStringAdvanceToNextCharacter(s);
 
 		const char c = *s->data;
+		if(c == ';'){
+			lStringAdvanceToNextLine(s);
+			continue;
+		}
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
 				lExceptionThrowValClo(":unmatched-opening-bracket", "Unmatched opening bracket",NULL,readClosure);

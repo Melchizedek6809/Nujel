@@ -1,10 +1,19 @@
 ; Some functions dealing with arrays
 
+[defun array/+= [a i v]
+       [array/set! a i [+ v [array/ref a i]]]
+]
+
+[defun array/++ [a i]
+       [array/+= a i 1]
+]
+
 [defun array/fill! [a v i]
         "Fills array a with value v"
         [cond [[>= [int i] [array/length a]] a]
               [#t [array/set! a [int i] v] [array/fill! a v [+ 1 i]]]
         ]
+	a
 ]
 
 [defun array/reduce [fun arr α]

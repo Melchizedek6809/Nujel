@@ -1,0 +1,12 @@
+; Some functions about trees
+
+[defun tree/zip [keys values]
+       "Return a tree where KEYS point to VALUES"
+       [def ret [tree/new]]
+       [while keys
+	      [tree/set! ret [car keys] [car values]]
+	      [cdr! keys]
+	      [cdr! values]
+       ]
+       ret
+]
