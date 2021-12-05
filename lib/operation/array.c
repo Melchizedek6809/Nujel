@@ -56,7 +56,7 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 		arr->vArray->data[key++] = cv;
 		if(key >= arr->vArray->length){return NULL;}
 	}
-	return arr->vArray->data[key];
+	return arr;
 }
 
 static lVal *lnfArrNew(lClosure *c, lVal *v){
