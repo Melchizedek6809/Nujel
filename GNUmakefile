@@ -118,7 +118,7 @@ nujel-bootstrap: $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	@$(CC) -s -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
+	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
 	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
@@ -184,7 +184,11 @@ runn: $(NUJEL)
 	$(NUJEL)
 
 .PHONY: install
-install: release.musl
+install: release
+	cp $(NUJEL) $(INSTALL_BIN_DIR)
+
+.PHONY: install.musl
+install.musl: release.musl
 	cp $(NUJEL) $(INSTALL_BIN_DIR)
 
 .PHONY: profile
