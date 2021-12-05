@@ -73,3 +73,24 @@
                       [cons 'do [cdar ...body]]
                       [macro-apply cond [cdr ...body]]]]
 ]
+
+[defmacro for [for-loop ...body]
+          "For loops, [for [name start stop] ...body]"
+          [def symbol-name [car for-loop]]
+	  [def loop-start [cadr for-loop]]
+	  [def loop-stop  [caddr for-loop]]
+	  [def dir 1]
+	  [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
+	  [when-not [symbol? symbol-name]
+	            [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]]
+          [when-not loop-start
+	            [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
+          [when-not loop-stop
+	            [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
+	  `[let [[~symbol-name ~loop-start]]
+	        [while [!= ~symbol-name ~loop-stop]
+                       ~@...body
+		       [set! ~symbol-name [+ ~dir ~symbol-name]]
+	        ]
+	   ]
+]

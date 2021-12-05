@@ -682,6 +682,10 @@
 [test/add "123" [read/single "123;asd"]]
 [test/add '[123] [read "123"]]
 [test/add '[123] [read "123;asd"]]
+[test/add '[123 234] [read "123;asd\n234"]]
+[test/add '[2 1 0] [let [[ret #nil]] [for [i 0 3] [set! ret [cons i ret]]] ret]]
+[test/add '[1 2 3] [let [[ret #nil]] [for [i 3 0 -1] [set! ret [cons i ret]]] ret]]
+[test/add '[20 10 0] [let [[ret #nil]] [for [i 0 30 10] [set! ret [cons i ret]]] ret]]
 ;[test/add 10 [def arr #[1 2 3]] [array/length! arr 4] [array/set! 3 4] [reduce + arr 0]]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
