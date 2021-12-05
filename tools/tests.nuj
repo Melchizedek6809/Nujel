@@ -1,5 +1,6 @@
 #!/usr/bin/env nujel
 
+[println [ansi-purple "Running the AoC Tests, this might take a couple seconds"]]
 [def test/beginning [time/milliseconds]]
 [test-run]
 [path/change "tests/"]

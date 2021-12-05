@@ -1,0 +1,59 @@
+#!/usr/bin/env nujel
+
+[defun array/2d/new [width height val]
+       [def ret [array/allocate width]]
+       [def x 0]
+       [while [< x width]
+	      [array/set! ret x [array/fill! [array/allocate height] val]]
+	      [++ x]
+       ]
+       ret
+]
+
+[defun parse/point [text]
+       [tree/zip '[:x :y] [map read/single [split text ","]]]
+]
+
+[defun line/dir [start end]
+       [cond [[== start end] 0]
+	     [[< start end] 1]
+	     [#t -1]]
+]
+
+[defun line/draw [x y end-x end-y]
+       [def dir-x [line/dir x end-x]]
+       [def dir-y [line/dir y end-y]]
+       [while [or [!= x end-x] [!= y end-y]]
+	      [array/++ [vents x] y 1]
+	      [+= x dir-x]
+	      [+= y dir-y]
+       ]
+       [array/++ [vents x] y 1]
+]
+
+[defun line/horiz? [line]
+       [== [[line :a] :y] [[line :b] :y]]
+]
+
+[defun line/vert? [line]
+       [== [[line :a] :x] [[line :b] :x]]
+]
+
+[defun line/draw-vents [line]
+       [when [or [line/horiz? line] [line/vert? line]]
+             [line/draw [[line :a] :x] [[line :a] :y] [[line :b] :x] [[line :b] :y]]]
+]
+
+[defun points/count [v num]
+       [reduce [\ [a b] [+ a [reduce [\ [a b] [+ a [if [> b num] 1 0]]] b 0]]] v 0]
+]
+
+[defun parse/line [line]
+       [line/draw-vents [tree/zip '[:b :a] [map parse/point [split line "->"]]]]
+]
+
+[def vents [array/2d/new 1000 1000 0]]
+[def lines [split [file/read "day5.input"] "\n"]]
+[for-each parse/line lines]
+[when [!= [points/count vents 1] 3990]
+      [throw [list :wrong-result "Wrong result" result]]]
