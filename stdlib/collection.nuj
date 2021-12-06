@@ -1,5 +1,10 @@
 ; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
+[defun sum [c]
+       "Return the sum of every value in collection C"
+       [reduce + c 0]
+]
+
 [defun join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]

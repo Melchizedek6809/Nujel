@@ -1,7 +1,5 @@
 #!/usr/bin/env nujel
 
-[defun array/sum [a] [reduce + a 0]]
-
 [defun step [a]
        #[[a 1]
          [a 2]
@@ -31,9 +29,9 @@
 ]
 
 [def input [input/parse [map int [split [file/read "day6.input"] ","]]]]
-[def result [array/sum [do-steps input 80]]]
+[def result [sum [do-steps input 80]]]
 [when [!= result 349549]
       [throw [list :wrong-result "Wrong result" result]]]
-[def result [array/sum [do-steps input 256]]]
+[def result [sum [do-steps input 256]]]
 [when [!= result 1589590444365]
       [throw [list :wrong-result "Wrong result" result]]]

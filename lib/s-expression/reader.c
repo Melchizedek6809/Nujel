@@ -407,9 +407,6 @@ lVal *lReadValue(lString *s){
 		const u8 n = s->data[1];
 		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
 			return lParseNumber(s,lParseNumberDecimal);
-		}else if((c == '-') && (n != 0) && (n != '-') && (!isspace(n)) && (!isnonsymbol(n))){
-			s->data++;
-			return lCons(lCons(lValSymS(symMinus),lCons(lParseSymbol(s),NULL)),NULL);
 		}else{
 			return lParseSymbol(s);
 		}
