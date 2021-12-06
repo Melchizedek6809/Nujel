@@ -1,7 +1,7 @@
 #pragma once
 #include "nujel.h"
 
-int         castToInt   (const lVal *v, int         fallback);
+i64         castToInt   (const lVal *v, i64         fallback);
 float       castToFloat (const lVal *v, float       fallback);
 vec         castToVec   (const lVal *v, vec         fallback);
 bool        castToBool  (const lVal *v);

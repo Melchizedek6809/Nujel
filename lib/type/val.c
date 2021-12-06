@@ -13,7 +13,7 @@
 #include "../type/closure.h"
 
 /* Return a newly allocated Nujel int of value V */
-lVal *lValInt(int v){
+lVal *lValInt(i64 v){
 	lVal *ret = lValAlloc();
 	ret->type = ltInt;
 	ret->vInt = v;

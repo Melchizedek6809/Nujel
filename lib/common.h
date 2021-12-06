@@ -78,7 +78,7 @@ struct lVal {
 	union {
 		bool           vBool;
 		lPair          vList;
-		int            vInt;
+		i64            vInt;
 		float          vFloat;
 		vec            vVec;
 		lArray        *vArray;

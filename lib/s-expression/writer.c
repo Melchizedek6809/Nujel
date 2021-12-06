@@ -241,7 +241,7 @@ char *lSWriteVal(lVal *v, char *buf, char *bufEnd, int indentLevel, bool display
 		t = snprintf(cur,bufEnd-cur,"]");
 		break; }
 	case ltInt:
-		t = snprintf(buf,len,"%i",v->vInt);
+		t = snprintf(buf,len,"%li",v->vInt);
 		break;
 	case ltFloat:
 		t = bufPrintFloat(v->vFloat,buf,t,len);

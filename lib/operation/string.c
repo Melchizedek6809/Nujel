@@ -145,7 +145,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			if(buf[clen-1] == '.'){buf[clen++] = '0';}
 			break;
 		case ltInt:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%i",t->vInt);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%li",t->vInt);
 			break;
 		case ltBool:
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");

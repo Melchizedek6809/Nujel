@@ -47,8 +47,8 @@ static float lnfAddF(const lVal *v){
 	}
 	return acc;
 }
-static int lnfAddI(const lVal *v){
-	int acc = v->vList.car->vInt;
+static i64 lnfAddI(const lVal *v){
+	i64 acc = v->vList.car->vInt;
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		acc += v->vList.car->vInt;
@@ -86,8 +86,8 @@ static float lnfSubF(lVal *v){
 	}
 	return acc;
 }
-static int lnfSubI(lVal *v){
-	int acc = v->vList.car->vInt;
+static i64 lnfSubI(lVal *v){
+	i64 acc = v->vList.car->vInt;
 	v = v->vList.cdr;
 	if(!v){return -acc;}
 	for(; v ; v = v->vList.cdr){
@@ -121,8 +121,8 @@ static float lnfMulF(lVal *v){
 	}
 	return acc;
 }
-static int lnfMulI(lVal *v){
-	int acc;
+static i64 lnfMulI(lVal *v){
+	i64 acc;
 	for(acc = 1; v ; v = v->vList.cdr){
 		acc *= v->vList.car->vInt;
 	}
@@ -160,8 +160,8 @@ static float lnfDivF(lVal *v){
 
 
 
-static int lnfDivI(lClosure *c, lVal *v){
-	int acc = v->vList.car->vInt;
+static i64 lnfDivI(lClosure *c, lVal *v){
+	i64 acc = v->vList.car->vInt;
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
@@ -201,8 +201,8 @@ static float lnfModF(lVal *v){
 	}
 	return acc;
 }
-static int lnfModI(lVal *v){
-	int acc = v->vList.car->vInt;
+static i64 lnfModI(lVal *v){
+	i64 acc = v->vList.car->vInt;
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
@@ -232,7 +232,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"absolute");
 		case ltFloat: return lValFloat(fabsf(t->vFloat));
-		case ltInt:   return lValInt(abs(t->vInt));
+		case ltInt:   return lValInt(labs(t->vInt));
 		case ltVec:   return lValVec(vecAbs(t->vVec));
 	}
 }

@@ -111,7 +111,7 @@ lVal *lnfString(lClosure *c, lVal *t){
 		buf += clen;
 		break; }
 	case ltInt: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%i",t->vInt);
+		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%li",t->vInt);
 		len += clen;
 		buf += clen;
 		break; }
@@ -152,7 +152,7 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
-int castToInt(const lVal *v, int fallback){
+i64 castToInt(const lVal *v, i64 fallback){
 	switch(v ? v->type : ltNoAlloc){
 	case ltVec:
 		return v->vVec.x;
