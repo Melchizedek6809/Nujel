@@ -95,22 +95,22 @@
 	   ]
 ]
 
-[defun thread/==> [init fun]
+[defun thread/-> [init fun]
        [if fun
-          `[~[caar fun] ~[thread/==> init [cdr fun]] ~@[cdar fun]]
+          `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
            init]
 ]
-[defmacro ==> [init ...fun]
+[defmacro -> [init ...fun]
           "Thread init as the first argument through every function in ...fun"
-	  [thread/==> init [reverse ...fun]]
+	  [thread/-> init [reverse ...fun]]
 ]
 
-[defun thread/==>> [init fun]
+[defun thread/->> [init fun]
        [if fun
-           [append [car fun] [cons [thread/==>> init [cdr fun]] #nil]]
+           [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]
            init]
 ]
-[defmacro ==>> [init ...fun]
+[defmacro ->> [init ...fun]
           "Thread init as the last argument through every function in ...fun"
-	  [thread/==>> init [reverse ...fun]]
+	  [thread/->> init [reverse ...fun]]
 ]
