@@ -232,7 +232,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"absolute");
 		case ltFloat: return lValFloat(fabsf(t->vFloat));
-		case ltInt:   return lValInt(labs(t->vInt));
+		case ltInt:   return lValInt(llabs(t->vInt));
 		case ltVec:   return lValVec(vecAbs(t->vVec));
 	}
 }
