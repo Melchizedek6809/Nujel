@@ -21,6 +21,8 @@
 #include "type/val.h"
 #include "operation/string.h"
 
+
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -111,7 +113,7 @@ lVal *lnfString(lClosure *c, lVal *t){
 		buf += clen;
 		break; }
 	case ltInt: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%li",t->vInt);
+		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf), "%"PRId64 ,t->vInt);
 		len += clen;
 		buf += clen;
 		break; }

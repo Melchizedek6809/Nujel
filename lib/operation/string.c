@@ -17,6 +17,7 @@
 #include "../type/val.h"
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -145,7 +146,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			if(buf[clen-1] == '.'){buf[clen++] = '0';}
 			break;
 		case ltInt:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%li",t->vInt);
+			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%"PRId64 ,t->vInt);
 			break;
 		case ltBool:
 			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
