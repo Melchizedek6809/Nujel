@@ -18,11 +18,13 @@
               [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
            object-code]]]
     [def file/eval [λ* file/eval
-        [path]
+        [path environment]
         "Evaluate a Nujel source file in the current context"
-        [do [def source [cons 'do [read [file/read path]]]]
-           [def object-code [compile/forms [cons 'do source] environment]]
-           [apply root-form [list object-code]]]]]
+        [do [if environmnet
+              #nil
+              [set! environment root-closure]]
+           [def source [cons 'do [read [file/read path]]]]
+           [compile/forms [cons 'do source] environment]]]]
     [def eval/forked [λ* eval/forked
         [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
@@ -32,31 +34,7 @@
            [def res [popen command]]
            [file/remove tmp-path]
            [cons [car res] [cdr res]]]]]
-    [def test-context "Nujel Bootstrap"]][do [def display/error/wrap [λ* display/error/wrap
-        [i text]
-        ""
-        [if [== i 0]
-           [ansi-red text]
-           [if [== i 1]
-              [string text]
-              [if [== i 2]
-                 [ansi-yellow [str/write text]]
-                 [if [== i 3]
-                    [describe/closure text]
-                    [if #t
-                       text
-                       #nil]]]]]]]
-    [def display/error/iter [λ* display/error/iter
-        [error i]
-        ""
-        [if error
-           [cons [display/error/wrap i [car error]] [display/error/iter [cdr error] [+ 1 i]]]
-           [cons "" #nil]]]]
-    [def display/error [λ* display/error
-        [error]
-        "Display ERROR in a nice, human readable way"
-        [display [join [display/error/iter error 0] "\r\n"]]]]
-    [def repl/exception-handler [λ* repl/exception-handler
+    [def test-context "Nujel Bootstrap"]][do [def repl/exception-handler [λ* repl/exception-handler
         [error]
         ""
         [display/error error]]]
@@ -135,7 +113,7 @@
            [if [== [char-at arg 0] 45]
               [repl/parse-options [substr arg 1]]
               [if #t
-                 [do [file/eval arg]
+                 [do [try display/error [file/eval arg]]
                     [set! repl/parse-args/run-repl #f]]
                  #nil]]]]]
     [def repl/parse-args [λ* repl/parse-args
