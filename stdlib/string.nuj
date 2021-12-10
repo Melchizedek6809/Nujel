@@ -143,3 +143,15 @@
 [defun read/single [text]
        [car [read text]]
 ]
+
+[defun string/length?! [chars]
+       [\ [a] [== chars [string/length a]]]
+]
+
+[defun contains-any? [str chars]
+       [apply or [map [\ [a] [>= [index-of str a] 0]] [split chars ""]]]
+]
+
+[defun contains-all? [str chars]
+       [apply and [map [\ [a] [>= [index-of str a] 0]] [split chars ""]]]
+]
