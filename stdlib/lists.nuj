@@ -136,3 +136,20 @@
              [#t [getf [cdr l] key]]
        ]
 ]
+
+[defun list/sort [l]
+       "Terribly slow way to sort a list, though it was simple to write"
+       [if l
+           [do [def top [car l]]
+               [def next #nil]
+               [cdr! l]
+               [while l
+                      [if [> [car l] top]
+                          [do [set! next [cons top next]]
+                              [set! top [car l]]]
+                          [set! next [cons [car l] next]]]
+                      [cdr! l]
+               ]
+               [cons top [list/sort next]]]
+           #nil]
+]
