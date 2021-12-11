@@ -1,0 +1,138 @@
+#!/usr/bin/env nujel
+
+[def lines [split [file/read "day8.input"] "\n"]]
+[def counts [-> [array/allocate 10] [array/fill! 0]]]
+
+[defun output/count [entry]
+       [def len [string/length entry]]
+       [case len
+	     [[2] [array/++ counts 1]]
+	     [[3] [array/++ counts 7]]
+	     [[4] [array/++ counts 4]]
+	     [[7] [array/++ counts 8]]
+	     [otherwise #f]
+       ]
+]
+
+[defun find/by-length [vals arr len pos]
+       [if vals
+	   [if [== len [popcount [car vals]]]
+	       [do [array/set! arr pos [car vals]]
+		   [find/by-length [cdr vals] arr len pos]]
+	       [cons [car vals]
+		     [find/by-length [cdr vals] arr len pos]]]
+	   #nil]
+]
+
+[defun find/six [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 6]]]
+                [filter [\ [α] [== [popcount [logand α [numbers 1]]] 1]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 6 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun find/five [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 5]]]
+                [filter [\ [α] [== α [logand α [numbers 6]]]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 5 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun find/nine [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 6]]]
+                [filter [\ [α] [== α [logior α [numbers 4]]]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 9 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun find/zero [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 6]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 0 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun find/three [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 5]]]
+                [filter [\ [α] [== α [logior α [numbers 1]]]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 3 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun find/two [vals numbers]
+       [def ret [->> vals
+                [filter [\ [α] [== [popcount α] 5]]]
+                [filter [\ [α] [!= α [logior α [numbers 1]]]]]
+       ]]
+       [when [> [length ret] 1] [stacktrace]]
+       [array/set! numbers 2 [car ret]]
+       [filter [\ [α] [!= α [car ret]]] vals]
+]
+
+[defun seven-seg->binary [str]
+       [reduce [\ [α β] [logior α [case β
+                                        [["a"] #x01]
+                                        [["b"] #x02]
+                                        [["c"] #x04]
+                                        [["d"] #x08]
+                                        [["e"] #x10]
+                                        [["f"] #x20]
+                                        [["g"] #x40]
+                                  ]]] [split str ""]]
+]
+
+[defun translate [vals out-vals]
+       [def numbers [-> [array/allocate 10]
+		        [array/fill! #nil]]]
+
+       [-> [map seven-seg->binary vals]
+           [find/by-length numbers 2 1]
+           [find/by-length numbers 3 7]
+	   [find/by-length numbers 4 4]
+	   [find/by-length numbers 7 8]
+	   [find/six numbers]
+	   [find/five numbers]
+	   [find/nine numbers]
+	   [find/zero numbers]
+	   [find/three numbers]
+	   [find/two numbers]]
+
+       [defun translate/val [val i]
+              [when-not i [def i 0]]
+	      [when [> i 10] [throw [list :error ""]]]
+              [if [== [numbers i] val]
+                  i
+                  [translate/val val [+ 1 i]]]
+       ]
+       [reduce [\ [α β] [+ [* α 10] β]] [map translate/val [map seven-seg->binary out-vals]] 0]
+]
+
+[def part-2 [reduce [\ [Σ line]
+	  [def split-args [split line "|"]]
+	  [def output-raw [map string [read [cadr split-args]]]]
+	  [for-each output/count output-raw]
+	  [def table-raw [map string [read [car split-args]]]]
+	  [def output-sum [translate table-raw output-raw]]
+	  [+ Σ output-sum]
+] lines 0]]
+
+[def result [sum counts]]
+[when [!= result 532]
+      [throw [list :wrong-result "Wrong result" result]]]
+[def result part-2]
+[when [!= result 1011284]
+      [throw [list :wrong-result "Wrong result" result]]]

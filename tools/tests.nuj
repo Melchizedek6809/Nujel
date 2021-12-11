@@ -1,8 +1,8 @@
 #!/usr/bin/env nujel
 
-[println [ansi-purple "Running the AoC Tests, this might take a couple seconds"]]
 [def test/beginning [time/milliseconds]]
 [test-run]
+[println [ansi-purple "Now running the AoC Tests, this might take a while."]]
 [path/change "tests/"]
 
 [def ext-nuj? [path/ext?! "nuj"]]
