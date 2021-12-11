@@ -51,18 +51,25 @@ static int lnfLogXorI(const lVal *l){
 	return acc;
 }
 
-static lVal *lnfLogXor (lClosure *c, lVal *v){
+static lVal *lnfLogXor(lClosure *c, lVal *v){
 	lVal *t = lCast(c,v,ltInt);
 	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
 	lRootsValPush(t);
 	return lValInt(lnfLogXorI(t));
 }
 
-static lVal *lnfLogNot (lClosure *c, lVal *v){
+static lVal *lnfLogNot(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCast(c,v,ltInt);
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
 	return lValInt(~lCar(t)->vInt);
+}
+
+static lVal *lnfPopCount(lClosure *c, lVal *v){
+	if(v == NULL){return lValInt(0);}
+	lVal *t = lCast(c,v,ltInt);
+	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
+	return lValInt(__builtin_popcount(lCar(t)->vInt));
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){
@@ -86,4 +93,5 @@ void lOperationsBinary(lClosure *c){
 	lAddInfix(lAddNativeFunc(c,"logxor ^","[...args]","Xor ...ARGS",                      lnfLogXor));
 	          lAddNativeFunc(c,"lognot ~","[val]",    "Binary not of VAL",                lnfLogNot);
 	lAddInfix(lAddNativeFunc(c,"ash <<",  "[value amount]","Shift VALUE left AMOUNT bits",lnfAsh));
+	          lAddNativeFunc(c,"popcount","[val]",    "Return amount of bits set in VAL", lnfPopCount);
 }

@@ -695,6 +695,13 @@
 [test/add 10 [reduce + [-> #[1 2 3] [array/length! 4] [array/set! 3 4]] 0]]
 [test/add 10 [sum #[1 2 3 4]]]
 [test/add 10 [sum '[1 2 3 4]]]
+[test/add 0 [popcount 0]]
+[test/add 0 [popcount #nil]]
+[test/add 0 [popcount ""]]
+[test/add 1 [popcount 1]]
+[test/add 1 [popcount 2]]
+[test/add 2 [popcount 3]]
+[test/add 4 [popcount 15]]
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
