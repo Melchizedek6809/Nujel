@@ -268,6 +268,7 @@ static lVal *lParseCharacter(lString *s){
 	else if((s->data[0] == 'R') && (s->data[1] == 'e')){ret = '\r';}
 	else if((s->data[0] == 'l') && (s->data[1] == 'f')){ret = '\n';}
 	else if((s->data[0] == 'c') && (s->data[1] == 'r')){ret = '\r';}
+	s->data++;
 	lStringAdvanceToNextSpaceOrSpecial(s);
 	return lValInt(ret);
 }
