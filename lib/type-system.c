@@ -197,13 +197,15 @@ vec castToVec(const lVal *v, vec fallback){
 
 /* Cast v to be a bool without memory allocations, or return false */
 bool castToBool(const lVal *v){
-	if(v == NULL){return false;}
-	if(v->type == ltBool){
+	if(v == NULL){
+		return false;
+	}else if(v->type == ltBool){
 		return v->vBool;
 	}else if(v->type == ltPair){
 		return (v->vList.car != NULL) || (v->vList.cdr != NULL);
+	}else{
+		return true;
 	}
-	return true;
 }
 
 /* Cast v to be a string without memory allocations, or return fallback */

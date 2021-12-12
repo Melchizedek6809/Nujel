@@ -66,8 +66,8 @@ static int lValCompare(lVal *v){
 			return  1;
 		}
 	case ltInt: {
-		const int av = castToInt(a,0);
-		const int bv = castToInt(b,0);
+		const i64 av = castToInt(a,0);
+		const i64 bv = castToInt(b,0);
 		if(bv == av){
 			return  0;
 		}else if(av < bv){

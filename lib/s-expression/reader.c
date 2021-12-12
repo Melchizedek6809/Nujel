@@ -27,7 +27,7 @@
 
 lClosure *readClosure = NULL;
 
-static float createFloat(int value, int mantissa, int mantissaLeadingZeroes){
+static float createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
 	if(mantissa == 0){return value;}
 	const float mant = mantissa * pow(10, -(floor(log10f(mantissa)) + 1 + mantissaLeadingZeroes));
 	return value + mant;
@@ -147,8 +147,8 @@ static lVal *lParseSymbol(lString *s){
 }
 
 /* Parse s as a binary number and return it as an ltInt lVal */
-static int lParseNumberBinary(lString *s, int *leadingZeroes){
-	int ret = 0;
+static i64 lParseNumberBinary(lString *s, int *leadingZeroes){
+	i64 ret = 0;
 	int zeroes = 0;
 	const char *start = s->data;
 	for(;(s->data < s->bufEnd);s->data++){
@@ -169,8 +169,8 @@ static int lParseNumberBinary(lString *s, int *leadingZeroes){
 }
 
 /* Parse s as an octal number and return it as an ltInt lVal */
-static int lParseNumberOctal(lString *s, int *leadingZeroes){
-	int ret = 0;
+static i64 lParseNumberOctal(lString *s, int *leadingZeroes){
+	i64 ret = 0;
 	int zeroes = 0;
 	const char *start = s->data;
 	for(;(s->data < s->bufEnd);s->data++){
@@ -190,8 +190,8 @@ static int lParseNumberOctal(lString *s, int *leadingZeroes){
 }
 
 /* Parse s as an decimal number and return it as an int */
-static int lParseNumberDecimal(lString *s, int *leadingZeroes){
-	int ret = 0;
+static i64 lParseNumberDecimal(lString *s, int *leadingZeroes){
+	i64 ret = 0;
 	int zeroes = 0;
 	const char *start = s->data;
 
@@ -212,8 +212,8 @@ static int lParseNumberDecimal(lString *s, int *leadingZeroes){
 }
 
 /* Parse s as a hexadecimal number and return it as an ltInt lVal */
-static int lParseNumberHex(lString *s, int *leadingZeroes){
-	int ret = 0;
+static i64 lParseNumberHex(lString *s, int *leadingZeroes){
+	i64 ret = 0;
 	int zeroes = 0;
 	const char *start = s->data;
 	for(;s->data < s->bufEnd;s->data++){
@@ -234,18 +234,18 @@ static int lParseNumberHex(lString *s, int *leadingZeroes){
 }
 
 /* Parse s as a decimal number and return it as an lVal */
-static lVal *lParseNumber(lString *s, int (*parser)(lString *, int *)){
+static lVal *lParseNumber(lString *s, i64 (*parser)(lString *, int *)){
 	const char *start = s->data;
 	bool negative = false;
 	if(*start == '-'){
 		s->data++;
 		negative = true;
 	}
-	const int val = parser(s, NULL);
+	const i64 val = parser(s, NULL);
 	if(*s->data == '.'){
 		s->data++;
 		int mantissaLeadingZeroes = 0;
-		const int mantissaVal = parser(s,&mantissaLeadingZeroes);
+		const i64 mantissaVal = parser(s,&mantissaLeadingZeroes);
 		if(*s->data == '.'){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
