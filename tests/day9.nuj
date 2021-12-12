@@ -1,30 +1,5 @@
 #!/usr/bin/env nujel
 
-[defun array/2d/allocate [width height]
-       @[:data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]
-]
-
-[defun array/2d/ref [data x y]
-       [if [or [> x [data :width]] [> y [data :height]]]
-	   [throw [list :out-of-bounds "Trying to access an array out of bounds" data [current-lambda]]]
-           [array/ref [data :data] [+ x [* y [data :width]]]]]
-]
-
-[defun array/2d/set! [data x y val]
-       [if [or [> x [data :width]] [> y [data :height]]]
-	   [throw [list :out-of-bounds "Trying to access an array out of bounds" data [current-lambda]]]
-           [array/set! [data :data] [+ x [* y [data :width]]] val]]
-]
-
-[defun array/2d/print [data]
-       [for [y 0 [data :height]]
-	    [for [x 0 [data :width]]
-	         [display [cat [array/2d/ref data x y] " "]]
-	    ]
-	    [newline]
-       ]
-]
-
 [defun is-low-point? [data x y]
        [def v [array/2d/ref data x y]]
        [def top [if [> y 0]
