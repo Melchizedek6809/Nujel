@@ -25,7 +25,7 @@ static int lValCompare(lVal *v){
 	if(v == NULL){return 2;}
 	lVal *b = lCar(v);
 	if((a == NULL) || (b == NULL)){
-		return !((a == NULL) && (b == NULL));
+		return ((a == NULL) && (b == NULL)) ? 0 : 2;
 	}
 	lType ct = lTypecast(a->type, b->type);
 	switch(ct){

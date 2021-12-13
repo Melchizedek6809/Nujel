@@ -10,3 +10,8 @@
        ]
        ret
 ]
+
+[defun tree/++ [t k]
+       "Increment value at K in T by 1"
+       [tree/set! t k [+ 1 [int [tree/get t k]]]]
+]

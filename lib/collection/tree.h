@@ -5,6 +5,7 @@ lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
 bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal **value);
 void   lTreeSet             (      lTree *t, const lSymbol *s, lVal *v, bool *found);
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal *v);
+lTree *lTreeDup             (const lTree *t);
 
 lVal  *lTreeAddToList       (const lTree *t, lVal *v);
 lVal  *lTreeAddKeysToList   (const lTree *t, lVal *v);

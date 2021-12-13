@@ -10,5 +10,3 @@ lVal     *lValVec    (const vec v);
 lVal     *lValTree   (lTree *v);
 lVal     *lValObject (lClosure *v);
 lVal     *lValLambda (lClosure *v);
-lVal     *lValCopy   (lVal *dst, const lVal *src);
-lVal     *lValDup    (const lVal *v);

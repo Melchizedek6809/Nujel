@@ -102,6 +102,13 @@ static lVal *lnfTreeSize(lClosure *c, lVal *v){
 	return lValInt(tree == 0 ? 0 : lTreeSize(tree));
 }
 
+static lVal *lnfTreeDup(lClosure *c, lVal *v){
+	(void)c;
+	lTree *tree = castToTree(lCar(v),NULL);
+	if(!tree){return NULL;}
+	return lValTree(lTreeDup(tree));
+}
+
 void lOperationsTree(lClosure *c){
 	lnfvTreeGet = lAddNativeFunc(c,"tree/get","[tree sym]","Return the value of SYM in TREE, or #nil", lnfTreeGet);
 	lAddNativeFunc(c,"tree/new",     "[...plist]",     "Return a new tree", lnfTreeNew);
@@ -112,4 +119,5 @@ void lOperationsTree(lClosure *c){
 	lAddNativeFunc(c,"tree/size",    "[tree]",         "Return the amount of entries in TREE", lnfTreeSize);
 	lAddNativeFunc(c,"tree/has?",    "[tree sym]",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
 	lAddNativeFunc(c,"tree/set!",    "[tree sym val]", "Set SYM to VAL in TREE", lnfTreeSet);
+	lAddNativeFunc(c,"tree/dup",     "[tree]",         "Return a duplicate of TREE", lnfTreeDup);
 }

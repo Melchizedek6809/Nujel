@@ -200,3 +200,15 @@ lVal *lTreeValuesToList(const lTree *t){
 uint lTreeSize(const lTree *t){
 	return t == NULL ? 0 : (t->key ? 1 : 0) + lTreeSize(t->left) + lTreeSize(t->right);
 }
+
+/* Return a duplicate of t */
+lTree *lTreeDup(const lTree *t){
+	if(t == NULL){return NULL;}
+	lTree *ret  = lTreeAlloc();
+	ret->key    = t->key;
+	ret->value  = t->value;
+        ret->height = t->height;
+	ret->left   = lTreeDup(t->left);
+	ret->right  = lTreeDup(t->right);
+	return ret;
+}
