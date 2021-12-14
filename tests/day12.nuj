@@ -1,0 +1,44 @@
+#!/usr/bin/env nujel
+
+[def cave-map @[]]
+[def big-caves @[]]
+[defun big-cave? [α] [big-caves α]]
+[defun add-connections [line]
+       [def parts [map str->sym [split line "-"]]]
+       [tree/set! cave-map [car parts] [cons [cadr parts] [tree/get cave-map [car parts]]]]
+       [tree/set! cave-map [cadr parts] [cons [car parts] [tree/get cave-map [cadr parts]]]]
+       [tree/set! big-caves [car parts] [< [char-at [sym->str [car parts]] 0] #\a]]
+       [tree/set! big-caves [cadr parts] [< [char-at [sym->str [cadr parts]] 0] #\a]]
+]
+[def connections [for-each add-connections [split [file/read "day12.input"] "\n"]]]
+
+[def valid-routes 0]
+
+[defun calc-routes [position s twice]
+       [if [== position 'start]
+           [++ valid-routes]
+           [when-not [and [== position 'end]
+                          [> [tree/get s 'end] 0]]
+                     [def routes [cave-map position]]
+                     [when-not [big-cave? position]
+                               [when [> [tree/get s position] 0]
+                               [if twice
+                                   [throw [list :return]]
+                                   [set! twice #t]]]
+                               [set! s [tree/dup s]]
+                               [tree/++ s position]
+                     ]
+                     [while routes
+                            [try [\ [ε] [when [!= [car ε] :return] [throw ε]]]
+                            [calc-routes [car routes] s twice]]
+                            [cdr! routes]]]]
+]
+
+[calc-routes 'end @[:asd #f] #t]
+[when [!= valid-routes 4411]
+      [throw [list :wrong-result "Wrong result" valid-routes]]]
+
+[set! valid-routes 0]
+[calc-routes 'end @[:asd #f] #f]
+[when [!= valid-routes 136767]
+      [throw [list :wrong-result "Wrong result" valid-routes]]]
