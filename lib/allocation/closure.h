@@ -1,7 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
-#define CLO_MAX (1<<18)
+#define CLO_MAX (1<<16)
 extern lClosure lClosureList[CLO_MAX];
 extern uint     lClosureMax;
 extern uint     lClosureActive;
