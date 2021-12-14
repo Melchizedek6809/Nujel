@@ -1,4 +1,7 @@
-; A bunch of procedurs that work on all collections where the collection primitives are implemented
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+
+;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
 [defun sum [c]
        "Return the sum of every value in collection C"

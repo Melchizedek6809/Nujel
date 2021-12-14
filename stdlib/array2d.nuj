@@ -1,4 +1,7 @@
-; Contains some routines for working with 2d data
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+					;
+;; Contains some routines for working with 2d data
 
 [defun array/2d/allocate [width height]
        @[:data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]

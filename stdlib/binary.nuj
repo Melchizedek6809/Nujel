@@ -1,4 +1,7 @@
-; Some functions manipulating binary date
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+
+;; Some functions manipulating binary date
 
 [defun lognand [...l]
         "Returns the Nand of its arguments"

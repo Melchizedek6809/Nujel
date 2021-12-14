@@ -1,4 +1,7 @@
-; Put all the LISt Processing stuff in here
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+
+;; Put all the LISt Processing stuff in here
 
 [defun except-last-pair/iter [list rest]
        "Iterator for except-last-pair"
