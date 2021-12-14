@@ -71,9 +71,12 @@
 
 [defun list/map [f l]
         "Runs f over every item in list l and returns the resulting list"
-        [if [nil? l]
-            l
-            [cons [f [car l]] [map f [cdr l]]]]
+        [def ret #nil]
+        [while l
+               [set! ret [cons [f [car l]] ret]]
+               [cdr! l]
+        ]
+        [nreverse ret]
 ]
 
 [defun append/iter [a b]

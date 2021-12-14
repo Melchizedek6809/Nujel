@@ -5,18 +5,22 @@
 
 [defun count-increases [l]
        "Compares every two items in L and increments a counter if the value increases"
-       [if [and l [cdr l]]
-           [+ [if [< [car l] [cadr l]] 1 0]
-              [count-increases [cdr l]]
-              0]]
+       [def acc 0]
+       [while [and l [cdr l]]
+              [when [> [cadr l] [car l]] [++ acc]]
+              [cdr! l]
+       ]
+       acc
 ]
 
 [defun build-sums [l]
        "Build sums out of 3 values with a sliding window"
-       [if [and l [cdr l] [cddr l]]
-           [cons [+ [car l] [cadr l] [caddr l]]
-                 [build-sums [cdr l]]]
-           #nil]
+       [def ret #nil]
+       [while [and l [cdr l] [cddr l]]
+              [set! ret [cons [+ [car l] [cadr l] [caddr l]] ret]]
+              [cdr! l]
+       ]
+       [nreverse ret]
 ]
 
 [def result [count-increases example-list]]

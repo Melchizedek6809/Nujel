@@ -46,8 +46,6 @@
             [ansi-blue   "Closures: "] [getf info :closure] "\n"
             [ansi-red    "Arrays:   "] [getf info :array]   "\n"
             [ansi-yellow "STrings:  "] [getf info :string]  "\n"
-            [ansi-cyan   "NFunc:    "] [getf info :native-function] "\n"
-            [ansi-purple "Vectors:  "] [getf info :vector] "\n"
             [ansi-pink   "Symbols:  "] [getf info :symbol] "\n"
             ansi-reset
        ]
