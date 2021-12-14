@@ -4,6 +4,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "tree.h"
+#include "../exception.h"
 #include "../nujel.h"
 #include "../allocation/roots.h"
 #include "../allocation/val.h"
@@ -39,8 +40,7 @@ static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){return NULL;}
-	lTree *tre = car->vTree;
-	return lTreeToList(tre);
+	return lTreeToList(car->vTree);
 }
 
 /* [tree/keys tree] - Return each key of TREE in a list */
@@ -48,8 +48,7 @@ static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){return NULL;}
-	lTree *tre = car->vTree;
-	return lTreeKeysToList(tre);
+	return lTreeKeysToList(car->vTree);
 }
 
 /* [tree/values tree] - Return each value of TREE in a list */
@@ -57,8 +56,7 @@ static lVal *lnfTreeGetValues(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){return NULL;}
-	lTree *tre = car->vTree;
-	return lTreeValuesToList(tre);
+	return lTreeValuesToList(car->vTree);
 }
 
 /* [tree/get tree sym] - Return the value of SYM in TREE, or #nil */
@@ -104,8 +102,14 @@ static lVal *lnfTreeSize(lClosure *c, lVal *v){
 
 static lVal *lnfTreeDup(lClosure *c, lVal *v){
 	(void)c;
+	if((v == NULL)
+		|| (v->type != ltPair)
+		|| (v->vList.car == NULL)
+		|| (v->vList.car->type != ltTree)){
+		lExceptionThrowValClo(":type-error","tree/dup can only be called with a tree as an argument", v, c);
+	}
 	lTree *tree = castToTree(lCar(v),NULL);
-	if(!tree){return NULL;}
+	if(!tree){return lCar(v);}
 	return lValTree(lTreeDup(tree));
 }
 

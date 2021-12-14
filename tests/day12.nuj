@@ -34,11 +34,11 @@
                             [cdr! routes]]]]
 ]
 
-[calc-routes 'end @[:asd #f] #t]
+[calc-routes 'end @[] #t]
 [when [!= valid-routes 4411]
       [throw [list :wrong-result "Wrong result" valid-routes]]]
 
 [set! valid-routes 0]
-[calc-routes 'end @[:asd #f] #f]
+[calc-routes 'end @[] #f]
 [when [!= valid-routes 136767]
       [throw [list :wrong-result "Wrong result" valid-routes]]]

@@ -45,11 +45,14 @@
        [car l]
 ]
 
-[defun reverse [l r]
-        "Return the list l in reverse order"
-        [if [nil? l]
-            r
-            [reverse [cdr l] [cons [car l] r]]]
+[defun reverse [l]
+       "Return the list l in reverse order"
+       [def ret]
+       [while l
+              [set! ret [cons [car l] ret]]
+              [cdr! l]
+       ]
+       ret
 ]
 
 [defun list/length [l]
@@ -62,11 +65,12 @@
 [defun list/filter [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [def ret #nil]
-        [if l
-            [if [p [car l]]
-                [cons [car l] [filter p [cdr l]]]
-                [filter p [cdr l]]
-            #nil]]
+        [while l
+               [when [p [car l]]
+                     [set! ret [cons [car l] ret]]]
+               [cdr! l]
+        ]
+        [nreverse ret]
 ]
 
 [defun list/map [f l]
@@ -87,7 +91,7 @@
 ]
 
 [defun append [a b]
-       "Appends to two lists a and b together"
+       "Appends two lists A and B together"
        [append/iter [reverse a] b]
 ]
 
