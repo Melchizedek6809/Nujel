@@ -9,11 +9,12 @@
 ]
 
 [defun array/fill! [a v i]
-        "Fills array a with value v"
-        [cond [[>= [int i] [array/length a]] a]
-              [#t [array/set! a [int i] v] [array/fill! a v [+ 1 i]]]
-        ]
-	a
+       "Fills array a with value v"
+       [def len [array/length a]]
+       [for [i 0 len]
+            [array/set! a i v]
+       ]
+       a
 ]
 
 [defun array/reduce [fun arr α]
