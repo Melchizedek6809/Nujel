@@ -19,6 +19,13 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 		RVP(lValSym(":symbol")), RVP(lValInt(lSymbolMax)));
 }
 
+static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
+	(void)c; (void)v;
+	lGarbageCollect();
+	return NULL;
+}
+
 void lOperationsAllocation(lClosure *c){
 	lAddNativeFunc(c,"memory-info", "[]", "Return memory usage data", lnfMemInfo);
+	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
 }
