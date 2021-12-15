@@ -2,6 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "reader.h"
+#include "../display.h"
 #include "../exception.h"
 #include "../allocation/roots.h"
 #include "../allocation/string.h"
@@ -52,14 +53,20 @@ static lVal *lParseString(lString *s){
 	static char *buf = NULL;
 	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
-	if(buf == NULL){exit(20);}
+	if(buf == NULL){
+		lPrintError("Couldn't allocate string buffer, exiting!\n");
+		exit(20);
+	}
 	char *b = buf;
 	uint i=0;
-	while(true){
+	while(s->data < s->bufEnd){
 		if(++i == bufSize){
 			bufSize *= 2;
 			buf = realloc(buf,bufSize);
-			if(buf == NULL){exit(21);}
+			if(buf == NULL){
+				lPrintError("Couldn't grow string buffer, exiting!\n");
+				exit(21);
+			}
 			b = &buf[i];
 		}
 		if(*s->data == '\\'){
@@ -115,10 +122,15 @@ static lVal *lParseString(lString *s){
 			v->type = ltString;
 			v->vString = lStringNew(buf,b-buf);
 			return v;
+		}else if(*s->data == 0){
+			buf[i] = 0;
+			lExceptionThrowValClo(":unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
 		}else{
 			*b++ = *s->data++;
 		}
 	}
+	buf[i] = 0;
+	lExceptionThrowValClo(":unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
 	return NULL;
 }
 
@@ -308,7 +320,6 @@ static lVal *lParseSpecial(lString *s){
 /* Read the string in s and parse all escape sequences */
 lVal *lReadList(lString *s, bool rootForm){
 	lVal *v = NULL, *ret = NULL;
-	(void)rootForm;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 
@@ -319,13 +330,15 @@ lVal *lReadList(lString *s, bool rootForm){
 		}
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				lExceptionThrowValClo(":unmatched-opening-bracket", "Unmatched opening bracket",NULL,readClosure);
+				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+				lExceptionThrowValClo(":unmatched-opening-bracket", "Unmatched opening bracket", err,readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else if((c == ']') || (c == ')') || (c == '}')){
 			if(rootForm){
-				lExceptionThrowValClo(":unmatched-closing-bracket", "Unmatched closing bracket",NULL,readClosure);
+				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+				lExceptionThrowValClo(":unmatched-closing-bracket", "Unmatched closing bracket", err, readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
@@ -415,7 +428,7 @@ lVal *lReadValue(lString *s){
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
 	lString *s = lRootsStringPush(lStringAlloc());
-	s->buf = s->data = str;
+	s->buf     = s->data = str;
 	s->bufEnd  = &str[strlen(str)];
 	lVal *ret  = lReadList(s,true);
 	return ret;

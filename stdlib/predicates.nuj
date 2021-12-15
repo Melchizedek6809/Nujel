@@ -15,17 +15,17 @@
 
 [defun pos? [a]
         "Return #t if a is positive"
-        [>= a 0]
+        [and [numeric? a] [>= a 0]]
 ]
 
 [defun zero-neg? [a]
         "Return #t if a is zero or negative"
-        [<= a 0]
+        [and [numeric? a] [<= a 0]]
 ]
 
 [defun neg? [a]
         "Returns #t if a is negative"
-        [< a 0]
+        [and [numeric? a] [< a 0]]
 ]
 
 [defun odd? [a]

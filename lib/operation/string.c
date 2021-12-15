@@ -240,7 +240,7 @@ static lVal *lnfWriteStr(lClosure *c, lVal *v){
 		return lValString("#nil");
 	}
 	if(buf == NULL){buf = malloc(1<<16);}
-	lSWriteVal(lCar(v), buf, &buf[1<<16],0,false);
+	lSWriteVal(lCar(v), buf, &buf[1<<16],false);
 	buf[(1<<16)-1]=0;
 	return lValString(buf);
 }

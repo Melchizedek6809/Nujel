@@ -90,13 +90,13 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 	if(c == NULL){c = createRoolClosure(loadStdLib);}
 
 	if(lVerbose){
-		printf("sizeof(lClosure): %u\n",(uint)sizeof(lClosure));
-		printf("sizeof(lVal): %u\n",    (uint)sizeof(lVal));
-		printf("sizeof(lArray): %u\n",  (uint)sizeof(lArray));
-		printf("sizeof(lString): %u\n", (uint)sizeof(lString));
-		printf("sizeof(lTree): %u\n",   (uint)sizeof(lTree));
-		printf("sizeof(jmp_buf): %u\n", (uint)sizeof(jmp_buf));
-		printf("\n\nRoot Closure Data Size: %u\n",lTreeSize(c->data));
+		pf("sizeof(lClosure): %u\n",sizeof(lClosure));
+		pf("sizeof(lVal): %u\n",    sizeof(lVal));
+		pf("sizeof(lArray): %u\n",  sizeof(lArray));
+		pf("sizeof(lString): %u\n", sizeof(lString));
+		pf("sizeof(lTree): %u\n",   sizeof(lTree));
+		pf("sizeof(jmp_buf): %u\n", sizeof(jmp_buf));
+		pf("\n\nRoot Closure Data Size: %u\n", lTreeSize(c->data));
 	}
 	return c;
 }

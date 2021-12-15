@@ -41,6 +41,7 @@ ifeq ($(OS),Windows_NT)
 	ASSET := ./tools/assets.exe
 	BIN_SRCS += vendor/getline/getline.c
 	LIBS += -lpthread
+	INSTALL_BIN_DIR := /usr/local/bin/
 else
 	BIN_SRCS += vendor/bestline/bestline.c
 endif

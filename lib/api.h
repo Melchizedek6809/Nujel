@@ -18,6 +18,7 @@
 #include "collection/string.h"
 #include "collection/tree.h"
 
+#include "misc/pf.h"
 #include "operation.h"
 
 #include "s-expression/reader.h"
