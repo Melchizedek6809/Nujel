@@ -2,11 +2,10 @@
 A Lisp inspired language for games and other latency sensitive applications.
 Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting layer.
 
-
 # Why Nujel?
 Mostly because I wanted the following for WolkenWelten:
 - A Lisp
-- with static typing
+- with static typing (still not implemented!)
 - embeddable in C
 - designed for beginners
 
@@ -22,7 +21,6 @@ syntax to definie literals with, for example `[@[:one 1 :two 2] :two]` returns `
 
 # Try it out yourself
 You can easily start experimenting with Nujel right in your Browser by using a [WASM Release](https://wolkenwelten.net/nujel/).
-
 
 ## Build Status
 | Operating System   | Master | Develop |
