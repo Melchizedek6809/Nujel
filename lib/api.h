@@ -18,8 +18,7 @@
 #include "collection/string.h"
 #include "collection/tree.h"
 
-#include "operation/string.h"
-#include "operation/special.h"
+#include "operation.h"
 
 #include "s-expression/reader.h"
 #include "s-expression/writer.h"

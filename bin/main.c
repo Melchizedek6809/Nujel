@@ -43,13 +43,13 @@ static void *readEvalStringRaw(void *cl, void *str){
 static lClosure *createRoolClosure(bool loadStdLib){
 	lClosure *c;
 	if(loadStdLib){
-		c = lClosureNewRoot();
+		c = lNewRoot();
 		lOperationsIO(c);
 		lOperationsReadline(c);
 		lnfDo(c,lRead((const char *)binlib_no_data));
 		lGarbageCollect();
 	}else{
-		c = lClosureNewRootNoStdLib();
+		c = lNewRootNoStdLib();
 		lOperationsIO(c);
 		lOperationsReadline(c);
 	}

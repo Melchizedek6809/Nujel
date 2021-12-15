@@ -1,7 +1,8 @@
 /* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "array.h"
+#include "../operation.h"
+
 #include "../display.h"
 #include "../allocation/array.h"
 #include "../allocation/roots.h"

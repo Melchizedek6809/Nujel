@@ -18,8 +18,8 @@ extern lVal *lnfvQuote;
 
 void      lInit             ();
 
-lClosure *lClosureNewRoot   ();
-lClosure *lClosureNewRootNoStdLib();
+lClosure *lNewRoot          ();
+lClosure *lNewRootNoStdLib  ();
 
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);

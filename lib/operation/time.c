@@ -1,7 +1,8 @@
 /* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
-#include "time.h"
+#include "../operation.h"
+
 #include "../type-system.h"
 #include "../collection/list.h"
 #include "../collection/string.h"

@@ -17,13 +17,13 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
-#include "operation/string.h"
-
+#include "operation.h"
 
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 
 /* [int v] - Convert v into an integer number */
 lVal *lnfInt(lClosure *c, lVal *v){

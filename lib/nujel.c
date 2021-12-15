@@ -8,19 +8,7 @@
 #include "allocation/native-function.h"
 #include "allocation/tree.h"
 #include "allocation/symbol.h"
-#include "operation/allocation.h"
-#include "operation/arithmetic.h"
-#include "operation/array.h"
-#include "operation/binary.h"
-#include "operation/closure.h"
-#include "operation/eval.h"
-#include "operation/list.h"
-#include "operation/predicates.h"
-#include "operation/special.h"
-#include "operation/string.h"
-#include "operation/time.h"
-#include "operation/tree.h"
-#include "operation/vec.h"
+#include "operation.h"
 #include "type/native-function.h"
 #include "type/symbol.h"
 
@@ -311,7 +299,7 @@ lVal *lQuote(lVal *v){
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
-lClosure *lClosureNewRootNoStdLib(){
+lClosure *lNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
 	c->type = closureObject;
@@ -322,9 +310,9 @@ lClosure *lClosureNewRootNoStdLib(){
 }
 
 /* Create a new root closure with the default included stdlib */
-static void *lClosureNewRootReal(void *a, void *b){
+static void *lNewRootReal(void *a, void *b){
 	(void)a; (void)b;
-	lClosure *c = lClosureNewRootNoStdLib();
+	lClosure *c = lNewRootNoStdLib();
 	c->text = lRead((const char *)stdlib_no_data);
 	lnfDo(c,c->text);
 	c->text = NULL;
@@ -333,8 +321,8 @@ static void *lClosureNewRootReal(void *a, void *b){
 
 /* Create a new root closure with the default stdlib using the
  * fallback exception handler */
-lClosure *lClosureNewRoot(){
-	return lExceptionTry(lClosureNewRootReal,NULL,NULL);
+lClosure *lNewRoot(){
+	return lExceptionTry(lNewRootReal,NULL,NULL);
 }
 
 /* A convenient way to generate a list */
