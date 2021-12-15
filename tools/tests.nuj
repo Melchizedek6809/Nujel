@@ -28,7 +28,7 @@
             [display [cat [ansi-green i] " "]]
        ]
 ]
-[for-each file/test [filter ext-nuj? [directory/read-relative "."]]]
+[for-each file/test [list/sort [filter ext-nuj? [directory/read-relative "."]]]]
 [newline]
 [def dur [- [time/milliseconds] test/start]]
 [if [and [> test/success 0] [zero? test/errors]]
