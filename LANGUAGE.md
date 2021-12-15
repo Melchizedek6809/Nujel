@@ -1,4 +1,21 @@
- ## Error Handling
+## Type System
+I greatly prefer static type systems, since then you get more errors
+during compile time, and not during runtime where it is a lot harder
+to debug. Additionally it makes it a lot easier to generate fast code
+since we already know all the types during compile time and allows for
+multimethods with no runtime overhead. For those parts where one just
+can't know a type ahead of time Nujel should allow for automatic boxing
+and unboxing using something like a `mixed` type. Multimethods can also
+be extended afterwards, so you could for example implement a custom vector
+datatype and expand the primitve operators by writing something similar to:
+```
+[defun +:vector [a:vector b:vector]
+       [vector [+ a:x b:x]
+               [+ a:y b:y]
+               [+ a:z b:z]]]
+```
+
+## Error Handling
 Nujel uses 2 different systems for error handling, depending on the
 broad category that the error belongs to:
 
