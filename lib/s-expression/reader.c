@@ -26,9 +26,9 @@
 
 lClosure *readClosure = NULL;
 
-static float createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
+static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
 	if(mantissa == 0){return value;}
-	const float mant = mantissa * pow(10, -(floor(log10f(mantissa)) + 1 + mantissaLeadingZeroes));
+	const double mant = mantissa * pow(10, -(floor(log10(mantissa)) + 1 + mantissaLeadingZeroes));
 	return value + mant;
 }
 
@@ -261,7 +261,7 @@ static lVal *lParseNumber(lString *s, i64 (*parser)(lString *, int *)){
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
 			lExceptionThrowValClo(":invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}else{
-			const float valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
+			const double valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
 			return lValFloat(negative ? -valf : valf);
 		}
 	}else{

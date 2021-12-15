@@ -166,7 +166,7 @@ i64 castToInt(const lVal *v, i64 fallback){
 }
 
 /* Cast v to be a float without memory allocations, or return fallback */
-float castToFloat(const lVal *v, float fallback){
+double castToFloat(const lVal *v, double fallback){
 	switch(v ? v->type : ltNoAlloc){
 	case ltVec:
 		return v->vVec.x;

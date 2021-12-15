@@ -2,7 +2,7 @@
 #include "nujel.h"
 
 i64         castToInt   (const lVal *v, i64         fallback);
-float       castToFloat (const lVal *v, float       fallback);
+double      castToFloat (const lVal *v, double      fallback);
 vec         castToVec   (const lVal *v, vec         fallback);
 bool        castToBool  (const lVal *v);
 const char *castToString(const lVal *v, const char *fallback);

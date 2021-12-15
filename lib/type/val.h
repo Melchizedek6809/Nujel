@@ -5,7 +5,7 @@
 
 lVal     *lValBool   (bool v);
 lVal     *lValInt    (i64 v);
-lVal     *lValFloat  (float v);
+lVal     *lValFloat  (double v);
 lVal     *lValVec    (const vec v);
 lVal     *lValTree   (lTree *v);
 lVal     *lValObject (lClosure *v);

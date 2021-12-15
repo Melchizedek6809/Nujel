@@ -79,7 +79,7 @@ struct lVal {
 		bool           vBool;
 		lPair          vList;
 		i64            vInt;
-		float          vFloat;
+		double         vFloat;
 		vec            vVec;
 		lArray        *vArray;
 		lTree         *vTree;

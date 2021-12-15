@@ -19,7 +19,7 @@ lVal *lValInt(i64 v){
 }
 
 /* Return a newly allocated Nujel float of value V */
-lVal *lValFloat(float v){
+lVal *lValFloat(double v){
 	if(isnan(v)){
 		lExceptionThrow(":float-nan","NaN is disallowed in Nujel, please check you calculations");
 	}else if(isinf(v)){
