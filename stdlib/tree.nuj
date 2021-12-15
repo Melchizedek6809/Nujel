@@ -14,7 +14,12 @@
        ret
 ]
 
-[defun tree/++ [t k]
+[defun tree/+= [t k v]
+       "Increment value at K in T by V"
+       [tree/set! t k [+ v [int [tree/get t k]]]]
+]
+
+[defmacro tree/++ [t k]
        "Increment value at K in T by 1"
-       [tree/set! t k [+ 1 [int [tree/get t k]]]]
+       `[tree/+= ~t ~k 1]
 ]
