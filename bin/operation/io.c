@@ -53,7 +53,7 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 static lVal *lnfPrint(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){return v;}
-	lDisplayVal(lCar(v));
+	lWriteVal(lCar(v));
 	return NULL;
 }
 

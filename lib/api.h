@@ -22,7 +22,6 @@
 #include "operation.h"
 
 #include "s-expression/reader.h"
-#include "s-expression/writer.h"
 
 #include "display.h"
 #include "exception.h"

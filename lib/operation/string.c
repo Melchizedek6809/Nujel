@@ -11,7 +11,6 @@
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../misc/pf.h"
-#include "../s-expression/writer.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -234,14 +233,8 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
-	static char *buf = NULL;
-	if(v == NULL){
-		return lValString("#nil");
-	}
-	if(buf == NULL){buf = malloc(1<<16);}
-	lSWriteVal(lCar(v), buf, &buf[1<<16],false);
-	buf[(1<<16)-1]=0;
-	return lValString(buf);
+	spf(dispWriteBuf, &dispWriteBuf[sizeof(dispWriteBuf)], "%v", lCar(v));
+	return lValString(dispWriteBuf);
 }
 
 static lVal *lnfCharAt(lClosure *c,lVal *v){

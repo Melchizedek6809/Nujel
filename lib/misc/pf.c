@@ -3,19 +3,139 @@
  */
 #include "pf.h"
 
+#include "../allocation/closure.h"
+#include "../allocation/native-function.h"
+#include "../allocation/symbol.h"
+#include "../collection/list.h"
+
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
 
-static char *writeString(char *buf, char *bufEnd, const char *s){
+static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display);
+
+static char *writeTreeRec(char *buf, char *bufEnd, const lTree *v){
+	if((v == NULL) || (v->key == NULL)){return buf;}
+
 	char *cur = buf;
-	if(s == NULL){return NULL;}
-	while((cur < bufEnd) && *s){ *cur++ = *s++; }
+	cur = writeTreeRec(cur, bufEnd, v->left);
+	cur = spf(cur,bufEnd,"%s %v ",v->key->c, v->value);
+	cur = writeTreeRec(cur, bufEnd, v->right);
+
 	return cur;
 }
 
-char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
+static char *writeTree(char *buf, char *bufEnd, const lTree *v){
+	char *cur = buf;
+	cur = spf(cur,bufEnd,"@[");
+	char *new = writeTreeRec(cur, bufEnd, v);
+	if(new != cur){
+		cur = new;
+		cur[-1] = ']';
+	}else if(cur < bufEnd){
+		*cur++ = ']';
+	}
+	return cur;
+}
+
+static char *writeTreeDef(char *buf, char *bufEnd, const lTree *v){
+	if(v == NULL){return buf;}
+
+	buf = writeTreeDef(buf, bufEnd, v->left);
+	buf = spf(buf,bufEnd,"[def %s %v]\n",v->key->c, v->value);
+	return writeTreeDef(buf, bufEnd, v->right);
+}
+
+static char *writeArray(char *buf, char *bufEnd, const lArray *v){
+	char *cur = buf;
+	cur = spf(cur, bufEnd, "#[");
+	if(v && v->data != NULL){
+		for(int i=0;i<v->length;i++){
+			cur = spf(cur, bufEnd, "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");
+		}
+	}
+	return spf(cur, bufEnd, "]");
+}
+
+static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
+	char *cur = buf;
+
+	if(v == NULL){
+		return spf(buf,bufEnd,"#nil");
+	}
+	switch(v->type){
+	default:
+		return buf;
+	case ltNoAlloc:
+		return spf(cur, bufEnd,"#zzz");
+	case ltBool:
+		return spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
+	case ltObject:
+		return spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+	case ltMacro:
+	case ltLambda:
+		if(v->vClosure && v->vClosure->name){
+			return spf(cur, bufEnd, "%s", v->vClosure->name->c);
+		}else{
+			return spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
+		}
+	case ltPair: {
+		const lVal *carSym = v->vList.car;
+		if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
+			const lSymbol *sym = carSym->vSymbol;
+			if((sym == symQuote) && (v->vList.cdr != NULL) && (v->vList.cdr->type == ltPair) && (v->vList.cdr->vList.cdr == NULL) && (v->vList.cdr->vList.car != NULL)){
+				return spf(cur, bufEnd, "\'%v",v->vList.cdr->vList.car);
+			}
+		}
+		cur = spf(cur, bufEnd, "[");
+		for(const lVal *n = v;n != NULL; n = n->vList.cdr){
+			if(n->type == ltPair){
+				const lVal *cv = n->vList.car;
+				if((n == v) && (cv == NULL) && (n->vList.cdr == NULL)){continue;}
+				cur = spf(cur, bufEnd, "%v%s", cv, n->vList.cdr != NULL ? " " : "");
+			}else{
+				cur = spf(cur, bufEnd, ". %v", n);
+				break;
+			}
+		}
+		return spf(cur, bufEnd, "]");}
+	case ltTree:
+		return writeTree(cur, bufEnd, v->vTree);
+	case ltArray:
+		return writeArray(cur, bufEnd, v->vArray);
+	case ltInt:
+		return spf(cur , bufEnd, "%i" ,v->vInt);
+	case ltFloat:
+		return spf(cur , bufEnd, "%f" ,v->vFloat);
+	case ltVec:
+		return spf(cur, bufEnd, "[vec %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
+	case ltString:
+		return spf(buf, bufEnd, display ? "%s" : "%S", v->vString->data);
+	case ltSymbol:
+		return spf(cur, bufEnd, "%s",v->vSymbol->c);
+	case ltSpecialForm:
+	case ltNativeFunc:
+		if(v->vNFunc->name){
+			return spf(cur, bufEnd, "%s",v->vNFunc->name->c);
+		}else{
+			return spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
+		}
+	case ltGUIWidget:
+		return spf(cur, bufEnd, "#gui_%p", v->vPointer);
+	}
+}
+
+static char *writeString(char *buf, char *bufEnd, const char *s){
+	char *cur = buf;
+	if(s == NULL){return NULL;}
+	while((cur < bufEnd) && *s){
+		*cur++ = *s++;
+	}
+	return cur;
+}
+
+static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
 	if((cur+1) >= bufEnd){return buf;}
 	*cur++ = '\"';
@@ -93,7 +213,6 @@ static char *writeXint(char *buf, char *bufEnd, u64 v){
 	return buf;
 }
 
-#include <stdio.h>
 static char *writeFloat(char *buf, char *bufEnd, double v){
 	double fract, integer;
 	fract = fabs(modf(v, &integer));
@@ -147,6 +266,18 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 				break;
 			case 'S':
 				cur = writeStringEscaped(cur, bufEnd, va_arg(va, const char *));
+				break;
+			case 'v':
+				cur = writeVal(cur, bufEnd, va_arg(va, const lVal *), false);
+				break;
+			case 'V':
+				cur = writeVal(cur, bufEnd, va_arg(va, const lVal *), true);
+				break;
+			case 't':
+				cur = writeTree(cur, bufEnd, va_arg(va, const lTree *));
+				break;
+			case 'T':
+				cur = writeTreeDef(cur, bufEnd, va_arg(va, const lTree *));
 				break;
 			}
 			format++;

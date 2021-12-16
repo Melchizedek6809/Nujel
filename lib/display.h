@@ -1,6 +1,8 @@
 #pragma once
 #include "common.h"
 
+extern char dispWriteBuf[1<<18];
+
 void        lPrintError       (const char *format, ...);
 void        lDisplayVal       (lVal *v);
 const char *lReturnDisplayVal (lVal *v);

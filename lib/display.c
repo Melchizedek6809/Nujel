@@ -10,30 +10,24 @@ char dispWriteBuf[1<<18];
 
 /* Display v on the default channel, most likely stdout */
 void lDisplayVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],true);
-	pf("%s",dispWriteBuf);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%v",v);
+	fwrite(dispWriteBuf, end - dispWriteBuf, 1, stdout);
 }
 
 /* Display v on the default channel, most likely stdout */
 const char *lReturnDisplayVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],true);
+	spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%v",v);
 	return dispWriteBuf;
 }
 
 /* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],true);
-	fpf(stderr,"%s",dispWriteBuf);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%V",v);
+	fwrite(dispWriteBuf, end - dispWriteBuf, 1, stderr);
 }
 
 /* Write a machine-readable presentation of v to stdout */
 void lWriteVal(lVal *v){
-	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],false);
-	pf("%s\n",dispWriteBuf);
-}
-
-/* Write a machine-readable presentation of t to stdout */
-void lWriteTree(lTree *t){
-	lSWriteTree(t, dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],false);
-	pf("%s\n",dispWriteBuf);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%V",v);
+	fwrite(dispWriteBuf, end - dispWriteBuf, 1, stdout);
 }
