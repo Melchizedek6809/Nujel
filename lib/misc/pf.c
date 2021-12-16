@@ -15,10 +15,9 @@
 
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display);
 
-static char *writeTreeRec(char *buf, char *bufEnd, const lTree *v){
-	if((v == NULL) || (v->key == NULL)){return buf;}
+static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
+	if((v == NULL) || (v->key == NULL)){return cur;}
 
-	char *cur = buf;
 	cur = writeTreeRec(cur, bufEnd, v->left);
 	cur = spf(cur,bufEnd,"%s %v ",v->key->c, v->value);
 	cur = writeTreeRec(cur, bufEnd, v->right);
@@ -26,8 +25,7 @@ static char *writeTreeRec(char *buf, char *bufEnd, const lTree *v){
 	return cur;
 }
 
-static char *writeTree(char *buf, char *bufEnd, const lTree *v){
-	char *cur = buf;
+static char *writeTree(char *cur, char *bufEnd, const lTree *v){
 	cur = spf(cur,bufEnd,"@[");
 	char *new = writeTreeRec(cur, bufEnd, v);
 	if(new != cur){
@@ -39,20 +37,40 @@ static char *writeTree(char *buf, char *bufEnd, const lTree *v){
 	return cur;
 }
 
-static char *writeTreeDef(char *buf, char *bufEnd, const lTree *v){
-	if(v == NULL){return buf;}
+static char *writeTreeDef(char *cur, char *bufEnd, const lTree *v){
+	if(v == NULL){return cur;}
 
-	buf = writeTreeDef(buf, bufEnd, v->left);
-	buf = spf(buf,bufEnd,"[def %s %v]\n",v->key->c, v->value);
-	return writeTreeDef(buf, bufEnd, v->right);
+	cur = writeTreeDef(cur, bufEnd, v->left);
+	cur = spf(cur,bufEnd,"[def %s %v]\n",v->key->c, v->value);
+	return writeTreeDef(cur, bufEnd, v->right);
 }
 
-static char *writeArray(char *buf, char *bufEnd, const lArray *v){
-	char *cur = buf;
+static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 	cur = spf(cur, bufEnd, "#[");
 	if(v && v->data != NULL){
 		for(int i=0;i<v->length;i++){
 			cur = spf(cur, bufEnd, "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");
+		}
+	}
+	return spf(cur, bufEnd, "]");
+}
+
+static char *writePair(char *cur, char *bufEnd, const lVal *v){
+	const lVal *carSym = v->vList.car;
+	if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
+		if((carSym->vSymbol == symQuote) && (v->vList.cdr != NULL) && (v->vList.cdr->type == ltPair) && (v->vList.cdr->vList.cdr == NULL) && (v->vList.cdr->vList.car != NULL)){
+			return spf(cur, bufEnd, "\'%v",v->vList.cdr->vList.car);
+		}
+	}
+	cur = spf(cur, bufEnd, "[");
+	for(const lVal *n = v;n != NULL; n = n->vList.cdr){
+		if(n->type == ltPair){
+			const lVal *cv = n->vList.car;
+			if((n == v) && (cv == NULL) && (n->vList.cdr == NULL)){continue;}
+			cur = spf(cur, bufEnd, "%v%s", cv, n->vList.cdr != NULL ? " " : "");
+		}else{
+			cur = spf(cur, bufEnd, ". %v", n);
+			break;
 		}
 	}
 	return spf(cur, bufEnd, "]");
@@ -80,26 +98,8 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		}else{
 			return spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
 		}
-	case ltPair: {
-		const lVal *carSym = v->vList.car;
-		if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
-			const lSymbol *sym = carSym->vSymbol;
-			if((sym == symQuote) && (v->vList.cdr != NULL) && (v->vList.cdr->type == ltPair) && (v->vList.cdr->vList.cdr == NULL) && (v->vList.cdr->vList.car != NULL)){
-				return spf(cur, bufEnd, "\'%v",v->vList.cdr->vList.car);
-			}
-		}
-		cur = spf(cur, bufEnd, "[");
-		for(const lVal *n = v;n != NULL; n = n->vList.cdr){
-			if(n->type == ltPair){
-				const lVal *cv = n->vList.car;
-				if((n == v) && (cv == NULL) && (n->vList.cdr == NULL)){continue;}
-				cur = spf(cur, bufEnd, "%v%s", cv, n->vList.cdr != NULL ? " " : "");
-			}else{
-				cur = spf(cur, bufEnd, ". %v", n);
-				break;
-			}
-		}
-		return spf(cur, bufEnd, "]");}
+	case ltPair:
+		return writePair(cur, bufEnd, v);
 	case ltTree:
 		return writeTree(cur, bufEnd, v->vTree);
 	case ltArray:
@@ -248,6 +248,9 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			case '%':
 				*cur++ = '%';
 				break;
+			case 'c':
+				*cur++ = (char)va_arg(va, i64);
+				break;
 			case 'i':
 				cur = writeInt(cur, bufEnd, va_arg(va, i64));
 				break;
@@ -285,6 +288,7 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			*cur++ = *format++;
 		}
 	}
+	cur = MIN(cur, bufEnd-1);
 	*cur = 0;
 	return cur;
 }

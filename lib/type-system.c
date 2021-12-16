@@ -95,30 +95,11 @@ lVal *lnfBool(lClosure *c, lVal *v){
 	return lValBool(castToBool(lCar(v)));
 }
 
-/* [string v] - Convert v into a printable and readable string */
-lVal *lnfString(lClosure *c, lVal *t){
-	char tmpStringBuf[32];
-	char *buf = tmpStringBuf;
-	char *bufEnd = &tmpStringBuf[sizeof(tmpStringBuf)];
-	char *cur = buf;
-	if(t == NULL){return lValString("");}
+/* Cast it's argument into a string represenation, should only be used by cast/map  */
+static lVal *lCastString(lClosure *c, lVal *v){
 	(void)c;
-
-	switch(t->type){
-	default: break;
-	case ltFloat:
-		cur = spf(cur, bufEnd,"%f", t->vFloat);
-		break;
-	case ltInt:
-		cur = spf(cur, bufEnd, "%i" ,t->vInt);
-		break;
-	case ltBool:
-		cur = spf(cur, bufEnd, "%s", t->vBool ? "#t" : "#f");
-		break;
-	case ltString:
-		return t;
-	}
-	return lValString(buf);
+	spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%V",v);
+	return lValString(dispWriteBuf);
 }
 
 /* Cast all values in list v to be of type t */
@@ -127,7 +108,7 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 	default:
 		return v;
 	case ltString:
-		return lMap(c,v,lnfString);
+		return lMap(c,v,lCastString);
 	case ltInt:
 		return lMap(c,v,lnfInt);
 	case ltFloat:

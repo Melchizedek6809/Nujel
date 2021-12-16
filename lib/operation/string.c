@@ -129,33 +129,8 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	char *new, *cur = tmpStringBuf;
 	char *bufEnd = &tmpStringBuf[tmpStringBufSize];
 	forEach(sexpr,v){
-		lVal *t = lCar(sexpr);
-		if(t == NULL){continue;}
 		restart:
-		switch(t->type){
-		default:
-			new = cur;
-			break;
-		case ltSymbol:
-			new = spf(cur, bufEnd, "%s", t->vSymbol->c);
-			break;
-		case ltFloat:
-			new = spf(cur, bufEnd, "%f", t->vFloat);
-			break;
-		case ltInt:
-			new = spf(cur, bufEnd, "%i", t->vInt);
-			break;
-		case ltBool:
-			new = spf(cur, bufEnd, "%s", t->vBool ? "#t" : "#f");
-			break;
-		case ltString:
-			if(t->vString == NULL){
-				new = cur;
-			} else {
-				new = spf(cur, bufEnd, "%s", t->vString->data);
-			}
-			break;
-		}
+		new = spf(cur, bufEnd, "%V", lCar(sexpr));
 		if(new >= bufEnd){
 			tmpStringBufSize *= 2;
 			const int i = cur - tmpStringBuf;
@@ -170,6 +145,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		}
 		cur = new;
 	}
+	if(cur < bufEnd){*cur = 0;}
 	return lValString(tmpStringBuf);
 }
 
