@@ -1,0 +1,18 @@
+name: MacOS
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: macos-11
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Compile
+      run: make -j
+    - name: Run Tests
+      run: make test
