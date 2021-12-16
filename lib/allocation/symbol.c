@@ -6,6 +6,7 @@
 #include "../display.h"
 #include "../nujel.h"
 #include "../allocation/val.h"
+#include "../misc/pf.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -72,7 +73,7 @@ lSymbol *lSymS(const char *str){
 		lPrintError("lSym Overflow\n");
 		return NULL;
 	}
-	snprintf(lSymbolList[lSymbolMax].c,sizeof(lSymbolList[0].c),"%s",str);
+	spf(lSymbolList[lSymbolMax].c,&lSymbolList[lSymbolMax].c[sizeof(lSymbolList[0].c)],"%s",str);
 	return &lSymbolList[lSymbolMax++];
 }
 

@@ -99,36 +99,26 @@ lVal *lnfBool(lClosure *c, lVal *v){
 lVal *lnfString(lClosure *c, lVal *t){
 	char tmpStringBuf[32];
 	char *buf = tmpStringBuf;
-	int len = 0;
+	char *bufEnd = &tmpStringBuf[sizeof(tmpStringBuf)];
+	char *cur = buf;
 	if(t == NULL){return lValString("");}
 	(void)c;
 
 	switch(t->type){
 	default: break;
-	case ltFloat: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%f",t->vFloat);
-		len += clen;
-		buf += clen;
-		break; }
-	case ltInt: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf), "%"PRId64 ,t->vInt);
-		len += clen;
-		buf += clen;
-		break; }
-	case ltBool: {
-		int clen = snprintf(buf,sizeof(tmpStringBuf) - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
-		len += clen;
-		buf += clen;
-		break; }
+	case ltFloat:
+		cur = spf(cur, bufEnd,"%f", t->vFloat);
+		break;
+	case ltInt:
+		cur = spf(cur, bufEnd, "%i" ,t->vInt);
+		break;
+	case ltBool:
+		cur = spf(cur, bufEnd, "%s", t->vBool ? "#t" : "#f");
+		break;
 	case ltString:
 		return t;
 	}
-
-	buf[len] = 0;
-	lVal *ret    = lValAlloc();
-	ret->type    = ltString;
-	ret->vString = lStringNew(tmpStringBuf, len);
-	return ret;
+	return lValString(buf);
 }
 
 /* Cast all values in list v to be of type t */

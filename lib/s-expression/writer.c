@@ -26,11 +26,9 @@ static char *lSWriteTreeRec(lTree *v, char *buf, char *bufEnd, bool display){
 	if((v == NULL) || (v->key == NULL)){return buf;}
 	char *cur = buf;
 	cur = lSWriteTreeRec(v->left,cur,bufEnd,display);
-	int t = snprintf(cur,bufEnd-cur,"%s ",v->key->c);
-	if(t > 0){cur += t;}
+	cur = spf(cur,bufEnd,"%s ",v->key->c);
 	cur = lSWriteVal(v->value,cur,bufEnd,display);
-	t = snprintf(cur,bufEnd-cur," ");
-	if(t > 0){cur += t;}
+	cur = spf(cur,bufEnd," ");
 	cur = lSWriteTreeRec(v->right,cur,bufEnd,display);
 
 	return cur;
@@ -38,8 +36,7 @@ static char *lSWriteTreeRec(lTree *v, char *buf, char *bufEnd, bool display){
 
 char *lSWriteTree(lTree *v, char *buf, char *bufEnd, bool display){
 	char *cur = buf;
-	int t = snprintf(cur,bufEnd-cur,"@[");
-	if(t > 0){cur += t;}
+	cur = spf(cur,bufEnd,"@[");
 	char *new = lSWriteTreeRec(v,cur,bufEnd, display);
 	if(new != cur){
 		cur = new;
@@ -50,16 +47,13 @@ char *lSWriteTree(lTree *v, char *buf, char *bufEnd, bool display){
 	return cur;
 }
 
-// char *lSIndent(char *buf, char *bufEnd, int indentLevel)
 char *lSWriteTreeDef(lTree *v, char *buf, char *bufEnd){
 	if(v == NULL){return buf;}
-	buf = lSWriteTreeDef(v->left, buf, bufEnd);
 
-	int t = snprintf(buf,bufEnd-buf,"[def %s ",v->key->c);
-	if(t > 0){buf += t;}
+	buf = lSWriteTreeDef(v->left, buf, bufEnd);
+	buf = spf(buf,bufEnd,"[def %s ",v->key->c);
 	buf = lSWriteVal(v->value, buf, bufEnd, false);
-	t = snprintf(buf,bufEnd-buf,"]\n");
-	if(t > 0){buf += t;}
+	buf = spf(buf,bufEnd,"]\n");
 
 	return lSWriteTreeDef(v->right, buf, bufEnd);
 }

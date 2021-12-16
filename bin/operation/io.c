@@ -41,7 +41,7 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 	(void)c;
 	const char *prompt = castToString(lCar(v),NULL);
 	if(prompt != NULL){
-		printf("%s",prompt);
+		pf("%s",prompt);
 	}
 	char buf[4096];
 	if(fgets(buf,sizeof(buf),stdin) == NULL){
@@ -121,7 +121,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	const char *content  = castToString(lCar(v),NULL);
 
 	char buf[32];
-	snprintf(buf,sizeof(buf),"/tmp/nujel-XXXXXX");
+	spf(buf,&buf[sizeof(buf)],"/tmp/nujel-XXXXXX");
 	int ret = mkstemp(buf);
 	FILE *fd = fdopen(ret,"w");
 
@@ -161,7 +161,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 	FILE *child = popen(command,"r");
 	if(child == NULL){
-		fprintf(stderr,"Error openeing %s\n",command);
+		fpf(stderr,"Error openeing %s\n",command);
 		return NULL;
 	}
 	while(1){

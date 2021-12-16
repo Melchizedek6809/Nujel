@@ -16,6 +16,7 @@
 #include "../collection/list.h"
 #include "../collection/string.h"
 #include "../collection/tree.h"
+#include "../misc/pf.h"
 #include "../type/closure.h"
 #include "../type/native-function.h"
 
@@ -201,12 +202,12 @@ void lGarbageCollect(){
 	lGCSweep();
 	if(lVerbose){
 		const u64 end = getMSecs();
-		printf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(int)(end-start));
-		printf("Vals: %u -> %u [Δ %i]{Σ %i}\n",bva,lValActive,    (int)lValActive     - bva, lValMax);
-		printf("Clos: %u -> %u [Δ %i]{Σ %i}\n",bca,lClosureActive,(int)lClosureActive - bca, lClosureMax);
-		printf("Strs: %u -> %u [Δ %i]{Σ %i}\n",bsa,lStringActive, (int)lStringActive  - bsa, lStringMax);
-		printf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive,  (int)lArrayActive   - baa, lArrayMax);
-		printf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive,   (int)lTreeActive    - bta, lTreeMax);
-		printf("--------------\n\n");
+		pf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(i64)(end-start));
+		pf("Vals: %u -> %u [Δ %i]{Σ %i}\n",bva,lValActive,    (i64)lValActive     - bva, lValMax);
+		pf("Clos: %u -> %u [Δ %i]{Σ %i}\n",bca,lClosureActive,(i64)lClosureActive - bca, lClosureMax);
+		pf("Strs: %u -> %u [Δ %i]{Σ %i}\n",bsa,lStringActive, (i64)lStringActive  - bsa, lStringMax);
+		pf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive,  (i64)lArrayActive   - baa, lArrayMax);
+		pf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive,   (i64)lTreeActive    - bta, lTreeMax);
+		pf("--------------\n\n");
 	}
 }

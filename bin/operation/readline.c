@@ -55,10 +55,7 @@ const char *getHistoryPath(){
 	}
 	#endif
 
-	if(snprintf(buf,sizeof(buf),"%s/.nujel_history",home) <= 0){ // snprintf instead of strcpy/strcat
-		fprintf(stderr,"Can't create historyPath, maybe your $HOME is too big?\n");
-		return NULL;
-	}
+	spf(buf,&buf[sizeof(buf)],"%s/.nujel_history",home);
 	return buf;
 }
 

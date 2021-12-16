@@ -11,7 +11,7 @@ char dispWriteBuf[1<<18];
 /* Display v on the default channel, most likely stdout */
 void lDisplayVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],true);
-	printf("%s",dispWriteBuf);
+	pf("%s",dispWriteBuf);
 }
 
 /* Display v on the default channel, most likely stdout */
@@ -23,17 +23,17 @@ const char *lReturnDisplayVal(lVal *v){
 /* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],true);
-	fprintf(stderr,"%s",dispWriteBuf);
+	fpf(stderr,"%s",dispWriteBuf);
 }
 
 /* Write a machine-readable presentation of v to stdout */
 void lWriteVal(lVal *v){
 	lSWriteVal(v,dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],false);
-	printf("%s\n",dispWriteBuf);
+	pf("%s\n",dispWriteBuf);
 }
 
 /* Write a machine-readable presentation of t to stdout */
 void lWriteTree(lTree *t){
 	lSWriteTree(t, dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],false);
-	printf("%s\n",dispWriteBuf);
+	pf("%s\n",dispWriteBuf);
 }

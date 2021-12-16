@@ -10,7 +10,8 @@
 
 static char *writeString(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
-	while((buf < bufEnd) && *s){ *cur++ = *s++; }
+	if(s == NULL){return NULL;}
+	while((cur < bufEnd) && *s){ *cur++ = *s++; }
 	return cur;
 }
 
@@ -110,7 +111,6 @@ static char *writeFloat(char *buf, char *bufEnd, double v){
 	}
 	zeroes = MAX(0, zeroes - 1);
 	i64 ifract = round(fract);
-	//printf("%f = %i . [%i] %lli\n",v, (int)integer, zeroes, ifract);
 	while(!(ifract % 10)){ifract /= 10; if(--digits < 0){break;}}
 	if(cur < bufEnd){*cur++ = '.';}
 	while((cur < bufEnd) && zeroes--){*cur++ = '0';}
@@ -164,6 +164,21 @@ char *spf(char *cur, char *bufEnd, const char *format, ...){
 	char *ret = vspf(cur, bufEnd, format, va);
 	va_end(va);
 	return ret;
+}
+
+void vfpf(FILE *fp, const char *format, va_list va){
+	char buf[8192];
+	char *ret = vspf(buf,buf + sizeof(buf), format, va);
+	fwrite(buf, ret - buf, 1, fp);
+}
+
+void fpf(FILE *fp, const char *format, ...){
+	char buf[8192];
+	va_list va;
+	va_start(va ,format);
+	char *ret = vspf(buf,buf + sizeof(buf), format, va);
+	va_end(va);
+	fwrite(buf, ret - buf, 1, fp);
 }
 
 void pf(const char *format, ...){

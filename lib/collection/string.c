@@ -10,6 +10,7 @@
 #include "../allocation/garbage-collection.h"
 #include "../allocation/string.h"
 #include "../allocation/val.h"
+#include "../misc/pf.h"
 #include "../type/closure.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
@@ -103,19 +104,12 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 
 	char *data = buf;
 	if((errStart - lineStart) > 30){
-		*data++ = '.';
-		*data++ = '.';
-		*data++ = '.';
+		data = spf(data,&buf[sizeof(buf)],"...");
 		lineStart = errStart - 30;
 	}
 	while(lineStart < err){*data++ = *lineStart++;}
 	*data = 0;
-	const int sret = snprintf(data,sizeof(buf) - (data-buf), "\033[41m%c\033[49m",*err);
-	if(sret > 0){
-		data += sret;
-	}else{
-		return NULL;
-	}
+	data = spf(data,&buf[sizeof(buf)], "\033[41m%c\033[49m",*err);
 	bool endAbbreviated = false;
 	if((lineEnd - errEnd) > 30){
 		lineEnd = errEnd + 30;

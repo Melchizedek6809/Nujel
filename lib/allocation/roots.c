@@ -8,6 +8,7 @@
 #include "../type-system.h"
 #include "../allocation/garbage-collection.h"
 #include "../collection/string.h"
+#include "../misc/pf.h"
 #include "../type/closure.h"
 #include "../type/val.h"
 
@@ -34,7 +35,7 @@ static void lRootsPush(const lType t, void *ptr){
 		rootMax = MAX(rootMax * 2, 256);
 		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
 		if(rootStack == NULL){
-			fprintf(stderr,"Can't grow rootsStack\n");
+			fpf(stderr,"Can't grow rootsStack\n");
 			exit(123);
 		}
 	}

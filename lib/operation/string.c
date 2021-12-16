@@ -10,6 +10,7 @@
 #include "../allocation/val.h"
 #include "../collection/list.h"
 #include "../collection/string.h"
+#include "../misc/pf.h"
 #include "../s-expression/writer.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
@@ -120,58 +121,56 @@ static lVal *lnfSubstr(lClosure *c, lVal *v){
 lVal *lnfCat(lClosure *c, lVal *v){
 	(void)c;
 	static char *tmpStringBuf = NULL;
-	static int tmpStringBufSize = 1<<8; // Start with 4K
+	static int tmpStringBufSize = 1<<12; // Start with 4K
 	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
 	if(tmpStringBuf == NULL){
 		lPrintError("lnfCat OOM\n");
 		return NULL;
 	}
-	char *buf = tmpStringBuf;
-	int i = 0;
+	char *new, *cur = tmpStringBuf;
+	char *bufEnd = &tmpStringBuf[tmpStringBufSize];
 	forEach(sexpr,v){
 		lVal *t = lCar(sexpr);
-		int clen = 0;
 		if(t == NULL){continue;}
 		restart:
 		switch(t->type){
-		default: break;
+		default:
+			new = cur;
+			break;
 		case ltSymbol:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vSymbol->c);
+			new = spf(cur, bufEnd, "%s", t->vSymbol->c);
 			break;
 		case ltFloat:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%.5f",t->vFloat);
-			for(;buf[clen-1] == '0';clen--){buf[clen]=0;}
-			if(buf[clen] == '0'){buf[clen] = 0;}
-			if(buf[clen-1] == '.'){buf[clen++] = '0';}
+			new = spf(cur, bufEnd, "%f", t->vFloat);
 			break;
 		case ltInt:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%"PRId64 ,t->vInt);
+			new = spf(cur, bufEnd, "%i", t->vInt);
 			break;
 		case ltBool:
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vBool ? "#t" : "#f");
+			new = spf(cur, bufEnd, "%s", t->vBool ? "#t" : "#f");
 			break;
 		case ltString:
-			if(t->vString == NULL){continue;}
-			clen = snprintf(buf,tmpStringBufSize - (buf-tmpStringBuf),"%s",t->vString->data);
+			if(t->vString == NULL){
+				new = cur;
+			} else {
+				new = spf(cur, bufEnd, "%s", t->vString->data);
+			}
 			break;
 		}
-		if(clen < 0){
-			return NULL;
-		}
-		if((i + clen) >= tmpStringBufSize){
+		if(new >= bufEnd){
 			tmpStringBufSize *= 2;
+			const int i = cur - tmpStringBuf;
 			tmpStringBuf = realloc(tmpStringBuf,tmpStringBufSize);
+			bufEnd = &tmpStringBuf[tmpStringBufSize];
 			if(tmpStringBuf == NULL){
 				lPrintError("lnfCat2 OOM\n");
 				return NULL;
 			}
-			buf = &tmpStringBuf[i];
+			cur = &tmpStringBuf[i];
 			goto restart;
 		}
-		buf += clen;
-		i += clen;
+		cur = new;
 	}
-	*buf = 0;
 	return lValString(tmpStringBuf);
 }
 
