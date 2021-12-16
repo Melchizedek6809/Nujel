@@ -31,7 +31,7 @@ LIBS                 := -lm
 RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
 
-STATIC_LIBS := -static -lpthread
+STATIC_LIBS := -static -lpthread -lm
 BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
