@@ -71,8 +71,6 @@
        [try [\ [err] [test-failure result err rawexpr i]]
             [def expr [eval rawexpr]]
             [def pred? ==]
-            [when [string? result]
-                  [set! expr [str/write expr]]]
             [when [pair? result]
                   [set! pred? list-equal?]]
             [if [pred? result expr]
