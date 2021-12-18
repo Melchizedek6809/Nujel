@@ -3,11 +3,12 @@
  *
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
-#include <setjmp.h>
 
 #include "../lib/api.h"
 #include "misc.h"
@@ -120,10 +121,20 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	lExceptionTry(evalRaw,c,ret);
 }
 
+void breakSignalHandler(int sig){
+	(void)sig;
+	breakQueued = true;
+}
+
+void initSignalHandlers(){
+	signal(SIGINT, breakSignalHandler);
+}
+
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
+	initSignalHandlers();
 	lInit();
 	setIOSymbols();
 

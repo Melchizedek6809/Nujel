@@ -342,3 +342,7 @@ lVal *lList(int length, ...){
 	va_end(varArgs);
 	return ret;
 }
+
+void lBreak(){
+	breakQueued = true;
+}

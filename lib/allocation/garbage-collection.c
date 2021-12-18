@@ -11,6 +11,7 @@
 #include "string.h"
 #include "tree.h"
 #include "val.h"
+#include "../exception.h"
 #include "../nujel.h"
 #include "../operation.h"
 #include "../collection/list.h"
@@ -22,6 +23,7 @@
 
 #include <stdio.h>
 
+volatile bool breakQueued = false;
 int lGCRuns = 0;
 
 u8 lValMarkMap    [VAL_MAX];
@@ -209,5 +211,9 @@ void lGarbageCollect(){
 		pf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",baa,lArrayActive,  (i64)lArrayActive   - baa, lArrayMax);
 		pf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive,   (i64)lTreeActive    - bta, lTreeMax);
 		pf("--------------\n\n");
+	}
+	if(breakQueued){
+		breakQueued = false;
+		lExceptionThrow(":break","A break has been triggered");
 	}
 }

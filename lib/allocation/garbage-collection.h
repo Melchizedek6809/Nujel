@@ -1,6 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
+extern volatile bool breakQueued;
 extern int lGCRuns;
 extern void (*sweeperChain)();
 
