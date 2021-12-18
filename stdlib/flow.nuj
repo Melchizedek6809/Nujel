@@ -93,7 +93,7 @@
 	  `[let [[~symbol-name ~loop-start]]
 	        [while [!= ~symbol-name ~loop-stop]
                        ~@...body
-		       [set! ~symbol-name [+ ~dir ~symbol-name]]
+		       [set! ~symbol-name [add/int ~dir ~symbol-name]]
 	        ]
 	   ]
 ]

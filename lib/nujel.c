@@ -238,6 +238,8 @@ static void lAddPlatformVars(lClosure *c){
 static void lAddCoreFuncs(lClosure *c){
 	lOperationsAllocation(c);
 	lOperationsArithmetic(c);
+	lOperationsInfix(c);
+	lOperationsMath(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
 	lOperationsClosure(c);
