@@ -2,7 +2,7 @@ INSTALL_BIN_DIR := ~/bin/
 
 EMCC        := emcc
 EMAR        := emar
-EMMEM       := -s TOTAL_MEMORY=64MB -s ALLOW_MEMORY_GROWTH=1
+EMMEM       := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
 
 LIB_SRCS    := $(shell find lib -type f -name '*.c')
 LIB_HDRS    := $(shell find lib -type f -name '*.h')
