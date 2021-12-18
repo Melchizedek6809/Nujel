@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define isopenparen(v) ((v=='[')||(v=='(')||(v=='{'))
+#define isopenparen(v)  ((v=='[')||(v=='(')||(v=='{'))
 #define iscloseparen(v) ((v==']')||(v==')')||(v=='}'))
 #define isparen(v) (isopenparen(v) || (iscloseparen(v)))
 #define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`')||(v==';'))
@@ -285,7 +285,7 @@ static lVal *lParseCharacter(lString *s){
 
 /* Parse the special value in s starting with a # and return the resulting lVal */
 static lVal *lParseSpecial(lString *s){
-	if(*s->data++ != '#'){return NULL;}
+	if(s->data >= s->bufEnd){return NULL;}
 	switch(*s->data++){
 	default: {
 		const char *start, *end;
@@ -343,21 +343,24 @@ lVal *lReadList(lString *s, bool rootForm){
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else{
-			if(v == NULL){
-				v = ret = lRootsValPush(lCons(NULL,NULL));
+			if(v != NULL && (c == '.') && (isspace(s->data[1]) || isnonsymbol(s->data[1]))){
+				s->data++;
+				lStringAdvanceToNextCharacter(s);
+				lVal *nv = lReadValue(s);
+				v->vList.cdr = isComment(nv) ? NULL : nv;
+				continue;
 			}else{
-				if((c == '.') && (isspace(s->data[1]) || isnonsymbol(s->data[1]))){
-					s->data++;
-					lStringAdvanceToNextCharacter(s);
-					v->vList.cdr = lReadValue(s);
-					continue;
+				lVal *nv = lReadValue(s);
+				if(isComment(nv)){continue;}
+				RVP(nv);
+				if(v == NULL){
+					v = ret = lRootsValPush(lCons(nv,NULL));
+				}else{
+					v->vList.cdr = lCons(nv,NULL);
+					v = v->vList.cdr;
 				}
-				v->vList.cdr = lCons(NULL,NULL);
-				v = v->vList.cdr;
 			}
-			v->vList.car = lReadValue(s);
 		}
-
 	}
 }
 
@@ -402,7 +405,21 @@ lVal *lReadValue(lString *s){
 		s->data++;
 		return lParseString(s);
 	case '#':
-		return lParseSpecial(s);
+		s->data++;
+		if(s->data >= s->bufEnd){
+			return NULL;
+		}else if(*s->data == '_'){
+			++s->data;
+			if((s->data < s->bufEnd) && isopenparen(*s->data)){
+				s->data++;
+				lReadList(s,false);
+				return lValComment();
+			}else{
+				lExceptionThrowValClo(":invalid-comment", "Comment reader forms have to use brackets/parenthesis around the value to be commented out", NULL, readClosure);
+			}
+		}else{
+			return lParseSpecial(s);
+		}
 	case ';':
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);

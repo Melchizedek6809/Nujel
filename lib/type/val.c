@@ -70,3 +70,10 @@ lVal *lValLambda(lClosure *v){
 	ret->vClosure = v;
 	return ret;
 }
+
+/* Return a newly allocated comment, something that should be ignored */
+lVal *lValComment(){
+	lVal *ret = lValAlloc();
+	ret->type = ltComment;
+	return ret;
+}

@@ -815,6 +815,11 @@
 [test/add "#[2]" [array/set! #[1] 0 2]]
 [test/add "#[#t]" [array/set! #[1] 0 #t]]
 [test/add "#[#f]" [array/set! #[1] 0 #f]]
+[test/add "[1]" [read "#_[\"asd\"] 1"]]
+[test/add "[1]" [read "#_[asd] 1"]]
+[test/add "[1]" [read "#_[asd [123]] 1"]]
+[test/add "[1 2]" [read "1 #_[asd [123]] 2"]]
+[test/add "[1]" [read "1 #_[asd [123]]"]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]

@@ -39,6 +39,7 @@ typedef struct {
 
 typedef enum lType {
 	ltNoAlloc = 0,
+	ltComment,
 
 	ltSymbol,
 	ltBool,

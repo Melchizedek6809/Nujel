@@ -14,3 +14,5 @@ lVal *lCastAuto         (lClosure *c, lVal *v);
 lType lTypecast         (const lType a, const lType b);
 
 void  lOperationsTypeSystem(lClosure *c);
+
+static inline bool isComment(lVal *v){return v && v->type == ltComment;}
