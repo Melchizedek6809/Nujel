@@ -290,7 +290,7 @@ lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
 
 /* Quote V, enabling it to be used verbatim, without being evaluated. */
 lVal *lQuote(lVal *v){
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
+	lVal *ret = RVP(lCons(NULL,NULL));
 	ret->vList.car = lValSymS(symQuote);
 	ret->vList.cdr = lCons(v,NULL);
 	return ret;
