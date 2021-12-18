@@ -109,7 +109,10 @@ static lVal *lnfTreeDup(lClosure *c, lVal *v){
 	}
 	lTree *tree = castToTree(lCar(v),NULL);
 	if(!tree){return lCar(v);}
-	return lValTree(lTreeDup(tree));
+	const int SP = lRootsGet();
+	tree = lTreeDup(tree);
+	lRootsRet(SP);
+	return lValTree(tree);
 }
 
 void lOperationsTree(lClosure *c){

@@ -20,6 +20,7 @@ typedef struct {
 	union {
 		lClosure *vClosure;
 		lVal     *vVal;
+		lTree    *vTree;
 		lString  *vString;
 		void     *vPointer;
 	};
@@ -48,6 +49,12 @@ lClosure *lRootsClosurePush(lClosure *c){
 	return c;
 }
 
+/* Push an lClosure onto the root stack, protecting it from being freed by the GC */
+lTree *lRootsTreePush(lTree *c){
+	lRootsPush(ltTree,c);
+	return c;
+}
+
 /* Push an lVal onto the root stack, protecting it from being freed by the GC */
 lVal *lRootsValPush(lVal *v){
 	lRootsPush(ltPair,v);
@@ -73,6 +80,9 @@ void lRootsMark(){
 			break;
 		case ltString:
 			lStringGCMark(rootStack[i].vString);
+			break;
+		case ltTree:
+			lTreeGCMark(rootStack[i].vTree);
 			break;
 		default:
 			break;

@@ -40,8 +40,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 	}
 	const int SP = lRootsGet();
 	lVal *vn = args;
-	lClosure *tmpc = lClosureNew(lambda->vClosure);
-	lRootsClosurePush(tmpc);
+	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
@@ -69,8 +68,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lVal *vn = args;
-	lClosure *tmpc = lClosureNew(lambda->vClosure);
-	lRootsClosurePush(tmpc);
+	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
@@ -177,9 +175,9 @@ lVal *lEval(lClosure *c, lVal *v){
 
 /* Evaluate func for every entry in list v and return a list containing the results */
 lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
-	if(v == NULL){return NULL;}
-	lVal *ret, *cc, *car = lRootsValPush(func(c,lCar(v)));
-	ret = cc = lRootsValPush(lCons(car,NULL));
+	lVal *ret, *cc;
+	ret = cc = RVP(lCons(NULL,NULL));
+	ret->vList.car = func(c,lCar(v));
 	for(lVal *t = lCdr(v); t ; t = lCdr(t)){
 		cc = cc->vList.cdr = lCons(NULL,NULL);
 		cc->vList.car = func(c,lCar(t));

@@ -1,7 +1,7 @@
 #pragma once
 #include "../nujel.h"
 
-#define TRE_MAX (1<<18)
+#define TRE_MAX (1<<19)
 extern lTree  lTreeList[TRE_MAX];
 extern uint   lTreeMax;
 extern uint   lTreeActive;
