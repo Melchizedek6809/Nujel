@@ -52,7 +52,7 @@ lString *lStringAlloc(){
 		lStringFFree = ret->nextFree;
 	}
 	lStringActive++;
-	*ret = (lString){0};
+	memset(ret, 0, sizeof(lString));
 	return ret;
 }
 

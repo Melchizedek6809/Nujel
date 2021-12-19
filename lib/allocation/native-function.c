@@ -9,6 +9,7 @@
 #include "../s-expression/reader.h"
 #include "../type/closure.h"
 
+#include <string.h>
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
@@ -44,6 +45,6 @@ lNFunc *lNFuncAlloc(){
 		lNFuncFFree = ret->nextFree;
 	}
 	lNFuncActive++;
-	*ret = (lNFunc){0};
+	memset(ret, 0, sizeof(lNFunc));
 	return ret;
 }

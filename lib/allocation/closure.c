@@ -45,7 +45,7 @@ lClosure *lClosureAlloc(){
 		lClosureFFree = ret->nextFree;
 	}
 	lClosureActive++;
-	*ret = (lClosure){0};
+	memset(ret, 0, sizeof(lClosure));
 	return ret;
 }
 

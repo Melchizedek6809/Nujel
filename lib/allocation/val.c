@@ -13,6 +13,7 @@ uint     lValActive = 0;
 uint     lValMax    = 0;
 lVal    *lValFFree  = NULL;
 
+#include <string.h>
 #include <stdlib.h>
 
 /* Initialize the val allocator */
@@ -42,7 +43,7 @@ lVal *lValAlloc(){
 		lValFFree = ret->nextFree;
 	}
 	lValActive++;
-	*ret = (lVal){0};
+	memset(ret, 0, sizeof(lVal));
 	return ret;
 }
 
