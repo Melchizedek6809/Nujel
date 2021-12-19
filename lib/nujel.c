@@ -195,6 +195,8 @@ static void lAddPlatformVars(lClosure *c){
 	lDefineVal(c, "OS", lValString("Emscripten"));
 	#elif defined(__MINGW32__)
 	lDefineVal(c, "OS", lValString("Windows"));
+	#elif defined(__MSYS__)
+	lDefineVal(c, "OS", lValString("Legacy Windows"));
 	#elif defined(__MINIX__) || defined(__MINIX3__)
 	lDefineVal(c, "OS", lValString("Minix"));
 	#elif defined(__linux__)

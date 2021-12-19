@@ -15,7 +15,7 @@
 #include "operation/readline.h"
 #include "operation/io.h"
 
-extern char binlib_no_data[];
+extern unsigned char binlib_no_data[];
 lClosure *mainClosure;
 
 #ifdef __EMSCRIPTEN__

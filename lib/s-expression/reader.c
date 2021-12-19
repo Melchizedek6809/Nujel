@@ -343,7 +343,8 @@ lVal *lReadList(lString *s, bool rootForm){
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else{
-			if(v != NULL && (c == '.') && (isspace(s->data[1]) || isnonsymbol(s->data[1]))){
+			const u8 next = s->data[1];
+			if(v != NULL && (c == '.') && (isspace(next) || isnonsymbol(next))){
 				s->data++;
 				lStringAdvanceToNextCharacter(s);
 				lVal *nv = lReadValue(s);

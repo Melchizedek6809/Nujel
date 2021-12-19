@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __MINGW32__
+#if defined(__MINGW32__) || defined(__MSYS__)
 	#include <windows.h>
 	#include <shlobj.h>
 	#include "../../vendor/getline/getline.h"

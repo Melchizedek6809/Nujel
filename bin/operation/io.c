@@ -143,6 +143,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	return lValString(ret);
 }
 
+#if (!defined(__MSYS__)) || (defined(__MINGW32__))
 static lVal *lnfPopen(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	#ifdef __EMSCRIPTEN__
@@ -197,6 +198,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	return ret;
 	#endif
 }
+#endif
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	(void) c;
@@ -276,7 +278,9 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
+	#if (!defined(__MSYS__)) || (defined(__MINGW32__))
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
+	#endif
 
 	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
 	lAddNativeFunc(c,"file/write",       "[path content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
