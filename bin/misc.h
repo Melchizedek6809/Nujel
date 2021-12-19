@@ -8,3 +8,4 @@ int  makeDir         (const char *name);
 int  makeDirR        (const char *name);
 void rmDirR          (const char *name);
 void changeToDataDir ();
+const char *tempFilename();

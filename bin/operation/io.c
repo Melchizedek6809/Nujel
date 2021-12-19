@@ -120,10 +120,8 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	const char *content  = castToString(lCar(v),NULL);
 
-	char buf[32];
-	spf(buf,&buf[sizeof(buf)],"/tmp/nujel-XXXXXX");
-	int ret = mkstemp(buf);
-	FILE *fd = fdopen(ret,"w");
+	const char *ret = tempFilename();
+	FILE *fd = fopen(ret,"w");
 
 	if(content){
 		const int len = lStringLength(lCar(v)->vString);
@@ -132,7 +130,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 			int r = fwrite(&content[written],1,len - written,fd);
 			if(r <= 0){
 				if(ferror(fd)){
-					lPrintError("Error while writing to temporary file: %s\n",buf);
+					lPrintError("Error while writing to temporary file: %s\n",ret);
 					break;
 				}
 			}else{
@@ -142,7 +140,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	}
 
 	fclose(fd);
-	return lValString(buf);
+	return lValString(ret);
 }
 
 static lVal *lnfPopen(lClosure *c, lVal *v){

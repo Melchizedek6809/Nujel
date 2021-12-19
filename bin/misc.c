@@ -139,3 +139,10 @@ void rmDirR(const char *name){
 	closedir(dp);
 	rmdir(name);
 }
+
+const char *tempFilename(){
+	static uint counter = 0;
+	static char buf[32];
+	spf(buf,&buf[sizeof(buf)], "/tmp/nujel-%x-%x", getpid(),++counter);
+	return buf;
+}
