@@ -68,23 +68,32 @@
           `[repl/run-forked* ~[list 'quote expr]]
 ]
 
+[def repl/option-map @[]]
+[tree/set! repl/option-map 'h
+           [\ [option]
+              [repl/print-help]
+              [set! repl/parse-args/run-repl #f]]]
+[tree/set! repl/option-map 'x
+           [\ [option]
+              [set! repl/parse-args/eval-next #t]
+              [set! repl/parse-args/run-repl #f]]]
+[tree/set! repl/option-map :default
+           [\ [option]
+              [tree/set! repl/options option #t]]]
 
 [def repl/executable-name "nujel"]
 [def repl/parse-args/eval-next #f]
 [def repl/parse-args/run-repl #t]
+[def repl/options @[]]
 
 [defun repl/parse-option [option]
-       [cond [[== option "x"]
-              [set! repl/parse-args/eval-next #t]
-              [set! repl/parse-args/run-repl #f]]
-             [[== option "h"]
-              [repl/print-help]
-              [set! repl/parse-args/run-repl #f]]
-       ]
+       [[or [repl/option-map option] [repl/option-map :default]] option]
 ]
 
 [defun repl/parse-options [options]
-       [for-each repl/parse-option [split options ""]]
+       [if [== [char-at options 0] #\-]
+           [repl/parse-option [str->sym [substr options 1]]]
+           [for-each repl/parse-option [map str->sym [split options ""]]]]
 ]
 
 [defun repl/parse-arg [arg]

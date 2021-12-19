@@ -172,6 +172,10 @@ tmp/binlib.h: tmp/binlib.c
 test: $(NUJEL)
 	@$(NUJEL) tools/tests.nuj
 
+.PHONY: test-full
+test-full: $(NUJEL)
+	@$(NUJEL) --:full-test tools/tests.nuj
+
 .PHONY: run
 run: $(NUJEL)
 	@$(NUJEL) -x "[exit [test-run]]"

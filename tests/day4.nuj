@@ -129,7 +129,7 @@
 	     [throw [list :wrong-result "Wrong result" last-board]]]
 ]
 
-[def raw [split [file/read "day4.input"] "\n"]]
+[def raw [split [file/read "tests/day4.input"] "\n"]]
 [def turns [map [\ [a] [car [read a]]] [split [car raw] ","]]]
 [def boards [map parse/board [split/boards [cddr raw]]]]
 

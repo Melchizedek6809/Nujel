@@ -3,7 +3,6 @@
 [def test/beginning [time/milliseconds]]
 [test-run]
 [println [ansi-purple "Now running the AoC Tests, this might take a while."]]
-[path/change "tests/"]
 
 [def ext-nuj? [path/ext?! "nuj"]]
 [defun directory/read-relative [path]
@@ -18,6 +17,7 @@
 	    [if start [cat " " [ansi-blue [string/pad-start [- [time/milliseconds] start] 5]] "ms"] #nil]]
 ]
 
+[def test/full [or [repl/options :full-test] #f]]
 [def test/start [time/milliseconds]]
 [def test/success 0]
 [def test/errors 0]
@@ -38,7 +38,8 @@
             [println [prog-str ansi-green i path test/start/file]]
        ]
 ]
-[def test-paths [list/sort [filter ext-nuj? [directory/read-relative "."]]]]
+[def test-paths [list/sort [filter ext-nuj? [append [directory/read-relative "./tests"]
+                                                    [when test/full [directory/read-relative "./tests-full"]]]]]]
 [def test/count [length test-paths]]
 [for-each file/test test-paths]
 [newline]

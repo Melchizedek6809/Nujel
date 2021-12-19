@@ -89,7 +89,7 @@
        α
 ]
 
-[def state [map/load "day11.input" 10 10]]
+[def state [map/load "tests/day11.input" 10 10]]
 [try [\ [ε] [when [!= [car ε] :all-flashes] [throw ε]]]
      [def ret [step/do-many state 1000]]
 ]

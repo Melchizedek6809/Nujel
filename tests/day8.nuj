@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[def lines [split [file/read "day8.input"] "\n"]]
+[def lines [split [file/read "tests/day8.input"] "\n"]]
 [def counts [-> [array/allocate 10] [array/fill! 0]]]
 
 [defun output/count [entry]
