@@ -1,0 +1,39 @@
+#!/usr/bin/env nujel
+
+[def counter 0]
+
+[defun in-area? [x y]
+       [and [>= x 144]
+	    [<= x 178]
+	    [>= y -100]
+	    [<= y -76]]]
+
+[defun over? [x y]
+       [or [> x 178]
+	   [< y -100]]]
+
+[defun zdir [a]
+       [cond [[zero? a] 0]
+             [[> a 0] -1]
+	     [#t 1]]]
+
+[defun shoot [x y vx vy max-y]
+       ;[println [cat x " " y " " vx " " vy]]
+       [cond [[in-area? x y] [++ counter] max-y]
+	     [[over? x y] 0]
+	     [#t [shoot [+ x vx] [+ y vy] [+ vx [zdir vx]] [+ vy -1] [max y max-y]]]]]
+
+[defun find-max []
+       [def ret 0]
+       [for [vx 0 300]
+       [for [vy -300 300]
+	    [def res [shoot 0 0 vx vy 0]]
+	    [set! ret [max ret res]]
+       ]] ret]
+
+[def res-p1 [find-max]]
+[when [!= res-p1 4950]
+      [throw [list :wrong-result "Wrong result" res-p1]]]
+[def res-p2 counter]
+[when [!= res-p2 1477]
+      [throw [list :wrong-result "Wrong result" res-p2]]]
