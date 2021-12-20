@@ -5,23 +5,18 @@
 
 [defun sum [c]
        "Return the sum of every value in collection C"
-       [reduce + c 0]
-]
+       [reduce + c 0]]
 
 [defun join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]
-       [if l
-           [reduce [λ [a b] [if a [cat a glue b] b]] l #nil]
-           ""]
-]
+       [if-not l ""
+               [reduce [λ [a b] [if a [cat a glue b] b]] l #nil]]]
 
 [defun for-each [f l]
        "Runs F over every item in collection L and returns the resulting list"
-       [reduce [λ [a b] [f b]] l #nil]
-]
+       [reduce [λ [a b] [f b]] l #nil]]
 
 [defun count [l p]
        "Count the number of items in L where P is true"
-       [reduce [λ [a b] [+ a [if [p b] 1 0]]] l 0]
-]
+       [reduce [λ [a b] [+ a [if [p b] 1 0]]] l 0]]

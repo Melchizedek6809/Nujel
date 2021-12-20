@@ -5,48 +5,40 @@
 
 [defun println [str]
        "Print STR on a single line"
-       [print [cat str "\n"]]
-]
+       [print [cat str "\n"]]]
 
 [defun display [value]
         "Display VALUE"
-        [print value]
-]
+        [print value]]
 
 [defun newline []
         "Print a single line feed character"
-        [display "\n"]
-]
+        [display "\n"]]
 
 [defun br [num]
        "Return NUM=1 linebreaks"
        [if [or [nil? num] [<= [int num] 1]]
            "\n"
-           ["\n" [br [+ -1 num]]]]
-]
+           ["\n" [br [+ -1 num]]]]]
 
 [defun path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
        [λ [path]
-          [== ext [lowercase [path/extension path]]]
-       ]
-]
+          [== ext [lowercase [path/extension path]]]]]
 
 [defun path/extension [path]
        "Return the extension of PATH"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
            [substr path [+ 1 last-period] [string/length path]]
-           path]
-]
+           path]]
 
 [defun path/without-extension [path]
        "Return PATH, but without the extension part"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
            [substr path 0 last-period]
-           path]
-]
+           path]]
 
 [defun int->string/binary [α]
        "Turn α into a its **binary** string representation"
@@ -55,10 +47,8 @@
        [when [zero? α] [set! ret "0"]]
        [while [not-zero? α]
               [set! ret [cat [from-char-code [+ #\0 [logand α #b1]]] ret]]
-              [set! α [ash α -1]]
-       ]
-       ret
-]
+              [set! α [ash α -1]]]
+       ret]
 
 [defun int->string/octal [α]
        "Turn α into a its **octal** string representation"
@@ -67,10 +57,8 @@
        [when [zero? α] [set! ret "0"]]
        [while [not-zero? α]
               [set! ret [cat [from-char-code [+ #\0 [logand α #b111]]] ret]]
-              [set! α [ash α -3]]
-       ]
-       ret
-]
+              [set! α [ash α -3]]]
+       ret]
 
 [def int->string/hex [let*
      "Turn α into a its **hexadecimal** string representation"
@@ -82,38 +70,31 @@
         [when [zero? α] [set! ret "0"]]
         [while [not-zero? α]
                [set! ret [cat [conversion-arr [logand α #b1111]] ret]]
-               [set! α [ash α -4]]
-        ]
-        ret
-]]]
+               [set! α [ash α -4]]]
+        ret]]]
 
 [defun int->string/decimal [α]
         "Turn α into a its **decimal** string representation"
-        [string α]
-]
+        [string α]]
 [def int->string int->string/decimal]
 
 [defun string/pad-start [text goal-length char]
        "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
        [while [< [string/length text] goal-length]
-              [set! text [cat char text]]
-       ]
+              [set! text [cat char text]]]
        [if [> [string/length text] goal-length]
            [substr text [- [string/length text] goal-length] [string/length text]]
-           text]
-]
+           text]]
 
 [defun string/pad-end [text goal-length char]
        "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
        [while [< [string/length text] goal-length]
-              [set! text [cat text char]]
-       ]
+              [set! text [cat text char]]]
        [if [> [string/length text] goal-length]
            [substr text 0 goal-length]
-           text]
-]
+           text]]
 
 [defun split/empty [str separator]
        [def slen [string/length str]]
@@ -121,10 +102,8 @@
        [def ret #nil]
        [while [< start slen]
 	      [set! ret [cons [substr str start [+ 1 start]] ret]]
-	      [++ start]
-       ]
-       [reverse ret]
-]
+	      [++ start]]
+       [reverse ret]]
 
 [defun split/string [str separator start]
        [when-not start [set! start 0]]
@@ -133,28 +112,21 @@
 	   [cons [substr str start pos-found]
 		 [split/string str separator [+ pos-found [string/length separator]]]]
 	   [cons [substr str start [string/length str]]
-		 #nil]]
-]
+		 #nil]]]
 
 [defun split [str separator]
        [case [string/length separator]
              [[0] [split/empty str]]
-             [otherwise [split/string str separator 0]]
-       ]
-]
+             [otherwise [split/string str separator 0]]]]
 
 [defun read/single [text]
-       [car [read text]]
-]
+       [car [read text]]]
 
 [defun string/length?! [chars]
-       [λ [a] [== chars [string/length a]]]
-]
+       [λ [a] [== chars [string/length a]]]]
 
 [defun contains-any? [str chars]
-       [apply or [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]
-]
+       [apply or [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]]
 
 [defun contains-all? [str chars]
-       [apply and [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]
-]
+       [apply and [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]]

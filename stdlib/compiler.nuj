@@ -13,92 +13,72 @@
                [let* [def ocar [compile* [car args]]]
                      [if [pair? ocar]
                          [cons ocar [compile/do/args [cdr args]]]
-                         [compile/do/args [cdr args]]]
-               ]
-               [compile/do/args [cdr args]]]]
-]
+                         [compile/do/args [cdr args]]]]
+               [compile/do/args [cdr args]]]]]
 
 [defun compile/do [source]
        [let* [def args [compile/do/args source]]
              [if [last? args]
                  [car args]
-                 [cons 'do args]]
-       ]
-]
+                 [cons 'do args]]]]
 
 [defun compile/def [source]
-       [list 'def [cadr source] [compile* [caddr source]]]
-]
+       [list 'def [cadr source] [compile* [caddr source]]]]
 
 [defun compile/set! [source]
-       [list 'set! [cadr source] [compile* [caddr source]]]
-]
+       [list 'set! [cadr source] [compile* [caddr source]]]]
 
 [defun compile/λ* [source]
        [list 'λ*
              [cadr source]
              [caddr source]
              [cadddr source]
-             [compile [caddddr source]]]
-]
+             [compile [caddddr source]]]]
 
 [defun compile/μ* [source]
        [list 'μ*
              [cadr source]
              [caddr source]
              [cadddr source]
-             [compile [caddddr source]]]
-]
+             [compile [caddddr source]]]]
 
 [defun compile/ω [source]
-       [list 'ω [compile/do [cdr source]]]
-]
+       [list 'ω [compile/do [cdr source]]]]
 
 [defun compile/try [source]
-       [list 'try [compile* [cadr source]] [compile/do [cddr source]]]
-]
+       [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]
 
 [defun compile/if [source]
-       [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]
-]
+       [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]
 
 [defun compile/let* [source]
-       [list 'let* [compile/do [cdr source]]]
-]
+       [list 'let* [compile/do [cdr source]]]]
 
 [defun compile/and [source]
-       [compile/procedure/arg source]
-]
+       [compile/procedure/arg source]]
 
 [defun compile/or [source]
-       [compile/procedure/arg source]
-]
+       [compile/procedure/arg source]]
 
 [defun compile/while [source]
-       [list 'while [compile* [cadr source]] [compile/do [cddr source]]]
-]
+       [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]
 
 [defun compile/macro [macro source]
-       [compile* [macro-apply macro [cdr source]]]
-]
+       [compile* [macro-apply macro [cdr source]]]]
 
 [defun compile/procedure/arg [source]
        [when [pair? source]
              [cons [compile* [car source]]
-                   [compile/procedure/arg [cdr source]]]
-       ]
-]
+                   [compile/procedure/arg [cdr source]]]]]
 
 [defun compile/procedure [proc source]
-       [compile/procedure/arg source]
-]
+       [compile/procedure/arg source]]
 
 [defun compile* [source]
        "Compile the forms in source"
        [let* [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
                          [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
                          [car source]]]
-
        [case [type-of op]
              [:special-form [case op
                     [do     [compile/do     source]]
@@ -114,8 +94,7 @@
                     [or     [compile/or     source]]
                     [while  [compile/while  source]]
                     [quote                  source ]
-                    [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]
-              ]]
+                    [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
              [:macro                      [compile/macro      op  source]]
              [[:lambda :native-function]  [compile/procedure  op  source]]
              [:pair                       [compile/procedure/arg  source]]
@@ -123,9 +102,7 @@
              [:array                      [compile/procedure/arg  source]]
              [:string                     [compile/procedure/arg  source]]
              [:tree                       [compile/procedure/arg  source]]
-             [otherwise                                           source]]
-       ]
-]
+             [otherwise                                           source]]]]
 
 [defun compile [source new-environment new-verbose]
        "Compile the forms in source"
@@ -133,8 +110,7 @@
        [when-not new-verbose [set! new-verbose #f]]
        [set! compile/environment new-environment]
        [set! compile/verbose new-verbose]
-       [compile* source]
-]
+       [compile* source]]
 
 [defun compile/forms [source-raw environment]
         "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
@@ -144,8 +120,7 @@
         [def passes 0]
         [def max-passes 100]
         [defun try-again [source]
-               [set! source-next [cons source source-next]]
-        ]
+               [set! source-next [cons source source-next]]]
         [while source-next
                [set! source source-next]
                [set! source-next #nil]
@@ -157,82 +132,61 @@
                                           [:runtime-macro [try-again [car source]]]
                                           [otherwise [throw err]]]]
                            [def compiled-form [compile [car source] environment #t]]
-                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]]
-                      ]
-                      [cdr! source]
-               ]
+                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]]]
+                      [cdr! source]]
                [set! source-next [reverse source-next]]
                [when [> [set! passes [+ 1 passes]] max-passes]
                      [for-each display/error errors]
-		     [throw [list :too-many-passes "The compiler couldn't produce a valid result in a 100 passes, probably something wrong with the code."]]
-               ]
-        ]
-        [compile source-raw environment]
-]
+		     [throw [list :too-many-passes "The compiler couldn't produce a valid result in a 100 passes, probably something wrong with the code."]]]]
+        [compile source-raw environment]]
 
 [def defmacro [μ* defmacro [name args ...body]
               "Define a new macro"
-              [do [def doc-string [if [string? [car ...body]]
-                                  [car ...body]
-                                  ""]]
-                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do ...body]] [current-closure]]]]
-]]
+              [do [def doc-string [if-not [string? [car ...body]] ""
+					  [car ...body]]]
+                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do ...body]] [current-closure]]]]]]
 
 [defmacro defun [name args ...body]
               "Define a new function"
-              [def doc-string [if [string? [car ...body]]
-                                  [car ...body]
-                                  ""]]
-              [list 'def name [compile [list 'λ* name args doc-string [cons 'do ...body]] [current-closure]]]
-]
+              [def doc-string [if-not [string? [car ...body]] ""
+                                      [car ...body]]]
+              [list 'def name [compile [list 'λ* name args doc-string [cons 'do ...body]] [current-closure]]]]
 
 [defmacro μ [args ...body]
           "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if [string? [car ...body]]
-                                  [car ...body]
-                                  ""]]
-          [compile [list 'μ* #nil args doc-string [cons 'do ...body]] [current-closure]]
-]
+          [def doc-string [if-not [string? [car ...body]] ""
+                                  [car ...body]]]
+          [compile [list 'μ* #nil args doc-string [cons 'do ...body]] [current-closure]]]
 
 [defmacro \ [args ...body]
           "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if [string? [car ...body]]
-                                  [car ...body]
-                                  ""]]
-          [compile [list 'λ* #nil args doc-string [cons 'do ...body]] [current-closure]]
-]
+          [def doc-string [if-not [string? [car ...body]] ""
+                                  [car ...body]]]
+          [compile [list 'λ* #nil args doc-string [cons 'do ...body]] [current-closure]]]
 [def λ \]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"
-          `[eval* [compile ~expr [current-closure]]]
-]
+          `[eval* [compile ~expr [current-closure]]]]
 
 [defun optimize/code/rest [code]
-       [if [pair? code]
-           [cons [optimize/code      [car code]]
-                 [optimize/code/rest [cdr code]]]
-           code]
-]
+       [if-not [pair? code] code
+               [cons [optimize/code      [car code]]
+                     [optimize/code/rest [cdr code]]]]]
 
 [defun optimize/code [code]
-       [if [pair? code]
-           [if [and [symbol? [car code]] [resolves? [car code]]]
-               [cons [resolve [car code]]
-                     [optimize/code/rest [cdr code]]]
-               [cons [optimize/code [car code]]
-                     [optimize/code/rest [cdr code]]]]
-           code]
-]
+       [if-not [pair? code] code
+               [if [and [symbol? [car code]] [resolves? [car code]]]
+		   [cons [resolve [car code]]
+			 [optimize/code/rest [cdr code]]]
+		   [cons [optimize/code [car code]]
+			 [optimize/code/rest [cdr code]]]]]]
 
 [defun optimize! [fun]
        "Optimize FUN via mutation"
-       [if [lambda? fun]
-           [closure! fun @[:code [optimize/code [[closure fun] :code]]]]
-           #f]
-]
+       [if-not [lambda? fun] #f
+               [closure! fun @[:code [optimize/code [[closure fun] :code]]]]]]
 
 [defun optimize-all! []
        "Return a list of all lambdas in CTX"
-       [for-each optimize! [filter lambda? [map resolve [symbol-table]]]]
-]
+       [for-each optimize! [filter lambda? [map resolve [symbol-table]]]]]

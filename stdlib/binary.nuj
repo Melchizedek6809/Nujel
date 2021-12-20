@@ -5,15 +5,12 @@
 
 [defun lognand [...l]
         "Returns the Nand of its arguments"
-        [lognot [apply logand ...l]]
-]
+        [lognot [apply logand ...l]]]
 
 [defun bit-set?! [i]
        [def mask [ash 1 i]]
-       [λ [α] [not [zero? [logand α mask]]]]
-]
+       [λ [α] [not [zero? [logand α mask]]]]]
 
 [defun bit-clear?! [i]
        [def mask [ash 1 i]]
-       [λ [α] [zero? [logand α mask]]]
-]
+       [λ [α] [zero? [logand α mask]]]]

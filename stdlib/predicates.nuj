@@ -5,48 +5,39 @@
 
 [defun numeric? [a]
         "Return #t if a is a number"
-        [or [int? a] [float? a] [vec? a]]
-]
+        [or [int? a] [float? a] [vec? a]]]
 
 [defun last? [a]
         "Return #t if a is the last pair in a list"
-        [nil? [cdr a]]
-]
+        [nil? [cdr a]]]
 
 [defun pos? [a]
         "Return #t if a is positive"
-        [and [numeric? a] [>= a 0]]
-]
+        [and [numeric? a] [>= a 0]]]
 
 [defun zero-neg? [a]
         "Return #t if a is zero or negative"
-        [and [numeric? a] [<= a 0]]
-]
+        [and [numeric? a] [<= a 0]]]
 
 [defun neg? [a]
         "Returns #t if a is negative"
-        [and [numeric? a] [< a 0]]
-]
+        [and [numeric? a] [< a 0]]]
 
 [defun odd? [a]
         "Predicate that returns #t if a is odd"
-        [== [% [int a] 2] 1]
-]
+        [== [% [int a] 2] 1]]
 
 [defun even? [a]
         "Predicate that returns #t if a is even"
-        [== [mod/int [int a] 2] 0]
-]
+        [== [mod/int [int a] 2] 0]]
 
 [defun zero? [val]
         "#t if VAL is zero"
-        [== 0 val]
-]
+        [== 0 val]]
 
 [defun not-zero? [val]
         "#t if VAL is not zero"
-        [!= 0 val]
-]
+        [!= 0 val]]
 
 [defun list-equal? [a b]
         "#t if A and B are equal"
@@ -54,101 +45,79 @@
               [if [pair? a]
                   [and [list-equal? [car a] [car b]]
                       [list-equal? [cdr a] [cdr b]]]
-                  [== a b]]
-        ]
-]
+                  [== a b]]]]
 
 [defun there-exists? [l pred]
         "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
         [cond [[nil? l] #f]
               [[pred [car l]] #t]
-              [#t [there-exists? [cdr l] pred]]
-        ]
-]
+              [#t [there-exists? [cdr l] pred]]]]
 
 [defun for-all? [l pred]
         "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
         [cond [[nil? l] #t]
               [[not [pred [car l]]] #f]
-              [#t [for-all? [cdr l] pred]]
-        ]
-]
+              [#t [for-all? [cdr l] pred]]]]
 
 [defun int? [val]
         "#t if VAL is a integer"
-        [== :int [type-of val]]
-]
+        [== :int [type-of val]]]
 
 [defun float? [val]
         "#t if VAL is a floating-point number"
-        [== :float [type-of val]]
-]
+        [== :float [type-of val]]]
 
 [defun vec? [val]
         "#t if VAL is a vector"
-        [== :vec [type-of val]]
-]
+        [== :vec [type-of val]]]
 
 [defun bool? [val]
         "#t if VAL is a boolean"
-        [== :bool [type-of val]]
-]
+        [== :bool [type-of val]]]
 
 [defun pair? [val]
         "#t if VAL is a pair"
-        [== :pair [type-of val]]
-]
+        [== :pair [type-of val]]]
 
 [defun arr? [val]
 	"#t if VAL is an array"
-	[== :array [type-of val]]
-]
+	[== :array [type-of val]]]
 
 [defun string? [val]
         "#t if VAL is a string"
-        [== :string [type-of val]]
-]
+        [== :string [type-of val]]]
 
 [defun symbol? [val]
         "#t if VAL is a symbol"
-        [== :symbol [type-of val]]
-]
+        [== :symbol [type-of val]]]
 
 [defun object? [val]
         "#t if VAL is an object"
-        [== :object [type-of val]]
-]
+        [== :object [type-of val]]]
 
 [defun tree? [val]
         "#t if VAL is an object"
-        [== :tree [type-of val]]
-]
+        [== :tree [type-of val]]]
 
 [defun macro? [val]
         "#t if VAL is an object"
-        [== :macro [type-of val]]
-]
+        [== :macro [type-of val]]]
 
 [defun lambda? [val]
         "#t if VAL is a lambda"
-        [or [== :lambda [type-of val]] [== :dynamic [type-of val]]]
-]
+        [or [== :lambda [type-of val]] [== :dynamic [type-of val]]]]
 
 [defun native? [val]
         "#t if VAL is a native function"
-        [== :native-function [type-of val]]
-]
+        [== :native-function [type-of val]]]
 
 [defun special-form? [val]
         "#t if VAL is a native function"
-        [== :special-form [type-of val]]
-]
+        [== :special-form [type-of val]]]
 
 [defun procedure? [val]
         "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val]]
-]
+        [or [lambda? val] [native? val]]]
 
 [defun in-range? [v min max]
-       [and [>= v min] [<= v max]]
-]
+       [and [>= v min] [<= v max]]]

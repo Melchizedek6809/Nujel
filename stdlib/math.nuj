@@ -6,65 +6,49 @@
 
 [defmacro ++ [i]
           "Increment I by 1 and store the result in I"
-          `[set! ~i [+ 1 ~i]]
-]
+          `[set! ~i [+ 1 ~i]]]
 
 [defmacro -- [i]
           "Decrement I by 1 and store the result in I"
-          `[set! ~i [+ -1 ~i]]
-]
+          `[set! ~i [+ -1 ~i]]]
 
 [defun +x [α]
        "Return a function that adds α to it's argument, useful for mapping"
-       [\ [β] [+ α β]]
-]
+       [\ [β] [+ α β]]]
 
 [defun >> [val amount]
        "Shifts VAL by AMOUNT bits to the right"
-       [ash val [- amount]]
-]
+       [ash val [- amount]]]
 
 [defun min/iter [a l]
        [cond [[nil? l] a]
              [[< a [car l]] [min/iter a [cdr l]]]
-             [#t [min/iter [car l] [cdr l]]]
-       ]
-]
+             [#t [min/iter [car l] [cdr l]]]]]
 
 [defun min [...l]
        "Returns the minimum value of its arguments"
        [cond [[nil? ...l] 0]
              [[nil? [cdr ...l]] [car ...l]]
-             [#t [min/iter [car ...l] [cdr ...l]]]
-       ]
-]
+             [#t [min/iter [car ...l] [cdr ...l]]]]]
 
 [defun max/iter [a l]
        [cond [[nil? l] a]
              [[> a [car l]] [max/iter a [cdr l]]]
-             [#t [max/iter [car l] [cdr l]]]
-       ]
-]
+             [#t [max/iter [car l] [cdr l]]]]]
 
 [defun max [...l]
        "Returns the maximum value of its arguments"
        [cond [[nil? ...l] 0]
              [[nil? [cdr ...l]] [car ...l]]
-             [#t [max/iter [car ...l] [cdr ...l]]]
-       ]
-]
+             [#t [max/iter [car ...l] [cdr ...l]]]]]
 
 [defun fib [i]
            "Terribly inefficient, but, useful for testing the GC"
-           [if [< i 2]
-               i
-               [+ [fib [- i 2]] [fib [- i 1]]]]
-]
+           [if [< i 2] i
+               [+ [fib [- i 2]] [fib [- i 1]]]]]
 
 [defun wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
-        [+ min [% [- val min] [- max min]]]
-]
+        [+ min [% [- val min] [- max min]]]]
 
 [defmacro +1 [v]
-          `[+ 1 ~v]
-]
+          `[+ 1 ~v]]

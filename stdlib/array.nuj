@@ -4,37 +4,31 @@
 ;; Some functions dealing with arrays
 
 [defun array/+= [a i v]
-       [array/set! a i [+ v [array/ref a i]]]
-]
+       "Add V to the value in A at position I and store the result in A returning A"
+       [array/set! a i [+ v [array/ref a i]]]]
 
 [defun array/++ [a i]
-       [array/+= a i 1]
-]
+       "Increment position I in A and return A"
+       [array/+= a i 1]]
 
 [defun array/fill! [a v i]
        "Fills array a with value v"
        [def len [array/length a]]
        [for [i 0 len]
-            [array/set! a i v]
-       ]
-       a
-]
+            [array/set! a i v]]
+       a]
 
 [defun array/reduce [fun arr α]
        [def len [array/length arr]]
        [for [i 0 len]
-              [set! α [fun α [arr i]]]
-       ]
-       α
-]
+              [set! α [fun α [arr i]]]]
+       α]
 
 [defun array/map [fun arr]
        [def len [array/length arr]]
        [for [i 0 len]
-              [array/set! arr i [fun [arr i]]]
-       ]
-       arr
-]
+              [array/set! arr i [fun [arr i]]]]
+       arr]
 
 [defun array/filter [pred arr]
        [def ri 0]
@@ -43,7 +37,5 @@
        [for [ai 0 len]
               [when [pred [arr ai]]
                     [array/set! ret ri [arr ai]]
-                    [++ ri]]
-       ]
-       [array/length! ret ri]
-]
+                    [++ ri]]]
+       [array/length! ret ri]]

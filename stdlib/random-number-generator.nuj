@@ -4,31 +4,25 @@
 [def random/seed 0]
 
 [defun random/seed-initialize! []
-       [set! random/seed [logxor [time] [time/milliseconds]]]
-]
+       [set! random/seed [logxor [time] [time/milliseconds]]]]
 
 [defun random/rng! []
        [set! random/seed [+ 12345 [* random/seed 1103515245]]]
        [logior [ash [logand random/seed #xFFFF] 16]
-               [logand [ash random/seed -16] #xFFFF]
-       ]
-]
+               [logand [ash random/seed -16] #xFFFF]]]
 
 [defun random/seed! [new-seed]
        "Set a new seed value for the RNG"
-       [set! seed new-seed]
-]
+       [set! seed new-seed]]
 
 [defun random/seed []
        "Return the current RNG seed value"
-       seed
-]
+       seed]
 
 [defun random [max]
        "Return a value from 0 to MAX, or, if left out, a random int"
        [if [numeric? max]
            [mod [abs [random/rng!]] max]
-           [random/rng!]]
-]
+           [random/rng!]]]
 
 [random/seed-initialize!]

@@ -4,50 +4,39 @@
 ;; Mostly macros implementing different control flow constructs
 
 [defmacro if-not [pred then else]
-          `[if ~pred ~else ~then]
-]
+          `[if ~pred ~else ~then]]
 
 [defmacro if-let [binding then else]
           `[let* [def ~[car binding] ~[cadr binding]]
-                 [if ~[car binding] ~then ~else]
-           ]
-]
+                 [if ~[car binding] ~then ~else]]]
 
 [defmacro when-let [binding ...body]
-          `[if-let ~binding ~[cons 'do ...body] #nil]
-]
+          `[if-let ~binding ~[cons 'do ...body] #nil]]
 
 [defmacro when-not [pred ...body]
           "Evalutes to BODY if PRED is false"
-          `[if ~pred #nil [do ~@...body]]
-]
+          `[if ~pred #nil [do ~@...body]]]
 
 [defmacro when [pred ...body]
           "Evalutes to BODY if PRED is true"
-          `[if ~pred [do ~@...body] #nil]
-]
+          `[if ~pred [do ~@...body] #nil]]
 
 [defun let/arg [arg]
        [when-not [pair? arg] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
        [when-not [symbol? [car arg]] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
-       `[def ~[car arg] ~[cadr arg]]
-]
+       `[def ~[car arg] ~[cadr arg]]]
 [defun let/args [args]
-       [if args
-           [cons [let/arg [car args]]
-                 [let/args [cdr args]]]
-           #nil]
-]
+       [if-not args #nil
+               [cons [let/arg [car args]]
+                     [let/args [cdr args]]]]]
 [defmacro let [bindings ...body]
           "Evalutes to BODY if PRED is true"
-          `[let* [do ~@[let/args bindings] ~@...body]]
-]
+          `[let* [do ~@[let/args bindings] ~@...body]]]
 
 [defun case/clauses/multiple [key-sym cases]
        [when cases
              [cons [list '== key-sym [car cases]]
-                   [case/clauses/multiple key-sym [cdr cases]]]]
-]
+                   [case/clauses/multiple key-sym [cdr cases]]]]]
 
 [defun case/clauses [key-sym clauses]
        [when clauses
@@ -58,15 +47,13 @@
                            [cons 'or [case/clauses/multiple key-sym [caar clauses]]]
                            [list '== key-sym [caar clauses]]]
                        [cons 'do [cdar clauses]]
-                       [case/clauses key-sym [cdr clauses]]]]]
-]
+                       [case/clauses key-sym [cdr clauses]]]]]]
 
 [defmacro case [key-form ...clauses]
           [def key-sym [gensym]]
           [list 'let*
                 [list 'def key-sym key-form]
-                [case/clauses key-sym ...clauses]]
-]
+                [case/clauses key-sym ...clauses]]]
 
 [defmacro cond [...body]
           "Contains multiple cond clauses"
@@ -74,8 +61,7 @@
                 [list 'if
                       [caar ...body]
                       [cons 'do [cdar ...body]]
-                      [macro-apply cond [cdr ...body]]]]
-]
+                      [macro-apply cond [cdr ...body]]]]]
 
 [defmacro for [for-loop ...body]
           "For loops, [for [name start stop] ...body]"
@@ -99,21 +85,15 @@
 ]
 
 [defun thread/-> [init fun]
-       [if fun
-          `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
-           init]
-]
+       [if-not fun init
+          `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]]]
 [defmacro -> [init ...fun]
           "Thread init as the first argument through every function in ...fun"
-	  [thread/-> init [reverse ...fun]]
-]
+	  [thread/-> init [nreverse ...fun]]]
 
 [defun thread/->> [init fun]
-       [if fun
-           [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]
-           init]
-]
+       [if-not fun init
+           [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
 [defmacro ->> [init ...fun]
           "Thread init as the last argument through every function in ...fun"
-	  [thread/->> init [reverse ...fun]]
-]
+	  [thread/->> init [nreverse ...fun]]]

@@ -7,63 +7,52 @@
        "Iterator for except-last-pair"
        [if [nil? [cdr list]]
            [reverse rest]
-           [except-last-pair/iter [cdr list] [cons [car list] rest]]]
-]
+           [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
 
 [defun except-last-pair [list]
        "Return a copy of LIST without the last pair"
-       [except-last-pair/iter list #nil]
-]
+       [except-last-pair/iter list #nil]]
 
 [defun last-pair [l]
        "Return the last pair of l"
-       [while [cdr l] [cdr! l]]
-       l
-]
+       [while [cdr l] [cdr! l]] l]
 
 [defun make-list [number value]
        "Return a list of NUMBER elements containing VALUE in every car"
        [def l #nil]
        [while [>= [-- number] 0]
-              [set! l [cons value l]]
-       ]
-       l
-]
+              [set! l [cons value l]]]
+       l]
 
 [defun list/reduce [o l s]
        "Combine all elements in l using operation o and starting value s"
        [while l
               [set! s [o s [car l]]]
-              [cdr! l]
-       ]
-       s
-]
+              [cdr! l]]
+       s]
 
 [defun list/ref [l i]
        "Returns the the element of list l at location i"
        [while [and l [> i 0]]
               [-- i]
-              [cdr! l]
-       ]
-       [car l]
-]
+              [cdr! l]]
+       [car l]]
 
 [defun reverse [l]
        "Return the list l in reverse order"
        [def ret]
        [while l
               [set! ret [cons [car l] ret]]
-              [cdr! l]
-       ]
-       ret
-]
+              [cdr! l]]
+       ret]
 
 [defun list/length [l]
        "Returns the length of list l"
        [def ret 0]
-       [while l [cdr! l] [++ ret]]
-       ret
-]
+       [while l
+	      [cdr! l]
+	      [++ ret]]
+       ret]
 
 [defun list/filter [p l]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
@@ -71,35 +60,29 @@
         [while l
                [when [p [car l]]
                      [set! ret [cons [car l] ret]]]
-               [cdr! l]
-        ]
-        [nreverse ret]
-]
+               [cdr! l]]
+        [nreverse ret]]
 
 [defun list/map [f l]
         "Runs f over every item in list l and returns the resulting list"
         [def ret #nil]
         [while l
                [set! ret [cons [f [car l]] ret]]
-               [cdr! l]
-        ]
-        [nreverse ret]
-]
+               [cdr! l]]
+        [nreverse ret]]
 
 [defun append/iter [a b]
        "Iterator for append"
        [if [nil? a]
            b
-           [append/iter [cdr a] [cons [car a] b]]]
-]
+           [append/iter [cdr a] [cons [car a] b]]]]
 
 [defun append [a ...b]
        "Appends two lists A and B together"
        [while ...b
 	      [set! a [append/iter [reverse a] [car ...b]]]
 	      [cdr! ...b]]
-       a
-]
+       a]
 
 [defun sublist [l start end ret]
         "Returns a new list containing all elements of l from start to end"
@@ -107,62 +90,48 @@
               [[neg?  end] [sublist      l      start  [+ [length l] end]]]
               [[zero? end] [reverse ret]]
               [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
-              [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]
-        ]
-]
+              [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]]]
 
 [defun list-head [l k]
         "Returns the first k elemnts of list l"
-        [sublist l 0 k]
-]
+        [sublist l 0 k]]
 
 [defun list-tail [l k]
         "Returns the sublist of l obtained by omitting the first l elements"
-        [sublist l k [length l]]
-]
+        [sublist l k [length l]]]
 
 [defun member [m l]
         "Returns the first pair of list l whose car is equal to m"
         [cond [[nil? l] #f]
               [[== [car l] m] l]
-              [#t [member m [cdr l]]]
-        ]
-]
+              [#t [member m [cdr l]]]]]
 
 [defun delete [e l]
         "Returns a filtered list l with all elements equal to e omitted"
-        [filter [\ [a] [not [== a e]]] l]
-]
+        [filter [\ [a] [not [== a e]]] l]]
 
 [defun arg-list [f]
         "Return the Argument list of f which can be a Native Function or a Lambda"
         [cond [[lambda? f] [reduce cat [map [\ [a] [" " [car a]]] [cl-data f]]]]
               [[native? f] [reduce cat [map [\ [a] [" " a]] [car [cl-data f]]]]]
-              [#t ""]
-        ]
-]
+              [#t ""]]]
 
 [defun getf [l key]
        "Return the value in LIST following KEY"
        [cond [[nil? l] #nil]
              [[== key [car l]] [cadr l]]
-             [#t [getf [cdr l] key]]
-       ]
-]
+             [#t [getf [cdr l] key]]]]
 
 [defun list/sort [l]
        "Terribly slow way to sort a list, though it was simple to write"
-       [if l
-           [do [def top [car l]]
-               [def next #nil]
-               [cdr! l]
-               [while l
-                      [if [> [car l] top]
-                          [do [set! next [cons top next]]
-                              [set! top [car l]]]
-                          [set! next [cons [car l] next]]]
-                      [cdr! l]
-               ]
-               [cons top [list/sort next]]]
-           #nil]
-]
+       [if-not l #nil
+               [do [def top [car l]]
+		   [def next #nil]
+		   [cdr! l]
+		   [while l
+                          [if [> [car l] top]
+                              [do [set! next [cons top next]]
+				  [set! top [car l]]]
+                              [set! next [cons [car l] next]]]
+			  [cdr! l]]
+		   [cons top [list/sort next]]]]]

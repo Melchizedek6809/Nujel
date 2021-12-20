@@ -9,17 +9,13 @@
        [while keys
 	      [tree/set! ret [car keys] [car values]]
 	      [cdr! keys]
-	      [cdr! values]
-       ]
-       ret
-]
+	      [cdr! values]]
+       ret]
 
 [defun tree/+= [t k v]
        "Increment value at K in T by V"
-       [tree/set! t k [+ v [int [tree/get t k]]]]
-]
+       [tree/set! t k [+ v [int [tree/get t k]]]]]
 
 [defmacro tree/++ [t k]
        "Increment value at K in T by 1"
-       `[tree/+= ~t ~k 1]
-]
+       `[tree/+= ~t ~k 1]]

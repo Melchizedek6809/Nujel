@@ -9,9 +9,7 @@
                         " - "
                         [str/write [info :data]]
                         "\r\n"
-                        [describe/closure [closure-caller c] [+ [int i] 1]]]]]
-]
+                        [describe/closure [closure-caller c] [+ [int i] 1]]]]]]
 
 [defun stacktrace []
-          [display [describe/closure [closure-caller [current-lambda]]]]
-]
+          [display [describe/closure [closure-caller [current-lambda]]]]]
