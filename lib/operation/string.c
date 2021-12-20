@@ -128,9 +128,13 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	}
 	char *new, *cur = tmpStringBuf;
 	char *bufEnd = &tmpStringBuf[tmpStringBufSize];
-	forEach(sexpr,v){
+	for(lVal *sexpr = v; sexpr; sexpr = sexpr->vList.cdr){
+		lVal *car;
 		restart:
-		new = spf(cur, bufEnd, "%V", lCar(sexpr));
+		car = sexpr;
+		if(car->type == ltPair){car = sexpr->vList.car;}
+		if(car == NULL){continue;}
+		new = spf(cur, bufEnd, "%V", car);
 		if(new >= bufEnd){
 			tmpStringBufSize *= 2;
 			const int i = cur - tmpStringBuf;
@@ -144,6 +148,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			goto restart;
 		}
 		cur = new;
+		if(sexpr->type != ltPair){break;}
 	}
 	if(cur < bufEnd){*cur = 0;}
 	return lValString(tmpStringBuf);

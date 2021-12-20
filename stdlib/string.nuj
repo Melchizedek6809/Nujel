@@ -27,7 +27,7 @@
 
 [defun path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
-       [\ [path]
+       [λ [path]
           [== ext [lowercase [path/extension path]]]
        ]
 ]
@@ -76,7 +76,7 @@
      "Turn α into a its **hexadecimal** string representation"
      [def conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
 
-     [\ [α]
+     [λ [α]
         [def ret ""]
         [when-not α [def α 0]]
         [when [zero? α] [set! ret "0"]]
@@ -148,13 +148,13 @@
 ]
 
 [defun string/length?! [chars]
-       [\ [a] [== chars [string/length a]]]
+       [λ [a] [== chars [string/length a]]]
 ]
 
 [defun contains-any? [str chars]
-       [apply or [map [\ [a] [>= [index-of str a] 0]] [split chars ""]]]
+       [apply or [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]
 ]
 
 [defun contains-all? [str chars]
-       [apply and [map [\ [a] [>= [index-of str a] 0]] [split chars ""]]]
+       [apply and [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]
 ]

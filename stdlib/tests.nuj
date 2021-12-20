@@ -827,6 +827,7 @@
 [test/add '[1] [read "#_[asd [123]] 1"]]
 [test/add '[1 2] [read "1 #_[asd [123]] 2"]]
 [test/add '[1] [read "1 #_[asd [123]]"]]
+[test/add "asd" [cat "a" #nil "s" "" "d"]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
