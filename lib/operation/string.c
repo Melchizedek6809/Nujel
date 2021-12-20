@@ -120,7 +120,7 @@ static lVal *lnfSubstr(lClosure *c, lVal *v){
 lVal *lnfCat(lClosure *c, lVal *v){
 	(void)c;
 	static char *tmpStringBuf = NULL;
-	static int tmpStringBufSize = 1<<12; // Start with 4K
+	static int tmpStringBufSize = 1<<16; // Start with 4K
 	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
 	if(tmpStringBuf == NULL){
 		lPrintError("lnfCat OOM\n");
@@ -135,7 +135,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		if(car->type == ltPair){car = sexpr->vList.car;}
 		if(car == NULL){continue;}
 		new = spf(cur, bufEnd, "%V", car);
-		if(new >= bufEnd){
+		if(new >= bufEnd){ // Doesn't Work right now!!!!!
 			tmpStringBufSize *= 2;
 			const int i = cur - tmpStringBuf;
 			tmpStringBuf = realloc(tmpStringBuf,tmpStringBufSize);
