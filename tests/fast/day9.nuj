@@ -63,7 +63,7 @@
        ret
 ]
 
-[def ex-map [map/load "tests/day9.input" 100 100]]
+[def ex-map [map/load "tests/fast/day9.input" 100 100]]
 [def res [array/2d/find-low-points ex-map]]
 [def result [res :part1]]
 [when [!= result 480]

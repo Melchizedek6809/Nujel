@@ -88,7 +88,7 @@
 				      " v:" [ansi-green [p :version]]]]
 			 [for-each [\ [a] [bits/print a [+ 4 indent]]] [p :value]]]]]
 
-[def parsed-prog [cdr [bits/parse/hex [file/read "tests/day16.input"]]]]
+[def parsed-prog [cdr [bits/parse/hex [file/read "tests/fast/day16.input"]]]]
 ;[bits/print parsed-prog]
 ;[println [str/write [bits/compile parsed-prog]]]
 					;[newline]

@@ -56,7 +56,7 @@
      [apply min [tree/values [state :eles]]]]
 ]
 
-[def state [state/read "tests/day14.input"]]
+[def state [state/read "tests/fast/day14.input"]]
 [def p1-state [state/run/many state 10]]
 [def res-p1 [result p1-state]]
 [when [!= res-p1 2010]

@@ -10,7 +10,7 @@
        [tree/set! big-caves [car parts] [< [char-at [sym->str [car parts]] 0] #\a]]
        [tree/set! big-caves [cadr parts] [< [char-at [sym->str [cadr parts]] 0] #\a]]
 ]
-[def connections [for-each add-connections [split [file/read "tests-full/day12.input"] "\n"]]]
+[def connections [for-each add-connections [split [file/read "tests/slow/day12.input"] "\n"]]]
 
 [def valid-routes 0]
 

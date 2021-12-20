@@ -53,7 +53,7 @@
 ]
 
 [def vents [array/2d/new 1000 1000 0]]
-[def lines [split [file/read "tests-full/day5.input"] "\n"]]
+[def lines [split [file/read "tests/slow/day5.input"] "\n"]]
 [for-each parse/line lines]
 [when [!= [points/count vents 1] 3990]
       [throw [list :wrong-result "Wrong result" result]]]

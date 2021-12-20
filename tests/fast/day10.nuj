@@ -49,7 +49,7 @@
        ]
 ]
 
-[def lines [split [file/read "tests/day10.input"] "\n"]]
+[def lines [split [file/read "tests/fast/day10.input"] "\n"]]
 [def res [map find-first-syntax-error lines]]
 [def p1-res [reduce [\ [α β] [if [== :part1 [car β]] [+ α [cdr β]] α]] res 0]]
 [def incomplete-lines [list/sort [filter [\ [α] [!= :part1 [car α]]] res]]]
