@@ -24,8 +24,8 @@ static int lValCompare(lVal *v){
 	if((a == NULL) || (b == NULL)){
 		return ((a == NULL) && (b == NULL)) ? 0 : 2;
 	}
-	lType ct = lTypecast(a->type, b->type);
-	switch(ct){
+	if(a->type != b->type){return 2;}
+	switch(a->type){
 	case ltNoAlloc:
 	default:
 		return 2;
@@ -37,23 +37,16 @@ static int lValCompare(lVal *v){
 				&& (a->vList.cdr == b->vList.cdr));
 		}
 	case ltSymbol:
-		if(a->type    != b->type)    {return -1;}
 		return (b->vSymbol != a->vSymbol) ? -1 : 0;
 	case ltObject:
 	case ltMacro:
 	case ltLambda:
-		if(a->type     != b->type)     {return -1;}
 		return (b->vClosure != a->vClosure) ? -1 : 0;
 	case ltNativeFunc:
 	case ltSpecialForm:
-		if(a->type   != b->type)  {return -1;}
 		return (b->vNFunc != a->vNFunc) ? -1 : 0;
 	case ltBool:
-		if((b->type != ltBool) || (a->type != ltBool)){
-			return -1;
-		}else{
-			return castToBool(a) != castToBool(b);
-		}
+		return a->vBool != b->vBool;
         case ltGUIWidget:
 		if(a->vInt == b->vInt){
 			return  0;

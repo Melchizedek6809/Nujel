@@ -37,7 +37,6 @@
        [when cases
              [cons [list '== key-sym [car cases]]
                    [case/clauses/multiple key-sym [cdr cases]]]]]
-
 [defun case/clauses [key-sym clauses]
        [when clauses
              [if [== [caar clauses] 'otherwise]
@@ -52,7 +51,6 @@
                            [list '== key-sym [caar clauses]]]
                        [cons 'do [cdar clauses]]
                        [case/clauses key-sym [cdr clauses]]]]]]
-
 [defmacro case [key-form ...clauses]
           [def key-sym [gensym]]
           [list 'let*

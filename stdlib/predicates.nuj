@@ -13,15 +13,15 @@
 
 [defun pos? [a]
         "Return #t if a is positive"
-        [and [numeric? a] [>= a 0]]]
+        [and [numeric? a] [>= [float a] 0.0]]]
 
 [defun zero-neg? [a]
         "Return #t if a is zero or negative"
-        [and [numeric? a] [<= a 0]]]
+        [and [numeric? a] [<= [float a] 0.0]]]
 
 [defun neg? [a]
         "Returns #t if a is negative"
-        [and [numeric? a] [< a 0]]]
+        [and [numeric? a] [< [float a] 0.0]]]
 
 [defun odd? [a]
         "Predicate that returns #t if a is odd"
