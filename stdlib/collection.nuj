@@ -20,3 +20,15 @@
 [defun count [l p]
        "Count the number of items in L where P is true"
        [reduce [λ [a b] [+ a [if [p b] 1 0]]] l 0]]
+
+[defun min l
+       "Returns the minimum value of its arguments, or collection"
+       [reduce [λ [a b] [if [< a b] a b]]
+               [if [cdr l] l [car l]]
+               #nil]]
+
+[defun max l
+       "Returns the minimum value of its arguments, or collection"
+       [reduce [λ [a b] [if [> a b] a b]]
+               [if [cdr l] l [car l]]
+               #nil]]

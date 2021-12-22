@@ -20,28 +20,6 @@
        "Shifts VAL by AMOUNT bits to the right"
        [ash val [- amount]]]
 
-[defun min/iter [a l]
-       [cond [[nil? l] a]
-             [[< a [car l]] [min/iter a [cdr l]]]
-             [#t [min/iter [car l] [cdr l]]]]]
-
-[defun min l
-       "Returns the minimum value of its arguments"
-       [cond [[not l] 0]
-             [[nil? [cdr l]] [car l]]
-             [#t [min/iter [car l] [cdr l]]]]]
-
-[defun max/iter [a l]
-       [cond [[not l] a]
-             [[> a [car l]] [max/iter a [cdr l]]]
-             [#t [max/iter [car l] [cdr l]]]]]
-
-[defun max l
-       "Returns the maximum value of its arguments"
-       [cond [[not l] 0]
-             [[nil? [cdr l]] [car l]]
-             [#t [max/iter [car l] [cdr l]]]]]
-
 [defun fib [i]
            "Terribly inefficient, but, useful for testing the GC"
            [if [< i 2] i

@@ -27,7 +27,7 @@
              [[:nil]    α]
              [[:pair]   [list/reduce f l α]]
              [[:array]  [array/reduce f l α]]
-             [otherwise [throw [list :invalid-type "You can only use reduce with a collection" l [current-lambda]]]]]]
+             [otherwise [f α l]]]]
 
 [defun length [α]
        "Returns the length of collection α"
