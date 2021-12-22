@@ -32,13 +32,13 @@ lVal *lValAlloc(){
 				lPrintError("lVal OOM\n");
 				exit(1);
 			}else{
-				ret       = lValFFree;
-				lValFFree = ret->nextFree;
+				goto allocateFromFreeList;
 			}
 		}else{
 			ret = &lValList[lValMax++];
 		}
 	}else{
+		allocateFromFreeList:
 		ret       = lValFFree;
 		lValFFree = ret->nextFree;
 	}

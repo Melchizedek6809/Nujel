@@ -39,15 +39,15 @@ lString *lStringAlloc(){
 			lGarbageCollect();
 			if(lStringFFree == NULL){
 				lPrintError("lString OOM ");
-				return 0;
+				exit(123);
 			}else{
-				ret = lStringFFree;
-				lStringFFree = ret->nextFree;
+				goto allocateFromFreeList;
 			}
 		}else{
 			ret = &lStringList[lStringMax++];
 		}
 	}else{
+		allocateFromFreeList:
 		ret = lStringFFree;
 		lStringFFree = ret->nextFree;
 	}

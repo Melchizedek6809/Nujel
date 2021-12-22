@@ -155,5 +155,8 @@ struct lNFunc {
 };
 
 struct lSymbol {
-	char c[32];
+	union {
+		char c[32];
+		struct lSymbol *nextFree;
+	};
 };

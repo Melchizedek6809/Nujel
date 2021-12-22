@@ -12,9 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 
-lSymbol lSymbolList[SYM_MAX];
-uint    lSymbolActive = 0;
-uint    lSymbolMax    = 0;
+lSymbol  lSymbolList[SYM_MAX];
+uint     lSymbolActive = 0;
+uint     lSymbolMax    = 0;
+lSymbol *lSymbolFFree = NULL;
 
 lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree;
@@ -22,38 +23,52 @@ lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lS
 void lSymbolInit(){
 	lSymbolActive   = 0;
 	lSymbolMax      = 0;
+	lSymbolFFree    = NULL;
 
-	symNull            = lSymS("");
-	symQuote           = lSymS("quote");
-	symArr             = lSymS("array/new");
-	symIf              = lSymS("if");
-	symCond            = lSymS("cond");
-	symDo              = lSymS("do");
-	symMinus           = lSymS("-");
-	symLambda          = lSymS("λ");
-	symLambdAst        = lSymS("λ*");
-	symTreeNew         = lSymS("tree/new");
-	symQuasiquote      = lSymS("quasiquote");
-	symUnquote         = lSymS("unquote");
-	symUnquoteSplicing = lSymS("unquote-splicing");
+	lSymbolList[0].nextFree = NULL;
+	lSymbolList[0].c[sizeof(lSymbolList[0].c) - 1] = 0xFF;
+	if(lSymbolList[0].nextFree != NULL){
+		fpf(stderr, "Overlapping zero byte and nextFree Pointer in symbol table, exiting immediatly\n");
+		exit(123);
+	}
 
-	lSymLTNil            = lSymS(":nil");
-	lSymLTNoAlloc        = lSymS(":no-alloc");
-	lSymLTBool           = lSymS(":bool");
-	lSymLTPair           = lSymS(":pair");
-	lSymLTObject         = lSymS(":object");
-	lSymLTLambda         = lSymS(":lambda");
-	lSymLTInt            = lSymS(":int");
-	lSymLTFloat          = lSymS(":float");
-	lSymLTVec            = lSymS(":vec");
-	lSymLTString         = lSymS(":string");
-	lSymLTSymbol         = lSymS(":symbol");
-	lSymLTNativeFunction = lSymS(":native-function");
-	lSymLTSpecialForm    = lSymS(":special-form");
-	lSymLTArray          = lSymS(":array");
-	lSymLTGUIWidget      = lSymS(":gui-widget");
-	lSymLTMacro          = lSymS(":macro");
-	lSymLTTree           = lSymS(":tree");
+	symNull            = RSYMP(lSymS(""));
+	symQuote           = RSYMP(lSymS("quote"));
+	symArr             = RSYMP(lSymS("array/new"));
+	symIf              = RSYMP(lSymS("if"));
+	symCond            = RSYMP(lSymS("cond"));
+	symDo              = RSYMP(lSymS("do"));
+	symMinus           = RSYMP(lSymS("-"));
+	symLambda          = RSYMP(lSymS("λ"));
+	symLambdAst        = RSYMP(lSymS("λ*"));
+	symTreeNew         = RSYMP(lSymS("tree/new"));
+	symQuasiquote      = RSYMP(lSymS("quasiquote"));
+	symUnquote         = RSYMP(lSymS("unquote"));
+	symUnquoteSplicing = RSYMP(lSymS("unquote-splicing"));
+
+	lSymLTNil            = RSYMP(lSymS(":nil"));
+	lSymLTNoAlloc        = RSYMP(lSymS(":no-alloc"));
+	lSymLTBool           = RSYMP(lSymS(":bool"));
+	lSymLTPair           = RSYMP(lSymS(":pair"));
+	lSymLTObject         = RSYMP(lSymS(":object"));
+	lSymLTLambda         = RSYMP(lSymS(":lambda"));
+	lSymLTInt            = RSYMP(lSymS(":int"));
+	lSymLTFloat          = RSYMP(lSymS(":float"));
+	lSymLTVec            = RSYMP(lSymS(":vec"));
+	lSymLTString         = RSYMP(lSymS(":string"));
+	lSymLTSymbol         = RSYMP(lSymS(":symbol"));
+	lSymLTNativeFunction = RSYMP(lSymS(":native-function"));
+	lSymLTSpecialForm    = RSYMP(lSymS(":special-form"));
+	lSymLTArray          = RSYMP(lSymS(":array"));
+	lSymLTGUIWidget      = RSYMP(lSymS(":gui-widget"));
+	lSymLTMacro          = RSYMP(lSymS(":macro"));
+	lSymLTTree           = RSYMP(lSymS(":tree"));
+}
+
+void lSymbolFree(lSymbol *s){
+	s->nextFree = lSymbolFFree;
+	lSymbolFFree = s;
+	lSymbolActive--;
 }
 
 lSymbol *lSymSL(const char *str, uint len){
@@ -66,15 +81,31 @@ lSymbol *lSymSL(const char *str, uint len){
 
 lSymbol *lSymS(const char *str){
 	for(uint i = 0;i<lSymbolMax;i++){
-		if(strncmp(str,lSymbolList[i].c,sizeof(lSymbolList[0].c)-1)){continue;}
+		if(strncmp(str,lSymbolList[i].c,sizeof(lSymbolList[i].c)-1)){continue;}
+		if(lSymbolList[i].c[sizeof(lSymbolList[i].c)-1]){continue;}
 		return &lSymbolList[i];
 	}
-	if(lSymbolMax >= SYM_MAX){
-		lPrintError("lSym Overflow\n");
-		return NULL;
+	lSymbol *ret;
+	if(lSymbolFFree){
+		getFirstFree:
+		ret = lSymbolFFree;
+		lSymbolFFree = lSymbolFFree->nextFree;
+	}else{
+		if(lSymbolMax >= SYM_MAX){
+			lGarbageCollect();
+			if(lSymbolFFree != NULL){
+				goto getFirstFree;
+			} else {
+				lPrintError("lSym Overflow\n");
+				exit(123);
+			}
+		}else{
+			ret = &lSymbolList[lSymbolMax++];
+		}
 	}
-	spf(lSymbolList[lSymbolMax].c,&lSymbolList[lSymbolMax].c[sizeof(lSymbolList[0].c)],"%s",str);
-	return &lSymbolList[lSymbolMax++];
+	lSymbolActive++;
+	spf(ret->c, &ret->c[sizeof(ret->c)], "%s", str);
+	return ret;
 }
 
 lSymbol *getTypeSymbol(const lVal* v){

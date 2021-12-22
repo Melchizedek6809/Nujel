@@ -31,15 +31,15 @@ lTree *lTreeAlloc(){
 			lGarbageCollect();
 			if(lTreeFFree == NULL){
 				lPrintError("lTree OOM\n");
-				exit(1);
+				exit(123);
 			}else{
-				ret        = lTreeFFree;
-				lTreeFFree = ret->nextFree;
+				goto allocateFromFreeList;
 			}
 		}else{
 			ret = &lTreeList[lTreeMax++];
 		}
 	}else{
+		allocateFromFreeList:
 		ret        = lTreeFFree;
 		lTreeFFree = ret->nextFree;
 	}

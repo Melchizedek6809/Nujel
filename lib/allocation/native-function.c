@@ -10,6 +10,7 @@
 #include "../type/closure.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncActive = 0;
@@ -37,7 +38,7 @@ lNFunc *lNFuncAlloc(){
 	if(lNFuncFFree == NULL){
 		if(lNFuncMax >= NFN_MAX-1){
 			lPrintError("lNFunc OOM ");
-			return 0;
+			exit(123);
 		}
 		ret = &lNFuncList[lNFuncMax++];
 	}else{

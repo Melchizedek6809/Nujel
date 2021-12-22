@@ -14,7 +14,7 @@ static lVal *lnfMemInfo(lClosure *c, lVal *v){
 		RVP(lValSym(":closure")),RVP(lValInt(lClosureActive)),
 		RVP(lValSym(":array")),  RVP(lValInt(lArrayActive)),
 		RVP(lValSym(":string")), RVP(lValInt(lStringActive)),
-		RVP(lValSym(":symbol")), RVP(lValInt(lSymbolMax)));
+		RVP(lValSym(":symbol")), RVP(lValInt(lSymbolActive)));
 }
 
 static lVal *lnfGarbageCollect(lClosure *c, lVal *v){

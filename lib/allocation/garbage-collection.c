@@ -9,6 +9,7 @@
 #include "garbage-collection.h"
 #include "roots.h"
 #include "string.h"
+#include "symbol.h"
 #include "tree.h"
 #include "val.h"
 #include "../exception.h"
@@ -31,6 +32,7 @@ u8 lTreeMarkMap   [TRE_MAX];
 u8 lClosureMarkMap[CLO_MAX];
 u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
+u8 lSymbolMarkMap [SYM_MAX];
 
 /* Mark v as being in use so it won't get freed by the GC */
 void lStringGCMark(const lString *v){
@@ -38,6 +40,14 @@ void lStringGCMark(const lString *v){
 	const uint ci = v - lStringList;
 	if(lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
+}
+
+/* Mark v as being in use so it won't get freed by the GC */
+void lSymbolGCMark(const lSymbol *v){
+	if(v == NULL){return;}
+	const uint ci = v - lSymbolList;
+	if(lSymbolMarkMap[ci]){return;}
+	lSymbolMarkMap[ci] = 1;
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
@@ -67,6 +77,9 @@ void lValGCMark(lVal *v){
 	case ltString:
 		lStringGCMark(v->vString);
 		break;
+	case ltSymbol:
+		lSymbolGCMark(v->vSymbol);
+		break;
 	case ltTree:
 		lTreeGCMark(v->vTree);
 		break;
@@ -86,6 +99,7 @@ void lTreeGCMark(const lTree *v){
 	lTreeMarkMap[ci] = 1;
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
+	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
 }
 
@@ -127,6 +141,10 @@ static void lMarkFree(){
 	for(lClosure *clo = lClosureFFree;clo != NULL;clo = clo->nextFree){
 		const uint ci = clo - lClosureList;
 		lClosureMarkMap[ci] = 1;
+	}
+	for(lSymbol *sym = lSymbolFFree;sym != NULL;sym = sym->nextFree){
+		const uint ci = sym - lSymbolList;
+		lSymbolMarkMap[ci] = 1;
 	}
 	for(lString *str = lStringFFree;str != NULL;str = str->nextFree){
 		const uint ci = str - lStringList;
@@ -170,6 +188,13 @@ static void lGCSweep(){
 			lStringMarkMap[i] = 0;
 		}else{
 			lStringFree(&lStringList[i]);
+		}
+	}
+	for(uint i=0;i<lSymbolMax;i++){
+		if(lSymbolMarkMap[i]){
+			lSymbolMarkMap[i] = 0;
+		}else{
+			lSymbolFree(&lSymbolList[i]);
 		}
 	}
 	for(uint i=0;i<lArrayMax;i++){

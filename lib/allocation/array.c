@@ -28,15 +28,15 @@ lArray *lArrayAlloc(){
 			lGarbageCollect();
 			if(lArrayFFree == NULL){
 				lPrintError("lArray OOM ");
-				return NULL;
+				exit(123);
 			}else{
-				ret = lArrayFFree;
-				lArrayFFree = ret->nextFree;
+				goto allocateFromFreeList;
 			}
 		}else{
 			ret = &lArrayList[lArrayMax++];
 		}
 	}else{
+		allocateFromFreeList:
 		ret = lArrayFFree;
 		lArrayFFree = ret->nextFree;
 	}

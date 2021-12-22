@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 lClosure  lClosureList[CLO_MAX];
 uint      lClosureActive = 0;
@@ -32,15 +33,15 @@ lClosure *lClosureAlloc(){
 			lGarbageCollect();
 			if(lClosureFFree == NULL){
 				lPrintError("lClosure OOM ");
-				return 0;
+				exit(123);
 			}else{
-				ret = lClosureFFree;
-				lClosureFFree = ret->nextFree;
+				goto allocateFromFreeList;
 			}
 		}else{
 			ret = &lClosureList[lClosureMax++];
 		}
 	}else{
+		allocateFromFreeList:
 		ret = lClosureFFree;
 		lClosureFFree = ret->nextFree;
 	}

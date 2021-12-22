@@ -138,17 +138,15 @@ static lVal *lParseString(lString *s){
 static lVal *lParseSymbol(lString *s){
 	uint i;
 	char buf[128];
-	for(i=0;i<4096;i++){
+	for(i=0;i<(sizeof(buf)-1);i++){
 		char c = *s->data++;
 		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
 			s->data--;
 			break;
 		}
-		if(i < sizeof(buf)){
-			buf[i] = c;
-		}
+		buf[i] = c;
 	}
-	buf[MIN(sizeof(buf)-1,i)] = 0;
+	buf[i] = 0;
 	while(isspace((u8)*s->data)){
 		if(*s->data == 0){break;}
 		s->data++;
@@ -445,10 +443,12 @@ lVal *lReadValue(lString *s){
 }
 /* Read the s-expression in str */
 lVal *lRead(const char *str){
+	const int SP = lRootsGet();
 	lString *s = lRootsStringPush(lStringAlloc());
 	s->buf     = s->data = str;
 	s->bufEnd  = &str[strlen(str)];
 	lVal *ret  = lReadList(s,true);
+	lRootsRet(SP);
 	return ret;
 }
 

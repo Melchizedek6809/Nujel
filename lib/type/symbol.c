@@ -23,7 +23,7 @@ lVal *lValSymS(const lSymbol *s){
 
 /* Return a nujel value for the symbol within S */
 lVal *lValSym(const char *s){
-	return lValSymS(lSymS(s));
+	return lValSymS(RSYMP(lSymS(s)));
 }
 
 /* Return true if S is a symbol for a variadic argument */

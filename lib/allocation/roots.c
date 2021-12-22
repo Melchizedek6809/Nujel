@@ -22,6 +22,7 @@ typedef struct {
 		lVal     *vVal;
 		lTree    *vTree;
 		lString  *vString;
+		lSymbol  *vSymbol;
 		void     *vPointer;
 	};
 } rootEntry;
@@ -67,6 +68,12 @@ lString *lRootsStringPush(lString *s){
 	return s;
 }
 
+/* Push an lString onto the root stack, protecting it from being freed by the GC */
+lSymbol *lRootsSymbolPush(lSymbol *s){
+	lRootsPush(ltSymbol,s);
+	return s;
+}
+
 void (*rootsMarkerChain)() = NULL;
 /* Mark every single root and everything they point to */
 void lRootsMark(){
@@ -77,6 +84,9 @@ void lRootsMark(){
 			break;
 		case ltPair:
 			lValGCMark(rootStack[i].vVal);
+			break;
+		case ltSymbol:
+			lSymbolGCMark(rootStack[i].vSymbol);
 			break;
 		case ltString:
 			lStringGCMark(rootStack[i].vString);
