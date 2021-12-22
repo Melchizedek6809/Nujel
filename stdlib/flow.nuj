@@ -44,7 +44,11 @@
                  [cons 'do [cdar clauses]]
                  [list 'if
                        [if [pair? [caar clauses]]
-                           [cons 'or [case/clauses/multiple key-sym [caar clauses]]]
+                           [if [and [== [car [caar clauses]] 'quote]
+                                    [last? [cdr [caar clauses]]]
+                                    [symbol? [cadr [caar clauses]]]]
+                               [list '== key-sym [caar clauses]]
+                               [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
                            [list '== key-sym [caar clauses]]]
                        [cons 'do [cdar clauses]]
                        [case/clauses key-sym [cdr clauses]]]]]]

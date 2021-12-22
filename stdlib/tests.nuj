@@ -830,6 +830,12 @@
 [test/add "asd" [cat "a" #nil "s" "" "d"]]
 [test/add '[1 2 3] [append '[1] '[2] '[3]]]
 [test/add '[1 2 . 3] [append '[1] '[2] 3]]
+[test/add #t [case 'asd [[asd] #f] [['asd] #t]]]
+[test/add #t [case 'asd [[asd] #f] ['asd #t]]]
+[test/add #t [case 'quote [['quote] #t] [otherwise #f]]]
+[test/add #t [case 'quote ['quote #t] [otherwise #f]]]
+[test/add #t [case 'otherwise [['otherwise] #t] [otherwise #f]]]
+[test/add #t [case 'otherwise ['otherwise #t] [otherwise #f]]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
