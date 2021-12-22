@@ -77,11 +77,11 @@
            b
            [append/iter [cdr a] [cons [car a] b]]]]
 
-[defun append [a ...b]
+[defun append [a . b]
        "Appends two lists A and B together"
-       [while ...b
-	      [set! a [append/iter [reverse a] [car ...b]]]
-	      [cdr! ...b]]
+       [while b
+	      [set! a [append/iter [reverse a] [car b]]]
+	      [cdr! b]]
        a]
 
 [defun sublist [l start end ret]

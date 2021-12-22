@@ -21,8 +21,8 @@
        [def end-time [time/milliseconds]]
        [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]
 
-[defmacro profile [...body]
+[defmacro profile body
           "Measure and display how much time and ressources it takes for BODY to be evaluated"
-          `[profile-form '~[if [last? ...body]
-                               [car ...body]
-                               [cons 'do ...body]]]]
+          `[profile-form '~[if [last? body]
+                               [car body]
+                               [cons 'do body]]]]

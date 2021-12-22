@@ -228,6 +228,7 @@ static lVal *lnfLambdaAst(lClosure *c, lVal *v){
 	ret->vClosure       = lClosureNew(c);
 
 	ret->vClosure->name = name;
+
 	ret->vClosure->args = lCadr(v);
 	ret->vClosure->doc  = lCaddr(v);
 	ret->vClosure->text = lCadddr(v);

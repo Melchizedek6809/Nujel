@@ -122,8 +122,8 @@
        [when [repl/parse-args [cdr args]] [repl]]
 ]
 
-[defun repl/init [...args]
+[defun repl/init args
        [if [== ARCH "wasm"]
-           [repl/init/wasm ...args]
-           [repl/init/bin ...args]]
+           [repl/init/wasm args]
+           [repl/init/bin args]]
 ]

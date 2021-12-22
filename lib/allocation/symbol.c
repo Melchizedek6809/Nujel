@@ -67,6 +67,7 @@ void lSymbolInit(){
 
 void lSymbolFree(lSymbol *s){
 	s->nextFree = lSymbolFFree;
+	s->c[sizeof(s->c)-1] = 0xFF;
 	lSymbolFFree = s;
 	lSymbolActive--;
 }
@@ -105,6 +106,7 @@ lSymbol *lSymS(const char *str){
 	}
 	lSymbolActive++;
 	spf(ret->c, &ret->c[sizeof(ret->c)], "%s", str);
+	ret->c[sizeof(ret->c)-1] = 0;
 	return ret;
 }
 

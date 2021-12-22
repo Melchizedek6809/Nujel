@@ -3,9 +3,9 @@
 
 ;; Some functions manipulating binary date
 
-[defun lognand [...l]
+[defun lognand l
         "Returns the Nand of its arguments"
-        [lognot [apply logand ...l]]]
+        [lognot [apply logand l]]]
 
 [defun bit-set?! [i]
        [def mask [ash 1 i]]

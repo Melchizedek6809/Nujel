@@ -35,5 +35,5 @@
         [cond [[nil? l] #t]
               [#t [apply [car l] v] [event-fire-iter [cdr l] v]]]]
 
-[defun event-fire [event-name ...val] "Applies ...val to all event handlers associated with event-name"
-        [event-fire-iter [resolve [str->sym event-name]] ...val]]
+[defun event-fire [event-name . val] "Applies ...val to all event handlers associated with event-name"
+        [event-fire-iter [resolve [str->sym event-name]] val]]

@@ -140,29 +140,29 @@
 		     [throw [list :too-many-passes "The compiler couldn't produce a valid result in a 100 passes, probably something wrong with the code."]]]]
         [compile source-raw environment]]
 
-[def defmacro [μ* defmacro [name args ...body]
+[def defmacro [μ* defmacro [name args . body]
               "Define a new macro"
-              [do [def doc-string [if-not [string? [car ...body]] ""
-					  [car ...body]]]
-                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do ...body]] [current-closure]]]]]]
+              [do [def doc-string [if-not [string? [car body]] ""
+					  [car body]]]
+                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]]
 
-[defmacro defun [name args ...body]
+[defmacro defun [name args . body]
               "Define a new function"
-              [def doc-string [if-not [string? [car ...body]] ""
-                                      [car ...body]]]
-              [list 'def name [compile [list 'λ* name args doc-string [cons 'do ...body]] [current-closure]]]]
+              [def doc-string [if-not [string? [car body]] ""
+                                      [car body]]]
+              [list 'def name [compile [list 'λ* name args doc-string [cons 'do body]] [current-closure]]]]
 
-[defmacro μ [args ...body]
+[defmacro μ [args . body]
           "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car ...body]] ""
-                                  [car ...body]]]
-          [compile [list 'μ* #nil args doc-string [cons 'do ...body]] [current-closure]]]
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]
 
-[defmacro \ [args ...body]
+[defmacro \ [args . body]
           "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car ...body]] ""
-                                  [car ...body]]]
-          [compile [list 'λ* #nil args doc-string [cons 'do ...body]] [current-closure]]]
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
 [def λ \]
 
 [defmacro eval [expr]

@@ -45,18 +45,14 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
 	tmpc->caller = c;
-	forEach(n,lambda->vClosure->args){
-		lVal *car = lCar(n);
-		if(car == NULL){continue;}
-		const lSymbol *csym = lGetSymbol(car);
-		if(vn == NULL){
-			lDefineClosureSym(tmpc,csym,NULL);
-		}else if(lSymVariadic(csym)){
-			lDefineClosureSym(tmpc,csym,vn);
-			break;
-		}else{
-			lDefineClosureSym(tmpc,csym,lCar(vn));
+	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
+		if(n->type == ltPair){
+			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
 			vn = lCdr(vn);
+		}else if(n->type == ltSymbol){
+			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? vn : lCons(NULL,NULL));
+		}else{
+			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
@@ -73,18 +69,14 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	tmpc->name = lambda->vClosure->name;
 	tmpc->type = closureCall;
 	tmpc->caller = c;
-	forEach(n,lambda->vClosure->args){
-		lVal *car = lCar(n);
-		if(car == NULL){continue;}
-		const lSymbol *csym = lGetSymbol(car);
-		if(vn == NULL){
-			lDefineClosureSym(tmpc,csym,NULL);
-		}else if(lSymVariadic(csym)){
-			lDefineClosureSym(tmpc,csym,lMap(c,vn,lEval));
-			break;
-		}else{
-			lDefineClosureSym(tmpc,csym,lEval(c,lCar(vn)));
+	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
+		if(n->type == ltPair){
+			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), RVP(lEval(c,lCar(vn))));
 			vn = lCdr(vn);
+		}else if(n->type == ltSymbol){
+			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? RVP(lMap(c,vn,lEval)) : lCons(NULL,NULL));
+		}else{
+			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);

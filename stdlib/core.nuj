@@ -4,7 +4,7 @@
 ;; Contains native nujel implementations of some
 ;; core language constructs and essential macros
 
-[defmacro comment [...body]
+[defmacro comment body
           "Does nothing"
           #nil]
 
@@ -19,9 +19,9 @@
            "Return true if V is false"
            [if v #f #t]]
 
-[defun list [...arguments]
+[defun list arguments
         "Return ARGUMENTS as a list"
-        ...arguments]
+        arguments]
 
 [defun default [arg default-value]
         "Returns ARG or DEFAULT-VALUE if ARG is #nil"

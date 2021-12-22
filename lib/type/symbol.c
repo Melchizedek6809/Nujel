@@ -26,15 +26,6 @@ lVal *lValSym(const char *s){
 	return lValSymS(RSYMP(lSymS(s)));
 }
 
-/* Return true if S is a symbol for a variadic argument */
-bool lSymVariadic(const lSymbol *s){
-	const char *p = s->c;
-	if((p[0] == '.') && (p[1] == '.') && (p[2] == '.')){
-		return true;
-	}
-	return false;
-}
-
 /* Return true if S is a keyword symbol */
 bool lSymKeyword(const lSymbol *s){
 	return s->c[0] == ':';

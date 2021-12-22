@@ -15,6 +15,8 @@ static inline lVal *lCaar  (lVal *v){return lCar(lCar(v));}
 static inline lVal *lCadr  (lVal *v){return lCar(lCdr(v));}
 static inline lVal *lCdar  (lVal *v){return lCdr(lCar(v));}
 static inline lVal *lCddr  (lVal *v){return lCdr(lCdr(v));}
+static inline lVal *lCaadr (lVal *v){return lCar(lCar(lCdr(v)));}
+static inline lVal *lCdadr (lVal *v){return lCdr(lCar(lCdr(v)));}
 static inline lVal *lCadar (lVal *v){return lCar(lCdr(lCar(v)));}
 static inline lVal *lCaddr (lVal *v){return lCar(lCdr(lCdr(v)));}
 static inline lVal *lCdddr (lVal *v){return lCdr(lCdr(lCdr(v)));}

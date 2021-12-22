@@ -15,9 +15,9 @@
        [set! test-list [cons [cons result expr] test-list]]
        [set! test-count [+ test-count 1]]]
 
-[defmacro test/add [result ...expr]
-       "Add a test where ...EXPR must eval to RESULT"
-       `[test/add* ~result ~[list 'quote [cons 'do ...expr]]]]
+[defmacro test/add [result . expr]
+       "Add a test where EXPR must eval to RESULT"
+       `[test/add* ~result ~[list 'quote [cons 'do expr]]]]
 
 [defun display-results []
        "Prints the result Message"
