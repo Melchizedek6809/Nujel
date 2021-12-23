@@ -889,6 +889,7 @@
 [test/add :type-error [try [\ [e] [car e]] [array/append #[1]]]]
 [test/add :type-error [try [\ [e] [car e]] [array/append '[1]]]]
 [test/add :type-error [try [\ [e] [car e]] [array/append]]]
+[test/add "#[1 2 3]" [str/write [let [[o #[2 2 3]]] [array/set! o 0 1] [array/set! [array/dup o] 0 3] o]]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]

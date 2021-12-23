@@ -27,6 +27,9 @@
             [array/set! ret i [b [- i [array/length a]]]]]
        ret]
 
+[defun array/dup [a]
+       [array/append a #[]]]
+
 [defun array/reduce [fun arr α]
        [def len [array/length arr]]
        [for [i 0 len]
