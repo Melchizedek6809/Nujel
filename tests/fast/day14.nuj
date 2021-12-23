@@ -52,8 +52,8 @@
 ]
 
 [defun result [state]
-  [- [apply max [tree/values [state :eles]]]
-     [apply min [tree/values [state :eles]]]]
+  [- [max [tree/values [state :eles]]]
+     [min [tree/values [state :eles]]]]
 ]
 
 [def state [state/read "tests/fast/day14.input"]]
