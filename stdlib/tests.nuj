@@ -880,6 +880,7 @@
 [test/add 3 [[\ [a b c . d] c] 1 2 3]]
 [test/add 2 [[\ [a b c . d] b] 1 2 3]]
 [test/add 1 [[\ [a b c . d] a] 1 2 3]]
+[test/add 10 [def m 5] [for [i 0 m] [++ m] [when [> m 50] [set! i 100]]] m]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]

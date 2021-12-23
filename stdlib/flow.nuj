@@ -70,6 +70,7 @@
           [def symbol-name [car for-loop]]
 	  [def loop-start [cadr for-loop]]
 	  [def loop-stop  [caddr for-loop]]
+	  [def stop-var [gensym]]
 	  [def dir 1]
 	  [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
 	  [when-not [symbol? symbol-name]
@@ -78,12 +79,11 @@
 	            [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
           [when-not loop-stop
 	            [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
-	  `[let [[~symbol-name ~loop-start]]
-	        [while [!= ~symbol-name ~loop-stop]
+	  `[let [[~symbol-name ~loop-start]
+                 [~stop-var ~loop-stop]]
+	        [while [!= ~symbol-name ~stop-var]
                        ~@body
-		       [set! ~symbol-name [add/int ~dir ~symbol-name]]
-	        ]
-	   ]
+		       [set! ~symbol-name [add/int ~dir ~symbol-name]]]]
 ]
 
 [defun thread/-> [init fun]
