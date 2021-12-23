@@ -18,6 +18,15 @@
             [array/set! a i v]]
        a]
 
+[defun array/append [a b]
+       [when-not [and [arr? a] [arr? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
+       [def ret [array/allocate [+ [array/length a] [array/length b]]]]
+       [for [i 0 [array/length a]]
+            [array/set! ret i [a i]]]
+       [for [i [array/length a] [array/length ret]]
+            [array/set! ret i [b [- i [array/length a]]]]]
+       ret]
+
 [defun array/reduce [fun arr α]
        [def len [array/length arr]]
        [for [i 0 len]
