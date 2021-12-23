@@ -122,9 +122,9 @@
                                   [set! last-board board]]
                             ] boards]
        [when [!= [first-board :score] 10680]
-             [throw [list :wrong-result "Wrong result" first-board]]]
+             [throw [list :wrong-result "Wrong Part 1 result" first-board]]]
        [when [!= [last-board :score] 31892]
-             [throw [list :wrong-result "Wrong result" last-board]]]
+             [throw [list :wrong-result "Wrong Part 2 result" last-board]]]
 ]
 
 [def raw [split [file/read "tests/fast/day4.input"] "\n"]]
