@@ -890,13 +890,14 @@
 [test/add :type-error [try [\ [e] [car e]] [array/append '[1]]]]
 [test/add :type-error [try [\ [e] [car e]] [array/append]]]
 [test/add "#[1 2 3]" [str/write [let [[o #[2 2 3]]] [array/set! o 0 1] [array/set! [array/dup o] 0 3] o]]]
+[test/add #t [do [for [i 0 10] [set! i 20] [when [> i 30] [throw [list :error]]]] #t]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
 [def oneTwoThreeTest [+123 5]]
 [defmacro +123 [v]
-  `[+ 123 ~v]
+          `[+ 123 ~v]
 ]
 
 ; Having test defined somehow breaks the whole testing system, how come?
