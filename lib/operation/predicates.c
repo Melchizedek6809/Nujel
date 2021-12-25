@@ -29,6 +29,10 @@ static int lValCompare(lVal *v){
 	case ltNoAlloc:
 	default:
 		return 2;
+	case ltArray:
+		return (a->vArray == b->vArray) ? 0 : -1;
+	case ltTree:
+		return (a->vTree == b->vTree) ? 0 : -1;
 	case ltPair:
 		if(b->type != ltPair){
 			return -1;
