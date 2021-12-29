@@ -21,8 +21,6 @@ jobs:
 #          - { sys: ucrt64,  env: ucrt-x86_64 }
 #          - { sys: clang64, env: clang-x86_64 }
     steps:
-    - name: Setup Debug Session
-      uses: csexton/debugger-action@master
     - uses: msys2/setup-msys2@v2
       with:
         msystem: ${{matrix.sys}}
@@ -35,3 +33,7 @@ jobs:
       run: make -j
     - name: Run Tests
       run: make test
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 60
