@@ -108,11 +108,11 @@ nujel.a: $(LIB_OBJS)
 	@ar cq $@ $^
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
-$(NUJEL): $(BIN_OBJS) nujel.a tmp/stdlib.o tmp/binlib.o
+$(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-nujel-bootstrap: $(BIN_OBJS) nujel.a bootstrap/stdlib.o bootstrap/binlib.o
+nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 	@$(NUJEL_BOOT) -x "[exit [test-run]]"
