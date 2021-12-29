@@ -902,6 +902,8 @@
 [test/add "00620062" [string/pad-start [int->string/hex [hash/adler32 "a"]] 8 "0"]]
 [test/add "0F9D02BC" [string/pad-start [int->string/hex [hash/adler32 "asdQWE123"]] 8 "0"]]
 [test/add "796B110D" [string/pad-start [int->string/hex [hash/adler32 "DiesIstEinTestDerNujelAdler32Implementierung"]] 8 "0"]]
+[test/add 122 [-> @[:asd 123] [tree/-- :asd] [tree/get :asd]]]
+[test/add 124 [-> @[:asd 123] [tree/++ :asd] [tree/get :asd]]]
 
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]

@@ -16,6 +16,14 @@
        "Increment value at K in T by V"
        [tree/set! t k [+ v [int [tree/get t k]]]]]
 
+[defmacro tree/-= [t k v]
+       "Decrement value at K in T by V"
+       `[tree/+= ~t ~k [- ~v]]]
+
 [defmacro tree/++ [t k]
        "Increment value at K in T by 1"
        `[tree/+= ~t ~k 1]]
+
+[defmacro tree/-- [t k]
+       "Increment value at K in T by 1"
+       `[tree/-= ~t ~k 1]]
