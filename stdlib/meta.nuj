@@ -52,6 +52,12 @@
        [when-not len [set! len 9999999]]
        [sublist [environment [symbol-table*]] off [+ off len] #nil]]
 
+[defun arg-list [f]
+        "Return the Argument list of f which can be a Native Function or a Lambda"
+        [cond [[lambda? f] [reduce cat [map [\ [a] [" " [car a]]] [cl-data f]]]]
+              [[native? f] [reduce cat [map [\ [a] [" " a]] [car [cl-data f]]]]]
+              [#t ""]]]
+
 [def gensym/counter 0]
 [defun gensym []
        [set! gensym/counter [+ 1 gensym/counter]]

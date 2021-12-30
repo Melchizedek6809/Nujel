@@ -113,7 +113,7 @@
 [def part-2 [reduce [\ [Σ line]
           [def split-args [split line "|"]]
           [def output-raw [map string [read [cadr split-args]]]]
-          [for-each output/count output-raw]
+          [for-each output-raw output/count]
           [def table-raw [map string [read [car split-args]]]]
           [def output-sum [translate table-raw output-raw]]
           [+ Σ output-sum]] lines 0]]

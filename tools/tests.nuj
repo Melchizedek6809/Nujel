@@ -41,7 +41,7 @@
                                    [path/ext?! "nuj"]]]]
 
 [def test/count [length test-paths]]
-[for-each file/test test-paths]
+[for-each test-paths file/test]
 [newline]
 [def dur [- [time/milliseconds] test/start]]
 [if [and [> test/success 0] [zero? test/errors]]

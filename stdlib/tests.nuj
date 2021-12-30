@@ -587,7 +587,7 @@
 [test/add #f [in-range? 9 1 5]]
 [test/add #t [in-range? -3 -10 5]]
 [test/add #t [in-range? -3.0 -10.0 5.0]]
-[test/add 6 [let* [def sum 0] [for-each [λ [a] [set! sum [+ sum a]]] '[1 2 3]] sum]]
+[test/add 6 [let* [def sum 0] [for-each '[1 2 3] [λ [a] [set! sum [+ sum a]]]] sum]]
 [test/add "nuj" [path/extension "test.nuj"]]
 [test/add "nuj" [path/extension "Another/test.nuj"]]
 [test/add "NUJ" [uppercase [path/extension "Another/test.nuj"]]]

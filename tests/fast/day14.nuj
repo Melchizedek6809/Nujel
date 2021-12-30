@@ -29,7 +29,7 @@
 ]
 
 [defun combinations/read [state lines]
-       [for-each [\ [line] [combination/add state [split line " -> "]]] lines]
+       [for-each lines [\ [line] [combination/add state [split line " -> "]]]]
        state
 ]
 

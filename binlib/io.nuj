@@ -4,8 +4,8 @@
 [defun help [i]
        "Describe 10 functions at offset 1"
        [def off [* [int i] 10]]
-       [for-each [\ [l] [println [cat l " " [describe l]]]]
-                 [map cat [symbol-table off 10]]]
+       [for-each [map cat [symbol-table off 10]]
+                 [\ [l] [println [cat l " " [describe l]]]]]
        [println [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
        #t
 ]

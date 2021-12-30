@@ -95,7 +95,7 @@
 	      [otherwise [println [cat [string/pad-start "" indent]
 				      [ansi-yellow [p :type]]
 				      " v:" [ansi-green [p :version]]]]
-			 [for-each [\ [a] [bits/print a [+ 4 indent]]] [p :value]]]]]
+			 [for-each [p :value] [\ [a] [bits/print a [+ 4 indent]]]]]]]
 
 [def parsed-prog [cdr [bits/parse/hex [file/read "tests/fast/day16.input"]]]]
 ;[bits/print parsed-prog]

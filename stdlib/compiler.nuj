@@ -136,7 +136,7 @@
                       [cdr! source]]
                [set! source-next [reverse source-next]]
                [when [> [set! passes [+ 1 passes]] max-passes]
-                     [for-each display/error errors]
+                     [for-each errors display/error]
 		     [throw [list :too-many-passes "The compiler couldn't produce a valid result in a 100 passes, probably something wrong with the code."]]]]
         [compile source-raw environment]]
 
@@ -189,4 +189,4 @@
 
 [defun optimize-all! []
        "Return a list of all lambdas in CTX"
-       [for-each optimize! [filter [map resolve [symbol-table]] lambda?]]]
+       [for-each [filter [map resolve [symbol-table]] lambda?] optimize!]]

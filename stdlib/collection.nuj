@@ -13,7 +13,7 @@
        [if-not l ""
                [reduce [λ [a b] [if a [cat a glue b] b]] l #nil]]]
 
-[defun for-each [f l]
+[defun for-each [l f]
        "Runs F over every item in collection L and returns the resulting list"
        [reduce [λ [a b] [f b]] l #nil]]
 

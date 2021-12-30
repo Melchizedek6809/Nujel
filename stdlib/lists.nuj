@@ -106,12 +106,6 @@
               [[== [car l] m] l]
               [#t [member m [cdr l]]]]]
 
-[defun arg-list [f]
-        "Return the Argument list of f which can be a Native Function or a Lambda"
-        [cond [[lambda? f] [reduce cat [map [\ [a] [" " [car a]]] [cl-data f]]]]
-              [[native? f] [reduce cat [map [\ [a] [" " a]] [car [cl-data f]]]]]
-              [#t ""]]]
-
 [defun getf [l key]
        "Return the value in LIST following KEY"
        [cond [[nil? l] #nil]
