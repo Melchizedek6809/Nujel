@@ -30,7 +30,7 @@
 [defun array/dup [a]
        [array/append a #[]]]
 
-[defun array/reduce [fun arr α]
+[defun array/reduce [arr fun α]
        [def len [array/length arr]]
        [for [i 0 len]
               [set! α [fun α [arr i]]]]

@@ -72,7 +72,7 @@
 
 [defun snail/sum [lines]
        [def vals [map [split lines "\n"] snail/read]]
-       [reduce snail/add [cdr vals] [car vals]]]
+       [reduce [cdr vals] snail/add [car vals]]]
 
 [defun snail/mag [t]
        [cond [[snail/int? t] [t :v]]

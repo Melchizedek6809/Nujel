@@ -21,12 +21,12 @@
              [[:array] [array/filter l p]]
              [otherwise [throw [list :invalid-type "You can only use filter with a collection" l [current-lambda]]]]]]
 
-[defun reduce [f l α]
+[defun reduce [l f α]
        "Combine all elements in collection l using operation F and starting value α"
        [case [type-of l]
              [[:nil]    α]
-             [[:pair]   [list/reduce f l α]]
-             [[:array]  [array/reduce f l α]]
+             [[:pair]   [list/reduce l f α]]
+             [[:array]  [array/reduce l f α]]
              [otherwise [f α l]]]]
 
 [defun length [α]

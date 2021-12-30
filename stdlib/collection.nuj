@@ -5,32 +5,32 @@
 
 [defun sum [c]
        "Return the sum of every value in collection C"
-       [reduce + c 0]]
+       [reduce c + 0]]
 
 [defun join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]
        [if-not l ""
-               [reduce [λ [a b] [if a [cat a glue b] b]] l #nil]]]
+               [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
 
 [defun for-each [l f]
        "Runs F over every item in collection L and returns the resulting list"
-       [reduce [λ [a b] [f b]] l #nil]]
+       [reduce l [λ [a b] [f b]] #nil]]
 
 [defun count [l p]
        "Count the number of items in L where P is true"
-       [reduce [λ [a b] [+ a [if [p b] 1 0]]] l 0]]
+       [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]]
 
 [defun min l
        "Returns the minimum value of its arguments, or collection"
-       [reduce [λ [a b] [if [< a b] a b]]
-               [if [cdr l] l [car l]]
+       [reduce [if [cdr l] l [car l]]
+               [λ [a b] [if [< a b] a b]]
                #nil]]
 
 [defun max l
        "Returns the minimum value of its arguments, or collection"
-       [reduce [λ [a b] [if [> a b] a b]]
-               [if [cdr l] l [car l]]
+       [reduce [if [cdr l] l [car l]]
+               [λ [a b] [if [> a b] a b]]
                #nil]]
 
 [defun delete [l e]

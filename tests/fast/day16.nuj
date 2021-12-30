@@ -83,7 +83,7 @@
 
 [defun bits/version-sum [p]
        [if [pair? [p :value]]
-           [reduce [\ [a b] [+ a [bits/version-sum b]]] [p :value] [p :version]]
+           [reduce [p :value] [\ [a b] [+ a [bits/version-sum b]]] [p :version]]
 	   [p :version]]]
 
 [defun bits/print [p indent]

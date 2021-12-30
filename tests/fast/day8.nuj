@@ -74,15 +74,15 @@
        [filter vals [\ [α] [!= α [car ret]]]]]
 
 [defun seven-seg->binary [str]
-       [reduce [\ [α β] [logior α [case β
-                                        [["a"] #x01]
-                                        [["b"] #x02]
-                                        [["c"] #x04]
-                                        [["d"] #x08]
-                                        [["e"] #x10]
-                                        [["f"] #x20]
-                                        [["g"] #x40]]]]
-               [split str ""]]]
+       [reduce [split str ""]
+               [\ [α β] [logior α [case β
+                                           [["a"] #x01]
+                                           [["b"] #x02]
+                                           [["c"] #x04]
+                                           [["d"] #x08]
+                                           [["e"] #x10]
+                                           [["f"] #x20]
+                                           [["g"] #x40]]]]]]
 
 [defun translate [vals out-vals]
        [def numbers [-> [array/allocate 10]
@@ -107,16 +107,16 @@
                   i
                   [translate/val val [+ 1 i]]]
        ]
-       [reduce [\ [α β] [+ [* α 10] β]] [map [map out-vals seven-seg->binary] translate/val] 0]
+       [reduce [map [map out-vals seven-seg->binary] translate/val] [\ [α β] [+ [* α 10] β]] 0]
 ]
 
-[def part-2 [reduce [\ [Σ line]
+[def part-2 [reduce lines [\ [Σ line]
           [def split-args [split line "|"]]
           [def output-raw [map [read [cadr split-args]] string]]
           [for-each output-raw output/count]
           [def table-raw [map [read [car split-args]] string]]
           [def output-sum [translate table-raw output-raw]]
-          [+ Σ output-sum]] lines 0]]
+          [+ Σ output-sum]] 0]]
 
 [def result [sum counts]]
 [when [!= result 532]

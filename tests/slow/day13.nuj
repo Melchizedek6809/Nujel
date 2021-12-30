@@ -2,7 +2,8 @@
 
 [defun fold/load [filename]
        [def points #nil]
-       [def γ [reduce [\ [α β]
+       [def γ [reduce [split [file/read filename] "\n"]
+                       [\ [α β]
                          [cond [[zero? [string/length β]] α]
                                [[== [char-at β 0] #\f]
                                 [tree/set! α :folds [cons [split [caddr [split β " "]] "="] [α :folds]]]]
@@ -10,7 +11,6 @@
                                    [set! points [cons τ points]]
                                    [tree/set! α :width  [max [α  :width] [+ 1 [car τ]]]]
                                    [tree/set! α :height [max [α :height] [+ 1 [cadr τ]]]]]]]
-                      [split [file/read filename] "\n"]
                       @[:width 0 :height 0 :folds #nil]]]
        [tree/set! γ :data [-> [array/allocate [* [γ :width] [γ :height]]] [array/fill! 0]]]
        [while points

@@ -76,8 +76,8 @@
 
 [defun board/score! [board marks last-num]
        [defun board/score/num [a b] [+ a [if [marks b] 0 b]]]
-       [defun board/score/row [a b] [reduce board/score/num b a]]
-       [tree/set! board :score [* last-num [reduce board/score/row [board :board] 0]]]
+       [defun board/score/row [a b] [reduce b board/score/num a]]
+       [tree/set! board :score [* last-num [reduce [board :board] board/score/row 0]]]
        [tree/set! board :order [board/get-order]]
        ;[println [ansi-blue "Last Num: " last-num]]
        ;[print/board board marks]
