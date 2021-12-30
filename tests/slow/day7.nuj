@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[def real-data [apply array/new [map int [split [file/read "tests/slow/day7.input"] ","]]]]
+[def real-data [apply array/new [map [split [file/read "tests/slow/day7.input"] ","] int]]]
 
 [defun fancy/calc []
        [def ret [array/allocate 2000]]

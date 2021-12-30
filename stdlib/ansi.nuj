@@ -109,22 +109,19 @@
 [defun ansi-rainbow args
         "Wrap ARGS in the colors of the rainbow!"
         [let* [def count 0]
-              [cat [join [map
-                        [\ [a]
-                           [set! count [logand [+ 1 count] #x7]]
-                           [cat [ansi-fg [if [zero? count] 7 [+ count 8]]] a]]
-                        [split [apply cat args] ""]] ""]
+              [cat [join [map [split [apply cat args] ""]
+                              [\ [a]
+                                 [set! count [logand [+ 1 count] #x7]]
+                                 [cat [ansi-fg [if [zero? count] 7 [+ count 8]]] a]]] ""]
                    ansi-fg-reset]]]
 
 [defun ansi-rainbow-bg args
         "Wrap ARGS in the colors of the rainbow!"
         [def count 0]
-	[def split-args [split [apply cat args] ""]]
-	[def colored-list [map
+	[def colored-list [map [split [apply cat args] ""]
 			  [\ [a]
 			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [ansi-fg [logxor count #x7]] [ansi-bg count] a]]\
-			  split-args]]
+			     [cat [ansi-fg [logxor count #x7]] [ansi-bg count] a]]]]
         [cat [join colored-list ""] ansi-reset]]
 
 [defun reprint-line [text width]

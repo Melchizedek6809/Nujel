@@ -4,7 +4,7 @@
 [def big-caves @[]]
 [defun big-cave? [α] [big-caves α]]
 [defun add-connections [line]
-       [def parts [map str->sym [split line "-"]]]
+       [def parts [map [split line "-"] str->sym]]
        [tree/set! cave-map [car parts] [cons [cadr parts] [tree/get cave-map [car parts]]]]
        [tree/set! cave-map [cadr parts] [cons [car parts] [tree/get cave-map [cadr parts]]]]
        [tree/set! big-caves [car parts] [< [char-at [sym->str [car parts]] 0] #\a]]

@@ -4,9 +4,9 @@
 [def input-data [file/read "tests/fast/day3.input"]]
 
 [defun read-data [lines]
-       [map [λ [line]
-               [car [read [cat "#b" line]]]]
-            [split lines "\n"]]]
+       [map [split lines "\n"]
+            [λ [line]
+                [car [read [cat "#b" line]]]]]]
 
 [defun calc-γε [numbers bit-count]
        [def γ 0]

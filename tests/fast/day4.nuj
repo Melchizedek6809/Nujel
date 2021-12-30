@@ -14,7 +14,7 @@
 ]
 
 [defun parse/board [board-raw]
-       @[:score 0 :order 0 :board [apply array/new [map [\ [row] [apply array/new [read row]]] board-raw]]]
+       @[:score 0 :order 0 :board [apply array/new [map board-raw [\ [row] [apply array/new [read row]]]]]]
 ]
 
 [defun print/board/line/number [num marks]
@@ -125,7 +125,7 @@
 ]
 
 [def raw [split [file/read "tests/fast/day4.input"] "\n"]]
-[def turns [map [\ [a] [car [read a]]] [split [car raw] ","]]]
-[def boards [map parse/board [split/boards [cddr raw]]]]
+[def turns [map [split [car raw] ","] [\ [a] [car [read a]]]]]
+[def boards [map [split/boards [cddr raw]] parse/board]]
 
 [take-turns boards turns]

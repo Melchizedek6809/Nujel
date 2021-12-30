@@ -126,7 +126,7 @@
        [λ [a] [== chars [string/length a]]]]
 
 [defun contains-any? [str chars]
-       [apply or [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]]
+       [apply or [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]
 
 [defun contains-all? [str chars]
-       [apply and [map [λ [a] [>= [index-of str a] 0]] [split chars ""]]]]
+       [apply and [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]

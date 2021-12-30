@@ -88,7 +88,7 @@
        [def numbers [-> [array/allocate 10]
                         [array/fill! #nil]]]
 
-       [-> [map seven-seg->binary vals]
+       [-> [map vals seven-seg->binary]
            [find/by-length numbers 2 1]
            [find/by-length numbers 3 7]
            [find/by-length numbers 4 4]
@@ -107,14 +107,14 @@
                   i
                   [translate/val val [+ 1 i]]]
        ]
-       [reduce [\ [α β] [+ [* α 10] β]] [map translate/val [map seven-seg->binary out-vals]] 0]
+       [reduce [\ [α β] [+ [* α 10] β]] [map [map out-vals seven-seg->binary] translate/val] 0]
 ]
 
 [def part-2 [reduce [\ [Σ line]
           [def split-args [split line "|"]]
-          [def output-raw [map string [read [cadr split-args]]]]
+          [def output-raw [map [read [cadr split-args]] string]]
           [for-each output-raw output/count]
-          [def table-raw [map string [read [car split-args]]]]
+          [def table-raw [map [read [car split-args]] string]]
           [def output-sum [translate table-raw output-raw]]
           [+ Σ output-sum]] lines 0]]
 

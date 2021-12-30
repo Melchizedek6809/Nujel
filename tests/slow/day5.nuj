@@ -11,7 +11,7 @@
 ]
 
 [defun parse/point [text]
-       [tree/zip '[:x :y] [map read/single [split text ","]]]
+       [tree/zip '[:x :y] [map [split text ","] read/single]]
 ]
 
 [defun line/dir [start end]
@@ -49,7 +49,7 @@
 ]
 
 [defun parse/line [line]
-       [line/draw-vents [tree/zip '[:b :a] [map parse/point [split line "->"]]]]
+       [line/draw-vents [tree/zip '[:b :a] [map [split line "->"] parse/point]]]
 ]
 
 [def vents [array/2d/new 1000 1000 0]]

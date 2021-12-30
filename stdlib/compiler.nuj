@@ -189,4 +189,4 @@
 
 [defun optimize-all! []
        "Return a list of all lambdas in CTX"
-       [for-each [filter [map resolve [symbol-table]] lambda?] optimize!]]
+       [for-each [filter [map [symbol-table] resolve] lambda?] optimize!]]

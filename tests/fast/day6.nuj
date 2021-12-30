@@ -28,7 +28,7 @@
        ret
 ]
 
-[def input [input/parse [map int [split [file/read "tests/fast/day6.input"] ","]]]]
+[def input [input/parse [map [split [file/read "tests/fast/day6.input"] ","] int]]]
 [def result [sum [do-steps input 80]]]
 [when [!= result 349549]
       [throw [list :wrong-result "Wrong result" result]]]

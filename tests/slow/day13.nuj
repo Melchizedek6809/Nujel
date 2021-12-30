@@ -6,7 +6,7 @@
                          [cond [[zero? [string/length β]] α]
                                [[== [char-at β 0] #\f]
                                 [tree/set! α :folds [cons [split [caddr [split β " "]] "="] [α :folds]]]]
-                               [#t [def τ [map read/single [split β ","]]]
+                               [#t [def τ [map [split β ","] read/single]]
                                    [set! points [cons τ points]]
                                    [tree/set! α :width  [max [α  :width] [+ 1 [car τ]]]]
                                    [tree/set! α :height [max [α :height] [+ 1 [cadr τ]]]]]]]

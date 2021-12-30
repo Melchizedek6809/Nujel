@@ -29,7 +29,7 @@
 [defun bits/compile [p]
        [if [== 4 [p :type]]
 	   [p :value]
-	   [cons [bits/type->op [p :type]] [map bits/compile [p :value]]]]]
+	   [cons [bits/type->op [p :type]] [map [p :value] bits/compile]]]]
 
 [defun bits/parse/packet/operator/packets [p s offset packets]
        [def off offset]
@@ -79,7 +79,7 @@
 	   [bits/parse/packet-contents s [+ offset 6]]]]
 
 [defun bits/parse/hex [s]
-       [bits/parse/packet [join [map bits/hex->bits [split s ""]]] 0]]
+       [bits/parse/packet [join [map [split s ""] bits/hex->bits]] 0]]
 
 [defun bits/version-sum [p]
        [if [pair? [p :value]]

@@ -39,10 +39,10 @@
              [[:tree]   [tree/size     α]]
              [otherwise [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]]]
 
-[defun map [f l]
+[defun map [l f]
        "Runs f over every item in collection l and returns the resulting list"
        [case [type-of l]
              [[:nil] #nil]
-             [[:pair] [list/map f l]]
-             [[:array] [array/map f l]]
+             [[:pair] [list/map l f]]
+             [[:array] [array/map l f]]
              [otherwise [throw [list :invalid-type "You can only use map with a collection" l [current-lambda]]]]]]

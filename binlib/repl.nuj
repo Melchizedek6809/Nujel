@@ -93,7 +93,7 @@
 [defun repl/parse-options [options]
        [if [== [char-at options 0] #\-]
            [repl/parse-option [str->sym [substr options 1]]]
-           [for-each [map str->sym [split options ""]] repl/parse-option]]
+           [for-each [map [split options ""] str->sym] repl/parse-option]]
 ]
 
 [defun repl/parse-arg [arg]

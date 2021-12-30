@@ -5,8 +5,8 @@
 [println [ansi-purple "Now running the AoC Tests, this might take a while."]]
 
 [defun directory/read-relative [path]
-       [map [\ [α] [cat path "/" α]]
-            [directory/read path]]]
+       [map [directory/read path]
+            [\ [α] [cat path "/" α]]]]
 
 [defun prog-str [fun-color i path start]
        [cat "[" [fun-color [string/pad-start i 2]]

@@ -46,7 +46,7 @@
 ]
 
 [defun map/set/row [data y line w]
-       [def cols [map int [split line ""]]]
+       [def cols [map [split line ""] int]]
        [for [x 0 w]
             [array/2d/set! data x y [car cols]]
             [cdr! cols]

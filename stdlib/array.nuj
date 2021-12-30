@@ -36,7 +36,7 @@
               [set! α [fun α [arr i]]]]
        α]
 
-[defun array/map [fun arr]
+[defun array/map [arr fun]
        [def len [array/length arr]]
        [for [i 0 len]
               [array/set! arr i [fun [arr i]]]]

@@ -71,7 +71,7 @@
        [snail/reduce @[:l a :r b]]]
 
 [defun snail/sum [lines]
-       [def vals [map snail/read [split lines "\n"]]]
+       [def vals [map [split lines "\n"] snail/read]]
        [reduce snail/add [cdr vals] [car vals]]]
 
 [defun snail/mag [t]

@@ -63,7 +63,7 @@
                [cdr! l]]
         [nreverse ret]]
 
-[defun list/map [f l]
+[defun list/map [l f]
         "Runs f over every item in list l and returns the resulting list"
         [def ret #nil]
         [while l
