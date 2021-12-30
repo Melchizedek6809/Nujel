@@ -4,28 +4,22 @@
        [cond [[== name 'forward] [tree/set! state :horiz [+ [state :horiz] val]]]
              [[== name 'up     ] [tree/set! state :depth [- [state :depth] val]]]
              [[== name 'down   ] [tree/set! state :depth [+ [state :depth] val]]]
-             [#t [println "Unknown Command, continuing."]]
-       ]
-]
+             [#t [println "Unknown Command, continuing."]]]]
 
 [defun do-commands-2 [name val state]
        [cond [[== name 'forward] [tree/set! state :horiz [+ [state :horiz] val]]
                                  [tree/set! state :depth [+ [state :depth] [* [state :aim] val]]]]
              [[== name 'up     ] [tree/set! state :aim   [- [state   :aim] val]]]
              [[== name 'down   ] [tree/set! state :aim   [+ [state   :aim] val]]]
-             [#t [println "Unknown Command, continuing."]]
-       ]
-]
+             [#t [println "Unknown Command, continuing."]]]]
 
 [defun step [l state fun]
-       [if [and l [cdr l]]
-           [step [cddr l] [fun [car l] [cadr l] state] fun]
-           state]
-]
+       [if-not [and l [cdr l]] state
+               [step [cddr l] [fun [car l] [cadr l] state] fun]]]
 
 [defun calc-result [state]
-       [* [state :depth] [state :horiz]]
-]
+       [* [state :depth] [state :horiz]]]
+
 
 [def result [calc-result [step '[forward 5 down 5 forward 8 up 3 down 8 forward 2] @[:depth 0 :horiz 0] do-commands-1]]]
 [when [!= 150 result] [throw [list :wrong-result "Wrong result" result]]]

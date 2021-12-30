@@ -7,10 +7,8 @@
        [def acc 0]
        [for [i 0 2000]
             [set! acc [+ acc i]]
-	    [array/set! ret i acc]
-       ]
-       ret
-]
+	    [array/set! ret i acc]]
+       ret]
 [def fancy [fancy/calc]]
 
 [defun calc/mm [data pred] [reduce data [\ [a b] [if [pred b a] b a]] [data 0]]]
@@ -21,19 +19,14 @@
 [defun calc/optimal [data calc/fuel]
        [def cmin [calc/min data]]
        [def cmax [calc/max data]]
-
-
        [def ret-pos cmin]
        [def ret-fuel [calc/fuel data cmin]]
        [for [i [+ 1 cmin] cmax]
 	    [def new-fuel [calc/fuel data i]]
-	    ;[println ["I: " i " fuel: " new-fuel]]
 	    [when [< new-fuel ret-fuel]
 		  [do [set! ret-pos i]
-		      [set! ret-fuel new-fuel]]]
-       ]
-       @[:pos ret-pos :fuel ret-fuel]
-]
+		      [set! ret-fuel new-fuel]]]]
+       @[:pos ret-pos :fuel ret-fuel]]
 
 [def result [calc/optimal real-data calc/fuel/simple]]
 [when [!= [result :fuel] 355989]
@@ -41,5 +34,3 @@
 [def result [calc/optimal real-data calc/fuel/complex]]
 [when [!= [result :fuel] 102245489]
       [throw [list :wrong-result "Wrong result" result]]]
-
-;[repl]

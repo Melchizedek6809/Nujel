@@ -8,8 +8,7 @@
        [tree/set! cave-map [car parts] [cons [cadr parts] [tree/get cave-map [car parts]]]]
        [tree/set! cave-map [cadr parts] [cons [car parts] [tree/get cave-map [cadr parts]]]]
        [tree/set! big-caves [car parts] [< [char-at [sym->str [car parts]] 0] #\a]]
-       [tree/set! big-caves [cadr parts] [< [char-at [sym->str [cadr parts]] 0] #\a]]
-]
+       [tree/set! big-caves [cadr parts] [< [char-at [sym->str [cadr parts]] 0] #\a]]]
 [def connections [for-each [split [file/read "tests/slow/day12.input"] "\n"] add-connections]]
 
 [def valid-routes 0]
@@ -26,13 +25,11 @@
                                    [throw [list :return]]
                                    [set! twice #t]]]
                                [set! s [tree/dup s]]
-                               [tree/++ s position]
-                     ]
+                               [tree/++ s position]]
                      [while routes
                             [try [\ [ε] [when [!= [car ε] :return] [throw ε]]]
                             [calc-routes [car routes] s twice]]
-                            [cdr! routes]]]]
-]
+                            [cdr! routes]]]]]
 
 [calc-routes 'end @[] #t]
 [when [!= valid-routes 4411]

@@ -8,20 +8,16 @@
        [def acc 0]
        [while [and l [cdr l]]
               [when [> [cadr l] [car l]] [++ acc]]
-              [cdr! l]
-       ]
-       acc
-]
+              [cdr! l]]
+       acc]
 
 [defun build-sums [l]
        "Build sums out of 3 values with a sliding window"
        [def ret #nil]
        [while [and l [cdr l] [cddr l]]
               [set! ret [cons [+ [car l] [cadr l] [caddr l]] ret]]
-              [cdr! l]
-       ]
-       [nreverse ret]
-]
+              [cdr! l]]
+       [nreverse ret]]
 
 [def result [count-increases example-list]]
 [when [!= result 7] [throw [list :wrong-result "Wrong result" result]]]

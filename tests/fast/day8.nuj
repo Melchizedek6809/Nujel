@@ -105,10 +105,8 @@
               [when [> i 10] [throw [list :error ""]]]
               [if [== [numbers i] val]
                   i
-                  [translate/val val [+ 1 i]]]
-       ]
-       [reduce [map [map out-vals seven-seg->binary] translate/val] [\ [α β] [+ [* α 10] β]] 0]
-]
+                  [translate/val val [+ 1 i]]]]
+       [reduce [map [map out-vals seven-seg->binary] translate/val] [\ [α β] [+ [* α 10] β]] 0]]
 
 [def part-2 [reduce lines [\ [Σ line]
           [def split-args [split line "|"]]

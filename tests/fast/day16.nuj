@@ -98,9 +98,7 @@
 			 [for-each [p :value] [\ [a] [bits/print a [+ 4 indent]]]]]]]
 
 [def parsed-prog [cdr [bits/parse/hex [file/read "tests/fast/day16.input"]]]]
-;[bits/print parsed-prog]
-;[println [str/write [bits/compile parsed-prog]]]
-					;[newline]
+
 [def res-p1 [bits/version-sum parsed-prog]]
 [def res-p2 [eval [bits/compile parsed-prog]]]
 [when [!= res-p1 951]

@@ -9,24 +9,19 @@
 	 [a 6]
 	 [+ [a 7] [a 0]]
 	 [a 8]
-	 [a 0]]
-]
+	 [a 0]]]
 
 [defun do-steps [l count]
        [for [i 0 count]
-            [set! l [step l]]
-       ]
-       l
-]
+            [set! l [step l]]]
+       l]
 
 [defun input/parse [l]
        [def ret #[0 0 0 0 0 0 0 0 0]]
        [while l
               [array/++ ret [car l]]
-              [cdr! l]
-       ]
-       ret
-]
+              [cdr! l]]
+       ret]
 
 [def input [input/parse [map [split [file/read "tests/fast/day6.input"] ","] int]]]
 [def result [sum [do-steps input 80]]]
