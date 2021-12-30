@@ -32,3 +32,7 @@
        [reduce [λ [a b] [if [> a b] a b]]
                [if [cdr l] l [car l]]
                #nil]]
+
+[defun delete [l e]
+        "Returns a filtered list l with all elements equal to e omitted"
+        [filter l [λ [a] [not [== a e]]]]]

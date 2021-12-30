@@ -10,9 +10,9 @@
        [map [\ [α] [cat path "/" α]]
             [directory/read path]]
 ]
-[def stdlib-files [filter ext-nuj? [append [directory/read-relative "stdlib"]
+[def stdlib-files [filter [append [directory/read-relative "stdlib"]
                                   [directory/read-relative "binlib"]]
-                          ]]
+                          ext-nuj?]]
 
 ; If something happens, we just print the responsible error and exit immediatly,
 ; since we can't really fix things, we could only make things worse.
