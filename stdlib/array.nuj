@@ -42,7 +42,7 @@
               [array/set! arr i [fun [arr i]]]]
        arr]
 
-[defun array/filter [pred arr]
+[defun array/filter [arr pred]
        [def ri 0]
        [def len [array/length arr]]
        [def ret [array/allocate len]]

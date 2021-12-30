@@ -54,7 +54,7 @@
 	      [++ ret]]
        ret]
 
-[defun list/filter [p l]
+[defun list/filter [l p]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [def ret #nil]
         [while l
@@ -108,7 +108,7 @@
 
 [defun delete [e l]
         "Returns a filtered list l with all elements equal to e omitted"
-        [filter [\ [a] [not [== a e]]] l]]
+        [filter l [\ [a] [not [== a e]]]]]
 
 [defun arg-list [f]
         "Return the Argument list of f which can be a Native Function or a Lambda"

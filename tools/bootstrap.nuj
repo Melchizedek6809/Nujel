@@ -11,7 +11,8 @@
             [directory/read path]]
 ]
 [def stdlib-files [filter ext-nuj? [append [directory/read-relative "stdlib"]
-                                           [directory/read-relative "binlib"]]]]
+                                  [directory/read-relative "binlib"]]
+                          ]]
 
 ; If something happens, we just print the responsible error and exit immediatly,
 ; since we can't really fix things, we could only make things worse.

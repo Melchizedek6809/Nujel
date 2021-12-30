@@ -13,12 +13,12 @@
              [[:pair]   [list/ref  l i]]
              [otherwise [throw [list :invalid-type "You can only use ref with a collection" l [current-lambda]]]]]]
 
-[defun filter [p l]
+[defun filter [l p]
        "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
        [case [type-of l]
              [[:nil] #nil]
-             [[:pair] [list/filter p l]]
-             [[:array] [array/filter p l]]
+             [[:pair] [list/filter l p]]
+             [[:array] [array/filter l p]]
              [otherwise [throw [list :invalid-type "You can only use filter with a collection" l [current-lambda]]]]]]
 
 [defun reduce [f l α]
