@@ -117,33 +117,34 @@
         [when-not environment [set! environment [ω]]]
         [def source #nil]
         [def source-next source-raw]
-        [def passes 0]
-        [def max-passes 100]
+        [def forms-compiled 0]
         [defun try-again [source]
                [set! source-next [cons source source-next]]]
         [while source-next
+               [def forms-compiled-last forms-compiled]
                [set! source source-next]
                [set! source-next #nil]
-	       [def errors #nil]
+               [def errors #nil]
                [while source
                       [try [\ [err] [set! errors [cons err errors]]
-		                    [case [car err]
+                                    [case [car err]
                                           [:unresolved-procedure [try-again [car source]]]
                                           [:runtime-macro [try-again [car source]]]
                                           [otherwise [throw err]]]]
                            [def compiled-form [compile [car source] environment #t]]
-                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]]]
+                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]
+                                               [++ forms-compiled]]]
                       [cdr! source]]
                [set! source-next [reverse source-next]]
-               [when [> [set! passes [+ 1 passes]] max-passes]
+               [when [<= forms-compiled forms-compiled-last]
                      [for-each errors display/error]
-		     [throw [list :too-many-passes "The compiler couldn't produce a valid result in a 100 passes, probably something wrong with the code."]]]]
+                     [throw [list :you-can-not-advance "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"]]]]
         [compile source-raw environment]]
 
 [def defmacro [μ* defmacro [name args . body]
               "Define a new macro"
               [do [def doc-string [if-not [string? [car body]] ""
-					  [car body]]]
+                                          [car body]]]
                   [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]]
 
 [defmacro defun [name args . body]
@@ -177,10 +178,10 @@
 [defun optimize/code [code]
        [if-not [pair? code] code
                [if [and [symbol? [car code]] [resolves? [car code]]]
-		   [cons [resolve [car code]]
-			 [optimize/code/rest [cdr code]]]
-		   [cons [optimize/code [car code]]
-			 [optimize/code/rest [cdr code]]]]]]
+                   [cons [resolve [car code]]
+                         [optimize/code/rest [cdr code]]]
+                   [cons [optimize/code [car code]]
+                         [optimize/code/rest [cdr code]]]]]]
 
 [defun optimize! [fun]
        "Optimize FUN via mutation"
