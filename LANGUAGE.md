@@ -15,6 +15,21 @@ datatype and expand the primitve operators by writing something similar to:
                [+ a:z b:z]]]
 ```
 
+## Concurrency
+Nujel should use promises for concurrency, leveraging the type system and
+implicit casts should make for a very comfortable way of doing async:
+```
+[def α [file/read "a.txt"]]
+[def β [file/read "b.txt"]] ; α and β both contain unresolved promise:string values
+[cat α β] ; Since [cat] does not support promise:string but values of type string we will now await both promises in parallel
+[cat [file/read "a.txt"] [file/read "b.txt"]] ; This works the same, since first we build the complete argument list, and then do any implicit casts
+```
+That way one never has to manually await a result, the runtime will
+automatically await the result on first usage. Additionally Nujel does not make
+a difference between an async function and a normal one, they just differ on
+the return type.
+
+
 ## Error Handling
 Nujel uses 2 different systems for error handling, depending on the
 broad category that the error belongs to:
