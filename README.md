@@ -19,6 +19,9 @@ So you can also write `[display ["The result is: " [1 + 1]]]`. Or `[display [#["
 Nujel also has built-in support for maps using binary trees, including support by the reader for a convenient
 syntax to definie literals with, for example `[@[:one 1 :two 2] :two]` returns `2`.
 
+# Try it out yourself
+You can easily start experimenting with Nujel right in your Browser by using a [WASM Release](https://wolkenwelten.net/nujel/).
+
 ## Build Status
 | Operating System   | Master | Develop |
 |--------------------|-----------|-----------|
