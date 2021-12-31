@@ -27,7 +27,7 @@ def open_browser():
     webbrowser.open_new(url)
 
 os.chdir(pathlib.Path(__file__).parent.resolve())
-call("./buildwasm")
+#call("./buildwasm")
 os.chdir("../web")
 
 Handler = CloseHandler

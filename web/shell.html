@@ -5,52 +5,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>Nujel REPL</title>
 		<link rel="stylesheet" href="repl.css"/>
+		<link rel="stylesheet" href="editor.css"/>
+		<link rel="icon" type="image/png" href="favicon.png" sizes="32x32"/>
 	</head>
 	<body>
+		<div id="nujel-editor-wrapper"></div>
 		<div id="nujel-repl-wrapper"></div>
 		<script type="text/javascript" src="repl.js"></script>
-		<script type="text/javascript">
-			var args = window.location.search+'';
-			if(args.charAt(0) == '?'){
-				args = args.substr(1);
-			}
-			args = args.split('&');
-			for(var i=0;i<args.length;i++){
-				args[i] = '-'+args[i];
-			}
-
-			var nujel;
-			var stdoutBuffer = "";
-
-			var Module = {
-				arguments: args,
-				preRun: [],
-				postRun: [function(){
-					const nujelRun = Module.cwrap('run','string',['string']);
-					const nujelRead = () => {
-						const ret = stdoutBuffer;
-						stdoutBuffer = "";
-						return ret;
-					}
-					nujel = (line) => {
-						return nujelRun(line);
-					};
-					NujelREPL(document.getElementById("nujel-repl-wrapper"),{run: nujelRun, read: nujelRead});
-				}],
-				print: function(text) {
-					stdoutBuffer += text;
-				},
-				printErr: function(text) {
-					stdoutBuffer += text;
-				},
-				setStatus: function(text) {},
-				totalDependencies: 0,
-				monitorRunDependencies: function(left) {
-					this.totalDependencies = Math.max(this.totalDependencies, left);
-				}
-			};
-
-		</script>
+		<script type="text/javascript" src="editor.js"></script>
+		<script type="text/javascript" src="emnujel.js"></script>
 		{{{ SCRIPT }}}
 	</body>
 </html>

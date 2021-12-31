@@ -13,9 +13,7 @@ const NujelREPL = (ele, nuj) => {
 
 	const historyLoad = () => {
 		const raw = localStorage.getItem("nujel-repl-history");
-		if(raw){
-			history = JSON.parse(raw);
-		}
+		if(raw){history = JSON.parse(raw);}
 	};
 	historyLoad();
 
@@ -43,20 +41,6 @@ const NujelREPL = (ele, nuj) => {
 			}
 		}else{
 			input.value = history[history.length - historySelection - 1];
-		}
-	}
-
-	const historyFirst = () => {
-		if(historyCurrent === null){historyCurrent = input.value;}
-		historySelection = history.length-1;
-		input.value = history[history.length - historySelection - 1];
-	}
-
-	const historyLast = () => {
-		if(historyCurrent !== null){
-			input.value = historyCurrent;
-			historyCurrent = null;
-			historySelection = -1;
 		}
 	}
 
