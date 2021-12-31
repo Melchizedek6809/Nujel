@@ -119,6 +119,7 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	lRootsRet(SP);
 	RVP(ret);
 	lExceptionTry(evalRaw,c,ret);
+	mainClosure = c;
 }
 
 void breakSignalHandler(int sig){
