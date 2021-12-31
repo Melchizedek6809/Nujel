@@ -320,12 +320,12 @@ lVal *lnfPow(lClosure *c, lVal *v){
 
 void lOperationsArithmeticInteger(lClosure *c);
 void lOperationsArithmetic(lClosure *c){
-	lAddInfix(lAddNativeFunc(c,"%", "[...args]", "Modulo",        lnfMod));
-	lAddInfix(lAddNativeFunc(c,"/", "[...args]", "Division",      lnfDiv));
-	lAddInfix(lAddNativeFunc(c,"*", "[...args]", "Multiplication",lnfMul));
-	lAddInfix(lAddNativeFunc(c,"-", "[...args]", "Substraction",  lnfSub));
-	lAddInfix(lAddNativeFunc(c,"+", "[...args]", "Addition",      lnfAdd));
-	lAddInfix(lAddNativeFunc(c,"** pow", "[a b]", "Return A raised to the power of B",lnfPow));
+	lAddNativeFunc(c,"%", "[...args]", "Modulo",        lnfMod);
+	lAddNativeFunc(c,"/", "[...args]", "Division",      lnfDiv);
+	lAddNativeFunc(c,"*", "[...args]", "Multiplication",lnfMul);
+	lAddNativeFunc(c,"-", "[...args]", "Substraction",  lnfSub);
+	lAddNativeFunc(c,"+", "[...args]", "Addition",      lnfAdd);
+	lAddNativeFunc(c,"** pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
 	lAddNativeFunc(c,"add", "[a b]", "Return a + b",  lnfAddAst);
 	lAddNativeFunc(c,"sub", "[a b]", "Return a - b",  lnfSubAst);

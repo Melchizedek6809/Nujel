@@ -143,11 +143,11 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 }
 
 void lOperationsPredicate(lClosure *c){
-	lAddInfix(lAddNativeFunc(c,"<",    "[α β]","Return true if α is less than β",  lnfLess));
-	lAddInfix(lAddNativeFunc(c,"<=",   "[α β]","Return true if α is less or equal to β", lnfLessEqual));
-	lAddInfix(lAddNativeFunc(c,"==",   "[α β]","Return true if α is equal to β", lnfEqual));
-	lAddInfix(lAddNativeFunc(c,"!=",   "[α β]","Return true if α is not equal to  β", lnfUnequal));
-	lAddInfix(lAddNativeFunc(c,">=",   "[α β]","Return true if α is greater or equal than β", lnfGreaterEqual));
-	lAddInfix(lAddNativeFunc(c,">",    "[α β]","Return true if α is greater than β",  lnfGreater));
-	          lAddNativeFunc(c,"nil?", "[α]",  "Return true if α is #nil", lnfNilPred);
+	lAddNativeFunc(c,"<",    "[α β]","Return true if α is less than β",  lnfLess);
+	lAddNativeFunc(c,"<=",   "[α β]","Return true if α is less or equal to β", lnfLessEqual);
+	lAddNativeFunc(c,"==",   "[α β]","Return true if α is equal to β", lnfEqual);
+	lAddNativeFunc(c,"!=",   "[α β]","Return true if α is not equal to  β", lnfUnequal);
+	lAddNativeFunc(c,">=",   "[α β]","Return true if α is greater or equal than β", lnfGreaterEqual);
+	lAddNativeFunc(c,">",    "[α β]","Return true if α is greater than β",  lnfGreater);
+	lAddNativeFunc(c,"nil?", "[α]",  "Return true if α is #nil", lnfNilPred);
 }

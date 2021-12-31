@@ -3,13 +3,11 @@
 
 
 lVal *lnfCat     (lClosure *c, lVal *v);
-lVal *lnfInfix   (lClosure *c, lVal *v);
 lVal *lnfTry     (lClosure *c, lVal *v);
 lVal *lnfDo      (lClosure *c, lVal *v);
 lVal *lnfArrRef  (lClosure *c, lVal *v);
 lVal *lnfTreeGet (lClosure *c, lVal *v);
 
-void lAddInfix   (lVal *v);
 u64 getMSecs     ();
 
 void lOperationsAllocation (lClosure *c);
@@ -18,7 +16,6 @@ void lOperationsArray      (lClosure *c);
 void lOperationsBinary     (lClosure *c);
 void lOperationsClosure    (lClosure *c);
 void lOperationsEval       (lClosure *c);
-void lOperationsInfix      (lClosure *c);
 void lOperationsList       (lClosure *c);
 void lOperationsMath       (lClosure *c);
 void lOperationsPredicate  (lClosure *c);

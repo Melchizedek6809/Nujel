@@ -132,7 +132,7 @@
                                           [:runtime-macro [try-again [car source]]]
                                           [otherwise [throw err]]]]
                            [def compiled-form [compile [car source] environment #t]]
-                           [when compiled-form [apply environment `[[eval* ~compiled-form]]]
+                           [when compiled-form [apply environment `[eval* ~compiled-form]]
                                                [++ forms-compiled]]]
                       [cdr! source]]
                [set! source-next [reverse source-next]]

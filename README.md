@@ -9,12 +9,6 @@ Mostly because I wanted the following for WolkenWelten:
 - embeddable in C
 - designed for beginners
 
-## Infix operations
-One part that is quite different to most Lisps is that one can evaluate `[display [1 + 2 * 3]]` and get `7`,
-as one would expect from other languages. This is due to each type having a convenience function associated to them,
-which is an infix evaluator in the case of the numeric types, or `cat` for strings and `arr-ref` for arrays.
-So you can also write `[display ["The result is: " [1 + 1]]]`. Or `[display [#["Yay" "Nay"] 0]]`.
-
 ## Trees / Maps
 Nujel also has built-in support for maps using binary trees, including support by the reader for a convenient
 syntax to definie literals with, for example `[@[:one 1 :two 2] :two]` returns `2`.

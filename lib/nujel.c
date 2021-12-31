@@ -89,7 +89,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	(void)funSym;
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
-		lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", lCons(funSym,args),c);
+		lExceptionThrowValClo(":runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
@@ -98,10 +98,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 		return fun->vNFunc->fp(c,args);
 	case ltNativeFunc:
 		return fun->vNFunc->fp(c,lMap(c,args,lEval));
-	case ltInt:
-	case ltFloat:
-	case ltVec:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvInfix, NULL);
 	case ltArray:
 		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvArrRef, NULL);
 	case ltString:
@@ -137,10 +133,6 @@ lVal *lEval(lClosure *c, lVal *v){
 			return car->vNFunc->fp(c,lCdr(v));
 		case ltNativeFunc:
 			return car->vNFunc->fp(c,lMap(c,lCdr(v),lEval));
-		case ltInt:
-		case ltFloat:
-		case ltVec:
-			return lApply(c,v,lnfvInfix, NULL);
 		case ltArray:
 			return lApply(c,v,lnfvArrRef, NULL);
 		case ltString:
@@ -150,7 +142,7 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				return lApply(c,lCdr(v),resolved, car);
+				return lApply(c, lCdr(v), resolved, car);
 			}else{
 				if(car->vSymbol && lSymKeyword(car->vSymbol)){
 					return v;
@@ -232,7 +224,6 @@ static void lAddPlatformVars(lClosure *c){
 static void lAddCoreFuncs(lClosure *c){
 	lOperationsAllocation(c);
 	lOperationsArithmetic(c);
-	lOperationsInfix(c);
 	lOperationsMath(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
