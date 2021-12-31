@@ -68,23 +68,23 @@
 [defmacro for [for-loop . body]
           "For loops, [for [name start stop] body]"
           [def symbol-name [car for-loop]]
-	  [def loop-start [cadr for-loop]]
-	  [def loop-stop  [caddr for-loop]]
-	  [def stop-var [gensym]]
-	  [def dir 1]
-	  [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
-	  [when-not [symbol? symbol-name]
-	            [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]]
+          [def loop-start [cadr for-loop]]
+          [def loop-stop  [caddr for-loop]]
+          [def stop-var [gensym]]
+          [def dir 1]
+          [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
+          [when-not [symbol? symbol-name]
+                    [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]]
           [when-not loop-start
-	            [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
+                    [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
           [when-not loop-stop
-	            [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
+                    [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
           [def pred [if [> dir 0] < >]]
-	  `[let [[~symbol-name ~loop-start]
+          `[let [[~symbol-name ~loop-start]
                  [~stop-var ~loop-stop]]
-	        [while [~pred ~symbol-name ~stop-var]
+                [while [~pred ~symbol-name ~stop-var]
                        ~@body
-		       [set! ~symbol-name [add/int ~dir ~symbol-name]]]]
+                       [set! ~symbol-name [add/int ~dir ~symbol-name]]]]
 ]
 
 [defun thread/-> [init fun]
@@ -92,11 +92,11 @@
           `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]]]
 [defmacro -> [init . fun]
           "Thread init as the first argument through every function in fun"
-	  [thread/-> init [nreverse fun]]]
+          [thread/-> init [reverse fun]]]
 
 [defun thread/->> [init fun]
        [if-not fun init
            [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
 [defmacro ->> [init . fun]
           "Thread init as the last argument through every function in fun"
-	  [thread/->> init [nreverse fun]]]
+          [thread/->> init [reverse fun]]]

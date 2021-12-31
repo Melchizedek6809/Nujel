@@ -880,6 +880,8 @@
 [test/add 3 [[\ [a b c . d] c] 1 2 3]]
 [test/add 2 [[\ [a b c . d] b] 1 2 3]]
 [test/add 1 [[\ [a b c . d] a] 1 2 3]]
+[test/add 122 [-> @[:asd 123] [tree/-- :asd] [tree/get :asd]]]
+[test/add 124 [-> @[:asd 123] [tree/++ :asd] [tree/get :asd]]]
 [test/add 10 [def m 5] [for [i 0 m] [++ m] [when [> m 50] [set! i 100]]] m]
 [test/add "#[1 2 3 4]" [str/write [array/append #[1 2] #[3 4]]]]
 [test/add "#[1 2 3]" [str/write [array/append #[1 2] #[3]]]]
@@ -902,8 +904,6 @@
 [test/add "00620062" [string/pad-start [int->string/hex [hash/adler32 "a"]] 8 "0"]]
 [test/add "0F9D02BC" [string/pad-start [int->string/hex [hash/adler32 "asdQWE123"]] 8 "0"]]
 [test/add "796B110D" [string/pad-start [int->string/hex [hash/adler32 "DiesIstEinTestDerNujelAdler32Implementierung"]] 8 "0"]]
-[test/add 122 [-> @[:asd 123] [tree/-- :asd] [tree/get :asd]]]
-[test/add 124 [-> @[:asd 123] [tree/++ :asd] [tree/get :asd]]]
 [test/add '[2 3 4] [-> '[1 2 3 4] [delete 1]]]
 [test/add "#[2 3 4]" [str/write [-> #[1 2 3 4] [delete 1]]]]
 
