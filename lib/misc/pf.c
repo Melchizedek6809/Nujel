@@ -55,6 +55,16 @@ static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 	return spf(cur, bufEnd, "]");
 }
 
+static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
+	cur = spf(cur, bufEnd, "#[");
+	if(v && v->data != NULL){
+		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
+			cur = spf(cur, bufEnd, "#$%x%s", *c, (c < (v->dataEnd - 1)) ? " " : "");
+		}
+	}
+	return spf(cur, bufEnd, "]");
+}
+
 static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	const lVal *carSym = v->vList.car;
 	if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
@@ -104,6 +114,10 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		return writeTree(cur, bufEnd, v->vTree);
 	case ltArray:
 		return writeArray(cur, bufEnd, v->vArray);
+	case ltBytecodeArr:
+		return writeBytecodeArray(cur, bufEnd, &v->vBytecodeArr);
+	case ltBytecodeOp:
+		return spf(cur , bufEnd, "#$%x" , v->vBytecodeOp);
 	case ltInt:
 		return spf(cur , bufEnd, "%i" ,v->vInt);
 	case ltFloat:

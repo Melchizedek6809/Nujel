@@ -19,6 +19,7 @@
 #include "../collection/string.h"
 #include "../collection/tree.h"
 #include "../misc/pf.h"
+#include "../type/bytecode.h"
 #include "../type/closure.h"
 #include "../type/native-function.h"
 
@@ -48,6 +49,12 @@ void lSymbolGCMark(const lSymbol *v){
 	const uint ci = v - lSymbolList;
 	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
+}
+
+void lBytecodeStackMark(lVal **v){
+	for(int i=0; i < BYTECODE_STACK_SIZE; i++){
+		lValGCMark(v[i]);
+	}
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */

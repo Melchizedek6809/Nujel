@@ -18,7 +18,7 @@ uint     lSymbolMax    = 0;
 lSymbol *lSymbolFFree = NULL;
 
 lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
-lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree;
+lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree, *lSymLTBytecodeOp,*lSymLTBytecodeArray;
 
 void lSymbolInit(){
 	lSymbolActive   = 0;
@@ -63,6 +63,8 @@ void lSymbolInit(){
 	lSymLTGUIWidget      = RSYMP(lSymS(":gui-widget"));
 	lSymLTMacro          = RSYMP(lSymS(":macro"));
 	lSymLTTree           = RSYMP(lSymS(":tree"));
+	lSymLTBytecodeOp     = RSYMP(lSymS(":bytecode-op"));
+	lSymLTBytecodeArray  = RSYMP(lSymS(":bytecode-array"));
 }
 
 void lSymbolFree(lSymbol *s){
@@ -113,22 +115,24 @@ lSymbol *lSymS(const char *str){
 lSymbol *getTypeSymbol(const lVal* v){
 	if(v == NULL){return lSymLTNil;}
 	switch(v->type){
-		default:           return lSymLTNil;
-		case ltNoAlloc:    return lSymLTNoAlloc;
-		case ltBool:       return lSymLTBool;
-		case ltPair:       return lSymLTPair;
-		case ltObject:     return lSymLTObject;
-		case ltLambda:     return lSymLTLambda;
-		case ltInt:        return lSymLTInt;
-		case ltFloat:      return lSymLTFloat;
-		case ltVec:        return lSymLTVec;
-		case ltString:     return lSymLTString;
-		case ltSymbol:     return lSymLTSymbol;
-		case ltNativeFunc: return lSymLTNativeFunction;
-		case ltSpecialForm:return lSymLTSpecialForm;
-		case ltArray:      return lSymLTArray;
-		case ltGUIWidget:  return lSymLTGUIWidget;
-		case ltMacro:      return lSymLTMacro;
-		case ltTree:       return lSymLTTree;
+		default:            return lSymLTNil;
+		case ltNoAlloc:     return lSymLTNoAlloc;
+		case ltBool:        return lSymLTBool;
+		case ltPair:        return lSymLTPair;
+		case ltObject:      return lSymLTObject;
+		case ltLambda:      return lSymLTLambda;
+		case ltInt:         return lSymLTInt;
+		case ltFloat:       return lSymLTFloat;
+		case ltVec:         return lSymLTVec;
+		case ltString:      return lSymLTString;
+		case ltSymbol:      return lSymLTSymbol;
+		case ltNativeFunc:  return lSymLTNativeFunction;
+		case ltSpecialForm: return lSymLTSpecialForm;
+		case ltArray:       return lSymLTArray;
+		case ltGUIWidget:   return lSymLTGUIWidget;
+		case ltMacro:       return lSymLTMacro;
+		case ltTree:        return lSymLTTree;
+		case ltBytecodeOp:  return lSymLTBytecodeOp;
+		case ltBytecodeArr: return lSymLTBytecodeArray;
 	}
 }

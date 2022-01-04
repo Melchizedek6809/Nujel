@@ -14,5 +14,6 @@ void lStringGCMark (const lString *v);
 void lArrayGCMark  (const lArray *v);
 void lNFuncGCMark  (const lNFunc *f);
 void lSymbolGCMark (const lSymbol *v);
+void lBytecodeStackMark(lVal **v);
 
 void lGarbageCollect();

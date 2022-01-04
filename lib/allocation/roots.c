@@ -74,6 +74,10 @@ lSymbol *lRootsSymbolPush(lSymbol *s){
 	return s;
 }
 
+void lRootsBytecodePush(lVal *start){
+	lRootsPush(ltBytecodeOp, start);
+}
+
 void (*rootsMarkerChain)() = NULL;
 /* Mark every single root and everything they point to */
 void lRootsMark(){
@@ -94,6 +98,8 @@ void lRootsMark(){
 		case ltTree:
 			lTreeGCMark(rootStack[i].vTree);
 			break;
+		case ltBytecodeOp:
+			lBytecodeStackMark(rootStack[i].vPointer);
 		default:
 			break;
 		}

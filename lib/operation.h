@@ -14,6 +14,7 @@ void lOperationsAllocation (lClosure *c);
 void lOperationsArithmetic (lClosure *c);
 void lOperationsArray      (lClosure *c);
 void lOperationsBinary     (lClosure *c);
+void lOperationsBytecode   (lClosure *c);
 void lOperationsClosure    (lClosure *c);
 void lOperationsEval       (lClosure *c);
 void lOperationsList       (lClosure *c);

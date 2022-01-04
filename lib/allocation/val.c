@@ -50,6 +50,10 @@ lVal *lValAlloc(){
 /* Free the value V, should only be called by the GC */
 void lValFree(lVal *v){
 	if(v == NULL){return;}
+	if(v->type == ltBytecodeArr){
+		free((void *)v->vBytecodeArr.data);
+		v->vBytecodeArr.data = NULL;
+	}
 	lValActive--;
 	v->nextFree = lValFFree;
 	lValFFree   = v;

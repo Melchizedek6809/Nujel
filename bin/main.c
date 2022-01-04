@@ -106,7 +106,6 @@ static void *evalRaw(void *cl, void *body){
 	return lEval((lClosure *)cl,(lVal *)body);
 }
 
-
 void initNujel(int argc, char *argv[], lClosure *c){
 	lVal *ret = NULL;
 	const int SP = lRootsGet();

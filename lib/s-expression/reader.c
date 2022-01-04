@@ -281,6 +281,18 @@ static lVal *lParseCharacter(lString *s){
 	return lValInt(ret);
 }
 
+static lVal *lParseBytecodeOp(lString *s){
+	lVal *ret = lParseNumber(s,lParseNumberHex);
+	if((ret->vInt < 0) || (ret->vInt > 255)){
+		const char *start, *end;
+		for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
+		for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+		lExceptionThrowValClo(":invalid-literal", "Out of bounds bytecode operation literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+	}
+	ret->type = ltBytecodeOp;
+	return ret;
+}
+
 /* Parse the special value in s starting with a # and return the resulting lVal */
 static lVal *lParseSpecial(lString *s){
 	if(s->data >= s->bufEnd){return NULL;}
@@ -299,6 +311,7 @@ static lVal *lParseSpecial(lString *s){
 	case 'o': return lParseNumber(s,lParseNumberOctal);
 	case 'b': return lParseNumber(s,lParseNumberBinary);
 	case 'd': return lParseNumber(s,lParseNumberDecimal);
+	case '$': return lParseBytecodeOp(s);
 	case 'n':
 		lStringAdvanceToNextSpaceOrSpecial(s);
 		return NULL;

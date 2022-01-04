@@ -49,6 +49,8 @@ static int lValCompare(lVal *v){
 	case ltNativeFunc:
 	case ltSpecialForm:
 		return (b->vNFunc != a->vNFunc) ? -1 : 0;
+	case ltBytecodeOp:
+		return a->vBytecodeOp != b->vBytecodeOp;
 	case ltBool:
 		return a->vBool != b->vBool;
         case ltGUIWidget:

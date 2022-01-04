@@ -227,6 +227,7 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsMath(c);
 	lOperationsArray(c);
 	lOperationsBinary(c);
+	lOperationsBytecode(c);
 	lOperationsClosure(c);
 	lOperationsEval(c);
 	lOperationsList(c);

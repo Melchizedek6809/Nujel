@@ -37,6 +37,14 @@ typedef struct {
 	};
 } vec;
 
+
+typedef uint8_t lBytecodeOp;
+
+typedef struct lBytecodeArray{
+	lBytecodeOp *data,*dataEnd;
+} lBytecodeArray;
+
+
 typedef enum lType {
 	ltNoAlloc = 0,
 	ltComment,
@@ -57,6 +65,8 @@ typedef enum lType {
 	ltMacro,
 	ltNativeFunc,
 	ltSpecialForm,
+	ltBytecodeOp,
+	ltBytecodeArr,
 
 	ltGUIWidget
 } lType;
@@ -82,6 +92,8 @@ struct lVal {
 		i64            vInt;
 		double         vFloat;
 		vec            vVec;
+		lBytecodeOp    vBytecodeOp;
+		lBytecodeArray vBytecodeArr;
 		lArray        *vArray;
 		lTree         *vTree;
 		lString       *vString;
