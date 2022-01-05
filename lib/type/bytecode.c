@@ -18,9 +18,8 @@ typedef enum lOpcode {
 	lopEval = 7,
 	lopApply = 8,
 	lopJmp = 9,
-	lopJe = 10,
-	lopJne = 11,
-	lopDup = 12
+	lopJt = 10,
+	lopDup = 11
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -117,8 +116,19 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		stack[sp] = stack[sp-1];
 		sp++;
 		ip++;
-	case lopJmp:
 		break;
+	case lopJmp: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		ip += i;
+		break; }
+	case lopJt: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		if(castToBool(stack[--sp])){ip += i;}
+		break; }
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
 	return NULL;

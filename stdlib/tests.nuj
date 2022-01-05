@@ -951,8 +951,9 @@
 [test/add 3 [asmrun [$push/lval '[+ 1 2]] [$eval] [$ret]]]
 [test/add 5 [asmrun [$push/int 2] [$push/int 3] [$apply 2 add/int] [$ret]]]
 [test/add 4 [asmrun [$push/int 2] [$dup] [$apply 2 add/int] [$ret]]]
-;[test/add 4 [asmrun [$push/int 1] :loop [$push/int 1] [$add/int] [$dup] [$push/int 10] [$apply 2 <] [$jt :loop] [$ret]]]
-
+[test/add 26 [asmrun [$nop] [$push/int 26] [$jmp :asd] [$push/int 99] [:asd] [$ret]]]
+[test/add 26 [asmrun [$nop] [$push/int 26] [$push/lval #t] [$jt :asd] [$push/int 99] [:asd] [$ret]]]
+[test/add 99 [asmrun [$nop] [$push/int 26] [$push/lval #f] [$jt :asd] [$push/int 99] [:asd] [$ret]]]
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 

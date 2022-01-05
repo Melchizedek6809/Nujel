@@ -51,51 +51,65 @@
   [list #$8 [int->bytecode-op arg-count] a b c]]
 
 [defun $jmp* [off]
-  [when-not [int? off] [throw [list :invalid-bc-op "$jmp expects an integer offset" off [current-lambda]]]]
-  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
-  [def b [int->bytecode-op [logand     off     #xFF]]]
+  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
+  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
   [list #$9 a b]]
 
 [defun $jmp [label]
-  [list `[$jmp* [labels ~label]]]]
+  [list `[quote [$jmp* [- [tree/get labels ~label] [+ 1 oi]]]]]]
 
 [defun $jt* [off]
-  [when-not [int? off] [throw [list :invalid-bc-op "$je expects an integer offset" off [current-lambda]]]]
-  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
-  [def b [int->bytecode-op [logand     off     #xFF]]]
+  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
+  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
   [list #$A a b]]
 
 [defun $jt [label]
-  [list `[$jt* [labels ~label]]]]
-
-[defun $jf* [off]
-  [when-not [int? off] [throw [list :invalid-bc-op "$jne expects an integer offset" off [current-lambda]]]]
-  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
-  [def b [int->bytecode-op [logand     off     #xFF]]]
-  [list #$B a b]]
-
-[defun $jf [label]
-  [list `[$jf* [labels ~label]]]]
+  [list `[quote [$jt* [- [tree/get labels ~label] [+ 1 oi]]]]]]
 
 [defun $dup []
-  '[#$C]]
+  '[#$B]]
 
+[defun assemble/find-and-remove-labels [code labels]
+       [def out [array/allocate [array/length code]]]
+       [def oi -1]
+       [def li -1]
+       [for [i 0 [array/length code]]
+            [if-not [symbol? [array/ref code i]]
+                    [++ li]
+                    [when [pair? [array/ref code i]]
+                          [+= li [list/length [eval [list [car [array/ref code]]]]]]]]
+            [if [symbol? [array/ref code i]]
+                [tree/set! labels [array/ref code i] li]
+                [array/set! out [++ oi] [array/ref code i]]]]
+       [array/length! out [+ oi 1]]]
 
+[defun assemble/relocate-jumps [code labels]
+       [def out [array/allocate [array/length code]]]
+       [def oi -1]
+       [for [i 0 [array/length code]]
+            [def form [array/ref code i]]
+            [if [pair? form]
+                [do [def result [eval form]]
+                    [array/length! out [+ [list/length result] -1 [array/length out]]]
+                    [while result
+                           [array/set! out [++ oi] [car result]]
+                           [cdr! result]]]
+                [array/set! out [++ oi] [array/ref code i]]]]
+       out]
+
+[def assemble/verbose #f]
 
 [defun assemble l
-  "Assemble all arguments into a single :bytecode-array"
-  [def a [apply array/new [reduce [cdr l] append [car l]]]]
-  [def labels @[]]
-  [for [i 0 [array/length a]]
-       [when [symbol? [a i]]
-             [tree/set! labels [a i] i]]]
-  [for [i 0 [array/length a]]
-       [when [pair? [a i]]
-             [def form [a i]]
-             [println [str/write form]]
-             [array/set! a i [eval form]]]]
-  ;[println [cat [ansi-green "Final result:\n" [str/write a]]]]
-  [arr->bytecode-arr a]]
+       "Assemble all arguments into a single :bytecode-array"
+       [def labels @[]]
+       [and assemble/verbose [println [cat [ansi-blue "Raw:\n" [str/write l]]]]]
+       [def a [apply array/new [reduce [cdr l] append [car l]]]]
+       [and assemble/verbose [println [cat [ansi-red "Stage 1:\n" [str/write a]]]]]
+       [def b [assemble/find-and-remove-labels a labels]]
+       [and assemble/verbose [println [cat [ansi-yellow "Stage 2:\n" [str/write b]]]]]
+       [def c [assemble/relocate-jumps b labels]]
+       [and assemble/verbose [println [cat [ansi-green "Final result:\n" [str/write c]]]]]
+       [arr->bytecode-arr c]]
 
 [defmacro asmrun ops
   "Assemble and evaluate all bytecode arguments"
