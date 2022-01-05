@@ -3,4 +3,6 @@
 
 #define BYTECODE_STACK_SIZE 128
 
+
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops);
+void lBytecodeArrayMark(const lBytecodeArray *v);

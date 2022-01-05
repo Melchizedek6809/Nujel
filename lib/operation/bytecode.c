@@ -17,7 +17,7 @@ static lVal *lValBytecodeOp(lBytecodeOp v){
 
 static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
 	const i64 val = castToInt(lCar(v), -1);
-	if((val < 0) || (val > 255)){
+	if((val < -128) || (val > 255)){
 		lExceptionThrowValClo(":invalid-bc-op", "Bytecode operations have to be within the range 0-255", lCar(v), c);
 		return NULL;
 	}

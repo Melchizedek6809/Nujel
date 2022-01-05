@@ -95,6 +95,8 @@ void lValGCMark(lVal *v){
 	case ltGUIWidget:
 		lWidgetMarkI(v->vInt);
 		break;
+	case ltBytecodeArr:
+		lBytecodeArrayMark(&v->vBytecodeArr);
 	default:
 		break;
 	}

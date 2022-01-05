@@ -11,9 +11,16 @@ typedef enum lOpcode {
 	lopNOP = 0,
 	lopRet = 1,
 	lopIntByte = 2,
-	loplVal = 2,
 	lopIntAdd = 3,
 	lopDebugPrintStack = 4,
+	lopPushLVal = 5,
+	lopMakeList = 6,
+	lopEval = 7,
+	lopApply = 8,
+	lopJmp = 9,
+	lopJe = 10,
+	lopJne = 11,
+	lopDup = 12
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -29,6 +36,21 @@ void printStack(lVal **stack, int sp){
 	}
 }
 
+static lVal *lStackBuildList(lVal **stack, int sp, int len){
+	lVal *ret, *t = NULL;
+	ret = RVP(lCons(NULL,NULL));
+	for(int i = len; i > 0; i--){
+		if(t == NULL){
+			ret->vList.car = stack[sp - i];
+			t = ret;
+		}else{
+			t->vList.cdr = lCons(stack[sp - i],NULL);
+			t = t->vList.cdr;
+		}
+	}
+	return ret;
+}
+
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	const lBytecodeOp *ip = ops->data;
 	const int gcsp = lRootsGet();
@@ -38,6 +60,8 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 	switch(*ip){
 	default:
+		lExceptionThrowValClo(":unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
+		break;
 	case lopNOP:
 		ip++;
 		break;
@@ -62,7 +86,65 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		printStack(stack, sp);
 		ip++;
 		break;
+	case lopPushLVal: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		stack[sp++] = lIndexVal(i);
+		break;}
+	case lopMakeList: {
+		const int len = *++ip;
+		lVal *ret = lStackBuildList(stack, sp, len);
+		sp -= len;
+		stack[sp++] = ret;
+		ip++;
+		break;}
+	case lopEval:
+		stack[sp-1] = lEval(c,stack[sp-1]);
+		ip++;
+		break;
+	case lopApply: {
+		const int len = *++ip;
+		lVal *cargs = lStackBuildList(stack, sp, len);
+		sp -= len;
+		ip++;
+		lVal *fun = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
+		stack[sp++] = lApply(c, cargs, fun, fun);
+		ip += 3;
+		break; }
+	case lopDup:
+		stack[sp] = stack[sp-1];
+		sp++;
+		ip++;
+	case lopJmp:
+		break;
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
 	return NULL;
+}
+
+static int lBytecodeOpLength(const lBytecodeOp op){
+	switch(op){
+	default:
+		return 1;
+	case lopIntByte:
+		return 2;
+	case lopPushLVal:
+		return 4;
+	case lopApply:
+		return 5;
+	}
+}
+
+void lBytecodeArrayMark(const lBytecodeArray *v){
+	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
+		switch(*c){
+		default: break;
+		case lopPushLVal:
+			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
+			break;
+		}
+	}
+
 }

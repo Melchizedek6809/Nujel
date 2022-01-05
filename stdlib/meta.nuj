@@ -54,9 +54,7 @@
 
 [defun arg-list [f]
         "Return the Argument list of f which can be a Native Function or a Lambda"
-        [cond [[lambda? f] [reduce [map [cl-data f] [\ [a] [" " [car a]]]] cat]]
-              [[native? f] [reduce [map [car [cl-data f]] [\ [a] [" " a]]] cat]]
-              [#t ""]]]
+        [throw [list :gotta-implement-it]]]
 
 [def gensym/counter 0]
 [defun gensym []

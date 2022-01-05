@@ -19,7 +19,7 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 	if(resolved->type == ltSymbol){
 		resolved = lGetClosureSym(c,fun->vSymbol);
 	}
-	return lApply(c,lCadr(v),resolved, fun);
+	return lApply(c, lCadr(v), resolved, fun);
 }
 
 /* Handler for [apply fn list] */

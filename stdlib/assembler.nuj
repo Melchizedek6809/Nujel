@@ -1,0 +1,102 @@
+; Contains the bytecode assembler, so we don't have to write opcodes directly
+
+[defun $nop []
+  "- | Do nothing"
+  '[#$0]]
+
+[defun $ret []
+  "a - | Return top of value stack"
+  '[#$1]]
+
+[defun $push/int/byte [a]
+  "- a | Return top of value stack"
+  [when [or [> a 127] [< a -128]]
+        [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+  [list #$2 [int->bytecode-op a]]]
+
+[defun $push/int [a]
+  "- a | Return top of value stack"
+  [$push/int/byte a]]
+
+[defun $add/int []
+  "a b - c | Adds the two topmost values and pushes the result"
+  '[#$3]]
+
+[defun $debug/print-stack []
+  "- | Print out the stack for the current closure"
+  '[#$4]]
+
+[defun $push/lval [v]
+  "form - | Print out the stack for the current closure"
+  [def i [val->index v]]
+  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
+  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
+  [def c [int->bytecode-op [logand     i     #xFF]]]
+  [list #$5 a b c]]
+
+[defun $make-list [item-count]
+  "items ... - | Print out the stack for the current closure"
+  [list #$6 [int->bytecode-op item-count]]]
+
+[defun $eval [a]
+  "form - | Print out the stack for the current closure"
+  '[#$7]]
+
+[defun $apply [arg-count fun]
+  "form - | Print out the stack for the current closure"
+  [def i [val->index fun]]
+  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
+  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
+  [def c [int->bytecode-op [logand     i     #xFF]]]
+  [list #$8 [int->bytecode-op arg-count] a b c]]
+
+[defun $jmp* [off]
+  [when-not [int? off] [throw [list :invalid-bc-op "$jmp expects an integer offset" off [current-lambda]]]]
+  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
+  [def b [int->bytecode-op [logand     off     #xFF]]]
+  [list #$9 a b]]
+
+[defun $jmp [label]
+  [list `[$jmp* [labels ~label]]]]
+
+[defun $jt* [off]
+  [when-not [int? off] [throw [list :invalid-bc-op "$je expects an integer offset" off [current-lambda]]]]
+  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
+  [def b [int->bytecode-op [logand     off     #xFF]]]
+  [list #$A a b]]
+
+[defun $jt [label]
+  [list `[$jt* [labels ~label]]]]
+
+[defun $jf* [off]
+  [when-not [int? off] [throw [list :invalid-bc-op "$jne expects an integer offset" off [current-lambda]]]]
+  [def a [int->bytecode-op [logand [>> off  8] #xFF]]]
+  [def b [int->bytecode-op [logand     off     #xFF]]]
+  [list #$B a b]]
+
+[defun $jf [label]
+  [list `[$jf* [labels ~label]]]]
+
+[defun $dup []
+  '[#$C]]
+
+
+
+[defun assemble l
+  "Assemble all arguments into a single :bytecode-array"
+  [def a [apply array/new [reduce [cdr l] append [car l]]]]
+  [def labels @[]]
+  [for [i 0 [array/length a]]
+       [when [symbol? [a i]]
+             [tree/set! labels [a i] i]]]
+  [for [i 0 [array/length a]]
+       [when [pair? [a i]]
+             [def form [a i]]
+             [println [str/write form]]
+             [array/set! a i [eval form]]]]
+  ;[println [cat [ansi-green "Final result:\n" [str/write a]]]]
+  [arr->bytecode-arr a]]
+
+[defmacro asmrun ops
+  "Assemble and evaluate all bytecode arguments"
+  `[bytecode-eval [assemble ~@ops]]]

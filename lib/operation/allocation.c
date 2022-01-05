@@ -23,7 +23,20 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 	return NULL;
 }
 
+static lVal *lnfValIndex(lClosure *c, lVal *v){
+	(void)c;
+	return lValInt(lValIndex(lCar(v)));
+}
+
+static lVal *lnfIndexVal(lClosure *c, lVal *v){
+	(void)c;
+	const int i = castToInt(lCar(v), -1);
+	return lIndexVal(i);
+}
+
 void lOperationsAllocation(lClosure *c){
 	lAddNativeFunc(c,"memory-info", "[]", "Return memory usage data", lnfMemInfo);
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
+	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
+	lAddNativeFunc(c,"index->val", "[i]", "Return an the value at index position I", lnfIndexVal);
 }
