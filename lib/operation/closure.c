@@ -88,9 +88,9 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
+		ret->vTree = lTreeInsert(ret->vTree,symDocumentation, clo->doc);
+		ret->vTree = lTreeInsert(ret->vTree,symArguments, clo->args);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(clo->name));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":documentation"),clo->doc);
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":arguments"),clo->args);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
 		ret->vTree = lTreeInsert(ret->vTree,lSymS(":data"), lRootsValPush(lValTree(clo->data)));
 		if(clo->type == closureCall){

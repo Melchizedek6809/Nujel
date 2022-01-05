@@ -80,6 +80,8 @@ void lValGCMark(lVal *v){
 	case ltSpecialForm:
 	case ltNativeFunc:
 		lValGCMark(v->vNFunc->doc);
+		lValGCMark(v->vNFunc->args);
+		lSymbolGCMark(v->vNFunc->name);
 		break;
 	case ltString:
 		lStringGCMark(v->vString);
@@ -118,11 +120,13 @@ void lClosureGCMark(const lClosure *c){
 	if(lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
 
-	lTreeGCMark(c->data);
-	lValGCMark(c->doc);
-	lValGCMark(c->text);
-	lValGCMark(c->args);
 	lClosureGCMark(c->parent);
+	lTreeGCMark(c->data);
+	lValGCMark(c->text);
+	lValGCMark(c->doc);
+	lValGCMark(c->args);
+	lClosureGCMark(c->caller);
+	lSymbolGCMark(c->name);
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
