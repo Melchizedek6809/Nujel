@@ -1,0 +1,88 @@
+; Contains the low levelNujel -> Bytecode compiler
+
+[defun bytecompile/int [source]
+       [$push/int source]]
+
+[defun bytecompile/literal [source]
+       [case [type-of source]
+             [:int      [bytecompile/int source]]
+             [otherwise [$push/lval source]]]]
+
+[defun bytecompile/do/form [source env]
+       [when source [cons [cons [bytecompile* [car source] env]
+                                [if [last? source] #nil
+                                    [cons [$drop] #nil]]]
+                          [bytecompile/do/form [cdr source] env]]]]
+
+[defun bytecompile/do [source env]
+       [list [bytecompile/do/form [cdr source] env]]]
+
+[defun bytecompile/procedure [op source env]
+      [def args [map [cdr source] bytecompile*]]
+       [list args
+             [$apply [length args] op]]]
+
+[defun bytecompile/def [source env]
+       [list [bytecompile* [caddr source] env]
+             [$def [cadr source]]]]
+
+[defun bytecompile/set! [source env]
+       [list [bytecompile* [caddr source] env]
+             [$set [cadr source]]]]
+
+[defun bytecompile/if [source env]
+       [let [[sym-else [gensym]]
+             [sym-after [gensym]]]
+            [list [bytecompile* [cadr source] env]
+                  [$jf sym-else]
+                  [bytecompile* [caddr source] env]
+                  [$jmp sym-after]
+                  sym-else
+                  [bytecompile* [cadddr source] env]
+                  sym-after]]]
+
+[defun bytecompile/flatten/λ [a b]
+       [cond [[== [car b] 'quote] [cons b a]]
+             [[collection? b] [append [reduce b bytecompile/flatten/λ #nil] a]]
+             [#t [cons b a]]]]
+
+[defun bytecompile/flatten [l]
+       [if-not [collection? l] l
+               [nreverse [reduce l bytecompile/flatten/λ #nil]]]]
+
+[defun bytecompile* [source env]
+       "Compile the forms in source"
+       [let* [def op [if [apply env `[do [resolves? ~[list 'quote [car source]]]]]
+                         [apply env `[do [resolve ~[list 'quote [car source]]]]]
+                         [car source]]]
+       [case [type-of op]
+             [:special-form [case op
+                    [do     [bytecompile/do     source env]]
+                    [def    [bytecompile/def    source env]]
+                    [set!   [bytecompile/set!   source env]]
+                    [if     [bytecompile/if     source env]]
+
+                    [let*   [bytecompile/let*   source env]]
+                    [λ*    [bytecompile/λ*     source env]]
+                    [μ*    [bytecompile/μ*     source env]]
+                    [ω     [bytecompile/ω      source env]]
+                    [try    [bytecompile/try    source env]]
+                    [and    [bytecompile/and    source env]]
+                    [or     [bytecompile/or     source env]]
+                    [while  [bytecompile/while  source env]]
+                    [quote                  source]
+                    [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
+             [:symbol [case op
+                        ['do   [bytecompile/do source env]]
+                        ['def  [bytecompile/def source env]]
+                        ['set! [bytecompile/set source env]]
+                        ['if   [bytecompile/if     source env]]
+                        [otherwise [bytecompile/procedure  op  source env]]]]
+             [[:lambda :native-function]  [bytecompile/procedure  op  source env]]
+             [otherwise [bytecompile/literal source]]]]]
+
+[defun bytecompile [form environment]
+       [bytecompile/flatten [list [bytecompile* form environment] [$ret]]]]
+
+[defmacro byterun [form]
+          `[bytecode-eval [assemble* [list [bytecompile ~form [current-closure]]]]]]

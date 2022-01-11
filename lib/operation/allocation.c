@@ -34,9 +34,24 @@ static lVal *lnfIndexVal(lClosure *c, lVal *v){
 	return lIndexVal(i);
 }
 
+static lVal *lnfSymIndex(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if((car == NULL) || (car->type != ltSymbol)){return NULL;}
+	return lValInt(lSymIndex(car->vSymbol));
+}
+
+static lVal *lnfIndexSym(lClosure *c, lVal *v){
+	(void)c;
+	const int i = castToInt(lCar(v), -1);
+	return lValSymS(lIndexSym(i));
+}
+
 void lOperationsAllocation(lClosure *c){
 	lAddNativeFunc(c,"memory-info", "[]", "Return memory usage data", lnfMemInfo);
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
 	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
-	lAddNativeFunc(c,"index->val", "[i]", "Return an the value at index position I", lnfIndexVal);
+	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
+	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
+	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
 }

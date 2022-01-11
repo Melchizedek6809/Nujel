@@ -10,8 +10,7 @@
 [defun join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]
-       [if-not l ""
-               [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
+       [if-not l "" [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
 
 [defun for-each [l f]
        "Runs F over every item in collection L and returns the resulting list"
@@ -21,18 +20,24 @@
        "Count the number of items in L where P is true"
        [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]]
 
+[defun min/λ [a b] [if [< a b] a b]]
 [defun min l
        "Returns the minimum value of its arguments, or collection"
-       [reduce [if [cdr l] l [car l]]
-               [λ [a b] [if [< a b] a b]]
-               #nil]]
+       [reduce [if [cdr l] l [car l]] min/λ #nil]]
 
+[defun max/λ [a b] [if [> a b] a b]]
 [defun max l
        "Returns the minimum value of its arguments, or collection"
-       [reduce [if [cdr l] l [car l]]
-               [λ [a b] [if [> a b] a b]]
-               #nil]]
+       [reduce [if [cdr l] l [car l]] max/λ #nil]]
 
 [defun delete [l e]
-        "Returns a filtered list l with all elements equal to e omitted"
-        [filter l [λ [a] [not [== a e]]]]]
+       "Returns a filtered list l with all elements equal to e omitted"
+       [filter l [λ [a] [not [== a e]]]]]
+
+[defun flatten/λ [a b]
+       [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
+             [#t [cons b a]]]]
+
+[defun flatten [l]
+       [if-not [collection? l] l
+               [nreverse [reduce l flatten/λ #nil]]]]

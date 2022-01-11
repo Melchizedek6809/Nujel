@@ -14,3 +14,6 @@ void      lSymbolFree  (lSymbol *s);
 lSymbol  *lSymS        (const char *s);
 lSymbol  *lSymSL       (const char *s, uint len);
 lSymbol  *getTypeSymbol(const lVal *a);
+
+static inline int lSymIndex(const lSymbol *s){return s - lSymbolList;}
+static inline lSymbol *lIndexSym(uint i){return (i >= lSymbolMax) ? NULL : &lSymbolList[i];}

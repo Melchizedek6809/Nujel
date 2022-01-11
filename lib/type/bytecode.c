@@ -4,6 +4,9 @@
 #include "bytecode.h"
 
 #include "../exception.h"
+#include "../allocation/symbol.h"
+#include "../type/closure.h"
+#include "../type/symbol.h"
 #include "../collection/list.h"
 #include "../misc/pf.h"
 
@@ -19,7 +22,11 @@ typedef enum lOpcode {
 	lopApply = 8,
 	lopJmp = 9,
 	lopJt = 10,
-	lopDup = 11
+	lopDup = 11,
+	lopDrop = 12,
+	lopDef = 13,
+	lopSet = 14,
+	lopJf = 15,
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -129,6 +136,33 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		ip++;
 		if(castToBool(stack[--sp])){ip += i;}
 		break; }
+	case lopJf: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		if(!castToBool(stack[--sp])){ip += i;}
+		break; }
+	case lopDrop:
+		sp--;
+		ip++;
+		break;
+	case lopDef: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		const lSymbol *s = lIndexSym(i);
+		//pf("Define: %v[%i] := %v\n", lValSymS(s), i, stack[sp - 1]);
+		lDefineClosureSym(c, s, stack[sp - 1]);
+		break;}
+	case lopSet: {
+		int i = *++ip;
+		i = (i << 8) | *++ip;
+		i = (i << 8) | *++ip;
+		ip++;
+		const lSymbol *s = lIndexSym(i);
+		lSetClosureSym(c, s, stack[sp - 1]);
+		break;}
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
 	return NULL;
@@ -138,8 +172,15 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 	switch(op){
 	default:
 		return 1;
+	case lopMakeList:
 	case lopIntByte:
 		return 2;
+	case lopJmp:
+	case lopJf:
+	case lopJt:
+		return 3;
+	case lopDef:
+	case lopSet:
 	case lopPushLVal:
 		return 4;
 	case lopApply:

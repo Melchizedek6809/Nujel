@@ -46,3 +46,8 @@
              [[:pair] [list/map l f]]
              [[:array] [array/map l f]]
              [otherwise [throw [list :invalid-type "You can only use map with a collection" l [current-lambda]]]]]]
+
+[defun collection? [l]
+  [case [type-of l]
+    [[:pair :array] #t]
+    [otherwise #f]]]

@@ -51,3 +51,10 @@
                     [array/set! ret ri [arr ai]]
                     [++ ri]]]
        [array/length! ret ri]]
+
+[defun array/push [arr . val]
+  [while val
+    [array/length! arr [+ 1 [array/length arr]]]
+    [array/set! arr [- [array/length arr] 1] [car val]]
+    [cdr! val]]
+  arr]

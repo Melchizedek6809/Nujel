@@ -66,8 +66,35 @@
 [defun $jt [label]
   [list `[quote [$jt* [- [tree/get labels ~label] [+ 1 oi]]]]]]
 
+[defun $jf* [off]
+  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
+  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
+  [list #$F a b]]
+
+[defun $jf [label]
+  [list `[quote [$jf* [- [tree/get labels ~label] [+ 1 oi]]]]]]
+
 [defun $dup []
   '[#$B]]
+
+[defun $drop []
+  '[#$C]]
+
+[defun $def [v]
+  "form - | Print out the stack for the current closure"
+  [def i [sym->index v]]
+  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
+  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
+  [def c [int->bytecode-op [logand     i     #xFF]]]
+  [list #$D a b c]]
+
+[defun $set [v]
+  "form - | Print out the stack for the current closure"
+  [def i [sym->index v]]
+  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
+  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
+  [def c [int->bytecode-op [logand     i     #xFF]]]
+  [list #$E a b c]]
 
 [defun assemble/find-and-remove-labels [code labels]
        [def out [array/allocate [array/length code]]]
@@ -99,7 +126,7 @@
 
 [def assemble/verbose #f]
 
-[defun assemble l
+[defun assemble* [l]
        "Assemble all arguments into a single :bytecode-array"
        [def labels @[]]
        [and assemble/verbose [println [cat [ansi-blue "Raw:\n" [str/write l]]]]]
@@ -110,6 +137,10 @@
        [def c [assemble/relocate-jumps b labels]]
        [and assemble/verbose [println [cat [ansi-green "Final result:\n" [str/write c]]]]]
        [arr->bytecode-arr c]]
+
+[defun assemble l
+       "Assemble all arguments into a single :bytecode-array"
+       [assemble* l]]
 
 [defmacro asmrun ops
   "Assemble and evaluate all bytecode arguments"
