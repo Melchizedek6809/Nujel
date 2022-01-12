@@ -28,7 +28,12 @@ typedef enum lOpcode {
 	lopSet = 14,
 	lopJf = 15,
 	lopLambda = 16,
-	lopMacro = 17
+	lopMacro = 17,
+	lopGet = 18,
+	lopPushClosure = 19,
+	lopClosureEnter = 20,
+	lopLet = 21,
+	lopClosurePop = 22
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -83,7 +88,9 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	const lBytecodeOp *ip = ops->data;
 	const int gcsp = lRootsGet();
 	lVal *stack[BYTECODE_STACK_SIZE];
+	lClosure *cloStack[CLOSURE_STACK_SIZE];
 	int sp = pushList(stack, 0, args);
+	int csp = 0;
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 	switch(*ip){
@@ -172,14 +179,18 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		if(--sp < 0){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
 		break;
-	case lopDef: {
+	case lopDef:
 		ip++;
 		lDefineClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
-		break;}
-	case lopSet: {
+		break;
+	case lopSet:
 		ip++;
 		lSetClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
-		break;}
+		break;
+	case lopGet:
+		ip++;
+		stack[sp++] = lGetClosureSym(c, lBytecodeReadOPSym(&ip));
+		break;
 	case lopLambda: {
 		ip++;
 		lVal *cName = lBytecodeReadOPVal(&ip);
@@ -197,6 +208,27 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
 		if(stack[sp-1]){stack[sp-1]->type = ltMacro;}
 		break;}
+	case lopPushClosure:
+		ip++;
+		stack[sp++] = lValObject(c);
+		break;
+	case lopClosureEnter: {
+		ip++;
+		lVal *cObj = stack[--sp];
+		if((cObj->type != ltLambda) && (cObj->type != ltObject)){lExceptionThrowValClo(":invalid-closure", "Error while trying to enter a closure", cObj, c);}
+		cloStack[csp++] = c;
+		c = cObj->vClosure;
+		break; }
+	case lopLet:
+		ip++;
+		cloStack[csp++] = c;
+		c = lClosureNew(c);
+		break;
+	case lopClosurePop:
+		ip++;
+		if(csp <= 0){lExceptionThrowValClo(":closure-stack-underflow", "Can't pop from the closure stack when it is empty", NULL, c);}
+		c = cloStack[--csp];
+		break;
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
 	return NULL;
@@ -215,10 +247,14 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 		return 3;
 	case lopDef:
 	case lopSet:
+	case lopGet:
 	case lopPushLVal:
 		return 4;
 	case lopApply:
 		return 5;
+	case lopLambda:
+	case lopMacro:
+		return 4*3+1;
 	}
 }
 

@@ -1,11 +1,10 @@
-; Contains the low levelNujel -> Bytecode compiler
-
-[defun bytecompile/int [source]
-       [$push/int source]]
+; Contains the low level Nujel -> Bytecode compiler
 
 [defun bytecompile/literal [source]
+       ;[println [str/write source]]
        [case [type-of source]
-             [:int      [bytecompile/int source]]
+             [:symbol   [$get source]]
+             [:int      [$push/int source]]
              [otherwise [$push/lval source]]]]
 
 [defun bytecompile/do/form [source env]
@@ -96,9 +95,22 @@
             [list [bytecompile/or/rec [cdr source] env sym-end]
                   sym-end]]
 
-
 [defun bytecompile/λ* [source env]
        [apply $lambda [cdr source]]]
+
+[defun bytecompile/μ* [source env]
+       [apply $macro [cdr source]]]
+
+[defun bytecompile/let*  [source env]
+       [list [$let]
+             [bytecompile/do [cdr source] env]
+             [$closure/pop]]]
+
+[defun bytecompile/ω  [source env]
+       [list [$let]
+             [bytecompile/do [cdr source] env]
+             [$push/closure]
+             [$closure/pop]]]
 
 [defun bytecompile* [source env]
        "Compile the forms in source"
@@ -107,20 +119,20 @@
                    [car source]]]
        [case [type-of op]
              [:special-form [case op
-                    [do     [bytecompile/do     source env]]
-                    [def    [bytecompile/def    source env]]
-                    [set!   [bytecompile/set!   source env]]
-                    [if     [bytecompile/if     source env]]
-                    [while  [bytecompile/while  source env]]
-                    [and    [bytecompile/and    source env]]
-                    [or     [bytecompile/or     source env]]
-                    [λ*    [bytecompile/λ*     source env]]
+                    [do    [bytecompile/do    source env]]
+                    [def   [bytecompile/def   source env]]
+                    [set!  [bytecompile/set!  source env]]
+                    [if    [bytecompile/if    source env]]
+                    [while [bytecompile/while source env]]
+                    [and   [bytecompile/and   source env]]
+                    [or    [bytecompile/or    source env]]
+                    [λ*    [bytecompile/λ*    source env]]
+                    [μ*    [bytecompile/μ*    source env]]
+                    [let*  [bytecompile/let*  source env]]
+                    [ω     [bytecompile/ω     source env]]
 
-                    [let*   [bytecompile/let*   source env]]
-                    [μ*    [bytecompile/μ*     source env]]
-                    [ω     [bytecompile/ω      source env]]
-                    [try    [bytecompile/try    source env]]
-                    [quote                  source]
+                    [try   [bytecompile/try   source env]]
+                    [quote                    source]
                     [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
              [[:lambda :native-function] [bytecompile/procedure op source env]]
              [otherwise [bytecompile/literal source]]]]

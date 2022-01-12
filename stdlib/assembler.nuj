@@ -12,6 +12,9 @@
              [int->bytecode-op [logand [>> i  8] #xFF]]
              [int->bytecode-op [logand     i     #xFF]]]]
 
+[defun int-fit-in-byte? [a]
+       [and [<= a 127] [>= a -128]]]
+
 [defun $nop []
        "- | Do nothing"
        '[#$0]]
@@ -22,13 +25,15 @@
 
 [defun $push/int/byte [a]
        "- a | Return top of value stack"
-       [when [or [> a 127] [< a -128]]
-             [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+       [when-not [int-fit-in-byte? a]
+                 [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
        [list #$2 [int->bytecode-op a]]]
 
 [defun $push/int [a]
        "- a | Return top of value stack"
-       [$push/int/byte a]]
+       [if [int-fit-in-byte? a]
+           [$push/int/byte a]
+           [$push/lval a]]]
 
 [defun $add/int []
        "a b - c | Adds the two topmost values and pushes the result"
@@ -78,12 +83,25 @@
        '[#$C]]
 
 [defun $def [v]
-       "form - | Print out the stack for the current closure"
        [list #$D [sym->bytecode-op v]]]
 
 [defun $set [v]
-       "form - | Print out the stack for the current closure"
        [list #$E [sym->bytecode-op v]]]
+
+[defun $get [v]
+       [list #$12 [sym->bytecode-op v]]]
+
+[defun $push/closure []
+       '[#$13]]
+
+[defun $closure/enter []
+       '[#$14]]
+
+[defun $let []
+       '[#$15]]
+
+[defun $closure/pop []
+       '[#$16]]
 
 [defun $lambda [name args docs body]
        [list #$10
