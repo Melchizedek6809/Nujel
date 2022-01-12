@@ -207,33 +207,25 @@ static lVal *lnfClSelf(lClosure *c, lVal *v){
 
 static lVal *lnfResolve(lClosure *c, lVal *v){
 	const lSymbol *sym = castToSymbol(lCar(v),NULL);
-	return sym ? lGetClosureSym(c,sym) : NULL;
+	lVal *env = lCadr(v);
+	if(env && (env->type != ltLambda) && (env->type != ltObject)){
+		lExceptionThrowValClo(":invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+	}
+	return sym ? lGetClosureSym(env ? env->vClosure : c, sym) : NULL;
 }
 
 static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	const lSymbol *sym = castToSymbol(lCar(v),NULL);
-	return lValBool(sym ? lHasClosureSym(c,sym,NULL) : false);
+	lVal *env = lCadr(v);
+	if(env && (env->type != ltLambda) && (env->type != ltObject)){
+		lExceptionThrowValClo(":invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+	}
+	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
 }
 
-/* Handler for [λ$ [..args] docstring body] */
+/* Handler for [λ$ name [..args] docstring body] */
 static lVal *lnfLambdaAst(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
-	if(v == NULL){
-		lExceptionThrowValClo(":invalid-lambda","Lambdas do need to have a name, some arguments a docstring and a body",NULL, c);
-		return NULL;
-	}
-	const lSymbol *name = (car && car->type == ltSymbol) ? car->vSymbol : NULL;
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type           = ltLambda;
-	ret->vClosure       = lClosureNew(c);
-
-	ret->vClosure->name = name;
-
-	ret->vClosure->args = lCadr(v);
-	ret->vClosure->doc  = lCaddr(v);
-	ret->vClosure->text = lCadddr(v);
-
-	return ret;
+	return lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
 }
 
 /* Handler for [μ* [...args] ...body] */
@@ -284,8 +276,8 @@ void lOperationsClosure(lClosure *c){
 	symCode          = lSymS(":code");
 	symData          = lSymS(":data");
 
-	lAddNativeFunc(c,"resolve",        "[sym]",         "Resolve SYM until it is no longer a symbol", lnfResolve);
-	lAddNativeFunc(c,"resolves?",      "[sym]",         "Check if SYM resolves to a value",           lnfResolvesPred);
+	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
+	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
 	lAddNativeFunc(c,"closure-parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);

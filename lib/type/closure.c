@@ -85,3 +85,17 @@ void lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 void lDefineVal(lClosure *c, const char *str, lVal *val){
 	lDefineClosureSym(c,lSymS(str),val);
 }
+
+lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
+	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
+
+	lVal *ret = RVP(lValAlloc());
+	ret->type           = ltLambda;
+	ret->vClosure       = lClosureNew(parent);
+	ret->vClosure->name = sym;
+	ret->vClosure->args = args;
+	ret->vClosure->doc  = docs;
+	ret->vClosure->text = body;
+
+	return ret;
+}

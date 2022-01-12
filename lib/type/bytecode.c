@@ -27,6 +27,8 @@ typedef enum lOpcode {
 	lopDef = 13,
 	lopSet = 14,
 	lopJf = 15,
+	lopLambda = 16,
+	lopMacro = 17
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -57,6 +59,26 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	return ret;
 }
 
+static lVal *lBytecodeReadOPVal(const lBytecodeOp **rip){
+	const lBytecodeOp *ip = *rip;
+	int i = *ip++;
+	i = (i << 8) | *ip++;
+	i = (i << 8) | *ip++;
+	lVal *ret = lIndexVal(i);
+	*rip = ip;
+	return ret;
+}
+
+static lSymbol *lBytecodeReadOPSym(const lBytecodeOp **rip){
+	const lBytecodeOp *ip = *rip;
+	int i = *ip++;
+	i = (i << 8) | *ip++;
+	i = (i << 8) | *ip++;
+	lSymbol *ret = lIndexSym(i);
+	*rip = ip;
+	return ret;
+}
+
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	const lBytecodeOp *ip = ops->data;
 	const int gcsp = lRootsGet();
@@ -81,6 +103,7 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		ip++;
 		break;}
 	case lopIntAdd: {
+		if(sp < 2){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		const i64 a = castToInt(stack[sp-1],0);
 		const i64 b = castToInt(stack[sp-2],0);
 		stack[sp-2] = lValInt(a + b);
@@ -93,11 +116,8 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		ip++;
 		break;
 	case lopPushLVal: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		i = (i << 8) | *++ip;
 		ip++;
-		stack[sp++] = lIndexVal(i);
+		stack[sp++] = lBytecodeReadOPVal(&ip);
 		break;}
 	case lopMakeList: {
 		const int len = *++ip;
@@ -120,6 +140,7 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		ip += 3;
 		break; }
 	case lopDup:
+		if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		stack[sp] = stack[sp-1];
 		sp++;
 		ip++;
@@ -127,41 +148,54 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	case lopJmp: {
 		int i = *++ip;
 		i = (i << 8) | *++ip;
-		ip++;
 		ip += i;
 		break; }
 	case lopJt: {
 		int i = *++ip;
 		i = (i << 8) | *++ip;
-		ip++;
-		if(castToBool(stack[--sp])){ip += i;}
+		if(castToBool(stack[--sp])){
+			ip += i;
+		}else{
+			ip++;
+		}
 		break; }
 	case lopJf: {
 		int i = *++ip;
 		i = (i << 8) | *++ip;
-		ip++;
-		if(!castToBool(stack[--sp])){ip += i;}
+		if(!castToBool(stack[--sp])){
+			ip += i;
+		}else{
+			ip++;
+		}
 		break; }
 	case lopDrop:
-		sp--;
+		if(--sp < 0){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
 		break;
 	case lopDef: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		i = (i << 8) | *++ip;
 		ip++;
-		const lSymbol *s = lIndexSym(i);
-		//pf("Define: %v[%i] := %v\n", lValSymS(s), i, stack[sp - 1]);
-		lDefineClosureSym(c, s, stack[sp - 1]);
+		lDefineClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
 		break;}
 	case lopSet: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		i = (i << 8) | *++ip;
 		ip++;
-		const lSymbol *s = lIndexSym(i);
-		lSetClosureSym(c, s, stack[sp - 1]);
+		lSetClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
+		break;}
+	case lopLambda: {
+		ip++;
+		lVal *cName = lBytecodeReadOPVal(&ip);
+		lVal *cArgs = lBytecodeReadOPVal(&ip);
+		lVal *cDocs = lBytecodeReadOPVal(&ip);
+		lVal *cBody = lBytecodeReadOPVal(&ip);
+		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
+		break;}
+	case lopMacro: {
+		ip++;
+		lVal *cName = lBytecodeReadOPVal(&ip);
+		lVal *cArgs = lBytecodeReadOPVal(&ip);
+		lVal *cDocs = lBytecodeReadOPVal(&ip);
+		lVal *cBody = lBytecodeReadOPVal(&ip);
+		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
+		if(stack[sp-1]){stack[sp-1]->type = ltMacro;}
 		break;}
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);

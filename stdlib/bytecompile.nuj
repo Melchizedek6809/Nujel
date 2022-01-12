@@ -41,48 +41,92 @@
                   [bytecompile* [cadddr source] env]
                   sym-after]]]
 
-[defun bytecompile/flatten/λ [a b]
-       [cond [[== [car b] 'quote] [cons b a]]
-             [[collection? b] [append [reduce b bytecompile/flatten/λ #nil] a]]
-             [#t [cons b a]]]]
 
-[defun bytecompile/flatten [l]
-       [if-not [collection? l] l
-               [nreverse [reduce l bytecompile/flatten/λ #nil]]]]
+[defun bytecompile/while [source env]
+       [def sym-start [gensym]]
+       [def sym-end [gensym]]
+       [list sym-start
+             [bytecompile* [cadr source] env]
+             [$jf sym-end]
+             [bytecompile* [caddr source] env]
+             [$jmp sym-start]
+             sym-end]]
+
+[defun bytecompile/procedure/arg [source env]
+       [if [last? source]
+           [bytecompile* [car source] env]
+           [cons [bytecompile/procedure/arg [cdr source] env]
+                 [bytecompile* [car source] env]]]]
+
+[defun bytecompile/procedure [op source env]
+       [def args [cdr source]]
+       [def arg-count [length args]]
+       [if args
+           [list [bytecompile/procedure/arg [cdr source]]
+                 [$apply arg-count op]]
+           [$apply arg-count op]]]
+
+[defun bytecompile/and/rec [source env sym-end]
+       [def c [bytecompile* [car source] env]]
+       [if [last? source]
+           c
+           [list c
+                 [$dup]
+                 [$jf sym-end]
+                 [$drop]
+                 [bytecompile/and/rec [cdr source] env sym-end]]]]
+
+[defun bytecompile/and [source env]
+       [def sym-end [gensym]]
+            [list [bytecompile/and/rec [cdr source] env sym-end]
+                  sym-end]]
+
+[defun bytecompile/or/rec [source env sym-end]
+       [def c [bytecompile* [car source] env]]
+       [if [last? source]
+           c
+           [list c
+                 [$dup]
+                 [$jt sym-end]
+                 [$drop]
+                 [bytecompile/or/rec [cdr source] env sym-end]]]]
+
+[defun bytecompile/or [source env]
+       [def sym-end [gensym]]
+            [list [bytecompile/or/rec [cdr source] env sym-end]
+                  sym-end]]
+
+
+[defun bytecompile/λ* [source env]
+       [apply $lambda [cdr source]]]
 
 [defun bytecompile* [source env]
        "Compile the forms in source"
-       [let* [def op [if [apply env `[do [resolves? ~[list 'quote [car source]]]]]
-                         [apply env `[do [resolve ~[list 'quote [car source]]]]]
-                         [car source]]]
+       [def op [if [resolves? [car source] env]
+                   [resolve [car source] env]
+                   [car source]]]
        [case [type-of op]
              [:special-form [case op
                     [do     [bytecompile/do     source env]]
                     [def    [bytecompile/def    source env]]
                     [set!   [bytecompile/set!   source env]]
                     [if     [bytecompile/if     source env]]
+                    [while  [bytecompile/while  source env]]
+                    [and    [bytecompile/and    source env]]
+                    [or     [bytecompile/or     source env]]
+                    [λ*    [bytecompile/λ*     source env]]
 
                     [let*   [bytecompile/let*   source env]]
-                    [λ*    [bytecompile/λ*     source env]]
                     [μ*    [bytecompile/μ*     source env]]
                     [ω     [bytecompile/ω      source env]]
                     [try    [bytecompile/try    source env]]
-                    [and    [bytecompile/and    source env]]
-                    [or     [bytecompile/or     source env]]
-                    [while  [bytecompile/while  source env]]
                     [quote                  source]
                     [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
-             [:symbol [case op
-                        ['do   [bytecompile/do source env]]
-                        ['def  [bytecompile/def source env]]
-                        ['set! [bytecompile/set source env]]
-                        ['if   [bytecompile/if     source env]]
-                        [otherwise [bytecompile/procedure  op  source env]]]]
-             [[:lambda :native-function]  [bytecompile/procedure  op  source env]]
-             [otherwise [bytecompile/literal source]]]]]
+             [[:lambda :native-function] [bytecompile/procedure op source env]]
+             [otherwise [bytecompile/literal source]]]]
 
 [defun bytecompile [form environment]
-       [bytecompile/flatten [list [bytecompile* form environment] [$ret]]]]
+       [list [bytecompile* form environment] [$ret]]]
 
 [defmacro byterun [form]
-          `[bytecode-eval [assemble* [list [bytecompile ~form [current-closure]]]]]]
+          `[bytecode-eval [assemble* [bytecompile ~form [current-closure]]]]]

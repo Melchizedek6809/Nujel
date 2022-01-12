@@ -1,142 +1,141 @@
 ; Contains the bytecode assembler, so we don't have to write opcodes directly
 
+[defun val->bytecode-op [v]
+       [def i [val->index v]]
+       [list [int->bytecode-op [logand [>> i 16] #xFF]]
+             [int->bytecode-op [logand [>> i  8] #xFF]]
+             [int->bytecode-op [logand     i     #xFF]]]]
+
+[defun sym->bytecode-op [v]
+       [def i [sym->index v]]
+       [list [int->bytecode-op [logand [>> i 16] #xFF]]
+             [int->bytecode-op [logand [>> i  8] #xFF]]
+             [int->bytecode-op [logand     i     #xFF]]]]
+
 [defun $nop []
-  "- | Do nothing"
-  '[#$0]]
+       "- | Do nothing"
+       '[#$0]]
 
 [defun $ret []
-  "a - | Return top of value stack"
-  '[#$1]]
+       "a - | Return top of value stack"
+       '[#$1]]
 
 [defun $push/int/byte [a]
-  "- a | Return top of value stack"
-  [when [or [> a 127] [< a -128]]
-        [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
-  [list #$2 [int->bytecode-op a]]]
+       "- a | Return top of value stack"
+       [when [or [> a 127] [< a -128]]
+             [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+       [list #$2 [int->bytecode-op a]]]
 
 [defun $push/int [a]
-  "- a | Return top of value stack"
-  [$push/int/byte a]]
+       "- a | Return top of value stack"
+       [$push/int/byte a]]
 
 [defun $add/int []
-  "a b - c | Adds the two topmost values and pushes the result"
-  '[#$3]]
+       "a b - c | Adds the two topmost values and pushes the result"
+       '[#$3]]
 
 [defun $debug/print-stack []
-  "- | Print out the stack for the current closure"
-  '[#$4]]
+       "- | Print out the stack for the current closure"
+       '[#$4]]
 
 [defun $push/lval [v]
-  "form - | Print out the stack for the current closure"
-  [def i [val->index v]]
-  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
-  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
-  [def c [int->bytecode-op [logand     i     #xFF]]]
-  [list #$5 a b c]]
+       "form - | Print out the stack for the current closure"
+       [list #$5 [val->bytecode-op v]]]
 
 [defun $make-list [item-count]
-  "items ... - | Print out the stack for the current closure"
-  [list #$6 [int->bytecode-op item-count]]]
+       "items ... - | Print out the stack for the current closure"
+       [list #$6 [int->bytecode-op item-count]]]
 
 [defun $eval [a]
-  "form - | Print out the stack for the current closure"
-  '[#$7]]
+       "form - | Print out the stack for the current closure"
+       '[#$7]]
 
 [defun $apply [arg-count fun]
-  "form - | Print out the stack for the current closure"
-  [def i [val->index fun]]
-  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
-  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
-  [def c [int->bytecode-op [logand     i     #xFF]]]
-  [list #$8 [int->bytecode-op arg-count] a b c]]
+       "form - | Print out the stack for the current closure"
+       [list #$8 [int->bytecode-op arg-count]
+                 [val->bytecode-op fun]]]
 
 [defun $jmp* [off]
-  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
-  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
-  [list #$9 a b]]
+       [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
+       [def b [int->bytecode-op [logand     [int off]     #xFF]]]]
 
-[defun $jmp [label]
-  [list `[quote [$jmp* [- [tree/get labels ~label] [+ 1 oi]]]]]]
+[defun $jmp [target]
+       [list #$9 [list :relocate target 8  0 [int->bytecode-op 0]]
+                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
 
-[defun $jt* [off]
-  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
-  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
-  [list #$A a b]]
+[defun $jt [target]
+       [list #$A [list :relocate target 8  0 [int->bytecode-op 0]]
+                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
 
-[defun $jt [label]
-  [list `[quote [$jt* [- [tree/get labels ~label] [+ 1 oi]]]]]]
-
-[defun $jf* [off]
-  [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
-  [def b [int->bytecode-op [logand     [int off]     #xFF]]]
-  [list #$F a b]]
-
-[defun $jf [label]
-  [list `[quote [$jf* [- [tree/get labels ~label] [+ 1 oi]]]]]]
+[defun $jf [target]
+       [list #$F [list :relocate target 8  0 [int->bytecode-op 0]]
+                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
 
 [defun $dup []
-  '[#$B]]
+       '[#$B]]
 
 [defun $drop []
-  '[#$C]]
+       '[#$C]]
 
 [defun $def [v]
-  "form - | Print out the stack for the current closure"
-  [def i [sym->index v]]
-  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
-  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
-  [def c [int->bytecode-op [logand     i     #xFF]]]
-  [list #$D a b c]]
+       "form - | Print out the stack for the current closure"
+       [list #$D [sym->bytecode-op v]]]
 
 [defun $set [v]
-  "form - | Print out the stack for the current closure"
-  [def i [sym->index v]]
-  [def a [int->bytecode-op [logand [>> i 16] #xFF]]]
-  [def b [int->bytecode-op [logand [>> i  8] #xFF]]]
-  [def c [int->bytecode-op [logand     i     #xFF]]]
-  [list #$E a b c]]
+       "form - | Print out the stack for the current closure"
+       [list #$E [sym->bytecode-op v]]]
 
-[defun assemble/find-and-remove-labels [code labels]
-       [def out [array/allocate [array/length code]]]
-       [def oi -1]
-       [def li -1]
-       [for [i 0 [array/length code]]
-            [if-not [symbol? [array/ref code i]]
-                    [++ li]
-                    [when [pair? [array/ref code i]]
-                          [+= li [list/length [eval [list [car [array/ref code]]]]]]]]
-            [if [symbol? [array/ref code i]]
-                [tree/set! labels [array/ref code i] li]
-                [array/set! out [++ oi] [array/ref code i]]]]
-       [array/length! out [+ oi 1]]]
+[defun $lambda [name args docs body]
+       [list #$10
+             [val->bytecode-op name]
+             [val->bytecode-op args]
+             [val->bytecode-op docs]
+             [val->bytecode-op body]]]
 
-[defun assemble/relocate-jumps [code labels]
-       [def out [array/allocate [array/length code]]]
-       [def oi -1]
-       [for [i 0 [array/length code]]
-            [def form [array/ref code i]]
-            [if [pair? form]
-                [do [def result [eval form]]
-                    [array/length! out [+ [list/length result] -1 [array/length out]]]
-                    [while result
-                           [array/set! out [++ oi] [car result]]
-                           [cdr! result]]]
-                [array/set! out [++ oi] [array/ref code i]]]]
-       out]
+[defun $macro [name args docs body]
+       [list #$11
+             [val->bytecode-op name]
+             [val->bytecode-op args]
+             [val->bytecode-op docs]
+             [val->bytecode-op body]]]
+
+[defun assemble/build-sym-map [code sym-map pos]
+       [while code
+              [case [type-of [car code]]
+                    [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
+                    [:symbol      [tree/set! sym-map [car code] pos]]
+                    [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
+              [cdr! code]]
+       pos]
+
+[defun assemble/relocate-op [code sym-map pos out]
+       [def off [- [+ [sym-map [cadr code]] [cadddr code]] pos]]
+       [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
+       pos]
+
+[defun assemble/emit-relocated-ops [code sym-map pos out]
+       [if [== [car code] :relocate]
+           [set! pos [assemble/relocate-op code sym-map pos out]]
+           [while code
+                  [case [type-of [car code]]
+                        [:bytecode-op [array/set! out [++ pos] [car code]]]
+                        [:pair        [set! pos [assemble/emit-relocated-ops [car code] sym-map pos out]]]]
+                  [cdr! code]]]
+       pos]
 
 [def assemble/verbose #f]
-
-[defun assemble* [l]
+[defun assemble* [code]
        "Assemble all arguments into a single :bytecode-array"
-       [def labels @[]]
-       [and assemble/verbose [println [cat [ansi-blue "Raw:\n" [str/write l]]]]]
-       [def a [apply array/new [reduce [cdr l] append [car l]]]]
-       [and assemble/verbose [println [cat [ansi-red "Stage 1:\n" [str/write a]]]]]
-       [def b [assemble/find-and-remove-labels a labels]]
-       [and assemble/verbose [println [cat [ansi-yellow "Stage 2:\n" [str/write b]]]]]
-       [def c [assemble/relocate-jumps b labels]]
-       [and assemble/verbose [println [cat [ansi-green "Final result:\n" [str/write c]]]]]
-       [arr->bytecode-arr c]]
+       [def sym-map @[]]
+
+       [and assemble/verbose [println [cat [ansi-blue "Input:\n" [str/write code]]]]]
+       [assemble/build-sym-map code sym-map 0]
+       [and assemble/verbose [println [cat [ansi-yellow "Symbol Map:\n" [str/write sym-map]]]]]
+       [def out [array/allocate [sym-map :last-op]]]
+       [assemble/emit-relocated-ops code sym-map -1 out]
+       [and assemble/verbose [println [cat [ansi-green "Output:\n" [str/write out]]]]]
+
+       [arr->bytecode-arr out]]
 
 [defun assemble l
        "Assemble all arguments into a single :bytecode-array"

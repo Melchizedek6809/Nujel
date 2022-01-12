@@ -964,6 +964,7 @@
 [test/add '[1 2 3 4 5] [flatten [list '[1 2] #[3] #['[[4] 5]]]]]
 [test/add #t [int? [sym->index 'asd]]]
 [test/add 'asd [index->sym [sym->index 'asd]]]
+[test/add 5 [[asmrun [$lambda 'test-add '[a b] "Add a and b together" '[+ a b]] [$ret]] 2 3]]
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
