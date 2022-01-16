@@ -59,7 +59,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 	cur = spf(cur, bufEnd, "#[");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
-			cur = spf(cur, bufEnd, "#$%x%s", *c, (c < (v->dataEnd - 1)) ? " " : "");
+			cur = spf(cur, bufEnd, "#$%x%s", (i64)(*c & 0xFF), (c < (v->dataEnd - 1)) ? " " : "");
 		}
 	}
 	return spf(cur, bufEnd, "]");
@@ -117,7 +117,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	case ltBytecodeArr:
 		return writeBytecodeArray(cur, bufEnd, &v->vBytecodeArr);
 	case ltBytecodeOp:
-		return spf(cur , bufEnd, "#$%x" , v->vBytecodeOp);
+		return spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));
 	case ltInt:
 		return spf(cur , bufEnd, "%i" ,v->vInt);
 	case ltFloat:
