@@ -43,7 +43,9 @@ static lVal *lnfTrim(lClosure *c, lVal *v){
 	char *buf = malloc(len+1);
 	memcpy(buf,s,len);
 	buf[len] = 0;
-	return lValStringLen(buf, len);
+	lVal *ret = lValStringLen(buf, len);
+	free(buf);
+	return ret;
 }
 
 static lVal *lnfStrDown(lClosure *c, lVal *v){
@@ -57,7 +59,9 @@ static lVal *lnfStrDown(lClosure *c, lVal *v){
 		buf[i] = tolower((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
-	return lValStringLen(buf, len);
+	lVal *ret = lValStringLen(buf, len);
+	free(buf);
+	return ret;
 }
 
 static lVal *lnfStrUp(lClosure *c, lVal *v){
@@ -71,7 +75,9 @@ static lVal *lnfStrUp(lClosure *c, lVal *v){
 		buf[i] = toupper((u8)t->vString->data[i]);
 	}
 	buf[len] = 0;
-	return lValStringLen(buf, len);
+	lVal *ret = lValStringLen(buf, len);
+	free(buf);
+	return ret;
 }
 
 static lVal *lnfStrCap(lClosure *c, lVal *v){
@@ -96,7 +102,9 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 		}
 	}
 	buf[len] = 0;
-	return lValStringLen(buf, len);
+	lVal *ret = lValStringLen(buf, len);
+	free(buf);
+	return ret;
 }
 
 static lVal *lnfSubstr(lClosure *c, lVal *v){
