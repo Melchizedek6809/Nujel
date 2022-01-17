@@ -41,7 +41,7 @@ static void *readEvalStringRaw(void *cl, void *str){
 	return v;
 }
 
-static lClosure *createRoolClosure(bool loadStdLib){
+static lClosure *createRootClosure(bool loadStdLib){
 	lClosure *c;
 	if(loadStdLib){
 		c = lNewRoot();
@@ -58,15 +58,14 @@ static lClosure *createRoolClosure(bool loadStdLib){
 }
 
 /* Parse options that might radically alter runtime behaviour, like running
- * without the stdlib (probably for using an alternative build of the stdlib )
- */
+ * without the stdlib (probably for using an alternative build of the stdlib ) */
 static lClosure *parsePreOptions(int argc, char *argv[]){
 	bool loadStdLib = true;
 	bool readNext   = false;
 	lClosure *c     = NULL;
 	for(int i=1;i<argc;i++){
 		if(readNext){
-			if(c == NULL){c = createRoolClosure(loadStdLib);}
+			if(c == NULL){c = createRootClosure(loadStdLib);}
 			size_t len = 0;
 			char *str = loadFile(argv[i],&len);
 			lExceptionTry(readEvalStringRaw,c,str);
@@ -88,7 +87,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			}
 		}
 	}
-	if(c == NULL){c = createRoolClosure(loadStdLib);}
+	if(c == NULL){c = createRootClosure(loadStdLib);}
 
 	if(lVerbose){
 		pf("sizeof(lClosure): %u\n",sizeof(lClosure));

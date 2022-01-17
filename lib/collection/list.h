@@ -4,6 +4,7 @@
 
 lVal     *lCons       (lVal *car,lVal *cdr);
 int       lListLength (lVal *v);
+lVal     *lList       (int length, ...);
 
 static inline lVal *lCar(lVal *v){
 	return (v != NULL) && (v->type == ltPair) ? v->vList.car : NULL;

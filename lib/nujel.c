@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
 
 extern u8 stdlib_no_data[];
 
@@ -110,7 +109,28 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	}
 }
 
-/* Evaluate a single value, v, and return the result */
+/* Run an expression after expanding/compiling it */
+lVal *lRun(lClosure *c, lVal *v){
+	const int SP = lRootsGet();
+
+	lVal *expr = RVP(lList(3,RVP(lValSym("eval-compile")), RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))), RVP(lValObject(c))));
+	lVal *ret = lEval(c,expr);
+
+	lRootsRet(SP);
+	return ret;
+}
+
+/* Read and run an expression after expanding/compiling it */
+lVal *lRunS(lClosure *c, const char *s){
+	const int SP = lRootsGet();
+	lVal *expr = lCons(lnfvDo,lRead(s));
+	lVal *tmp = lRun(c,expr);
+	lRootsRet(SP);
+	return tmp;
+}
+
+/* Directly Evaluate a single value, v, and return the result.
+ * DOES NOT COMPILE THE EXPRESSION. */
 lVal *lEval(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
 	default:
@@ -309,24 +329,6 @@ static void *lNewRootReal(void *a, void *b){
  * fallback exception handler */
 lClosure *lNewRoot(){
 	return lExceptionTry(lNewRootReal,NULL,NULL);
-}
-
-/* A convenient way to generate a list */
-lVal *lList(int length, ...){
-	lVal *ret = NULL, *l;
-	va_list varArgs;
-	va_start(varArgs,length);
-	for(;length;length--){
-		lVal *t = va_arg(varArgs, lVal *);
-		if(ret == NULL){
-			ret = l = RVP(lCons(NULL,NULL));
-		}else{
-			l = l->vList.cdr = lCons(NULL,NULL);
-		}
-		l->vList.car = t;
-	}
-	va_end(varArgs);
-	return ret;
 }
 
 void lBreak(){

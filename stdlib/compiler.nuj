@@ -170,6 +170,10 @@
           "Compile, Evaluate and then return the result of EXPR"
           `[eval* [compile ~expr [current-closure]]]]
 
+[defun eval-compile [expr closure]
+       "Compile and the immediatly evaluate the result, mostly used by lRun()"
+       [try display/error [eval* [compile/forms expr closure]]]]
+
 [defun optimize/code/rest [code]
        [if-not [pair? code] code
                [cons [optimize/code      [car code]]

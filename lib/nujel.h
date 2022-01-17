@@ -21,6 +21,8 @@ void      lInit             ();
 lClosure *lNewRoot          ();
 lClosure *lNewRootNoStdLib  ();
 
+lVal     *lRun              (lClosure *c, lVal *v);
+lVal     *lRunS             (lClosure *c, const char *s);
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lMacro            (lClosure *c, lVal *args, lVal *lambda);
@@ -29,5 +31,3 @@ lVal     *lApply            (lClosure *c, lVal *args, lVal *fun, lVal *funSym);
 lVal     *lTry              (lClosure *c, lVal *catchRaw, lVal *bodyRaw);
 lVal     *lQuote            (lVal *v);
 void      lBreak            ();
-
-lVal     *lList             (int length, ...);
