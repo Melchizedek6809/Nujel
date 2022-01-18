@@ -57,8 +57,8 @@
         [throw [list :gotta-implement-it]]]
 
 [def gensym/counter 0]
-[defun gensym []
+[defun gensym [prefix]
        [set! gensym/counter [+ 1 gensym/counter]]
-       [str->sym ["ΓεnΣym-" gensym/counter]]]
+       [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
 
 [def root-closure [current-closure]]

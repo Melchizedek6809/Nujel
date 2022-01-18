@@ -975,6 +975,7 @@
 [test/add 1 [asmrun [$push/int 1] [$def 'tmp] [$let] [$push/int 2] [$def 'tmp] [$closure/pop] [$get 'tmp] [$ret]]]
 [test/add 2 [[asmrun [$push/int 1] [$def 'tmp] [$let] [$push/int 2] [$def 'tmp] [$lambda two '[] "" '[do tmp]] [$closure/pop] [$ret]]]]
 [test/add 128 [eval-compile '[+123 5] [current-closure]]]
+[test/add 5 [def a 4] [for [i 0 10] [once [++ a]]] a]
 ;[test/add 1000 [byterun '[do [def i 0] [while [< i 100] [set! i [+ 1 i]]] i]]]
 ;[test/add #t [for [i 5 4]] #t]
 ;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
