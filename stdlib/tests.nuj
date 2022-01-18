@@ -296,7 +296,7 @@
 [test/add :asd [do [def :asd #t] :asd]]
 [test/add "[1 . 2]" [def test [cons 1 2]] [str/write test]]
 [test/add "Eins" [def eins [ω [def say [λ [] "Eins"]]]] [eins [say]]]
-[test/add "Zwei" [def eins [ω [def say [λ [] "Zwei"]]]] [def zwei [eins [ω]]] [zwei [say]]]
+[test/add "Zwei" [let* [def eins [ω [defun say [] "Zwei"]]] [def zwei [eins [ω]]] [zwei [say]]]]
 [test/add "asd" ["a" "s" "d"]]
 [test/add "a" ["a"]]
 [test/add #nil [def testerle #[1 2 3]] [testerle 4]]

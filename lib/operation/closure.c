@@ -235,8 +235,8 @@ static lVal *lnfMacroAst(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* Handler for [ω ...body] */
-static lVal *lnfObject(lClosure *c, lVal *v){
+/* Handler for [ω* ...body] */
+static lVal *lnfObjectAst(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc());
 	ret->type     = ltObject;
 	ret->vClosure = lClosureNew(c);
@@ -297,5 +297,5 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
 	lAddSpecialForm(c,"μ*",           "[name args source body]", "Create a new, raw, macro",  lnfMacroAst);
-	lAddSpecialForm(c,"object ω",     "[...body]",               "Create a new object",       lnfObject);
+	lAddSpecialForm(c,"ω*",           "[body]",                  "Create a new object",       lnfObjectAst);
 }

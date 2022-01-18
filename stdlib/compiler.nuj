@@ -42,8 +42,8 @@
              [cadddr source]
              [compile [caddddr source]]]]
 
-[defun compile/ω [source]
-       [list 'ω [compile/do [cdr source]]]]
+[defun compile/ω* [source]
+       [list 'ω* [compile/do [cdr source]]]]
 
 [defun compile/try [source]
        [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]
@@ -87,7 +87,7 @@
                     [let*   [compile/let*   source]]
                     [λ*     [compile/λ*     source]]
                     [μ*     [compile/μ*     source]]
-                    [ω      [compile/ω      source]]
+                    [ω*     [compile/ω*     source]]
                     [if     [compile/if     source]]
                     [try    [compile/try    source]]
                     [and    [compile/and    source]]
@@ -97,12 +97,15 @@
                     [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
              [:macro                      [compile/macro      op  source]]
              [[:lambda :native-function]  [compile/procedure  op  source]]
+             [:object                     [compile/procedure/arg  source]]
              [:pair                       [compile/procedure/arg  source]]
              [[:int :float :vec]          [compile/procedure/arg  source]]
              [:array                      [compile/procedure/arg  source]]
              [:string                     [compile/procedure/arg  source]]
              [:tree                       [compile/procedure/arg  source]]
-             [otherwise                                           source]]]]
+             [otherwise                   [if [last? source]
+                                              source
+                                              [compile/procedure/arg source]]]]]]
 
 [defun compile [source new-environment new-verbose]
        "Compile the forms in source"
@@ -165,6 +168,11 @@
                                   [car body]]]
           [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
 [def λ \]
+
+[defmacro ω body
+          "Defines and returns new object after evaluating body within"
+          [compile [cons 'ω* body]]]
+[def defobj ω*]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"

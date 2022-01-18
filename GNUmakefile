@@ -17,6 +17,7 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 NUJEL       := ./nujel
 NUJEL_BOOT  := ./nujel-bootstrap
 #NUJEL_BOOT  := /usr/local/bin/nujel.exe
+#NUJEL_BOOT  := /home/benny/bin/nujel
 ASSET       := ./tools/assets
 
 CC                   := cc
