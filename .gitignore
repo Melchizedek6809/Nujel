@@ -26,9 +26,10 @@ gmon.out
 *.lib
 *.so
 *.o
-/bin/lib/*.no
 /stdlib/*.no
+/stdlib/*/*.no
 /binlib/*.no
+/binlib/*/*.no
 *.wd
 *.wa
 *.wo
