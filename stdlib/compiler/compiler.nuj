@@ -1,0 +1,205 @@
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+
+;; Contains the self-hosting Nujel compiler
+
+[def compile/environment [current-closure]]
+[def compile/verbose #f]
+
+[defun compile/do/args [args]
+       [if [last? args]
+           [cons [compile* [car args]] #nil]
+           [if [pair? [car args]]
+               [let* [def ocar [compile* [car args]]]
+                     [if [pair? ocar]
+                         [cons ocar [compile/do/args [cdr args]]]
+                         [compile/do/args [cdr args]]]]
+               [compile/do/args [cdr args]]]]]
+
+[defun compile/do [source]
+       [let* [def args [compile/do/args source]]
+             [if [last? args]
+                 [car args]
+                 [cons 'do args]]]]
+
+[defun compile/def [source]
+       [list 'def [cadr source] [compile* [caddr source]]]]
+
+[defun compile/set! [source]
+       [list 'set! [cadr source] [compile* [caddr source]]]]
+
+[defun compile/λ* [source]
+       [list 'λ*
+             [cadr source]
+             [caddr source]
+             [cadddr source]
+             [compile [caddddr source]]]]
+
+[defun compile/μ* [source]
+       [list 'μ*
+             [cadr source]
+             [caddr source]
+             [cadddr source]
+             [compile [caddddr source]]]]
+
+[defun compile/ω* [source]
+       [list 'ω* [compile/do [cdr source]]]]
+
+[defun compile/try [source]
+       [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]
+
+[defun compile/if [source]
+       [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]
+
+[defun compile/let* [source]
+       [list 'let* [compile/do [cdr source]]]]
+
+[defun compile/and [source]
+       [compile/procedure/arg source]]
+
+[defun compile/or [source]
+       [compile/procedure/arg source]]
+
+[defun compile/while [source]
+       [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]
+
+[defun compile/macro [macro source]
+       [compile* [macro-apply macro [cdr source]]]]
+
+[defun compile/procedure/arg [source]
+       [when [pair? source]
+             [cons [compile* [car source]]
+                   [compile/procedure/arg [cdr source]]]]]
+
+[defun compile/procedure [proc source]
+       [compile/procedure/arg source]]
+
+[defun compile* [source]
+       "Compile the forms in source"
+       [let* [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
+                         [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
+                         [car source]]]
+       [case [type-of op]
+             [:special-form [case op
+                    [do     [compile/do     source]]
+                    [def    [compile/def    source]]
+                    [set!   [compile/set!   source]]
+                    [let*   [compile/let*   source]]
+                    [λ*     [compile/λ*     source]]
+                    [μ*     [compile/μ*     source]]
+                    [ω*     [compile/ω*     source]]
+                    [if     [compile/if     source]]
+                    [try    [compile/try    source]]
+                    [and    [compile/and    source]]
+                    [or     [compile/or     source]]
+                    [while  [compile/while  source]]
+                    [quote                  source ]
+                    [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
+             [:macro                      [compile/macro      op  source]]
+             [[:lambda :native-function]  [compile/procedure  op  source]]
+             [:object                     [compile/procedure/arg  source]]
+             [:pair                       [compile/procedure/arg  source]]
+             [[:int :float :vec]          [compile/procedure/arg  source]]
+             [:array                      [compile/procedure/arg  source]]
+             [:string                     [compile/procedure/arg  source]]
+             [:tree                       [compile/procedure/arg  source]]
+             [otherwise                   [if [last? source]
+                                              source
+                                              [compile/procedure/arg source]]]]]]
+
+[defun compile [source new-environment new-verbose]
+       "Compile the forms in source"
+       [when-not new-environment [set! new-environment [current-closure]]]
+       [when-not new-verbose [set! new-verbose #f]]
+       [set! compile/environment new-environment]
+       [set! compile/verbose new-verbose]
+       [compile* source]]
+
+[defun compile/forms [source-raw environment]
+        "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+        [when-not environment [set! environment [ω]]]
+        [def source #nil]
+        [def source-next source-raw]
+        [def forms-compiled 0]
+        [defun try-again [source]
+               [set! source-next [cons source source-next]]]
+        [while source-next
+               [def forms-compiled-last forms-compiled]
+               [set! source source-next]
+               [set! source-next #nil]
+               [def errors #nil]
+               [while source
+                      [try [\ [err] [set! errors [cons err errors]]
+                                    [case [car err]
+                                          [:unresolved-procedure [try-again [car source]]]
+                                          [:runtime-macro [try-again [car source]]]
+                                          [otherwise [throw err]]]]
+                           [def compiled-form [compile [car source] environment #t]]
+                           [when compiled-form [apply environment `[eval* ~compiled-form]]
+                                               [++ forms-compiled]]]
+                      [cdr! source]]
+               [set! source-next [reverse source-next]]
+               [when [<= forms-compiled forms-compiled-last]
+                     [for-each errors display/error]
+                     [throw [list :you-can-not-advance "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"]]]]
+        [compile source-raw environment]]
+
+[def defmacro [μ* defmacro [name args . body]
+              "Define a new macro"
+              [do [def doc-string [if-not [string? [car body]] ""
+                                          [car body]]]
+                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]]
+
+[defmacro defun [name args . body]
+              "Define a new function"
+              [def doc-string [if-not [string? [car body]] ""
+                                      [car body]]]
+              [list 'def name [compile [list 'λ* name args doc-string [cons 'do body]] [current-closure]]]]
+
+[defmacro μ [args . body]
+          "Define a λ with the self-hosting Nujel compiler"
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]
+
+[defmacro \ [args . body]
+          "Define a λ with the self-hosting Nujel compiler"
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
+[def λ \]
+
+[defmacro ω body
+          "Defines and returns new object after evaluating body within"
+          [compile [cons 'ω* body]]]
+[def defobj ω*]
+
+[defmacro eval [expr]
+          "Compile, Evaluate and then return the result of EXPR"
+          `[eval* [compile ~expr [current-closure]]]]
+
+[defun eval-compile [expr closure]
+       "Compile and the immediatly evaluate the result, mostly used by lRun()"
+       [try display/error [eval* [compile/forms expr closure]]]]
+
+[defun optimize/code/rest [code]
+       [if-not [pair? code] code
+               [cons [optimize/code      [car code]]
+                     [optimize/code/rest [cdr code]]]]]
+
+[defun optimize/code [code]
+       [if-not [pair? code] code
+               [if [and [symbol? [car code]] [resolves? [car code]]]
+                   [cons [resolve [car code]]
+                         [optimize/code/rest [cdr code]]]
+                   [cons [optimize/code [car code]]
+                         [optimize/code/rest [cdr code]]]]]]
+
+[defun optimize! [fun]
+       "Optimize FUN via mutation"
+       [if-not [lambda? fun] #f
+               [closure! fun @[:code [optimize/code [[closure fun] :code]]]]]]
+
+[defun optimize-all! []
+       "Return a list of all lambdas in CTX"
+       [for-each [filter [map [symbol-table] resolve] lambda?] optimize!]]

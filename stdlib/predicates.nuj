@@ -119,5 +119,11 @@
         "#t if VAL is a native or lisp function"
         [or [lambda? val] [native? val]]]
 
+[defun bytecode-array? [v]
+       [== :bytecode-array [type-of v]]]
+
+[defun bytecode-op? [v]
+       [== :bytecode-op [type-of v]]]
+
 [defun in-range? [v min max]
        [and [>= v min] [<= v max]]]

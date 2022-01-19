@@ -60,38 +60,62 @@
        [list #$8 [int->bytecode-op arg-count]
                  [val->bytecode-op fun]]]
 
-[defun $jmp* [off]
-       [def a [int->bytecode-op [logand [>> [int off]  8] #xFF]]]
-       [def b [int->bytecode-op [logand     [int off]     #xFF]]]]
+[defun $call [target]
+       " - | Call a bytecode subroutine"
+       [list #$17 [list :relocate target 8 0 [int->bytecode-op 0]]
+                  [list :relocate target 0 1 [int->bytecode-op 0]]]]
+
+[defun $try [target]
+       " - | Try something, jumping to target if an exception occurs"
+       [list #$18 [list :relocate target 8 0 [int->bytecode-op 0]]
+                  [list :relocate target 0 1 [int->bytecode-op 0]]]]
+
+[defun $throw []
+       " - | Return to the closest exception handler"
+       [list #$19]]
 
 [defun $jmp [target]
-       [list #$9 [list :relocate target 8  0 [int->bytecode-op 0]]
-                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
+       [list #$9 [list :relocate target 8 0 [int->bytecode-op 0]]
+                 [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defun $jt [target]
-       [list #$A [list :relocate target 8  0 [int->bytecode-op 0]]
-                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
+       [list #$A [list :relocate target 8 0 [int->bytecode-op 0]]
+                 [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defun $jf [target]
-       [list #$F [list :relocate target 8  0 [int->bytecode-op 0]]
-                 [list :relocate target 0 -1 [int->bytecode-op 0]]]]
+       [list #$B [list :relocate target 8 0 [int->bytecode-op 0]]
+                 [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defun $dup []
-       '[#$B]]
-
-[defun $drop []
        '[#$C]]
 
-[defun $def [v]
-       [list #$D [sym->bytecode-op v]]]
+[defun $drop []
+       '[#$D]]
 
-[defun $set [v]
+[defun $def [v]
        [list #$E [sym->bytecode-op v]]]
 
-[defun $get [v]
-       [list #$12 [sym->bytecode-op v]]]
+[defun $set [v]
+       [list #$F [sym->bytecode-op v]]]
 
-[defun $push/closure []
+[defun $get [v]
+       [list #$10 [sym->bytecode-op v]]]
+
+[defun $lambda [name args docs body]
+       [list #$11
+             [val->bytecode-op name]
+             [val->bytecode-op args]
+             [val->bytecode-op docs]
+             [val->bytecode-op body]]]
+
+[defun $macro [name args docs body]
+       [list #$12
+             [val->bytecode-op name]
+             [val->bytecode-op args]
+             [val->bytecode-op docs]
+             [val->bytecode-op body]]]
+
+[defun $closure/push []
        '[#$13]]
 
 [defun $closure/enter []
@@ -103,31 +127,19 @@
 [defun $closure/pop []
        '[#$16]]
 
-[defun $lambda [name args docs body]
-       [list #$10
-             [val->bytecode-op name]
-             [val->bytecode-op args]
-             [val->bytecode-op docs]
-             [val->bytecode-op body]]]
-
-[defun $macro [name args docs body]
-       [list #$11
-             [val->bytecode-op name]
-             [val->bytecode-op args]
-             [val->bytecode-op docs]
-             [val->bytecode-op body]]]
-
 [defun assemble/build-sym-map [code sym-map pos]
        [while code
               [case [type-of [car code]]
                     [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
-                    [:symbol      [tree/set! sym-map [car code] pos]]
+                    [:symbol      [and [== [car code] :label]
+                                       [tree/set! sym-map [cadr code] pos]]]
                     [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
               [cdr! code]]
        pos]
 
 [defun assemble/relocate-op [code sym-map pos out]
-       [def off [- [+ [sym-map [cadr code]] [cadddr code]] pos]]
+       [def target [sym-map [cadr code]]]
+       [def off [- [+ target [cadddr code]] pos]]
        [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
        pos]
 

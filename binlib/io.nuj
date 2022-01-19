@@ -36,3 +36,9 @@
         [cons [car res] [cdr res]]
 ]
 [def test-context "Nujel Standalone"]
+
+[defun file/file? [filename]
+       [[file/stat filename] :regular-file?]]
+
+[defun file/dir? [filename]
+       [[file/stat filename] :directory?]]

@@ -52,7 +52,7 @@ void lSymbolGCMark(const lSymbol *v){
 }
 
 void lBytecodeStackMark(lVal **v){
-	for(int i=0; i < BYTECODE_STACK_SIZE; i++){
+	for(int i=0; i < CALL_STACK_SIZE; i++){
 		lValGCMark(v[i]);
 	}
 }

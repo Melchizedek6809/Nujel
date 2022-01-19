@@ -59,7 +59,7 @@
 
 [defmacro cond body
           "Contains multiple cond clauses"
-          [when body
+          [when [and body [caar body]]
                 [list 'if
                       [caar body]
                       [cons 'do [cdar body]]

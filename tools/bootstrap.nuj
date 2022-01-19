@@ -7,8 +7,11 @@
 [def environment [ω]]
 [def ext-nuj? [path/ext?! "nuj"]]
 [defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
+       [-> [directory/read path]
+           [map [\ [α] [cat path "/" α]]]
+           [map [\ [α] [if-not [file/dir? α] α
+                                [directory/read-relative α]]]]
+           [flatten]]]
 [def stdlib-files [filter [append [directory/read-relative "stdlib"]
                                   [directory/read-relative "binlib"]]
                           ext-nuj?]]

@@ -118,7 +118,10 @@ typedef enum closureType {
 	closureDefault = 0,
 	closureObject = 1,
 	closureConstant = 2,
-	closureCall = 3
+	closureCall = 3,
+	closureLet = 4,
+	closureTry = 5,
+	closureRet = 6
 } closureType;
 
 struct lClosure {
@@ -127,9 +130,15 @@ struct lClosure {
 		lClosure *nextFree;
 	};
 	lTree *data;
-	lVal *text;
+	union {
+		lVal *text;
+		const lBytecodeOp *ip;
+	};
+	union {
+		lVal *args;
+		int sp;
+	};
 	lVal *doc;
-	lVal *args;
 	lClosure *caller;
 	const lSymbol *name;
 	u8 type;

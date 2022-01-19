@@ -20,15 +20,41 @@
 	#include <sys/wait.h>
 #endif
 
-lSymbol *lsMode, *lsSize, *lsUserID, *lsGroupID, *lsAccessTime, *lsModificationTime;
+lSymbol *lsMode;
+lSymbol *lsSize;
+lSymbol *lsUserID;
+lSymbol *lsGroupID;
+lSymbol *lsAccessTime;
+lSymbol *lsModificationTime;
+lSymbol *lsError;
+lSymbol *lsErrorNumber;
+lSymbol *lsErrorText;
+lSymbol *lsRegularFile;
+lSymbol *lsDirectory;
+lSymbol *lsCharacterDevice;
+lSymbol *lsBlockDevice;
+lSymbol *lsNamedPipe;
+//lSymbol *lsSymbolicLink;
+//lSymbol *lsSocket;
 
 void setIOSymbols(){
-	lsMode             = lSymS(":mode");
-	lsSize             = lSymS(":size");
-	lsUserID           = lSymS(":user-id");
-	lsGroupID          = lSymS(":group-id");
-	lsAccessTime       = lSymS(":access-time");
-	lsModificationTime = lSymS(":modification-time");
+	lsError            = RSYMP(lSymS(":error?"));
+	lsErrorNumber      = RSYMP(lSymS(":error-number"));
+	lsErrorText        = RSYMP(lSymS(":error-text"));
+	lsMode             = RSYMP(lSymS(":mode"));
+	lsSize             = RSYMP(lSymS(":size"));
+	lsUserID           = RSYMP(lSymS(":user-id"));
+	lsGroupID          = RSYMP(lSymS(":group-id"));
+	lsAccessTime       = RSYMP(lSymS(":access-time"));
+	lsModificationTime = RSYMP(lSymS(":modification-time"));
+
+	lsRegularFile      = RSYMP(lSymS(":regular-file?"));
+	lsDirectory        = RSYMP(lSymS(":directory?"));
+	lsCharacterDevice  = RSYMP(lSymS(":character-device?"));
+	lsBlockDevice      = RSYMP(lSymS(":block-device?"));
+	lsNamedPipe        = RSYMP(lSymS(":named-pipe?"));
+	//lsSymbolicLink     = RSYMP(lSymS(":symbolic-link?"));
+	//lsSocket           = RSYMP(lSymS(":socket?"));
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
@@ -101,20 +127,30 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 	if(filename == NULL){return NULL;}
 	struct stat statbuf;
 	int err = stat(filename,&statbuf);
+	lVal *ret = RVP(lValTree(NULL));
+	ret->vTree = lTreeInsert(ret->vTree, lsError, RVP(lValBool(err)));
 	if(err){
-		lPrintError("Error while trying to gather stats for %s, errno: [%u] %s\n",filename,errno,strerror(errno));
-		return NULL;
-	}
-	lVal *ret = lRootsValPush(lValTree(NULL));
-	ret->vTree = lTreeInsert(ret->vTree, lsMode, lValInt(statbuf.st_mode));
-	ret->vTree = lTreeInsert(ret->vTree, lsUserID, lValInt(statbuf.st_uid));
-	ret->vTree = lTreeInsert(ret->vTree, lsGroupID, lValInt(statbuf.st_gid));
-	ret->vTree = lTreeInsert(ret->vTree, lsSize, lValInt(statbuf.st_size));
-	ret->vTree = lTreeInsert(ret->vTree, lsAccessTime, lValInt(statbuf.st_atime));
-	ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(statbuf.st_mtime));
+		ret->vTree = lTreeInsert(ret->vTree, lsErrorNumber,      RVP(lValInt(errno)));
+		ret->vTree = lTreeInsert(ret->vTree, lsErrorText,        RVP(lValString(strerror(errno))));
+	}else{
+		ret->vTree = lTreeInsert(ret->vTree, lsMode,             RVP(lValInt(statbuf.st_mode)));
+		ret->vTree = lTreeInsert(ret->vTree, lsUserID,           RVP(lValInt(statbuf.st_uid)));
+		ret->vTree = lTreeInsert(ret->vTree, lsGroupID,          RVP(lValInt(statbuf.st_gid)));
+		ret->vTree = lTreeInsert(ret->vTree, lsSize,             RVP(lValInt(statbuf.st_size)));
+		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime,       RVP(lValInt(statbuf.st_atime)));
+		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, RVP(lValInt(statbuf.st_mtime)));
 
+		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile,      RVP(lValBool(S_ISREG(statbuf.st_mode))));
+		ret->vTree = lTreeInsert(ret->vTree, lsDirectory,        RVP(lValBool(S_ISDIR(statbuf.st_mode))));
+		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice,  RVP(lValBool(S_ISCHR(statbuf.st_mode))));
+		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice,      RVP(lValBool(S_ISBLK(statbuf.st_mode))));
+		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        RVP(lValBool(S_ISFIFO(statbuf.st_mode))));
+		//ret->vTree = lTreeInsert(ret->vTree, lsSymbolicLink,     RVP(lValBool(S_ISLNK(statbuf.st_mode))));
+		//ret->vTree = lTreeInsert(ret->vTree, lsSocket,           RVP(lValBool(S_ISSOCK(statbuf.st_mode))));
+	}
 	return ret;
 }
+
 
 static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	(void)c; (void)v;

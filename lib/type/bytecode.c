@@ -11,29 +11,32 @@
 #include "../misc/pf.h"
 
 typedef enum lOpcode {
-	lopNOP = 0,
-	lopRet = 1,
-	lopIntByte = 2,
-	lopIntAdd = 3,
-	lopDebugPrintStack = 4,
-	lopPushLVal = 5,
-	lopMakeList = 6,
-	lopEval = 7,
-	lopApply = 8,
-	lopJmp = 9,
-	lopJt = 10,
-	lopDup = 11,
-	lopDrop = 12,
-	lopDef = 13,
-	lopSet = 14,
-	lopJf = 15,
-	lopLambda = 16,
-	lopMacro = 17,
-	lopGet = 18,
-	lopPushClosure = 19,
-	lopClosureEnter = 20,
-	lopLet = 21,
-	lopClosurePop = 22
+	lopNOP             =  0x0,
+	lopRet             =  0x1,
+	lopIntByte         =  0x2,
+	lopIntAdd          =  0x3,
+	lopDebugPrintStack =  0x4,
+	lopPushLVal        =  0x5,
+	lopMakeList        =  0x6,
+	lopEval            =  0x7,
+	lopApply           =  0x8,
+	lopJmp             =  0x9,
+	lopJt              =  0xA,
+	lopJf              =  0xB,
+	lopDup             =  0xC,
+	lopDrop            =  0xD,
+	lopDef             =  0xE,
+	lopSet             =  0xF,
+	lopGet             = 0x10,
+	lopLambda          = 0x11,
+	lopMacro           = 0x12,
+	lopClosurePush     = 0x13,
+	lopClosureEnter    = 0x14,
+	lopLet             = 0x15,
+	lopClosurePop      = 0x16,
+	lopCall            = 0x17,
+	lopTry             = 0x18,
+	lopThrow           = 0x19
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -43,7 +46,9 @@ int pushList(lVal **stack, int sp, lVal *args){
 	return sp + 1;
 }
 
-void printStack(lVal **stack, int sp){
+void printStack(lVal **stack, int sp, lClosure **cloStack, int csp){
+	(void)cloStack;
+	pf("-- Debug Output [SP:%u CSP:%u] -- %v\n", sp, csp);
 	while(sp > 0){
 		pf("%v\n",stack[--sp]);
 	}
@@ -84,13 +89,21 @@ static lSymbol *lBytecodeReadOPSym(const lBytecodeOp **rip){
 	return ret;
 }
 
-lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
+static int lBytecodeGetOffset16(const lBytecodeOp *ip){
+	const int x = (ip[0] << 8) | ip[1];
+	return (x < (1 << 15)) ? x : -((1<<16) - x);
+}
+
+lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
 	const lBytecodeOp *ip = ops->data;
 	const int gcsp = lRootsGet();
-	lVal *stack[BYTECODE_STACK_SIZE];
-	lClosure *cloStack[CLOSURE_STACK_SIZE];
-	int sp = pushList(stack, 0, args);
-	int csp = 0;
+	lVal *stack[VALUE_STACK_SIZE];
+	lClosure *cloStack[CALL_STACK_SIZE];
+	lClosure *c = lClosureNew(callingClosure);
+	cloStack[0] = c;
+	int sp  = pushList(stack, 0, args);
+	int csp = 1;
+	c->type = closureLet;
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 	switch(*ip){
@@ -100,10 +113,6 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 	case lopNOP:
 		ip++;
 		break;
-	case lopRet:
-		lRootsRet(gcsp);
-		if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
-		return stack[--sp];
 	case lopIntByte: {
 		const i8 v = *++ip;
 		stack[sp++] = lValInt(v);
@@ -119,7 +128,7 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		break;}
 	case lopDebugPrintStack:
 		pf("Bytecode Debug stack:\n");
-		printStack(stack, sp);
+		printStack(stack, sp, cloStack, csp);
 		ip++;
 		break;
 	case lopPushLVal: {
@@ -152,29 +161,15 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		sp++;
 		ip++;
 		break;
-	case lopJmp: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		ip += i;
-		break; }
-	case lopJt: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		if(castToBool(stack[--sp])){
-			ip += i;
-		}else{
-			ip++;
-		}
-		break; }
-	case lopJf: {
-		int i = *++ip;
-		i = (i << 8) | *++ip;
-		if(!castToBool(stack[--sp])){
-			ip += i;
-		}else{
-			ip++;
-		}
-		break; }
+	case lopJmp:
+		ip += lBytecodeGetOffset16(ip+1);
+		break;
+	case lopJt:
+		ip +=  castToBool(stack[--sp]) ? lBytecodeGetOffset16(ip+1) : 3;
+		break;
+	case lopJf:
+		ip += !castToBool(stack[--sp]) ? lBytecodeGetOffset16(ip+1) : 3;
+		break;
 	case lopDrop:
 		if(--sp < 0){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
@@ -208,7 +203,7 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
 		if(stack[sp-1]){stack[sp-1]->type = ltMacro;}
 		break;}
-	case lopPushClosure:
+	case lopClosurePush:
 		ip++;
 		stack[sp++] = lValObject(c);
 		break;
@@ -223,11 +218,76 @@ lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops){
 		ip++;
 		cloStack[csp++] = c;
 		c = lClosureNew(c);
+		c->type = closureLet;
 		break;
 	case lopClosurePop:
 		ip++;
-		if(csp <= 0){lExceptionThrowValClo(":closure-stack-underflow", "Can't pop from the closure stack when it is empty", NULL, c);}
-		c = cloStack[--csp];
+		while(csp > 0){
+			lClosure *nclo = cloStack[--csp];
+			if(nclo->type == closureTry){continue;}
+			c = nclo;
+			break;
+		}
+		if(csp == 0){
+			lRootsRet(gcsp);
+			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			return NULL;
+		}
+		break;
+	case lopCall:
+		c->ip = ip+3;
+		c->sp = sp;
+		cloStack[csp++] = c;
+		c = lClosureNew(c);
+		c->type = closureCall;
+		ip += lBytecodeGetOffset16(ip+1);
+		break;
+	case lopTry:
+		cloStack[csp++] = c;
+		c = lClosureNew(c);
+		c->type = closureTry;
+		c->ip = ip + lBytecodeGetOffset16(ip+1);
+		c->sp = sp;
+		ip+=3;
+		break;
+	case lopRet:
+		while(csp > 0){
+			lVal *rv = stack[sp-1];
+			lClosure *nclo = cloStack[--csp];
+			if(csp == 0){break;}
+			if((nclo->type == closureTry)
+			|| (nclo->type == closureLet)){
+				continue;
+			}
+			ip = nclo->ip;
+			sp = nclo->sp;
+			stack[sp++] = rv;
+			break;
+		}
+		if(csp == 0){
+			lRootsRet(gcsp);
+			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			return stack[--sp];
+		}
+		break;
+	case lopThrow:
+		ip++;
+		while(csp > 0){
+			lVal *rv = stack[sp-1];
+			lClosure *nclo = cloStack[--csp];
+			if(!nclo || csp == 0){break;}
+			if(nclo->type != closureTry){continue;}
+			ip = nclo->ip;
+			sp = nclo->sp;
+			stack[sp++] = rv;
+			break;
+		}
+		if(csp == 0){
+			lRootsRet(gcsp);
+			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			lExceptionThrowRaw(stack[--sp]);
+			return NULL;
+		}
 		break;
 	}}
 	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
@@ -241,6 +301,8 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 	case lopMakeList:
 	case lopIntByte:
 		return 2;
+	case lopCall:
+	case lopTry:
 	case lopJmp:
 	case lopJf:
 	case lopJt:

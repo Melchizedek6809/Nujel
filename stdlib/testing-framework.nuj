@@ -63,7 +63,7 @@
 
 [defun test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
-       [try [\ [err] [test-failure result err rawexpr i]]
+       [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [eval rawexpr]]
             [def pred? ==]
             [when [pair? result]
