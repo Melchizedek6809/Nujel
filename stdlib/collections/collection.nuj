@@ -37,7 +37,7 @@
 [defun flatten/λ [a b]
        [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
              [#t [cons b a]]]]
-
 [defun flatten [l]
+       "Flatten a collection of collections into a simple list"
        [if-not [collection? l] l
                [nreverse [reduce l flatten/λ #nil]]]]

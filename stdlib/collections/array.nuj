@@ -19,6 +19,7 @@
        a]
 
 [defun array/append [a b]
+       "Append array A to array B"
        [when-not [and [arr? a] [arr? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
        [def ret [array/allocate [+ [array/length a] [array/length b]]]]
        [for [i 0 [array/length a]]
@@ -28,21 +29,25 @@
        ret]
 
 [defun array/dup [a]
+       "Duplicate Array A"
        [array/append a #[]]]
 
 [defun array/reduce [arr fun α]
+       "Reduce an array, [reduce] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
               [set! α [fun α [arr i]]]]
        α]
 
 [defun array/map [arr fun]
+       "Map an array, [map] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
               [array/set! arr i [fun [arr i]]]]
        arr]
 
 [defun array/filter [arr pred]
+       "Filter an array, [filter] should be preferred"
        [def ri 0]
        [def len [array/length arr]]
        [def ret [array/allocate len]]
@@ -53,8 +58,9 @@
        [array/length! ret ri]]
 
 [defun array/push [arr . val]
-  [while val
-    [array/length! arr [+ 1 [array/length arr]]]
-    [array/set! arr [- [array/length arr] 1] [car val]]
-    [cdr! val]]
-  arr]
+       "Append all arguments following ARR to ARR"
+       [while val
+              [array/length! arr [+ 1 [array/length arr]]]
+              [array/set! arr [- [array/length arr] 1] [car val]]
+              [cdr! val]]
+       arr]
