@@ -10,30 +10,27 @@
 
 [defun yield-run []
        "Executes pending coroutines if their predicate evaluates to #t"
-       [def l yield-queue]
        [def new #nil]
-       [def cur #nil]
-       [set! yield-queue #nil]
-       [while l
-              [set! cur [car l]]
-              [if [[car cur]]
-                  [[cdr cur]]
-                  [set! yield-queue [cons cur yield-queue]]]
-              [set! l [cdr l]]]]
+       [for-in [cur yield-queue]
+               [if [[car cur]]
+                   [[cdr cur]]
+                   [set! new [cons cur new]]]]
+       [set! yield-queue new]]
 
-[defun timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed"
-        [def goal [+ [time/milliseconds] milliseconds]]
-        [\ [] [> [time/milliseconds] goal]]]
+[defun timeout [milliseconds]
+       "Returns a function that evaluates to true once MILLISECONDS have passed"
+       [def goal [+ [time/milliseconds] milliseconds]]
+       [\ [] [> [time/milliseconds] goal]]]
 
-[defun event-bind [event-name handler] "Binds handler lambda to event-name"
-        [set! [str->sym event-name] [cons handler [resolve [str->sym event-name]]]]]
+[defun event-bind [event id handler]
+       "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before."
+       [tree/set! event id handler]]
 
-[defun event-clear [event-name] "Clears all event handlers for event-name"
-        [set! [str->sym event-name] '[]]]
+[defmacro event-clear [event]
+          "Clears all event handlers for event-name"
+          `[set! ~event @[]]]
 
-[defun event-fire-iter [l v] "Iter for event-fire"
-        [cond [[nil? l] #t]
-              [#t [apply [car l] v] [event-fire-iter [cdr l] v]]]]
-
-[defun event-fire [event-name . val] "Applies ...val to all event handlers associated with event-name"
-        [event-fire-iter [resolve [str->sym event-name]] val]]
+[defun event-fire [event . val]
+       "Applies ...val to all event handlers associated with event-name"
+       [for-in [h [tree/values event]]
+               [h val]]]
