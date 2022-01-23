@@ -113,7 +113,9 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 lVal *lRun(lClosure *c, lVal *v){
 	const int SP = lRootsGet();
 
-	lVal *expr = RVP(lList(3,RVP(lValSym("eval-compile")), RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))), RVP(lValObject(c))));
+	lVal *expr = RVP(lList(3,RVP(lValSym("eval-compile")),
+	                         RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))),
+	                         RVP(lValObject(c))));
 	lVal *ret = lEval(c,expr);
 
 	lRootsRet(SP);
@@ -121,12 +123,34 @@ lVal *lRun(lClosure *c, lVal *v){
 }
 
 /* Read and run an expression after expanding/compiling it */
-lVal *lRunS(lClosure *c, const char *s){
+lVal *lRunS(lClosure *c, const char *s, int sLen){
 	const int SP = lRootsGet();
-	lVal *expr = lCons(lnfvDo,lRead(s));
-	lVal *tmp = lRun(c,expr);
+
+	lVal *expr = RVP(lList(3,RVP(lValSym("read-eval-compile")),
+	                         RVP(lValStringConst(s, sLen)),
+	                         RVP(lValObject(c))));
+	lVal *ret = lEval(c,expr);
+
 	lRootsRet(SP);
-	return tmp;
+	return ret;
+}
+
+/* Load an expression expanding/compiling/evaluating it, multiple times if necessary */
+void lLoad(lClosure *c, lVal *v){
+	const int SP = lRootsGet();
+	lEval(c,RVP(lList(3,RVP(lValSym("eval-load")),
+	                    RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))),
+	                    RVP(lValObject(c)))));
+	lRootsRet(SP);
+}
+
+/* Load and compile a string, evaluating parts of it multiple times to enable circular references */
+void lLoadS(lClosure *c, const char *s, int sLen){
+	const int SP = lRootsGet();
+	lEval(c,RVP(lList(3,RVP(lValSym("read-eval-load")),
+	                    RVP(lValStringConst(s, sLen)),
+	                    RVP(lValObject(c)))));
+	lRootsRet(SP);
 }
 
 /* Directly Evaluate a single value, v, and return the result.

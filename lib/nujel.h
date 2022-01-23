@@ -22,7 +22,9 @@ lClosure *lNewRoot          ();
 lClosure *lNewRootNoStdLib  ();
 
 lVal     *lRun              (lClosure *c, lVal *v);
-lVal     *lRunS             (lClosure *c, const char *s);
+lVal     *lRunS             (lClosure *c, const char *s, int sLen);
+void      lLoad             (lClosure *c, lVal *v);
+void      lLoadS            (lClosure *c, const char *s, int sLen);
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lMacro            (lClosure *c, lVal *args, lVal *lambda);

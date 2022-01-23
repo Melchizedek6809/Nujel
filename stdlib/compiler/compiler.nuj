@@ -115,9 +115,8 @@
        [set! compile/verbose new-verbose]
        [compile* source]]
 
-[defun compile/forms [source-raw environment]
-        "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
-        [when-not environment [set! environment [ω]]]
+[defun load/forms [source-raw environment]
+        "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
         [def source #nil]
         [def source-next source-raw]
         [def forms-compiled 0]
@@ -138,11 +137,16 @@
                            [when compiled-form [apply environment `[eval* ~compiled-form]]
                                                [++ forms-compiled]]]
                       [cdr! source]]
-               [set! source-next [reverse source-next]]
+               [set! source-next [nreverse source-next]]
                [when [<= forms-compiled forms-compiled-last]
                      [for-each errors display/error]
-                     [throw [list :you-can-not-advance "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"]]]]
-        [compile source-raw environment]]
+                     [throw [list :you-can-not-advance "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"]]]]]
+
+[defun compile/forms [source-raw environment]
+       "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+       [when-not environment [set! environment [ω]]]
+       [load/forms source-raw environment]
+       [compile source-raw environment]]
 
 [def defmacro [μ* defmacro [name args . body]
               "Define a new macro"
@@ -180,7 +184,19 @@
 
 [defun eval-compile [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [eval* [compile/forms expr closure]]]]
+       [try display/error [eval* [compile expr closure]]]]
+
+[defun read-eval-compile [expr closure]
+       "Compile and the immediatly evaluate the result, mostly used by lRun()"
+       [try display/error [eval* [compile [read expr] closure]]]]
+
+[defun eval-load [expr closure]
+       "Compile and the immediatly evaluate the result, mostly used by lRun()"
+       [try display/error [load/forms expr closure]]]
+
+[defun read-eval-load [expr closure]
+       "Compile and the immediatly evaluate the result, mostly used by lRun()"
+       [try display/error [load/forms [read expr] closure]]]
 
 [defun optimize/code/rest [code]
        [if-not [pair? code] code
