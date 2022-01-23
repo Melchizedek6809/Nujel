@@ -1,20 +1,31 @@
 # Nujel
 A Lisp inspired language for games and other latency sensitive applications.
-Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting layer.
+Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting runtime.
 
 # Why Nujel?
-Mostly because I wanted the following for WolkenWelten:
-- A Lisp
-- with static typing (still not implemented!)
-- embeddable in C
-- designed for beginners
+Mostly because I needed the following for WolkenWelten:
 
-## Trees / Maps
-Nujel also has built-in support for maps using binary trees, including support by the reader for a convenient
-syntax to definie literals with, for example `[@[:one 1 :two 2] :two]` returns `2`.
+## Easy interaction with C
+Since the engine is written in C this needs to be convenient and efficient.
+
+## Should allow for fast code
+This might require some effort from the programmer, but it should be possible
+to write very fast code for the parts where it actually matters.
+
+## Portable
+Windows/ARM/WASM need to be supported perfectly, requiring x86/Linux would exclude
+too many users.
+
+## Powerful metaprogramming
+This mostly means macros/runtime code generation, enabling DSLs which I would love
+to use in all kinds of areas of WolkeWelten (Animal Behaviour/WorldGen/UI)
+
+## Easy for beginners
+Modding should be as open and inclusive as possible, this means spending a lot of
+time and effort on polishing documentation, writing tutorials and improving error handling/messages.
 
 # Try it out yourself
-You can easily start experimenting with Nujel right in your Browser by using a [WASM Release](https://wolkenwelten.net/nujel/).
+You can easily start experimenting with Nujel right in your browser by using a [WASM release](https://wolkenwelten.net/nujel/).
 
 ## Build Status
 | Operating System   | Master | Develop |
