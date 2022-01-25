@@ -11,25 +11,27 @@
              [[#$11 #$12] 13]
              [otherwise 1]]]
 
+[defun bytecode/nil-catcher [error] [if [== [car error] :argument-mismatch] #nil [throw error]]]
+
 [defun bytecode-op->val [a b c]
        "Turn three bytecode ops representing an encoded value into an actual value"
-       [def i [val->index v]]
        [index->val [logior [<< [bytecode-op->int a] 16]
                            [<< [bytecode-op->int b]  8]
-                               [bytecode-op->int c]    ]]]
+                           [bytecode-op->int c]    ]]]
+
 [defun bytecode-arr->val [a i]
        "Read a bytecode encoded value in A at I and return it"
-       [bytecode-op->val [a i] [a [+ 1 i]] [a [+ 2 i]]]]
+       [try bytecode/nil-catcher [bytecode-op->val [a i] [a [+ 1 i]] [a [+ 2 i]]]]]
 
 [defun bytecode-op->sym [a b c]
        "Turn three bytecode ops representing an encoded symbol into an actual symbol"
-       [def i [val->index v]]
        [index->sym [logior [<< [bytecode-op->int a] 16]
                            [<< [bytecode-op->int b]  8]
-                               [bytecode-op->int c]    ]]]
+                           [bytecode-op->int c]    ]]]
+
 [defun bytecode-arr->sym [a i]
        "Read a bytecode encoded symbol in A at I and return it"
-       [bytecode-op->sym [a i] [a [+ 1 i]] [a [+ 2 i]]]]
+       [try bytecode/nil-catcher [bytecode-op->sym [a i] [a [+ 1 i]] [a [+ 2 i]]]]]
 
 [defun bytecode-op->offset [a b]
        "Turn two bytecode ops encoding an offset into the integer representation"
@@ -41,7 +43,6 @@
 [defun bytecode-arr->offset [a i]
        "Read a bytecode encoded offset in A at I and return it as a signed integer"
        [bytecode-op->offset [a i] [a [+ 1 i]]]]
-
 
 [defun disassemble/op [a i]
        "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
@@ -56,22 +57,22 @@
              [#$7  '[$eval]]
              [#$8  `[$apply ~[bytecode-op->int [a [+ i 1]]]
                             ~[bytecode-arr->val a [+ i 2]]]]
-             [#$9  `[$jmp* ~[bytecode-arr->offset a [+ i 1]]]]
-             [#$B  '[$dup]]
-             [#$A  `[$jt* ~[bytecode-arr->offset a [+ i 1]]]]
-             [#$C  '[$drop]]
-             [#$D  `[$def ~[bytecode-arr->sym a [+ i 1]]]]
-             [#$E  `[$set ~[bytecode-arr->sym a [+ i 1]]]]
-             [#$F  `[$jf* ~[bytecode-arr->offset a [+ i 1]]]]
-             [#$10 `[$lambda ~[bytecode-arr->val a [+ i 1]]
+             [#$9  `[$jmp*  ~[bytecode-arr->offset a [+ i 1]]]]
+             [#$A  `[$jt*   ~[bytecode-arr->offset a [+ i 1]]]]
+             [#$B  `[$jf*   ~[bytecode-arr->offset a [+ i 1]]]]
+             [#$C  '[$dup]]
+             [#$D  '[$drop]]
+             [#$E  `[$def ~[bytecode-arr->sym a [+ i 1]]]]
+             [#$F  `[$set ~[bytecode-arr->sym a [+ i 1]]]]
+             [#$10 `[$get ~[bytecode-arr->sym a [+ i 1]]]]
+             [#$11 `[$lambda ~[bytecode-arr->val a [+ i 1]]
                              ~[bytecode-arr->val a [+ i 4]]
                              ~[bytecode-arr->val a [+ i 7]]
                              ~[bytecode-arr->val a [+ i 10]]]]
-             [#$11 `[$macro ~[bytecode-arr->val a [+ i 1]]
+             [#$12 `[$macro ~[bytecode-arr->val a [+ i 1]]
                             ~[bytecode-arr->val a [+ i 4]]
                             ~[bytecode-arr->val a [+ i 7]]
                             ~[bytecode-arr->val a [+ i 10]]]]
-             [#$12 `[$get ~[bytecode-arr->sym a [+ i 1]]]]
              [#$13 '[$closure/push]]
              [#$14 '[$closure/enter]]
              [#$15 '[$let]]

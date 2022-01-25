@@ -58,7 +58,7 @@
 
 [def gensym/counter 0]
 [defun gensym [prefix]
-       [set! gensym/counter [+ 1 gensym/counter]]
+       [++ gensym/counter]
        [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
 
 [def root-closure [current-closure]]

@@ -41,11 +41,12 @@
 
 [defun list-equal? [a b]
         "#t if A and B are equal"
-        [when [== [type-of a] [type-of b]]
-              [if [pair? a]
-                  [and [list-equal? [car a] [car b]]
-                      [list-equal? [cdr a] [cdr b]]]
-                  [== a b]]]]
+        [if [== [type-of a] [type-of b]]
+            [if [pair? a]
+                [and [list-equal? [car a] [car b]]
+                     [list-equal? [cdr a] [cdr b]]]
+                [== a b]]
+            #f]]
 
 [defun there-exists? [l pred]
         "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"

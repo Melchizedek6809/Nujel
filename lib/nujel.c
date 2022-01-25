@@ -60,7 +60,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
-lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
+lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
@@ -70,12 +70,12 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 	tmpc->caller = c;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(n->type == ltPair){
-			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), RVP(lEval(c,lCar(vn))));
+			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
 			vn = lCdr(vn);
 		}else if(n->type == ltSymbol){
-			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? RVP(lMap(c,vn,lEval)) : lCons(NULL,NULL));
+			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? vn : lCons(NULL, NULL));
 		}else{
-			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
+			lExceptionThrowValClo(":invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
@@ -85,14 +85,13 @@ lVal *lLambda(lClosure *c,lVal *args, lVal *lambda){
 
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
-	(void)funSym;
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
 		lExceptionThrowValClo(":runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
-		return lLambda(c,args,fun);
+		return lLambda(c,lMap(c,args,lEval),fun);
 	case ltSpecialForm:
 		return fun->vNFunc->fp(c,args);
 	case ltNativeFunc:
@@ -170,7 +169,7 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
-			return lRootsValPush(lLambda(c,lCdr(v),car));
+			return lRootsValPush(lLambda(c,lMap(c,lCdr(v),lEval),car));
 		case ltMacro:
 			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
 		case ltSpecialForm:

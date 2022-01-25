@@ -19,13 +19,12 @@ lVal *lnfvDo;
 lVal *lnfvQuote;
 
 static lVal *lnfAnd(lClosure *c, lVal *v){
-	if(v == NULL){return lValBool(false);}
-	lVal *t = lEval(c,lCar(v));
-	if(castToBool(t)){
-		lVal *cdr = lCdr(v);
-		return cdr == NULL ? t : lnfAnd(c,cdr);
+	lVal *res = NULL;
+	for(lVal *t=v;t;t = t->vList.cdr){
+		res = lEval(c,lCar(t));
+		if(!castToBool(res)){break;}
 	}
-	return lValBool(false);
+	return res;
 }
 
 static lVal *lnfOr(lClosure *c, lVal *v){

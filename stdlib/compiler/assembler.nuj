@@ -139,6 +139,7 @@
 
 [defun assemble/relocate-op [code sym-map pos out]
        [def target [sym-map [cadr code]]]
+       ;[println [str/write sym-map]]
        [def off [- [+ target [cadddr code]] pos]]
        [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
        pos]

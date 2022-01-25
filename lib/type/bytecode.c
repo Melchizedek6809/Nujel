@@ -153,6 +153,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		lVal *fun = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
 		stack[sp++] = lApply(c, cargs, fun, fun);
+
 		ip += 3;
 		break; }
 	case lopDup:

@@ -5,12 +5,16 @@
 ;[disassemble/test '[[$jmp :start] [:label :func] [$push/int 2] [$add/int] [$ret] [:label :start] [$push/int 3] [$call :func] [$ret]]]
 ;[disassemble/test '[[$jmp :start] [:label :ret] [$push/int 3] [$ret] [:label :start] [$push/int 2] [$jmp :ret] [$ret]]]
 
-[disassemble/test '[[$push/int 1] [$push/int 7] [$apply 2 -] [$ret]]]
+;[println [str/write [compile ''[1 . 2]]]]
 
-[disassemble/raw [assemble [bytecompile [compile '[- 7 1]]]]]
-[println [ansi-rainbow "Done!!!!"]]
+;[println [str/write [byterun '[do [== :bool [type-of #f]]]]]]
+
+[println [str/write [bytecompile [compile '[cons 1 2]]]]]
+
+[def a [assemble [bytecompile [compile '[car [cons 1 2]]]]]]
+[disassemble/raw a]
+[println [ansi-rainbow "Done!!!! => " [bytecode-eval a]]]
 ;[disassemble/test '[bytecompile [compile '[- 7 1]]]]
-
 
 [exit]
 

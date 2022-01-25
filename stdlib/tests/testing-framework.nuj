@@ -61,6 +61,17 @@
                                       "\r\n\r\n"]]]
        [set! error-count [+ 1 error-count]]]
 
+[defun test-bytecode [result rawexpr i]
+       "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter"
+       [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
+            [def expr [byterun rawexpr]]
+            [def pred? ==]
+            [when [pair? result]
+                  [set! pred? list-equal?]]
+            [if [pred? result expr]
+                [test-success result expr rawexpr i]
+                [test-failure result expr rawexpr i]]]]
+
 [defun test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
        [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
@@ -79,11 +90,9 @@
           [def expr [cdr eval-result]]
           [def pred? ==]
           [when-not [string? result]
-                    [set! expr [car [read expr]]]
-          ]
+                    [set! expr [car [read expr]]]]
           [when [pair? result]
-                [set! pred? list-equal?]
-          ]
+                [set! pred? list-equal?]]
           [if [and [zero? [car eval-result]]
                    [pred? result expr]]
               [test-success result expr rawexpr i]
@@ -103,11 +112,17 @@
        [display-results]
        error-count]
 
-[defun test-run [output-passes hide-errors]
+[defun test-run [output-passes hide-errors run-bytecode]
        "Run through all automated Tests"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
        [test-run-real test-default]]
+
+[defun test-run-bytecode [output-passes hide-errors run-bytecode]
+       "Run through all automated Tests"
+       [set! print-errors  [not [bool hide-errors]]]
+       [set! print-passes  [bool output-passes]]
+       [test-run-real test-bytecode]]
 
 [defun test-run-forked [\ [nujel-runtime output-passes hide-errors]
        "Run through all automated Tests in a separate runtime"

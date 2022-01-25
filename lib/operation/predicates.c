@@ -144,6 +144,12 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 	return lValBool(lCar(v) == NULL);
 }
 
+static lVal *lnfKeywordPred(lClosure *c, lVal *v){
+	(void)c;
+	const lSymbol *s = castToSymbol(lCar(v), NULL);
+	return lValBool(s ? lSymKeyword(s) : false);
+}
+
 void lOperationsPredicate(lClosure *c){
 	lAddNativeFunc(c,"<",    "[α β]","Return true if α is less than β",  lnfLess);
 	lAddNativeFunc(c,"<=",   "[α β]","Return true if α is less or equal to β", lnfLessEqual);
@@ -152,4 +158,5 @@ void lOperationsPredicate(lClosure *c){
 	lAddNativeFunc(c,">=",   "[α β]","Return true if α is greater or equal than β", lnfGreaterEqual);
 	lAddNativeFunc(c,">",    "[α β]","Return true if α is greater than β",  lnfGreater);
 	lAddNativeFunc(c,"nil?", "[α]",  "Return true if α is #nil", lnfNilPred);
+	lAddNativeFunc(c,"keyword?", "[α]",  "Return true if α is a keyword symbol", lnfKeywordPred);
 }

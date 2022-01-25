@@ -1,8 +1,15 @@
 ; Contains the low level Nujel -> Bytecode compiler
 
+[def bytecompile/gen-label/counter 0]
+[defun bytecompile/gen-label [prefix]
+       [++ bytecompile/gen-label/counter]
+       [str->sym [cat prefix ":label-" bytecompile/gen-label/counter]]]
+
 [defun bytecompile/literal [source]
        [case [type-of source]
-             [:symbol   [$get source]]
+             [:symbol   [if [keyword? source]
+                            [$push/lval source]
+                            [$get source]]]
              [:int      [$push/int source]]
              [otherwise [$push/lval source]]]]
 
@@ -17,8 +24,8 @@
 
 [defun bytecompile/procedure [op source env]
       [def args [map [cdr source] bytecompile*]]
-       [list args
-             [$apply [length args] op]]]
+      [list args
+            [$apply [length args] op]]]
 
 [defun bytecompile/def [source env]
        [list [bytecompile* [caddr source] env]
@@ -29,8 +36,8 @@
              [$set [cadr source]]]]
 
 [defun bytecompile/if [source env]
-       [let [[sym-else [gensym]]
-             [sym-after [gensym]]]
+       [let [[sym-else [bytecompile/gen-label]]
+             [sym-after [bytecompile/gen-label]]]
             [list [bytecompile* [cadr source] env]
                   [$jf sym-else]
                   [bytecompile* [caddr source] env]
@@ -39,10 +46,9 @@
                   [bytecompile* [cadddr source] env]
                   [list :label sym-after]]]]
 
-
 [defun bytecompile/while [source env]
-       [def sym-start [gensym]]
-       [def sym-end [gensym]]
+       [def sym-start [bytecompile/gen-label]]
+       [def sym-end [bytecompile/gen-label]]
        [list sym-start
              [bytecompile* [cadr source] env]
              [$jf sym-end]
@@ -53,8 +59,8 @@
 [defun bytecompile/procedure/arg [source env]
        [if [last? source]
            [bytecompile* [car source] env]
-           [cons [bytecompile/procedure/arg [cdr source] env]
-                 [bytecompile* [car source] env]]]]
+           [cons [bytecompile* [car source] env]
+                 [bytecompile/procedure/arg [cdr source] env]]]]
 
 [defun bytecompile/procedure [op source env]
        [def args [cdr source]]
@@ -62,37 +68,33 @@
        [if args
            [list [bytecompile/procedure/arg [cdr source]]
                  [$apply arg-count op]]
-           [$apply arg-count op]]]
+           [$apply 0 op]]]
 
-[defun bytecompile/and/rec [source env sym-end]
-       [def c [bytecompile* [car source] env]]
-       [if [last? source]
-           c
-           [list c
-                 [$dup]
-                 [$jf sym-end]
-                 [$drop]
-                 [bytecompile/and/rec [cdr source] env sym-end]]]]
+[defun bytecompile/and/rec [source env label-end]
+       [list [bytecompile* [car source] env]
+             [when [cdr source]
+                   [list [$dup]
+                         [$jf label-end]
+                         [$drop]
+                         [bytecompile/and/rec [cdr source] env label-end]]]]]
 
 [defun bytecompile/and [source env]
-       [def sym-end [gensym]]
-            [list [bytecompile/and/rec [cdr source] env sym-end]
-                  sym-end]]
+       [def label-end [bytecompile/gen-label]]
+            [list [bytecompile/and/rec [cdr source] env label-end]
+                  [list :label label-end]]]
 
-[defun bytecompile/or/rec [source env sym-end]
-       [def c [bytecompile* [car source] env]]
-       [if [last? source]
-           c
-           [list c
-                 [$dup]
-                 [$jt sym-end]
-                 [$drop]
-                 [bytecompile/or/rec [cdr source] env sym-end]]]]
+[defun bytecompile/or/rec [source env label-end]
+       [when source[list [bytecompile* [car source] env]
+                         [$dup]
+                         [$jt label-end]
+                         [$drop]
+                         [bytecompile/or/rec [cdr source] env label-end]]]]
 
 [defun bytecompile/or [source env]
-       [def sym-end [gensym]]
-            [list [bytecompile/or/rec [cdr source] env sym-end]
-                  sym-end]]
+       [def label-end [bytecompile/gen-label]]
+       [list [bytecompile/or/rec [cdr source] env label-end]
+             [$push/lval #f]
+             [list :label label-end]]]
 
 [defun bytecompile/λ* [source env]
        [apply $lambda [cdr source]]]
@@ -108,12 +110,12 @@
 
 [defun bytecompile/let*  [source env]
        [list [$let]
-             [bytecompile/do [cdr source] env]
+             [bytecompile/do [cadr source] env]
              [$closure/pop]]]
 
 [defun bytecompile/try  [source env]
-       [def handler-sym [gensym]]
-       [def end-sym [gensym]]
+       [def handler-sym [bytecompile/gen-label]]
+       [def end-sym [bytecompile/gen-label]]
        [list [$try handler-sym]
              [bytecompile/do [cddr source] env]
              [$jmp end-sym]
@@ -140,7 +142,7 @@
                     [μ*   [bytecompile/μ*   source env]]
                     [ω*   [bytecompile/ω*   source env]]
                     [try   [bytecompile/try   source env]]
-                    [quote                    source]
+                    [quote [bytecompile/literal source]]
                     [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
              [[:lambda :native-function] [bytecompile/procedure op source env]]
              [otherwise [bytecompile/literal source]]]]

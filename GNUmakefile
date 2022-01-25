@@ -181,10 +181,13 @@ test.slow: $(NUJEL)
 test.ridiculous: $(NUJEL)
 	@$(NUJEL) --:slow-test --:ridiculous-test tools/tests.nuj
 
-
 .PHONY: run
 run: $(NUJEL)
 	@$(NUJEL) -x "[exit [test-run]]"
+
+.PHONY: runl
+runl: $(NUJEL)
+	@$(NUJEL) -x "[exit [test-run-bytecode]]"
 
 .PHONY: rund
 rund: $(NUJEL)
