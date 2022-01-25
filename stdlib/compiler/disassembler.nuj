@@ -86,12 +86,20 @@
        [def ret #nil]
        [while [< i [array/length a]]
               [set! ret [cons [cons i [disassemble/op a i]] ret]]
+              ;[println [str/write [car ret]]]
               [set! i [+ i [disassemble/length [a i]]]]]
        [nreverse ret]]
 
 [defun disassemble [code]
        "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
        [disassemble/array [bytecode-arr->arr code] 0]]
+
+[defun disassemble/raw [bc]
+       "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
+       [for-each [disassemble bc] [\ [a]
+                                   [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+                                                 " - "
+                                                 [cdr a]]]]]]
 
 [defun disassemble/test [asm]
        "Verbose way of testing the disassembler"

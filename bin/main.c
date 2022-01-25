@@ -15,11 +15,11 @@
 #include "operation/readline.h"
 #include "operation/io.h"
 
-extern unsigned char binlib_no_data[];
+extern u8 binlib_no_data[];
 lClosure *mainClosure;
 
 #ifdef __EMSCRIPTEN__
-void *runRaw(void *cl, void *body){
+static void *runRaw(void *cl, void *body){
 	return lEval((lClosure *)cl,(lVal *) body);
 }
 
@@ -120,12 +120,12 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	mainClosure = c;
 }
 
-void breakSignalHandler(int sig){
+static void breakSignalHandler(int sig){
 	(void)sig;
 	breakQueued = true;
 }
 
-void initSignalHandlers(){
+static void initSignalHandlers(){
 	signal(SIGINT, breakSignalHandler);
 }
 

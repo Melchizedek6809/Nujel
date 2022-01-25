@@ -3,7 +3,11 @@
 ;[disassemble/test '[[$nop] [$push/int 5] [$push/int 2] [$add/int] [$ret]]]
 ;[disassemble/test '[[$nop] [$push/int 26] [$push/lval #t] [$jt :asd] [$push/int 99] [:label :asd] [$ret]]]
 ;[disassemble/test '[[$jmp :start] [:label :func] [$push/int 2] [$add/int] [$ret] [:label :start] [$push/int 3] [$call :func] [$ret]]]
-[disassemble/test '[[$jmp :start] [:label :ret] [$push/int 3] [$ret] [:label :start] [$push/int 2] [$jmp :ret] [$ret]]]
+;[disassemble/test '[[$jmp :start] [:label :ret] [$push/int 3] [$ret] [:label :start] [$push/int 2] [$jmp :ret] [$ret]]]
+
+[disassemble/raw [assemble [bytecompile [compile '[- 7 1]]]]]
+[println [ansi-rainbow "Done!!!!"]]
+;[disassemble/test '[bytecompile [compile '[- 7 1]]]]
 
 
 [exit]

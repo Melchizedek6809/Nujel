@@ -967,7 +967,7 @@
 [test/add 5 [[asmrun [$lambda 'test-add '[a b] "Add a and b together" '[+ a b]] [$ret]] 2 3]]
 [test/add 13 [byterun '[+ 6 7]]]
 ;[test/add 15 [byterun '[+ 3 [+ 6 [- 7 1]]]]]
-;[test/add 6 [byterun '[- 7 1]]]
+[test/add 6 [byterun '[- 7 1]]]
 [test/add 1 [byterun '[if #t 1 2]]]
 [test/add 2 [byterun '[if #f 1 2]]]
 [test/add 1000 [byterun '[do 1000]]]

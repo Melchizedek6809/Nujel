@@ -86,58 +86,84 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	return spf(cur, bufEnd, "]");
 }
 
+const lVal *writeValStack[256];
+int         writeValSP = 0;
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	char *cur = buf;
+	char *ret = buf;
 
-	if(v == NULL){
-		return spf(buf,bufEnd,"#nil");
+	if(v == NULL){return spf(buf,bufEnd,"#nil");}
+	for(int i=0;i<writeValSP;i++){
+		if(writeValStack[i] != v){continue;}
+		return spf(cur, bufEnd, " -+- Loop detected -+- ");
 	}
+	writeValStack[writeValSP++] = v;
+
 	switch(v->type){
 	default:
-		return buf;
+		break;
 	case ltNoAlloc:
-		return spf(cur, bufEnd,"#zzz");
+		ret = spf(cur, bufEnd,"#zzz");
+		break;
 	case ltBool:
-		return spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
+		ret = spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
+		break;
 	case ltObject:
-		return spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+		ret = spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+		break;
 	case ltMacro:
 	case ltLambda:
 		if(v->vClosure && v->vClosure->name){
-			return spf(cur, bufEnd, "%s", v->vClosure->name->c);
+			ret = spf(cur, bufEnd, "%s", v->vClosure->name->c);
 		}else{
-			return spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
+			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
 		}
+		break;
 	case ltPair:
-		return writePair(cur, bufEnd, v);
+		ret = writePair(cur, bufEnd, v);
+		break;
 	case ltTree:
-		return writeTree(cur, bufEnd, v->vTree);
+		ret = writeTree(cur, bufEnd, v->vTree);
+		break;
 	case ltArray:
-		return writeArray(cur, bufEnd, v->vArray);
+		ret = writeArray(cur, bufEnd, v->vArray);
+		break;
 	case ltBytecodeArr:
-		return writeBytecodeArray(cur, bufEnd, &v->vBytecodeArr);
+		ret = writeBytecodeArray(cur, bufEnd, &v->vBytecodeArr);
+		break;
 	case ltBytecodeOp:
-		return spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));
+		ret = spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));
+		break;
 	case ltInt:
-		return spf(cur , bufEnd, "%i" ,v->vInt);
+		ret = spf(cur , bufEnd, "%i" ,v->vInt);
+		break;
 	case ltFloat:
-		return spf(cur , bufEnd, "%f" ,v->vFloat);
+		ret = spf(cur , bufEnd, "%f" ,v->vFloat);
+		break;
 	case ltVec:
-		return spf(cur, bufEnd, "[vec %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
+		ret = spf(cur, bufEnd, "[vec %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
+		break;
 	case ltString:
-		return spf(buf, bufEnd, display ? "%s" : "%S", v->vString->data);
+		ret = spf(buf, bufEnd, display ? "%s" : "%S", v->vString->data);
+		break;
 	case ltSymbol:
-		return spf(cur, bufEnd, "%s",v->vSymbol->c);
+		ret = spf(cur, bufEnd, "%s",v->vSymbol->c);
+		break;
 	case ltSpecialForm:
 	case ltNativeFunc:
 		if(v->vNFunc->name){
-			return spf(cur, bufEnd, "%s",v->vNFunc->name->c);
+			ret = spf(cur, bufEnd, "%s",v->vNFunc->name->c);
 		}else{
-			return spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
+			ret = spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
 		}
+		break;
 	case ltGUIWidget:
-		return spf(cur, bufEnd, "#gui_%p", v->vPointer);
+		ret = spf(cur, bufEnd, "#gui_%p", v->vPointer);
+		break;
 	}
+
+	writeValSP--;
+	return ret;
 }
 
 static char *writeString(char *buf, char *bufEnd, const char *s){
