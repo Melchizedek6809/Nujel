@@ -55,7 +55,7 @@
              [#$6  `[$make-list ~[bytecode-op->int [a [+ i 1]]]]]
              [#$7  '[$eval]]
              [#$8  `[$apply ~[bytecode-op->int [a [+ i 1]]]
-                            ~[bytecode-arr->val a [+ i 1]]]]
+                            ~[bytecode-arr->val a [+ i 2]]]]
              [#$9  `[$jmp* ~[bytecode-arr->offset a [+ i 1]]]]
              [#$B  '[$dup]]
              [#$A  `[$jt* ~[bytecode-arr->offset a [+ i 1]]]]
@@ -86,7 +86,6 @@
        [def ret #nil]
        [while [< i [array/length a]]
               [set! ret [cons [cons i [disassemble/op a i]] ret]]
-              ;[println [str/write [car ret]]]
               [set! i [+ i [disassemble/length [a i]]]]]
        [nreverse ret]]
 

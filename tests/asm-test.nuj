@@ -5,6 +5,8 @@
 ;[disassemble/test '[[$jmp :start] [:label :func] [$push/int 2] [$add/int] [$ret] [:label :start] [$push/int 3] [$call :func] [$ret]]]
 ;[disassemble/test '[[$jmp :start] [:label :ret] [$push/int 3] [$ret] [:label :start] [$push/int 2] [$jmp :ret] [$ret]]]
 
+[disassemble/test '[[$push/int 1] [$push/int 7] [$apply 2 -] [$ret]]]
+
 [disassemble/raw [assemble [bytecompile [compile '[- 7 1]]]]]
 [println [ansi-rainbow "Done!!!!"]]
 ;[disassemble/test '[bytecompile [compile '[- 7 1]]]]
