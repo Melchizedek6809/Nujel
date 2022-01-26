@@ -97,7 +97,10 @@
 
 [defun thread/-> [init fun]
        [if-not fun init
-          `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]]]
+               [if [pair? [car fun]]
+                   `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
+                   [list [car fun] [thread/-> init [cdr fun]]]]]]
+
 [defmacro -> [init . fun]
           "Thread init as the first argument through every function in fun"
           [thread/-> init [reverse fun]]]

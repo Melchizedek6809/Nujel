@@ -36,7 +36,8 @@ typedef enum lOpcode {
 	lopClosurePop      = 0x16,
 	lopCall            = 0x17,
 	lopTry             = 0x18,
-	lopThrow           = 0x19
+	lopThrow           = 0x19,
+	lopApplyDynamic    = 0x1A
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -153,8 +154,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		lVal *fun = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
 		stack[sp++] = lApply(c, cargs, fun, fun);
-
 		ip += 3;
+		break; }
+	case lopApplyDynamic: {
+		const int len = *++ip;
+		lVal *fun = RVP(stack[--sp]);
+		lVal *cargs = lStackBuildList(stack, sp, len);
+		sp -= len;
+		ip++;
+		stack[sp++] = lApply(c, cargs, fun, fun);
 		break; }
 	case lopDup:
 		if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
@@ -300,6 +308,7 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 	default:
 		return 1;
 	case lopMakeList:
+	case lopApplyDynamic:
 	case lopIntByte:
 		return 2;
 	case lopCall:

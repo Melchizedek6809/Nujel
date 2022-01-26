@@ -193,9 +193,15 @@ runl: $(NUJEL)
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
 
+ifeq ($(OS),Windows_NT)
+.PHONY: runn
+runn: $(NUJEL)
+	rlwrap $(NUJEL)
+else
 .PHONY: runn
 runn: $(NUJEL)
 	$(NUJEL)
+endif
 
 .PHONY: install
 install: release

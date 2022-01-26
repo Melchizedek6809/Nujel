@@ -26,9 +26,8 @@
 
 [defun list/reduce [l o s]
        "Combine all elements in l using operation o and starting value s"
-       [while l
-              [set! s [o s [car l]]]
-              [cdr! l]]
+       [for-in [e l]
+              [set! s [o s e]]]
        s]
 
 [defun list/ref [l i]
@@ -41,34 +40,30 @@
 [defun reverse [l]
        "Return the list l in reverse order"
        [def ret]
-       [while l
-              [set! ret [cons [car l] ret]]
-              [cdr! l]]
+       [for-in [e l]
+               [set! ret [cons e ret]]]
        ret]
 
 [defun list/length [l]
        "Returns the length of list l"
        [def ret 0]
-       [while l
-	      [cdr! l]
-	      [++ ret]]
+       [for-in [e l]
+               [++ ret]]
        ret]
 
 [defun list/filter [l p]
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [def ret #nil]
-        [while l
-               [when [p [car l]]
-                     [set! ret [cons [car l] ret]]]
-               [cdr! l]]
+        [for-in [e l]
+               [when [p e]
+                     [set! ret [cons e ret]]]]
         [nreverse ret]]
 
 [defun list/map [l f]
         "Runs f over every item in list l and returns the resulting list"
         [def ret #nil]
-        [while l
-               [set! ret [cons [f [car l]] ret]]
-               [cdr! l]]
+        [for-in [e l]
+               [set! ret [cons [f e] ret]]]
         [nreverse ret]]
 
 [defun append/iter [a b]

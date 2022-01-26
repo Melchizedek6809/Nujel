@@ -44,21 +44,24 @@
        '[#$4]]
 
 [defun $push/lval [v]
-       "form - | Print out the stack for the current closure"
+       "- v | Pushes v onto the stack"
        [list #$5 [val->bytecode-op v]]]
 
 [defun $make-list [item-count]
-       "items ... - | Print out the stack for the current closure"
+       "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list"
        [list #$6 [int->bytecode-op item-count]]]
 
 [defun $eval [a]
-       "form - | Print out the stack for the current closure"
+       "form - | Evaluates the form from the top of the stack"
        '[#$7]]
 
 [defun $apply [arg-count fun]
-       "form - | Print out the stack for the current closure"
+       "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
        [list #$8 [int->bytecode-op arg-count]
                  [val->bytecode-op fun]]]
+
+[defun $apply/dynamic [arg-count fun]
+       [list #$1A [int->bytecode-op arg-count]]]
 
 [defun $call [target]
        " - | Call a bytecode subroutine"
@@ -173,5 +176,5 @@
        [assemble* l]]
 
 [defmacro asmrun ops
-  "Assemble and evaluate all bytecode arguments"
-  `[bytecode-eval [assemble ~@ops]]]
+          "Assemble and evaluate all bytecode arguments"
+          `[bytecode-eval [assemble ~@ops]]]

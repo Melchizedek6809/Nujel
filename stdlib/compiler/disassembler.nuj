@@ -80,6 +80,7 @@
              [#$17 `[$call ~[bytecode-arr->offset a [+ i 1]]]]
              [#$18 `[$try ~[bytecode-arr->offset a [+ i 1]]]]
              [#$19 '[$throw]]
+             [#$1A '[$apply/dynamic ~[bytecode-op->int [a [+ i 1]]]]]
              [otherwise :unknown-op]]]
 
 [defun disassemble/array [a i]
