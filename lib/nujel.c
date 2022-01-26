@@ -49,7 +49,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
 			vn = lCdr(vn);
 		}else if(n->type == ltSymbol){
-			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? vn : lCons(NULL,NULL));
+			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
 		}else{
 			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
 		}
@@ -73,7 +73,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
 			vn = lCdr(vn);
 		}else if(n->type == ltSymbol){
-			lDefineClosureSym(tmpc, lGetSymbol(n), vn ? vn : lCons(NULL, NULL));
+			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
 		}else{
 			lExceptionThrowValClo(":invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}

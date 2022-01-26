@@ -11,7 +11,7 @@
 
 [defun combination/parse [recipe last-recipe]
        [def source [str->sym [car recipe]]]
-       [def new [str->sym [cadr recipe]]]
+       [def new    [str->sym [cadr recipe]]]
        [def new-α [str->sym [cat [substr [car recipe] 0 1] [cadr recipe]]]]
        [def new-β [str->sym [cat [cadr recipe] [substr [car recipe] 1 2]]]]
        [\ [α Ω]
@@ -20,7 +20,7 @@
           [tree/+= [Ω :pairs] source [- count]]
           [tree/+= [Ω :pairs] new-α count]
           [tree/+= [Ω :pairs] new-β count]
-          [if last-recipe [last-recipe α Ω] Ω]]]
+          [if [lambda? last-recipe] [last-recipe α Ω] Ω]]]
 
 [defun combination/add [state recipe]
        [tree/set! state :combinations [combination/parse recipe [state :combinations]]]]
@@ -41,7 +41,8 @@
        [[α :combinations] α [state/dup α]]]
 
 [defun state/run/many [α steps]
-       [if [<= steps 0] α [state/run/many [state/run/once α] [- steps 1]]]]
+       [if [<= steps 0] α
+           [state/run/many [state/run/once α] [- steps 1]]]]
 
 [defun result [state]
   [- [max [tree/values [state :eles]]]

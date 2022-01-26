@@ -170,8 +170,6 @@ bool castToBool(const lVal *v){
 		return false;
 	}else if(v->type == ltBool){
 		return v->vBool;
-	}else if(v->type == ltPair){
-		return (v->vList.car != NULL) || (v->vList.cdr != NULL);
 	}else{
 		return true;
 	}

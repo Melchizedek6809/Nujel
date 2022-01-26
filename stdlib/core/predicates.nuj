@@ -48,18 +48,6 @@
                 [== a b]]
             #f]]
 
-[defun there-exists? [l pred]
-        "Applies predicate to each element and return #t if it holds true for any element, otherwise #f"
-        [cond [[nil? l] #f]
-              [[pred [car l]] #t]
-              [#t [there-exists? [cdr l] pred]]]]
-
-[defun for-all? [l pred]
-        "Applies predicate to each element returns #t if it holds true for every element, otherwise #f"
-        [cond [[nil? l] #t]
-              [[not [pred [car l]]] #f]
-              [#t [for-all? [cdr l] pred]]]]
-
 [defun int? [val]
         "#t if VAL is a integer"
         [== :int [type-of val]]]
@@ -106,7 +94,7 @@
 
 [defun lambda? [val]
         "#t if VAL is a lambda"
-        [or [== :lambda [type-of val]] [== :dynamic [type-of val]]]]
+        [or [== :lambda [type-of val]]]]
 
 [defun native? [val]
         "#t if VAL is a native function"
