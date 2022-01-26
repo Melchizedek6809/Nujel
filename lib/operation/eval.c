@@ -31,7 +31,7 @@ static lVal *lnfMacroApply(lClosure *c, lVal *v){
 		fun = lEval(c,fun);
 	}
 
-	return lMacro(c,lCadr(v),fun);
+	return lMacro(c, lCadr(v),fun);
 }
 
 void lOperationsEval(lClosure *c){

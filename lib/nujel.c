@@ -91,17 +91,16 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
-		return lLambda(c,lMap(c,args,lEval),fun);
+		return lLambda(c,args,fun);
 	case ltSpecialForm:
-		return fun->vNFunc->fp(c,args);
 	case ltNativeFunc:
-		return fun->vNFunc->fp(c,lMap(c,args,lEval));
+		return fun->vNFunc->fp(c,args);
 	case ltArray:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvArrRef, NULL);
+		return lnfArrRef(c, RVP(lCons(fun,args)));
 	case ltString:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvCat, NULL);
+		return lnfCat(c,RVP(lCons(fun,args)));
 	case ltTree:
-		return lApply(c,lRootsValPush(lCons(fun,args)),lnfvTreeGet, NULL);
+		return lnfTreeGet(c,RVP(lCons(fun,args)));
 	default:
 		lExceptionThrowValClo(":type-error", "Can't apply to following val", fun, c);
 		return NULL;
@@ -152,6 +151,19 @@ void lLoadS(lClosure *c, const char *s, int sLen){
 	lRootsRet(SP);
 }
 
+static bool lArgsEval(const lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	default:
+		return false;
+	case ltLambda:
+	case ltNativeFunc:
+	case ltArray:
+	case ltString:
+	case ltTree:
+		return true;
+	}
+}
+
 /* Directly Evaluate a single value, v, and return the result.
  * DOES NOT COMPILE THE EXPRESSION. */
 lVal *lEval(lClosure *c, lVal *v){
@@ -169,13 +181,13 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
-			return lRootsValPush(lLambda(c,lMap(c,lCdr(v),lEval),car));
+			return RVP(lLambda(c,lMap(c,lCdr(v),lEval),car));
 		case ltMacro:
 			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
 		case ltSpecialForm:
-			return car->vNFunc->fp(c,lCdr(v));
+			return RVP(car->vNFunc->fp(c,lCdr(v)));
 		case ltNativeFunc:
-			return car->vNFunc->fp(c,lMap(c,lCdr(v),lEval));
+			return RVP(car->vNFunc->fp(c,lMap(c,lCdr(v),lEval)));
 		case ltArray:
 			return lnfArrRef(c, lMap(c,v,lEval));
 		case ltString:
@@ -185,7 +197,8 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				return lApply(c, lCdr(v), resolved, car);
+				lVal *args = lArgsEval(resolved) ? lMap(c,lCdr(v),lEval) : lCdr(v);
+				return lApply(c, args, resolved, car);
 			}else{
 				if(car->vSymbol && lSymKeyword(car->vSymbol)){
 					return v;
@@ -195,7 +208,7 @@ lVal *lEval(lClosure *c, lVal *v){
 				}
 			}}
 		case ltPair:
-			return lApply(c,lCdr(v),lRootsValPush(lEval(c,car)),car);
+			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);
 		}}
 	}
 }

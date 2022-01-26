@@ -16,7 +16,6 @@ int exceptionTargetDepth = 0;
 /* Cause an exception, passing V directly to the closest exception handler */
 __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 	if(exceptionTargetDepth <= 0){
-		lPrintError("Exception without a handler!!! Exiting!\n");
 		lWriteVal(v);
 		exit(201);
 	}
@@ -51,7 +50,7 @@ void *lExceptionTry(void *(*body)(void *,void *), void *a, void *b){
 	exceptionTargetDepth++;
 	int ret = setjmp(exceptionTarget);
 	if(ret){
-		lWriteVal(exceptionValue);
+		epf("Root Exception:\n%V\n",exceptionValue);
 		exceptionTargetDepth--;
 		exit(200);
 		return NULL;

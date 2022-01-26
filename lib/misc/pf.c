@@ -109,14 +109,18 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		ret = spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
 		break;
 	case ltObject:
-		ret = spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+		if(v->vClosure->parent == NULL){
+			ret = spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
+		}else{
+			ret = spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+		}
 		break;
 	case ltMacro:
 	case ltLambda:
 		if(v->vClosure && v->vClosure->name){
 			ret = spf(cur, bufEnd, "%s", v->vClosure->name->c);
 		}else{
-			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", lClosureID(v->vClosure));
+			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", (i64)lClosureID(v->vClosure));
 		}
 		break;
 	case ltPair:
@@ -363,4 +367,13 @@ void pf(const char *format, ...){
 	char *ret = vspf(buf,buf + sizeof(buf), format, va);
 	va_end(va);
 	fwrite(buf, ret - buf, 1, stdout);
+}
+
+void epf(const char *format, ...){
+	char buf[8192];
+	va_list va;
+	va_start(va,format);
+	char *ret = vspf(buf,buf + sizeof(buf), format, va);
+	va_end(va);
+	fwrite(buf, ret - buf, 1, stderr);
 }
