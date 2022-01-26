@@ -20,7 +20,7 @@
 
 [defun array/append [a b]
        "Append array A to array B"
-       [when-not [and [arr? a] [arr? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
+       [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
        [def ret [array/allocate [+ [array/length a] [array/length b]]]]
        [for [i 0 [array/length a]]
             [array/set! ret i [a i]]]

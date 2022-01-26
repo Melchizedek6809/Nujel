@@ -54,7 +54,7 @@
 [defun bytecompile/while [source env]
        [def sym-start [bytecompile/gen-label]]
        [def sym-end [bytecompile/gen-label]]
-       [list sym-start
+       [list [list :label sym-start]
              [bytecompile* [cadr source] env]
              [$jf sym-end]
              [bytecompile* [caddr source] env]

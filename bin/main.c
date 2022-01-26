@@ -34,6 +34,8 @@ const char *run(const char *line){
 }
 #endif
 
+/* Read and Eval str directly */
+/* DOES NOT EXPAND MACROS */
 static void *readEvalStringRaw(void *cl, void *str){
 	lClosure *c = (lClosure *)cl;
 	const char *expr = str;
@@ -41,6 +43,7 @@ static void *readEvalStringRaw(void *cl, void *str){
 	return v;
 }
 
+/* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(bool loadStdLib){
 	lClosure *c;
 	if(loadStdLib){

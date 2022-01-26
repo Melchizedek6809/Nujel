@@ -1,7 +1,7 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-;; Some predica tes that were simpler to do in nujel
+;; Some predicates that were simpler to do in nujel
 
 [defun numeric? [a]
         "Return #t if a is a number"
@@ -41,12 +41,11 @@
 
 [defun list-equal? [a b]
         "#t if A and B are equal"
-        [if [== [type-of a] [type-of b]]
-            [if [pair? a]
-                [and [list-equal? [car a] [car b]]
-                     [list-equal? [cdr a] [cdr b]]]
-                [== a b]]
-            #f]]
+        [if-not [== [type-of a] [type-of b]] #f
+                [if [pair? a]
+                    [and [list-equal? [car a] [car b]]
+                         [list-equal? [cdr a] [cdr b]]]
+                    [== a b]]]]
 
 [defun int? [val]
         "#t if VAL is a integer"
@@ -68,7 +67,7 @@
         "#t if VAL is a pair"
         [== :pair [type-of val]]]
 
-[defun arr? [val]
+[defun array? [val]
 	"#t if VAL is an array"
 	[== :array [type-of val]]]
 

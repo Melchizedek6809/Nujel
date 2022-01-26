@@ -189,7 +189,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break;
 	case lopSet:
 		ip++;
-		lSetClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
+		lSetClosureSym(c, lBytecodeReadOPSym(&ip), stack[--sp]);
 		break;
 	case lopGet:
 		ip++;

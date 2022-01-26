@@ -32,7 +32,7 @@
           [quasiquote-real l 0]]
 
 [defun unquote [expr]
-        [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]
+       [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]
 
 [defun unquote-splicing [expr]
-        [throw [list :unquote-splicing-without-quasiquote "unquote-splicing should only occur inside a quasiquote, never evaluated directly"]]]
+       [throw [list :unquote-splicing-without-quasiquote "unquote-splicing should only occur inside a quasiquote, never evaluated directly"]]]

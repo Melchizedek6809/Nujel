@@ -29,7 +29,8 @@ void lPrintError(const char *format, ...){
 	va_end(ap);
 }
 
-
+/* Load filename into a fresly allocated buffer which is always zero terminated.
+ * The length is returned in len if len is not NULL */
 void *loadFile(const char *filename,size_t *len){
 	FILE *fp;
 	size_t filelen,readlen,read;
@@ -57,10 +58,11 @@ void *loadFile(const char *filename,size_t *len){
 	fclose(fp);
 	buf[filelen] = 0;
 
-	*len = filelen;
+	if(len){*len = filelen;}
 	return buf;
 }
 
+/* Save len bytes of buf into filename, overwriting whatever was there before */
 void saveFile(const char *filename,const void *buf, size_t len){
 	FILE *fp;
 	size_t written,wlen = 0;
@@ -82,6 +84,7 @@ void saveFile(const char *filename,const void *buf, size_t len){
 	fclose(fp);
 }
 
+/* Return true if name is a directory */
 int isDir(const char *name){
 	#if defined (__EMSCRIPTEN__)
 	(void)name;
@@ -93,6 +96,7 @@ int isDir(const char *name){
 	return 1;
 }
 
+/* Create a new directory in a portable manner */
 int makeDir(const char *name){
 	if(isDir(name)){return 1;}
 	#ifdef __MINGW32__
@@ -105,6 +109,7 @@ int makeDir(const char *name){
 	#endif
 }
 
+/* Create a directory and all needed parent directories in a portable manner */
 int makeDirR(const char *name){
 	char buf[256];
 	strncpy(buf,name,sizeof(buf));
@@ -118,6 +123,7 @@ int makeDirR(const char *name){
 	return makeDir(buf);
 }
 
+/* Remove a directory and all subdirectories and files in a portable manner */
 void rmDirR(const char *name){
 	#if defined (__EMSCRIPTEN__)
 	return;
@@ -140,6 +146,7 @@ void rmDirR(const char *name){
 	rmdir(name);
 }
 
+/* Generate a temporary filename in a portable manner */
 const char *tempFilename(){
 	static uint counter = 0;
 	static char buf[32];

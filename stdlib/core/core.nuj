@@ -16,49 +16,49 @@
           `[set! ~l [cdr ~l]]]
 
 [defun not [v]
-           "Return true if V is false"
-           [if v #f #t]]
+       "Return true if V is false"
+       [if v #f #t]]
 
 [defun list arguments
-        "Return ARGUMENTS as a list"
-        arguments]
+       "Return ARGUMENTS as a list"
+       arguments]
 
 [defun default [arg default-value]
-        "Returns ARG or DEFAULT-VALUE if ARG is #nil"
-        [if arg arg default-value]]
+       "Returns ARG or DEFAULT-VALUE if ARG is #nil"
+       [if arg arg default-value]]
 
 [defun caar [p]
-        "[car [car p]]"
-        [car [car p]]]
+       "[car [car p]]"
+       [car [car p]]]
 
 [defun cadr [p]
-        "[car [cdr p]]"
-        [car [cdr p]]]
+       "[car [cdr p]]"
+       [car [cdr p]]]
 
 [defun cdar [p]
-        "[cdr [car p]]"
-        [cdr [car p]]]
+       "[cdr [car p]]"
+       [cdr [car p]]]
 
 [defun cddr [p]
-        "[cdr [cdr p]]"
-        [cdr [cdr p]]]
+       "[cdr [cdr p]]"
+       [cdr [cdr p]]]
 
 [defun cadar [p]
-        "[cdr [car p]]"
-        [car [cdr [car p]]]]
+       "[cdr [car p]]"
+       [car [cdr [car p]]]]
 
 [defun caddr [p]
-        "[car [cdr [cdr p]]]"
-        [car [cdr [cdr p]]]]
+       "[car [cdr [cdr p]]]"
+       [car [cdr [cdr p]]]]
 
 [defun cdddr [p]
-        "[cdr [cdr [cdr p]]]"
-        [cdr [cdr [cdr p]]]]
+       "[cdr [cdr [cdr p]]]"
+       [cdr [cdr [cdr p]]]]
 
 [defun cadddr [p]
-        "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr p]]]]]
+       "[car [cdr [cdr [cdr p]]]]"
+       [car [cdr [cdr [cdr p]]]]]
 
 [defun caddddr [p]
-        "[car [cdr [cdr [cdr p]]]]"
-        [car [cdr [cdr [cdr [cdr p]]]]]]
+       "[car [cdr [cdr [cdr p]]]]"
+       [car [cdr [cdr [cdr [cdr p]]]]]]

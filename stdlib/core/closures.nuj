@@ -1,0 +1,24 @@
+; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+; This project uses the MIT license, a copy should be included under /LICENSE
+
+;; Mostly macros for all kinds of let varieties
+
+[defun let/arg [arg]
+       [when arg
+             [when-not [pair? arg] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
+             [when-not [symbol? [car arg]] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
+             `[def ~[car arg] ~[cadr arg]]]]
+[defun let/args [args]
+       [if-not args #nil
+               [cons [let/arg [car args]]
+                     [let/args [cdr args]]]]]
+[defmacro let [bindings . body]
+          "Evalutes to BODY if PRED is true"
+          `[let* [do ~@[let/args bindings] ~@body]]]
+
+[defmacro if-let [binding then else]
+          `[let* [def ~[car binding] ~[cadr binding]]
+                 [if ~[car binding] ~then ~else]]]
+
+[defmacro when-let [binding . body]
+          `[if-let ~binding ~[cons 'do body] #nil]]

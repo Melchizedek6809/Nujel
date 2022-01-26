@@ -6,13 +6,6 @@
 [defmacro if-not [pred then else]
           `[if ~pred ~else ~then]]
 
-[defmacro if-let [binding then else]
-          `[let* [def ~[car binding] ~[cadr binding]]
-                 [if ~[car binding] ~then ~else]]]
-
-[defmacro when-let [binding . body]
-          `[if-let ~binding ~[cons 'do body] #nil]]
-
 [defmacro when-not [pred . body]
           "Evalutes to BODY if PRED is false"
           `[if ~pred #nil [do ~@body]]]
@@ -20,19 +13,6 @@
 [defmacro when [pred . body]
           "Evalutes to BODY if PRED is true"
           `[if ~pred [do ~@body] #nil]]
-
-[defun let/arg [arg]
-       [when arg
-             [when-not [pair? arg] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
-             [when-not [symbol? [car arg]] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
-             `[def ~[car arg] ~[cadr arg]]]]
-[defun let/args [args]
-       [if-not args #nil
-               [cons [let/arg [car args]]
-                     [let/args [cdr args]]]]]
-[defmacro let [bindings . body]
-          "Evalutes to BODY if PRED is true"
-          `[let* [do ~@[let/args bindings] ~@body]]]
 
 [defun case/clauses/multiple [key-sym cases]
        [when cases
