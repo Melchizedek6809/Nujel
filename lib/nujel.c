@@ -177,11 +177,11 @@ lVal *lEval(lClosure *c, lVal *v){
 		case ltNativeFunc:
 			return car->vNFunc->fp(c,lMap(c,lCdr(v),lEval));
 		case ltArray:
-			return lApply(c,v,lnfvArrRef, NULL);
+			return lnfArrRef(c, lMap(c,v,lEval));
 		case ltString:
-			return lApply(c,v,lnfvCat, NULL);
+			return lnfCat(c, lMap(c,v,lEval));
 		case ltTree:
-			return lApply(c,v,lnfvTreeGet, NULL);
+			return lnfTreeGet(c, lMap(c,v,lEval));
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
