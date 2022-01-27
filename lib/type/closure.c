@@ -73,7 +73,7 @@ void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	c->data = lTreeInsert(c->data,s,v);
 }
 
-/* Set the value bound to S in C to V, if it has already been bounbd */
+/* Set the value bound to S in C to V, if it has already been bound */
 void lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	if(c == NULL){return;}
 	bool found = false;

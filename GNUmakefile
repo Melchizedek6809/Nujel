@@ -23,6 +23,7 @@ ASSET       := ./tools/assets
 CC                   := cc
 CC_MUSL              := musl-gcc
 CFLAGS               := -g -D_GNU_SOURCE
+LDFLAGS              :=
 CSTD                 := -std=c99
 OPTIMIZATION         := -O2
 WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing-braces
@@ -42,6 +43,7 @@ ifeq ($(OS),Windows_NT)
 	ASSET := ./tools/assets.exe
 	BIN_SRCS += vendor/getline/getline.c
 	LIBS += -lpthread
+	LDFLAGS := -Wl,--stack,16777216
 	INSTALL_BIN_DIR := /usr/local/bin/
 else
 	BIN_SRCS += vendor/bestline/bestline.c
@@ -110,11 +112,11 @@ nujel.a: $(LIB_OBJS)
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
 $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
-	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
-	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 	@$(NUJEL_BOOT) -x "[exit [test-run]]"
 

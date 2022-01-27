@@ -184,6 +184,7 @@ lVal *lEval(lClosure *c, lVal *v){
 			return RVP(lLambda(c,lMap(c,lCdr(v),lEval),car));
 		case ltMacro:
 			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
+			return NULL;
 		case ltSpecialForm:
 			return RVP(car->vNFunc->fp(c,lCdr(v)));
 		case ltNativeFunc:
