@@ -63,8 +63,9 @@ bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
 
 /* Return the value bound to S in C */
 lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
+	if(c == NULL){return NULL;}
 	lVal *ret;
-	return lHasClosureSym(c,s,&ret) ? ret : NULL;
+	return lTreeHas(c->data,s,&ret) ? ret : lGetClosureSym(c->parent,s);
 }
 
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */
