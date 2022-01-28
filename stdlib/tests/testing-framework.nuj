@@ -85,7 +85,7 @@
 
 [defun test-forked [nujel-runtime]
        [\ [result rawexpr i]
-         "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
+          "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
           [def eval-result [eval/forked nujel-runtime rawexpr]]
           [def expr [cdr eval-result]]
           [def pred? ==]
@@ -98,17 +98,13 @@
               [test-success result expr rawexpr i]
               [test-failure result expr rawexpr i]]]]
 
-[defun test-run-iter [test l i]
-  "Recurse through LIST and runs eatch test"
-       [when l
-             [test [caar l] [cdar l] i]
-             [test-run-iter test [cdr l] [- i 1]]]]
-
 [defun test-run-real [test]
        [set! nujel-start    [time/milliseconds]]
        [set! success-count  0]
        [set! error-count    0]
-       [test-run-iter test test-list test-count]
+       [def i [- test-count 1]]
+       [for-in [cur-test test-list]
+               [test [car cur-test] [cdr cur-test] [-- i]]]
        [display-results]
        error-count]
 

@@ -4,16 +4,16 @@
 ;; Time related λs
 
 [defun time/seconds [timestamp]
-        "Return the seconds part of TIMESTAMP, defaults to current time"
-        [% [default timestamp [time]] 60]]
+       "Return the seconds part of TIMESTAMP, defaults to current time"
+       [% [default timestamp [time]] 60]]
 
 [defun time/minutes [timestamp]
-        "Return the minutes part of TIMESTAMP, defaults to current time"
-        [% [/ [default timestamp [time]] 60] 60]]
+       "Return the minutes part of TIMESTAMP, defaults to current time"
+       [% [/ [default timestamp [time]] 60] 60]]
 
 [defun time/hours [timestamp]
-        "Return the hours part of TIMESTAMP, defaults to current time"
-        [% [/ [default timestamp [time]] 3600] 24]]
+       "Return the hours part of TIMESTAMP, defaults to current time"
+       [% [/ [default timestamp [time]] 3600] 24]]
 
 [defun profile-form [raw]
        [def start-time [time/milliseconds]]

@@ -33,10 +33,12 @@
             [$apply [length args] op]]]
 
 [defun bytecompile/def [source env]
+       [when [or [not [cadr source]] [not [symbol? [cadr source]]] [not [caddr source]]] [throw [list :syntax-error "[def] needs a symbol name and a value as arguments" #nil env]]]
        [list [bytecompile* [caddr source] env]
              [$def [cadr source]]]]
 
 [defun bytecompile/set! [source env]
+       [when [or [not [cadr source]] [not [symbol? [cadr source]]] [not [caddr source]]] [throw [list :syntax-error "[set!] needs a symbol name and a value as arguments" #nil env]]]
        [list [bytecompile* [caddr source] env]
              [$set [cadr source]]]]
 

@@ -150,11 +150,10 @@
 [defun assemble/emit-relocated-ops [code sym-map pos out]
        [if [== [car code] :relocate]
            [set! pos [assemble/relocate-op code sym-map pos out]]
-           [while code
-                  [case [type-of [car code]]
-                        [:bytecode-op [array/set! out [++ pos] [car code]]]
-                        [:pair        [set! pos [assemble/emit-relocated-ops [car code] sym-map pos out]]]]
-                  [cdr! code]]]
+           [for-in [op code]
+                   [case [type-of op]
+                         [:bytecode-op [array/set! out [++ pos] op]]
+                         [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
        pos]
 
 [def assemble/verbose #f]

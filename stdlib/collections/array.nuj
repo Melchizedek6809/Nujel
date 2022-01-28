@@ -59,8 +59,7 @@
 
 [defun array/push [arr . val]
        "Append all arguments following ARR to ARR"
-       [while val
+       [for-in [v val]
               [array/length! arr [+ 1 [array/length arr]]]
-              [array/set! arr [- [array/length arr] 1] [car val]]
-              [cdr! val]]
+              [array/set! arr [- [array/length arr] 1] v]]
        arr]
