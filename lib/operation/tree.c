@@ -38,7 +38,7 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	if(car->type != ltTree){return NULL;}
+	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	return lTreeToList(car->vTree);
 }
 
@@ -46,7 +46,7 @@ static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	if(car->type != ltTree){return NULL;}
+	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	return lTreeKeysToList(car->vTree);
 }
 
@@ -54,7 +54,7 @@ static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
 static lVal *lnfTreeGetValues(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	if(car->type != ltTree){return NULL;}
+	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	return lTreeValuesToList(car->vTree);
 }
 

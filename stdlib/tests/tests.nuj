@@ -1021,6 +1021,10 @@
 [test/add 4 [length '[#nil #nil 2 #nil]]]
 [test/add 4 [length '[#nil #nil #nil #nil]]]
 [test/add 5 [length '[#nil #nil #nil #nil 5]]]
+[test/add #nil [tree/values]]
+[test/add #nil [tree/keys #nil]]
+[test/add #nil [tree/has? #nil]]
+[test/add #nil [tree/has?]]
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
 
 ;[test/add 1000 [byterun '[do [def i 0] [while [< i 100] [set! i [+ 1 i]]] i]]]
