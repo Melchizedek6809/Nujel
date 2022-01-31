@@ -16,11 +16,9 @@ jobs:
       run: make -j
     - name: Compile WASM REPL
       run: bash tools/buildwasm
-    - name: Install SSH Key
-      uses: shimataro/ssh-key-action@v2
+    - name: Upload build Artifacts
+      uses: actions/upload-artifact@v2
       with:
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        known_hosts: ${{ secrets.SSH_HOST_KEY }}
-    - name: Upload to wolkenwelten.net
-      run: |
-        rsync -avze 'ssh -p 42' --delete ./web/ github@wolkenwelten.net:/home/github/nujel/${GITHUB_REF##*/}/
+        name: Nujel-Web-${{ github.ref_name }}
+        path: "./web/"
+        retention-days: 7
