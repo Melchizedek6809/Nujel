@@ -33,19 +33,31 @@ static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
 }
 
 static void lStringAdvanceToNextCharacter(lString *s){
-	for(;(*s->data != 0) && (isspace((u8)*s->data));s->data++){}
+	for(;(s->data < s->bufEnd) && (isspace((u8)*s->data));s->data++){}
 }
 
 static void lStringAdvanceToNextSpaceOrSpecial(lString *s){
-	for(;(*s->data != 0) && (!isspace((u8)*s->data));s->data++){
+	for(;(s->data < s->bufEnd) && (!isspace((u8)*s->data));s->data++){
 		const u8 c = *s->data;
 		if(isnonsymbol(c)){break;}
 		if(*s->data == ':'){break;}
 	}
 }
-
 static void lStringAdvanceToNextLine(lString *s){
-	for(;(*s->data != 0) && (*s->data != '\n');s->data++){}
+	for(;(s->data < s->bufEnd) && (*s->data != '\n');s->data++){}
+}
+
+static void lStringAdvanceUntilEndOfBlockComment(lString *s){
+	const char *end = s->bufEnd-1;
+	for(;(s->data < end);s->data++){
+		if((s->data[0] == '#') && (s->data[1] == '|')){
+			s->data+=2;
+			lStringAdvanceUntilEndOfBlockComment(s);
+		}else if((s->data[0] == '|') && (s->data[1] == '#')){
+			s->data+=2;
+			return;
+		}
+	}
 }
 
 /* Parse the string literal in s and return the resulting ltString lVal */
@@ -303,6 +315,10 @@ static lVal *lParseSpecial(lString *s){
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
 			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		return NULL; }
+	case '|': // SRFI-30
+		lStringAdvanceUntilEndOfBlockComment(s);
+		lStringAdvanceToNextCharacter(s);
+		return lReadValue(s);
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
