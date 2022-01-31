@@ -12,8 +12,9 @@
 
 #include "../lib/api.h"
 #include "misc.h"
-#include "operation/readline.h"
+#include "operation/environment.h"
 #include "operation/io.h"
+#include "operation/readline.h"
 
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
@@ -111,6 +112,7 @@ static void *evalRaw(void *cl, void *body){
 void initNujel(int argc, char *argv[], lClosure *c){
 	lVal *ret = NULL;
 	const int SP = lRootsGet();
+	initEnvironmentMap(c);
 	for(int i = argc-1; i >= 0; i--){
 		ret = lCons(lValString(argv[i]), ret);
 	}
