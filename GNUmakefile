@@ -38,6 +38,7 @@ BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
+
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
@@ -48,6 +49,12 @@ ifeq ($(OS),Windows_NT)
 else
 	BIN_SRCS += vendor/bestline/bestline.c
 endif
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	STATIC_LIBS := -lm
+endif
+
 BIN_OBJS    := $(BIN_SRCS:.c=.o)
 BIN_DEPS    := ${BIN_SRCS:.c=.d}
 
