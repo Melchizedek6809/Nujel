@@ -10,19 +10,32 @@ Since the engine is written in C this needs to be convenient and efficient.
 
 ## Should allow for fast code
 This might require some effort from the programmer, but it should be possible
-to write very fast code for the parts where it actually matters.
+to write very fast code for the parts where it actually matters. Because of this
+a bunch of decisions were made:
+### Static typing
+While dynamic typing can be fast, it is much harder to pull off, the much simpler
+solution is to put that burden on the programmer. Although Nujel will default to
+an any/boxed type.
+### Focus on Imperative looping constructs
+As with dynamic typing, it is just much easier to support fast for-loops than it is
+to make map/reduce fast.
 
 ## Portable
 Windows/ARM/WASM need to be supported perfectly, requiring x86/Linux would exclude
 too many users.
+### Build environment
+Nujel should only require Make and a somewhat modern C compiler as a build
+environement, this makes it much easier to port to various platforms, since they
+probably already have a great C compiler.
 
 ## Powerful metaprogramming
 This mostly means macros/runtime code generation, enabling DSLs which I would love
 to use in all kinds of areas of WolkeWelten (Animal Behaviour/WorldGen/UI)
 
 ## Easy for beginners
-Modding should be as open and inclusive as possible, this means spending a lot of
-time and effort on polishing documentation, writing tutorials and improving error handling/messages.
+Modding for WolkenWelten should be as open and inclusive as possible, this means spending a lot of
+time and effort on polishing documentation, writing tutorials, improving error handling/messages and
+building a welcoming and supportive community.
 
 # Try it out yourself
 You can easily start experimenting with Nujel right in your browser by using a [WASM release](https://wolkenwelten.net/nujel/).
