@@ -183,17 +183,17 @@ lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
 
 /* Create an a-list with all the key/value bindings from T */
 lVal *lTreeToList(const lTree *t){
-	return t ? lTreeAddToList(t,NULL) : lCons(NULL,NULL);
+	return t ? lTreeAddToList(t,NULL) : NULL;
 }
 
 /* Create a list of all the keys within T */
 lVal *lTreeKeysToList(const lTree *t){
-	return t ? lTreeAddKeysToList(t,NULL) : lCons(NULL,NULL);
+	return t ? lTreeAddKeysToList(t,NULL) : NULL;
 }
 
 /* Create a list of all the values within T */
 lVal *lTreeValuesToList(const lTree *t){
-	return t ? lTreeAddValuesToList(t,NULL) : lCons(NULL,NULL);
+	return t ? lTreeAddValuesToList(t,NULL) : NULL;
 }
 
 /* Return the total size of the tree T */

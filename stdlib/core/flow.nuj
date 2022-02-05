@@ -71,10 +71,11 @@
           "[for-in [l [list 1 2 3 4]] [println l]]"
           [def symbol-name [gensym]]
           `[let [[~symbol-name ~[cadr for-loop]]]
-                [while ~symbol-name
-                       [def ~[car for-loop] [car ~symbol-name]]
-                       ~@body
-                       [cdr! ~symbol-name]]]]
+                [when ~symbol-name
+                      [while ~symbol-name
+                             [def ~[car for-loop] [car ~symbol-name]]
+                             ~@body
+                             [cdr! ~symbol-name]]]]]
 
 [defun thread/-> [init fun]
        [if-not fun init
