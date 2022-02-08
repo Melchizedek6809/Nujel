@@ -4,6 +4,7 @@
 #include "../operation.h"
 
 #include "../display.h"
+#include "../exception.h"
 #include "../nujel.h"
 #include "../type-system.h"
 #include "../allocation/string.h"
@@ -25,9 +26,15 @@ lVal *lnfvCat;
 
 static lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;
-	if(v == NULL){return lValInt(0);}
+	if(v == NULL){
+		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		return NULL;
+	}
 	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return lValInt(0);}
+	if((t == NULL) || (t->type != ltString)){
+		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		return NULL;
+	}
 	return lValInt(lStringLength(t->vString));
 }
 
@@ -111,7 +118,11 @@ static lVal *lnfSubstr(lClosure *c, lVal *v){
 	(void)c;
 	int start, slen, len;
 	lVal *str = lCar(v);
-	if((str == NULL) || (str->type != ltString)){ return NULL;}
+	if((str == NULL) || (str->type != ltString)){
+		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		return NULL;
+	}
+
 	const char *buf = str->vString->data;
 	slen = len = lStringLength(str->vString);
 	start = castToInt(lCadr(v), 0);
