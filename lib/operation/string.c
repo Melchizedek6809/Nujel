@@ -244,10 +244,20 @@ static lVal *lnfWriteStr(lClosure *c, lVal *v){
 static lVal *lnfCharAt(lClosure *c,lVal *v){
 	(void)c;
 	const char *str = castToString(lCar(v),NULL);
-	const int pos = castToInt(lCadr(v),0);
-	if(str == NULL){return NULL;}
+	if(str == NULL){
+		lExceptionThrowValClo(":type-error","[char-at] expects a string as its first argument", v, c);
+		return NULL;
+	}
+	const int pos = castToInt(lCadr(v),-1);
+	if(pos < 0){
+		lExceptionThrowValClo(":bounds-error","[char-at] does not support negative indices", v, c);
+		return NULL;
+	}
 	const int len = strlen(str);
-	if(pos >= len){return NULL;}
+	if(pos >= len){
+		lExceptionThrowValClo(":bounds-error","[char-at] index bigger that string", v, c);
+		return NULL;
+	}
 	return lValInt(str[pos]);
 }
 
