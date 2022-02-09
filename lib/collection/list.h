@@ -2,16 +2,26 @@
 #include "../nujel.h"
 #include "../type/val.h"
 
-lVal     *lCons       (lVal *car,lVal *cdr);
 int       lListLength (lVal *v);
 lVal     *lList       (int length, ...);
+
+/* Create and return a cell out of CAR and CDR */
+static inline lVal *lCons(lVal *car, lVal *cdr){
+	lVal *v = lValAlloc();
+	v->type = ltPair;
+	v->vList.car = car;
+	v->vList.cdr = cdr;
+	return v;
+}
 
 static inline lVal *lCar(lVal *v){
 	return (v != NULL) && (v->type == ltPair) ? v->vList.car : NULL;
 }
+
 static inline lVal *lCdr(lVal *v){
 	return (v != NULL) && (v->type == ltPair) ? v->vList.cdr : NULL;
 }
+
 static inline lVal *lCaar  (lVal *v){return lCar(lCar(v));}
 static inline lVal *lCadr  (lVal *v){return lCar(lCdr(v));}
 static inline lVal *lCdar  (lVal *v){return lCdr(lCar(v));}

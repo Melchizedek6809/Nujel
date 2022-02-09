@@ -7,15 +7,6 @@
 
 #include <stdarg.h>
 
-/* Create and return a cell out of CAR and CDR */
-lVal *lCons(lVal *car, lVal *cdr){
-	lVal *v = lValAlloc();
-	v->type = ltPair;
-	v->vList.car = car;
-	v->vList.cdr = cdr;
-	return v;
-}
-
 /* Return the length of the list V */
 int lListLength(lVal *v){
 	int i = 0;
