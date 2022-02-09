@@ -7,8 +7,8 @@
        [def parts [map [split line "-"] str->sym]]
        [tree/set! cave-map [car parts] [cons [cadr parts] [tree/get cave-map [car parts]]]]
        [tree/set! cave-map [cadr parts] [cons [car parts] [tree/get cave-map [cadr parts]]]]
-       [tree/set! big-caves [car parts] [< [char-at [sym->str [car parts]] 0] #\a]]
-       [tree/set! big-caves [cadr parts] [< [char-at [sym->str [cadr parts]] 0] #\a]]]
+       [tree/set! big-caves [car parts] [< [try [\ [] 0] [char-at [sym->str [car parts]] 0]] #\a]]
+       [tree/set! big-caves [cadr parts] [< [try [\ [] 0] [char-at [sym->str [cadr parts]] 0]] #\a]]]
 [def connections [for-each [split [file/read "tests/slow/day12.input"] "\n"] add-connections]]
 
 [def valid-routes 0]
