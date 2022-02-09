@@ -1,6 +1,68 @@
 ; Subroutines and macros for formatted text output
 
-[def fmt/tmp 123]
+[def fmt/format-arg/default @[
+     :debug #f
+     :base #f
+]]
+
+[defun fmt/parse-spec [opts spec]
+       [if [zero? [string/length spec]]
+           opts
+           [case [char-at spec [- [string/length spec] 1]]
+                 [#\? [fmt/parse-spec [tree/set! opts :debug #t]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\X [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\x [fmt/parse-spec [tree/set! opts :base :hexadecimal]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\d [fmt/parse-spec [tree/set! opts :base :decimal]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\o [fmt/parse-spec [tree/set! opts :base :octal]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\b [fmt/parse-spec [tree/set! opts :base :binary]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
+
+[defun fmt/debug [opts]
+       [if-not [opts :debug]
+               opts
+               [tree/set! opts :argument [list str/write [opts :argument]]]]]
+
+[defun fmt/number-format [opts]
+       [case [opts :base]
+             [:binary [tree/set! opts :argument [list int->string/binary [opts :argument]]]]
+             [:octal [tree/set! opts :argument [list int->string/octal [opts :argument]]]]
+             [:decimal [tree/set! opts :argument [list int->string/decimal [opts :argument]]]]
+             [:hexadecimal [tree/set! opts :argument [list int->string/hex [opts :argument]]]]
+             [:HEXADECIMAL [tree/set! opts :argument [list int->string/HEX [opts :argument]]]]
+             [otherwise opts]]]
+
+[def fmt/number-format-prefixex @[
+     :binary "#b"
+     :octal "#o"
+     :decimal "#d"
+     :hexadecimal "#x"
+     :HEXADECIMAL "#x"
+]]
+
+[defun fmt/number-format-prefix [opts]
+       [if [or [not [opts :debug]] [not [opts :base]]] opts
+           [-> [if [member [opts :base] '[:binary :octal :decimal :hexadecimal :HEXADECIMAL]]
+                   [tree/set! opts :argument [list cat
+                                                   [fmt/number-format-prefixex [opts :base]]
+                                                   [opts :argument]]]
+                   opts]
+               [tree/set! :debug #f]]]]
+
+[defun fmt/output [opts]
+       [opts :argument]]
+
+[defun fmt/format-arg [spec argument]
+       [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
+           fmt/number-format
+           fmt/number-format-prefix
+           fmt/debug
+           fmt/output]]
 
 [defun fmt/valid-argument? [argument]
        [or [int? argument] [symbol? argument]]]
@@ -15,7 +77,7 @@
 
        [if [== "" argument]
            [do [array/set! arguments-used [-- fmt/expr/count] #t]
-               [str->sym [string fmt/expr/count]]]
+               [fmt/format-arg format-spec [str->sym [string fmt/expr/count]]]]
            [let [[read-vals [read argument]]]
                 [when [cdr read-vals]
                       [throw [list :format-error "Format argument specifier contains more than a single atom" argument [current-lambda]]]]
@@ -26,7 +88,7 @@
                       [when [or [< [car read-vals] 0] [>= [car read-vals] [array/length arguments-used]]]
                             [throw [list :format-error "fmt numbered argument is out of bounds" argument [current-lambda]]]]
                       [array/set! arguments-used [car read-vals] #t]]
-                [str->sym [string [car read-vals]]]]]]
+                [fmt/format-arg format-spec [str->sym [string [car read-vals]]]]]]]
 
 [def fmt/args/map-fun/count 0]
 [defun fmt/args/map-fun [arg]

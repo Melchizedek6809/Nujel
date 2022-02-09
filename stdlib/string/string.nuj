@@ -60,18 +60,22 @@
               [set! α [ash α -3]]]
        ret]
 
-[def int->string/hex [let*
+[def int->string/HEX [let*
      "Turn α into a its **hexadecimal** string representation"
      [def conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
 
      [λ [α]
-        [def ret ""]
-        [when-not α [def α 0]]
-        [when [zero? α] [set! ret "0"]]
-        [while [not-zero? α]
-               [set! ret [cat [conversion-arr [logand α #b1111]] ret]]
-               [set! α [ash α -4]]]
-        ret]]]
+         [def ret ""]
+         [when-not α [def α 0]]
+         [when [zero? α] [set! ret "0"]]
+         [while [not-zero? α]
+                [set! ret [cat [conversion-arr [logand α #b1111]] ret]]
+                [set! α [ash α -4]]]
+         ret]]]
+
+[defun int->string/hex [α]
+       "Turn α into a its **hexadecimal** string representation"
+       [lowercase [int->string/HEX α]]]
 
 [defun int->string/decimal [α]
         "Turn α into a its **decimal** string representation"
