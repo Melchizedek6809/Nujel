@@ -107,7 +107,7 @@
              [[== key [car l]] [cadr l]]
              [#t [getf [cdr l] key]]]]
 
-[defun list/sort [l]
+[defun list/bubble-sort [l]
        "Terribly slow way to sort a list, though it was simple to write"
        [if-not l #nil
                [do [def top [car l]]
@@ -119,7 +119,7 @@
 				  [set! top [car l]]]
                               [set! next [cons [car l] next]]]
 			  [cdr! l]]
-		   [cons top [list/sort next]]]]]
+		   [cons top [list/bubble-sort next]]]]]
 
 [defun list/merge-sorted-lists [l1 l2]
        [cond [[nil? l1] l2]
@@ -136,9 +136,12 @@
 [defun list/split-half [l] [list/split-half-rec l #nil #nil]]
 
 [defun list/merge-sort [l]
+       "Sorts a list"
        [if [nil? [cdr l]]
            l
            [do [def parts [list/split-half l]]
                [list/merge-sorted-lists
                  [list/merge-sort [car parts]]
                  [list/merge-sort [cdr parts]]]]]]
+
+[def list/sort list/merge-sort]
