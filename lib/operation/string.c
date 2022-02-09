@@ -218,16 +218,20 @@ static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 static lVal *lnfStrSym(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
-	if(v == NULL){return NULL;}
-	if(v->type != ltString){return NULL;}
+	if((v == NULL) || (v->type != ltString)){
+		lExceptionThrowValClo(":type-error","[str->sym] expects a string as its first and only argument", v, c);
+		return NULL;
+	}
 	return lValSym(v->vString->data);
 }
 
 static lVal *lnfSymStr(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
-	if(v == NULL){return NULL;}
-	if(v->type != ltSymbol){return NULL;}
+	if((v == NULL) || (v->type != ltSymbol)){
+		lExceptionThrowValClo(":type-error","[sym->str] expects a string as its first and only argument", v, c);
+		return NULL;
+	}
 	return lValString(v->vSymbol->c);
 }
 
