@@ -81,6 +81,9 @@
 [defun string/pad-start [text goal-length char]
        "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
+       [when-not [string? text] [set! text [string text]]]
+       [when-not [string? char]
+                 [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
        [while [< [string/length text] goal-length]
               [set! text [cat char text]]]
        [if [> [string/length text] goal-length]
@@ -90,6 +93,9 @@
 [defun string/pad-end [text goal-length char]
        "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
        [when-not char [set! char " "]]
+       [when-not [string? text] [set! text [string text]]]
+       [when-not [string? char]
+                 [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
        [while [< [string/length text] goal-length]
               [set! text [cat text char]]]
        [if [> [string/length text] goal-length]
