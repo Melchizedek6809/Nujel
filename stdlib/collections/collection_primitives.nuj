@@ -11,7 +11,7 @@
              [[:string] [char-at   l i]]
              [[:array]  [array/ref l i]]
              [[:pair]   [list/ref  l i]]
-             [otherwise [throw [list :invalid-type "You can only use ref with a collection" l [current-lambda]]]]]]
+             [otherwise [throw [list :type-error "You can only use ref with a collection" l [current-lambda]]]]]]
 
 [defun filter [l p]
        "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
@@ -19,7 +19,7 @@
              [[:nil] #nil]
              [[:pair] [list/filter l p]]
              [[:array] [array/filter l p]]
-             [otherwise [throw [list :invalid-type "You can only use filter with a collection" l [current-lambda]]]]]]
+             [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
 
 [defun reduce [l f α]
        "Combine all elements in collection l using operation F and starting value α"
@@ -37,7 +37,7 @@
              [[:pair]   [list/length   α]]
              [[:string] [string/length α]]
              [[:tree]   [tree/size     α]]
-             [otherwise [throw [list :invalid-type "You can only use length with a collection" α [current-lambda]]]]]]
+             [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]
 
 [defun map [l f]
        "Runs f over every item in collection l and returns the resulting list"
@@ -45,7 +45,14 @@
              [[:nil] #nil]
              [[:pair] [list/map l f]]
              [[:array] [array/map l f]]
-             [otherwise [throw [list :invalid-type "You can only use map with a collection" l [current-lambda]]]]]]
+             [otherwise [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]
+
+[defun sort [l]
+       "Sorts the collection L"
+       [case [type-of l]
+             [:pair [list/sort l]]
+             [:array [array/sort l]]
+             [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
 
 [defun collection? [l]
        [case [type-of l]
