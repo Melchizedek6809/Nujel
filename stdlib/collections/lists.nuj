@@ -95,11 +95,11 @@
         "Returns the sublist of l obtained by omitting the first l elements"
         [sublist l k [length l]]]
 
-[defun member [m l]
-        "Returns the first pair of list l whose car is equal to m"
-        [cond [[nil? l] #f]
-              [[== [car l] m] l]
-              [#t [member m [cdr l]]]]]
+[defun list/member [l m]
+       "Returns the first pair of list l whose car is equal to m"
+       [cond [[nil? l] #f]
+             [[== [car l] m] l]
+             [#t [member [cdr l] m]]]]
 
 [defun getf [l key]
        "Return the value in LIST following KEY"
@@ -114,7 +114,7 @@
 		   [def next #nil]
 		   [cdr! l]
 		   [while l
-                          [if [> [car l] top]
+                          [if [<= [car l] top]
                               [do [set! next [cons top next]]
 				  [set! top [car l]]]
                               [set! next [cons [car l] next]]]

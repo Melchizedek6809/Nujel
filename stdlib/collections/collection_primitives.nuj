@@ -54,6 +54,13 @@
              [:array [array/sort l]]
              [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
 
+[defun member [l m]
+       "Returns the first pair/item of collection l whose car is equal to m"
+       [case [type-of l]
+             [:pair [list/member l m]]
+             [:tree [tree/get l m]]
+             [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
+
 [defun collection? [l]
        [case [type-of l]
              [[:pair :array] #t]

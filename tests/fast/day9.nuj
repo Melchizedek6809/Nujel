@@ -38,7 +38,7 @@
                   [+= low-point-sum [+ 1 [array/2d/ref data x y]]]
                   [set! basins [cons [count-basin-size data x y] basins]]]
        ]]
-       [def bb [list/sort basins]]
+       [def bb [reverse [sort basins]]]
        [def biggest-3-basins [list [car bb] [cadr bb] [caddr bb]]]
        @[:part1 low-point-sum :part2 [apply * biggest-3-basins]]]
 

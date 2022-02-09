@@ -3,12 +3,32 @@
 [def fmt/format-arg/default @[
      :debug #f
      :base #f
+     :precision #nil
+     :width #nil
+     :padding-char " "
 ]]
+
+[defun fmt/find-first-non-digit-from-right [s i]
+       [if [< i 0]
+           #f
+           [do [def char [char-at s i]]
+               [if [and [>= char #\0] [<= char #\9]]
+                   [fmt/find-first-non-digit-from-right s [- i 1]]
+                   i]]]]
 
 [defun fmt/parse-spec [opts spec]
        [if [zero? [string/length spec]]
            opts
            [case [char-at spec [- [string/length spec] 1]]
+                 [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
+                  [def next-non-digit [fmt/find-first-non-digit-from-right spec [- [string/length spec] 1]]]
+                  [if next-non-digit
+                      [fmt/parse-spec [tree/set! opts :precision [read/single [substr spec [+ next-non-digit 1] [string/length spec]]]]
+                                      [substr spec 0 next-non-digit]]
+                      [-> [if [== #\0 [char-at spec 0]]
+                              [tree/set! opts :padding-char "0"]
+                              opts]
+                          [tree/set! :width [read/single spec]]]]]
                  [#\? [fmt/parse-spec [tree/set! opts :debug #t]
                                       [substr spec 0 [- [string/length spec] 1]]]]
                  [#\X [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL]
@@ -47,12 +67,22 @@
 
 [defun fmt/number-format-prefix [opts]
        [if [or [not [opts :debug]] [not [opts :base]]] opts
-           [-> [if [member [opts :base] '[:binary :octal :decimal :hexadecimal :HEXADECIMAL]]
+           [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [opts :base]]
                    [tree/set! opts :argument [list cat
                                                    [fmt/number-format-prefixex [opts :base]]
                                                    [opts :argument]]]
                    opts]
                [tree/set! :debug #f]]]]
+
+[defun fmt/add-padding [opts]
+       [if-not [opts :width]
+               opts
+               [tree/set! opts :argument [list string/pad-start
+                                               [opts :argument]
+                                               [if [and [opts :debug] [opts :base]]
+                                                   [- [opts :width] 2]
+                                                   [opts :width]]
+                                               [opts :padding-char]]]]]
 
 [defun fmt/output [opts]
        [opts :argument]]
@@ -60,6 +90,7 @@
 [defun fmt/format-arg [spec argument]
        [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
            fmt/number-format
+           fmt/add-padding
            fmt/number-format-prefix
            fmt/debug
            fmt/output]]
