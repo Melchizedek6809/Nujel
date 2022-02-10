@@ -41,12 +41,9 @@ building a welcoming and supportive community.
 You can easily start experimenting with Nujel right in your browser by using a [WASM release](https://wolkenwelten.net/nujel/).
 
 ## Build Status
-| Operating System   | Master | Develop |
+|                       | Master | Develop |
 |--------------------|-----------|-----------|
-| Windows            | [![Windows](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml)|[![Windows](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/windows.yml)|
-| MacOS              | [![MacOS](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml)|[![MacOS](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/macos.yml)|
-| Ubuntu             | [![Ubuntu](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml)|[![Ubuntu](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ubuntu.yml)|
-| WASM REPL          | [![WASM](https://github.com/Melchizedek6809/Nujel/actions/workflows/wasm.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/wasm.yml)|[![WASM](https://github.com/Melchizedek6809/Nujel/actions/workflows/wasm.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/wasm.yml)|
+| CI            | [![CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml) | [![CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml) |
 
 | Operating System   | CI Status |
 |--------------------|-----------|
