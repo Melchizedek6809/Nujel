@@ -82,6 +82,7 @@ clean:
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wo')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.d')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wd')
+	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.deps')
 	@rm -f -- $(shell find binlib stdlib -type f -name '*.no')
 	@rm -f ./callgrind.out.*
 	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
@@ -94,7 +95,7 @@ distclean:
 	@rm -rf tools/emsdk
 
 %.o: %.c
-	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.wd}
+	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 %.wo: %.c
