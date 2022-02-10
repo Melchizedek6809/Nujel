@@ -1,0 +1,12 @@
+image: archlinux
+packages:
+  - clang
+sources:
+  - https://git.sr.ht/~melchizedek6809/Nujel
+tasks:
+  - compile: |
+      cd Nujel
+      make -j CC=clang
+  - test: |
+      cd Nujel
+      make test
