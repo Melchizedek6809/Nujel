@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_MISC_VEC
+#define NUJEL_LIB_MISC_VEC
 #include "../common.h"
 
 vec   vecNew      (float x, float y, float z);
@@ -34,3 +35,5 @@ vec   vecVecToDeg (const vec a);
 vec   vecDegToVec (const vec a);
 vec   vecCeil     (const vec a);
 vec   vecRound    (const vec a);
+
+#endif

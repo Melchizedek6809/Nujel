@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_NUJEL
+#define NUJEL_LIB_NUJEL
 #include "common.h"
 #include "allocation/array.h"
 #include "allocation/closure.h"
@@ -33,3 +34,5 @@ lVal     *lApply            (lClosure *c, lVal *args, lVal *fun, lVal *funSym);
 lVal     *lTry              (lClosure *c, lVal *catchRaw, lVal *bodyRaw);
 lVal     *lQuote            (lVal *v);
 void      lBreak            ();
+
+#endif

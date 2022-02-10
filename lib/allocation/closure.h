@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_CLOSURE
+#define NUJEL_LIB_ALLOC_CLOSURE
 #include "../nujel.h"
 
 #define CLO_MAX (1<<16)
@@ -11,3 +12,5 @@ void      lClosureInit      ();
 lClosure *lClosureAlloc     ();
 void      lClosureFree      (lClosure *c);
 int       lClosureID        (const lClosure *n);
+
+#endif

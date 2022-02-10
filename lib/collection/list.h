@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_COLLECTION_LIST
+#define NUJEL_LIB_COLLECTION_LIST
 #include "../nujel.h"
 #include "../type/val.h"
 
@@ -34,3 +35,5 @@ static inline lVal *lCdddr (lVal *v){return lCdr(lCdr(lCdr(v)));}
 static inline lVal *lCadddr(lVal *v){return lCar(lCdr(lCdr(lCdr(v))));}
 
 #define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
+
+#endif

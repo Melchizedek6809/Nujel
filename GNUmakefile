@@ -33,8 +33,8 @@ LIBS                 := -lm
 RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
 
-STATIC_LIBS := -static -lpthread -lm
-BIN_SRCS    := $(shell find bin -type f -name '*.c')
+STATIC_LIBS := -static -lm
+BIN_SRCS    := $(shell find bin -type f -name '*.c') vendor/getline/getline.c
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
@@ -42,12 +42,9 @@ BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 ifeq ($(OS),Windows_NT)
 	NUJEL := ./nujel.exe
 	ASSET := ./tools/assets.exe
-	BIN_SRCS += vendor/getline/getline.c
 	LIBS += -lpthread
 	LDFLAGS := -Wl,--stack,16777216
 	INSTALL_BIN_DIR := /usr/local/bin/
-else
-	BIN_SRCS += vendor/bestline/bestline.c
 endif
 
 UNAME_S := $(shell uname -s)
@@ -97,11 +94,11 @@ distclean:
 	@rm -rf tools/emsdk
 
 %.o: %.c
-	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.d}
+	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 %.wo: %.c
-	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MMD > ${<:.c=.wd}
+	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[WCC]" "$(ANSI_RESET)" $@
 
 nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo
@@ -110,7 +107,7 @@ nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo
 	@echo "$(ANSI_BG_CYAN)" "[WAR]" "$(ANSI_RESET)" $@
 
 $(ASSET): tools/assets.c
-	@$(CC) -o $@    $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
+	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
 
 nujel.a: $(LIB_OBJS)
@@ -135,7 +132,7 @@ release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 
 release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(NUJEL) -x "[exit [test-run]]"
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
@@ -202,15 +199,9 @@ runl: $(NUJEL)
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
 
-ifeq ($(OS),Windows_NT)
 .PHONY: runn
 runn: $(NUJEL)
 	rlwrap $(NUJEL)
-else
-.PHONY: runn
-runn: $(NUJEL)
-	$(NUJEL)
-endif
 
 .PHONY: install
 install: release

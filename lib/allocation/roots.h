@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_ROOTS
+#define NUJEL_LIB_ALLOC_ROOTS
 #include "../nujel.h"
 
 lClosure *lRootsClosurePush   (lClosure *c);
@@ -21,3 +22,5 @@ static inline int lRootsGet(){ return rootSP; }
 #define RSP(c) lRootsStringPush(c)
 #define RSYMP(c) lRootsSymbolPush(c)
 #define RTP(c) lRootsTreePush(c)
+
+#endif

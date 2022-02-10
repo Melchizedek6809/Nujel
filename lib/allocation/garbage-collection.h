@@ -1,4 +1,6 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_GC
+#define NUJEL_LIB_ALLOC_GC
+
 #include "../nujel.h"
 
 extern volatile bool breakQueued;
@@ -17,3 +19,5 @@ void lSymbolGCMark (const lSymbol *v);
 void lBytecodeStackMark(lVal **v);
 
 void lGarbageCollect();
+
+#endif

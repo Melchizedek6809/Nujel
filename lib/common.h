@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_COMMON
+#define NUJEL_COMMON
 /* Contains most typedefs and struct definitions
  * as well as a couple of macros for usage throughout
  * the codebase
@@ -29,14 +30,14 @@ typedef  int32_t          i32;
 typedef  int16_t          i16;
 typedef  int8_t            i8;
 
-typedef struct {
+struct vec {
 	union {
 		struct { float x,y,z; };
 		struct { float v[3]; };
 		struct { float yaw,pitch,roll; };
 	};
-} vec;
-
+};
+typedef struct vec vec;
 
 typedef uint8_t lBytecodeOp;
 
@@ -181,3 +182,5 @@ struct lSymbol {
 		struct lSymbol *nextFree;
 	};
 };
+
+#endif

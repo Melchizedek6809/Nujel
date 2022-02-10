@@ -264,7 +264,7 @@ static lVal *lnfCharAt(lClosure *c,lVal *v){
 static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 	(void)c;
 	int len = lListLength(v)+1;
-	char *buf = __builtin_alloca(len);
+	char *buf = malloc(len);
 	int i=0;
 
 	while(v != NULL){
@@ -273,7 +273,7 @@ static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 		if(i >= len){break;}
 	}
 	buf[i] = 0;
-	v = lValString(buf);
+	v = lValStringNoCopy(buf, len);
 	return v;
 }
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_TREE
+#define NUJEL_LIB_ALLOC_TREE
 #include "../nujel.h"
 
 #define TRE_MAX (1<<19)
@@ -10,3 +11,5 @@ extern lTree *lTreeFFree;
 void   lTreeInit ();
 lTree *lTreeAlloc();
 void   lTreeFree (lTree *t);
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef NUJEL_LIB_TYPE_SYSTEM
+#define NUJEL_LIB_TYPE_SYSTEM
+
 #include "nujel.h"
 
 i64         castToInt   (const lVal *v, i64         fallback);
@@ -16,3 +18,5 @@ lType lTypecast         (const lType a, const lType b);
 void  lOperationsTypeSystem(lClosure *c);
 
 static inline bool isComment(lVal *v){return v && v->type == ltComment;}
+
+#endif

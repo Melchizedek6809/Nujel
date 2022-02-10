@@ -13,31 +13,26 @@
 #if defined(__MINGW32__) || defined(__MSYS__)
 	#include <windows.h>
 	#include <shlobj.h>
-	#include "../../vendor/getline/getline.h"
-	/* Since bestline does not support windows,
-	 * these serve as a simple replacement.
-	 */
-	#define BUF_SIZE (1 << 14)
-	static void bestlineHistoryLoad(const char *path){(void)path;}
-	static void bestlineHistorySave(const char *path){(void)path;}
-	static void bestlineHistoryAdd (const char *line){(void)line;}
-	static char *bestline(const char *prompt){
-		char *buf = NULL;
-		size_t bufsize = 0;
-
-		fputs(prompt, stdout);
-		const ssize_t ret = getline(&buf,&bufsize,stdin);
-
-		if(ret >= 0){
-			buf[MIN(bufsize-1,(size_t)ret)] = 0;
-			return buf;
-		}else{
-			return NULL;
-		}
-	}
-#else
-	#include "../../vendor/bestline/bestline.h"
 #endif
+#include "../../vendor/getline/getline.h"
+#define BUF_SIZE (1 << 14)
+static void bestlineHistoryLoad(const char *path){(void)path;}
+static void bestlineHistorySave(const char *path){(void)path;}
+static void bestlineHistoryAdd (const char *line){(void)line;}
+static char *bestline(const char *prompt){
+	char *buf = NULL;
+	size_t bufsize = 0;
+
+	fputs(prompt, stdout);
+	const ssize_t ret = getline(&buf,&bufsize,stdin);
+
+	if(ret >= 0){
+		buf[MIN(bufsize-1,(size_t)ret)] = 0;
+		return buf;
+	}else{
+		return NULL;
+	}
+}
 
 const char *getHistoryPath(){
 	static char buf[512];

@@ -63,6 +63,19 @@ static lVal *lnfLogNot(lClosure *c, lVal *v){
 	return lValInt(~lCar(t)->vInt);
 }
 
+#ifdef __TINYC__
+static inline uint64_t __builtin_popcount(uint64_t x){
+    uint64_t m1 = 0x5555555555555555;
+    uint64_t m2 = 0x3333333333333333;
+    uint64_t m4 = 0x0f0f0f0f0f0f0f0f;
+    x -= (x >> 1) & m1;
+    x = (x & m2) + ((x >> 2) & m2);
+    x = (x + (x >> 4)) & m4;
+    x += x >>  8;
+    return (x + (x >> 16)) & 0x3f;
+}
+#endif
+
 static lVal *lnfPopCount(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCast(c,v,ltInt);

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_NFUNC
+#define NUJEL_LIB_ALLOC_NFUNC
 #include "../nujel.h"
 
 #define NFN_MAX (1<<10)
@@ -10,3 +11,5 @@ void      lNativeFunctionsInit();
 void      lNFuncFree          (uint i);
 lNFunc   *lNFuncAlloc         ();
 int       lNFuncID            (const lNFunc *n);
+
+#endif

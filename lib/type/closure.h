@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_TYPE_CLOSURE
+#define NUJEL_LIB_TYPE_CLOSURE
 #include "../nujel.h"
 
 lClosure *lClosureNew       (lClosure *parent);
@@ -14,3 +15,5 @@ void      lSetClosureSym    (lClosure *c, const lSymbol *s, lVal *v);
 void      lDefineVal        (lClosure *c, const char *str,  lVal *v);
 
 lVal     *lLambdaNew        (lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body);
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_COLLECTION_TREE
+#define NUJEL_LIB_COLLECTION_TREE
 #include "../nujel.h"
 
 lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
@@ -15,3 +16,5 @@ lVal  *lTreeKeysToList      (const lTree *t);
 lVal  *lTreeValuesToList    (const lTree *t);
 
 uint   lTreeSize            (const lTree *t);
+
+#endif

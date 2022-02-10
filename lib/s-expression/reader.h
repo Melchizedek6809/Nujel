@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_SEXPR_READER
+#define NUJEL_LIB_SEXPR_READER
 #include "../nujel.h"
 #include "../collection/string.h"
 
@@ -8,3 +9,5 @@ lVal *lRead             (const char *str);
 lVal *lReadValue        (lString *s);
 lVal *lReadList         (lString *s, bool rootForm);
 void  lOperationsReader (lClosure *c);
+
+#endif

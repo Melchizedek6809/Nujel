@@ -274,9 +274,8 @@ static lVal *lParseNumber(lString *s, i64 (*parser)(lString *, int *)){
 			const double valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
 			return lValFloat(negative ? -valf : valf);
 		}
-	}else{
-		return lValInt(negative ? -val : val);
 	}
+	return lValInt(negative ? -val : val);
 }
 
 /* Parse s as a character constant and return it's value as an ltInt lVal */

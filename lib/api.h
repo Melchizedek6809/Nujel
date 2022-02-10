@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_API
+#define NUJEL_API
 /* The API is still very unstable, still this is the
  * header that should be included if you want to link
  * Nujel into your program.
@@ -31,3 +32,5 @@
 #include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef NUJEL_LIB_EXCEPTION
+#define NUJEL_LIB_EXCEPTION
+
 #include "nujel.h"
 #include <setjmp.h>
 
@@ -11,3 +13,5 @@ void  lExceptionThrow       (const char *symbol, const char *error) __attribute_
 void  lExceptionThrowVal    (const char *symbol, const char *error, lVal *v) __attribute__((noreturn));
 void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) __attribute__((noreturn));
 void *lExceptionTry         (void *(*body)(void *,void *), void *a, void *b);
+
+#endif

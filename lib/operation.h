@@ -1,4 +1,6 @@
-#pragma once
+#ifndef NUJEL_LIB_OPERATION
+#define NUJEL_LIB_OPERATION
+
 #include "nujel.h"
 
 
@@ -25,3 +27,5 @@ void lOperationsString     (lClosure *c);
 void lOperationsTime       (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsVector     (lClosure *c);
+
+#endif

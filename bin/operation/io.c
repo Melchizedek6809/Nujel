@@ -238,11 +238,12 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	(void) c;
+	char pathBuf[512];
 
 	const char *path = castToString(lCar(v),NULL);
 	const bool showHidden = castToBool(lCadr(v));
 	if(path == NULL){
-		path = getcwd(__builtin_alloca(512),512);
+		path = getcwd(pathBuf,512);
 		if(path == NULL){return NULL;}
 	}
 

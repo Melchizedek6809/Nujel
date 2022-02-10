@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUJEL_LIB_ALLOC_SYMBOL
+#define NUJEL_LIB_ALLOC_SYMBOL
 #include "../nujel.h"
 
 #define SYM_MAX (1<<14)
@@ -17,3 +18,5 @@ lSymbol  *getTypeSymbol(const lVal *a);
 
 static inline int lSymIndex(const lSymbol *s){return s - lSymbolList;}
 static inline lSymbol *lIndexSym(uint i){return (i >= lSymbolMax) ? NULL : &lSymbolList[i];}
+
+#endif
