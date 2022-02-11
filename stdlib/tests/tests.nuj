@@ -1096,6 +1096,7 @@
 [test/add :format-error [try car [compile '[fmt "abc {{}}" "def"]]]]
 [test/add :format-error [try car [compile '[fmt "abc {" "def}"]]]]
 [test/add :format-error [try car [compile '[fmt "" "abc"]]]]
+[test/add "a 0 b cd e 5" [eval [compile '[let [[i 0]] [fmt "a {i} b {} e {}" [cat "c" "d"] [+ 2 3]]]]]]
 [test/add :type-error [try car [string/pad-start 123 4 #\0]]]
 [test/add :type-error [try car [string/pad-start "123" 4 #\0]]]
 [test/add :type-error [try car [string/pad-end 123 4 #\0]]]

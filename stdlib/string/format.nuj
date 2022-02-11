@@ -174,3 +174,11 @@
 [defmacro efmt [format-string . args]
           "Print a formatted string"
           `[error [fmt ~format-string ~@args]]]
+
+[defmacro pfmtln [format-string . args]
+          "Print a formatted string"
+          `[println [fmt ~format-string ~@args]]]
+
+[defmacro efmtln [format-string . args]
+          "Print a formatted string"
+          `[errorln [fmt ~format-string ~@args]]]

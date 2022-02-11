@@ -7,6 +7,10 @@
        "Print STR on a single line"
        [print [cat str "\r\n"]]]
 
+[defun errorln [str]
+       "Print to stderr STR on a single line"
+       [print [cat str "\r\n"]]]
+
 [defun display [value]
         "Display VALUE"
         [print value]]

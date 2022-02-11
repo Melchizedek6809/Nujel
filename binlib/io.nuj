@@ -3,11 +3,13 @@
 
 [defun help [i]
        "Describe 10 functions at offset 1"
-       [def off [* [int i] 10]]
-       [for-each [map [symbol-table off 10] cat]
-                 [\ [l] [println [cat l " " [describe l]]]]]
-       [println [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
-       #t]
+       [when-not [int? i] [set! i [int i]]]
+       [def off [* i 10]]
+       [for-each [map [symbol-table off 10] string]
+                 [\ [l] [def desc [describe l]]
+                        [pfmtln "{l} {desc}"]]]
+       [def sc [/ [symbol-count] 10]]
+       [pfmtln "Help page {i} of {sc}"]]
 
 [defun file/compile [path no-write environment]
         "Compile a Nujel source file into optimized object code"
