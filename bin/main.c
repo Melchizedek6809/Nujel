@@ -28,7 +28,7 @@ static void *runRaw(void *cl, void *body){
 const char *run(const char *line){
 	const int SP = lRootsGet();
 	lVal *exp = RVP(lList(2,RVP(lValSym("repl/wasm")),RVP(lValString(line))));
-	lVal *v = lExceptionTry(runRaw,mainClosure,exp);
+	lVal *v = lExceptionTryExit(runRaw,mainClosure,exp);
 	const char *ret = v ? lReturnDisplayVal(v) : "";
 	lRootsRet(SP);
 	return ret;
@@ -72,7 +72,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			if(c == NULL){c = createRootClosure(loadStdLib);}
 			size_t len = 0;
 			char *str = loadFile(argv[i],&len);
-			lExceptionTry(readEvalStringRaw,c,str);
+			lExceptionTryExit(readEvalStringRaw,c,str);
 			free(str);
 			readNext = false;
 		}else if(argv[i][0] == '-'){
@@ -121,7 +121,7 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	ret = lCons(lValSym("repl/init"), ret);
 	lRootsRet(SP);
 	RVP(ret);
-	lExceptionTry(evalRaw,c,ret);
+	lExceptionTryExit(evalRaw,c,ret);
 	mainClosure = c;
 }
 

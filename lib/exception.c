@@ -42,17 +42,24 @@ __attribute__((noreturn)) void lExceptionThrowValClo(const char *symbol, const c
 	lExceptionThrowRaw(l);
 }
 
+static void exceptionCatchExit(lVal *exc){
+	epf("Root Exception:\n%V\n",exc);
+}
+
 /* Execute BODY(A,B) with a fallback exception handler set that writes everything to stdout before exiting. */
-void *lExceptionTry(void *(*body)(void *,void *), void *a, void *b){
+void *lExceptionTryExit(void *(*body)(void *,void *), void *a, void *b){
+	return lExceptionTryCatch(body, a, b, exceptionCatchExit);
+}
+
+void *lExceptionTryCatch(void *(*body)(void *,void *), void *a, void *b, void (*handler)(lVal *exceptionValue)){
 	jmp_buf oldExceptionTarget;
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 
 	exceptionTargetDepth++;
 	int ret = setjmp(exceptionTarget);
 	if(ret){
-		epf("Root Exception:\n%V\n",exceptionValue);
+		handler(exceptionValue);
 		exceptionTargetDepth--;
-		exit(200);
 		return NULL;
 	}else{
 		void *doRet = body(a, b);

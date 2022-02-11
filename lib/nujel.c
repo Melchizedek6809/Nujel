@@ -365,7 +365,7 @@ static void *lNewRootReal(void *a, void *b){
 /* Create a new root closure with the default stdlib using the
  * fallback exception handler */
 lClosure *lNewRoot(){
-	return lExceptionTry(lNewRootReal,NULL,NULL);
+	return lExceptionTryExit(lNewRootReal,NULL,NULL);
 }
 
 void lBreak(){
