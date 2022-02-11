@@ -7,23 +7,21 @@
        [for-each [map [symbol-table off 10] cat]
                  [\ [l] [println [cat l " " [describe l]]]]]
        [println [cat "Help page " [int i] " of " [/ [symbol-count] 10]]]
-       #t
-]
+       #t]
 
 [defun file/compile [path no-write environment]
         "Compile a Nujel source file into optimized object code"
         [def source [cons 'do [read [file/read path]]]]
         [def object-code [compile/forms source environment]]
-        [when-not no-write [file/write [cat [path/without-extension path] ".no"] [str/write object-code]]]
-        object-code
-]
+        [when-not no-write [file/write [cat [path/without-extension path] ".no"]
+                                       [if object-code [str/write object-code] ""]]]
+        object-code]
 
 [defun file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environmnet [set! environment root-closure]]
        [def source [cons 'do [read [file/read path]]]]
-       [compile/forms [cons 'do source] environment]
-]
+       [compile/forms [cons 'do source] environment]]
 
 [defun eval/forked [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
@@ -33,8 +31,7 @@
         [def command [cat nujel-binary " " tmp-path]]
         [def res [popen command]]
         [file/remove tmp-path]
-        [cons [car res] [cdr res]]
-]
+        [cons [car res] [cdr res]]]
 [def test-context "Nujel Standalone"]
 
 [defun file/file? [filename]
