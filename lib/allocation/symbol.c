@@ -17,6 +17,21 @@ uint     lSymbolActive = 0;
 uint     lSymbolMax    = 0;
 lSymbol *lSymbolFFree = NULL;
 
+// a hash index over the symbol array.  It is essentially a sparse map such that
+// for a string S, lHashSymStr(S) is a slot in the hash table (with linear
+// probing if there's a hash collision).  Then lSymbolIndex[slot] is the
+// position in lSymbolList where the actual symbol is stored, and
+// lSymbolBackIndex[pos] is the opposite mapping from a position in lSymbolList
+// to the corresponding slot in the hash table.
+// lSymbolIndex stores all indices 1-based, because it allows us to use 0 to
+// mean that the slot is empty which is more convenient.  negative values denote
+// deleted slots, and positive values denote used slots.
+int      lSymbolIndex[SYM_MAX];
+int      lSymbolBackIndex[SYM_MAX];
+#define SYMBOL_SLOT_IS_EMPTY(X) (X == 0)
+#define SYMBOL_SLOT_IS_TOMB(X)  (X < 0)
+#define SYMBOL_SLOT_IS_USED(X)  (X > 0)
+
 lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
 lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree, *lSymLTBytecodeOp,*lSymLTBytecodeArray;
 
@@ -72,6 +87,9 @@ void lSymbolFree(lSymbol *s){
 	s->c[sizeof(s->c)-1] = 0xFF;
 	lSymbolFFree = s;
 	lSymbolActive--;
+	int symIndex = lSymIndex(s);
+	int slot = lSymbolBackIndex[symIndex];
+	lSymbolIndex[slot] = -symIndex;
 }
 
 lSymbol *lSymSL(const char *str, uint len){
@@ -82,11 +100,55 @@ lSymbol *lSymSL(const char *str, uint len){
 	return lSymS(buf);
 }
 
+uint lHashSymStr(const char *str)
+{
+	uint res = 0x12345678;
+	while (*str) {
+		res = (res << 4) | ((res & 0xf0000000) >> 28);
+		res += *str++;
+	}
+	return res;
+}
+
+// Probes the symbol index and returns the slot where STR is stored.  If STR is
+// not in the map, returns a slot where it could be inserted, which could be
+// either an empty slot or a tomb slot from when a different symbol with a hash
+// collision was deleted.
+uint lSymbolIndexSlot(const char *str)
+{
+	uint firstTomb = 0xffffffff;
+	uint h = lHashSymStr(str) % SYM_MAX;
+	uint hInitial = h;
+	do {
+		int idx = lSymbolIndex[h];
+		if(SYMBOL_SLOT_IS_EMPTY(idx)){
+			return firstTomb == 0xffffffff ? h : firstTomb;
+		}
+		if(SYMBOL_SLOT_IS_TOMB(idx) && firstTomb == 0xffffffff){
+			firstTomb = h;
+		}
+		if(SYMBOL_SLOT_IS_USED(idx)){
+			--idx;
+			if (0 == strncmp(str,lSymbolList[idx].c,sizeof(lSymbolList[idx].c)-1)
+				&& 0 == lSymbolList[idx].c[sizeof(lSymbolList[idx].c)-1])
+			{
+				return h;
+			}
+		}
+		if (++h == SYM_MAX) {
+			h = 0;
+		}
+	} while (h != hInitial);
+	lPrintError("lSymbolIndexSlot Overflow\n");
+	exit(123);
+	return 0;
+}
+
 lSymbol *lSymS(const char *str){
-	for(uint i = 0;i<lSymbolMax;i++){
-		if(strncmp(str,lSymbolList[i].c,sizeof(lSymbolList[i].c)-1)){continue;}
-		if(lSymbolList[i].c[sizeof(lSymbolList[i].c)-1]){continue;}
-		return &lSymbolList[i];
+	uint slot = lSymbolIndexSlot(str);
+	int symIndex = lSymbolIndex[slot];
+	if(SYMBOL_SLOT_IS_USED(symIndex)){
+		return &lSymbolList[symIndex-1];
 	}
 	lSymbol *ret;
 	if(lSymbolFFree){
@@ -109,6 +171,9 @@ lSymbol *lSymS(const char *str){
 	lSymbolActive++;
 	spf(ret->c, &ret->c[sizeof(ret->c)], "%s", str);
 	ret->c[sizeof(ret->c)-1] = 0;
+	symIndex = lSymIndex(ret);
+	lSymbolIndex[slot] = symIndex + 1;
+	lSymbolBackIndex[symIndex] = slot;
 	return ret;
 }
 
