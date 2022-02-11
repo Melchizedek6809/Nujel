@@ -7,6 +7,7 @@
 #include "../exception.h"
 #include "../nujel.h"
 #include "../type-system.h"
+#include "../misc/pf.h"
 #include "../misc/vec.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
@@ -174,7 +175,9 @@ static i64 lnfSubI(lVal *v){
 }
 static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	if((t == NULL) || (t->vList.car == NULL)){
+		lExceptionThrowValClo(":arity-error","/ expects at least 1 argument", NULL, c);
+	}
 	lRootsValPush(t);
 	switch(t->vList.car->type){
 		default:      return exceptionThrow(c, v,"substraction");
@@ -207,7 +210,7 @@ static i64 lnfMulI(lVal *v){
 }
 lVal *lnfMul(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	if((t == NULL) || (t->vList.car == NULL)){return lValInt(1);}
 	lRootsValPush(t);
 	switch(t->vList.car->type){
 		default:      return exceptionThrow(c, v,"multiplication");
@@ -235,8 +238,6 @@ static double lnfDivF(lVal *v){
 	return acc;
 }
 
-
-
 static i64 lnfDivI(lClosure *c, lVal *v){
 	i64 acc = v->vList.car->vInt;
 	v = v->vList.cdr;
@@ -251,7 +252,19 @@ static i64 lnfDivI(lClosure *c, lVal *v){
 }
 lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
+	if((t == NULL) || (t->vList.car == NULL)){
+		lExceptionThrowValClo(":arity-error","/ expects at least 1 argument", NULL, c);
+	}
+	if(t->vList.cdr == NULL){
+		switch(t->vList.car->type){
+		default: return exceptionThrow(c, v,"division");
+		case ltInt:
+			if(t->vInt == 0){lExceptionThrowValClo(":division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
+			return lValFloat(1.0 / ((double)t->vList.car->vInt));
+		case ltFloat: return lValFloat(1.0 / t->vList.car->vFloat);
+		case ltVec:   return lValVec(vecDiv(vecOne(),t->vList.car->vVec));
+		}
+	}
 	lRootsValPush(t);
 	switch(t->vList.car->type){
 		default:      return exceptionThrow(c, v,"division");
