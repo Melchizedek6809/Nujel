@@ -357,23 +357,34 @@ lVal *lReadList(lString *s, bool rootForm){
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
 				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-				lExceptionThrowValClo(":unmatched-opening-bracket", "Unmatched opening bracket", err,readClosure);
+				lExceptionThrowValClo(":read-error", "Unmatched opening bracket", err,readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
-		}else if((c == ']') || (c == ')') || (c == '}')){
+		}else if(iscloseparen(c)){
 			if(rootForm){
 				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-				lExceptionThrowValClo(":unmatched-closing-bracket", "Unmatched closing bracket", err, readClosure);
+				lExceptionThrowValClo(":read-error", "Unmatched closing bracket", err, readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else{
 			const u8 next = s->data[1];
-			if(v != NULL && (c == '.') && (isspace(next) || isnonsymbol(next))){
+			if((c == '.') && (isspace(next) || isnonsymbol(next))){
+				if(v == NULL){
+					lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+					lExceptionThrowValClo(":read-error", "Missing car in dotted pair", err, readClosure);
+				}
 				s->data++;
-				lStringAdvanceToNextCharacter(s);
-				lVal *nv = lReadValue(s);
+				lVal *nv;
+				do {
+					if((s->data >= s->bufEnd) || (*s->data == 0) || iscloseparen(*s->data)){
+						lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+						lExceptionThrowValClo(":read-error", "Missing cdr in dotted pair", err, readClosure);
+					}
+					lStringAdvanceToNextCharacter(s);
+					nv = lReadValue(s);
+				} while(isComment(nv));
 				v->vList.cdr = isComment(nv) ? NULL : nv;
 				continue;
 			}else{
