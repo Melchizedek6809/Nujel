@@ -435,14 +435,15 @@ lVal *lReadValue(lString *s){
 		s->data++;
 		if(s->data >= s->bufEnd){
 			return NULL;
-		}else if(*s->data == '_'){
+		}else if(*s->data == ';'){
 			++s->data;
 			if((s->data < s->bufEnd) && isopenparen(*s->data)){
 				s->data++;
 				lReadList(s,false);
 				return lValComment();
 			}else{
-				lExceptionThrowValClo(":invalid-comment", "Comment reader forms have to use brackets/parenthesis around the value to be commented out", NULL, readClosure);
+				lReadValue(s);
+				return lValComment();
 			}
 		}else{
 			return lParseSpecial(s);
