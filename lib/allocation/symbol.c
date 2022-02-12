@@ -100,8 +100,7 @@ lSymbol *lSymSL(const char *str, uint len){
 	return lSymS(buf);
 }
 
-uint lHashSymStr(const char *str)
-{
+uint lHashSymStr(const char *str){
 	uint res = 0x12345678;
 	while (*str) {
 		res = (res << 4) | ((res & 0xf0000000) >> 28);
@@ -114,8 +113,7 @@ uint lHashSymStr(const char *str)
 // not in the map, returns a slot where it could be inserted, which could be
 // either an empty slot or a tomb slot from when a different symbol with a hash
 // collision was deleted.
-uint lSymbolIndexSlot(const char *str)
-{
+uint lSymbolIndexSlot(const char *str){
 	uint firstTomb = 0xffffffff;
 	uint h = lHashSymStr(str) % SYM_MAX;
 	uint hInitial = h;
