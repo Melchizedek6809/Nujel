@@ -1,0 +1,14 @@
+#!/usr/bin/env
+
+[defun test-sort [times sort-func]
+       [def l #nil]
+       [for [i 0 times]
+            [set! l [cons [random/rng!] l]]]
+       [set! sorted [sort-func l]]
+       [while sorted
+              [when [and [cadr sorted]
+                         [> [car sorted] [cadr sorted]]]
+                    [throw :list-not-sorted]]
+              [cdr! sorted]]]
+
+[test-sort 1500 list/sort/bubble]
