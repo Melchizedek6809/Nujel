@@ -44,6 +44,7 @@ __attribute__((noreturn)) void lExceptionThrowValClo(const char *symbol, const c
 
 static void exceptionCatchExit(lVal *exc){
 	epf("Root Exception:\n%V\n",exc);
+	exit(200);
 }
 
 /* Execute BODY(A,B) with a fallback exception handler set that writes everything to stdout before exiting. */
