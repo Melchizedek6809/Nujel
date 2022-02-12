@@ -115,32 +115,26 @@ lVal *lValStringConst(const char *c,int len){
 /* Return a string value, containing a mark from ERR to ERREND,
  * which has to be within BUF and BUFSTART */
 lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd){
-	char buf[512];
 	const char *lineStart, *lineEnd;
+	if(bufEnd <= bufStart){return NULL;}
+	if(errStart > err){return NULL;}
+	if(errEnd < err){return NULL;}
+
 	for(lineStart = errStart; (lineStart > bufStart) && (*lineStart != '\n'); lineStart--){}
 	if(*lineStart == '\n'){lineStart++;}
 	for(lineEnd = errEnd; (lineEnd < bufEnd) && (*lineEnd != '\n'); lineEnd++){}
 
-	char *data = buf;
-	if((errStart - lineStart) > 30){
-		data = spf(data,&buf[sizeof(buf)],"...");
-		lineStart = errStart - 30;
-	}
-	while(lineStart < err){*data++ = *lineStart++;}
+	const char *msgStart = MAX(lineStart, (errStart - 30));
+	const char *msgEnd = MIN(lineEnd, (errEnd + 30));
+	const size_t bufSize = (msgEnd - msgStart) + 3 + 3 + 1;
+	char *outbuf = malloc(bufSize);
+	char *outbufEnd = &outbuf[bufSize];
+	char *data = outbuf;
+
+	if(msgStart != lineStart){data = spf(data, outbufEnd, "...");}
+	memcpy(data, msgStart, msgEnd - msgStart);
+	data += (msgEnd - msgStart);
+	if(msgEnd != lineEnd){data = spf(data, outbufEnd, "...");}
 	*data = 0;
-	data = spf(data,&buf[sizeof(buf)], "\033[41m%c\033[49m",*err);
-	bool endAbbreviated = false;
-	if((lineEnd - errEnd) > 30){
-		lineEnd = errEnd + 30;
-		endAbbreviated = true;
-	}
-	lineStart = err+1;
-	while(lineStart < lineEnd){*data++ = *lineStart++;}
-	if(endAbbreviated){
-		*data++ = '.';
-		*data++ = '.';
-		*data++ = '.';
-	}
-	*data = 0;
-	return lValString(buf);
+	return lValStringNoCopy(outbuf, data - outbuf);
 }

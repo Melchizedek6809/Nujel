@@ -213,6 +213,7 @@ static i64 lParseNumberOctal(lString *s, int *leadingZeroes){
 static i64 lParseNumberDecimal(lString *s, int *leadingZeroes){
 	i64 ret = 0;
 	int zeroes = 0;
+	int digits = 0;
 	const char *start = s->data;
 
 	for(;(s->data < s->bufEnd);s->data++){
@@ -221,6 +222,11 @@ static i64 lParseNumberDecimal(lString *s, int *leadingZeroes){
 		if(!ret && (c == '0')){zeroes++;}
 		if((c >= '0')  && (c <= '9')){
 			ret = (ret * 10) + (c - '0');
+			if(++digits > 18){
+				const char *end;
+				for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+				lExceptionThrowValClo(":invalid-literal", "Decimal literal is too big to be read without a loss in precision", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			}
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
