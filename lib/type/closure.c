@@ -52,20 +52,30 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 
 /* Return TRUE if C contains a binding for S, storing the value in V */
 bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
-	if(c == NULL){return NULL;}
 	bool found = false;
-	lVal *t = lTreeGet(c->data,s,&found);
-	if(found && (v != NULL)){
-		*v = t;
+	while(c != NULL){
+		lVal *t = lTreeGet(c->data,s,&found);
+		if(found){
+			if(v != NULL){
+				*v = t;
+			}
+			return true;
+		}
+		c = c->parent;
 	}
-	return found ? true : lHasClosureSym(c->parent,s,v);
+	return false;
 }
 
 /* Return the value bound to S in C */
 lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
-	if(c == NULL){return NULL;}
 	lVal *ret;
-	return lTreeHas(c->data,s,&ret) ? ret : lGetClosureSym(c->parent,s);
+	while(c != NULL){
+		if(lTreeHas(c->data,s,&ret)){
+			return ret;
+		}
+		c = c->parent;
+	}
+	return NULL;
 }
 
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */
