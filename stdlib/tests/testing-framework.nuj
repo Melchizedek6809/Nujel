@@ -22,43 +22,33 @@
 [defun display-results []
        "Prints the result Message"
        [random/seed-initialize!]
-       [error [cat test-context " [" OS " " ARCH "] - "
-                   [if [and [zero? error-count] [> test-count 0]]
-                       "Success - ["
-                       "Failed! - ["]
-                   [ansi-green success-count]
-                   " / "
-                   [ansi-red error-count]
-                   "] in "
-                   [- [time/milliseconds] nujel-start]
-                   "ms - "
-                   [if [and [zero? error-count] [> test-count 0]]
-                       [ansi-rainbow "Everything is working, very nice!"]
-                       [ansi-red "Better fix those!"]]
-                   "\r\n"]]]
+       [eval '[efmtln "{test-context} [{OS} {ARCH}] - {} - [{} / {}] in {} ms - {}"
+               [if [and [zero? error-count] [> test-count 0]]
+                       "Success"
+                       "Failed!"]
+               [ansi-green success-count]
+               [ansi-red error-count]
+               [- [time/milliseconds] nujel-start]
+               [if [and [zero? error-count] [> test-count 0]]
+                   [ansi-rainbow "Everything is working, very nice!"]
+                   [ansi-red "Better fix those!"]]]]]
 
 [defun test-success [res-should res-is expr i]
        "Should be called after a test has finished successfully"
-       [when print-passes [error [cat "stdlib/tests.nuj:" i ":1: "
-                                      [ansi-green "[PASS] -> "]
-                                      [ansi-green [str/write res-is]]
-                                      " != "
-                                      [ansi-green [str/write res-should]]
-                                      "\r\n"
-                                      [str/write expr]
-                                      "\r\n\r\n"]]]
+       [when print-passes
+             [eval '[efmtln "stdlib/tests/tests.nuj:{i}:1 {} == {}\r\n{}\r\n\r\n"
+                            [ansi-green [str/write res-is]]
+                            [ansi-green [str/write res-should]]
+                            [str/write expr]]]]
        [set! success-count [+ 1 success-count]]]
 
 [defun test-failure [res-should res-is expr i]
        "Should be called if EXPR does not equal RES"
-       [when print-errors [error [cat "stdlib/tests.nuj:" i ":1: "
-                                      [ansi-red "[FAIL] -> "]
-                                      [ansi-red [str/write res-is]]
-                                      " != "
-                                      [ansi-green [str/write res-should]]
-                                      "\r\n"
-                                      [str/write expr]
-                                      "\r\n\r\n"]]]
+       [when print-errors
+             [eval '[efmtln "stdlib/tests/tests.nuj:{i}:1 {} != {}\r\n{}\r\n\r\n"
+                            [ansi-red [str/write res-is]]
+                            [ansi-green [str/write res-should]]
+                            [str/write expr]]]]
        [set! error-count [+ 1 error-count]]]
 
 [defun test-bytecode [result rawexpr i]
@@ -102,7 +92,7 @@
        [set! nujel-start    [time/milliseconds]]
        [set! success-count  0]
        [set! error-count    0]
-       [def i [- test-count 1]]
+       [def i [+ test-count 1]]
        [for-in [cur-test test-list]
                [test [car cur-test] [cdr cur-test] [-- i]]]
        [display-results]
