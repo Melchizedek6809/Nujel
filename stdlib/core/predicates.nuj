@@ -39,12 +39,12 @@
         "#t if VAL is not zero"
         [!= 0 val]]
 
-[defun list-equal? [a b]
+[defun list/equal? [a b]
         "#t if A and B are equal"
         [if-not [== [type-of a] [type-of b]] #f
                 [if [pair? a]
-                    [and [list-equal? [car a] [car b]]
-                         [list-equal? [cdr a] [cdr b]]]
+                    [and [list/equal? [car a] [car b]]
+                         [list/equal? [cdr a] [cdr b]]]
                     [== a b]]]]
 
 [defun int? [val]
