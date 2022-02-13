@@ -64,15 +64,21 @@ static lVal *lnfLogNot(lClosure *c, lVal *v){
 }
 
 #ifdef __TINYC__
-static inline uint64_t __builtin_popcount(uint64_t x){
-    uint64_t m1 = 0x5555555555555555;
-    uint64_t m2 = 0x3333333333333333;
-    uint64_t m4 = 0x0f0f0f0f0f0f0f0f;
+/* Classic binary divide-and-conquer popcount.
+   This is popcount_2() from
+   http://en.wikipedia.org/wiki/Hamming_weight */
+static inline uint32_t popcount_2(uint32_t x){
+    uint32_t m1 = 0x55555555;
+    uint32_t m2 = 0x33333333;
+    uint32_t m4 = 0x0f0f0f0f;
     x -= (x >> 1) & m1;
     x = (x & m2) + ((x >> 2) & m2);
     x = (x + (x >> 4)) & m4;
     x += x >>  8;
     return (x + (x >> 16)) & 0x3f;
+}
+static inline __builtin_popcountll(uint64_t x){
+	return popcount_2(x) + popcount_2(x >> 32);
 }
 #endif
 
@@ -80,7 +86,7 @@ static lVal *lnfPopCount(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
 	lVal *t = lCast(c,v,ltInt);
 	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
-	return lValInt(__builtin_popcount(lCar(t)->vInt));
+	return lValInt(__builtin_popcountll(lCar(t)->vInt));
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){

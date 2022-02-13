@@ -1142,6 +1142,10 @@
 [test/add :invalid-literal [try car [read/single "1000000000000000000"]]]
 [test/add 999999999999999999 [read/single "999999999999999999"]]
 [test/add 100000000000000000 [read/single "100000000000000000"]]
+[test/add 0 [popcount 0]]
+[test/add 8 [popcount 255]]
+[test/add 15 [popcount #b1100001000010000101101011010101101]]
+[test/add 64 [popcount [lognot 0]]]
 
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
 
