@@ -146,3 +146,10 @@
 
 ; Set default sort to merge-sort
 [def list/sort list/sort/merge]
+
+[defun list/equal? [a b]
+        "#t if A and B are equal"
+        [if [pair? a]
+            [and [list/equal? [car a] [car b]]
+                 [list/equal? [cdr a] [cdr b]]]
+            [equal? a b]]]
