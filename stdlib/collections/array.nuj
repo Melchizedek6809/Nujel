@@ -57,6 +57,20 @@
                     [++ ri]]]
        [array/length! ret ri]]
 
+[defun array/equal? [a b]
+       [if [or [not [array? a]]
+               [not [array? b]]
+               [!= [array/length a]
+                   [array/length b]]]
+           #f
+           [let [[ret #t]]
+                [for [i 0 [array/length a]]
+                     [when-not [equal? [array/ref a i]
+                                       [array/ref b i]]
+                               [set! ret #f]
+                               [set! i [array/length a]]]]
+                ret]]]
+
 [defun array/push [arr . val]
        "Append all arguments following ARR to ARR"
        [for-in [v val]

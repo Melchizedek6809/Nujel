@@ -1147,6 +1147,15 @@
 [test/add 8 [popcount 255]]
 [test/add 15 [popcount #b1100001000010000101101011010101101]]
 [test/add 64 [popcount [lognot 0]]]
+[test/add #t [array/equal? #[1 2 3] #[1 2 3]]]
+[test/add #f [array/equal? #[2 2 3] #[1 2 3]]]
+[test/add #f [array/equal? #[1 2 3] #[1 2 3 4]]]
+[test/add #f [array/equal? #[1 2 3 4] #[1 2 3]]]
+[test/add #t [array/equal? #[1.0 2.0 3.0] #[1.0 2.0 3.0]]]
+[test/add #t [array/equal? #[:a :b :c] #[:a :b :c]]]
+[test/add #f [array/equal? #[:a :b :c] #[:a :b :d]]]
+[test/add #f [array/equal? #["a" "b" "c"] #["a" "b" "d"]]]
+[test/add #t [array/equal? #["a" "b" "c"] #["a" "b" "c"]]]
 
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
 
