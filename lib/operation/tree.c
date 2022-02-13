@@ -1,4 +1,4 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+ /* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
 #include "../operation.h"
@@ -10,6 +10,7 @@
 #include "../collection/list.h"
 #include "../collection/tree.h"
 #include "../type/native-function.h"
+#include "../type/symbol.h"
 #include "../type/val.h"
 #include "../type-system.h"
 
@@ -99,6 +100,7 @@ static lVal *lnfTreeSize(lClosure *c, lVal *v){
 	return lValInt(tree == 0 ? 0 : lTreeSize(tree));
 }
 
+/* [tree/dup tree] - Return a duplicate of TREE */
 static lVal *lnfTreeDup(lClosure *c, lVal *v){
 	(void)c;
 	if((v == NULL)
@@ -115,6 +117,46 @@ static lVal *lnfTreeDup(lClosure *c, lVal *v){
 	return lValTree(tree);
 }
 
+/* [tree/key* tree] - return the key of a tree */
+static lVal *lnfTreeKeyAst(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if(car->type != ltTree){
+		lExceptionThrowValClo(":type-error","tree/key* can only be called with a tree", v, c);
+	}
+	return car->vTree ? lValSymS(car->vTree->key) : NULL;
+}
+
+/* [tree/value* tree] - return the value of a tree */
+static lVal *lnfTreeValueAst(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if(car->type != ltTree){
+		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+	}
+	return car->vTree ? car->vTree->value : NULL;
+}
+
+/* [tree/left* tree] - return the right branch of a tree */
+static lVal *lnfTreeLeftAst(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if(car->type != ltTree){
+		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+	}
+	return (car->vTree && car->vTree->left) ? lValTree(car->vTree->left) : NULL;
+}
+
+/* [tree/right* tree] - return the left branch of a tree */
+static lVal *lnfTreeRightAst(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	if(car->type != ltTree){
+		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+	}
+	return (car->vTree && car->vTree->right) ? lValTree(car->vTree->right) : NULL;
+}
+
 void lOperationsTree(lClosure *c){
 	lnfvTreeGet = lAddNativeFunc(c,"tree/get","[tree sym]","Return the value of SYM in TREE, or #nil", lnfTreeGet);
 	lAddNativeFunc(c,"tree/new",     "[...plist]",     "Return a new tree", lnfTreeNew);
@@ -126,4 +168,9 @@ void lOperationsTree(lClosure *c){
 	lAddNativeFunc(c,"tree/has?",    "[tree sym]",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
 	lAddNativeFunc(c,"tree/set!",    "[tree sym val]", "Set SYM to VAL in TREE", lnfTreeSet);
 	lAddNativeFunc(c,"tree/dup",     "[tree]",         "Return a duplicate of TREE", lnfTreeDup);
+
+	lAddNativeFunc(c,"tree/key*",    "[tree]",         "Low-level: return the key for TREE segment", lnfTreeKeyAst);
+	lAddNativeFunc(c,"tree/value*",  "[tree]",         "Low-level: return the value for TREE segment", lnfTreeValueAst);
+	lAddNativeFunc(c,"tree/left*",   "[tree]",         "Low-level: return the left ref for TREE segment", lnfTreeLeftAst);
+	lAddNativeFunc(c,"tree/right*",  "[tree]",         "Low-level: return the right ref for TREE segment", lnfTreeRightAst);
 }

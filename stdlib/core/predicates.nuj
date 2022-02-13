@@ -46,6 +46,7 @@
            #f
            [case cur-type
                  [:array [array/equal? a b]]
+                 [:tree [tree/equal? a b]]
                  [:pair [list/equal? a b]]
                  [otherwise [== a b]]]]]
 

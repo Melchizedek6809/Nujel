@@ -27,3 +27,17 @@
 [defmacro tree/-- [t k]
        "Increment value at K in T by 1"
        `[tree/-= ~t ~k 1]]
+
+[defun tree/equal? [a b]
+       "Compares two trees for equality"
+       [if [and [tree? a]
+                [tree? b]]
+           [and [== [tree/key* a]
+                    [tree/key* b]]
+                [equal? [tree/value* a]
+                        [tree/value* b]]
+                [tree/equal? [tree/left* a]
+                             [tree/left* b]]
+                [tree/equal? [tree/right* a]
+                             [tree/right* b]]]
+           [equal? a b]]]
