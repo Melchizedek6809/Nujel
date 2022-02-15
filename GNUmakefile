@@ -1,4 +1,6 @@
-INSTALL_BIN_DIR := ~/bin/
+prefix      := /usr/local
+exec_prefix  = $(prefix)
+bindir       = $(exec_prefix)/bin/
 
 EMCC        := emcc
 EMAR        := emar
@@ -16,8 +18,6 @@ LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
 NUJEL       := ./nujel
 NUJEL_BOOT  := ./nujel-bootstrap
-#NUJEL_BOOT  := /usr/local/bin/nujel.exe
-#NUJEL_BOOT  := /home/benny/bin/nujel
 ASSET       := ./tools/assets
 
 CC                   := cc
@@ -44,7 +44,6 @@ ifeq ($(OS),Windows_NT)
 	ASSET := ./tools/assets.exe
 	LIBS += -lpthread
 	LDFLAGS := -Wl,--stack,16777216
-	INSTALL_BIN_DIR := /usr/local/bin/
 endif
 
 UNAME_S := $(shell uname -s)
@@ -113,7 +112,7 @@ $(ASSET): tools/assets.c
 
 nujel.a: $(LIB_OBJS)
 	@rm -rf $@
-	@ar cq $@ $^
+	@$(AR) cq $@ $^
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
 $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
@@ -180,6 +179,9 @@ tmp/binlib.h: tmp/binlib.c
 test: $(NUJEL)
 	@$(NUJEL) tools/tests.nuj
 
+.PHONY: check
+check: run
+
 .PHONY: test.slow
 test.slow: $(NUJEL)
 	@$(NUJEL) --:slow-test tools/tests.nuj
@@ -206,11 +208,13 @@ runn: $(NUJEL)
 
 .PHONY: install
 install: release
-	cp $(NUJEL) $(INSTALL_BIN_DIR)
+	mkdir -p $(bindir)
+	$(INSTALL) $(NUJEL) $(bindir)
 
 .PHONY: install.musl
 install.musl: release.musl
-	cp $(NUJEL) $(INSTALL_BIN_DIR)
+	mkdir -p $(BINDIR)
+	$(INSTALL) $(NUJEL) $(bindir)
 
 .PHONY: profile
 profile: $(NUJEL)

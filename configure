@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "No need for configure, just type `make` and you are good to go!"
