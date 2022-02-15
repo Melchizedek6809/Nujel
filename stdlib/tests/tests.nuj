@@ -1178,6 +1178,9 @@
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:a 1 :b 3]]]
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:c 1 :b 2]]]
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:b 1 :b 2]]]
+[test/add #t [procedure? car]]
+[test/add #t [procedure? eval*]]
+[test/add #t [procedure? procedure?]]
 
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
 

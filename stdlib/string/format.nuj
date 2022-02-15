@@ -41,6 +41,8 @@
                                       [substr spec 0 [- [string/length spec] 1]]]]
                  [#\b [fmt/parse-spec [tree/set! opts :base :binary]
                                       [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\< [fmt/parse-spec [tree/set! opts :base :binary]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
                  [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
 [defun fmt/debug [opts]

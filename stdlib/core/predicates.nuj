@@ -112,7 +112,7 @@
 
 [defun procedure? [val]
         "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val]]]
+        [or [lambda? val] [native? val] [special-form? val]]]
 
 [defun bytecode-array? [v]
        [== :bytecode-array [type-of v]]]
