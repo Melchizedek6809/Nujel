@@ -119,7 +119,7 @@ static lVal *lnfSubstr(lClosure *c, lVal *v){
 	int start, slen, len;
 	lVal *str = lCar(v);
 	if((str == NULL) || (str->type != ltString)){
-		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo(":type-error","[string/substr] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 

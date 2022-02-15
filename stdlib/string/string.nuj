@@ -110,6 +110,20 @@
            [substr text 0 goal-length]
            text]]
 
+[defun string/pad-middle [text goal-length char]
+       "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
+       [when-not char [set! char " "]]
+       [when-not [string? text] [set! text [string text]]]
+       [when-not [string? char]
+                 [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
+       [while [< [string/length text] goal-length]
+              [set! text [cat char text char]]]
+       [if [> [string/length text] goal-length]
+           [let [[end-overflow [/ [- [string/length text] goal-length] 2]]
+                 [start-overflow [- [- [string/length text] goal-length] end-overflow]]]
+                [substr text start-overflow [+ start-overflow goal-length]]]
+           text]]
+
 [defun split/empty [str separator]
        [def slen [string/length str]]
        [def start 0]

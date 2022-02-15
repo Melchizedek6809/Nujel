@@ -1,34 +1,33 @@
 ; Subroutines and macros for formatted text output
 
 [def fmt/format-arg/default @[
+     :align :right
      :debug #f
      :base #f
-     :precision #nil
      :width #nil
      :padding-char " "
 ]]
 
 [defun fmt/find-first-non-digit-from-right [s i]
        [if [< i 0]
-           #f
+           -1
            [do [def char [char-at s i]]
                [if [and [>= char #\0] [<= char #\9]]
                    [fmt/find-first-non-digit-from-right s [- i 1]]
                    i]]]]
 
 [defun fmt/parse-spec [opts spec]
+       #;[println [cat spec " -> " [str/write opts]]]
        [if [zero? [string/length spec]]
            opts
            [case [char-at spec [- [string/length spec] 1]]
                  [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
                   [def next-non-digit [fmt/find-first-non-digit-from-right spec [- [string/length spec] 1]]]
-                  [if next-non-digit
-                      [fmt/parse-spec [tree/set! opts :precision [read/single [substr spec [+ next-non-digit 1] [string/length spec]]]]
-                                      [substr spec 0 next-non-digit]]
-                      [-> [if [== #\0 [char-at spec 0]]
-                              [tree/set! opts :padding-char "0"]
-                              opts]
-                          [tree/set! :width [read/single spec]]]]]
+                  [def number [substr spec [+ 1 next-non-digit] [string/length spec]]]
+                  [tree/set! opts :width [read/single number]]
+                  [when [== #\0 [char-at number 0]]
+                        [tree/set! opts :padding-char "0"]]
+                  [fmt/parse-spec opts [substr spec 0 [+ 1 next-non-digit]]]]
                  [#\? [fmt/parse-spec [tree/set! opts :debug #t]
                                       [substr spec 0 [- [string/length spec] 1]]]]
                  [#\X [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL]
@@ -41,7 +40,11 @@
                                       [substr spec 0 [- [string/length spec] 1]]]]
                  [#\b [fmt/parse-spec [tree/set! opts :base :binary]
                                       [substr spec 0 [- [string/length spec] 1]]]]
-                 [#\< [fmt/parse-spec [tree/set! opts :base :binary]
+                 [#\< [fmt/parse-spec [tree/set! opts :align :left]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\^ [fmt/parse-spec [tree/set! opts :align :center]
+                                      [substr spec 0 [- [string/length spec] 1]]]]
+                 [#\> [fmt/parse-spec [tree/set! opts :align :right]
                                       [substr spec 0 [- [string/length spec] 1]]]]
                  [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
@@ -79,7 +82,10 @@
 [defun fmt/add-padding [opts]
        [if-not [opts :width]
                opts
-               [tree/set! opts :argument [list string/pad-start
+               [tree/set! opts :argument [list [case [opts :align]
+                                                     [:right   string/pad-start]
+                                                     [:center string/pad-middle]
+                                                     [:left  string/pad-end]]
                                                [opts :argument]
                                                [if [and [opts :debug] [opts :base]]
                                                    [- [opts :width] 2]
