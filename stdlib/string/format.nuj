@@ -17,7 +17,7 @@
                    i]]]]
 
 [defun fmt/parse-spec [opts spec]
-       #;[println [cat spec " -> " [str/write opts]]]
+       ;[println [cat spec " -> " [str/write opts]]]
        [if [zero? [string/length spec]]
            opts
            [case [char-at spec [- [string/length spec] 1]]
@@ -45,6 +45,8 @@
                  [#\^ [fmt/parse-spec [tree/set! opts :align :center]
                                       [string/cut spec 0 [- [string/length spec] 1]]]]
                  [#\> [fmt/parse-spec [tree/set! opts :align :right]
+                                      [string/cut spec 0 [- [string/length spec] 1]]]]
+                 [#\. [fmt/parse-spec [tree/set! opts :precision [tree/get opts :width]]
                                       [string/cut spec 0 [- [string/length spec] 1]]]]
                  [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
@@ -92,13 +94,30 @@
                                                    [opts :width]]
                                                [opts :padding-char]]]]]
 
+[defun fmt/precision [opts]
+       [if-not [opts :precision]
+               opts
+               [tree/set! opts :argument [list string/round
+                                               [opts :argument]
+                                               [opts :precision]]]]]
+
+[defun fmt/truncate [opts]
+       [if-not [opts :width]
+               opts
+               [tree/set! opts :argument [list string/cut
+                                               [opts :argument]
+                                               0
+                                               [+ 1 [opts :width]]]]]]
+
 [defun fmt/output [opts]
        [opts :argument]]
 
 [defun fmt/format-arg [spec argument]
        [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
            fmt/number-format
+           fmt/precision
            fmt/add-padding
+           fmt/truncate
            fmt/number-format-prefix
            fmt/debug
            fmt/output]]

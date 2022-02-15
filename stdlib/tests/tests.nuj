@@ -1116,6 +1116,9 @@
 [test/add :type-error [try car [compile '[fmt]]]]
 [test/add 1 [string/length [eval [compile '[fmt "{:}" "\n"]]]]]
 [test/add 4 [string/length [eval [compile '[fmt "{:?}" "\n"]]]]] ;
+[test/add "   255" [eval [compile '[fmt "{:6d}" 255]]]]
+[test/add "     99.12" [eval [compile '[fmt "{:10.2d}" 99.1234]]]]
+[test/add " 99.12" [eval [compile '[fmt "{:6.2d}" 99.1234]]]]
 [test/add "ff" [eval [compile '[fmt "{:x}" 255]]]]
 [test/add "#xff" [eval [compile '[fmt "{:x?}" 255]]]]
 [test/add "#xFF" [eval [compile '[fmt "{:X?}" 255]]]]

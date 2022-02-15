@@ -124,6 +124,13 @@
                 [string/cut text start-overflow [+ start-overflow goal-length]]]
            text]]
 
+[defun string/round [text decimal-digits]
+       "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period"
+       [def pos [last-index-of text "."]]
+       [if [>= pos 0]
+           [string/cut text 0 [+ pos 1 decimal-digits]]
+           text]]
+
 [defun split/empty [str separator]
        [def slen [string/length str]]
        [def start 0]
