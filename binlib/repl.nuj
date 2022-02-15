@@ -92,14 +92,14 @@
 
 [defun repl/parse-options [options]
        [if [== [char-at options 0] #\-]
-           [repl/parse-option [str->sym [substr options 1]]]
+           [repl/parse-option [str->sym [string/cut options 1]]]
            [for-each [map [split options ""] str->sym] repl/parse-option]]
 ]
 
 [defun repl/parse-arg [arg]
        [cond [repl/parse-args/eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
                         [set! repl/eval-next #f]]
-             [[== [char-at arg 0] #\-] [repl/parse-options [substr arg 1]]]
+             [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
              [#t [try display/error
 		      [file/eval arg]]
                  [set! repl/parse-args/run-repl #f]]

@@ -114,25 +114,21 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfSubstr(lClosure *c, lVal *v){
+static lVal *lnfStringCut(lClosure *c, lVal *v){
 	(void)c;
 	int start, slen, len;
 	lVal *str = lCar(v);
 	if((str == NULL) || (str->type != ltString)){
-		lExceptionThrowValClo(":type-error","[string/substr] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo(":type-error","[string/cut] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 
 	const char *buf = str->vString->data;
 	slen = len = lStringLength(str->vString);
-	start = castToInt(lCadr(v), 0);
-	len   = MIN(len,castToInt(lCaddr(v), len));
+	start = MAX(0, castToInt(lCadr(v), 0));
+	len   = MIN(slen - start, castToInt(lCaddr(v), len) - start);
 
-	if(start >= slen){return lValString("");}
-	if(start < 0){start = slen + start;}
-	if(len < 0)  {len   = slen + len;}
-	len = MIN(slen,len-start);
-
+	if(len <= 0){return lValString("");}
 	return lValStringLen(&buf[start], len);
 }
 
@@ -284,7 +280,7 @@ void lOperationsString(lClosure *c){
 	          lAddNativeFunc(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
 	          lAddNativeFunc(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
 	          lAddNativeFunc(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
-	          lAddNativeFunc(c,"substr",        "[str &start &stop]",       "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfSubstr);
+	          lAddNativeFunc(c,"string/cut",    "[str &start &stop]",       "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
 	          lAddNativeFunc(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
 	          lAddNativeFunc(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 	          lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);

@@ -11,7 +11,7 @@
 [defun prog-str [fun-color i path start]
        [cat "[" [fun-color [string/pad-start i 2]]
             "/" [string/pad-start test/count 2]
-	    "] " [string/pad-end [substr path 2 [length path]] 32]
+	    "] " [string/pad-end [cut path 2 [length path]] 32]
 	    [if start [cat " " [ansi-blue [string/pad-start [- [time/milliseconds] start] 5]] "ms"] #nil]]]
 
 [def test/slow [or [repl/options :slow-test] #f]]

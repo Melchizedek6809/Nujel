@@ -4,7 +4,7 @@
        [string/pad-start [int->string/binary [read/single [cat "#x" s]]] 4 "0"]]
 
 [defun bits/read-value [s offset len]
-       [read/single [cat "#b" [substr s offset [+ offset len]]]]]
+       [read/single [cat "#b" [string/cut s offset [+ offset len]]]]]
 
 [defun bits/> [a b] [if [> a b] 1 0]]
 [defun bits/< [a b] [if [< a b] 1 0]]
@@ -61,10 +61,10 @@
        [def off offset]
        [while [== [char-at s off] #\1]
 	      [++ off]
-	      [set! parts [cons [substr s off [+ 4 off]] parts]]
+	      [set! parts [cons [string/cut s off [+ 4 off]] parts]]
 	      [+= off 4]]
        [++ off]
-       [set! parts [cons [substr s off [+ 4 off]] parts]]
+       [set! parts [cons [string/cut s off [+ 4 off]] parts]]
        [+= off 4]
        [cons off [tree/set! p :value [read/single [cat "#b" [join [nreverse parts]]]]]]]
 

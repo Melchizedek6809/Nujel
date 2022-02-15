@@ -153,3 +153,19 @@
             [and [list/equal? [car a] [car b]]
                  [list/equal? [cdr a] [cdr b]]]
             [equal? a b]]]
+
+[defun list/take [l count]
+       "Take the first COUNT elements from list L"
+       [if [<= count 0]
+           #nil
+           [cons [car l] [list/take [cdr l] [- count 1]]]]]
+
+[defun list/drop [l count]
+       "Drop the final COUNT elements from list L"
+       [if [<= count 0]
+           l
+           [list/drop [cdr l] [- count 1]]]]
+
+[defun list/cut [l start end]
+       "Return a subsequence of L from START to END"
+       [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]

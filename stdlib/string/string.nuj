@@ -34,14 +34,14 @@
        "Return the extension of PATH"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
-           [substr path [+ 1 last-period] [string/length path]]
+           [string/cut path [+ 1 last-period] [string/length path]]
            path]]
 
 [defun path/without-extension [path]
        "Return PATH, but without the extension part"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
-           [substr path 0 last-period]
+           [string/cut path 0 last-period]
            path]]
 
 [defun int->string/binary [α]
@@ -95,7 +95,7 @@
        [while [< [string/length text] goal-length]
               [set! text [cat char text]]]
        [if [> [string/length text] goal-length]
-           [substr text [- [string/length text] goal-length] [string/length text]]
+           [string/cut text [- [string/length text] goal-length] [string/length text]]
            text]]
 
 [defun string/pad-end [text goal-length char]
@@ -107,7 +107,7 @@
        [while [< [string/length text] goal-length]
               [set! text [cat text char]]]
        [if [> [string/length text] goal-length]
-           [substr text 0 goal-length]
+           [string/cut text 0 goal-length]
            text]]
 
 [defun string/pad-middle [text goal-length char]
@@ -121,7 +121,7 @@
        [if [> [string/length text] goal-length]
            [let [[end-overflow [/ [- [string/length text] goal-length] 2]]
                  [start-overflow [- [- [string/length text] goal-length] end-overflow]]]
-                [substr text start-overflow [+ start-overflow goal-length]]]
+                [string/cut text start-overflow [+ start-overflow goal-length]]]
            text]]
 
 [defun split/empty [str separator]
@@ -129,7 +129,7 @@
        [def start 0]
        [def ret #nil]
        [while [< start slen]
-	      [set! ret [cons [substr str start [+ 1 start]] ret]]
+	      [set! ret [cons [string/cut str start [+ 1 start]] ret]]
 	      [++ start]]
        [reverse ret]]
 
@@ -137,9 +137,9 @@
        [when-not start [set! start 0]]
        [def pos-found [index-of str separator start]]
        [if [>= pos-found 0]
-	   [cons [substr str start pos-found]
+	   [cons [string/cut str start pos-found]
 		 [split/string str separator [+ pos-found [string/length separator]]]]
-	   [cons [substr str start [string/length str]]
+	   [cons [string/cut str start [string/length str]]
 		 #nil]]]
 
 [defun split [str separator]
