@@ -118,3 +118,12 @@
        arr]
 
 [def array/sort array/heap-sort]
+
+[defun array/cut [arr start end]
+       "Return a newly allocated array with the values of ARR from START to END"
+       [set! start [max 0 start]]
+       [set! end [min [array/length arr] end]]
+       [def ret [array/allocate [max 0 [- end start]]]]
+       [for [i start end]
+            [array/set! ret [- i start] [array/ref arr i]]]
+       ret]

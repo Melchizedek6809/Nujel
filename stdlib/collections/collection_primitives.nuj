@@ -64,6 +64,7 @@
 [defun cut [l start end]
        "Return a subcollection of L from START to END"
        [case [type-of l]
+             [:array [array/cut l start end]]
              [:pair [list/cut l start end]]
              [:string [string/cut l start end]]
              [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]

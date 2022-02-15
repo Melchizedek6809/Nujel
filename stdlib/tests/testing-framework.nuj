@@ -55,10 +55,7 @@
        "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter"
        [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [byterun rawexpr]]
-            [def pred? ==]
-            [when [pair? result]
-                  [set! pred? list/equal?]]
-            [if [pred? result expr]
+            [if [equal? result expr]
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]
 
@@ -66,10 +63,7 @@
        "Tests that RAWEXPR evaluates to RESULT"
        [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [eval rawexpr]]
-            [def pred? ==]
-            [when [pair? result]
-                  [set! pred? list/equal?]]
-            [if [pred? result expr]
+            [if [equal? result expr]
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]
 
@@ -78,13 +72,10 @@
           "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
           [def eval-result [eval/forked nujel-runtime rawexpr]]
           [def expr [cdr eval-result]]
-          [def pred? ==]
           [when-not [string? result]
                     [set! expr [car [read expr]]]]
-          [when [pair? result]
-                [set! pred? list/equal?]]
           [if [and [zero? [car eval-result]]
-                   [pred? result expr]]
+                   [equal? result expr]]
               [test-success result expr rawexpr i]
               [test-failure result expr rawexpr i]]]]
 
