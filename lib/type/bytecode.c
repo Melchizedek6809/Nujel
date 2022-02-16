@@ -10,6 +10,8 @@
 #include "../collection/list.h"
 #include "../misc/pf.h"
 
+#include <string.h>
+
 typedef enum lOpcode {
 	lopNOP             =  0x0,
 	lopRet             =  0x1,
@@ -70,24 +72,20 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	return ret;
 }
 
-static lVal *lBytecodeReadOPVal(const lBytecodeOp **rip){
-	const lBytecodeOp *ip = *rip;
+static const lBytecodeOp *lBytecodeReadOPVal(const lBytecodeOp *ip, lVal **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
 	i = (i << 8) | *ip++;
-	lVal *ret = lIndexVal(i);
-	*rip = ip;
-	return ret;
+	*ret = lIndexVal(i);
+	return ip;
 }
 
-static lSymbol *lBytecodeReadOPSym(const lBytecodeOp **rip){
-	const lBytecodeOp *ip = *rip;
+static const lBytecodeOp *lBytecodeReadOPSym(const lBytecodeOp *ip, lSymbol **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
 	i = (i << 8) | *ip++;
-	lSymbol *ret = lIndexSym(i);
-	*rip = ip;
-	return ret;
+	*ret = lIndexSym(i);
+	return ip;
 }
 
 static int lBytecodeGetOffset16(const lBytecodeOp *ip){
@@ -96,15 +94,44 @@ static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 }
 
 lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
-	const lBytecodeOp *ip = ops->data;
+	jmp_buf oldExceptionTarget;
+	const lBytecodeOp *ip;
 	const int gcsp = lRootsGet();
 	lVal *stack[VALUE_STACK_SIZE];
 	lClosure *cloStack[CALL_STACK_SIZE];
 	lClosure *c = lClosureNew(callingClosure);
-	cloStack[0] = c;
-	int sp  = pushList(stack, 0, args);
-	int csp = 1;
+	volatile int csp = 1;
+	int sp;
+	int exceptionCount = 0;
 	c->type = closureLet;
+	memset(stack, 0, sizeof(stack));
+	memset(cloStack, 0, sizeof(cloStack));
+	lRootsValStackPush(stack);
+	lRootsCallStackPush(cloStack);
+	cloStack[0] = c;
+
+	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
+	exceptionTargetDepth++;
+	const int setjmpRet = setjmp(exceptionTarget);
+	if(setjmpRet){
+		while((csp >= 0) && (c->type != closureTry)){
+			c = cloStack[--csp];
+		}
+		if((csp >= 0) && (++exceptionCount < 100000) && (c->type == closureTry)){
+			ip = c->ip;
+			sp = c->sp;
+			stack[sp++] = exceptionValue;
+			c = cloStack[--csp];
+		}else{
+			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
+			lExceptionThrowRaw(exceptionValue);
+			return NULL;
+		}
+	}else{
+		ip = ops->data;
+		sp = pushList(stack, 0, args);
+		csp = 1;
+	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 	switch(*ip){
@@ -133,8 +160,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		break;
 	case lopPushLVal: {
-		ip++;
-		stack[sp++] = lBytecodeReadOPVal(&ip);
+		ip = lBytecodeReadOPVal(ip+1, &stack[sp++]);
 		break;}
 	case lopMakeList: {
 		const int len = *++ip;
@@ -158,9 +184,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break; }
 	case lopApplyDynamic: {
 		const int len = *++ip;
-		lVal *fun = RVP(stack[--sp]);
 		lVal *cargs = lStackBuildList(stack, sp, len);
 		sp -= len;
+		lVal *fun = RVP(stack[--sp]);
 		ip++;
 		stack[sp++] = lApply(c, cargs, fun, fun);
 		break; }
@@ -183,34 +209,39 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if(--sp < 0){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
 		break;
-	case lopDef:
-		ip++;
-		lDefineClosureSym(c, lBytecodeReadOPSym(&ip), stack[sp - 1]);
-		break;
-	case lopSet:
-		ip++;
-		lSetClosureSym(c, lBytecodeReadOPSym(&ip), stack[--sp]);
-		break;
-	case lopGet:
-		ip++;
-		stack[sp++] = lGetClosureSym(c, lBytecodeReadOPSym(&ip));
-		break;
+	case lopDef: {
+		lSymbol *sym;
+		ip = lBytecodeReadOPSym(ip+1, &sym);
+		lDefineClosureSym(c, sym, stack[sp - 1]);
+		break; }
+	case lopSet: {
+		lSymbol *sym;
+		ip = lBytecodeReadOPSym(ip+1, &sym);
+		lSetClosureSym(c, sym, stack[sp - 1]);
+		break; }
+	case lopGet: {
+		lSymbol *sym;
+		ip = lBytecodeReadOPSym(ip+1, &sym);
+		stack[sp++] = lGetClosureSym(c, sym);
+		break; }
 	case lopLambda: {
-		ip++;
-		lVal *cName = lBytecodeReadOPVal(&ip);
-		lVal *cArgs = lBytecodeReadOPVal(&ip);
-		lVal *cDocs = lBytecodeReadOPVal(&ip);
-		lVal *cBody = lBytecodeReadOPVal(&ip);
+		lVal *cName, *cArgs, *cDocs, *cBody;
+		ip = lBytecodeReadOPVal(ip+1, &cName);
+		ip = lBytecodeReadOPVal(ip, &cArgs);
+		ip = lBytecodeReadOPVal(ip, &cDocs);
+		ip = lBytecodeReadOPVal(ip, &cBody);
 		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
 		break;}
 	case lopMacro: {
-		ip++;
-		lVal *cName = lBytecodeReadOPVal(&ip);
-		lVal *cArgs = lBytecodeReadOPVal(&ip);
-		lVal *cDocs = lBytecodeReadOPVal(&ip);
-		lVal *cBody = lBytecodeReadOPVal(&ip);
+		lVal *cName, *cArgs, *cDocs, *cBody;
+		ip = lBytecodeReadOPVal(ip+1, &cName);
+		ip = lBytecodeReadOPVal(ip, &cArgs);
+		ip = lBytecodeReadOPVal(ip, &cDocs);
+		ip = lBytecodeReadOPVal(ip, &cBody);
 		stack[sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
-		if(stack[sp-1]){stack[sp-1]->type = ltMacro;}
+		if(stack[sp-1]){
+			stack[sp-1]->type = ltMacro;
+		}
 		break;}
 	case lopClosurePush:
 		ip++;
@@ -222,12 +253,14 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if((cObj->type != ltLambda) && (cObj->type != ltObject)){lExceptionThrowValClo(":invalid-closure", "Error while trying to enter a closure", cObj, c);}
 		cloStack[csp++] = c;
 		c = cObj->vClosure;
+		cloStack[csp] = c;
 		break; }
 	case lopLet:
 		ip++;
 		cloStack[csp++] = c;
 		c = lClosureNew(c);
 		c->type = closureLet;
+		cloStack[csp] = c;
 		break;
 	case lopClosurePop:
 		ip++;
@@ -249,6 +282,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		cloStack[csp++] = c;
 		c = lClosureNew(c);
 		c->type = closureCall;
+		cloStack[csp] = c;
 		ip += lBytecodeGetOffset16(ip+1);
 		break;
 	case lopTry:
@@ -257,6 +291,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		c->type = closureTry;
 		c->ip = ip + lBytecodeGetOffset16(ip+1);
 		c->sp = sp;
+		cloStack[csp] = c;
 		ip+=3;
 		break;
 	case lopRet:
@@ -275,7 +310,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		if(csp == 0){
 			lRootsRet(gcsp);
-			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			if(sp < 1){
+				lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);
+				return NULL;
+			}
+			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
+			exceptionTargetDepth--;
 			return stack[--sp];
 		}
 		break;
@@ -334,6 +374,18 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){
 		default: break;
+		case lopDef:
+		case lopGet:
+		case lopSet:
+			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
+			break;
+		case lopLambda:
+		case lopMacro:
+			lValGCMark(lIndexVal((c[ 1] << 16) | (c[ 2] << 8) | c[ 3]));
+			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));
+			lValGCMark(lIndexVal((c[ 7] << 16) | (c[ 8] << 8) | c[ 9]));
+			lValGCMark(lIndexVal((c[10] << 16) | (c[11] << 8) | c[12]));
+			break;
 		case lopPushLVal:
 			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;

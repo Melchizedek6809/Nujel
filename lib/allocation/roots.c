@@ -24,6 +24,8 @@ typedef struct {
 		lString  *vString;
 		lSymbol  *vSymbol;
 		void     *vPointer;
+		lVal     **vValRef;
+		lClosure **vClosureRef;
 	};
 } rootEntry;
 
@@ -78,11 +80,25 @@ void lRootsBytecodePush(lVal *start){
 	lRootsPush(ltBytecodeOp, start);
 }
 
+void lRootsValStackPush  (lVal **c){
+	lRootsPush(ltValueStack, c);
+}
+
+void lRootsCallStackPush (lClosure **c){
+	lRootsPush(ltCallStack, c);
+}
+
 void (*rootsMarkerChain)() = NULL;
 /* Mark every single root and everything they point to */
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){
+		case ltValueStack:
+			lValStackGCMark(rootStack[i].vValRef);
+			break;
+		case ltCallStack:
+			lCallStackGCMark(rootStack[i].vClosureRef);
+			break;
 		case ltLambda:
 			lClosureGCMark(rootStack[i].vClosure);
 			break;

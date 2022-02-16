@@ -201,8 +201,12 @@ lVal *lEval(lClosure *c, lVal *v){
 				lVal *args = lArgsEval(resolved) ? lMap(c,lCdr(v),lEval) : lCdr(v);
 				return lApply(c, args, resolved, car);
 			}else{
-				lExceptionThrowValClo(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
-				return NULL;
+				if(car->vSymbol && lSymKeyword(car->vSymbol)){
+					return v;
+				}else{
+					lExceptionThrowValClo(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
+					return NULL;
+				}
 			}}
 		case ltPair:
 			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);

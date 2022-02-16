@@ -35,6 +35,20 @@ u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
 u8 lSymbolMarkMap [SYM_MAX];
 
+void lValStackGCMark(lVal **v){
+	if(v == NULL){return;}
+	for(int i=0;i<VALUE_STACK_SIZE;i++){
+		lValGCMark(v[i]);
+	}
+}
+
+void lCallStackGCMark(lClosure **v){
+	if(v == NULL){return;}
+	for(int i=0;i<CALL_STACK_SIZE;i++){
+		lClosureGCMark(v[i]);
+	}
+}
+
 /* Mark v as being in use so it won't get freed by the GC */
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}

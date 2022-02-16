@@ -176,7 +176,7 @@ static i64 lnfSubI(lVal *v){
 static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
 	if((t == NULL) || (t->vList.car == NULL)){
-		lExceptionThrowValClo(":arity-error","/ expects at least 1 argument", NULL, c);
+		lExceptionThrowValClo(":arity-error","- expects at least 1 argument", NULL, c);
 	}
 	lRootsValPush(t);
 	switch(t->vList.car->type){

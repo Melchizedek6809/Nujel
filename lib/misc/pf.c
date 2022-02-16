@@ -112,7 +112,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		if(v->vClosure->parent == NULL){
 			ret = spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
 		}else{
-			ret = spf(cur, bufEnd, "[ω %T]", v->vClosure->data);
+			ret = spf(cur, bufEnd, "[ω %M]", v->vClosure->data);
 		}
 		break;
 	case ltMacro:
@@ -320,12 +320,26 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			case 'V':
 				cur = writeVal(cur, bufEnd, va_arg(va, const lVal *), true);
 				break;
-			case 't':
+			case 'm':
 				cur = writeTree(cur, bufEnd, va_arg(va, const lTree *));
 				break;
-			case 'T':
+			case 'M':
 				cur = writeTreeDef(cur, bufEnd, va_arg(va, const lTree *));
 				break;
+			case 't': {
+				const lSymbol *typeSym = getTypeSymbol(va_arg(va, const lVal *));
+				if(typeSym){
+					cur = writeString(cur, bufEnd, typeSym->c);
+				}
+				break; }
+			case 'T': {
+				const lVal *val = va_arg(va, const lVal *);
+				cur = writeVal(cur, bufEnd, val, true);
+				const lSymbol *typeSym = getTypeSymbol(val);
+				if(typeSym){
+					cur = writeString(cur, bufEnd, typeSym->c);
+				}
+				break; }
 			}
 			format++;
 		}else{

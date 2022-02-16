@@ -33,12 +33,18 @@
             [$apply [length args] op]]]
 
 [defun bytecompile/def [source env]
-       [when [or [not [cadr source]] [not [symbol? [cadr source]]] [not [caddr source]]] [throw [list :syntax-error "[def] needs a symbol name and a value as arguments" #nil env]]]
+       [when [or [not [symbol? [cadr source]]]
+                 [not [cddr source]]]
+             [throw [list :syntax-error
+                          "[def] needs a symbol name and a value as arguments" #nil env]]]
        [list [bytecompile* [caddr source] env]
              [$def [cadr source]]]]
 
 [defun bytecompile/set! [source env]
-       [when [or [not [cadr source]] [not [symbol? [cadr source]]] [not [caddr source]]] [throw [list :syntax-error "[set!] needs a symbol name and a value as arguments" #nil env]]]
+       [when [or [not [symbol? [cadr source]]]
+                 [not [cddr source]]]
+             [throw [list :syntax-error
+                          "[set!] needs a symbol name and a value as arguments" #nil env]]]
        [list [bytecompile* [caddr source] env]
              [$set [cadr source]]]]
 
@@ -78,12 +84,9 @@
 
 [defun bytecompile/procedure/dynamic [op args env]
        [def arg-count [length args]]
-       [if args
-           [list [bytecompile/procedure/arg args]
-                 [bytecompile* op env]
-                 [$apply/dynamic arg-count]]
-           [list [bytecompile* op env]
-                 [$apply/dynamic 0]]]]
+       [list [bytecompile* op env]
+             [when args [bytecompile/procedure/arg args]]
+             [$apply/dynamic arg-count]]]
 
 [defun bytecompile/and/rec [source env label-end]
        [list [bytecompile* [car source] env]
@@ -140,12 +143,12 @@
 [defun bytecompile/try  [source env]
        [def handler-sym [bytecompile/gen-label]]
        [def end-sym [bytecompile/gen-label]]
-       [println [str/write [cddr source]]]
-       [list [$try handler-sym]
-             [bytecompile/do [cddr source] env]
+       [list [bytecompile* [cadr source] env]
+             [$try handler-sym]
+             [bytecompile/do/form [cddr source] env]
              [$jmp end-sym]
              [list :label handler-sym]
-             [$apply 1 [cadr source]]
+             [$apply/dynamic 1]
              [list :label end-sym]]]
 
 [defun bytecompile* [source env]
@@ -170,7 +173,7 @@
                     [quote [bytecompile/quote [cadr source]]]
                     [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
              [[:lambda :native-function] [bytecompile/procedure op [cdr source] env]]
-             [:pair   [bytecompile/procedure/dynamic op [cdr source] env]]
+             [[:pair :symbol] [bytecompile/procedure/dynamic op [cdr source] env]]
              [:string [bytecompile/string source env]]
              [:array  [bytecompile/array source env]]
              [:tree   [bytecompile/tree source env]]

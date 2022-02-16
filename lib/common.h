@@ -49,6 +49,8 @@ typedef struct lBytecodeArray{
 typedef enum lType {
 	ltNoAlloc = 0,
 	ltComment,
+	ltValueStack,
+	ltCallStack,
 
 	ltSymbol,
 	ltBool,

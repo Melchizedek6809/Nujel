@@ -8,6 +8,8 @@ lTree    *lRootsTreePush      (lTree *c);
 lString  *lRootsStringPush    (lString *s);
 lSymbol  *lRootsSymbolPush    (lSymbol *s);
 void      lRootsBytecodePush  (lVal *start);
+void      lRootsValStackPush  (lVal **c);
+void      lRootsCallStackPush (lClosure **c);
 
 void      lRootsMark();
 

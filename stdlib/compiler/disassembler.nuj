@@ -4,12 +4,14 @@
 [defun disassemble/length [op]
        "Return the length in bytes of a bytecode operation and all its arguments"
        [case op
-             [[#$2 #$6] 2]
+             [[#$0 #$1 #$4 #$7 #$C #$D #$13 #$14 #$15 #$16 #$19] 1]
+             [[#$2 #$6 #$1A] 2]
              [[#$9 #$A #$B #$17 #$18] 3]
              [[#$5 #$E #$F #$10] 4]
              [[#$8] 5]
              [[#$11 #$12] 13]
-             [otherwise 1]]]
+             [otherwise [throw [list :unknown-op "This op needs its length specified for disassembly to work" op [current-lambda]]]]]]
+
 
 [defun bytecode/nil-catcher [error] [if [== [car error] :argument-mismatch] #nil [throw error]]]
 
@@ -80,7 +82,7 @@
              [#$17 `[$call ~[bytecode-arr->offset a [+ i 1]]]]
              [#$18 `[$try ~[bytecode-arr->offset a [+ i 1]]]]
              [#$19 '[$throw]]
-             [#$1A '[$apply/dynamic ~[bytecode-op->int [a [+ i 1]]]]]
+             [#$1A `[$apply/dynamic ~[bytecode-op->int [a [+ i 1]]]]]
              [otherwise :unknown-op]]]
 
 [defun disassemble/array [a i]
