@@ -23,4 +23,4 @@
 ]
 
 [test/add #t [tree? environment/variables]]
-[test/add #t [string? [environment/variables 'PATH]]]
+[test/add #t [string? [tree/get environment/variables 'PATH]]]

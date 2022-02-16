@@ -120,7 +120,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		break;}
 	case lopIntAdd: {
-		if(sp < 2){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+		if(sp < 2){lExceptionThrowValClo(":stack-underflow", "A stack underflow occured", NULL, c);}
 		const i64 a = castToInt(stack[sp-1],0);
 		const i64 b = castToInt(stack[sp-2],0);
 		stack[sp-2] = lValInt(a + b);

@@ -9,9 +9,11 @@
 
 ;[println [str/write [byterun '[do [== :bool [type-of #f]]]]]]
 
-[println [str/write [bytecompile [compile '[cons 1 2]]]]]
+[def expr '[do [try car [/]]]]
 
-[def a [assemble [bytecompile [compile '[car [cons 1 2]]]]]]
+[println [str/write [bytecompile [compile expr]]]]
+
+[def a [assemble [bytecompile [compile expr]]]]
 [disassemble/raw a]
 [println [ansi-rainbow "Done!!!! => " [bytecode-eval a]]]
 ;[disassemble/test '[bytecompile [compile '[- 7 1]]]]
@@ -24,7 +26,7 @@
 [println [ansi-blue "--------------------"]]
 [println [str/write [byterun [cond [[odd? 2] #f] [even? 2] #t]]]]
 
-#_[println [str/write [asmrun
+#;[println [str/write [asmrun
          [$jmp :start]
          [:label :handle]
          [$ret]

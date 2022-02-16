@@ -140,12 +140,13 @@
 [defun bytecompile/try  [source env]
        [def handler-sym [bytecompile/gen-label]]
        [def end-sym [bytecompile/gen-label]]
+       [println [str/write [cddr source]]]
        [list [$try handler-sym]
              [bytecompile/do [cddr source] env]
              [$jmp end-sym]
-             [:label handler-sym]
+             [list :label handler-sym]
              [$apply 1 [cadr source]]
-             [:label end-sym]]]
+             [list :label end-sym]]]
 
 [defun bytecompile* [source env]
        "Compile the forms in source"
