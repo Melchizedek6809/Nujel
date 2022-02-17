@@ -57,7 +57,7 @@
        [def len [array/length β]]
        [def ret 0]
        [for [i 0 len]
-            [when [> [β i] 0] [++ ret]]]
+            [when [> [array/ref β i] 0] [++ ret]]]
        ret]
 
 [defun print-folded [α]

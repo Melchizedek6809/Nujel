@@ -23,9 +23,9 @@
        [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
        [def ret [array/allocate [+ [array/length a] [array/length b]]]]
        [for [i 0 [array/length a]]
-            [array/set! ret i [a i]]]
+            [array/set! ret i [array/ref a i]]]
        [for [i [array/length a] [array/length ret]]
-            [array/set! ret i [b [- i [array/length a]]]]]
+            [array/set! ret i [array/ref b [- i [array/length a]]]]]
        ret]
 
 [defun array/dup [a]
@@ -36,14 +36,14 @@
        "Reduce an array, [reduce] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
-              [set! α [fun α [arr i]]]]
+              [set! α [fun α [array/ref arr i]]]]
        α]
 
 [defun array/map [arr fun]
        "Map an array, [map] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
-              [array/set! arr i [fun [arr i]]]]
+              [array/set! arr i [fun [array/ref arr i]]]]
        arr]
 
 [defun array/filter [arr pred]
@@ -52,8 +52,8 @@
        [def len [array/length arr]]
        [def ret [array/allocate len]]
        [for [ai 0 len]
-              [when [pred [arr ai]]
-                    [array/set! ret ri [arr ai]]
+              [when [pred [array/ref arr ai]]
+                    [array/set! ret ri [array/ref arr ai]]
                     [++ ri]]]
        [array/length! ret ri]]
 
@@ -79,8 +79,8 @@
        arr]
 
 [defun array/swap [arr i j]
-       [def tmp [arr i]]
-       [array/set! arr i [arr j]]
+       [def tmp [array/ref arr i]]
+       [array/set! arr i [array/ref arr j]]
        [array/set! arr j tmp]]
 
 [defun array/heapify [arr n at]
@@ -90,9 +90,9 @@
        [while looping
               [def l [+ [<< at 1] 1]]
               [def r [+ [<< at 1] 2]]
-              [when [and [< l n] [> [arr l] [arr top]]]
+              [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]]
                     [set! top l]]
-              [when [and [< r n] [> [arr r] [arr top]]]
+              [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]
                     [set! top r]]
               [if [== top at]
                   [set! looping #f]

@@ -23,7 +23,7 @@
 [defun find/six [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 6]]]
-                [filter [\ [α] [== [popcount [logand α [numbers 1]]] 1]]]
+                [filter [\ [α] [== [popcount [logand α [array/ref numbers 1]]] 1]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 6 [car ret]]
@@ -32,7 +32,7 @@
 [defun find/five [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logand α [numbers 6]]]]]
+                [filter [\ [α] [== α [logand α [array/ref numbers 6]]]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 5 [car ret]]
@@ -41,7 +41,7 @@
 [defun find/nine [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 6]]]
-                [filter [\ [α] [== α [logior α [numbers 4]]]]]
+                [filter [\ [α] [== α [logior α [array/ref numbers 4]]]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 9 [car ret]]
@@ -58,7 +58,7 @@
 [defun find/three [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logior α [numbers 1]]]]]
+                [filter [\ [α] [== α [logior α [array/ref numbers 1]]]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 3 [car ret]]
@@ -67,7 +67,7 @@
 [defun find/two [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [!= α [logior α [numbers 1]]]]]
+                [filter [\ [α] [!= α [logior α [array/ref numbers 1]]]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 2 [car ret]]
@@ -75,14 +75,13 @@
 
 [defun seven-seg->binary [str]
        [reduce [split str ""]
-               [\ [α β] [logior α [case β
-                                           [["a"] #x01]
-                                           [["b"] #x02]
-                                           [["c"] #x04]
-                                           [["d"] #x08]
-                                           [["e"] #x10]
-                                           [["f"] #x20]
-                                           [["g"] #x40]]]]]]
+               [\ [α β] [logior α [case β ["a" #x01]
+                                          ["b" #x02]
+                                          ["c" #x04]
+                                          ["d" #x08]
+                                          ["e" #x10]
+                                          ["f" #x20]
+                                          ["g" #x40]]]]]]
 
 [defun translate [vals out-vals]
        [def numbers [-> [array/allocate 10]
@@ -103,7 +102,7 @@
        [defun translate/val [val i]
               [when-not i [def i 0]]
               [when [> i 10] [throw [list :error ""]]]
-              [if [== [numbers i] val]
+              [if [== [array/ref numbers i] val]
                   i
                   [translate/val val [+ 1 i]]]]
        [reduce [map [map out-vals seven-seg->binary] translate/val] [\ [α β] [+ [* α 10] β]] 0]]

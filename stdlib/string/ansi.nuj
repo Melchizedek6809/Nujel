@@ -40,7 +40,7 @@
 
 [defun ansi-wrap [code string]
 	"Wrap STRING in the ansi color CODE"
-	[cat [ansi-fg code] string ansi-reset]]
+	[cat [array/ref ansi-fg code] string ansi-reset]]
 
 [defun ansi-black args
 	"Wrap ARGS in black"
@@ -112,7 +112,7 @@
               [cat [join [map [split [apply cat args] ""]
                               [\ [a]
                                  [set! count [logand [+ 1 count] #x7]]
-                                 [cat [ansi-fg [if [zero? count] 7 [+ count 8]]] a]]] ""]
+                                 [cat [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]] a]]] ""]
                    ansi-fg-reset]]]
 
 [defun ansi-rainbow-bg args
@@ -121,7 +121,7 @@
 	[def colored-list [map [split [apply cat args] ""]
 			  [\ [a]
 			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [ansi-fg [logxor count #x7]] [ansi-bg count] a]]]]
+			     [cat [array/ref ansi-fg [logxor count #x7]] [array/ref ansi-bg count] a]]]]
         [cat [join colored-list ""] ansi-reset]]
 
 [defun reprint-line [text width]

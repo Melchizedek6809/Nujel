@@ -73,7 +73,7 @@
          [when-not α [def α 0]]
          [when [zero? α] [set! ret "0"]]
          [while [not-zero? α]
-                [set! ret [cat [conversion-arr [logand α #b1111]] ret]]
+                [set! ret [cat [array/ref conversion-arr [logand α #b1111]] ret]]
                 [set! α [ash α -4]]]
          ret]]]
 

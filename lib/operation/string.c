@@ -22,8 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-lVal *lnfvCat;
-
 static lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){
@@ -274,18 +272,18 @@ static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 }
 
 void lOperationsString(lClosure *c){
-	lnfvCat = lAddNativeFunc(c,"cat",           "[...args]",                "ConCATenates ARGS into a single string",                     lnfCat);
-	          lAddNativeFunc(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
-	          lAddNativeFunc(c,"string/length", "[str]",                    "Return length of STR",                                       lnfStrlen);
-	          lAddNativeFunc(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
-	          lAddNativeFunc(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
-	          lAddNativeFunc(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
-	          lAddNativeFunc(c,"string/cut",    "[str &start &stop]",       "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
-	          lAddNativeFunc(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
-	          lAddNativeFunc(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
-	          lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
-	          lAddNativeFunc(c,"from-char-code","[...codes]",               "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
-	          lAddNativeFunc(c,"str->sym",      "[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
-	          lAddNativeFunc(c,"sym->str",      "[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
-	          lAddNativeFunc(c,"str/write",     "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
+	lAddNativeFunc(c,"cat",           "[...args]",                "ConCATenates ARGS into a single string",                     lnfCat);
+	lAddNativeFunc(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
+	lAddNativeFunc(c,"string/length", "[str]",                    "Return length of STR",                                       lnfStrlen);
+	lAddNativeFunc(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
+	lAddNativeFunc(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
+	lAddNativeFunc(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
+	lAddNativeFunc(c,"string/cut",    "[str &start &stop]",       "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
+	lAddNativeFunc(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
+	lAddNativeFunc(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
+	lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
+	lAddNativeFunc(c,"from-char-code","[...codes]",               "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
+	lAddNativeFunc(c,"str->sym",      "[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
+	lAddNativeFunc(c,"sym->str",      "[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
+	lAddNativeFunc(c,"str/write",     "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
 }

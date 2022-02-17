@@ -20,10 +20,10 @@
        [def dir-x [line/dir x end-x]]
        [def dir-y [line/dir y end-y]]
        [while [or [!= x end-x] [!= y end-y]]
-	      [array/++ [vents x] y 1]
+	      [array/++ [ref vents x] y 1]
 	      [+= x dir-x]
 	      [+= y dir-y]]
-       [array/++ [vents x] y 1]]
+       [array/++ [ref vents x] y 1]]
 
 [defun line/draw-vents [line]
        [line/draw [tree/get [tree/get line :a] :x] [tree/get [tree/get line :a] :y] [tree/get [tree/get line :b] :x] [tree/get [tree/get line :b] :y]]]
