@@ -1225,6 +1225,9 @@
 [test/add 1 [count #[1]]]
 [test/add 3 [count '[1 2 3]]]
 [test/add 3 [count #[1 2 3]]]
+[test/add 0 [add]]
+[test/add 3 [add 1 2]]
+[test/add 1 [mul]]
 ;[test/add "Testing!" [let* [defun a [] "Testing!" [tree/get [closure [closure-parent [current-closure]]] :documentation]] [a]]]
 
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]

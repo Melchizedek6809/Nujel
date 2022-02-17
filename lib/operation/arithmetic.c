@@ -67,7 +67,7 @@ static lVal *lnfAddAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
+	if(a == NULL){return lValInt(0);}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
@@ -97,7 +97,7 @@ static lVal *lnfMulAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
+	if(a == NULL){return lValInt(1);}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
