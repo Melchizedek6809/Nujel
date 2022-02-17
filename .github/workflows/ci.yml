@@ -131,16 +131,3 @@ jobs:
         name: Nujel-Web-${{ github.ref_name }}
         path: "./web/"
         retention-days: 7
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [release-wasm, release-macos, release-windows, release-linux]
-    steps:
-    - uses: actions/download-artifact@v2
-    - name: Create archive
-      run: tar -czf nujel-${{ github.ref_name}}-${{ github.sha }}.tar.gz ./*
-    - name: Upload archive
-      uses: actions/upload-artifact@v2
-      with:
-        name: Nujel-${{ github.ref_name }}-${{ github.sha }}
-        path: "./nujel-${{ github.ref_name}}-${{ github.sha }}.tar.gz"
-        retention-days: 7
