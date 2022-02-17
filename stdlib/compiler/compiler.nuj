@@ -213,7 +213,7 @@
 [defun optimize! [fun]
        "Optimize FUN via mutation"
        [if-not [lambda? fun] #f
-               [closure! fun @[:code [optimize/code [[closure fun] :code]]]]]]
+               [closure! fun @[:code [optimize/code [tree/get [closure fun] :code]]]]]]
 
 [defun optimize-all! []
        "Return a list of all lambdas in CTX"

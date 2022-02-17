@@ -23,7 +23,7 @@
 [defun describe/thing [o]
        "Describe a specific value O"
        [def doc [closure o]]
-       [cat [str/write [doc :arguments]] " - " [doc :documentation]]]
+       [cat [str/write [tree/get doc :arguments]] " - " [tree/get doc :documentation]]]
 
 [defun describe/string [a]
        "Descibe whatever value string A resolves to"

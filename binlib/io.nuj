@@ -1,6 +1,8 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
+[def test-context "Nujel Standalone"]
+
 [defun help [i]
        "Describe 10 functions at offset 1"
        [when-not [int? i] [set! i [int i]]]
@@ -34,10 +36,9 @@
         [def res [popen command]]
         [file/remove tmp-path]
         [cons [car res] [cdr res]]]
-[def test-context "Nujel Standalone"]
 
 [defun file/file? [filename]
-       [[file/stat filename] :regular-file?]]
+       [tree/get [file/stat filename] :regular-file?]]
 
 [defun file/dir? [filename]
-       [[file/stat filename] :directory?]]
+       [tree/get [file/stat filename] :directory?]]

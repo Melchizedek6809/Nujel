@@ -99,8 +99,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 		return lnfArrRef(c, RVP(lCons(fun,args)));
 	case ltString:
 		return lnfCat(c,RVP(lCons(fun,args)));
-	case ltTree:
-		return lnfTreeGet(c,RVP(lCons(fun,args)));
 	default:
 		lExceptionThrowValClo(":type-error", "Can't apply to following val", fun, c);
 		return NULL;
@@ -159,7 +157,6 @@ static bool lArgsEval(const lVal *v){
 	case ltNativeFunc:
 	case ltArray:
 	case ltString:
-	case ltTree:
 		return true;
 	}
 }
@@ -193,8 +190,6 @@ lVal *lEval(lClosure *c, lVal *v){
 			return lnfArrRef(c, lMap(c,v,lEval));
 		case ltString:
 			return lnfCat(c, lMap(c,v,lEval));
-		case ltTree:
-			return lnfTreeGet(c, lMap(c,v,lEval));
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){

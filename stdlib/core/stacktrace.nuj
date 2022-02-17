@@ -4,10 +4,10 @@
 [defun describe/closure [c i]
        [when c
              [def info [closure c]]
-             [when [and info [info :call]]
+             [when [and info [tree/get info :call]]
                    [cat [ansi-blue [cat [int i] "# " [str/write c]]]
                         " - "
-                        [str/write [info :data]]
+                        [str/write [tree/get info :data]]
                         "\r\n"
                         [describe/closure [closure-caller c] [+ [int i] 1]]]]]]
 

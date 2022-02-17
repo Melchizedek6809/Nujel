@@ -15,8 +15,8 @@
        [and l [tree/get l :v]]]
 
 [defun snail->str [l]
-       [cond [[snail/int? l] [string [l :v]]]
-             [#t [cat "[" [snail->str [l :l]]  "," [snail->str [l :r]] "]"]]]]
+       [cond [[snail/int? l] [string [tree/get l :v]]]
+             [#t [cat "[" [snail->str [tree/get l :l]]  "," [snail->str [tree/get l :r]] "]"]]]]
 
 [defun snail/find [root needle as bs]
        [def last #nil]
@@ -24,8 +24,8 @@
 
               [cond [[snail/int? t] [set! last t] #f]
                     [[== needle t] last]
-                    [#t [or [rec [t as] root needle]
-                            [rec [t bs] root needle]]]]]
+                    [#t [or [rec [tree/get t as] root needle]
+                            [rec [tree/get t bs] root needle]]]]]
        [rec root root needle]]
 
 [defun snail/find/previous [root needle]
@@ -36,32 +36,32 @@
 
 [defun snail/explode [t root]
        [def p [snail/find/previous root t]]
-       [when p [tree/+= p :v [[t :l] :v]]]
+       [when p [tree/+= p :v [tree/get [tree/get t :l] :v]]]
        [def n [snail/find/next root t]]
-       [when n [tree/+= n :v [[t :r] :v]]]
+       [when n [tree/+= n :v [tree/get [tree/get t :r] :v]]]
        [-> t
            [tree/set! :v 0]
            [tree/set! :l #nil]
            [tree/set! :r #nil]]]
 
 [defun snail/split [t root]
-       [def lv [/ [t :v] 2]]
+       [def lv [/ [tree/get t :v] 2]]
        [-> t
            [tree/set! :l @[:v lv]]
-           [tree/set! :r @[:v [- [t :v] lv]]]
+           [tree/set! :r @[:v [- [tree/get t :v] lv]]]
            [tree/set! :v #nil]]]
 
 [defun snail/explode/maybe [t root d]
        [cond [[snail/int? t] #f]
              [[>= d 4] [snail/explode t root]]
-             [[snail/explode/maybe [t :l] root [+ 1 d]] #t]
-             [#t [snail/explode/maybe [t :r] root [+ 1 d]]]]]
+             [[snail/explode/maybe [tree/get t :l] root [+ 1 d]] #t]
+             [#t [snail/explode/maybe [tree/get t :r] root [+ 1 d]]]]]
 
 [defun snail/split/maybe [t root d]
-       [cond [[snail/int? t] [and [>= [t :v] 10]
+       [cond [[snail/int? t] [and [>= [tree/get t :v] 10]
                                   [snail/split t root] #t]]
-             [[snail/split/maybe [t :l] root [+ 1 d]] #t]
-             [#t [snail/split/maybe [t :r] root [+ 1 d]]]]]
+             [[snail/split/maybe [tree/get t :l] root [+ 1 d]] #t]
+             [#t [snail/split/maybe [tree/get t :r] root [+ 1 d]]]]]
 
 [defun snail/reduce [t]
        [while [or [snail/explode/maybe t t 0]
@@ -75,9 +75,9 @@
        [reduce [cdr vals] snail/add [car vals]]]
 
 [defun snail/mag [t]
-       [cond [[snail/int? t] [t :v]]
-             [#t [+ [* [snail/mag [t :l]] 3]
-                    [* [snail/mag [t :r]] 2]]]]]
+       [cond [[snail/int? t] [tree/get t :v]]
+             [#t [+ [* [snail/mag [tree/get t :l]] 3]
+                    [* [snail/mag [tree/get t :r]] 2]]]]]
 
 [defun snail/find-biggest [lines]
        [def vals [apply array/new [split lines "\n"]]]
@@ -85,9 +85,9 @@
        [for [a 0 100]
        [for [b 0 100]
             [when [!= a b]
-                  [def cs [snail/add [snail/read [vals a]] [snail/read [vals b]]]]
+                  [def cs [snail/add [snail/read [array/ref vals a]] [snail/read [array/ref vals b]]]]
                   [set! cmax [max cmax [snail/mag cs]]]
-                  [def cs [snail/add [snail/read [vals b]] [snail/read [vals a]]]]
+                  [def cs [snail/add [snail/read [array/ref vals b]] [snail/read [array/ref vals a]]]]
                   [set! cmax [max cmax [snail/mag cs]]]]]]
        cmax]
 [optimize-all!]

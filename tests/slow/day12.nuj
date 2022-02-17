@@ -2,7 +2,7 @@
 
 [def cave-map @[]]
 [def big-caves @[]]
-[defun big-cave? [α] [big-caves α]]
+[defun big-cave? [α] [tree/get big-caves α]]
 [defun add-connections [line]
        [def parts [map [split line "-"] str->sym]]
        [tree/set! cave-map [car parts] [cons [cadr parts] [tree/get cave-map [car parts]]]]
@@ -18,7 +18,7 @@
            [++ valid-routes]
            [when-not [and [== position 'end]
                           [> [tree/get s 'end] 0]]
-                     [def routes [cave-map position]]
+                     [def routes [tree/get cave-map position]]
                      [when-not [big-cave? position]
                                [when [> [tree/get s position] 0]
                                [if twice

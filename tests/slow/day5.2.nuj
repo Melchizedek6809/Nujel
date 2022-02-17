@@ -26,7 +26,7 @@
        [array/++ [vents x] y 1]]
 
 [defun line/draw-vents [line]
-       [line/draw [[line :a] :x] [[line :a] :y] [[line :b] :x] [[line :b] :y]]]
+       [line/draw [tree/get [tree/get line :a] :x] [tree/get [tree/get line :a] :y] [tree/get [tree/get line :b] :x] [tree/get [tree/get line :b] :y]]]
 
 [defun points/count [v num]
        [reduce v [\ [a b] [+ a [reduce b [\ [a b] [+ a [if [> b num] 1 0]]] 0]]] 0]]

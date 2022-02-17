@@ -14,8 +14,8 @@
 	    "] " [string/pad-end [cut path 2 [length path]] 32]
 	    [if start [cat " " [ansi-blue [string/pad-start [- [time/milliseconds] start] 5]] "ms"] #nil]]]
 
-[def test/slow [or [repl/options :slow-test] #f]]
-[def test/ridiculous [or [repl/options :ridiculous-test] #f]]
+[def test/slow [or [tree/get repl/options :slow-test] #f]]
+[def test/ridiculous [or [tree/get repl/options :ridiculous-test] #f]]
 [def test/start [time/milliseconds]]
 [def test/success 0]
 [def test/errors 0]

@@ -17,7 +17,6 @@
                    i]]]]
 
 [defun fmt/parse-spec [opts spec]
-       ;[println [cat spec " -> " [str/write opts]]]
        [if [zero? [string/length spec]]
            opts
            [case [char-at spec [- [string/length spec] 1]]
@@ -51,17 +50,17 @@
                  [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
 [defun fmt/debug [opts]
-       [if-not [opts :debug]
+       [if-not [tree/get opts :debug]
                opts
-               [tree/set! opts :argument [list str/write [opts :argument]]]]]
+               [tree/set! opts :argument [list str/write [tree/get opts :argument]]]]]
 
 [defun fmt/number-format [opts]
-       [case [opts :base]
-             [:binary [tree/set! opts :argument [list int->string/binary [opts :argument]]]]
-             [:octal [tree/set! opts :argument [list int->string/octal [opts :argument]]]]
-             [:decimal [tree/set! opts :argument [list int->string/decimal [opts :argument]]]]
-             [:hexadecimal [tree/set! opts :argument [list int->string/hex [opts :argument]]]]
-             [:HEXADECIMAL [tree/set! opts :argument [list int->string/HEX [opts :argument]]]]
+       [case [tree/get opts :base]
+             [:binary      [tree/set! opts :argument [list int->string/binary  [tree/get opts :argument]]]]
+             [:octal       [tree/set! opts :argument [list int->string/octal   [tree/get opts :argument]]]]
+             [:decimal     [tree/set! opts :argument [list int->string/decimal [tree/get opts :argument]]]]
+             [:hexadecimal [tree/set! opts :argument [list int->string/hex     [tree/get opts :argument]]]]
+             [:HEXADECIMAL [tree/set! opts :argument [list int->string/HEX     [tree/get opts :argument]]]]
              [otherwise opts]]]
 
 [def fmt/number-format-prefixex @[
@@ -73,44 +72,44 @@
 ]]
 
 [defun fmt/number-format-prefix [opts]
-       [if [or [not [opts :debug]] [not [opts :base]]] opts
-           [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [opts :base]]
+       [if [or [not [tree/get opts :debug]] [not [tree/get opts :base]]] opts
+           [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [tree/get opts :base]]
                    [tree/set! opts :argument [list cat
-                                                   [fmt/number-format-prefixex [opts :base]]
-                                                   [opts :argument]]]
+                                                   [tree/get fmt/number-format-prefixex [tree/get opts :base]]
+                                                   [tree/get opts :argument]]]
                    opts]
                [tree/set! :debug #f]]]]
 
 [defun fmt/add-padding [opts]
-       [if-not [opts :width]
+       [if-not [tree/get opts :width]
                opts
-               [tree/set! opts :argument [list [case [opts :align]
+               [tree/set! opts :argument [list [case [tree/get opts :align]
                                                      [:right   string/pad-start]
                                                      [:center string/pad-middle]
                                                      [:left  string/pad-end]]
-                                               [opts :argument]
-                                               [if [and [opts :debug] [opts :base]]
-                                                   [- [opts :width] 2]
-                                                   [opts :width]]
-                                               [opts :padding-char]]]]]
+                                               [tree/get opts :argument]
+                                               [if [and [tree/get opts :debug] [tree/get opts :base]]
+                                                   [- [tree/get opts :width] 2]
+                                                   [tree/get opts :width]]
+                                               [tree/get opts :padding-char]]]]]
 
 [defun fmt/precision [opts]
-       [if-not [opts :precision]
+       [if-not [tree/get opts :precision]
                opts
                [tree/set! opts :argument [list string/round
-                                               [opts :argument]
-                                               [opts :precision]]]]]
+                                               [tree/get opts :argument]
+                                               [tree/get opts :precision]]]]]
 
 [defun fmt/truncate [opts]
-       [if-not [opts :width]
+       [if-not [tree/get opts :width]
                opts
                [tree/set! opts :argument [list string/cut
-                                               [opts :argument]
+                                               [tree/get opts :argument]
                                                0
-                                               [+ 1 [opts :width]]]]]]
+                                               [+ 1 [tree/get opts :width]]]]]]
 
 [defun fmt/output [opts]
-       [opts :argument]]
+       [tree/get opts :argument]]
 
 [defun fmt/format-arg [spec argument]
        [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
