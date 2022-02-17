@@ -14,8 +14,6 @@
 #include "../type/val.h"
 #include "../type-system.h"
 
-lVal *lnfvTreeGet;
-
 /* [tree/new ...plist] - Return a new tree, initialized with PLIST */
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
@@ -158,7 +156,7 @@ static lVal *lnfTreeRightAst(lClosure *c, lVal *v){
 }
 
 void lOperationsTree(lClosure *c){
-	lnfvTreeGet = lAddNativeFunc(c,"tree/get","[tree sym]","Return the value of SYM in TREE, or #nil", lnfTreeGet);
+	lAddNativeFunc(c,"tree/get",     "[tree sym]",     "Return the value of SYM in TREE, or #nil", lnfTreeGet);
 	lAddNativeFunc(c,"tree/new",     "[...plist]",     "Return a new tree", lnfTreeNew);
 	lAddNativeFunc(c,"tree/list",    "[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c,"tree/keys",    "[tree]",         "Return each key of TREE in a list", lnfTreeGetKeys);

@@ -23,7 +23,7 @@
        "Return NUM=1 linebreaks"
        [if [or [nil? num] [<= [int num] 1]]
            "\n"
-           ["\n" [br [+ -1 num]]]]]
+           [cat "\n" [br [+ -1 num]]]]]
 
 [defun path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"

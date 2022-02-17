@@ -11,10 +11,7 @@
 extern bool lVerbose;
 
 extern lVal *lnfvDo;
-extern lVal *lnfvInfix;
 extern lVal *lnfvArrRef;
-extern lVal *lnfvCat;
-extern lVal *lnfvTreeGet;
 extern lVal *lnfvQuote;
 
 void      lInit             ();

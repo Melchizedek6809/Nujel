@@ -97,8 +97,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 		return fun->vNFunc->fp(c,args);
 	case ltArray:
 		return lnfArrRef(c, RVP(lCons(fun,args)));
-	case ltString:
-		return lnfCat(c,RVP(lCons(fun,args)));
 	default:
 		lExceptionThrowValClo(":type-error", "Can't apply to following val", fun, c);
 		return NULL;
@@ -188,8 +186,6 @@ lVal *lEval(lClosure *c, lVal *v){
 			return RVP(car->vNFunc->fp(c,lMap(c,lCdr(v),lEval)));
 		case ltArray:
 			return lnfArrRef(c, lMap(c,v,lEval));
-		case ltString:
-			return lnfCat(c, lMap(c,v,lEval));
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
