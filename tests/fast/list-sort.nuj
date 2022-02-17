@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env nujel
 
 [defun test-sort [times sort-func]
        [def l #nil]

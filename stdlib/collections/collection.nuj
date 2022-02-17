@@ -18,7 +18,9 @@
 
 [defun count [l p]
        "Count the number of items in L where P is true"
-       [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]]
+       [if p
+           [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]
+           [reduce l [λ [a b] [+ a 1]] 0]]]
 
 [defun min/λ [a b] [if [< a b] a b]]
 [defun min l

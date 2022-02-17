@@ -1,0 +1,27 @@
+#!/usr/bin/env nujel
+;; Simple test program that should give the same result as `wc -l` or `wc -w`
+
+[defun count-lines [filename]
+       [def text [string [file/read filename]]]
+       [- [count [split text "\n"]] 1]]
+
+[defun count-words [filename]
+       [def text [string [file/read filename]]]
+       [-> text
+           [split "\n"]
+           [reduce [\ [a b]
+                      [+ a [count [split b " "] [\ [a] [> [string/length [trim a]] 0]]]]]
+                   0]]]
+
+[def lines [count-lines "CODE_OF_CONDUCT.md"]]
+[when [!= lines 136]
+      [throw [list :wrong-result "CoC Lines Wrong" lines]]]
+[def words [count-words "CODE_OF_CONDUCT.md"]]
+[when [!= words 717]
+      [throw [list :wrong-result "CoC Words Wrong" words]]]
+[def llines [count-lines "LICENSE"]]
+[when [!= llines 19]
+      [throw [list :wrong-result "CoC Lines Wrong" llines]]]
+[def lwords [count-words "LICENSE"]]
+[when [!= lwords 168]
+      [throw [list :wrong-result "CoC Words Wrong" lwords]]]
