@@ -168,18 +168,20 @@ lVal *lEval(lClosure *c, lVal *v){
 		switch(car ? car->type : ltNoAlloc){
 		default:
 			lExceptionThrowValClo(":type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)), c);
-			return v;
+			return NULL;
+                case ltMacro:
+			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
+			return NULL;
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
 			return RVP(lLambda(c,lMap(c,lCdr(v),lEval),car));
-		case ltMacro:
-			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
-			return NULL;
 		case ltSpecialForm:
 			return RVP(car->vNFunc->fp(c,lCdr(v)));
 		case ltNativeFunc:
 			return RVP(car->vNFunc->fp(c,lMap(c,lCdr(v),lEval)));
+                case ltPair:
+			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
@@ -193,10 +195,8 @@ lVal *lEval(lClosure *c, lVal *v){
 					return NULL;
 				}
 			}}
-		case ltPair:
-			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);
-		}}
-	}
+		}
+	}}
 }
 
 /* Evaluate func for every entry in list v and return a list containing the results */

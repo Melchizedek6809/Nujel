@@ -13,6 +13,8 @@ jmp_buf exceptionTarget;
 lVal *exceptionValue;
 int exceptionTargetDepth = 0;
 
+bool breakQueued = false;
+
 /* Cause an exception, passing V directly to the closest exception handler */
 __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 	if(exceptionTargetDepth <= 0){

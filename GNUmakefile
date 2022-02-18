@@ -2,6 +2,7 @@ prefix      := /usr/local
 exec_prefix  = $(prefix)
 bindir       = $(exec_prefix)/bin/
 
+INSTALL     := install
 EMCC        := emcc
 EMAR        := emar
 EMMEM       := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
@@ -213,7 +214,7 @@ install: release
 
 .PHONY: install.musl
 install.musl: release.musl
-	mkdir -p $(BINDIR)
+	mkdir -p $(bindir)
 	$(INSTALL) $(NUJEL) $(bindir)
 
 .PHONY: profile
@@ -227,7 +228,7 @@ profile-while: $(NUJEL)
 .PHONY: web
 web:
 	./tools/buildwasm
-	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/var/www/html/nujel/
+	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/home/nujel/nujel/
 
 update-bootstrap: tmp/stdlib.no tmp/binlib.no
 	cp -f tmp/stdlib.no bootstrap/stdlib.no

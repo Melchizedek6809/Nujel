@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 
-volatile bool breakQueued = false;
 int lGCRuns = 0;
 
 u8 lValMarkMap    [VAL_MAX];
@@ -264,8 +263,5 @@ void lGarbageCollect(){
 		pf("Tres: %u -> %u [Δ %i]{Σ %i}\n",bta,lTreeActive,   (i64)lTreeActive    - bta, lTreeMax);
 		pf("--------------\n\n");
 	}
-	if(breakQueued){
-		breakQueued = false;
-		lExceptionThrow(":break","A break has been triggered");
-	}
+        lCheckBreak();
 }
