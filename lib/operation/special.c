@@ -67,6 +67,7 @@ static lVal *lnfWhile(lClosure *c, lVal *v){
 	while(castToBool(lEval(c,cond))){
 		lRootsRet(SP);
 		ret = RVP(lnfDo(c,body));
+                lCheckBreak();
 	}
 	lRootsRet(SP);
 	return ret;
