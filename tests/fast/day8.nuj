@@ -81,7 +81,7 @@
                                           ["d" #x08]
                                           ["e" #x10]
                                           ["f" #x20]
-                                          ["g" #x40]]]]]]
+                                          ["g" #x40]]]] 0]]
 
 [defun translate [vals out-vals]
        [def numbers [-> [array/allocate 10]

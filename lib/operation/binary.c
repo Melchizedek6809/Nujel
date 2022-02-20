@@ -3,64 +3,85 @@
  */
 #include "../operation.h"
 
+#include "../exception.h"
 #include "../type-system.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
 
-static int lnfLogAndI(const lVal *l){
-	int acc = l->vList.car->vInt;
+static u64 lnfLogAndI(lClosure *c, lVal *l){
+        if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                return 0;
+        }
+	u64 acc = l->vList.car->vInt;
 	l = l->vList.cdr;
 	for(; l; l = l->vList.cdr){
+                if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                        lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                        return 0;
+                }
 		acc &= l->vList.car->vInt;
 	}
 	return acc;
 }
 
 static lVal *lnfLogAnd (lClosure *c, lVal *v){
-	lVal *t = lCast(c,v,ltInt);
-	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
-	lRootsValPush(t);
-	return lValInt(lnfLogAndI(t));
+        if(v == NULL){return lValInt(0);}
+	return lValInt(lnfLogAndI(c,v));
 }
 
-static int lnfLogIorI(const lVal *l){
-	int acc = l->vList.car->vInt;
+static u64 lnfLogIorI(lClosure *c, lVal *l){
+        if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                return 0;
+        }
+	u64 acc = l->vList.car->vInt;
 	l = l->vList.cdr;
 	for(; l; l = l->vList.cdr){
+                if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                        lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                        return 0;
+                }
 		acc |= l->vList.car->vInt;
 	}
 	return acc;
 }
 
 static lVal *lnfLogIor (lClosure *c, lVal *v){
-	lVal *t = lCast(c,v,ltInt);
-	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
-	lRootsValPush(t);
-	return lValInt(lnfLogIorI(t));
+	if(v == NULL){return lValInt(0);}
+	return lValInt(lnfLogIorI(c,v));
 }
 
-static int lnfLogXorI(const lVal *l){
-	int acc = l->vList.car->vInt;
+static u64 lnfLogXorI(lClosure *c, lVal *l){
+        if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                return 0;
+        }
+	u64 acc = l->vList.car->vInt;
 	l = l->vList.cdr;
 	for(; l; l = l->vList.cdr){
+                if((l->vList.car == NULL) || (l->vList.car->type != ltInt)){
+                        lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].", l, c);
+                        return 0;
+                }
 		acc ^= l->vList.car->vInt;
 	}
 	return acc;
 }
 
 static lVal *lnfLogXor(lClosure *c, lVal *v){
-	lVal *t = lCast(c,v,ltInt);
-	if((t == NULL) || (t->vList.car == NULL) || (t->vList.car->type != ltInt)){return lValInt(0);}
-	lRootsValPush(t);
-	return lValInt(lnfLogXorI(t));
+        if(v == NULL){return lValInt(0);}
+	return lValInt(lnfLogXorI(c,v));
 }
 
 static lVal *lnfLogNot(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(0);}
-	lVal *t = lCast(c,v,ltInt);
-	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
-	return lValInt(~lCar(t)->vInt);
+	if(v == NULL){return lValInt(~0);}
+	if((v->type != ltPair) || (v->vList.car == NULL) || (v->vList.car->type != ltInt)){
+                lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].",v, c);
+                return NULL;
+        }
+	return lValInt(~v->vList.car->vInt);
 }
 
 #ifdef __TINYC__
@@ -84,21 +105,31 @@ static inline __builtin_popcountll(uint64_t x){
 
 static lVal *lnfPopCount(lClosure *c, lVal *v){
 	if(v == NULL){return lValInt(0);}
-	lVal *t = lCast(c,v,ltInt);
-	if((t == NULL) || (t->type != ltPair)){return lValInt(0);}
-	return lValInt(__builtin_popcountll(lCar(t)->vInt));
+	if((v->type != ltPair) || (v->vList.car == NULL) || (v->vList.car->type != ltInt)){
+                lExceptionThrowValClo(":type-error","Binary operations can only be done on integers, please convert them beforehand using [int].",v, c);
+                return NULL;
+        }
+	return lValInt(__builtin_popcountll(v->vList.car->vInt));
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltPair)){return lValInt(0);}
-	lVal *vals  = lCast(c,v,ltInt);
-	if(vals == NULL){return lValInt(0);}
-	lVal *val   = lCar(vals);
-	lVal *shift = lCadr(vals);
-	if(shift == NULL){return val;}
+	lVal *val   = lCar(v);
+	lVal *shift = lCadr(v);
+        if((val == NULL) || (shift == NULL)){
+                lExceptionThrowValClo(":arity-error","[ash] needs exactly two arguments", v, c);
+                return NULL;
+        }
+        if(val->type != ltInt){
+                lExceptionThrowValClo(":type-error","[ash] can only shift integer values", val, c);
+                return NULL;
+        }
+	if(shift->type != ltInt){
+                lExceptionThrowValClo(":type-error","[ash] can only shift by integer values", shift, c);
+                return NULL;
+        }
 	const int sv = shift->vInt;
 	if(sv > 0){
-		return lValInt(val->vInt << shift->vInt);
+		return lValInt(val->vInt <<  sv);
 	}else{
 		return lValInt(val->vInt >> -sv);
 	}

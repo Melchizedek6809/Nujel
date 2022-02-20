@@ -72,6 +72,7 @@
          [def ret ""]
          [when-not α [def α 0]]
          [when [zero? α] [set! ret "0"]]
+         [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
          [while [not-zero? α]
                 [set! ret [cat [array/ref conversion-arr [logand α #b1111]] ret]]
                 [set! α [ash α -4]]]

@@ -6,4 +6,4 @@
        [for [i 0 [string/length data]]
             [set! a [mod/int [add/int a [char-at data i]] 65521]]
             [set! b [mod/int [add/int a b] 65521]]]
-       [logior a [<< b 16]]]
+       [logior a [ash b 16]]]
