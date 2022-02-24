@@ -138,3 +138,6 @@ float vecSum(const vec a){
 float vecAbsSum(const vec a){
 	return fabsf(a.x)+fabsf(a.y)+fabsf(a.z);
 }
+vec vecReflect(const vec i, const vec n){
+	return vecMul(vecMulS(vecSubS(i,2.f), vecDot(n,i)),n);
+}

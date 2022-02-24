@@ -35,5 +35,6 @@ vec   vecVecToDeg (const vec a);
 vec   vecDegToVec (const vec a);
 vec   vecCeil     (const vec a);
 vec   vecRound    (const vec a);
+vec   vecReflect  (const vec i, const vec n);
 
 #endif

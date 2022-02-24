@@ -30,3 +30,7 @@
 
 [defmacro +1 [v]
           `[+ 1 ~v]]
+
+[defun radians [degrees]
+  "Convert a quantity in degrees to radians"
+  [/ [* π degrees] 180.0]]

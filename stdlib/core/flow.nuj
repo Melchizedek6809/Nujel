@@ -98,3 +98,12 @@
           "Evaluate forms exactly once, even if called multiple times"
           [let [[lock [gensym "once-"]]]
                `[when-not ~lock ~@forms [def ~lock #t]]]]
+
+[defun returnable/λ [e]
+  [if [== [car e] :return] [cdr e] [throw e]]]
+
+[defmacro returnable body
+  `[try returnable/λ ~@body]]
+
+[defmacro return [v]
+  `[throw [cons :return ~v]]]

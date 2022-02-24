@@ -131,9 +131,3 @@
               [print " "]]
        [print "\r"]
        [print text]]
-
-[defun test-reprint-line []
-       [print "\r\n"]
-       [for [i 0 100000]
-              [reprint-line [string i]]]
-       [print " Done!\r\n"]]
