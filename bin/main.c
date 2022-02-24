@@ -94,6 +94,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 	if(c == NULL){c = createRootClosure(loadStdLib);}
 
 	if(lVerbose){
+		pf("sizeof(vec): %u\n",     sizeof(vec));
 		pf("sizeof(lClosure): %u\n",sizeof(lClosure));
 		pf("sizeof(lVal): %u\n",    sizeof(lVal));
 		pf("sizeof(lArray): %u\n",  sizeof(lArray));
