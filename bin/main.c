@@ -94,14 +94,14 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 	if(c == NULL){c = createRootClosure(loadStdLib);}
 
 	if(lVerbose){
-		pf("sizeof(vec): %u\n",     sizeof(vec));
-		pf("sizeof(lClosure): %u\n",sizeof(lClosure));
-		pf("sizeof(lVal): %u\n",    sizeof(lVal));
-		pf("sizeof(lArray): %u\n",  sizeof(lArray));
-		pf("sizeof(lString): %u\n", sizeof(lString));
-		pf("sizeof(lTree): %u\n",   sizeof(lTree));
-		pf("sizeof(jmp_buf): %u\n", sizeof(jmp_buf));
-		pf("\n\nRoot Closure Data Size: %u\n", lTreeSize(c->data));
+		pf("sizeof(vec): %u\n",     (i64)sizeof(vec));
+		pf("sizeof(lClosure): %u\n",(i64)sizeof(lClosure));
+		pf("sizeof(lVal): %u\n",    (i64)sizeof(lVal));
+		pf("sizeof(lArray): %u\n",  (i64)sizeof(lArray));
+		pf("sizeof(lString): %u\n", (i64)sizeof(lString));
+		pf("sizeof(lTree): %u\n",   (i64)sizeof(lTree));
+		pf("sizeof(jmp_buf): %u\n", (i64)sizeof(jmp_buf));
+		pf("\n\nRoot Closure Data Size: %u\n", (i64)lTreeSize(c->data));
 	}
 	return c;
 }
