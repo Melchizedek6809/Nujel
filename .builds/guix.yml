@@ -3,6 +3,7 @@ sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 packages:
   - gcc-toolchain
+  - make
 tasks:
   - compile: |
       cd Nujel
