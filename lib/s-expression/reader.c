@@ -306,7 +306,9 @@ static lVal *lParseBytecodeOp(lString *s){
 		for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
 		lExceptionThrowValClo(":invalid-literal", "Out of bounds bytecode operation literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 	}
+	const i64 code = ret->vInt;
 	ret->type = ltBytecodeOp;
+	ret->vBytecodeOp = code;
 	return ret;
 }
 
