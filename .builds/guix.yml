@@ -1,0 +1,12 @@
+image: guix
+sources:
+  - https://git.sr.ht/~melchizedek6809/Nujel
+packages:
+  - gcc-toolchain
+tasks:
+  - compile: |
+      cd Nujel
+      make -j
+  - test: |
+      cd Nujel
+      make test
