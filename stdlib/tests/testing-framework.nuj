@@ -22,7 +22,7 @@
 [defun display-results []
        "Prints the result Message"
        [random/seed-initialize!]
-       [eval '[efmtln "{test-context} [{OS} {ARCH}] - {} - [{} / {}] in {} ms - {}"
+       [eval '[efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
                [if [and [zero? error-count] [> test-count 0]]
                        "Success"
                        "Failed!"]

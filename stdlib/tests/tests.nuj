@@ -1095,7 +1095,7 @@
 [test/add #t [let [[ret #t]] [for-in [l #nil] [set! ret #f]] ret]]
 [test/add #f [let [[ret #t]] [for-in [l '[]] [set! ret #f]] ret]]
 [test/add "asd" [fmt "asd"]]
-[test/add #t [== [cat test-context " " OS " " ARCH " " 5] [fmt "{test-context} {OS} {ARCH} {}" [if #t 5 0]]]]
+[test/add #t [== [cat test-context " " System/OS " " System/Architecture " " 5] [fmt "{test-context} {System/OS} {System/Architecture} {}" [if #t 5 0]]]]
 [test/add "asd" [compile '[fmt "asd"]]]
 [test/add "123" [eval [compile '[fmt "{}" 123]]]]
 [test/add "asd qwe" [eval [compile '[fmt "asd {}" "qwe"]]]]

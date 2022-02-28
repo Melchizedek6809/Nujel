@@ -26,7 +26,7 @@ jobs:
     - name: Compile
       run: make -j
     - name: Run Tests
-      run: make test
+      run: make test.slow
   release-windows:
     name: release-windows-${{ matrix.sys }}
     needs: build-windows
@@ -67,7 +67,7 @@ jobs:
     - name: Compile
       run: make -j
     - name: Run Tests
-      run: make test
+      run: make test.slow
   release-macos:
     needs: build-macos
     runs-on: macos-latest
@@ -99,7 +99,7 @@ jobs:
     - name: Compile
       run: make -j CC=${{ matrix.cc }}
     - name: Run Tests
-      run: make test
+      run: make test.slow
   release-linux:
     runs-on: ubuntu-latest
     needs: build-linux

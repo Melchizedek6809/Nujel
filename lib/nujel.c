@@ -213,55 +213,58 @@ lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
 
 /* Add all the platform specific constants to C */
 static void lAddPlatformVars(lClosure *c){
+	lVal *valOS, *valArch;
 	#if defined(__HAIKU__)
-	lDefineVal(c, "OS", lValString("Haiku"));
+	valOS = lValSym("Haiku");
 	#elif defined(__APPLE__)
-	lDefineVal(c, "OS", lValString("MacOS"));
+	valOS =  lValSym("MacOS");
 	#elif defined(__EMSCRIPTEN__)
-	lDefineVal(c, "OS", lValString("Emscripten"));
+	valOS =  lValSym("Emscripten");
 	#elif defined(__MINGW32__)
-	lDefineVal(c, "OS", lValString("Windows"));
+	valOS =  lValSym("Windows");
 	#elif defined(__MSYS__)
-	lDefineVal(c, "OS", lValString("Legacy Windows"));
+	valOS = lValSym("Legacy Windows");
 	#elif defined(__MINIX__) || defined(__MINIX3__)
-	lDefineVal(c, "OS", lValString("Minix"));
+	valOS = lValSym("Minix");
 	#elif defined(__linux__)
 		#if defined(__UCLIBC__)
-		lDefineVal(c, "OS", lValString("uClibc/Linux"));
+		valOS = lValSym("uClibc/Linux");
 		#elif defined(__GLIBC__)
-		lDefineVal(c, "OS", lValString("GNU/Linux"));
+		valOS = lValSym("GNU/Linux");
 		#elif defined(__BIONIC__)
-		lDefineVal(c, "OS", lValString("Android"));
+		valOS = lValSym("Android");
 		#else
-		lDefineVal(c, "OS", lValString("musl?/Linux"));
+		valOS = lValSym("musl?/Linux");
 		#endif
 	#elif defined(__FreeBSD__)
-	lDefineVal(c, "OS", lValString("FreeBSD"));
+	valOS = lValSym("FreeBSD");
 	#elif defined(__OpenBSD__)
-	lDefineVal(c, "OS", lValString("OpenBSD"));
+	valOS = lValSym("OpenBSD");
 	#elif defined(__NetBSD__)
-	lDefineVal(c, "OS", lValString("NetBSD"));
+	valOS = lValSym("NetBSD");
 	#elif defined(__DragonFly__)
-	lDefineVal(c, "OS", lValString("DragonFlyBSD"));
+	valOS = lValSym("DragonFlyBSD");
 	#else
-	lDefineVal(c, "OS", lValString("Unknown"));
+	valOS = lValSym("Unknown");
 	#endif
+	lDefineVal(c, "System/OS", valOS);
 
 	#if defined(__arm__)
-	lDefineVal(c, "ARCH", lValString("armv7l"));
+	valArch = lValSym("armv7l");
 	#elif defined(__aarch64__)
-	lDefineVal(c, "ARCH", lValString("aarch64"));
+	valArch = lValSym("aarch64");
 	#elif defined(__x86_64__) || defined(__amd64__)
-	lDefineVal(c, "ARCH", lValString("x86_64"));
+	valArch = lValSym("x86_64");
 	#elif defined(__i386__)
-	lDefineVal(c, "ARCH", lValString("x86"));
+	valArch = lValSym("x86");
 	#elif defined(__EMSCRIPTEN__)
-	lDefineVal(c, "ARCH", lValString("wasm"));
+	valArch = lValSym("wasm");
 	#elif defined(__powerpc__)
-	lDefineVal(c, "ARCH", lValString("powerpc"));
+	valArch = lValSym("powerpc");
 	#else
-	lDefineVal(c, "ARCH", lValString("unknown"));
+	valArch = lValSym("unknown");
 	#endif
+	lDefineVal(c, "System/Architecture", valArch);
 }
 
 /* Add all the core native functions to c, without IO or stdlib */
