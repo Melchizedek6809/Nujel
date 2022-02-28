@@ -103,6 +103,6 @@
        [when [repl/parse-args [cdr args]] [repl]]]
 
 [defun repl/init args
-       [if [== ARCH "wasm"]
+       [if [== System/Architecture 'wasm]
            [repl/init/wasm args]
            [repl/init/bin args]]]
