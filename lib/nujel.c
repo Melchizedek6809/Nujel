@@ -257,6 +257,8 @@ static void lAddPlatformVars(lClosure *c){
 	lDefineVal(c, "ARCH", lValString("x86"));
 	#elif defined(__EMSCRIPTEN__)
 	lDefineVal(c, "ARCH", lValString("wasm"));
+	#elif defined(__powerpc__)
+	lDefineVal(c, "ARCH", lValString("powerpc"));
 	#else
 	lDefineVal(c, "ARCH", lValString("unknown"));
 	#endif
