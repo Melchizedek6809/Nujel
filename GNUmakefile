@@ -22,6 +22,16 @@ NUJEL_BOOT  := ./nujel-bootstrap
 ASSET       := ./tools/assets
 
 CC                   := cc
+ifeq (, $(shell which $(CC)))
+CC                   := gcc
+endif
+ifeq (, $(shell which $(CC)))
+CC                   := clang
+endif
+ifeq (, $(shell which $(CC)))
+CC                   := tcc
+endif
+
 CC_MUSL              := musl-gcc
 CFLAGS               := -g -D_GNU_SOURCE
 LDFLAGS              :=
