@@ -136,7 +136,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 	switch(*ip){
 	default:
-		lExceptionThrowValClo(":unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
+		lExceptionThrowValClo("unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
 		break;
 	case lopNOP:
 		ip++;
@@ -147,7 +147,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		break;}
 	case lopIntAdd: {
-		if(sp < 2){lExceptionThrowValClo(":stack-underflow", "A stack underflow occured", NULL, c);}
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
 		const i64 a = castToInt(stack[sp-1],0);
 		const i64 b = castToInt(stack[sp-2],0);
 		stack[sp-2] = lValInt(a + b);
@@ -191,7 +191,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		stack[sp++] = lApply(c, cargs, fun, fun);
 		break; }
 	case lopDup:
-		if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+		if(sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		stack[sp] = stack[sp-1];
 		sp++;
 		ip++;
@@ -206,7 +206,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip += !castToBool(stack[--sp]) ? lBytecodeGetOffset16(ip+1) : 3;
 		break;
 	case lopDrop:
-		if(--sp < 0){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+		if(--sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
 		break;
 	case lopDef: {
@@ -250,7 +250,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	case lopClosureEnter: {
 		ip++;
 		lVal *cObj = stack[--sp];
-		if((cObj->type != ltLambda) && (cObj->type != ltObject)){lExceptionThrowValClo(":invalid-closure", "Error while trying to enter a closure", cObj, c);}
+		if((cObj->type != ltLambda) && (cObj->type != ltObject)){lExceptionThrowValClo("invalid-closure", "Error while trying to enter a closure", cObj, c);}
 		cloStack[csp++] = c;
 		c = cObj->vClosure;
 		cloStack[csp] = c;
@@ -272,7 +272,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		if(csp == 0){
 			lRootsRet(gcsp);
-			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			if(sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 			return NULL;
 		}
 		break;
@@ -311,7 +311,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if(csp == 0){
 			lRootsRet(gcsp);
 			if(sp < 1){
-				lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);
+				lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);
 				return NULL;
 			}
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
@@ -333,13 +333,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		if(csp == 0){
 			lRootsRet(gcsp);
-			if(sp < 1){lExceptionThrowValClo(":stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			if(sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 			lExceptionThrowRaw(stack[--sp]);
 			return NULL;
 		}
 		break;
 	}}
-	lExceptionThrowValClo(":expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
+	lExceptionThrowValClo("expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
 	return NULL;
 }
 

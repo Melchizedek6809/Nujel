@@ -13,13 +13,16 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+const lVal *writeValStack[256];
+int         writeValSP = 0;
+
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display);
 
 static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	if((v == NULL) || (v->key == NULL)){return cur;}
 
 	cur = writeTreeRec(cur, bufEnd, v->left);
-	cur = spf(cur,bufEnd,"%s %v ",v->key->c, v->value);
+	cur = spf(cur,bufEnd,":%s %v ",v->key->c, v->value);
 	cur = writeTreeRec(cur, bufEnd, v->right);
 
 	return cur;
@@ -86,8 +89,6 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	return spf(cur, bufEnd, "]");
 }
 
-const lVal *writeValStack[256];
-int         writeValSP = 0;
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	char *cur = buf;
 	char *ret = buf;
@@ -152,6 +153,9 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		break;
 	case ltSymbol:
 		ret = spf(cur, bufEnd, "%s",v->vSymbol->c);
+		break;
+	case ltKeyword:
+		ret = spf(cur, bufEnd, ":%s",v->vSymbol->c);
 		break;
 	case ltSpecialForm:
 	case ltNativeFunc:

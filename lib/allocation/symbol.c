@@ -32,8 +32,40 @@ int      lSymbolBackIndex[SYM_MAX];
 #define SYMBOL_SLOT_IS_TOMB(X)  (X < 0)
 #define SYMBOL_SLOT_IS_USED(X)  (X > 0)
 
-lSymbol *symNull,*symQuote,*symQuasiquote,*symUnquote,*symUnquoteSplicing,*symArr,*symIf,*symCond,*symDo,*symMinus,*symLambda,*symLambdAst,*symTreeNew;
-lSymbol *lSymLTNil, *lSymLTNoAlloc, *lSymLTBool, *lSymLTPair, *lSymLTLambda, *lSymLTInt, *lSymLTFloat, *lSymLTVec, *lSymLTString, *lSymLTSymbol, *lSymLTNativeFunction, *lSymLTSpecialForm, *lSymLTArray, *lSymLTGUIWidget, *lSymLTObject, *lSymLTDynamic, *lSymLTMacro, *lSymLTTree, *lSymLTBytecodeOp,*lSymLTBytecodeArray;
+lSymbol *symNull;
+lSymbol *symQuote;
+lSymbol *symQuasiquote;
+lSymbol *symUnquote;
+lSymbol *symUnquoteSplicing;
+lSymbol *symArr;
+lSymbol *symIf;
+lSymbol *symCond;
+lSymbol *symDo;
+lSymbol *symMinus;
+lSymbol *symLambda;
+lSymbol *symLambdAst;
+lSymbol *symTreeNew;
+
+lSymbol *lSymLTNil;
+lSymbol *lSymLTNoAlloc;
+lSymbol *lSymLTBool;
+lSymbol *lSymLTPair;
+lSymbol *lSymLTLambda;
+lSymbol *lSymLTInt;
+lSymbol *lSymLTFloat;
+lSymbol *lSymLTVec;
+lSymbol *lSymLTString;
+lSymbol *lSymLTSymbol;
+lSymbol *lSymLTKeyword;
+lSymbol *lSymLTNativeFunction;
+lSymbol *lSymLTSpecialForm;
+lSymbol *lSymLTObject;
+lSymbol *lSymLTMacro;
+lSymbol *lSymLTArray;
+lSymbol *lSymLTGUIWidget;
+lSymbol *lSymLTTree;
+lSymbol *lSymLTBytecodeOp;
+lSymbol *lSymLTBytecodeArray;
 
 void lSymbolInit(){
 	lSymbolActive   = 0;
@@ -47,39 +79,41 @@ void lSymbolInit(){
 		exit(123);
 	}
 
-	symNull            = RSYMP(lSymS(""));
-	symQuote           = RSYMP(lSymS("quote"));
-	symArr             = RSYMP(lSymS("array/new"));
-	symIf              = RSYMP(lSymS("if"));
-	symCond            = RSYMP(lSymS("cond"));
-	symDo              = RSYMP(lSymS("do"));
-	symMinus           = RSYMP(lSymS("-"));
-	symLambda          = RSYMP(lSymS("λ"));
-	symLambdAst        = RSYMP(lSymS("λ*"));
-	symTreeNew         = RSYMP(lSymS("tree/new"));
-	symQuasiquote      = RSYMP(lSymS("quasiquote"));
-	symUnquote         = RSYMP(lSymS("unquote"));
-	symUnquoteSplicing = RSYMP(lSymS("unquote-splicing"));
+	symNull              = RSYMP(lSymS(""));
+	symQuote             = RSYMP(lSymS("quote"));
+	symArr               = RSYMP(lSymS("array/new"));
+	symIf                = RSYMP(lSymS("if"));
+	symCond              = RSYMP(lSymS("cond"));
+	symDo                = RSYMP(lSymS("do"));
+	symMinus             = RSYMP(lSymS("-"));
+	symLambda            = RSYMP(lSymS("λ"));
+	symLambdAst          = RSYMP(lSymS("λ*"));
+	symTreeNew           = RSYMP(lSymS("tree/new"));
+	symQuasiquote        = RSYMP(lSymS("quasiquote"));
+	symUnquote           = RSYMP(lSymS("unquote"));
+	symUnquoteSplicing   = RSYMP(lSymS("unquote-splicing"));
 
-	lSymLTNil            = RSYMP(lSymS(":nil"));
-	lSymLTNoAlloc        = RSYMP(lSymS(":no-alloc"));
-	lSymLTBool           = RSYMP(lSymS(":bool"));
-	lSymLTPair           = RSYMP(lSymS(":pair"));
-	lSymLTObject         = RSYMP(lSymS(":object"));
-	lSymLTLambda         = RSYMP(lSymS(":lambda"));
-	lSymLTInt            = RSYMP(lSymS(":int"));
-	lSymLTFloat          = RSYMP(lSymS(":float"));
-	lSymLTVec            = RSYMP(lSymS(":vec"));
-	lSymLTString         = RSYMP(lSymS(":string"));
-	lSymLTSymbol         = RSYMP(lSymS(":symbol"));
-	lSymLTNativeFunction = RSYMP(lSymS(":native-function"));
-	lSymLTSpecialForm    = RSYMP(lSymS(":special-form"));
-	lSymLTArray          = RSYMP(lSymS(":array"));
-	lSymLTGUIWidget      = RSYMP(lSymS(":gui-widget"));
-	lSymLTMacro          = RSYMP(lSymS(":macro"));
-	lSymLTTree           = RSYMP(lSymS(":tree"));
-	lSymLTBytecodeOp     = RSYMP(lSymS(":bytecode-op"));
-	lSymLTBytecodeArray  = RSYMP(lSymS(":bytecode-array"));
+
+	lSymLTNil            = RSYMP(lSymS("nil"));
+	lSymLTNoAlloc        = RSYMP(lSymS("no-alloc"));
+	lSymLTBool           = RSYMP(lSymS("bool"));
+	lSymLTPair           = RSYMP(lSymS("pair"));
+	lSymLTObject         = RSYMP(lSymS("object"));
+	lSymLTLambda         = RSYMP(lSymS("lambda"));
+	lSymLTInt            = RSYMP(lSymS("int"));
+	lSymLTFloat          = RSYMP(lSymS("float"));
+	lSymLTVec            = RSYMP(lSymS("vec"));
+	lSymLTString         = RSYMP(lSymS("string"));
+	lSymLTSymbol         = RSYMP(lSymS("symbol"));
+	lSymLTKeyword        = RSYMP(lSymS("keyword"));
+	lSymLTNativeFunction = RSYMP(lSymS("native-function"));
+	lSymLTSpecialForm    = RSYMP(lSymS("special-form"));
+	lSymLTArray          = RSYMP(lSymS("array"));
+	lSymLTGUIWidget      = RSYMP(lSymS("gui-widget"));
+	lSymLTMacro          = RSYMP(lSymS("macro"));
+	lSymLTTree           = RSYMP(lSymS("tree"));
+	lSymLTBytecodeOp     = RSYMP(lSymS("bytecode-op"));
+	lSymLTBytecodeArray  = RSYMP(lSymS("bytecode-array"));
 }
 
 void lSymbolFree(lSymbol *s){
@@ -189,6 +223,7 @@ lSymbol *getTypeSymbol(const lVal* v){
 		case ltVec:         return lSymLTVec;
 		case ltString:      return lSymLTString;
 		case ltSymbol:      return lSymLTSymbol;
+		case ltKeyword:     return lSymLTKeyword;
 		case ltNativeFunc:  return lSymLTNativeFunction;
 		case ltSpecialForm: return lSymLTSpecialForm;
 		case ltArray:       return lSymLTArray;

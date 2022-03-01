@@ -18,7 +18,7 @@ static lVal *lValBytecodeOp(lBytecodeOp v){
 static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
 	const i64 val = castToInt(lCar(v), -1);
 	if((val < -128) || (val > 255)){
-		lExceptionThrowValClo(":invalid-bc-op", "Bytecode operations have to be within the range 0-255", lCar(v), c);
+		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range 0-255", lCar(v), c);
 		return NULL;
 	}
 	return lValBytecodeOp(val);
@@ -27,7 +27,7 @@ static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
 static lVal *lnfBytecodeOpInt(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltBytecodeOp)){
-		lExceptionThrowValClo(":argument-mismatch", "Expected 1 argument of type :bytecode-op", v, c);
+		lExceptionThrowValClo("argument-mismatch", "Expected 1 argument of type :bytecode-op", v, c);
 		return NULL;
 	}
 	return lValInt(car->vBytecodeOp);
@@ -36,7 +36,7 @@ static lVal *lnfBytecodeOpInt(lClosure *c, lVal *v){
 static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo(":argument-mismatch", "Expected 1 argument of type :array", v, c);
+		lExceptionThrowValClo("argument-mismatch", "Expected 1 argument of type :array", v, c);
 		return NULL;
 	}
 	const int len = arr->vArray->length;
@@ -48,7 +48,7 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	for(int i=0;i<len;i++){
 		const lVal *item = arr->vArray->data[i];
 		if((item == NULL) || (item->type != ltBytecodeOp)){
-			lExceptionThrowValClo(":argument-mismatch", "Expected array to only contain values of type :bytecode-op", v, c);
+			lExceptionThrowValClo("argument-mismatch", "Expected array to only contain values of type :bytecode-op", v, c);
 			return NULL;
 		}
 		ret->vBytecodeArr.data[i] = item->vBytecodeOp;
@@ -59,7 +59,7 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltBytecodeArr)){
-		lExceptionThrowValClo(":argument-mismatch", "Expected 1 argument of type :array", v, c);
+		lExceptionThrowValClo("argument-mismatch", "Expected 1 argument of type :array", v, c);
 		return NULL;
 	}
 	const int len = arr->vBytecodeArr.dataEnd - arr->vBytecodeArr.data;
@@ -78,7 +78,7 @@ static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	lVal *opsArr = lCar(v);
 	if((opsArr == NULL) || (opsArr->type != ltBytecodeArr)){
-		lExceptionThrowValClo(":argument-mismatch", "Expected first argument to be of type :bytecode-array", v, c);
+		lExceptionThrowValClo("argument-mismatch", "Expected first argument to be of type :bytecode-array", v, c);
 		return NULL;
 	}
 	return lBytecodeEval(c, lCdr(v), &opsArr->vBytecodeArr);

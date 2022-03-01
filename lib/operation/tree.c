@@ -14,6 +14,11 @@
 #include "../type/val.h"
 #include "../type-system.h"
 
+/*
+ * ToDo: All these should throw exceptions instead of returning null when
+ * encoutering missing/wrong aruments
+ */
+
 /* [tree/new ...plist] - Return a new tree, initialized with PLIST */
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
@@ -23,10 +28,9 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	ret->vTree = NULL;
 
 	while(v != NULL){
-		lVal *key = lCar(v);
-		lVal *val = lCadr(v);
-		if((key == NULL) || (key->type != ltSymbol)){break;}
-		ret->vTree = lTreeInsert(ret->vTree,key->vSymbol,val);
+		const lSymbol *sym = castToSymbol(lCar(v), NULL);
+		if(sym == NULL){break;}
+		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(v));
 		v = lCddr(v);
 	}
 
@@ -63,9 +67,8 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	lTree *tre = car->vTree;
-	lVal *vs = lCadr(v);
-	if((vs == NULL) || (vs->type != ltSymbol)){return car;}
-	return lTreeGet(tre,vs->vSymbol,NULL);
+	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	return key ? lTreeGet(tre, key, NULL) : car;
 }
 
 /* [tree/has? tree sym] - Return #t if TREE contains a value for SYM */
@@ -74,9 +77,8 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	lTree *tre = car->vTree;
-	lVal *vs = lCadr(v);
-	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
-	return lValBool(lTreeHas(tre,vs->vSymbol,NULL));
+	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	return lValBool(key ? lTreeHas(tre, key, NULL) : false);
 }
 
 /* [tree/set! tree sym val] - Set SYM to VAL in TREE */
@@ -85,9 +87,8 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltTree)){return NULL;}
 	lTree *tre = car->vTree;
-	lVal *vs = lCadr(v);
-	if((vs == NULL) || (vs->type != ltSymbol)){return NULL;}
-	car->vTree = lTreeInsert(tre,vs->vSymbol,lCaddr(v));
+	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	car->vTree = lTreeInsert(tre, key, lCaddr(v));
 	return car;
 }
 
@@ -105,7 +106,7 @@ static lVal *lnfTreeDup(lClosure *c, lVal *v){
 		|| (v->type != ltPair)
 		|| (v->vList.car == NULL)
 		|| (v->vList.car->type != ltTree)){
-		lExceptionThrowValClo(":type-error","tree/dup can only be called with a tree as an argument", v, c);
+		lExceptionThrowValClo("type-error","tree/dup can only be called with a tree as an argument", v, c);
 	}
 	lTree *tree = castToTree(lCar(v),NULL);
 	if(!tree){return lCar(v);}
@@ -120,9 +121,9 @@ static lVal *lnfTreeKeyAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){
-		lExceptionThrowValClo(":type-error","tree/key* can only be called with a tree", v, c);
+		lExceptionThrowValClo("type-error","tree/key* can only be called with a tree", v, c);
 	}
-	return car->vTree ? lValSymS(car->vTree->key) : NULL;
+	return car->vTree ? lValKeywordS(car->vTree->key) : NULL;
 }
 
 /* [tree/value* tree] - return the value of a tree */
@@ -130,7 +131,7 @@ static lVal *lnfTreeValueAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){
-		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
 	}
 	return car->vTree ? car->vTree->value : NULL;
 }
@@ -140,7 +141,7 @@ static lVal *lnfTreeLeftAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){
-		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
 	}
 	return (car->vTree && car->vTree->left) ? lValTree(car->vTree->left) : NULL;
 }
@@ -150,7 +151,7 @@ static lVal *lnfTreeRightAst(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if(car->type != ltTree){
-		lExceptionThrowValClo(":type-error","tree/value* can only be called with a tree", v, c);
+		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
 	}
 	return (car->vTree && car->vTree->right) ? lValTree(car->vTree->right) : NULL;
 }

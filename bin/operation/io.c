@@ -38,23 +38,23 @@ lSymbol *lsNamedPipe;
 //lSymbol *lsSocket;
 
 void setIOSymbols(){
-	lsError            = RSYMP(lSymS(":error?"));
-	lsErrorNumber      = RSYMP(lSymS(":error-number"));
-	lsErrorText        = RSYMP(lSymS(":error-text"));
-	lsMode             = RSYMP(lSymS(":mode"));
-	lsSize             = RSYMP(lSymS(":size"));
-	lsUserID           = RSYMP(lSymS(":user-id"));
-	lsGroupID          = RSYMP(lSymS(":group-id"));
-	lsAccessTime       = RSYMP(lSymS(":access-time"));
-	lsModificationTime = RSYMP(lSymS(":modification-time"));
+	lsError            = RSYMP(lSymS("error?"));
+	lsErrorNumber      = RSYMP(lSymS("error-number"));
+	lsErrorText        = RSYMP(lSymS("error-text"));
+	lsMode             = RSYMP(lSymS("mode"));
+	lsSize             = RSYMP(lSymS("size"));
+	lsUserID           = RSYMP(lSymS("user-id"));
+	lsGroupID          = RSYMP(lSymS("group-id"));
+	lsAccessTime       = RSYMP(lSymS("access-time"));
+	lsModificationTime = RSYMP(lSymS("modification-time"));
 
-	lsRegularFile      = RSYMP(lSymS(":regular-file?"));
-	lsDirectory        = RSYMP(lSymS(":directory?"));
-	lsCharacterDevice  = RSYMP(lSymS(":character-device?"));
-	lsBlockDevice      = RSYMP(lSymS(":block-device?"));
-	lsNamedPipe        = RSYMP(lSymS(":named-pipe?"));
-	//lsSymbolicLink     = RSYMP(lSymS(":symbolic-link?"));
-	//lsSocket           = RSYMP(lSymS(":socket?"));
+	lsRegularFile      = RSYMP(lSymS("regular-file?"));
+	lsDirectory        = RSYMP(lSymS("directory?"));
+	lsCharacterDevice  = RSYMP(lSymS("character-device?"));
+	lsBlockDevice      = RSYMP(lSymS("block-device?"));
+	lsNamedPipe        = RSYMP(lSymS("named-pipe?"));
+	//lsSymbolicLink     = RSYMP(lSymS("symbolic-link?"));
+	//lsSocket           = RSYMP(lSymS("socket?"));
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
@@ -183,7 +183,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 static lVal *lnfPopen(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	#ifdef __EMSCRIPTEN__
-		lExceptionThrowValClo(":unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.",v,c);
+		lExceptionThrowValClo("unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.",v,c);
 		return NULL;
 	#else
 	const char *command = castToString(lCar(v),NULL);

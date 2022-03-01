@@ -2,13 +2,19 @@
 #define NUJEL_LIB_TYPE_SYMBOL
 #include "../nujel.h"
 
-#define lGetSymbol(v) (((v == NULL) || (v->type != ltSymbol)) ? symNull : v->vSymbol)
+extern lSymbol *symNull;
+static inline const lSymbol *lGetSymbol(const lVal *v){
+	return ((v == NULL) || (v->type != ltSymbol))
+		? symNull
+		: v->vSymbol;
+}
 
-lVal     *lValSymS     (const lSymbol *s);
-lVal     *lValSym      (const char *s);
+lVal     *lValSymS      (const lSymbol *s);
+lVal     *lValSym       (const char    *s);
 
-bool      lSymKeyword  (const lSymbol *s);
+lVal     *lValKeywordS  (const lSymbol *s);
+lVal     *lValKeyword   (const char    *s);
 
-lVal     *lSymbolSearch(const char *s, uint len);
+lVal     *lSymbolSearch (const char    *s, uint len);
 
 #endif

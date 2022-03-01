@@ -21,9 +21,9 @@ lVal *lValInt(i64 v){
 /* Return a newly allocated Nujel float of value V */
 lVal *lValFloat(double v){
 	if(isnan(v)){
-		lExceptionThrow(":float-nan","NaN is disallowed in Nujel, please check you calculations");
+		lExceptionThrow("float-nan","NaN is disallowed in Nujel, please check you calculations");
 	}else if(isinf(v)){
-		lExceptionThrow(":float-inf","INF is disallowed in Nujel, please check you calculations");
+		lExceptionThrow("float-inf","INF is disallowed in Nujel, please check you calculations");
 	}
 	lVal *ret   = lValAlloc();
 	ret->type   = ltFloat;

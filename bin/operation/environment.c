@@ -14,7 +14,7 @@ static lTree *addVar(const char *e, lTree *t){
 	for(endOfString=endOfKey+1;e[endOfString];endOfString++){}
 	lSymbol *sym = RSYMP(lSymSL(e,endOfKey));
 	lVal *v = RVP(lValStringNoCopy(&e[endOfKey+1], endOfString));
-	return lTreeInsert(t,sym,v);
+	return lTreeInsert(t, sym, v);
 }
 
 #if (defined(__MSYS__)) || (defined(__MINGW32__))

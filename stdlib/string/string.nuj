@@ -3,6 +3,10 @@
 
 ;; Some nujel string λs
 
+[defun string->keyword [α]
+       "Return string α as a keyword"
+       [symbol->keyword [str->sym α]]]
+
 [defun println [str]
        "Print STR on a single line"
        [print [cat str "\r\n"]]]

@@ -80,21 +80,21 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		return NULL;
 	}
 	lVal *ret = lRootsValPush(lValTree(NULL));
-	ret->vTree = lTreeInsert(ret->vTree,lSymS(":type"),lRootsValPush(lValSymS(getTypeSymbol(car))));
+	ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("type")),lRootsValPush(lValSymS(getTypeSymbol(car))));
 	if((car->type == ltSpecialForm) || (car->type == ltNativeFunc)){
 		lNFunc *nf = car->vNFunc;
-		ret->vTree = lTreeInsert(ret->vTree,symDocumentation,nf->doc);
-		ret->vTree = lTreeInsert(ret->vTree,symArguments,nf->args);
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(nf->name));
+		ret->vTree = lTreeInsert(ret->vTree, symDocumentation,nf->doc);
+		ret->vTree = lTreeInsert(ret->vTree, symArguments,nf->args);
+		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
-		ret->vTree = lTreeInsert(ret->vTree,symDocumentation, clo->doc);
-		ret->vTree = lTreeInsert(ret->vTree,symArguments, clo->args);
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":name"),lValSymS(clo->name));
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":code"),clo->text);
-		ret->vTree = lTreeInsert(ret->vTree,lSymS(":data"), lRootsValPush(lValTree(clo->data)));
+		ret->vTree = lTreeInsert(ret->vTree, symDocumentation, clo->doc);
+		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
+		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")), RVP(lValSymS(clo->name)));
+		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("code")), clo->text);
+		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("data")), RVP(lValTree(clo->data)));
 		if(clo->type == closureCall){
-			ret->vTree = lTreeInsert(ret->vTree,lSymS(":call"), lRootsValPush(lValBool(true)));
+			ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("call")), lRootsValPush(lValBool(true)));
 		}
 	}
 	return ret;
@@ -151,7 +151,7 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 			clo->data = newData;
 		}
 	}else {
-		lExceptionThrowValClo(":invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
+		lExceptionThrowValClo("invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
 	}
 	lClosureSetRec(clo,data->left);
 	lClosureSetRec(clo,data->right);
@@ -209,7 +209,7 @@ static lVal *lnfResolve(lClosure *c, lVal *v){
 	const lSymbol *sym = castToSymbol(lCar(v),NULL);
 	lVal *env = lCadr(v);
 	if(env && (env->type != ltLambda) && (env->type != ltObject)){
-		lExceptionThrowValClo(":invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	return sym ? lGetClosureSym(env ? env->vClosure : c, sym) : NULL;
 }
@@ -218,7 +218,7 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	const lSymbol *sym = castToSymbol(lCar(v),NULL);
 	lVal *env = lCadr(v);
 	if(env && (env->type != ltLambda) && (env->type != ltObject)){
-		lExceptionThrowValClo(":invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
 }
@@ -270,11 +270,11 @@ static lVal *lnfSymbolSearch(lClosure *c, lVal *v){
 }
 
 void lOperationsClosure(lClosure *c){
-	symType          = lSymS(":type");
-	symDocumentation = lSymS(":documentation");
-	symArguments     = lSymS(":arguments");
-	symCode          = lSymS(":code");
-	symData          = lSymS(":data");
+	symType          = RSYMP(lSymS("type"));
+	symDocumentation = RSYMP(lSymS("documentation"));
+	symArguments     = RSYMP(lSymS("arguments"));
+	symCode          = RSYMP(lSymS("code"));
+	symData          = RSYMP(lSymS("data"));
 
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);

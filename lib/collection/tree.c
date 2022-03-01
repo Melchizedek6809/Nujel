@@ -154,7 +154,7 @@ lVal *lTreeAddToList(const lTree *t, lVal *list){
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
 	l->vList.cdr->vList.car = t->value;
-	l->vList.car = lValSymS(t->key);
+	l->vList.car = lValKeywordS(t->key);
 	return lTreeAddToList(t->left,l);
 }
 
@@ -165,7 +165,7 @@ lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
 	lRootsValPush(list);
 	list = lTreeAddKeysToList(t->right,list);
 
-	lVal *sym = lRootsValPush(lValSymS(t->key));
+	lVal *sym = lRootsValPush(lValKeywordS(t->key));
 	list = lCons(sym,list);
 
 	return lTreeAddKeysToList(t->left,list);

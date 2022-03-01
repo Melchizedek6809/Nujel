@@ -134,8 +134,8 @@
        [while code
               [case [type-of [car code]]
                     [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
-                    [:symbol      [and [== [car code] :label]
-                                       [tree/set! sym-map [cadr code] pos]]]
+                    [[:symbol :keyword] [and [== [car code] :label]
+                                             [tree/set! sym-map [cadr code] pos]]]
                     [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
               [cdr! code]]
        pos]

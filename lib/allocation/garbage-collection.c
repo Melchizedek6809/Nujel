@@ -99,6 +99,7 @@ void lValGCMark(lVal *v){
 	case ltString:
 		lStringGCMark(v->vString);
 		break;
+	case ltKeyword:
 	case ltSymbol:
 		lSymbolGCMark(v->vSymbol);
 		break;

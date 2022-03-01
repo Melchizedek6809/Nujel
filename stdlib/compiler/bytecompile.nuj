@@ -3,13 +3,13 @@
 [def bytecompile/gen-label/counter 0]
 [defun bytecompile/gen-label [prefix]
        [++ bytecompile/gen-label/counter]
-       [str->sym [cat prefix ":label-" bytecompile/gen-label/counter]]]
+       [str->sym [cat prefix "label-" bytecompile/gen-label/counter]]]
 
 [defun bytecompile/literal [source]
        [case [type-of source]
-             [:symbol   [if [keyword? source]
-                            [$push/lval source]
-                            [$get source]]]
+             [[:symbol :keyword] [if [keyword? source]
+                                     [$push/lval source]
+                                     [$get source]]]
              [:int      [$push/int source]]
              [otherwise [$push/lval source]]]]
 

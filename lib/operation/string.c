@@ -25,12 +25,12 @@
 static lVal *lnfStrlen(lClosure *c, lVal *v){
 	(void)c;
 	if(v == NULL){
-		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","[string/length] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){
-		lExceptionThrowValClo(":type-error","[string/length] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","[string/length] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 	return lValInt(lStringLength(t->vString));
@@ -117,7 +117,7 @@ static lVal *lnfStringCut(lClosure *c, lVal *v){
 	int start, slen, len;
 	lVal *str = lCar(v);
 	if((str == NULL) || (str->type != ltString)){
-		lExceptionThrowValClo(":type-error","[string/cut] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","[string/cut] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 
@@ -213,7 +213,7 @@ static lVal *lnfStrSym(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
 	if((v == NULL) || (v->type != ltString)){
-		lExceptionThrowValClo(":type-error","[str->sym] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","[str->sym] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 	return lValSym(v->vString->data);
@@ -223,7 +223,7 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 	(void)c;
 	v = lCar(v);
 	if((v == NULL) || (v->type != ltSymbol)){
-		lExceptionThrowValClo(":type-error","[sym->str] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","[sym->str] expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 	return lValString(v->vSymbol->c);
@@ -239,17 +239,17 @@ static lVal *lnfCharAt(lClosure *c,lVal *v){
 	(void)c;
 	const char *str = castToString(lCar(v),NULL);
 	if(str == NULL){
-		lExceptionThrowValClo(":type-error","[char-at] expects a string as its first argument", v, c);
+		lExceptionThrowValClo("type-error","[char-at] expects a string as its first argument", v, c);
 		return NULL;
 	}
 	const int pos = castToInt(lCadr(v),-1);
 	if(pos < 0){
-		lExceptionThrowValClo(":bounds-error","[char-at] does not support negative indices", v, c);
+		lExceptionThrowValClo("bounds-error","[char-at] does not support negative indices", v, c);
 		return NULL;
 	}
 	const int len = strlen(str);
 	if(pos >= len){
-		lExceptionThrowValClo(":bounds-error","[char-at] index bigger that string", v, c);
+		lExceptionThrowValClo("bounds-error","[char-at] index bigger that string", v, c);
 		return NULL;
 	}
 	return lValInt(str[pos]);
@@ -283,7 +283,9 @@ void lOperationsString(lClosure *c){
 	lAddNativeFunc(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 	lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
 	lAddNativeFunc(c,"from-char-code","[...codes]",               "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
+
 	lAddNativeFunc(c,"str->sym",      "[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
 	lAddNativeFunc(c,"sym->str",      "[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
+
 	lAddNativeFunc(c,"str/write",     "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
 }

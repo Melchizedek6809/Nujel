@@ -18,12 +18,12 @@
 
 static lVal *exceptionThrow(lClosure *c, lVal *v, const char *func){
 	(void)func;
-	lExceptionThrowValClo(":type-error","Can't calculate with non numeric types, please explicitly convert into a numeric form using [int α],[float β],[vec γ].",v, c);
+	lExceptionThrowValClo("type-error","Can't calculate with non numeric types, please explicitly convert into a numeric form using [int α],[float β],[vec γ].",v, c);
 	return NULL;
 }
 static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 	(void)func;
-	lExceptionThrowValClo(":type-error","This function can only be used with floats, you can use [float α] to explicitly convert into a floating point value",v, c);
+	lExceptionThrowValClo("type-error","This function can only be used with floats, you can use [float α] to explicitly convert into a floating point value",v, c);
 	return NULL;
 }
 
@@ -120,7 +120,7 @@ static lVal *lnfDivAst(lClosure *c, lVal *v){
 		case ltInt: {
 			const int av = castToInt(a,1);
 			const int bv = castToInt(b,1);
-			if(bv == 0){lExceptionThrowValClo(":division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
+			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
 		case ltFloat: return lValFloat(castToFloat(a,1.f) / castToFloat(b,1.f));
 		case ltVec:   return lValVec(vecDiv(castToVec(a,vecZero()), castToVec(b,vecZero())));
@@ -139,7 +139,7 @@ static lVal *lnfModAst(lClosure *c, lVal *v){
 		case ltInt: {
 			const int av = castToInt(a,1);
 			const int bv = castToInt(b,1);
-			if(bv == 0){lExceptionThrowValClo(":division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
+			if(bv == 0){lExceptionThrowValClo("division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av % bv);}
 		case ltFloat: return lValFloat(fmod(castToFloat(a,0.f),castToFloat(b,0.f)));
 		case ltVec:   return lValVec(vecMod(castToVec(a,vecZero()), castToVec(b,vecZero())));
@@ -176,7 +176,7 @@ static i64 lnfSubI(lVal *v){
 static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
 	if((t == NULL) || (t->vList.car == NULL)){
-		lExceptionThrowValClo(":arity-error","- expects at least 1 argument", NULL, c);
+		lExceptionThrowValClo("arity-error","- expects at least 1 argument", NULL, c);
 	}
 	lRootsValPush(t);
 	switch(t->vList.car->type){
@@ -243,7 +243,7 @@ static i64 lnfDivI(lClosure *c, lVal *v){
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
-			lExceptionThrowValClo(":division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);
+			lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);
 			return 0;
 		}
 		acc /= v->vList.car->vInt;
@@ -253,13 +253,13 @@ static i64 lnfDivI(lClosure *c, lVal *v){
 lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *t = lCastAuto(c,v);
 	if((t == NULL) || (t->vList.car == NULL)){
-		lExceptionThrowValClo(":arity-error","/ expects at least 1 argument", NULL, c);
+		lExceptionThrowValClo("arity-error","/ expects at least 1 argument", NULL, c);
 	}
 	if(t->vList.cdr == NULL){
 		switch(t->vList.car->type){
 		default: return exceptionThrow(c, v,"division");
 		case ltInt:
-			if(t->vInt == 0){lExceptionThrowValClo(":division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
+			if(t->vInt == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValFloat(1.0 / ((double)t->vList.car->vInt));
 		case ltFloat: return lValFloat(1.0 / t->vList.car->vFloat);
 		case ltVec:   return lValVec(vecDiv(vecOne(),t->vList.car->vVec));
@@ -298,7 +298,7 @@ static i64 lnfModI(lClosure *c, lVal *v){
 	v = v->vList.cdr;
 	for(; v ; v = v->vList.cdr){
 		if(v->vList.car->vInt == 0){
-			lExceptionThrowValClo(":division-by-zero","Modulo/Dividing by zero is probably not what you wanted", NULL, c);
+			lExceptionThrowValClo("division-by-zero","Modulo/Dividing by zero is probably not what you wanted", NULL, c);
 			return 0;
 		}
 		acc = acc % v->vList.car->vInt;

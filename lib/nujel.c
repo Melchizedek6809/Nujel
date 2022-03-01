@@ -35,7 +35,7 @@ void lInit(){
 lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 	(void)c;
 	if(lambda->type != ltMacro){
-		lExceptionThrowValClo(":macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lambda, c);
+		lExceptionThrowValClo("macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lambda, c);
 	}
 	const int SP = lRootsGet();
 	lVal *vn = args;
@@ -51,7 +51,7 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 		}else if(n->type == ltSymbol){
 			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
 		}else{
-			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
+			lExceptionThrowValClo("invalid-macro", "Incorrect type in argument list", lambda, c);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
@@ -75,7 +75,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 		}else if(n->type == ltSymbol){
 			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
 		}else{
-			lExceptionThrowValClo(":invalid-lambda", "Incorrect type in argument list", lambda, c);
+			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
 	}
 	lVal *ret = lEval(tmpc,lambda->vClosure->text);
@@ -87,7 +87,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
-		lExceptionThrowValClo(":runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
+		lExceptionThrowValClo("runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
 	case ltObject:
 		return lnfDo(fun->vClosure,args);
 	case ltLambda:
@@ -96,7 +96,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	case ltNativeFunc:
 		return fun->vNFunc->fp(c,args);
 	default:
-		lExceptionThrowValClo(":type-error", "Can't apply to following val", fun, c);
+		lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
 		return NULL;
 	}
 }
@@ -162,15 +162,15 @@ lVal *lEval(lClosure *c, lVal *v){
 	default:
 		return v;
 	case ltSymbol:
-		return lSymKeyword(v->vSymbol) ? v : lGetClosureSym(c,v->vSymbol);
+		return lGetClosureSym(c,v->vSymbol);
 	case ltPair: {
 		lVal *car = lCar(v);
 		switch(car ? car->type : ltNoAlloc){
 		default:
-			lExceptionThrowValClo(":type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)), c);
+			lExceptionThrowValClo("type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)), c);
 			return NULL;
                 case ltMacro:
-			lExceptionThrowValClo(":runtime-macro", "Can't use macros as functions", v, c);
+			lExceptionThrowValClo("runtime-macro", "Can't use macros as functions", v, c);
 			return NULL;
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
@@ -182,18 +182,16 @@ lVal *lEval(lClosure *c, lVal *v){
 			return RVP(car->vNFunc->fp(c,lMap(c,lCdr(v),lEval)));
                 case ltPair:
 			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);
+		case ltKeyword:
+			return v; // ToDo: can probably be removed
 		case ltSymbol: {
 			lVal *resolved;
 			if(lHasClosureSym(c,car->vSymbol,&resolved)){
 				lVal *args = lArgsEval(resolved) ? lMap(c,lCdr(v),lEval) : lCdr(v);
 				return lApply(c, args, resolved, car);
 			}else{
-				if(car->vSymbol && lSymKeyword(car->vSymbol)){
-					return v;
-				}else{
-					lExceptionThrowValClo(":unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
-					return NULL;
-				}
+				lExceptionThrowValClo("unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
+				return NULL;
 			}}
 		}
 	}}

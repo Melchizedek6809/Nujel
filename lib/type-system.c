@@ -189,7 +189,7 @@ lTree *castToTree(const lVal *v, lTree *fallback){
 
 /* Return the tree in V if possible, otherwise fallback. */
 const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback){
-	if((v == NULL) || (v->type != ltSymbol)){return fallback;}
+	if((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword))){return fallback;}
 	return v->vSymbol;
 }
 
@@ -231,7 +231,27 @@ lVal *lCastAuto(lClosure *c, lVal *v){
 /* [type-of v] - Return a symbol describing the type of VAL*/
 static lVal *lnfTypeOf(lClosure *c, lVal *v){
 	(void)c;
-	return lValSymS(getTypeSymbol(lCar(v)));
+	return lValKeywordS(getTypeSymbol(lCar(v)));
+}
+
+static lVal *lnfSymbolToKeyword(lClosure *c, lVal *v){
+	if((v == NULL) || (v->vList.car == NULL)){
+		lExceptionThrowValClo("arity-error","- expects at least 1 argument", v, c);
+	}
+	if(v->vList.car->type != ltSymbol){
+		lExceptionThrowValClo("type-error","expected argument of type :symbol", v->vList.car, c);
+	}
+	return lValKeywordS(v->vList.car->vSymbol);
+}
+
+static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
+	if((v == NULL) || (v->vList.car == NULL)){
+		lExceptionThrowValClo("arity-error","- expects at least 1 argument", v, c);
+	}
+	if(v->vList.car->type != ltKeyword){
+		lExceptionThrowValClo("type-error","expected argument of type :keyword", v->vList.car, c);
+	}
+	return lValSymS(v->vList.car->vSymbol);
 }
 
 /* Add typing and casting operators to c */
@@ -241,5 +261,7 @@ void lOperationsTypeSystem(lClosure *c){
 	lAddNativeFunc(c,"float",   "[α]",     "Convert α into a floating-point number", lnfFloat);
 	lAddNativeFunc(c,"vec",     "[x y z]", "Convert α into a vector value consistig of 3 floats x,y and z", lnfVec);
 	lAddNativeFunc(c,"string",  "[α]",     "Convert α into a printable and readable string", lnfCat);
+	lAddNativeFunc(c,"symbol->keyword", "[α]", "Convert symbol α into a keyword", lnfSymbolToKeyword);
+	lAddNativeFunc(c,"keyword->symbol", "[α]", "Convert keyword α into a symbol", lnfKeywordToSymbol);
 	lAddNativeFunc(c,"type-of", "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
 }

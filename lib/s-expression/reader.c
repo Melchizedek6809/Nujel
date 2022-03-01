@@ -124,7 +124,7 @@ static lVal *lParseString(lString *s){
 				const char *start, *end;
 				for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 				for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
-				lExceptionThrowValClo(":invalid-literal", "Unknown escape character found in string literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+				lExceptionThrowValClo("invalid-literal", "Unknown escape character found in string literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 				break; }
 			}
 			s->data++;
@@ -136,13 +136,13 @@ static lVal *lParseString(lString *s){
 			return v;
 		}else if(*s->data == 0){
 			buf[i] = 0;
-			lExceptionThrowValClo(":unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
+			lExceptionThrowValClo("unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
 		}else{
 			*b++ = *s->data++;
 		}
 	}
 	buf[i] = 0;
-	lExceptionThrowValClo(":unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
+	lExceptionThrowValClo("unclosed-string-literal", "Couldn't find a closing \" for the following string literal", lValString(buf), readClosure);
 	return NULL;
 }
 
@@ -163,7 +163,9 @@ static lVal *lParseSymbol(lString *s){
 		if(*s->data == 0){break;}
 		s->data++;
 	}
-	return lValSym(buf);
+	return (buf[0] == ':')
+		? lValKeyword(&buf[1])
+		: lValSym(buf);
 }
 
 /* Parse s as a binary number and return it as an ltInt lVal */
@@ -181,7 +183,7 @@ static i64 lParseNumberBinary(lString *s, int *leadingZeroes){
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in binary literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected character found in binary literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -202,7 +204,7 @@ static i64 lParseNumberOctal(lString *s, int *leadingZeroes){
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in octal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected character found in octal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -225,12 +227,12 @@ static i64 lParseNumberDecimal(lString *s, int *leadingZeroes){
 			if(++digits > 18){
 				const char *end;
 				for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-				lExceptionThrowValClo(":invalid-literal", "Decimal literal is too big to be read without a loss in precision", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+				lExceptionThrowValClo("invalid-literal", "Decimal literal is too big to be read without a loss in precision", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 			}
 		}else if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in decimal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected character found in decimal literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -252,7 +254,7 @@ static i64 lParseNumberHex(lString *s, int *leadingZeroes){
 		if(!isnumericseparator(c)){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in hex literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected character found in hex literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}
 	}
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
@@ -275,7 +277,7 @@ static lVal *lParseNumber(lString *s, i64 (*parser)(lString *, int *)){
 		if(*s->data == '.'){
 			const char *end;
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected period at end of number literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		}else{
 			const double valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
 			return lValFloat(negative ? -valf : valf);
@@ -304,7 +306,7 @@ static lVal *lParseBytecodeOp(lString *s){
 		const char *start, *end;
 		for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
 		for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-		lExceptionThrowValClo(":invalid-literal", "Out of bounds bytecode operation literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+		lExceptionThrowValClo("invalid-literal", "Out of bounds bytecode operation literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 	}
 	const i64 code = ret->vInt;
 	ret->type = ltBytecodeOp;
@@ -320,7 +322,7 @@ static lVal *lParseSpecial(lString *s){
 		const char *start, *end;
 			for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
 			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo(":invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			lExceptionThrowValClo("invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		return NULL; }
 	case '|': // SRFI-30
 		lStringAdvanceUntilEndOfBlockComment(s);
@@ -365,14 +367,14 @@ lVal *lReadList(lString *s, bool rootForm){
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
 				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-				lExceptionThrowValClo(":read-error", "Unmatched opening bracket", err,readClosure);
+				lExceptionThrowValClo("read-error", "Unmatched opening bracket", err,readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
 		}else if(iscloseparen(c)){
 			if(rootForm){
 				lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-				lExceptionThrowValClo(":read-error", "Unmatched closing bracket", err, readClosure);
+				lExceptionThrowValClo("read-error", "Unmatched closing bracket", err, readClosure);
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
@@ -381,14 +383,14 @@ lVal *lReadList(lString *s, bool rootForm){
 			if((c == '.') && (isspace(next) || isnonsymbol(next))){
 				if(v == NULL){
 					lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-					lExceptionThrowValClo(":read-error", "Missing car in dotted pair", err, readClosure);
+					lExceptionThrowValClo("read-error", "Missing car in dotted pair", err, readClosure);
 				}
 				s->data++;
 				lVal *nv;
 				do {
 					if((s->data >= s->bufEnd) || (*s->data == 0) || iscloseparen(*s->data)){
 						lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-						lExceptionThrowValClo(":read-error", "Missing cdr in dotted pair", err, readClosure);
+						lExceptionThrowValClo("read-error", "Missing cdr in dotted pair", err, readClosure);
 					}
 					lStringAdvanceToNextCharacter(s);
 					nv = lReadValue(s);

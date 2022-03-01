@@ -53,6 +53,7 @@ typedef enum lType {
 	ltCallStack,
 
 	ltSymbol,
+	ltKeyword,
 	ltBool,
 	ltInt,
 	ltFloat,

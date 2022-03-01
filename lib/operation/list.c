@@ -23,7 +23,7 @@ static lVal *lnfCdr(lClosure *c, lVal *v){
 static lVal *lnfCons(lClosure *c, lVal *v){
 	(void)c;
 	if(lCddr(v) != NULL){
-		lExceptionThrowValClo(":too-many-args","Cons should only be called with 2 arguments!", v, c);
+		lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c);
 	}
 	return lCons(lCar(v),lCadr(v));
 }

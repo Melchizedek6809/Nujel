@@ -118,7 +118,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			}
 		}
 	}
-	if(c == NULL){c = createRootClosure(loadStdLib);}
+	if(c == NULL){c = createRootClosure();}
 
 	if(lVerbose){
 		pf("sizeof(vec): %u\n",     (i64)sizeof(vec));

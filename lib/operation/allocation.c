@@ -10,11 +10,11 @@
 static lVal *lnfMemInfo(lClosure *c, lVal *v){
 	(void)c; (void)v;
 	return lList(10,
-		RVP(lValSym(":value")),  RVP(lValInt(lValActive)),
-		RVP(lValSym(":closure")),RVP(lValInt(lClosureActive)),
-		RVP(lValSym(":array")),  RVP(lValInt(lArrayActive)),
-		RVP(lValSym(":string")), RVP(lValInt(lStringActive)),
-		RVP(lValSym(":symbol")), RVP(lValInt(lSymbolActive)));
+		RVP(lValKeyword("value")),  RVP(lValInt(lValActive)),
+		RVP(lValKeyword("closure")),RVP(lValInt(lClosureActive)),
+		RVP(lValKeyword("array")),  RVP(lValInt(lArrayActive)),
+		RVP(lValKeyword("string")), RVP(lValInt(lStringActive)),
+		RVP(lValKeyword("symbol")), RVP(lValInt(lSymbolActive)));
 }
 
 static lVal *lnfGarbageCollect(lClosure *c, lVal *v){

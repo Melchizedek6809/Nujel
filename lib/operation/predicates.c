@@ -40,6 +40,7 @@ static int lValCompare(lVal *v){
 			return !((a->vList.car == b->vList.car)
 				&& (a->vList.cdr == b->vList.cdr));
 		}
+	case ltKeyword:
 	case ltSymbol:
 		return (b->vSymbol != a->vSymbol) ? -1 : 0;
 	case ltObject:
@@ -146,8 +147,8 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 
 static lVal *lnfKeywordPred(lClosure *c, lVal *v){
 	(void)c;
-	const lSymbol *s = castToSymbol(lCar(v), NULL);
-	return lValBool(s ? lSymKeyword(s) : false);
+	lVal *car = lCar(v);
+	return lValBool(car ? car->type == ltKeyword : false);
 }
 
 void lOperationsPredicate(lClosure *c){

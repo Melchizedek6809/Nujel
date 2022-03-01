@@ -26,9 +26,18 @@ lVal *lValSym(const char *s){
 	return lValSymS(RSYMP(lSymS(s)));
 }
 
-/* Return true if S is a keyword symbol */
-bool lSymKeyword(const lSymbol *s){
-	return s->c[0] == ':';
+/* Return a newly allocated nujel keyword of value S */
+lVal *lValKeywordS(const lSymbol *s){
+	if(s == NULL){return NULL;}
+	lVal *ret = lValAlloc();
+	ret->type = ltKeyword;
+	ret->vSymbol = s;
+	return ret;
+}
+
+/* Return a nujel value for the keyword within S */
+lVal *lValKeyword(const char *s){
+	return lValKeywordS(RSYMP(lSymS(s)));
 }
 
 /* Search the global symbol table for STR */

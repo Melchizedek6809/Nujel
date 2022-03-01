@@ -22,7 +22,7 @@ static lVal *lnfArrLength(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo(":type-mismatch","[array/length] expects an array as its first and only argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/length] expects an array as its first and only argument", v, c);
 		return NULL;
 	}
 	return lValInt(arr->vArray->length);
@@ -32,7 +32,7 @@ static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo(":type-mismatch","[array/length!] expects an array as its first argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/length!] expects an array as its first argument", v, c);
 		return NULL;
 	}
 	const int length =castToInt(lCadr(v),-1);
@@ -50,23 +50,23 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo(":type-mismatch","[array/set!] expects an array as its first argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/set!] expects an array as its first argument", v, c);
 		return NULL;
 	}
 	v = lCdr(v);
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltInt)){
-		lExceptionThrowValClo(":type-mismatch","[array/set!] expects its second argument to be an integer", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/set!] expects its second argument to be an integer", v, c);
 		return NULL;
 	}
 	const int key = t->vInt;
 	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo(":out-of-bounds","[array/set!] index provided is out of bounds", v, c);
+		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", v, c);
 		return NULL;
 	}
 	const lVal *vt = lCdr(v);
 	if((vt == NULL) || (vt->type != ltPair)){
-		lExceptionThrowValClo(":type-mismatch","[array/set!] expects a third argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/set!] expects a third argument", v, c);
 		return NULL;
 	}
 	arr->vArray->data[key] = lCadr(v);
@@ -77,7 +77,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	(void)c;
 	const int len = castToInt(lCar(v),-1);
 	if(len < 0){
-		lExceptionThrowValClo(":invalid-argument","[array/allocate] expects an integer indicating the size which has to be at least 0 or more", v, c);
+		lExceptionThrowValClo("invalid-argument","[array/allocate] expects an integer indicating the size which has to be at least 0 or more", v, c);
 		return NULL;
 	}
 	lVal *r = lRootsValPush(lValAlloc());
@@ -86,7 +86,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	r->vArray->length = len;
 	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
 	if(r->vArray->data == NULL){
-		lExceptionThrowValClo(":out-of-memory","[array/allocate] couldn't allocate its array", v, c);
+		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
 		return NULL;
 	}
 	return r;
@@ -101,7 +101,7 @@ static lVal *lnfArrNew(lClosure *c, lVal *v){
 	r->vArray->length = length;
 	r->vArray->data = calloc(length,sizeof(*r->vArray->data));
 	if(r->vArray->data == NULL){
-		lExceptionThrowValClo(":out-of-memory","[array/allocate] couldn't allocate its array", v, c);
+		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
 		return NULL;
 	}
 	int key = 0;
@@ -115,17 +115,17 @@ lVal *lnfArrRef(lClosure *c, lVal *v){
 	(void)c;
 	lVal *arr = lCar(v);
 	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo(":type-mismatch","[array/ref] expects an array as its first argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/ref] expects an array as its first argument", v, c);
 		return NULL;
 	}
 	lVal *t = lCadr(v);
 	if((t == NULL) || (t->type != ltInt)){
-		lExceptionThrowValClo(":type-mismatch","[array/ref] expects its second argument to be an integer", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/ref] expects its second argument to be an integer", v, c);
 		return NULL;
 	}
 	const int key = t->vInt;
 	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo(":out-of-bounds","[array/ref] index provided is out of bounds", v, c);
+		lExceptionThrowValClo("out-of-bounds","[array/ref] index provided is out of bounds", v, c);
 		return NULL;
 	}
 	return arr->vArray->data[key];
