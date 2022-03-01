@@ -12,9 +12,9 @@
            [map [\ [α] [if-not [file/dir? α] α
                                 [directory/read-relative α]]]]
            [flatten]]]
-[def stdlib-files [filter [append [directory/read-relative "stdlib"]
-                                  [directory/read-relative "binlib"]]
-                          ext-nuj?]]
+[def stdlib-files [sort [filter [append [directory/read-relative "stdlib"]
+                                        [directory/read-relative "binlib"]]
+                                ext-nuj?]]]
 
 ; If something happens, we just print the responsible error and exit immediately,
 ; since we can't really fix things, we could only make things worse.
