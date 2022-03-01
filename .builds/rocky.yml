@@ -1,4 +1,4 @@
-image: rocky/latest
+image: rockylinux/latest
 packages:
   - make
   - gcc
