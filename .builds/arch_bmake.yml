@@ -1,10 +1,12 @@
-image: freebsd/latest
+image: archlinux
+packages:
+  - bmake
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
   - compile: |
       cd Nujel
-      make
+      bmake
   - test: |
       cd Nujel
-      make test
+      bmake test
