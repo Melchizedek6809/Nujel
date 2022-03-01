@@ -18,6 +18,7 @@
 
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
+bool loadStdLib = true;
 
 #ifdef __EMSCRIPTEN__
 static void *runRaw(void *cl, void *body){
@@ -44,8 +45,35 @@ static void *readEvalStringRaw(void *cl, void *str){
 	return v;
 }
 
+static char *getLine(){
+	char *buf = NULL;
+	size_t bufsize = 0;
+
+	fputs("RAW> ", stdout);
+	const ssize_t ret = getline(&buf,&bufsize,stdin);
+
+	if(ret >= 0){
+		buf[MIN(bufsize-1,(size_t)ret)] = 0;
+		return buf;
+	}else{
+		return NULL;
+	}
+}
+
+static void replRaw(lClosure *c){
+	char *line = NULL;
+	while(true){
+		line = getLine();
+		if(line == NULL){break;}
+		lVal *v = readEvalStringRaw(c, line);
+		pf("  %V\n", v);
+	}
+	pf("\n");
+	exit(0);
+}
+
 /* Return a new root Closure, with all native functions in place */
-static lClosure *createRootClosure(bool loadStdLib){
+static lClosure *createRootClosure(){
 	lClosure *c;
 	if(loadStdLib){
 		c = lNewRoot();
@@ -64,12 +92,11 @@ static lClosure *createRootClosure(bool loadStdLib){
 /* Parse options that might radically alter runtime behaviour, like running
  * without the stdlib (probably for using an alternative build of the stdlib ) */
 static lClosure *parsePreOptions(int argc, char *argv[]){
-	bool loadStdLib = true;
 	bool readNext   = false;
 	lClosure *c     = NULL;
 	for(int i=1;i<argc;i++){
 		if(readNext){
-			if(c == NULL){c = createRootClosure(loadStdLib);}
+			if(c == NULL){c = createRootClosure();}
 			size_t len = 0;
 			char *str = loadFile(argv[i],&len);
 			lExceptionTryExit(readEvalStringRaw,c,str);
@@ -119,7 +146,11 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	}
 	lRootsRet(SP);
 	RVP(ret);
-	ret = lCons(lValSym("repl/init"), ret);
+	if(loadStdLib){
+		ret = lCons(lValSym("repl/init"), ret);
+	}else{
+		replRaw(c);
+	}
 	lRootsRet(SP);
 	RVP(ret);
 	lExceptionTryExit(evalRaw,c,ret);
