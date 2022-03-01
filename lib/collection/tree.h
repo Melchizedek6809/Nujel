@@ -2,6 +2,8 @@
 #define NUJEL_LIB_COLLECTION_TREE
 #include "../nujel.h"
 
+lTree *lTreeNew             (const lSymbol *s, lVal *v);
+
 lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
 bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal **value);
 void   lTreeSet             (      lTree *t, const lSymbol *s, lVal *v, bool *found);

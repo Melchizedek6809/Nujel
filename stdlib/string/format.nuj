@@ -8,12 +8,12 @@
      :padding-char " "
 ]]
 
-[defun fmt/find-first-non-digit-from-right [s i]
+[defun fmt/find-non-digit-from-right [s i]
        [if [< i 0]
            -1
            [do [def char [char-at s i]]
                [if [and [>= char #\0] [<= char #\9]]
-                   [fmt/find-first-non-digit-from-right s [- i 1]]
+                   [fmt/find-non-digit-from-right s [- i 1]]
                    i]]]]
 
 [defun fmt/parse-spec [opts spec]
@@ -21,7 +21,7 @@
            opts
            [case [char-at spec [- [string/length spec] 1]]
                  [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
-                  [def next-non-digit [fmt/find-first-non-digit-from-right spec [- [string/length spec] 1]]]
+                  [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]]
                   [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]]
                   [tree/set! opts :width [read/single number]]
                   [when [== #\0 [char-at number 0]]

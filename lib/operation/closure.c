@@ -150,10 +150,7 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 	}else if(data->key == symCode){
 		clo->text = data->value;
 	}else if(data->key == symData){
-		lTree *newData = castToTree(data->value,NULL);
-		if(newData){
-			clo->data = newData;
-		}
+		clo->data = castToTree(data->value,NULL);
 	}else {
 		lExceptionThrowValClo("invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
 	}
@@ -165,7 +162,10 @@ static lVal *lnfClosureSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	lTree *data = castToTree(lCadr(v),NULL);
-	if((car == NULL) || (data == NULL)
+	if(data == NULL){
+		lExceptionThrowValClo("type-error","expected a tree", lCadr(v), c);
+	}
+	if((car == NULL)
 		|| !((car->type == ltLambda)
 		||   (car->type == ltObject)
 		||   (car->type == ltMacro))){

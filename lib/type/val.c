@@ -8,6 +8,7 @@
 #include "../allocation/garbage-collection.h"
 #include "../allocation/val.h"
 #include "../collection/string.h"
+#include "../collection/tree.h"
 #include "../type/closure.h"
 
 /* Return a newly allocated Nujel int of value V */
@@ -51,7 +52,7 @@ lVal *lValBool(bool v){
 lVal *lValTree(lTree *v){
 	lVal *ret = lValAlloc();
 	ret->type = ltTree;
-	ret->vTree = v;
+	ret->vTree = v ? v : lTreeNew(NULL, NULL);
 	return ret;
 }
 

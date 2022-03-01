@@ -175,7 +175,7 @@
 [defmacro ω body
           "Defines and returns new object after evaluating body within"
           [compile [cons 'ω* body]]]
-[def defobj ω*]
+[def defobj ω]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"

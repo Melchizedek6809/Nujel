@@ -28,6 +28,9 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(v));
 		v = lCddr(v);
 	}
+	if(ret->vTree == NULL){
+		ret->vTree = lTreeNew(NULL, NULL);
+	}
 
 	return ret;
 }
@@ -75,6 +78,10 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	if(key == NULL){
+		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		/* Never Returns */
+	}
 	return key ? lTreeGet(tre, key, NULL) : car;
 }
 
@@ -88,6 +95,10 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	if(key == NULL){
+		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		/* Never Returns */
+	}
 	return lValBool(key ? lTreeHas(tre, key, NULL) : false);
 }
 
@@ -101,6 +112,10 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
+	if(key == NULL){
+		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		/* Never Returns */
+	}
 	car->vTree = lTreeInsert(tre, key, lCaddr(v));
 	return car;
 }

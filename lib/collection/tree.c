@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 /* Create a new Tree segment with S associated to V */
-static lTree *lTreeNew(const lSymbol *s, lVal *v){
+lTree *lTreeNew(const lSymbol *s, lVal *v){
 	lTree *ret = lTreeAlloc();
 	ret->key    = s;
 	ret->height = 1;
@@ -108,6 +108,10 @@ static lTree *lTreeBalance(lTree *t, const lSymbol *s){
 lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 	if(t == NULL){
 		return lTreeNew(s,v);
+	}else if(t->key == NULL){
+		t->key = s;
+		t->value = v;
+		return t;
 	}else if(t->key == s){
 		t->value = v;
 		return t;
@@ -149,7 +153,7 @@ bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 
 /* Add every symbol/value pair within T onto list, making it a big a-list */
 lVal *lTreeAddToList(const lTree *t, lVal *list){
-	if(t == NULL){return list;}
+	if((t == NULL) || (t->key == NULL)){return list;}
 	lRootsValPush(list);
 	lVal *l = lRootsValPush(lCons(NULL,NULL));
 	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
@@ -172,7 +176,7 @@ lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
 }
 /* Add all the values within T to the beginning LIST */
 lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
-	if(t == NULL){return list;}
+	if((t == NULL) || (t->key == NULL)){return list;}
 	list = lTreeAddValuesToList(t->right,list);
 
 	lRootsValPush(list);
