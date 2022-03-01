@@ -24,9 +24,10 @@ const lSymbol *symData;
 
 static lVal *lnfDef(lClosure *c, lVal *v){
 	lVal *sym = lCar(v);
-	if(sym == NULL){return NULL;}
-	if(sym->type != ltSymbol){sym = lEval(c,sym);}
-	if(sym->type != ltSymbol){return NULL;}
+	if((sym == NULL) || (sym->type != ltSymbol)){
+		lExceptionThrowValClo("type-error","def needs a symbol as its first argument", v, c);
+		/* Never Returns */
+	}
 	const lSymbol *s = sym->vSymbol;
 
 	lVal *ret = lEval(c,lCadr(v));
@@ -36,13 +37,16 @@ static lVal *lnfDef(lClosure *c, lVal *v){
 
 static lVal *lnfSet(lClosure *c, lVal *v){
 	lVal *sym = lCar(v);
-	if(sym == NULL){return NULL;}
-	if(sym->type != ltSymbol){sym = lEval(c,sym);}
-	if(sym->type != ltSymbol){return NULL;}
+	if((sym == NULL) || (sym->type != ltSymbol)){
+		lExceptionThrowValClo("type-error","def needs a symbol as its first argument", v, c);
+		/* Never Returns */
+	}
 	const lSymbol *s = sym->vSymbol;
 
 	lVal *ret = lEval(c,lCadr(v));
-	lSetClosureSym(c,s,ret);
+	if(!lSetClosureSym(c,s,ret)){
+		lExceptionThrowValClo("unbound-variable","set! only works with symbols that already have an associated value", lCar(v), c);
+	}
 	return ret;
 }
 

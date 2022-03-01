@@ -68,13 +68,11 @@ bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
 
 /* Return the value bound to S in C */
 lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
-	lVal *ret;
-	while(c != NULL){
-		if(lTreeHas(c->data,s,&ret)){
-			return ret;
-		}
-		c = c->parent;
+	for(lClosure *cc = c; cc; cc = cc->parent){
+		lVal *ret;
+		if(lTreeHas(cc->data,s,&ret)){return ret;}
 	}
+	lExceptionThrowValClo("unbound-variable","can't resolve symbol", RVP(lValSymS(s)), c);
 	return NULL;
 }
 
@@ -84,12 +82,12 @@ void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 }
 
 /* Set the value bound to S in C to V, if it has already been bound */
-void lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
-	if(c == NULL){return;}
+bool lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
+	if(c == NULL){return false;}
 	bool found = false;
 	lTreeSet(c->data,s,v,&found);
-	if(found){return;}
-	lSetClosureSym(c->parent,s,v);
+	if(found){return true;}
+	return lSetClosureSym(c->parent,s,v);
 }
 
 /* Turn STR into a symbol, and bind VAL to it within C */

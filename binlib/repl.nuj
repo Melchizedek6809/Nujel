@@ -1,6 +1,12 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
+[def repl/executable-name "nujel"]
+[def repl/parse-args/eval-next #f]
+[def repl/parse-args/run-repl #t]
+[def repl/options @[]]
+[def repl/option-map @[]]
+
 [defun repl/exception-handler [error]
         [display/error error]]
 
@@ -54,7 +60,6 @@
 [defmacro repl/run-forked [expr]
           `[repl/run-forked* ~[list 'quote expr]]]
 
-[def repl/option-map @[]]
 [tree/set! repl/option-map 'h
            [\ [option]
               [repl/print-help]
@@ -67,11 +72,6 @@
            [\ [option]
               [tree/set! repl/options option #t]]]
 
-[def repl/executable-name "nujel"]
-[def repl/parse-args/eval-next #f]
-[def repl/parse-args/run-repl #t]
-[def repl/options @[]]
-
 [defun repl/parse-option [option]
        [[or [tree/get repl/option-map option]
             [tree/get repl/option-map :default]] option]]
@@ -83,7 +83,7 @@
 
 [defun repl/parse-arg [arg]
        [cond [repl/parse-args/eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
-                        [set! repl/eval-next #f]]
+                        [set! repl/parse-args/eval-next #f]]
              [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
              [#t [try display/error
 		      [file/eval arg]]
@@ -99,8 +99,9 @@
        [println [cat [ansi-rainbow "Nujel"] " wasm/REPL ready for input"]]]
 
 [defun repl/init/bin [args]
-       [set! repl/executable-name [car args]]
-       [when [repl/parse-args [cdr args]] [repl]]]
+       [try repl/exception-handler
+            [set! repl/executable-name [car args]]
+            [when [repl/parse-args [cdr args]] [repl]]]]
 
 [defun repl/init args
        [if [== System/Architecture 'wasm]

@@ -327,10 +327,10 @@ static lVal *lParseSpecial(lString *s){
 	case '|': // SRFI-30
 		lStringAdvanceUntilEndOfBlockComment(s);
 		lStringAdvanceToNextCharacter(s);
-		return lReadValue(s);
+		return lValComment();
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
-		return lReadValue(s);
+		return lValComment();
 	case '\\':return lParseCharacter(s);
 	case 'x': return lParseNumber(s,lParseNumberHex);
 	case 'o': return lParseNumber(s,lParseNumberOctal);

@@ -94,11 +94,6 @@
           "Thread init as the last argument through every function in fun"
           [thread/->> init [reverse fun]]]
 
-[defmacro once forms
-          "Evaluate forms exactly once, even if called multiple times"
-          [let [[lock [gensym "once-"]]]
-               `[when-not ~lock ~@forms [def ~lock #t]]]]
-
 [defun returnable/λ [e]
   [if [== [car e] :return] [cdr e] [throw e]]]
 

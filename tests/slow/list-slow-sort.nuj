@@ -4,7 +4,7 @@
        [def l #nil]
        [for [i 0 times]
             [set! l [cons [random/rng!] l]]]
-       [set! sorted [sort-func l]]
+       [def sorted [sort-func l]]
        [while sorted
               [when [and [cadr sorted]
                          [> [car sorted] [cadr sorted]]]
