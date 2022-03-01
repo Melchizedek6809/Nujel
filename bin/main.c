@@ -15,6 +15,7 @@
 #include "operation/environment.h"
 #include "operation/io.h"
 #include "operation/readline.h"
+#include "../vendor/getline/getline.h"
 
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
