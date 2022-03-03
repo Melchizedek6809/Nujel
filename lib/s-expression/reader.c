@@ -150,8 +150,23 @@ static lVal *lParseString(lString *s){
 static lVal *lParseSymbol(lString *s){
 	uint i;
 	char buf[128];
+	bool keyword = false;
+	const char *start = s->data;
 	for(i=0;i<(sizeof(buf)-1);i++){
-		char c = *s->data++;
+		const char c = *s->data++;
+		if(c == ':'){
+			keyword = true;
+			if(i > 0){
+				const char cc = *s->data++;
+				if((cc == 0) || isspace((u8)cc) || isnonsymbol(cc)){
+					s->data--;
+					break;
+				}
+				const char *end;
+				for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+				lExceptionThrowValClo("invalid-literal", "can't have a colon within a symbol literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+			}
+		}
 		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
 			s->data--;
 			break;
@@ -163,8 +178,21 @@ static lVal *lParseSymbol(lString *s){
 		if(*s->data == 0){break;}
 		s->data++;
 	}
-	return (buf[0] == ':')
-		? lValKeyword(&buf[1])
+
+	char *kwstart = buf;
+	if((i > 0) && (buf[i-1] == ':')){
+		buf[i-1] = 0;
+	}
+	if(buf[0] == ':'){
+		kwstart = &buf[1];
+	}
+	if(*start == 0){
+		const char *end;
+		for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+		lExceptionThrowValClo("invalid-literal", "symbols/keywords need to be at least a single character long", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+	}
+	return keyword
+		? lValKeyword(kwstart)
 		: lValSym(buf);
 }
 

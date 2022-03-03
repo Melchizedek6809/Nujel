@@ -22,7 +22,7 @@ static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	if((v == NULL) || (v->key == NULL)){return cur;}
 
 	cur = writeTreeRec(cur, bufEnd, v->left);
-	cur = spf(cur,bufEnd,":%s %v ",v->key->c, v->value);
+	cur = spf(cur,bufEnd,"%s: %v ",v->key->c, v->value);
 	cur = writeTreeRec(cur, bufEnd, v->right);
 
 	return cur;
