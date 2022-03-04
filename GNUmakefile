@@ -1,27 +1,17 @@
-prefix      := /usr/local
-exec_prefix  = $(prefix)
-bindir       = $(exec_prefix)/bin/
+include mk/common.mk
+include mk/ansi_colors.mk
+include mk/disable_implicit_rules.mk
 
-INSTALL     := install
-EMCC        := emcc
-EMAR        := emar
-EMMEM       := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
-
-LIB_SRCS    := $(shell find lib -type f -name '*.c')
-LIB_HDRS    := $(shell find lib -type f -name '*.h')
-LIB_OBJS    := $(LIB_SRCS:.c=.o)
-LIB_DEPS    := ${LIB_SRCS:.c=.d}
-STDLIB_NUJS := $(shell find stdlib -type f -name '*.nuj' | sort)
-STDLIB_NOBS := $(STDLIB_NUJS:.nuj=.no)
+LIB_SRCS      := $(shell find lib -type f -name '*.c')
+LIB_HDRS      := $(shell find lib -type f -name '*.h')
+LIB_OBJS      := $(LIB_SRCS:.c=.o)
+LIB_DEPS      := ${LIB_SRCS:.c=.d}
+STDLIB_NUJS   := $(shell find stdlib -type f -name '*.nuj' | sort)
+STDLIB_NOBS   := $(STDLIB_NUJS:.nuj=.no)
 
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}
 
-NUJEL       := ./nujel
-NUJEL_BOOT  := ./nujel-bootstrap
-ASSET       := ./tools/assets
-
-CC                   := cc
 ifeq (, $(shell which $(CC)))
 CC                   := gcc
 endif
@@ -32,47 +22,30 @@ ifeq (, $(shell which $(CC)))
 CC                   := tcc
 endif
 
-CC_MUSL              := musl-gcc
-CFLAGS               := -g -D_GNU_SOURCE
-LDFLAGS              :=
-CSTD                 := -std=c99
-OPTIMIZATION         := -O2
-WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing-braces
-
-LIBS                 := -lm
-
-RELEASE_OPTIMIZATION := -O3 -flto
-VERSION_ARCH         := $(shell uname -m)
-
-STATIC_LIBS := -static -lm
 BIN_SRCS    := $(shell find bin -type f -name '*.c') vendor/getline/getline.c
 BIN_HDRS    := $(shell find bin -type f -name '*.h')
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
 ifeq ($(OS),Windows_NT)
-	NUJEL := ./nujel.exe
-	ASSET := ./tools/assets.exe
-	LIBS += -lpthread
+	NUJEL   := ./nujel.exe
+	ASSET   := ./tools/assets.exe
+	LIBS    += -lpthread
 	LDFLAGS := -Wl,--stack,16777216
 endif
 
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(shell uname -s),Darwin)
 	STATIC_LIBS := -lm
 endif
 
-BIN_OBJS    := $(BIN_SRCS:.c=.o)
-BIN_DEPS    := ${BIN_SRCS:.c=.d}
+BIN_OBJS      := $(BIN_SRCS:.c=.o)
+BIN_DEPS      := ${BIN_SRCS:.c=.d}
 
 BIN_WASM_OBJS := $(BIN_SRCS:.c=.wo)
 BIN_WASM_DEPS := $(BIN_SRCS:.c=.wd)
 
 all: $(NUJEL)
 .PHONY: all release release.musl
-
-include mk/ansi_colors.mk
-include mk/disable_implicit_rules.mk
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(LIB_DEPS)
@@ -133,7 +106,7 @@ $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOT) --only-test-suite tools/tests.nuj
+	@$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
@@ -161,9 +134,9 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOT)
+tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOTSTRAP)
 	@mkdir -p tmp/
-	@$(NUJEL_BOOT) tools/bootstrap.nuj
+	@$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no

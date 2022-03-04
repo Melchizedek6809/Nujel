@@ -1,7 +1,5 @@
-prefix               := /usr/local
-exec_prefix           = $(prefix)
-bindir                = $(exec_prefix)/bin/
-
+.include "mk/ansi_colors.mk"
+.include "mk/common.mk"
 
 LIB_SRCS             != find lib -type f -name '*.c'
 LIB_HDRS             != find lib -type f -name '*.h'
@@ -10,25 +8,7 @@ LIB_DEPS             := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS          != find stdlib -type f -name '*.nuj' | sort
 STDLIB_NOBS          := $(STDLIB_NUJS:.nuj=.no)
 
-NUJEL                := ./nujel
-NUJEL_BOOTSTRAP      := ./nujel-bootstrap
-ASSET                := ./tools/assets
-PROG                  = $(NUJEL)
-
-AR                   := ar
-CC                   := cc
-INSTALL              := install
-
-CFLAGS               := -g -D_GNU_SOURCE
-LDFLAGS              :=
-CSTD                 := -std=c99
-OPTIMIZATION         := -O2
-RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         != uname -m
-WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing-braces
-
-LIBS                 := -lm
-STATIC_LIBS          := -static -lm
 
 BIN_SRCS             != find bin vendor -type f -name '*.c'
 BIN_HDRS             != find bin vendor -type f -name '*.h'
@@ -40,8 +20,6 @@ BIN_DEPS             := $(BIN_SRCS:.c=.d)
 
 all: $(NUJEL)
 .PHONY: clean distclean all release release.musl test check test.slow test.ridiculous run runl rnd runn install profile profile-when
-
-.include "mk/ansi_colors.mk"
 
 .if "${MAKECMDGOALS}" != "clean"
 -include $(LIB_DEPS)
@@ -82,7 +60,7 @@ $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 	@$(CC) -o $@ $> $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-./nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+$(NUJEL_BOOTSTRAP): $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $> $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 	@$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
@@ -152,12 +130,6 @@ runn: $(NUJEL)
 install: release
 	mkdir -p $(bindir)
 	$(INSTALL) $(NUJEL) $(bindir)
-
-profile: nujel
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[test-run]"
-
-profile-while: nujel
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 2,000,000] [set! v [+ 1 v]]] v]]"
 
 update-bootstrap: tmp/stdlib.no tmp/binlib.no
 	cp -f tmp/stdlib.no bootstrap/stdlib.no
