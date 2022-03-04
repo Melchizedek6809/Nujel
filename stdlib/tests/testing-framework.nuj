@@ -19,6 +19,8 @@
        "Add a test where EXPR must eval to RESULT"
        `[test/add* ~result ~[list 'quote [cons 'do expr]]]]
 
+[test/add 4 [+ 3 1]]
+
 [defun display-results []
        "Prints the result Message"
        [random/seed-initialize!]

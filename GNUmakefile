@@ -133,7 +133,7 @@ $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOT) -x "[exit [test-run]]"
+	@$(NUJEL_BOOT) --only-test-suite tools/tests.nuj
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
@@ -203,11 +203,11 @@ test.ridiculous: $(NUJEL)
 
 .PHONY: run
 run: $(NUJEL)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) --only-test-suite tools/tests.nuj
 
 .PHONY: runl
 runl: $(NUJEL)
-	@$(NUJEL) -x "[exit [test-run-bytecode]]"
+	@$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
 
 .PHONY: rund
 rund: $(NUJEL)

@@ -104,7 +104,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			free(str);
 			readNext = false;
 		}else if(argv[i][0] == '-'){
-			for(const char *opts = &argv[i][1];*opts;opts++){
+			for(const char *opts = &argv[i][1];*opts && (*opts != '-');opts++){
 				switch(*opts){
 				case 'r':
 					readNext = true;
