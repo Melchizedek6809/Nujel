@@ -2,6 +2,7 @@
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
 [def repl/executable-name "nujel"]
+[def repl/parse-args/bytecode-eval-next #f]
 [def repl/parse-args/eval-next #f]
 [def repl/parse-args/run-repl #t]
 [def repl/options @[]]
@@ -47,11 +48,15 @@
 
 [defun repl/print-help []
        [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
-       [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]\n"]]
-       [println [cat [ansi-blue "n"] " - do not load any stdlib"]]
-       [println [cat [ansi-blue "v"] " - be verbose"]]
-       [println [cat [ansi-blue "r"] " - eval following file without compilation/expansion"]]
-       [println [cat [ansi-blue "x"] " - Run the expression following this argument directly"]]]
+       [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]]
+       [println [cat "\nLow-level options - for work on the runtime itself"]]
+       [println [cat "  " [ansi-yellow "n"] " - do not load the standard library"]]
+       [println [cat "  " [ansi-yellow "v"] " - be verbose"]]
+       [println [cat "  " [ansi-yellow "r"] " - eval following file without compilation/expansion"]]
+       [println [cat "\nHigh-level options - for working with/on Nujel code"]]
+       [println [cat "  " [ansi-blue "b"] " - eval following file using the bytecode interpreter"]]
+       [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]]
+       [println [cat "  " [ansi-blue "h"] " - Print this help screen"]]]
 
 [defun repl/run-forked* [expr]
        [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
@@ -60,6 +65,10 @@
 [defmacro repl/run-forked [expr]
           `[repl/run-forked* ~[list 'quote expr]]]
 
+[tree/set! repl/option-map 'b
+           [\ [option]
+              [set! repl/parse-args/bytecode-eval-next #t]
+              [set! repl/parse-args/run-repl #f]]]
 [tree/set! repl/option-map 'h
            [\ [option]
               [repl/print-help]
@@ -82,11 +91,15 @@
            [for-each [map [split options ""] str->sym] repl/parse-option]]]
 
 [defun repl/parse-arg [arg]
-       [cond [repl/parse-args/eval-next [apply root-closure [cons [compile [cons 'do [read arg]]]]]
-                        [set! repl/parse-args/eval-next #f]]
+       [cond [repl/parse-args/bytecode-eval-next [try display/error
+                                                      [file/eval/bytecode arg]]
+                                                 [set! repl/parse-args/bytecode-eval-next #f]]
+             [repl/parse-args/eval-next [try display/error
+                                             [apply root-closure [cons [compile [cons 'do [read arg]]]]]]
+                                        [set! repl/parse-args/eval-next #f]]
              [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
              [#t [try display/error
-		      [file/eval arg]]
+                      [file/eval arg]]
                  [set! repl/parse-args/run-repl #f]]]]
 
 [defun repl/parse-args [args]

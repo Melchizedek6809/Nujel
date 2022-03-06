@@ -27,6 +27,11 @@
        [def source [cons 'do [read [file/read path]]]]
        [compile/forms [cons 'do source] environment]]
 
+[defun file/eval/bytecode [path]
+       "Evaluate a Nujel source file in the current context"
+       [def source [cons 'do [read [file/read path]]]]
+       [byterun [cons 'do source]]]
+
 [defun eval/forked [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
         [def expr [cat "[print [str/write " [str/write raw-expr]] "]] "]
