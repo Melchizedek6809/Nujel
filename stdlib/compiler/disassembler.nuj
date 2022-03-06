@@ -23,7 +23,7 @@
 
 [defun bytecode-arr->val [a i]
        "Read a bytecode encoded value in A at I and return it"
-       [try bytecode/nil-catcher [bytecode-op->val [a i] [a [+ 1 i]] [a [+ 2 i]]]]]
+       [try bytecode/nil-catcher [bytecode-op->val [ref a i] [ref a [+ 1 i]] [ref a [+ 2 i]]]]]
 
 [defun bytecode-op->sym [a b c]
        "Turn three bytecode ops representing an encoded symbol into an actual symbol"
@@ -33,7 +33,7 @@
 
 [defun bytecode-arr->sym [a i]
        "Read a bytecode encoded symbol in A at I and return it"
-       [try bytecode/nil-catcher [bytecode-op->sym [a i] [a [+ 1 i]] [a [+ 2 i]]]]]
+       [try bytecode/nil-catcher [bytecode-op->sym [ref a i] [ref a [+ 1 i]] [ref a [+ 2 i]]]]]
 
 [defun bytecode-op->offset [a b]
        "Turn two bytecode ops encoding an offset into the integer representation"
@@ -44,20 +44,20 @@
 
 [defun bytecode-arr->offset [a i]
        "Read a bytecode encoded offset in A at I and return it as a signed integer"
-       [bytecode-op->offset [a i] [a [+ 1 i]]]]
+       [bytecode-op->offset [ref a i] [ref a [+ 1 i]]]]
 
 [defun disassemble/op [a i]
        "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
-       [case [a i]
+       [case [ref a i]
              [#$0  '[$nop]]
              [#$1  '[$ret]]
-             [#$2  `[$push/int/byte ~[bytecode-op->int [a [+ i 1]]]]]
+             [#$2  `[$push/int/byte ~[bytecode-op->int [ref a [+ i 1]]]]]
              [#$3  '[$add/int]]
              [#$4  '[$debug/print-stack]]
              [#$5  `[$push/lval ~[bytecode-arr->val a [+ i 1]]]]
-             [#$6  `[$make-list ~[bytecode-op->int [a [+ i 1]]]]]
+             [#$6  `[$make-list ~[bytecode-op->int [ref a [+ i 1]]]]]
              [#$7  '[$eval]]
-             [#$8  `[$apply ~[bytecode-op->int [a [+ i 1]]]
+             [#$8  `[$apply ~[bytecode-op->int [ref a [+ i 1]]]
                             ~[bytecode-arr->val a [+ i 2]]]]
              [#$9  `[$jmp*  ~[bytecode-arr->offset a [+ i 1]]]]
              [#$A  `[$jt*   ~[bytecode-arr->offset a [+ i 1]]]]
@@ -82,7 +82,7 @@
              [#$17 `[$call ~[bytecode-arr->offset a [+ i 1]]]]
              [#$18 `[$try ~[bytecode-arr->offset a [+ i 1]]]]
              [#$19 '[$throw]]
-             [#$1A `[$apply/dynamic ~[bytecode-op->int [a [+ i 1]]]]]
+             [#$1A `[$apply/dynamic ~[bytecode-op->int [ref a [+ i 1]]]]]
              [otherwise :unknown-op]]]
 
 [defun disassemble/array [a i]
@@ -90,7 +90,7 @@
        [def ret #nil]
        [while [< i [array/length a]]
               [set! ret [cons [cons i [disassemble/op a i]] ret]]
-              [set! i [+ i [disassemble/length [a i]]]]]
+              [set! i [+ i [disassemble/length [ref a i]]]]]
        [nreverse ret]]
 
 [defun disassemble [code]

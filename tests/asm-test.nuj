@@ -9,7 +9,7 @@
 
 ;[println [str/write [byterun '[do [== :bool [type-of #f]]]]]]
 
-[def expr '[let [[code [assemble [$push/lval [list 'test 'list]] [$ret]]]] [garbage-collect] [bytecode-eval code]]]
+[def expr '[let [[i 0]] [while [< i 10,000] [set! i [+ 1 i]]]]]
 
 [println [str/write [bytecompile [compile expr]]]]
 

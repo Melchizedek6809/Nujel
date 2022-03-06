@@ -65,7 +65,7 @@
        [list [list :label sym-start]
              [bytecompile* [cadr source] env]
              [$jf sym-end]
-             [bytecompile* [caddr source] env]
+             [bytecompile/do/form [cddr source] env]
              [$jmp sym-start]
              [list :label sym-end]]]
 
