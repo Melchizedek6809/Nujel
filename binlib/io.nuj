@@ -30,7 +30,9 @@
 [defun file/eval/bytecode [path]
        "Evaluate a Nujel source file in the current context"
        [def source [cons 'do [read [file/read path]]]]
-       [byterun [cons 'do source]]]
+       [def bc [assemble [bytecompile [compile [cons 'do source]]]]]
+       [disassemble/raw bc]
+       [bytecode-eval bc]]
 
 [defun eval/forked [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"

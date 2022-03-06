@@ -57,8 +57,20 @@
 
 [defun $apply [arg-count fun]
        "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-       [list #$8 [int->bytecode-op arg-count]
-                 [val->bytecode-op fun]]]
+       [case arg-count 2
+             [2 [case fun
+                      [add/int [$add/int]]
+                      [< [$<]]
+                      [<= [$<=]]
+                      [== [$==]]
+                      [>= [$>=]]
+                      [> [$>]]
+                      [otherwise [list #$8
+                                       [int->bytecode-op arg-count]
+                                       [val->bytecode-op fun]]]]]
+             [otherwise [list #$8
+                              [int->bytecode-op arg-count]
+                              [val->bytecode-op fun]]]]]
 
 [defun $apply/dynamic [arg-count fun]
        [list #$1A [int->bytecode-op arg-count]]]
@@ -129,6 +141,30 @@
 
 [defun $closure/pop []
        '[#$16]]
+
+[defun $roots/push []
+       '[#$1B]]
+
+[defun $roots/pop []
+       '[#$1C]]
+
+[defun $roots/peek []
+       '[#$1D]]
+
+[defun $< []
+       '[#$1E]]
+
+[defun $<= []
+       '[#$1F]]
+
+[defun $== []
+       '[#$20]]
+
+[defun $>= []
+       '[#$21]]
+
+[defun $> []
+       '[#$22]]
 
 [defun assemble/build-sym-map [code sym-map pos]
        [while code

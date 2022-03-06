@@ -4,6 +4,7 @@
 #include "../collection/list.h"
 #include "../type-system.h"
 
+int       lValCompare(const lVal *a, const lVal *b);
 lVal     *lValBool   (bool v);
 lVal     *lValInt    (i64 v);
 lVal     *lValFloat  (double v);

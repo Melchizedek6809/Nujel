@@ -38,7 +38,7 @@
 [defun test-success [res-should res-is expr i]
        "Should be called after a test has finished successfully"
        [when print-passes
-             [eval '[efmtln "stdlib/tests/tests.nuj:{i}:1 {} == {}\r\n{}\r\n\r\n"
+             [eval '[efmtln "tests/suite/tests.nuj:{i}:1 {} == {}\r\n{}\r\n\r\n"
                             [ansi-green [str/write res-is]]
                             [ansi-green [str/write res-should]]
                             [str/write expr]]]]
@@ -47,7 +47,7 @@
 [defun test-failure [res-should res-is expr i]
        "Should be called if EXPR does not equal RES"
        [when print-errors
-             [eval '[efmtln "stdlib/tests/tests.nuj:{i}:1 {} != {}\r\n{}\r\n\r\n"
+             [eval '[efmtln "tests/suite/tests.nuj:{i}:1 {} != {}\r\n{}\r\n\r\n"
                             [ansi-red [str/write res-is]]
                             [ansi-green [str/write res-should]]
                             [str/write expr]]]]

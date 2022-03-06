@@ -39,7 +39,15 @@ typedef enum lOpcode {
 	lopCall            = 0x17,
 	lopTry             = 0x18,
 	lopThrow           = 0x19,
-	lopApplyDynamic    = 0x1A
+	lopApplyDynamic    = 0x1A,
+	lopRootsPush       = 0x1B,
+	lopRootsPop        = 0x1C,
+	lopRootsPeek       = 0x1D,
+	lopLessPred        = 0x1E,
+	lopLessEqPred      = 0x1F,
+	lopEqualPred       = 0x20,
+	lopGreaterEqPred   = 0x21,
+	lopGreaterPred     = 0x22,
 } lOpcode;
 
 int pushList(lVal **stack, int sp, lVal *args){
@@ -96,7 +104,10 @@ static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
 	jmp_buf oldExceptionTarget;
 	const lBytecodeOp *ip;
-	const int gcsp = lRootsGet();
+	int rootsStack[ROOT_STACK_SIZE];
+	rootsStack[0] = lRootsGet();
+	int rsp = 1;
+
 	lVal *stack[VALUE_STACK_SIZE];
 	lClosure *cloStack[CALL_STACK_SIZE];
 	lClosure *c = lClosureNew(callingClosure);
@@ -146,14 +157,43 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		stack[sp++] = lValInt(v);
 		ip++;
 		break;}
-	case lopIntAdd: {
+	case lopIntAdd:
 		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		const i64 a = castToInt(stack[sp-1],0);
-		const i64 b = castToInt(stack[sp-2],0);
-		stack[sp-2] = lValInt(a + b);
+		stack[sp-2] = lValInt(castToInt(stack[sp-2],0) + castToInt(stack[sp-1],0));
 		sp--;
 		ip++;
-		break;}
+		break;
+	case lopLessPred:
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		stack[sp-2] = lValBool(lValCompare(stack[sp-2], stack[sp-1]) == -1);
+		sp--;
+		ip++;
+		break;
+	case lopLessEqPred:
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		stack[sp-2] = lValBool(lValCompare(stack[sp-2],stack[sp-1]) <= 0);
+		sp--;
+		ip++;
+		break;
+	case lopEqualPred:
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		stack[sp-2] = lValBool(lValCompare(stack[sp-2],stack[sp-1]) == 0);
+		sp--;
+		ip++;
+		break;
+	case lopGreaterEqPred: {
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		const int cmp = lValCompare(stack[sp-2],stack[sp-1]);
+		stack[sp-2] = lValBool((cmp == 1) || (cmp == 0));
+		sp--;
+		ip++;
+		break; }
+	case lopGreaterPred:
+		if(sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		stack[sp-2] = lValBool(lValCompare(stack[sp-2],stack[sp-1]) == 1);
+		sp--;
+		ip++;
+		break;
 	case lopDebugPrintStack:
 		pf("Bytecode Debug stack:\n");
 		printStack(stack, sp, cloStack, csp);
@@ -242,7 +282,22 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if(stack[sp-1]){
 			stack[sp-1]->type = ltMacro;
 		}
-		break;}
+		break; }
+	case lopRootsPush:
+		ip++;
+		rootsStack[rsp++] = lRootsGet();
+		break;
+	case lopRootsPop:
+		ip++;
+		if(rsp == 0){
+			lExceptionThrowValClo("stack-underflow", "Poped one too many times off the roots stack", NULL, c);
+		}
+		lRootsRet(rootsStack[--rsp]);
+		break;
+	case lopRootsPeek:
+		ip++;
+		lRootsRet(rootsStack[rsp - 1]);
+		break;
 	case lopClosurePush:
 		ip++;
 		stack[sp++] = lValObject(c);
@@ -250,7 +305,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	case lopClosureEnter: {
 		ip++;
 		lVal *cObj = stack[--sp];
-		if((cObj->type != ltLambda) && (cObj->type != ltObject)){lExceptionThrowValClo("invalid-closure", "Error while trying to enter a closure", cObj, c);}
+		if((cObj->type != ltLambda) && (cObj->type != ltObject)){
+			lExceptionThrowValClo("invalid-closure", "Error while trying to enter a closure", cObj, c);
+		}
 		cloStack[csp++] = c;
 		c = cObj->vClosure;
 		cloStack[csp] = c;
@@ -271,7 +328,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			break;
 		}
 		if(csp == 0){
-			lRootsRet(gcsp);
+			lRootsRet(rootsStack[0]);
 			if(sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 			return NULL;
 		}
@@ -309,7 +366,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			break;
 		}
 		if(csp == 0){
-			lRootsRet(gcsp);
+			lRootsRet(rootsStack[0]);
 			if(sp < 1){
 				lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);
 				return NULL;
@@ -332,7 +389,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			break;
 		}
 		if(csp == 0){
-			lRootsRet(gcsp);
+			lRootsRet(rootsStack[0]);
 			if(sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 			lExceptionThrowRaw(stack[--sp]);
 			return NULL;

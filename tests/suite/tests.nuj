@@ -416,6 +416,8 @@
 [test/add 3 [wrap-value 5 2 4]]
 [test/add #t [< 1 10]]
 [test/add #f [> 1 10]]
+[test/add #t [> 10 1]]
+[test/add #f [< 10 1]]
 [test/add #t [!= 1 10]]
 [test/add #f [!= 1 1]]
 [test/add #f [== 1 10]]
