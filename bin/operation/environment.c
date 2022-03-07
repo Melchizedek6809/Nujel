@@ -8,6 +8,7 @@
 
 #include <unistd.h>
 
+/* Add environment key/value pair to tree T */
 static lTree *addVar(const char *e, lTree *t){
 	int endOfKey, endOfString;
 	for(endOfKey=0;e[endOfKey] != '=';endOfKey++){}
@@ -21,6 +22,7 @@ static lTree *addVar(const char *e, lTree *t){
 
 #include <windows.h>
 
+/* Windows specific - add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
 	const int SP = lRootsGet();
 	lTree *t = NULL;
@@ -37,6 +39,7 @@ void initEnvironmentMap(lClosure *c){
 #else
 extern char **environ;
 
+/* Add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
 	const int SP = lRootsGet();
 	lTree *t = NULL;

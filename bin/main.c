@@ -21,24 +21,28 @@ extern u8 binlib_no_data[];
 lClosure *mainClosure;
 bool loadStdLib = true;
 
-#ifdef __EMSCRIPTEN__
-static void *runRaw(void *cl, void *body){
-	return lEval((lClosure *)cl,(lVal *) body);
+/* Evaluate an expression without expanding/compiling it, probably
+ * not what you want, run does expansion/compilation before invoking
+ * the VM. */
+static void *evalRaw(void *cl, void *body){
+	return lEval((lClosure *)cl,(lVal *)body);
 }
+
+#ifdef __EMSCRIPTEN__
 
 /* To be used for the WASM REPL, since we don't run continuously there */
 const char *run(const char *line){
 	const int SP = lRootsGet();
 	lVal *exp = RVP(lList(2,RVP(lValSym("repl/wasm")),RVP(lValString(line))));
-	lVal *v = lExceptionTryExit(runRaw,mainClosure,exp);
+	lVal *v = lExceptionTryExit(evalRaw,mainClosure,exp);
 	const char *ret = v ? lReturnDisplayVal(v) : "";
 	lRootsRet(SP);
 	return ret;
 }
 #endif
 
-/* Read and Eval str directly */
-/* DOES NOT EXPAND MACROS */
+/* Read and Eval str directly
+ * DOES NOT EXPAND MACROS */
 static void *readEvalStringRaw(void *cl, void *str){
 	lClosure *c = (lClosure *)cl;
 	const char *expr = str;
@@ -46,6 +50,9 @@ static void *readEvalStringRaw(void *cl, void *str){
 	return v;
 }
 
+/* Read a line from stdin and return a heap allocated string,
+ * you have to free the pointer returned from this function at
+ * some point in time. */
 static char *getLine(){
 	char *buf = NULL;
 	size_t bufsize = 0;
@@ -61,6 +68,8 @@ static char *getLine(){
 	}
 }
 
+/* REPL that is not controlled by Nujel, only really useful when
+ * running without the standard library */
 static void replRaw(lClosure *c){
 	char *line = NULL;
 	while(true){
@@ -134,10 +143,8 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 	return c;
 }
 
-static void *evalRaw(void *cl, void *body){
-	return lEval((lClosure *)cl,(lVal *)body);
-}
-
+/* Initialize the Nujel context with an stdlib as well
+ * as parsing arguments passed to the runtime */
 void initNujel(int argc, char *argv[], lClosure *c){
 	lVal *ret = NULL;
 	const int SP = lRootsGet();
@@ -158,11 +165,14 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	mainClosure = c;
 }
 
+/* Signal handler that enabled using C-c to break out of
+ * an infinite loop */
 static void breakSignalHandler(int sig){
 	(void)sig;
 	breakQueued = true;
 }
 
+/* Set up a bunch of signal handlers */
 static void initSignalHandlers(){
 	signal(SIGINT, breakSignalHandler);
 }
