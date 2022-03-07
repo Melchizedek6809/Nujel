@@ -68,7 +68,7 @@ $(NUJEL_BOOTSTRAP): $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $> $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)

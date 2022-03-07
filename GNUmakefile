@@ -111,13 +111,13 @@ nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
-	@$(NUJEL) -x "[exit [test-run]]"
+	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
@@ -202,7 +202,7 @@ install.musl: release.musl
 
 .PHONY: profile
 profile: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[test-run]"
+	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) --only-test-suite tools/tests.nuj
 
 .PHONY: profile-while
 profile-while: $(NUJEL)
