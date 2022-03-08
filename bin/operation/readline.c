@@ -22,7 +22,7 @@ static char *bestline(const char *prompt){
 	size_t bufsize = 0;
 
 	fputs(prompt, stdout);
-	const ssize_t ret = getline(&buf,&bufsize,stdin);
+	const int64_t ret = getline(&buf,&bufsize,stdin);
 
 	if(ret >= 0){
 		buf[MIN(bufsize-1,(size_t)ret)] = 0;

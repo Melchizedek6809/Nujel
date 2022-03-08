@@ -6,9 +6,12 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifndef __WATCOMC__
+  #include <signal.h>
+#endif
 
 #include "../lib/api.h"
 #include "misc.h"
@@ -165,6 +168,8 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	mainClosure = c;
 }
 
+
+#ifndef __WATCOMC__
 /* Signal handler that enabled using C-c to break out of
  * an infinite loop */
 static void breakSignalHandler(int sig){
@@ -176,12 +181,16 @@ static void breakSignalHandler(int sig){
 static void initSignalHandlers(){
 	signal(SIGINT, breakSignalHandler);
 }
+#endif
+
 
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
+	#ifndef __WATCOMC__
 	initSignalHandlers();
+	#endif
 	lInit();
 	setIOSymbols();
 

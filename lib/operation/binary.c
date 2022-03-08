@@ -84,7 +84,7 @@ static lVal *lnfLogNot(lClosure *c, lVal *v){
 	return lValInt(~v->vList.car->vInt);
 }
 
-#ifdef __TINYC__
+#if defined(__TINYC__) || defined(__WATCOMC__)
 /* Classic binary divide-and-conquer popcount.
    This is popcount_2() from
    http://en.wikipedia.org/wiki/Hamming_weight */

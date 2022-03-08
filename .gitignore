@@ -36,6 +36,7 @@ gmon.out
 *.deps
 *.gch
 *.obj
+*.err
 *.dylib
 *.exe
 *.kate-swp

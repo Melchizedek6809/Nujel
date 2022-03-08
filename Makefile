@@ -26,7 +26,7 @@ all: $(NUJEL)
 -include $(BIN_DEPS)
 .endif
 
-FILES_TO_CLEAN != find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.d' -o -name '*.wd' -o -name '*.deps'
+FILES_TO_CLEAN != find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps'
 NOBS_TO_CLEAN  != find binlib stdlib -type f -name '*.no'
 
 clean:

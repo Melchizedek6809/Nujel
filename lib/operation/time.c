@@ -10,7 +10,17 @@
 #include "../type/val.h"
 
 #include <time.h>
-#include <sys/time.h>
+#ifdef __WATCOMC__
+
+	static void clock_gettime(int type, struct timespec *tv){
+		tv->tv_nsec = 0;
+		tv->tv_sec = time(NULL);
+	}
+
+	#define CLOCK_MONOTONIC 123
+#else
+	#include <sys/time.h>
+#endif
 
 /* Return monotonic time in milliseconds */
 u64 getMSecs(){

@@ -16,6 +16,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifdef __WATCOMC__
+#define fmodf(X,Y) fmod(X,Y)
+#endif
+
 static lVal *exceptionThrow(lClosure *c, lVal *v, const char *func){
 	(void)func;
 	lExceptionThrowValClo("type-error","Can't calculate with non numeric types, please explicitly convert into a numeric form using [int α],[float β],[vec γ].",v, c);

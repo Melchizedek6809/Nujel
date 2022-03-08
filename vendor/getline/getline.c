@@ -28,6 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include "getline.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,7 +36,7 @@
 #include <errno.h>
 #include <string.h>
 
-ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp) {
+ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp){
 	char *ptr, *eptr;
 
 

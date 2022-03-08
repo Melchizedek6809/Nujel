@@ -43,7 +43,9 @@ static void lRootsPush(const lType t, void *ptr){
 			exit(123);
 		}
 	}
-	rootStack[rootSP++] = (rootEntry){t,{ptr}};
+	rootStack[rootSP].t = t;
+	rootStack[rootSP].vPointer = ptr;
+	rootSP++;
 }
 
 /* Push an lClosure onto the root stack, protecting it from being freed by the GC */

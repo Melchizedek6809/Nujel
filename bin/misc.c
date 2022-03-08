@@ -7,9 +7,15 @@
 
 #include "../lib/misc/pf.h"
 
+#ifdef __WATCOMC__
+	#include <direct.h>
+	#include <process.h>
+#else
+	#include <dirent.h>
+#endif
+
 #include <stdarg.h>
 #include <ctype.h>
-#include <dirent.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -66,6 +72,7 @@ void *loadFile(const char *filename,size_t *len){
 void saveFile(const char *filename,const void *buf, size_t len){
 	FILE *fp;
 	size_t written,wlen = 0;
+	const char *cbuf = buf;
 	#if defined (__EMSCRIPTEN__)
 	(void)filename;
 	(void)buf;
@@ -77,7 +84,7 @@ void saveFile(const char *filename,const void *buf, size_t len){
 	if(fp == NULL){return;}
 
 	while(wlen < len){
-		written = fwrite(buf+wlen,1,len-wlen,fp);
+		written = fwrite(&cbuf[wlen],1,len-wlen,fp);
 		if(written == 0){return;}
 		wlen += written;
 	}
@@ -99,7 +106,7 @@ int isDir(const char *name){
 /* Create a new directory in a portable manner */
 int makeDir(const char *name){
 	if(isDir(name)){return 1;}
-	#ifdef __MINGW32__
+	#if defined(__MINGW32__) || defined(__WATCOMC__)
 	return mkdir(name);
 	#elif defined (__EMSCRIPTEN__)
 	(void)name;

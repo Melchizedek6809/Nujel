@@ -12,6 +12,10 @@
 #include "../collection/list.h"
 #include "../type/native-function.h"
 
+#ifdef __WATCOMC__
+#include <malloc.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

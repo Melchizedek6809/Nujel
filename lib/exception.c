@@ -23,7 +23,7 @@ NORETURN void lExceptionThrowRaw(lVal *v){
 	}
 	exceptionValue = v;
 	longjmp(exceptionTarget, 1);
-	while(1);
+	while(1){}
 }
 
 /* Cause an exception, passing a list of SYMBOL and ERROR to the exception handler */

@@ -26,7 +26,6 @@ float vecDot      (const vec a, const vec b);
 float vecMag      (const vec a);
 float vecSum      (const vec a);
 float vecAbsSum   (const vec a);
-vec   vecCbrt     (const vec a);
 vec   vecSqrt     (const vec a);
 vec   vecCross    (const vec a, const vec b);
 vec   vecRotate   (const vec a, const vec b, const float rad);
@@ -36,5 +35,6 @@ vec   vecDegToVec (const vec a);
 vec   vecCeil     (const vec a);
 vec   vecRound    (const vec a);
 vec   vecReflect  (const vec i, const vec n);
+vec   vecCbrt     (const vec a);
 
 #endif

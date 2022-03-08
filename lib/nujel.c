@@ -242,6 +242,8 @@ static void lAddPlatformVars(lClosure *c){
 	valOS = lValSym("NetBSD");
 	#elif defined(__DragonFly__)
 	valOS = lValSym("DragonFlyBSD");
+	#elif defined(__WATCOMC__)
+	valOS = lValSym("DOS");
 	#else
 	valOS = lValSym("Unknown");
 	#endif
@@ -259,6 +261,8 @@ static void lAddPlatformVars(lClosure *c){
 	valArch = lValSym("wasm");
 	#elif defined(__powerpc__)
 	valArch = lValSym("powerpc");
+	#elif defined(__WATCOMC__)
+	valArch = lValSym("x86");
 	#else
 	valArch = lValSym("unknown");
 	#endif

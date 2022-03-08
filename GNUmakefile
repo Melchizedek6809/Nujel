@@ -62,6 +62,7 @@ endif
 clean:
 	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.o')
+	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.obj')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wo')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.d')
 	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wd')

@@ -8,7 +8,12 @@
 
 #include "../../lib/exception.h"
 
-#include <dirent.h>
+#ifdef __WATCOMC__
+	#include <direct.h>
+#else
+	#include <dirent.h>
+#endif
+
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -16,9 +21,21 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifndef __MINGW32__
+
+#if (defined(__WATCOMC__)) || (defined(__EMSCRIPTEN__))
+	#define NO_POPEN
+#else
+	#define ENABLE_POPEN
+#endif
+
+#if (!defined(__MINGW32__)) && (!defined(__WATCOMC__))
 	#include <sys/wait.h>
 #endif
+
+#ifndef __WATCOMC__
+
+#endif
+
 
 lSymbol *lsMode;
 lSymbol *lsSize;
@@ -34,8 +51,6 @@ lSymbol *lsDirectory;
 lSymbol *lsCharacterDevice;
 lSymbol *lsBlockDevice;
 lSymbol *lsNamedPipe;
-//lSymbol *lsSymbolicLink;
-//lSymbol *lsSocket;
 
 void setIOSymbols(){
 	lsError            = RSYMP(lSymS("error?"));
@@ -53,8 +68,6 @@ void setIOSymbols(){
 	lsCharacterDevice  = RSYMP(lSymS("character-device?"));
 	lsBlockDevice      = RSYMP(lSymS("block-device?"));
 	lsNamedPipe        = RSYMP(lSymS("named-pipe?"));
-	//lsSymbolicLink     = RSYMP(lSymS("symbolic-link?"));
-	//lsSocket           = RSYMP(lSymS("socket?"));
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
@@ -104,12 +117,16 @@ static lVal *lnfFileRead(lClosure *c, lVal *v){
 
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	(void)c;
-	const char *filename = castToString( lCar(v),NULL);
-	const char *content  = castToString(lCadr(v),NULL);
-	if(filename == NULL){return NULL;}
-	if(content  == NULL){return NULL;}
-	size_t len = strnlen(content,1<<20);
-	saveFile(filename,content,len);
+	const char *filename = castToString(lCar(v),NULL);
+	lVal *cv  = lCadr(v);
+	if((filename == NULL)
+	   || (cv == NULL)
+	   || (cv->type != ltString)){
+		return NULL;
+	}
+	lString *content = cv->vString;
+	const i64 len = content->bufEnd - content->buf;
+	saveFile(filename,content->data, len);
 	return NULL;
 }
 
@@ -145,8 +162,6 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice,  RVP(lValBool(S_ISCHR(statbuf.st_mode))));
 		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice,      RVP(lValBool(S_ISBLK(statbuf.st_mode))));
 		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        RVP(lValBool(S_ISFIFO(statbuf.st_mode))));
-		//ret->vTree = lTreeInsert(ret->vTree, lsSymbolicLink,     RVP(lValBool(S_ISLNK(statbuf.st_mode))));
-		//ret->vTree = lTreeInsert(ret->vTree, lsSocket,           RVP(lValBool(S_ISSOCK(statbuf.st_mode))));
 	}
 	return ret;
 }
@@ -179,13 +194,9 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	return lValString(ret);
 }
 
-#if (!defined(__MSYS__)) || (defined(__MINGW32__))
+#ifdef ENABLE_POPEN
 static lVal *lnfPopen(lClosure *c, lVal *v){
 	(void)c; (void)v;
-	#ifdef __EMSCRIPTEN__
-		lExceptionThrowValClo("unsupported","Popen is currently unsupported in Emscripten builds, please work around this procedure.",v,c);
-		return NULL;
-	#else
 	const char *command = castToString(lCar(v),NULL);
 	if(command == NULL){return NULL;}
 
@@ -232,7 +243,6 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	ret->vList.cdr = lValStringNoCopy(buf,len);
 
 	return ret;
-	#endif
 }
 #endif
 
@@ -315,7 +325,7 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
-	#if (!defined(__MSYS__)) || (defined(__MINGW32__))
+	#ifdef ENABLE_POPEN
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 	#endif
 
