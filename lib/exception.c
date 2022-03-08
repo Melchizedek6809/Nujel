@@ -16,7 +16,7 @@ int exceptionTargetDepth = 0;
 bool breakQueued = false;
 
 /* Cause an exception, passing V directly to the closest exception handler */
-__attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
+NORETURN void lExceptionThrowRaw(lVal *v){
 	if(exceptionTargetDepth <= 0){
 		lWriteVal(v);
 		exit(201);
@@ -27,19 +27,19 @@ __attribute__((noreturn)) void lExceptionThrowRaw(lVal *v){
 }
 
 /* Cause an exception, passing a list of SYMBOL and ERROR to the exception handler */
-__attribute__((noreturn)) void lExceptionThrow(const char *symbol, const char *error){
+NORETURN void lExceptionThrow(const char *symbol, const char *error){
 	lVal *l = lList(2, RVP(lValKeyword(symbol)), RVP(lValString(error)));
 	lExceptionThrowRaw(l);
 }
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
-__attribute__((noreturn)) void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
+NORETURN void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
 	lVal *l = lList(3, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v));
 	lExceptionThrowRaw(l);
 }
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
-__attribute__((noreturn)) void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
+NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
 	lVal *l = lList(4, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v),RVP(lValLambda(c)));
 	lExceptionThrowRaw(l);
 }

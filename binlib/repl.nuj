@@ -29,7 +29,6 @@
         [when [nil? line]
               [display "Bye!\r\n"]
               [exit 0]]
-        [readline/history/add line]
         [def raw [read line]]
         [def expr [cons 'do raw]]
         [def cexpr [cons [compile expr]]]
@@ -40,11 +39,9 @@
                           [str/write result]]]]]
 
 [defun repl []
-        [readline/history/load [readline/history/path]]
         [while #t
                [try repl/exception-handler
-                    [repl/readline root-closure]]
-               [readline/history/save [readline/history/path]]]]
+                    [repl/readline root-closure]]]]
 
 [defun repl/print-help []
        [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]

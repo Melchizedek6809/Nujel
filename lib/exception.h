@@ -10,10 +10,10 @@ extern int exceptionTargetDepth;
 
 extern bool breakQueued;
 
-void  lExceptionThrowRaw    (lVal *v) __attribute__((noreturn));
-void  lExceptionThrow       (const char *symbol, const char *error) __attribute__((noreturn));
-void  lExceptionThrowVal    (const char *symbol, const char *error, lVal *v) __attribute__((noreturn));
-void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) __attribute__((noreturn));
+void  lExceptionThrowRaw    (lVal *v) NORETURN;
+void  lExceptionThrow       (const char *symbol, const char *error) NORETURN;
+void  lExceptionThrowVal    (const char *symbol, const char *error, lVal *v) NORETURN;
+void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
 void *lExceptionTryExit     (void *(*body)(void *,void *), void *a, void *b);
 void *lExceptionTryCatch    (void *(*body)(void *,void *), void *a, void *b, void (*handler)(lVal *exceptionValue));
 
