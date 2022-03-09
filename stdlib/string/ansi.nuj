@@ -3,6 +3,11 @@
 
 ;; This File contains various functions generating ansi escape sequences for colorful output
 
+
+[def ansi/disabled #f]
+[when [== System/OS "DOS"]
+      [set! ansi/disabled ""]]
+
 [def ansi-reset "\e[0m"]
 [def ansi-fg-reset "\e[0;39m"]
 [def ansi-bg-reset "\e[49m"]
@@ -38,9 +43,12 @@
 	"\e[47m"
 ]]
 
+
 [defun ansi-wrap [code string]
 	"Wrap STRING in the ansi color CODE"
-	[cat [array/ref ansi-fg code] string ansi-reset]]
+	[cat [or ansi/disabled [array/ref ansi-fg code]]
+             string
+             [or ansi/disabled ansi-reset]]]
 
 [defun ansi-black args
 	"Wrap ARGS in black"
@@ -112,8 +120,8 @@
               [cat [join [map [split [apply cat args] ""]
                               [\ [a]
                                  [set! count [logand [+ 1 count] #x7]]
-                                 [cat [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]] a]]] ""]
-                   ansi-fg-reset]]]
+                                 [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
+                   [or ansi/disabled ansi-fg-reset]]]]
 
 [defun ansi-rainbow-bg args
         "Wrap ARGS in the colors of the rainbow!"
@@ -121,8 +129,9 @@
 	[def colored-list [map [split [apply cat args] ""]
 			  [\ [a]
 			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [array/ref ansi-fg [logxor count #x7]] [array/ref ansi-bg count] a]]]]
-        [cat [join colored-list ""] ansi-reset]]
+			     [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
+        [cat [join colored-list ""]
+             [or ansi/disabled ansi-reset]]]
 
 [defun reprint-line [text width]
        [when-not width [set! width 20]]

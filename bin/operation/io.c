@@ -244,6 +244,11 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 	return ret;
 }
+#else
+static lVal *lnfPopen(lClosure *c, lVal *v){
+	lExceptionThrowValClo("not-available","[popen] is not implemented on your current platform, please try and work around that", v, c);
+	return NULL;
+}
 #endif
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
@@ -325,9 +330,8 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
-	#ifdef ENABLE_POPEN
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
-	#endif
+
 
 	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
 	lAddNativeFunc(c,"file/write",       "[path content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);

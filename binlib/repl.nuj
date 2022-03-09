@@ -53,7 +53,10 @@
        [println [cat "\nHigh-level options - for working with/on Nujel code"]]
        [println [cat "  " [ansi-blue "b"] " - eval following file using the bytecode interpreter"]]
        [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]]
-       [println [cat "  " [ansi-blue "h"] " - Print this help screen"]]]
+       [println [cat "  " [ansi-blue "h"] " - Print this help screen"]]
+       [println [cat "\nLong options - for working with/on Nujel code"]]
+       [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]]
+       [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]
 
 [defun repl/run-forked* [expr]
        [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
@@ -70,6 +73,12 @@
            [\ [option]
               [repl/print-help]
               [set! repl/parse-args/run-repl #f]]]
+[tree/set! repl/option-map 'no-color
+           [\ [option]
+              [set! ansi/disabled ""]]]
+[tree/set! repl/option-map 'color
+           [\ [option]
+              [set! ansi/disabled #f]]]
 [tree/set! repl/option-map 'x
            [\ [option]
               [set! repl/parse-args/eval-next #t]

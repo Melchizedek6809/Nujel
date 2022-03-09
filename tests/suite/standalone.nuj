@@ -3,7 +3,7 @@
 
 [when [and [!= System/Architecture 'wasm]
            [!= System/OS 'DOS]
-           [resolves? popen]]
+           [resolves? 'popen]]
           [test/add '[0 . ""]    [repl/run-forked 1]]
           [test/add '[123 . ""]  [repl/run-forked [exit 123]]]
           [test/add '[0 . "123"] [repl/run-forked [display 123]]]
