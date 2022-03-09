@@ -8,6 +8,7 @@
 #include "../allocation/roots.h"
 #include "../allocation/val.h"
 #include "../exception.h"
+#include "../misc/pf.h"
 #include "../type-system.h"
 #include "../collection/list.h"
 #include "../type/native-function.h"
@@ -89,7 +90,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	r->vArray = lArrayAlloc();
 	r->vArray->length = len;
 	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
-	if(r->vArray->data == NULL){
+	if(len && (r->vArray->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
 		return NULL;
 	}
@@ -104,8 +105,8 @@ static lVal *lnfArrNew(lClosure *c, lVal *v){
 	r->vArray = lArrayAlloc();
 	r->vArray->length = length;
 	r->vArray->data = calloc(length,sizeof(*r->vArray->data));
-	if(r->vArray->data == NULL){
-		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
+	if(length && (r->vArray->data == NULL)){
+		lExceptionThrowValClo("out-of-memory","[array/new] couldn't allocate its array", lValInt(length), c);
 		return NULL;
 	}
 	int key = 0;
