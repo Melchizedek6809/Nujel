@@ -11,10 +11,15 @@
 
 #include <time.h>
 #ifdef __WATCOMC__
+	#include <dos.h>
+	#include "../misc/pf.h"
 
 	static void clock_gettime(int type, struct timespec *tv){
-		tv->tv_nsec = 0;
-		tv->tv_sec = time(NULL);
+		struct dostime_t dtime;
+		_dos_gettime( &dtime );
+
+		tv->tv_nsec =  dtime.hsecond * 10000000l;
+		tv->tv_sec  = time(NULL);
 	}
 
 	#define CLOCK_MONOTONIC 123

@@ -5,8 +5,6 @@
 
 
 [def ansi/disabled #f]
-[when [== System/OS "DOS"]
-      [set! ansi/disabled ""]]
 
 [def ansi-reset "\e[0m"]
 [def ansi-fg-reset "\e[0;39m"]

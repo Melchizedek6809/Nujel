@@ -7,6 +7,13 @@
        "Return string α as a keyword"
        [symbol->keyword [str->sym α]]]
 
+[defun string->byte-array [a]
+       "Turn a string into an UTF-8 encoded byte array"
+       [def ret [array/allocate [string/length a]]]
+       [for [i 0 [string/length a]]
+            [array/set! ret i [char-at a i]]]
+       ret]
+
 [defun println [str]
        "Print STR on a single line"
        [print [cat str "\r\n"]]]

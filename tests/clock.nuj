@@ -1,0 +1,11 @@
+#!/usr/bin/env nujel
+
+[def next-tick [+ [time/milliseconds] 1000]]
+[def tick-tock #t]
+[while #t
+       [while [< [time/milliseconds] next-tick]]
+       [if tick-tock
+           [println "Tick"]
+           [println "Tock"]]
+       [set! tick-tock [not tick-tock]]
+       [set! next-tick [+ [time/milliseconds] 1000]]]

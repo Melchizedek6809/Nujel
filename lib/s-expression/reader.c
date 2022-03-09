@@ -109,7 +109,7 @@ static lVal *lParseString(lString *s){
 				*b++ = '\r';
 				break;
 			case 'e':
-				*b++ = '\e';
+				*b++ = 0x1B; // Has to be hardcoded due to OpenWatcom
 				break;
 			case '"':
 				*b++ = '"';

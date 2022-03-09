@@ -131,8 +131,6 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			}
 		}
 	}
-	if(c == NULL){c = createRootClosure();}
-
 	if(lVerbose){
 		pf("sizeof(vec): %u\n",     (i64)sizeof(vec));
 		pf("sizeof(lClosure): %u\n",(i64)sizeof(lClosure));
@@ -141,6 +139,11 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 		pf("sizeof(lString): %u\n", (i64)sizeof(lString));
 		pf("sizeof(lTree): %u\n",   (i64)sizeof(lTree));
 		pf("sizeof(jmp_buf): %u\n", (i64)sizeof(jmp_buf));
+	}
+
+	if(c == NULL){c = createRootClosure();}
+
+	if(lVerbose){
 		pf("\n\nRoot Closure Data Size: %u\n", (i64)lTreeSize(c->data));
 	}
 	return c;
@@ -186,9 +189,9 @@ static void initSignalHandlers(){
 
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
+	#ifndef __WATCOMC__
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
-	#ifndef __WATCOMC__
 	initSignalHandlers();
 	#endif
 	lInit();

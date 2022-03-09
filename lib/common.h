@@ -15,8 +15,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PI    (3.1415926535897932384626433832795f)
-#define PI180 (3.1415926535897932384626433832795f / 180.f)
+#define PI    (3.1415926535897932384626433832795)
+#define PI180 (3.1415926535897932384626433832795 / 180.0)
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MINMAX(a, b, v) (MAX(a,MIN(b,v)))

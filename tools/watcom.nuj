@@ -3,7 +3,7 @@
 [def WCC "wcc386"]
 [def WLINK "wlink"]
 
-[def WCC-OPTS " -6r -fp6 -ecf -bt=DOS -za99 -ol -ol+ -om -ot"]
+[def WCC-OPTS " -6r -fp6 -ecf -bt=DOS -za99 -oi -ol+ -om -ot"]
 [when [file/dir? "/opt/watcom/h/"]
       [set! WCC-OPTS [cat WCC-OPTS " -i=/opt/watcom/h/"]]]
 
@@ -39,10 +39,11 @@
 
 [def source-files [filter [flatten [map '["bin" "lib" "tmp" "vendor"] directory/read-recursive]]
                           [path/ext?! "c"]]]
-
-[for-each source-files watcom/compile]
-
 [def object-files [map source-files [\ [A] [cat [path/without-extension A] ".obj"]]]]
+
+[for-each object-files file/remove]
+[file/remove "DOSNUJEL.EXE"]
+[for-each source-files watcom/compile]
 
 [println [cat [ref ansi-bg 2] "[LD]" ansi-bg-reset " DOSNUJEL.EXE"]]
 [run [cat WLINK " SYSTEM causeway NAME DOSNUJEL OPTION STACK=1m OPTION HEAPSIZE=64m FILE " [join object-files ", "]]]

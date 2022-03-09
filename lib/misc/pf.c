@@ -213,7 +213,7 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 		case '\r': // Carriage Return
 			*cur++ = '\\'; *cur++ = 'r';
 			break;
-		case '\e': // Escape
+		case 0x1B: // Escape
 			*cur++ = '\\'; *cur++ = 'e';
 			break;
 		case '"':
