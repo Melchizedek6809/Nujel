@@ -55,12 +55,3 @@
                [when [f t]
                      [tree/set! ret e t]]]
        ret]
-
-[defun tree/remove [l f]
-       "Return a new tree with all elements from L where F retunrs true"
-       [def ret @[]]
-       [for-in [e [tree/keys l]]
-               [def t [tree/get l e]]
-               [when-not [f t]
-                         [tree/set! ret e t]]]
-       ret]

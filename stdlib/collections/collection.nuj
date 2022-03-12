@@ -13,7 +13,7 @@
        [if-not l "" [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
 
 [defun for-each [l f]
-       "Runs F over every item in collection L and returns the resulting list"
+       "Runs F over every item in collection L"
        [reduce l [λ [a b] [f b]] #nil]]
 
 [defun count [l p]
@@ -36,10 +36,13 @@
        "Returns a filtered list l with all elements equal to e omitted"
        [filter l [λ [a] [not [== a e]]]]]
 
+[defun remove [l p]
+       "Returns a filtered list l with all elements where P equal true removed"
+       [filter l [λ [a] [not [p a]]]]]
+
 [defun flatten/λ [a b]
        [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
              [#t [cons b a]]]]
-
 [defun flatten [l]
        "Flatten a collection of collections into a simple list"
        [if-not [collection? l] l
