@@ -17,22 +17,25 @@
        "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
        [case [type-of l]
              [[:nil] #nil]
-             [[:pair] [list/filter l p]]
-             [[:array] [array/filter l p]]
+             [[:tree]   [tree/filter l p]]
+             [[:pair]   [list/filter l p]]
+             [[:array]  [array/filter l p]]
              [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
 
 [defun remove [l p]
        "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is false"
        [case [type-of l]
              [[:nil] #nil]
-             [[:pair] [list/remove l p]]
-             [[:array] [array/remove l p]]
+             [[:tree]   [tree/remove l p]]
+             [[:pair]   [list/remove l p]]
+             [[:array]  [array/remove l p]]
              [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
 
 [defun reduce [l f α]
        "Combine all elements in collection l using operation F and starting value α"
        [case [type-of l]
              [[:nil]    α]
+             [[:tree]   [tree/reduce l f α]]
              [[:pair]   [list/reduce l f α]]
              [[:array]  [array/reduce l f α]]
              [otherwise [f α l]]]]
@@ -50,34 +53,34 @@
 [defun map [l f]
        "Runs f over every item in collection l and returns the resulting list"
        [case [type-of l]
-             [[:nil] #nil]
-             [[:pair] [list/map l f]]
-             [[:array] [array/map l f]]
+             [[:nil]    #nil]
+             [[:pair]   [list/map l f]]
+             [[:array]  [array/map l f]]
              [otherwise [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]
 
 [defun sort [l]
        "Sorts the collection L"
        [case [type-of l]
-             [:pair [list/sort l]]
-             [:array [array/sort l]]
+             [:pair     [list/sort l]]
+             [:array    [array/sort l]]
              [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
 
 [defun member [l m]
        "Returns the first pair/item of collection l whose car is equal to m"
        [case [type-of l]
-             [:pair [list/member l m]]
-             [:tree [tree/get l m]]
+             [:pair     [list/member l m]]
+             [:tree     [tree/get l m]]
              [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
 
 [defun cut [l start end]
        "Return a subcollection of L from START to END"
        [case [type-of l]
-             [:array [array/cut l start end]]
-             [:pair [list/cut l start end]]
-             [:string [string/cut l start end]]
+             [:array    [array/cut l start end]]
+             [:pair     [list/cut l start end]]
+             [:string   [string/cut l start end]]
              [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
 
 [defun collection? [l]
        [case [type-of l]
-             [[:pair :array] #t]
+             [[:pair :array :tree] #t]
              [otherwise #f]]]
