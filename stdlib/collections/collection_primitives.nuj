@@ -21,6 +21,14 @@
              [[:array] [array/filter l p]]
              [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
 
+[defun remove [l p]
+       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is false"
+       [case [type-of l]
+             [[:nil] #nil]
+             [[:pair] [list/remove l p]]
+             [[:array] [array/remove l p]]
+             [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
+
 [defun reduce [l f α]
        "Combine all elements in collection l using operation F and starting value α"
        [case [type-of l]

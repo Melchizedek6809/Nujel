@@ -57,6 +57,10 @@
                     [++ ri]]]
        [array/length! ret ri]]
 
+[defun array/remove [arr pred]
+       "Filter an array, [filter] should be preferred"
+       [array/filter arr [λ [v] [not [pred v]]]]]
+
 [defun array/equal? [a b]
        [if [or [not [array? a]]
                [not [array? b]]

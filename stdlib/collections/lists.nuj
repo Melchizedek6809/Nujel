@@ -55,8 +55,16 @@
         "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
         [def ret #nil]
         [for-in [e l]
-               [when [p e]
-                     [set! ret [cons e ret]]]]
+                [when [p e]
+                      [set! ret [cons e ret]]]]
+        [nreverse ret]]
+
+[defun list/remove [l p]
+        "Runs predicate p over every item in list l and returns a list where every item for which p returns true is removed"
+        [def ret #nil]
+        [for-in [e l]
+                [when-not [p e]
+                          [set! ret [cons e ret]]]]
         [nreverse ret]]
 
 [defun list/map [l f]
