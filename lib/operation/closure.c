@@ -53,13 +53,18 @@ static lVal *lnfSet(lClosure *c, lVal *v){
 static lVal *lSymTable(lClosure *c, lVal *v){
 	if(c == NULL){return v;}
 	lRootsValPush(v);
-	v = lTreeAddKeysToList(c->data,v);
-	return lSymTable(c->parent,v);
+	lVal *l = lTreeAddKeysToList(c->data,v);
+	return lSymTable(c->parent,l);
 }
 
 static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	(void)v;
-	return lSymTable(c,NULL);
+	lVal *l = lSymTable(c,NULL);
+	for(lVal *n = l;n;n = n->vList.cdr){
+		if(n->vList.car == NULL){break;}
+		n->vList.car->type = ltSymbol;
+	}
+	return l;
 }
 
 static int lSymCount(lClosure *c, int ret){
