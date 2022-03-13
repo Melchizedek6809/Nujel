@@ -2,9 +2,15 @@ image: openbsd/latest
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
-  - compile: |
+  - compile-bootstrap: |
       cd Nujel
-      make
+      make -j2 nujel-bootstrap
+  - test-bootstrap: |
+      cd Nujel
+      make test.bootstrap
+  - compile-runtime: |
+      cd Nujel
+      make -j2 nujel
   - test: |
       cd Nujel
       make test

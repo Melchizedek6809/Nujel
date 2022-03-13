@@ -27,6 +27,10 @@
 	#include <sys/time.h>
 #endif
 
+#ifdef __MINGW32__
+	#include <pthread_time.h>
+#endif
+
 /* Return monotonic time in milliseconds */
 u64 getMSecs(){
 	struct timespec tv;

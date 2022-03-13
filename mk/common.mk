@@ -10,9 +10,9 @@ EMCC                 := emcc
 EMAR                 := emar
 EMMEM                := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
 
-NUJEL                := ./nujel
-NUJEL_BOOTSTRAP      := ./nujel-bootstrap
-ASSET                := ./tools/assets
+NUJEL                := nujel
+NUJEL_BOOTSTRAP      := nujel-bootstrap
+ASSET                := tools/assets
 PROG                  = $(NUJEL)
 
 CC_MUSL              := musl-gcc

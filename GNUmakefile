@@ -31,6 +31,7 @@ ifeq ($(OS),Windows_NT)
 	NUJEL   := ./nujel.exe
 	ASSET   := ./tools/assets.exe
 	LIBS    += -lpthread
+	STATIC_LIBS := -static -lpthread
 	LDFLAGS := -Wl,--stack,16777216
 endif
 
@@ -107,18 +108,15 @@ $(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
-	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
-	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
@@ -128,16 +126,16 @@ web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 release.wasm: web/index.html
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
-	@$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
+	@./$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
-	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
+	@./$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOTSTRAP)
 	@mkdir -p tmp/
-	@$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
+	@./$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
@@ -148,48 +146,52 @@ tmp/binlib.no: tmp/stdlib.no
 
 tmp/stdlib.c: tmp/stdlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/stdlib tmp/stdlib.no
+	@./$(ASSET) tmp/stdlib tmp/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/stdlib.h: tmp/stdlib.c
 	@true
 
 tmp/binlib.c: tmp/binlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/binlib tmp/binlib.no
+	@./$(ASSET) tmp/binlib tmp/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/binlib.h: tmp/binlib.c
 	@true
 
 .PHONY: test
 test: $(NUJEL)
-	@$(NUJEL) tools/tests.nuj
+	@./$(NUJEL) tools/tests.nuj
 
 .PHONY: check
-check: run
+check: test
+
+.PHONY: test.bootstrap
+test.bootstrap: $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
 .PHONY: test.slow
 test.slow: $(NUJEL)
-	@$(NUJEL) --slow-test tools/tests.nuj
+	@./$(NUJEL) --slow-test tools/tests.nuj
 
 .PHONY: test.ridiculous
 test.ridiculous: $(NUJEL)
-	@$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
+	@./$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
 
 .PHONY: run
 run: $(NUJEL)
-	@$(NUJEL) --only-test-suite tools/tests.nuj
+	@./$(NUJEL) --only-test-suite tools/tests.nuj
 
 .PHONY: runl
 runl: $(NUJEL)
-	@$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
+	@./$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
 
 .PHONY: rund
 rund: $(NUJEL)
-	gdb $(NUJEL) -ex "r"
+	gdb ./$(NUJEL) -ex "r"
 
 .PHONY: runn
 runn: $(NUJEL)
-	rlwrap $(NUJEL)
+	rlwrap ./$(NUJEL)
 
 .PHONY: install
 install: release

@@ -5,9 +5,15 @@ packages:
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
-  - compile: |
+  - compile-bootstrap: |
       cd Nujel
-      make -j
+      make -j2 nujel-bootstrap
+  - test-bootstrap: |
+      cd Nujel
+      make -j test.bootstrap
+  - compile-runtime: |
+      cd Nujel
+      make -j2 nujel
   - test: |
       cd Nujel
       make test

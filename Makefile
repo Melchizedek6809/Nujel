@@ -8,8 +8,6 @@ LIB_DEPS             := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS          != find stdlib -type f -name '*.nuj' | sort
 STDLIB_NOBS          := $(STDLIB_NUJS:.nuj=.no)
 
-VERSION_ARCH         != uname -m
-
 BIN_SRCS             != find bin vendor -type f -name '*.c'
 BIN_HDRS             != find bin vendor -type f -name '*.h'
 BINLIB_NUJS          != find binlib -type f -name '*.nuj' | sort
@@ -46,8 +44,7 @@ distclean: clean
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-
-$(ASSET): tools/assets.c
+tools/assets: tools/assets.c
 	@$(CC) -o $@ $> $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
 
@@ -56,32 +53,32 @@ nujel.a: $(LIB_OBJS)
 	$(AR) cq $@ $>
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
-$(NUJEL): $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+nujel: $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+	@rm -f $@
 	@$(CC) -o $@ $> $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-$(NUJEL_BOOTSTRAP): $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+	@rm -f $@
 	@$(CC) -o $@ $> $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-	@$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $> $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
-	@$(NUJEL) --only-test-suite tools/tests.nuj
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
-	@$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
+	@./$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
-	@$(ASSET) bootstrap/binlib bootstrap/binlib.no
+	@./$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOTSTRAP)
 	@mkdir -p tmp/
-	@$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
+	@./$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
 	@cat $(STDLIB_NOBS) > tmp/stdlib.no
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
@@ -92,34 +89,37 @@ tmp/binlib.no: tmp/stdlib.no
 
 tmp/stdlib.c: tmp/stdlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/stdlib tmp/stdlib.no
+	@./$(ASSET) tmp/stdlib tmp/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/stdlib.h: tmp/stdlib.c
 	@true
 
 tmp/binlib.c: tmp/binlib.no $(ASSET)
 	@mkdir -p tmp/
-	@$(ASSET) tmp/binlib tmp/binlib.no
+	@./$(ASSET) tmp/binlib tmp/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 tmp/binlib.h: tmp/binlib.c
 	@true
 
-test: $(NUJEL)
-	@$(NUJEL) tools/tests.nuj
+.PHONY: test.bootstrap
+test.bootstrap: $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
-check: run
+test: $(NUJEL)
+	@./$(NUJEL) tools/tests.nuj
+check: test
 
 test.slow: $(NUJEL)
-	@$(NUJEL) --slow-test tools/tests.nuj
+	@./$(NUJEL) --slow-test tools/tests.nuj
 
 test.ridiculous: $(NUJEL)
-	@$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
+	@./$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
 
 run: $(NUJEL)
-	@$(NUJEL) --only-test-suite tools/tests.nuj
+	@./$(NUJEL) --only-test-suite tools/tests.nuj
 
 runl: $(NUJEL)
-	@$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
+	@./$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
 
 rund: $(NUJEL)
 	gdb $(NUJEL) -ex "r"
