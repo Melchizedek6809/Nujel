@@ -107,7 +107,7 @@
        [when [!= [tree/get last-board :score] 31892]
              [throw [list :wrong-result "Wrong Part 2 result" last-board]]]]
 
-[def raw [split [file/read "tests/fast/day4.input"] "\n"]]
+[def raw [split [file/read "tests/fast/day4.dat"] "\n"]]
 [def turns [-> [car raw] [split ","] [map int]]]
 [def boards [-> [cddr raw] [split/boards] [map parse/board]]]
 

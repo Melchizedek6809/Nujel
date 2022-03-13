@@ -69,7 +69,7 @@
                   [throw [list :all-flashes]]]]
        α]
 
-[def state [map/load "tests/fast/day11.input" 10 10]]
+[def state [map/load "tests/fast/day11.dat" 10 10]]
 [try [\ [ε] [when [!= [car ε] :all-flashes] [throw ε]]]
      [def ret [step/do-many state 1000]]]
 [when [!= p1-res 1694]

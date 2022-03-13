@@ -39,7 +39,7 @@
                                               [throw [list :return cc i]]]]]]
             [calc-part2-score stack 0]]]
 
-[def lines [split [file/read "tests/fast/day10.input"] "\n"]]
+[def lines [split [file/read "tests/fast/day10.dat"] "\n"]]
 [def res [map lines find-first-syntax-error]]
 [def p1-res [reduce res [\ [α β] [if [== :part1 [car β]] [+ α [cdr β]] α]] 0]]
 [def incomplete-lines [list/sort [filter res [\ [α] [!= :part1 [car α]]]]]]

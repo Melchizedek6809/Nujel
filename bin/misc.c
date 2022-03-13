@@ -42,7 +42,18 @@ void *loadFile(const char *filename,size_t *len){
 	size_t filelen,readlen,read;
 	u8 *buf = NULL;
 
+#ifdef __WATCOMC__
+	char dosFilename[256];
+	for(int i=0;i<sizeof(dosFilename);i++){
+		dosFilename[i] = *filename++;
+		if(dosFilename[i] == 0){break;}
+		if(dosFilename[i] == '/'){dosFilename[i] = '\\';}
+	}
+	dosFilename[sizeof(dosFilename)-1] = 0;
+	fp = fopen(dosFilename,"rb");
+#else
 	fp = fopen(filename,"rb");
+#endif
 	if(fp == NULL){return NULL;}
 
 	fseek(fp,0,SEEK_END);
