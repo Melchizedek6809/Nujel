@@ -119,6 +119,9 @@ release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@$(CC_MUSL) -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
+DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
+	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
+
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
 	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@

@@ -68,6 +68,9 @@ release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@$(CC) -o $(NUJEL) $> $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
+DOSNUJEL.EXE: nujel tools/watcom.nuj
+	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
+
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
 	@./$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
