@@ -7,7 +7,7 @@
        "Return whatver is at position I in L"
        [case [type-of l]
              [[:nil]               #nil]
-             [[:tree]   [tree/get  l i]]
+             [[:tree]   [tree/ref  l i]]
              [[:string] [char-at   l i]]
              [[:array]  [array/ref l i]]
              [[:pair]   [list/ref  l i]]

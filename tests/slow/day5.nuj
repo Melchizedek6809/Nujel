@@ -26,19 +26,19 @@
        [array/++ [ref vents x] y 1]]
 
 [defun line/horiz? [line]
-       [== [tree/get [tree/get line :a] :y]
-           [tree/get [tree/get line :b] :y]]]
+       [== [ref [ref line :a] :y]
+           [ref [ref line :b] :y]]]
 
 [defun line/vert? [line]
-       [== [tree/get [tree/get line :a] :x]
-           [tree/get [tree/get line :b] :x]]]
+       [== [ref [ref line :a] :x]
+           [ref [ref line :b] :x]]]
 
 [defun line/draw-vents [line]
        [when [or [line/horiz? line] [line/vert? line]]
-             [line/draw [tree/get [tree/get line :a] :x]
-                        [tree/get [tree/get line :a] :y]
-                        [tree/get [tree/get line :b] :x]
-                        [tree/get [tree/get line :b] :y]]]]
+             [line/draw [ref [ref line :a] :x]
+                        [ref [ref line :a] :y]
+                        [ref [ref line :b] :x]
+                        [ref [ref line :b] :y]]]]
 
 [defun points/count [v num]
        [reduce v [\ [a b] [+ a [reduce b [\ [a b] [+ a [if [> b num] 1 0]]] 0]]] 0]]

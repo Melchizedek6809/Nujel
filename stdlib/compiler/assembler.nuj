@@ -177,7 +177,7 @@
        pos]
 
 [defun assemble/relocate-op [code sym-map pos out]
-       [def target [tree/get sym-map [cadr code]]]
+       [def target [tree/ref sym-map [cadr code]]]
        [def off [- [+ target [cadddr code]] pos]]
        [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
        pos]
@@ -199,7 +199,7 @@
        [and assemble/verbose [println [cat [ansi-blue "Input:\n" [str/write code]]]]]
        [assemble/build-sym-map code sym-map 0]
        [and assemble/verbose [println [cat [ansi-yellow "Symbol Map:\n" [str/write sym-map]]]]]
-       [def out [array/allocate [tree/get sym-map :last-op]]]
+       [def out [array/allocate [tree/ref sym-map :last-op]]]
        [assemble/emit-relocated-ops code sym-map -1 out]
        [and assemble/verbose [println [cat [ansi-green "Output:\n" [str/write out]]]]]
 

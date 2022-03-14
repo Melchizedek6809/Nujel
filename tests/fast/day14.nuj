@@ -15,15 +15,15 @@
        [def new-α [str->sym [cat [string/cut [car recipe] 0 1] [cadr recipe]]]]
        [def new-β [str->sym [cat [cadr recipe] [string/cut [car recipe] 1 2]]]]
        [\ [α Ω]
-          [def count [int [tree/get [tree/get α :pairs] source]]]
-          [tree/+= [tree/get Ω :eles] new count]
-          [tree/+= [tree/get Ω :pairs] source [- count]]
-          [tree/+= [tree/get Ω :pairs] new-α count]
-          [tree/+= [tree/get Ω :pairs] new-β count]
+          [def count [int [ref [ref α :pairs] source]]]
+          [tree/+= [ref Ω :eles] new count]
+          [tree/+= [ref Ω :pairs] source [- count]]
+          [tree/+= [ref Ω :pairs] new-α count]
+          [tree/+= [ref Ω :pairs] new-β count]
           [if [lambda? last-recipe] [last-recipe α Ω] Ω]]]
 
 [defun combination/add [state recipe]
-       [tree/set! state :combinations [combination/parse recipe [tree/get state :combinations]]]]
+       [tree/set! state :combinations [combination/parse recipe [ref state :combinations]]]]
 
 [defun combinations/read [state lines]
        [for-each lines [\ [line] [combination/add state [split line " -> "]]]]
@@ -35,18 +35,18 @@
        [combinations/read state [cddr input-raw]]]
 
 [defun state/dup [α]
-       @[:combinations [tree/get α :combinations] :pairs [tree/dup [tree/get α :pairs]] :eles [tree/dup [tree/get α :eles]]]]
+       @[:combinations [ref α :combinations] :pairs [tree/dup [ref α :pairs]] :eles [tree/dup [ref α :eles]]]]
 
 [defun state/run/once [α]
-       [[tree/get α :combinations] α [state/dup α]]]
+       [[ref α :combinations] α [state/dup α]]]
 
 [defun state/run/many [α steps]
        [if [<= steps 0] α
            [state/run/many [state/run/once α] [- steps 1]]]]
 
 [defun result [state]
-  [- [max [tree/values [tree/get state :eles]]]
-     [min [tree/values [tree/get state :eles]]]]]
+  [- [max [tree/values [ref state :eles]]]
+     [min [tree/values [ref state :eles]]]]]
 
 [def state [state/read "tests/fast/day14.dat"]]
 [def p1-state [state/run/many state 10]]

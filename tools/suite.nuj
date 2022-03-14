@@ -7,6 +7,6 @@
 [for-each [directory/read-relative "tests/suite"] file/eval]
 [println "Loaded all Tests"]
 
-[if [tree/get repl/options :bytecoded]
+[if [ref repl/options :bytecoded]
     [exit [test-run-bytecode]]
     [exit [test-run]]]

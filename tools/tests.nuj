@@ -18,18 +18,18 @@
 [for-each [directory/read-relative "tests/suite"] file/eval]
 
 [when [tree/has? repl/options :only-test-suite]
-      [exit [if [tree/get repl/options :bytecoded]
+      [exit [if [ref repl/options :bytecoded]
                 [test-run-bytecode]
                 [test-run]]]]
 
-[if [tree/get repl/options :bytecoded]
+[if [ref repl/options :bytecoded]
     [set! test/testsuite-errors [test-run-bytecode]]
     [set! test/testsuite-errors [test-run]]]
 
 [println [ansi-green "Great, Now we can do some more complicated and thorough tests."]]
 
-[def test/slow [or [tree/get repl/options :slow-test] #f]]
-[def test/ridiculous [or [tree/get repl/options :ridiculous-test] #f]]
+[def test/slow [or [ref repl/options :slow-test] #f]]
+[def test/ridiculous [or [ref repl/options :ridiculous-test] #f]]
 [def test/start [time/milliseconds]]
 [def test/success 0]
 [def test/errors 0]

@@ -45,7 +45,7 @@
         [cons [car res] [cdr res]]]
 
 [defun file/file? [filename]
-       [tree/get [file/stat filename] :regular-file?]]
+       [ref [file/stat filename] :regular-file?]]
 
 [defun file/dir? [filename]
-       [tree/get [file/stat filename] :directory?]]
+       [ref [file/stat filename] :directory?]]

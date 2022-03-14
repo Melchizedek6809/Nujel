@@ -1,16 +1,16 @@
 #!/usr/bin/env nujel
 
 [defun do-commands-1 [name val state]
-       [cond [[== name 'forward] [tree/set! state :horiz [+ [tree/get state :horiz] val]]]
-             [[== name 'up     ] [tree/set! state :depth [- [tree/get state :depth] val]]]
-             [[== name 'down   ] [tree/set! state :depth [+ [tree/get state :depth] val]]]
+       [cond [[== name 'forward] [tree/set! state :horiz [+ [ref state :horiz] val]]]
+             [[== name 'up     ] [tree/set! state :depth [- [ref state :depth] val]]]
+             [[== name 'down   ] [tree/set! state :depth [+ [ref state :depth] val]]]
              [#t [println "Unknown Command, continuing."]]]]
 
 [defun do-commands-2 [name val state]
-       [cond [[== name 'forward] [tree/set! state :horiz [+ [tree/get state :horiz] val]]
-                                 [tree/set! state :depth [+ [tree/get state :depth] [* [tree/get state :aim] val]]]]
-             [[== name 'up     ] [tree/set! state :aim   [- [tree/get state   :aim] val]]]
-             [[== name 'down   ] [tree/set! state :aim   [+ [tree/get state   :aim] val]]]
+       [cond [[== name 'forward] [tree/set! state :horiz [+ [ref state :horiz] val]]
+                                 [tree/set! state :depth [+ [ref state :depth] [* [ref state :aim] val]]]]
+             [[== name 'up     ] [tree/set! state :aim   [- [ref state   :aim] val]]]
+             [[== name 'down   ] [tree/set! state :aim   [+ [ref state   :aim] val]]]
              [#t [println "Unknown Command, continuing."]]]]
 
 [defun step [l state fun]
@@ -18,7 +18,7 @@
                [step [cddr l] [fun [car l] [cadr l] state] fun]]]
 
 [defun calc-result [state]
-       [* [tree/get state :depth] [tree/get state :horiz]]]
+       [* [ref state :depth] [ref state :horiz]]]
 
 
 [def result [calc-result [step '[forward 5 down 5 forward 8 up 3 down 8 forward 2] @[:depth 0 :horiz 0] do-commands-1]]]

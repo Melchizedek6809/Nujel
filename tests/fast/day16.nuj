@@ -27,17 +27,17 @@
 	     [6 bits/<]
 	     [7 bits/=]]]
 [defun bits/compile [p]
-       [if [== 4 [tree/get p :type]]
-	   [tree/get p :value]
-	   [cons [bits/type->op [tree/get p :type]] [map [tree/get p :value] bits/compile]]]]
+       [if [== 4 [ref p :type]]
+	   [ref p :value]
+	   [cons [bits/type->op [ref p :type]] [map [ref p :value] bits/compile]]]]
 
 [defun bits/parse/packet/operator/packets [p s offset packets]
        [def off offset]
        [for [i 0 packets]
 	    [def child [bits/parse/packet s off]]
-	    [tree/set! p :value [cons [cdr child] [tree/get p :value]]]
+	    [tree/set! p :value [cons [cdr child] [ref p :value]]]
 	    [set! off [car child]]]
-       [tree/set! p :value [nreverse [tree/get p :value]]]
+       [tree/set! p :value [nreverse [ref p :value]]]
        [cons off p]]
 
 [defun bits/parse/packet/operator/bits [p s offset bits]
@@ -46,9 +46,9 @@
 
        [while [< off goal-offset]
 	      [def child [bits/parse/packet s off]]
-	      [tree/set! p :value [cons [cdr child] [tree/get p :value]]]
+	      [tree/set! p :value [cons [cdr child] [ref p :value]]]
 	      [set! off [car child]]]
-       [tree/set! p :value [nreverse [tree/get p :value]]]
+       [tree/set! p :value [nreverse [ref p :value]]]
        [cons off p]]
 
 [defun bits/parse/packet/operator [p s offset]
@@ -69,7 +69,7 @@
        [cons off [tree/set! p :value [read/single [cat "#b" [join [nreverse parts]]]]]]]
 
 [defun bits/parse/packet-contents [p s offset]
-       [case [tree/get p :type]
+       [case [ref p :type]
 	     [4 [bits/parse/packet/literal p s offset]]
 	     [otherwise [bits/parse/packet/operator p s offset]]]]
 
@@ -82,20 +82,20 @@
        [bits/parse/packet [join [map [split s ""] bits/hex->bits]] 0]]
 
 [defun bits/version-sum [p]
-       [if [pair? [tree/get p :value]]
-           [reduce [tree/get p :value] [\ [a b] [+ a [bits/version-sum b]]] [tree/get p :version]]
-	   [tree/get p :version]]]
+       [if [pair? [ref p :value]]
+           [reduce [ref p :value] [\ [a b] [+ a [bits/version-sum b]]] [ref p :version]]
+	   [ref p :version]]]
 
 [defun bits/print [p indent]
        [when-not indent [set! indent 0]]
-       [case [tree/get p :type]
+       [case [ref p :type]
 	      [4 [println [cat [string/pad-start "" indent]
-				      [ansi-blue [tree/get p :value]]
-				      " v:" [ansi-green [tree/get p :version]]]]]
+				      [ansi-blue [ref p :value]]
+				      " v:" [ansi-green [ref p :version]]]]]
 	      [otherwise [println [cat [string/pad-start "" indent]
-				      [ansi-yellow [tree/get p :type]]
-				      " v:" [ansi-green [tree/get p :version]]]]
-			 [for-each [tree/get p :value] [\ [a] [bits/print a [+ 4 indent]]]]]]]
+				      [ansi-yellow [ref p :type]]
+				      " v:" [ansi-green [ref p :version]]]]
+			 [for-each [ref p :value] [\ [a] [bits/print a [+ 4 indent]]]]]]]
 
 [def parsed-prog [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]
 

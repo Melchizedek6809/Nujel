@@ -88,8 +88,8 @@
               [tree/set! repl/options option #t]]]
 
 [defun repl/parse-option [option]
-       [[or [tree/get repl/option-map option]
-            [tree/get repl/option-map :default]] option]]
+       [[or [ref repl/option-map option]
+            [ref repl/option-map :default]] option]]
 
 [defun repl/parse-options [options]
        [if [== [char-at options 0] #\-]

@@ -42,17 +42,17 @@
 
 
 [def result [calc-γε [read-data example-data] 5]]
-[when [!= [tree/get result :power-consumption] 198]
+[when [!= [ref result :power-consumption] 198]
       [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [calc-γε [read-data input-data] 12]]
-[when [!= [tree/get result :power-consumption] 4103154]
+[when [!= [ref result :power-consumption] 4103154]
       [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [calc-oxy-co [read-data example-data] 5]]
-[when [!= [tree/get result :power-consumption] 230]
+[when [!= [ref result :power-consumption] 230]
       [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [calc-oxy-co [read-data input-data] 12]]
-[when [!= [tree/get result :power-consumption] 4245351]
+[when [!= [ref result :power-consumption] 4245351]
       [throw [list :wrong-result "Wrong result" result]]]
