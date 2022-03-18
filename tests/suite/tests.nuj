@@ -148,7 +148,6 @@
 [test/add #f [even? 9]]
 [test/add #t [odd? 7]]
 [test/add #f [odd? 4]]
-[test/add 256 [int [** 2 8]]]
 [test/add 256 [int [pow 2 8]]]
 [test/add 1 [int [pow 1 8]]]
 [test/add 1 [int [pow 1.0 8]]]

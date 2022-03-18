@@ -342,7 +342,7 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"*", "[...args]", "Multiplication",lnfMul);
 	lAddNativeFunc(c,"-", "[...args]", "Substraction",  lnfSub);
 	lAddNativeFunc(c,"+", "[...args]", "Addition",      lnfAdd);
-	lAddNativeFunc(c,"** pow", "[a b]", "Return A raised to the power of B",lnfPow);
+	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
 	lAddNativeFunc(c,"add", "[a b]", "Return a + b",  lnfAddAst);
 	lAddNativeFunc(c,"sub", "[a b]", "Return a - b",  lnfSubAst);
