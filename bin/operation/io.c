@@ -1,11 +1,7 @@
-/*
- * Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- *
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "io.h"
 #include "../misc.h"
-
 #include "../../lib/exception.h"
 
 #ifdef __WATCOMC__
@@ -15,11 +11,10 @@
 #endif
 
 #include <errno.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 
 #if (defined(__WATCOMC__)) || (defined(__EMSCRIPTEN__))

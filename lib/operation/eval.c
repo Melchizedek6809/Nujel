@@ -1,10 +1,9 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
-
-#include "../api.h"
-#include <stdio.h>
+#include "../collection/list.h"
+#include "../type/closure.h"
+#include "../type/native-function.h"
 
 /* [eval* expr] - Evaluate the already compiled EXPR */
 static lVal *lnfEvalRaw(lClosure *c, lVal *v){

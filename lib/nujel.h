@@ -10,8 +10,6 @@
 
 extern bool lVerbose;
 
-extern lVal *lnfvDo;
-extern lVal *lnfvArrRef;
 extern lVal *lnfvQuote;
 
 void      lInit             ();

@@ -6,10 +6,10 @@
 [defun output/count [entry]
        [def len [string/length entry]]
        [case len
-             [[2] [array/++ counts 1]]
-             [[3] [array/++ counts 7]]
-             [[4] [array/++ counts 4]]
-             [[7] [array/++ counts 8]]
+             [2 [array/++ counts 1]]
+             [3 [array/++ counts 7]]
+             [4 [array/++ counts 4]]
+             [7 [array/++ counts 8]]
              [otherwise #f]]]
 
 [defun find/by-length [vals arr len pos]
@@ -32,8 +32,7 @@
 [defun find/five [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logand α [array/ref numbers 6]]]]]
-       ]]
+                [filter [\ [α] [== α [logand α [array/ref numbers 6]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 5 [car ret]]
        [filter vals [\ [α] [!= α [car ret]]]]]
@@ -41,16 +40,14 @@
 [defun find/nine [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 6]]]
-                [filter [\ [α] [== α [logior α [array/ref numbers 4]]]]]
-       ]]
+                [filter [\ [α] [== α [logior α [array/ref numbers 4]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 9 [car ret]]
        [filter vals [\ [α] [!= α [car ret]]]]]
 
 [defun find/zero [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 6]]]
-       ]]
+                [filter [\ [α] [== [popcount α] 6]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 0 [car ret]]
        [filter vals [\ [α] [!= α [car ret]]]]]
@@ -58,8 +55,7 @@
 [defun find/three [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logior α [array/ref numbers 1]]]]]
-       ]]
+                [filter [\ [α] [== α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 3 [car ret]]
        [filter vals [\ [α] [!= α [car ret]]]]]
@@ -67,8 +63,7 @@
 [defun find/two [vals numbers]
        [def ret [-> vals
                 [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [!= α [logior α [array/ref numbers 1]]]]]
-       ]]
+                [filter [\ [α] [!= α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 2 [car ret]]
        [filter vals [\ [α] [!= α [car ret]]]]]

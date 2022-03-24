@@ -1,23 +1,16 @@
-/*
- * Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- *
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
-#include <setjmp.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#ifndef __WATCOMC__
-  #include <signal.h>
-#endif
-
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../lib/api.h"
 #include "misc.h"
 #include "operation/environment.h"
 #include "operation/io.h"
 #include "operation/readline.h"
+
+#include <stdlib.h>
+
+#ifndef __WATCOMC__
+  #include <signal.h>
+#endif
 #include "../vendor/getline/getline.h"
 
 extern u8 binlib_no_data[];

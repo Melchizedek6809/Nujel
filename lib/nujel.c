@@ -1,22 +1,20 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "nujel.h"
 
-#include "api.h"
 #include "exception.h"
 #include "allocation/native-function.h"
 #include "allocation/tree.h"
 #include "allocation/symbol.h"
+#include "collection/list.h"
 #include "operation.h"
-#include "type/native-function.h"
+#include "s-expression/reader.h"
+#include "type/closure.h"
 #include "type/symbol.h"
 
-#include <stdio.h>
 #include <string.h>
 
 extern u8 stdlib_no_data[];
-
 bool lVerbose = false;
 
 /* Initialize the allocator and symbol table, needs to be called before as
@@ -145,14 +143,8 @@ void lLoadS(lClosure *c, const char *s, int sLen){
 	lRootsRet(SP);
 }
 
-static bool lArgsEval(const lVal *v){
-	switch(v ? v->type : ltNoAlloc){
-	default:
-		return false;
-	case ltLambda:
-	case ltNativeFunc:
-		return true;
-	}
+static inline bool lArgsEval(const lVal *v){
+	return v && ((v->type == ltLambda) || (v->type == ltNativeFunc));
 }
 
 /* Directly Evaluate a single value, v, and return the result.
@@ -168,10 +160,8 @@ lVal *lEval(lClosure *c, lVal *v){
 		switch(car ? car->type : ltNoAlloc){
 		default:
 			lExceptionThrowValClo("type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)), c);
-			return NULL;
                 case ltMacro:
-			lExceptionThrowValClo("runtime-macro", "Can't use macros as functions", v, c);
-			return NULL;
+			lExceptionThrowValClo("runtime-macro", "Macros can't be used as functions", v, c);
 		case ltObject:
 			return lnfDo(car->vClosure,lCdr(v));
 		case ltLambda:
@@ -191,7 +181,6 @@ lVal *lEval(lClosure *c, lVal *v){
 				return lApply(c, args, resolved, car);
 			}else{
 				lExceptionThrowValClo("unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
-				return NULL;
 			}}
 		}
 	}}
@@ -360,6 +349,8 @@ lClosure *lNewRoot(){
 	return lExceptionTryExit(lNewRootReal,NULL,NULL);
 }
 
+/* Trigger a break exception as soon as possible, which will most
+ * likely abort the current computation and return to the top-level */
 void lBreak(){
 	breakQueued = true;
 }

@@ -1,20 +1,15 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "val.h"
-
 #include "../display.h"
-#include "../allocation/garbage-collection.h"
-#include "../collection/string.h"
-#include "../type/closure.h"
+
+#include <string.h>
+#include <stdlib.h>
 
 lVal     lValList[VAL_MAX];
 uint     lValActive = 0;
 uint     lValMax    = 0;
 lVal    *lValFFree  = NULL;
-
-#include <string.h>
-#include <stdlib.h>
 
 /* Initialize the val allocator */
 void lValInit(){

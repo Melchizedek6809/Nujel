@@ -1,29 +1,24 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- *
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
+/*
  * In this file you will find different subroutines for casting from one type to
  * another, as well as code for determining which type would be most fitting when
  * you have to for example add two values together.
  */
 #include "type-system.h"
-
-#include "api.h"
-#include "nujel.h"
-#include "allocation/val.h"
+#include "allocation/symbol.h"
 #include "collection/list.h"
 #include "collection/string.h"
+#include "display.h"
+#include "exception.h"
+#include "misc/pf.h"
 #include "misc/vec.h"
+#include "operation.h"
 #include "type/closure.h"
 #include "type/native-function.h"
 #include "type/symbol.h"
-#include "type/val.h"
-#include "operation.h"
 
-#include <inttypes.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 
 /* [int v] - Convert v into an integer number */
 lVal *lnfInt(lClosure *c, lVal *v){

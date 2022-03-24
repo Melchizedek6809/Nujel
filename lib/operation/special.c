@@ -1,19 +1,9 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
-
-#include "../api.h"
 #include "../exception.h"
-#include "../type-system.h"
-#include "../allocation/roots.h"
-#include "../collection/list.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 lVal *lnfvDo;
 lVal *lnfvQuote;

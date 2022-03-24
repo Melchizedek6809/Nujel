@@ -1,18 +1,13 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- *
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
+
+/*
  * Contains code for dealing with GC Roots, essential for determining which
  * objects on the heap are still reachable.
  */
 #include "roots.h"
-#include "../type-system.h"
-#include "../allocation/garbage-collection.h"
-#include "../collection/string.h"
 #include "../misc/pf.h"
-#include "../type/closure.h"
-#include "../type/val.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {

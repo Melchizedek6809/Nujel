@@ -2,18 +2,18 @@
 
 [defun char-to-score [cc]
        [case cc
-             [[#\)]     3]
-             [[#\]]    57]
-             [[#\}]  1197]
-             [[#\>] 25137]
+             [#\)     3]
+             [#\]    57]
+             [#\}  1197]
+             [#\> 25137]
              [otherwise 0]]]
 
 [defun p2-score [cc]
        [case cc
-             [[#\)] 1]
-             [[#\]] 2]
-             [[#\}] 3]
-             [[#\>] 4]
+             [#\) 1]
+             [#\] 2]
+             [#\} 3]
+             [#\> 4]
              [otherwise 0]]]
 
 [defun calc-part2-score [stack α]

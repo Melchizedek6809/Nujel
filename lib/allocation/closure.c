@@ -1,16 +1,9 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "closure.h"
 #include "garbage-collection.h"
-#include "../nujel.h"
 #include "../display.h"
-#include "../collection/list.h"
-#include "../collection/tree.h"
-#include "../type/symbol.h"
-#include "../type/val.h"
 
-#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 

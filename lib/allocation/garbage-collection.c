@@ -1,29 +1,21 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- *
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
+
+/*
  * Contains a terrible implementation of a mark-sweep garbage collector, but it
  * is good enough for now.
  */
+#include "garbage-collection.h"
 #include "array.h"
 #include "closure.h"
-#include "garbage-collection.h"
 #include "roots.h"
 #include "string.h"
 #include "symbol.h"
 #include "tree.h"
-#include "val.h"
 #include "../exception.h"
-#include "../nujel.h"
 #include "../operation.h"
-#include "../collection/list.h"
-#include "../collection/string.h"
-#include "../collection/tree.h"
 #include "../misc/pf.h"
 #include "../type/bytecode.h"
-#include "../type/closure.h"
-#include "../type/native-function.h"
-
-#include <stdio.h>
 
 int lGCRuns = 0;
 

@@ -1254,8 +1254,8 @@
 [test/add 4 [identity 4]]
 [test/add "4" [identity "4"]]
 [test/add #[1 2 3] [identity #[1 2 3]]]
-;[test/add 128 oneTwoThreeTest]
-;[test/add 11 [def count [let [[a 0]] [λ [b] [set! a [+ a [if [[numeric? b] b] [#t 1]]]]]]] [count 10] [count]]
+[test/add "Polizei" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
+[test/add 11 [def count [let [[a 0]] [λ [b] [set! a [+ a [if [numeric? b] b 1]]]]]] [count 10] [count]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]
 ;[test/add "Testing!" [let* [defun a [] "Testing!" [tree/ref [closure [closure-parent [current-closure]]] :documentation]] [a]]]
 
@@ -1269,7 +1269,6 @@
 
 ;[test/add 1000 [byterun '[do [def i 0] [while [< i 100] [set! i [+ 1 i]]] i]]]
 ;[test/add #t [for [i 5 4]] #t]
-;[test/add "\"Polizei\"" [def eins [ω [def say [λ [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [λ [] "Polizei"]]] [zwei [say]]]
 
 ; Having test defined somehow breaks the whole testing system, how come?
 ; [def test [+99 1]]

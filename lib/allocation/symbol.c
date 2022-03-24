@@ -1,15 +1,10 @@
-/* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "symbol.h"
-#include "val.h"
 #include "../display.h"
-#include "../nujel.h"
-#include "../allocation/val.h"
 #include "../misc/pf.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
 lSymbol  lSymbolList[SYM_MAX];

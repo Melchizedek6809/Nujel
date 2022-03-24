@@ -7,7 +7,8 @@
        "Compares every two items in L and increments a counter if the value increases"
        [def acc 0]
        [while [and l [cdr l]]
-              [when [> [cadr l] [car l]] [++ acc]]
+              [when [> [cadr l] [car l]]
+                    [++ acc]]
               [cdr! l]]
        acc]
 

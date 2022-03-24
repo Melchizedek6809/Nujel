@@ -1,18 +1,11 @@
- /* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
- * This project uses the MIT license, a copy should be included under /LICENSE
- */
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
-
 #include "../exception.h"
-#include "../nujel.h"
-#include "../allocation/roots.h"
-#include "../allocation/val.h"
-#include "../collection/list.h"
 #include "../collection/tree.h"
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
-#include "../type-system.h"
 
 /* [tree/new ...plist] - Return a new tree, initialized with PLIST */
 static lVal *lnfTreeNew(lClosure *c, lVal *v){

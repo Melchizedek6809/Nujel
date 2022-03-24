@@ -21,6 +21,7 @@ void lOperationsClosure    (lClosure *c);
 void lOperationsEval       (lClosure *c);
 void lOperationsList       (lClosure *c);
 void lOperationsMath       (lClosure *c);
+void lOperationsReader     (lClosure *c);
 void lOperationsPredicate  (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
 void lOperationsString     (lClosure *c);

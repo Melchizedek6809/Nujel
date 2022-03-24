@@ -3,12 +3,12 @@
 
 #include "nujel.h"
 
-i64         castToInt   (const lVal *v, i64         fallback);
-double      castToFloat (const lVal *v, double      fallback);
-vec         castToVec   (const lVal *v, vec         fallback);
-bool        castToBool  (const lVal *v);
-const char *castToString(const lVal *v, const char *fallback);
-lTree      *castToTree  (const lVal *v, lTree *     fallback);
+i64            castToInt   (const lVal *v, i64         fallback);
+double         castToFloat (const lVal *v, double      fallback);
+vec            castToVec   (const lVal *v, vec         fallback);
+bool           castToBool  (const lVal *v);
+const char    *castToString(const lVal *v, const char *fallback);
+lTree         *castToTree  (const lVal *v, lTree *     fallback);
 const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback);
 
 lVal *lCast             (lClosure *c, lVal *v, lType t);
