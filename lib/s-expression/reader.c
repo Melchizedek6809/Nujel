@@ -340,15 +340,92 @@ static lVal *lParseBytecodeOp(lString *s){
 	return ret;
 }
 
+#include "../misc/pf.h"
+
+/* Read a literal array and return it as a lVal */
+static lVal *lParseBytecodeArray(lString *s){
+	static u8 *d = NULL;
+	static int size = 0;
+	int len = 0;
+
+	while(s->data < s->bufEnd){
+		if((len+4) >= size){
+			size = MAX(size,128) * 2;
+			d = realloc(d, size);
+		}
+		char c = *s->data++;
+		int t = 0;
+		if((c >= '0')  && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
+		if((c >= 'A')  && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
+		if((c >= 'a')  && (c <= 'f')){t = ((c - 'a')+0xA) << 4; goto readSecondNibble;}
+		if(c == '}'){break;}
+		if(c == 'i'){
+			lStringAdvanceToNextCharacter(s);
+			lVal *tv = lParseNumber(s,lParseNumberDecimal);
+			if(!tv || (tv->type != ltInt)){
+				lExceptionThrowValClo("invalid-literal", "Invalid integer constant in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			}
+			const int v = tv->vInt;
+			if((v > 127) || (v < -128)){
+				lExceptionThrowValClo("invalid-literal", "Invalid integer constant in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			}
+			d[len++] = v;
+			lStringAdvanceToNextCharacter(s);
+			continue;
+		}
+		if(c == 'v'){
+			lStringAdvanceToNextCharacter(s);
+			lVal *tv = RVP(lReadValue(s));
+			const int i = lValIndex(tv);
+			d[len++] = (i >> 16) & 0xFF;
+			d[len++] = (i >>  8) & 0xFF;
+			d[len++] =  i        & 0xFF;
+			lStringAdvanceToNextCharacter(s);
+			continue;
+		}
+		if(c == 's'){
+			lStringAdvanceToNextCharacter(s);
+			lVal *tv = RVP(lReadValue(s));
+			if(!tv || ((tv->type != ltSymbol) && (tv->type != ltKeyword))){
+				lExceptionThrowValClo("invalid-literal", "Invalid symbol literal in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			}
+			const int i = lSymIndex(tv->vSymbol);
+			d[len++] = (i >> 16) & 0xFF;
+			d[len++] = (i >>  8) & 0xFF;
+			d[len++] =  i        & 0xFF;
+			lStringAdvanceToNextCharacter(s);
+			continue;
+		}
+
+		readSecondNibble:
+		if(s->data >= s->bufEnd){
+			lExceptionThrowValClo("invalid-literal", "Unexpected end of bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+		}
+		c = *s->data++;
+		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
+		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
+		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
+		lExceptionThrowValClo("invalid-literal", "Unexpected character found in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+
+		storeOP:
+		d[len++] = (u8)t;
+	}
+	lVal *ret = RVP(lValAlloc(ltBytecodeArr));
+	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
+	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
+	memcpy(ret->vBytecodeArr.data, d, len);
+	return ret;
+}
+
 /* Parse the special value in s starting with a # and return the resulting lVal */
 static lVal *lParseSpecial(lString *s){
 	if(s->data >= s->bufEnd){return NULL;}
 	switch(*s->data++){
 	default: {
 		const char *start, *end;
-			for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
-			for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-			lExceptionThrowValClo("invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+		for(start = s->data; (start > s->buf) && (*start != '#'); start--){}
+		for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
+		lExceptionThrowValClo("invalid-literal", "Unexpected character found in special literal", lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 		return NULL; }
 	case '|': // SRFI-30
 		lStringAdvanceUntilEndOfBlockComment(s);
@@ -370,6 +447,8 @@ static lVal *lParseSpecial(lString *s){
 		return lValBool(true);
 	case 'f':
 		return lValBool(false);
+	case '{':
+		return lParseBytecodeArray(s);
 	case '[':{
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
 		ret->vList.car = lValSymS(symArr);
