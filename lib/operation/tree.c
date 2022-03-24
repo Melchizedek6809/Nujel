@@ -11,8 +11,7 @@
 static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type = ltTree;
+	lVal *ret = lRootsValPush(lValAlloc(ltTree));
 	ret->vTree = NULL;
 
 	while(v != NULL){

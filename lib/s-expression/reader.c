@@ -129,8 +129,7 @@ static lVal *lParseString(lString *s){
 			s->data++;
 		}else if(*s->data == '"'){
 			s->data++;
-			lVal *v = lValAlloc();
-			v->type = ltString;
+			lVal *v = lValAlloc(ltString);
 			v->vString = lStringNew(buf,b-buf);
 			return v;
 		}else if(*s->data == 0){

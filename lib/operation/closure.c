@@ -1,6 +1,7 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
+#include "../misc/pf.h"
 #include "../allocation/symbol.h"
 #include "../exception.h"
 #include "../collection/tree.h"
@@ -113,9 +114,8 @@ static lVal *lnfClosureParent(lClosure *c, lVal *v){
 	}else if(car->vClosure->parent == NULL){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc();
+		lVal *ret = lValAlloc(car->vClosure->parent->type == closureObject ? ltObject : ltLambda);
 		ret->vClosure = car->vClosure->parent;
-		ret->type = ret->vClosure->type == closureObject ? ltObject : ltLambda;
 		return ret;
 	}
 }
@@ -131,9 +131,8 @@ static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 	}else if(car->vClosure->caller == NULL){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc();
+		lVal *ret = lValAlloc(car->vClosure->caller->type == closureObject ? ltObject : ltLambda);
 		ret->vClosure = car->vClosure->caller;
-		ret->type = ret->vClosure->type == closureObject ? ltObject : ltLambda;
 		return ret;
 	}
 }
@@ -201,8 +200,7 @@ static lVal *lnfClSelf(lClosure *c, lVal *v){
 		c = getNextObject(c->parent);
 	}
 	if(c == NULL){return NULL;}
-	lVal *ret = lValAlloc();
-	ret->type = ltObject;
+	lVal *ret = lValAlloc(ltObject);
 	ret->vClosure = c;
 	return ret;
 }
@@ -225,9 +223,16 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
 }
 
-/* Handler for [λ$ name [..args] docstring body] */
+/* Handler for [λ* name [..args] docstring body] */
 static lVal *lnfLambdaAst(lClosure *c, lVal *v){
 	return lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
+}
+
+/* Handler for [λδ name [..args] docstring body] */
+static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
+	lVal *ret = lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
+	ret->vClosure->type = closureBytecoded;
+	return ret;
 }
 
 /* Handler for [μ* [...args] ...body] */
@@ -239,8 +244,7 @@ static lVal *lnfMacroAst(lClosure *c, lVal *v){
 
 /* Handler for [ω* ...body] */
 static lVal *lnfObjectAst(lClosure *c, lVal *v){
-	lVal *ret = lRootsValPush(lValAlloc());
-	ret->type     = ltObject;
+	lVal *ret = lRootsValPush(lValAlloc(ltObject));
 	ret->vClosure = lClosureNew(c);
 	ret->vClosure->type = closureObject;
 	lnfDo(ret->vClosure,v);
@@ -249,16 +253,14 @@ static lVal *lnfObjectAst(lClosure *c, lVal *v){
 
 static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
 	(void)v;
-	lVal *ret = lValAlloc();
-	ret->type = ltObject;
+	lVal *ret = lValAlloc(ltObject);
 	ret->vClosure = c;
 	return ret;
 }
 
 static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 	(void)v;
-	lVal *ret = lValAlloc();
-	ret->type = ltLambda;
+	lVal *ret = lValAlloc(ltLambda);
 	ret->vClosure = c;
 	return ret;
 }
@@ -298,6 +300,7 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",  lnfLetRaw);
 
 	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
+	lAddSpecialForm(c,"λδ*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
 	lAddSpecialForm(c,"μ*",           "[name args source body]", "Create a new, raw, macro",  lnfMacroAst);
 	lAddSpecialForm(c,"ω*",           "[body]",                  "Create a new object",       lnfObjectAst);
 }

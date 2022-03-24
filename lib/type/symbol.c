@@ -12,8 +12,7 @@
 /* Return a newly allocated nujel symbol of value S */
 lVal *lValSymS(const lSymbol *s){
 	if(s == NULL){return NULL;}
-	lVal *ret = lValAlloc();
-	ret->type = ltSymbol;
+	lVal *ret = lValAlloc(ltSymbol);
 	ret->vSymbol = s;
 	return ret;
 }
@@ -26,8 +25,7 @@ lVal *lValSym(const char *s){
 /* Return a newly allocated nujel keyword of value S */
 lVal *lValKeywordS(const lSymbol *s){
 	if(s == NULL){return NULL;}
-	lVal *ret = lValAlloc();
-	ret->type = ltKeyword;
+	lVal *ret = lValAlloc(ltKeyword);
 	ret->vSymbol = s;
 	return ret;
 }

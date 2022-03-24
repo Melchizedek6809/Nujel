@@ -77,8 +77,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 		lExceptionThrowValClo("invalid-argument","[array/allocate] expects an integer indicating the size which has to be at least 0 or more", v, c);
 		return NULL;
 	}
-	lVal *r = lRootsValPush(lValAlloc());
-	r->type = ltArray;
+	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
 	r->vArray->length = len;
 	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
@@ -92,8 +91,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 static lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	int length = v ? lListLength(v) : 0;
-	lVal *r = lRootsValPush(lValAlloc());
-	r->type = ltArray;
+	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
 	r->vArray->length = length;
 	r->vArray->data = calloc(length,sizeof(*r->vArray->data));

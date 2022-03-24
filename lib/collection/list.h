@@ -8,8 +8,7 @@ lVal     *lList       (int length, ...);
 
 /* Create and return a cell out of CAR and CDR */
 static inline lVal *lCons(lVal *car, lVal *cdr){
-	lVal *v = lValAlloc();
-	v->type = ltPair;
+	lVal *v = lValAlloc(ltPair);
 	v->vList.car = car;
 	v->vList.cdr = cdr;
 	return v;

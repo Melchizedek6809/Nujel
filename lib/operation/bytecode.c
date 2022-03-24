@@ -10,8 +10,7 @@
 #include <stdlib.h>
 
 static lVal *lValBytecodeOp(lBytecodeOp v){
-	lVal *ret = lValAlloc();
-	ret->type = ltBytecodeOp;
+	lVal *ret = lValAlloc(ltBytecodeOp);
 	ret->vBytecodeOp = v;
 	return ret;
 }
@@ -41,8 +40,7 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 		return NULL;
 	}
 	const int len = arr->vArray->length;
-	lVal *ret = lValAlloc();
-	ret->type = ltBytecodeArr;
+	lVal *ret = lValAlloc(ltBytecodeArr);
 	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
 	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
 
@@ -64,8 +62,7 @@ static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 		return NULL;
 	}
 	const int len = arr->vBytecodeArr.dataEnd - arr->vBytecodeArr.data;
-	lVal *ret = RVP(lValAlloc());
-	ret->type = ltArray;
+	lVal *ret = RVP(lValAlloc(ltArray));
 	ret->vArray = lArrayAlloc();
 	ret->vArray->length = len;
 	ret->vArray->data = malloc(len * sizeof(*ret->vArray->data));

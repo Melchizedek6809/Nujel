@@ -9,6 +9,7 @@
 #include "collection/list.h"
 #include "operation.h"
 #include "s-expression/reader.h"
+#include "type/bytecode.h"
 #include "type/closure.h"
 #include "type/symbol.h"
 
@@ -76,7 +77,12 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
 	}
-	lVal *ret = lEval(tmpc,lambda->vClosure->text);
+	lVal *ret;
+	if(lambda->vClosure->type == closureBytecoded){
+		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr);
+	}else{
+		ret = lEval(tmpc,lambda->vClosure->text);
+	}
 	lRootsRet(SP);
 	return ret;
 }

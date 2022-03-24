@@ -67,8 +67,7 @@ int lStringLength(const lString *s){
 /* Create a new string value out of S */
 lVal *lValStringLen(const char *c, int len){
 	if(c == NULL){return NULL;}
-	lVal *t = lRootsValPush(lValAlloc());
-	t->type = ltString;
+	lVal *t = lRootsValPush(lValAlloc(ltString));
 	t->vString = lStringNew(c,len);
 	return t->vString == NULL ? NULL : t;
 }
@@ -82,8 +81,7 @@ lVal *lValString(const char *c){
  * freed once the value leaves scope  */
 lVal *lValStringNoCopy(const char *c,int len){
 	if(c == NULL){return NULL;}
-	lVal *t = lRootsValPush(lValAlloc());
-	t->type = ltString;
+	lVal *t = lRootsValPush(lValAlloc(ltString));
 	t->vString = lStringNewNoCopy(c,len);
 	return t;
 }
@@ -92,8 +90,7 @@ lVal *lValStringNoCopy(const char *c,int len){
  * freed once the value leaves scope  */
 lVal *lValStringConst(const char *c,int len){
 	if(c == NULL){return NULL;}
-	lVal *t = lRootsValPush(lValAlloc());
-	t->type = ltString;
+	lVal *t = lRootsValPush(lValAlloc(ltString));
 	t->vString = lStringNewConst(c,len);
 	return t;
 }

@@ -436,6 +436,7 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		case lopLambda:
+		case lopApply:
 		case lopMacro:
 			lValGCMark(lIndexVal((c[ 1] << 16) | (c[ 2] << 8) | c[ 3]));
 			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));

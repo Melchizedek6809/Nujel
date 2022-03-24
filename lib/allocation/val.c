@@ -18,7 +18,7 @@ void lValInit(){
 }
 
 /* Return a newly allocated value */
-lVal *lValAlloc(){
+lVal *lValAlloc(lType t){
 	lVal *ret;
 	if(lValFFree == NULL){
 		if(lValMax >= VAL_MAX-1){
@@ -39,6 +39,7 @@ lVal *lValAlloc(){
 	}
 	lValActive++;
 	memset(ret, 0, sizeof(lVal));
+	ret->type = t;
 	return ret;
 }
 

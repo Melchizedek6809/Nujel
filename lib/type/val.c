@@ -12,8 +12,7 @@
 
 /* Return a newly allocated Nujel int of value V */
 lVal *lValInt(i64 v){
-	lVal *ret = lValAlloc();
-	ret->type = ltInt;
+	lVal *ret = lValAlloc(ltInt);
 	ret->vInt = v;
 	return ret;
 }
@@ -25,56 +24,43 @@ lVal *lValFloat(double v){
 	}else if(isinf(v)){
 		lExceptionThrow("float-inf","INF is disallowed in Nujel, please check you calculations");
 	}
-	lVal *ret   = lValAlloc();
-	ret->type   = ltFloat;
+	lVal *ret   = lValAlloc(ltFloat);
 	ret->vFloat = v;
 	return ret;
 }
 
 /* Return a newly allocated Nujel vec of value V */
 lVal *lValVec(const vec v){
-	lVal *ret = lValAlloc();
-	ret->type = ltVec;
+	lVal *ret = lValAlloc(ltVec);
 	ret->vVec = v;
 	return ret;
 }
 
 /* Return a newly allocated Nujel bool of value V */
 lVal *lValBool(bool v){
-	lVal *ret = lValAlloc();
-	ret->type = ltBool;
+	lVal *ret = lValAlloc(ltBool);
 	ret->vBool = v;
 	return ret;
 }
 
 /* Return a newly allocated Nujel tree of value V */
 lVal *lValTree(lTree *v){
-	lVal *ret = lValAlloc();
-	ret->type = ltTree;
+	lVal *ret = lValAlloc(ltTree);
 	ret->vTree = v ? v : lTreeNew(NULL, NULL);
 	return ret;
 }
 
 /* Return a newly allocated Nujel object of value V */
 lVal *lValObject(lClosure *v){
-	lVal *ret = lValAlloc();
-	ret->type = ltObject;
+	lVal *ret = lValAlloc(ltObject);
 	ret->vClosure = v;
 	return ret;
 }
 
 /* Return a newly allocated Nujel lambda of value V */
 lVal *lValLambda(lClosure *v){
-	lVal *ret = lValAlloc();
-	ret->type = ltLambda;
+	lVal *ret = lValAlloc(ltLambda);
 	ret->vClosure = v;
-	return ret;
-}
-
-/* Return a newly allocated comment, something that should be ignored */
-lVal *lValComment(){
-	lVal *ret = lValAlloc();
-	ret->type = ltComment;
 	return ret;
 }
 

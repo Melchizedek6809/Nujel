@@ -97,8 +97,7 @@ void lDefineVal(lClosure *c, const char *str, lVal *val){
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
-	lVal *ret = RVP(lValAlloc());
-	ret->type           = ltLambda;
+	lVal *ret = RVP(lValAlloc(ltLambda));
 	ret->vClosure       = lClosureNew(parent);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;

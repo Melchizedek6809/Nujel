@@ -10,8 +10,7 @@
 #include "../type/closure.h"
 
 static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
-	lVal *v = lRootsValPush(lValAlloc());
-	v->type   = ltNativeFunc;
+	lVal *v = lRootsValPush(lValAlloc(ltNativeFunc));
 	v->vNFunc = lNFuncAlloc();
 
 	v->vNFunc->fp   = func;

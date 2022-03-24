@@ -9,7 +9,7 @@ extern uint  lValActive;
 extern lVal *lValFFree;
 
 void      lValInit  ();
-lVal     *lValAlloc ();
+lVal     *lValAlloc (lType t);
 void      lValFree  (lVal *v);
 
 static inline int lValIndex(const lVal *v){return v - lValList;}
