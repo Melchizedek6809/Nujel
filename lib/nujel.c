@@ -190,6 +190,7 @@ lVal *lEval(lClosure *c, lVal *v){
 			}}
 		}
 	}}
+	return NULL;
 }
 
 /* Evaluate func for every entry in list v and return a list containing the results */
