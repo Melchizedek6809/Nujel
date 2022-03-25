@@ -189,7 +189,7 @@
                                         bytecompile
                                         assemble*]]]
 
-[defmacro defund [name args . body]
+[defmacro defnd [name args . body]
               "Define a new bytecoded function"
               [def doc-string [if-not [string? [car body]] ""
                                       [car body]]]

@@ -186,49 +186,16 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
+#define ALLOC_MAX MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax)))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
-	for(uint i=0;i<lValMax;i++){
-		if(lValMarkMap[i]){
-			lValMarkMap[i] = 0;
-		}else{
-			lValFree(&lValList[i]);
-		}
-	}
-	for(uint i=0;i<lClosureMax;i++){
-		if(lClosureMarkMap[i]){
-			lClosureMarkMap[i] = 0;
-		}else{
-			lClosureFree(&lClosureList[i]);
-		}
-	}
-	for(uint i=0;i<lStringMax;i++){
-		if(lStringMarkMap[i]){
-			lStringMarkMap[i] = 0;
-		}else{
-			lStringFree(&lStringList[i]);
-		}
-	}
-	for(uint i=0;i<lSymbolMax;i++){
-		if(lSymbolMarkMap[i]){
-			lSymbolMarkMap[i] = 0;
-		}else{
-			lSymbolFree(&lSymbolList[i]);
-		}
-	}
-	for(uint i=0;i<lArrayMax;i++){
-		if(lArrayMarkMap[i]){
-			lArrayMarkMap[i] = 0;
-		}else{
-			lArrayFree(&lArrayList[i]);
-		}
-	}
-	for(uint i=0;i<lTreeMax;i++){
-		if(lTreeMarkMap[i]){
-			lTreeMarkMap[i] = 0;
-		}else{
-			lTreeFree(&lTreeList[i]);
-		}
+	for(uint i=0;i<ALLOC_MAX;i++){
+		if(i < lValMax)    {lValMarkMap[i]     ? lValMarkMap[i]     = 0 : lValFree(&lValList[i]);}
+		if(i < lClosureMax){lClosureMarkMap[i] ? lClosureMarkMap[i] = 0 : lClosureFree(&lClosureList[i]);}
+		if(i < lStringMax) {lStringMarkMap[i]  ? lStringMarkMap[i]  = 0 : lStringFree(&lStringList[i]);}
+		if(i < lSymbolMax) {lSymbolMarkMap[i]  ? lSymbolMarkMap[i]  = 0 : lSymbolFree(&lSymbolList[i]);}
+		if(i < lArrayMax)  {lArrayMarkMap[i]   ? lArrayMarkMap[i]   = 0 : lArrayFree(&lArrayList[i]);}
+		if(i < lTreeMax)   {lTreeMarkMap[i]    ? lTreeMarkMap[i]    = 0 : lTreeFree(&lTreeList[i]);}
 	}
 	if(sweeperChain != NULL){sweeperChain();}
 }
@@ -236,25 +203,8 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
-	const int bva   = lValActive;
-	const int bca   = lClosureActive;
-	const int baa   = lArrayActive;
-	const int bsa   = lStringActive;
-	const int bta   = lTreeActive;
-	const u64 start = getMSecs();
-
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
-	if(lVerbose){
-		const u64 end = getMSecs();
-		pf("== Garbage Collection #%u took %ims ==\n",lGCRuns,(i64)(end-start));
-		pf("Vals: %u -> %u [Δ %i]{Σ %i}\n",(i64)bva,(i64)lValActive,    (i64)lValActive     - bva, (i64)lValMax);
-		pf("Clos: %u -> %u [Δ %i]{Σ %i}\n",(i64)bca,(i64)lClosureActive,(i64)lClosureActive - bca, (i64)lClosureMax);
-		pf("Strs: %u -> %u [Δ %i]{Σ %i}\n",(i64)bsa,(i64)lStringActive, (i64)lStringActive  - bsa, (i64)lStringMax);
-		pf("Arrs: %u -> %u [Δ %i]{Σ %i}\n",(i64)baa,(i64)lArrayActive,  (i64)lArrayActive   - baa, (i64)lArrayMax);
-		pf("Tres: %u -> %u [Δ %i]{Σ %i}\n",(i64)bta,(i64)lTreeActive,   (i64)lTreeActive    - bta, (i64)lTreeMax);
-		pf("--------------\n\n");
-	}
         lCheckBreak();
 }

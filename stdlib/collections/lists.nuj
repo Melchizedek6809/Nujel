@@ -15,7 +15,9 @@
 
 [defun last-pair [l]
        "Return the last pair of l"
-       [while [cdr l] [cdr! l]] l]
+       [while [cdr l]
+              [cdr! l]]
+       l]
 
 [defun make-list [number value]
        "Return a list of NUMBER elements containing VALUE in every car"
