@@ -11,44 +11,6 @@
 
 #include <string.h>
 
-typedef enum lOpcode {
-	lopNOP             =  0x0,
-	lopRet             =  0x1,
-	lopIntByte         =  0x2,
-	lopIntAdd          =  0x3,
-	lopDebugPrintStack =  0x4,
-	lopPushLVal        =  0x5,
-	lopMakeList        =  0x6,
-	lopEval            =  0x7,
-	lopApply           =  0x8,
-	lopJmp             =  0x9,
-	lopJt              =  0xA,
-	lopJf              =  0xB,
-	lopDup             =  0xC,
-	lopDrop            =  0xD,
-	lopDef             =  0xE,
-	lopSet             =  0xF,
-	lopGet             = 0x10,
-	lopLambda          = 0x11,
-	lopMacro           = 0x12,
-	lopClosurePush     = 0x13,
-	lopClosureEnter    = 0x14,
-	lopLet             = 0x15,
-	lopClosurePop      = 0x16,
-	lopCall            = 0x17,
-	lopTry             = 0x18,
-	lopThrow           = 0x19,
-	lopApplyDynamic    = 0x1A,
-	lopRootsPush       = 0x1B,
-	lopRootsPop        = 0x1C,
-	lopRootsPeek       = 0x1D,
-	lopLessPred        = 0x1E,
-	lopLessEqPred      = 0x1F,
-	lopEqualPred       = 0x20,
-	lopGreaterEqPred   = 0x21,
-	lopGreaterPred     = 0x22,
-} lOpcode;
-
 int pushList(lVal **stack, int sp, lVal *args){
 	if(!args){return sp;}
 	sp = pushList(stack, sp, lCdr(args));
@@ -433,17 +395,23 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 		case lopDef:
 		case lopGet:
 		case lopSet:
+			if(&c[3] >= v->dataEnd){break;}
 			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
-		case lopLambda:
 		case lopApply:
+			if(&c[4] >= v->dataEnd){break;}
+			lValGCMark(lIndexVal((c[ 2] << 16) | (c[ 3] << 8) | c[ 4]));
+			break;
+		case lopLambda:
 		case lopMacro:
+			if(&c[12] >= v->dataEnd){break;}
 			lValGCMark(lIndexVal((c[ 1] << 16) | (c[ 2] << 8) | c[ 3]));
 			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));
 			lValGCMark(lIndexVal((c[ 7] << 16) | (c[ 8] << 8) | c[ 9]));
 			lValGCMark(lIndexVal((c[10] << 16) | (c[11] << 8) | c[12]));
 			break;
 		case lopPushLVal:
+			if(&c[3] >= v->dataEnd){break;}
 			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		}

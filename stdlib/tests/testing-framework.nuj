@@ -91,13 +91,13 @@
        [display-results]
        error-count]
 
-[defun test-run [output-passes hide-errors run-bytecode]
+[defun test-run [output-passes hide-errors]
        "Run through all automated Tests"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
        [test-run-real test-default]]
 
-[defun test-run-bytecode [output-passes hide-errors run-bytecode]
+[defun test-run-bytecode [output-passes hide-errors]
        "Run through all automated Tests"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]

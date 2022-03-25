@@ -6,6 +6,7 @@
 #include "../allocation/native-function.h"
 #include "../allocation/symbol.h"
 #include "../collection/list.h"
+#include "../type/bytecode.h"
 
 #include <float.h>
 #include <math.h>
@@ -56,14 +57,63 @@ static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 	return spf(cur, bufEnd, "]");
 }
 
+static char getHexChar(int c){
+	c &= 0xF;
+	return (c < 0xA) ? '0' + c : 'A' + (c - 10);
+}
+
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
-	cur = spf(cur, bufEnd, "#[");
+	cur = spf(cur, bufEnd, "#{");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
-			cur = spf(cur, bufEnd, "#$%x%s", (i64)(*c & 0xFF), (c < (v->dataEnd - 1)) ? " " : "");
+			cur = spf(cur, bufEnd, "%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
+			switch(*c){
+			case lopDef:
+			case lopGet:
+			case lopSet: {
+				if(&c[3] < v->dataEnd){
+					lSymbol *sym = lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]);
+					cur = spf(cur, bufEnd, "s %s ", sym->c);
+				}
+				c+=3;
+				break;}
+			case lopApply: {
+				if(&c[4] < v->dataEnd){
+					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
+					lVal *tv = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
+					cur = spf(cur, bufEnd, "v %V ", tv);
+				}
+				c+=4;
+				break;}
+			case lopLambda:
+			case lopMacro: {
+				if(&c[12] >= v->dataEnd){
+					c+=12;
+					break;
+				}
+				for(int i=0;i<4;i++){
+					lVal *tv = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
+					cur = spf(cur, bufEnd, "v %V ", tv);
+					c+=3;
+				}
+				break;}
+			case lopIntByte: {
+				if(&c[1] < v->dataEnd){
+					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
+				}
+				c++;
+				break;}
+			case lopPushLVal: {
+				if(&c[3] < v->dataEnd){
+					lVal *tv = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
+					cur = spf(cur, bufEnd, "v %V ", tv);
+				}
+				c+=3;
+				break;}
+			}
 		}
 	}
-	return spf(cur, bufEnd, "]");
+	return spf(cur, bufEnd, "}");
 }
 
 static char *writePair(char *cur, char *bufEnd, const lVal *v){
