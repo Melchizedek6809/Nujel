@@ -160,8 +160,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		printStack(stack, sp, cloStack, csp);
 		ip++;
 		break;
-	case lopPushLVal: {
+	case lopPushLVal:
 		ip = lBytecodeReadOPVal(ip+1, &stack[sp++]);
+		break;
+	case lopPushSymbol: {
+		lSymbol *sym;
+		ip = lBytecodeReadOPSym(ip+1, &sym);
+		stack[sp++] = lValSymS(sym);
 		break;}
 	case lopMakeList: {
 		const int len = *++ip;
@@ -375,6 +380,7 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 	case lopJf:
 	case lopJt:
 		return 3;
+	case lopPushSymbol:
 	case lopDef:
 	case lopSet:
 	case lopGet:
@@ -392,6 +398,7 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){
 		default: break;
+		case lopPushSymbol:
 		case lopDef:
 		case lopGet:
 		case lopSet:
@@ -416,5 +423,37 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 			break;
 		}
 	}
+}
 
+/* Links a bytecode array, mostly used after serializing and deserializing
+ * a function */
+void lBytecodeLink(lClosure *clo){
+	lBytecodeArray *v = &clo->text->vBytecodeArr;
+	for(lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
+		switch(*c){
+		default: break;
+		case lopApply: {
+			if(&c[4] >= v->dataEnd){break;}
+			lVal *raw = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
+			if((!raw) || (raw->type != ltSymbol)){break;}
+			lVal *n = lGetClosureSym(clo, raw->vSymbol);
+			if(n == raw){break;}
+			int i = lValIndex(n);
+			c[2] = (i >> 16) & 0xFF;
+			c[3] = (i >>  8) & 0xFF;
+			c[4] = (i      ) & 0xFF;
+			break; }
+		case lopPushLVal:
+			if(&c[3] >= v->dataEnd){break;}
+			lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
+			if(raw || (raw->type != ltSymbol)){break;}
+			lVal *n = lGetClosureSym(clo, raw->vSymbol);
+			if(n == raw){break;}
+			int i = lValIndex(n);
+			c[1] = (i >> 16) & 0xFF;
+			c[2] = (i >>  8) & 0xFF;
+			c[3] = (i      ) & 0xFF;
+			break;
+		}
+	}
 }

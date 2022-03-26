@@ -47,6 +47,10 @@
        "- v | Pushes v onto the stack"
        [list #$5 [val->bytecode-op v]]]
 
+[defun $push/symbol [v]
+       "- v | Pushes v onto the stack"
+       [list #$23 [sym->bytecode-op v]]]
+
 [defun $make-list [item-count]
        "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list"
        [list #$6 [int->bytecode-op item-count]]]

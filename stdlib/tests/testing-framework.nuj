@@ -103,10 +103,10 @@
        [set! print-passes  [bool output-passes]]
        [test-run-real test-bytecode]]
 
-[defun test-run-forked [\ [nujel-runtime output-passes hide-errors]
+[defun test-run-forked [nujel-runtime output-passes hide-errors]
        "Run through all automated Tests in a separate runtime"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
-       [test-run-real [test-forked nujel-runtime]]]]
+       [test-run-real [test-forked nujel-runtime]]]
 
 ; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

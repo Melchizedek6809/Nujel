@@ -231,7 +231,7 @@ static lVal *lnfLambdaAst(lClosure *c, lVal *v){
 /* Handler for [λδ name [..args] docstring body] */
 static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
 	lVal *ret = lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
-	ret->vClosure->type = closureBytecoded;
+	ret->vClosure->type = closureUnlinkedBytecode;
 	return ret;
 }
 

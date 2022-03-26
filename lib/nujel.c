@@ -78,7 +78,10 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 		}
 	}
 	lVal *ret;
-	if(lambda->vClosure->type == closureBytecoded){
+	if(lambda->vClosure->type == closureUnlinkedBytecode){
+		lBytecodeLink(lambda->vClosure);
+		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr);
+	}else if(lambda->vClosure->type == closureBytecoded){
 		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr);
 	}else{
 		ret = lEval(tmpc,lambda->vClosure->text);

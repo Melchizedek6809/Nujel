@@ -132,7 +132,8 @@ typedef enum closureType {
 	closureLet = 4,
 	closureTry = 5,
 	closureRet = 6,
-	closureBytecoded = 7
+	closureBytecoded = 7,
+	closureUnlinkedBytecode = 8
 } closureType;
 
 struct lClosure {

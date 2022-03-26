@@ -16,6 +16,7 @@
 [defun bytecompile/quote [source]
        [case [type-of source]
              [:int      [$push/int source]]
+             [:symbol   [$push/symbol source]]
              [otherwise [$push/lval source]]]]
 
 [defun bytecompile/do/form [source env]
