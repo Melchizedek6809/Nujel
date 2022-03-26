@@ -23,7 +23,8 @@ var Module = {
 		nujel = (line) => {
 			return nujelRun(line);
 		};
-		NujelREPL(document.getElementById("nujel-repl-wrapper"),{run: nujelRun, read: nujelRead});
+		const repl = NujelREPL(document.getElementById("nujel-repl-wrapper"),{run: nujelRun, read: nujelRead});
+		NujelEditor(document.getElementById("nujel-editor-wrapper"),{file: "*scratch-buffer*", repl});
 	}],
 	print: function(text) {
 		stdoutBuffer += text;

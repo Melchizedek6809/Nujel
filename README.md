@@ -6,6 +6,8 @@ While Nujel is still very early in development, and for the most part just a ter
 rapidly. Even though the language is still very much in flux, the following points might give
 you an idea as to which direction Nujel is going in and which tradeoffs have been made.
 
+If you want to give it a spin, you can try out a current [WASM Build](https://wolkenwelten.net/nujel/).
+
 ### GitHub CI (Windows/MacOS/Ubuntu)
 | Master | Develop   |
 |--------|-----------|

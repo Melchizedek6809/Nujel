@@ -9,8 +9,13 @@
 		<link rel="icon" type="image/png" href="favicon.png" sizes="32x32"/>
 	</head>
 	<body>
-		<div id="nujel-editor-wrapper"></div>
-		<div id="nujel-repl-wrapper"></div>
+		<div id="nujel-wrapper">
+			<div id="nujel-editor-wrapper" class="nujel-editor">
+				<div class="nujel-editor-title"></div>
+				<div class="nujel-editor-content" contenteditable=true spellcheck="false"></div>
+			</div>
+			<div id="nujel-repl-wrapper"></div>
+		</div>
 		<script type="text/javascript" src="repl.js"></script>
 		<script type="text/javascript" src="editor.js"></script>
 		<script type="text/javascript" src="emnujel.js"></script>

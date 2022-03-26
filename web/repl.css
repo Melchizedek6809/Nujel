@@ -11,10 +11,32 @@ body,html {
 	position:relative;
 }
 
-#nujel-repl-wrapper {
+#nujel-wrapper {
+	width:100%;
 	height:100%;
-	background:#282c34;
+}
+
+#nujel-wrapper::after {
+	content:'';
+	display:block;
 	position:relative;
+	clear:both;
+}
+
+#nujel-editor-wrapper {
+	width:50%;
+	height:100%;
+	background:#1f1f1f;
+	position:relative;
+	float:left;
+}
+
+#nujel-repl-wrapper {
+	width:50%;
+	height:100%;
+	background:#161616;
+	position:relative;
+	float:right;
 }
 
 .nujel-repl {
@@ -25,26 +47,6 @@ body,html {
 	white-space:pre;
 	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
 	outline:none;
-}
-
-#nujel-repl-wrapper::after,
-#nujel-repl-wrapper::before {
-	content:"λ";
-	position:absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%,-50%);
-	display:block;
-	opacity:0.02;
-	z-index:0;
-	font-size:80vh;
-	color:#00f;
-	margin-left:-1vw;
-}
-
-#nujel-repl-wrapper::after {
-	color:#f00;
-	margin-left:1vw;
 }
 
 .nujel-repl-buffer {
@@ -83,7 +85,7 @@ input.nujel-repl {
 	height:2em;
 	line-height:1.35em;
 	padding:0 0.25em;
-	background:#383e4a;
+	background:#1f1f1f;
 	color:#f8f8f0;
 	position:absolute;
 	bottom:0;

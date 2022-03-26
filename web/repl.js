@@ -7,6 +7,7 @@ const NujelREPL = (ele, nuj) => {
 	ele.appendChild(output);
 	ele.appendChild(input);
 
+	let editorFocus = null;
 	let history = [];
 	let historyCurrent = null;
 	let historySelection = -1;
@@ -129,13 +130,17 @@ const NujelREPL = (ele, nuj) => {
 		output.scrollTop = output.scrollHeight;
 	};
 
+	const runForm = (form, echo=true) => {
+		const result = nuj.run(form);
+		echo && outputWriteInput(form);
+		outputWrite(nuj.read() + result);
+		echo && historyAdd(form);
+		return result;
+	}
+
 	input.addEventListener("keypress",(ev) => {
 		if(ev.code === "Enter"){
-			const currentLine = input.value;
-			const result = nuj.run(currentLine);
-			outputWriteInput(input.value);
-			outputWrite(nuj.read() + result);
-			historyAdd(input.value);
+			runForm(input.value);
 			input.value = "";
 		}
 	});
@@ -149,8 +154,22 @@ const NujelREPL = (ele, nuj) => {
 				historyNext();
 				break;
 		}
+		if((ev.keyCode == 90) && ev.ctrlKey){
+			ev.preventDefault();
+			console.log("OI!");
+			editorFocus && editorFocus();
+		}
 	});
+	ele.addEventListener("click", () => input.focus());
+	output.addEventListener("click", e => e.stopPropagation());
 
 	input.focus();
 	outputWrite(nuj.read());
+
+	return {
+		focus: () => input.focus(),
+		eval: form => nuj.run(form),
+		sendForm: runForm,
+		setEditorFocus: λ => editorFocus = λ
+	}
 };
