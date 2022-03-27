@@ -1,4 +1,4 @@
-Why not CLISP?
+What about CLISP?
 --------------------------------------------------------------
 
 CLISP is another Common Lisp implementation that might be usable as a scripting system for WolkenWelten, since it

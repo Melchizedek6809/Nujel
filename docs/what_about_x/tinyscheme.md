@@ -1,4 +1,4 @@
-Why not tinyscheme?
+What aboutW tinyscheme?
 ----------------------------------------------
 
 I tried out tinyscheme 1.41 and am quite impressed by how tight everything is, compile times are nearly instantaneous. But runtime performance is not where I would like it to be and the standard library included is a bit too minimalistic for me.

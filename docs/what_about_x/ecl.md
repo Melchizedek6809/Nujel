@@ -1,4 +1,4 @@
-ECL?
+What about ECL?
 ---------------------------------------------------------
 
 I tried out ECL 21.2.1 and have to say I am very impressed overall! I am a bit disappointed in the overall performance, since interpreted functions seem just a bit faster than Nujel and while compiled functions are quite fast, the compiler is very slow, probably because as far as I understood it is generating C code, executing the system's C Compiler to create a .so/.dll and then dlopen it afterwards, but this seems to result in Issues on platforms like MacOS/Windows where a C compiler is quite unlikely, or even worse: WASM, where a C compiler in just plain unavailable.
