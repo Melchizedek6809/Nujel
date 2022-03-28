@@ -66,3 +66,11 @@
 [defun caddddr [p]
        "[car [cdr [cdr [cdr p]]]]"
        [car [cdr [cdr [cdr [cdr p]]]]]]
+
+[defun keyword->string [α]
+       [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]
+       [sym->str [keyword->symbol α]]]
+
+[defun string->keyword [α]
+       [when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]]
+       [symbol->keyword [str->sym α]]]

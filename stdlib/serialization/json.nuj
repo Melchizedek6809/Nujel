@@ -1,0 +1,22 @@
+; Contains subroutines for (de-)serializing JSON
+[defun tree->json [v]
+       "Converts a tree into a JSON encoded string, you should prefer VAL->JSON"
+       [cat "{"
+            [join [map [tree/keys v]
+                       [λ [k]
+                          [cat "\"" [keyword->string k] "\":" [val->json [tree/ref v k]]]]]
+                  ","]
+            "}"]]
+
+[defun val->json [v]
+       "Return V as a JSON encoded string"
+       [case [type-of v]
+             [:nil "null"]
+             [[:int :float] [string v]]
+             [:bool [if v "true" "false"]]
+             [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]]
+             [:string [str/write v]]
+             [:symbol [cat "\"" [sym->str v] "\""]]
+             [:keyword [cat "\"" [keyword->string v] "\""]]
+             [:tree [tree->json v]]
+             [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]
