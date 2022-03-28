@@ -14,12 +14,41 @@
 .nujel-filebrowser-buffer {
 	padding:0.25rem 0.5rem;
 	cursor:pointer;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space:nowrap;
+	box-sizing: border-box;
 }
 
 .nujel-filebrowser-buffer::before {
 	content:'🗋';
 	display:inline-block;
 	margin-right:0.5rem;
+}
+
+.nujel-filebrowser-directory-title {
+	display:block;
+	cursor:pointer;
+}
+
+.nujel-filebrowser-directory-children {
+	display:none;
+	padding-left:1.5rem;
+}
+
+.nujel-filebrowser-directory-children.active {
+	display:block;
+}
+
+.nujel-filebrowser-directory-title::before {
+	content: '📁';
+	display:inline-block;
+	margin-right:0.5rem;
+}
+
+.nujel-filebrowser-directory-title.active::before {
+	content: '📂';
 }
 
 .nujel-filebrowser-buffer.active {
@@ -34,4 +63,28 @@
 	padding:0 0.25rem;
 	box-sizing:border-box;
 	margin-bottom:0.25rem;
+}
+
+.nujel-filebrowser-files {
+	scrollbar-width: auto;
+	scrollbar-color: #2e2e2e #1f1f1f;
+	overflow-y: scroll;
+	height:calc(100% - 1.5rem - 1px);
+	width:100%;
+    position: absolute;
+    left: 0;
+    top: calc(1.5rem + 1px);
+}
+
+.nujel-filebrowser-files::-webkit-scrollbar {
+	width: 1rem;
+}
+
+.nujel-filebrowser-files::-webkit-scrollbar-track {
+	background: #1f1f1f;
+}
+
+.nujel-filebrowser-files::-webkit-scrollbar-thumb {
+	background-color:#2e2e2e;
+	border: none;
 }

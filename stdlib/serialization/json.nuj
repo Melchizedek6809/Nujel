@@ -4,8 +4,8 @@
        [cat "{"
             [join [map [tree/keys v]
                        [λ [k]
-                          [cat "\"" [keyword->string k] "\":" [val->json [tree/ref v k]]]]]
-                  ","]
+                          [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]]
+                  ",\n"]
             "}"]]
 
 [defun val->json [v]

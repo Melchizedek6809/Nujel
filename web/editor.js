@@ -27,6 +27,13 @@ const NujelEditor = (ele, opts) => {
 		$titleFolderCrumbs.innerText = buf.name;
 	};
 
+	const evalBuffer = () => {
+		repl.sendForm($content.innerText,false);
+		$content.classList.add("visual-bell");
+		$content.offsetHeight;
+		$content.classList.remove("visual-bell");
+	};
+
 	$content.addEventListener("input", e => {
 		buf.content = $content.innerText;
 		files.queueSave(buf.name);
@@ -46,10 +53,7 @@ const NujelEditor = (ele, opts) => {
 		}
 		if((e.keyCode == 67) && e.ctrlKey && e.altKey){
 			e.preventDefault();
-			repl.sendForm($content.innerText,false);
-			$content.classList.add("visual-bell");
-			$content.offsetHeight;
-			$content.classList.remove("visual-bell");
+			evalBuffer();
 		}
 	});
 
@@ -71,11 +75,16 @@ const NujelEditor = (ele, opts) => {
 		sel.addRange(buf.range);
 	};
 
+	const getCurrentBuffer = () => buf;
+
 	openBuffer(opts.file);
 	repl.setEditorFocus(refocus);
+	repl.setEvalBuffer(evalBuffer);
 	files.setSwitchBuffer(openBuffer);
 
 	return {
-		openBuffer
+		evalBuffer,
+		openBuffer,
+		getCurrentBuffer
 	};
 }

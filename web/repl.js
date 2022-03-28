@@ -8,6 +8,7 @@ const NujelREPL = (ele, nuj) => {
 	ele.appendChild(input);
 
 	let editorFocus = null;
+	let evalBuffer = null;
 	let history = [];
 	let historyCurrent = null;
 	let historySelection = -1;
@@ -159,6 +160,10 @@ const NujelREPL = (ele, nuj) => {
 			console.log("OI!");
 			editorFocus && editorFocus();
 		}
+		if((ev.keyCode == 67) && ev.ctrlKey && ev.altKey){
+			ev.preventDefault();
+			evalBuffer();
+		}
 	});
 	ele.addEventListener("click", () => input.focus());
 	output.addEventListener("click", e => e.stopPropagation());
@@ -170,6 +175,7 @@ const NujelREPL = (ele, nuj) => {
 		focus: () => input.focus(),
 		eval: form => nuj.run(form),
 		sendForm: runForm,
-		setEditorFocus: λ => editorFocus = λ
+		setEditorFocus: λ => editorFocus = λ,
+		setEvalBuffer: λ => evalBuffer = λ
 	}
 };

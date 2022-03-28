@@ -57,3 +57,5 @@ gmon.out
 /web/index.wasm
 /web/index.wasm
 /.vs
+
+/web/filesystem.json

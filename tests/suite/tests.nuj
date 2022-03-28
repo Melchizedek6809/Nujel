@@ -346,7 +346,7 @@
 [test/add #\cr [char-at "\r" 0]]
 [test/add #x09 [char-at "\t" 0]]
 [test/add #x0B [char-at "\v" 0]]
-[test/add #x27 [char-at "\'" 0]]
+[test/add #x27 [char-at "'" 0]]
 [test/add #x22 [char-at "\"" 0]]
 [test/add #t [> [symbol-count] 200]] ; Probably not gonna shrink over time
 [test/add #t [== + +]]
@@ -1289,7 +1289,7 @@
 [test/add "\"asd\"" [val->json 'asd]]
 [test/add "\"asd\"" [val->json :asd]]
 [test/add "\"asd\"" [val->json "asd"]]
-[test/add "{\"asd\":123,\"qwe\":true}" [val->json @[asd: 123 qwe: #t]]]
+[test/add "{\"asd\": 123,\n\"qwe\": true}" [val->json @[asd: 123 qwe: #t]]]
 [test/add "asd" [keyword->string asd:]]
 [test/add :asd [string->keyword "asd"]]
 [test/add :type-error [try car [keyword->string 'asd]]]
