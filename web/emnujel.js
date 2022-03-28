@@ -24,7 +24,8 @@ var Module = {
 			return nujelRun(line);
 		};
 		const repl = NujelREPL(document.getElementById("nujel-repl-wrapper"),{run: nujelRun, read: nujelRead});
-		NujelEditor(document.getElementById("nujel-editor-wrapper"),{file: "*scratch-buffer*", repl});
+		const files = NujelFilebrowser(document.getElementById("nujel-filebrowser-wrapper",{}));
+		NujelEditor(document.getElementById("nujel-editor-wrapper"),{file: "*scratch-buffer*", files, repl});
 	}],
 	print: function(text) {
 		stdoutBuffer += text;

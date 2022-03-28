@@ -26,6 +26,8 @@
 	cursor:text;
 	height:calc(100% - 1.5rem);
 	outline:none;
+	white-space:pre;
+	transition:background-color 350ms;
 }
 
 .nujel-editor-title {
@@ -33,5 +35,14 @@
 	font-size:0.8em;
 	color: #abb2bf;
 	line-height:1rem;
+}
+
+.nujel-editor-title-crumbs {
+	display:inline-block;
 	padding:0.25rem 0.5rem;
+}
+
+.nujel-editor-content.visual-bell {
+	transition:none;
+	background-color: #1e2038;
 }

@@ -23,6 +23,16 @@ body,html {
 	clear:both;
 }
 
+#nujel-filebrowser-wrapper {
+	width:15%;
+	height:100%;
+	background:#161616;
+	position:relative;
+	float:left;
+	border-right: solid 1px #007acc;
+	box-sizing:border-box;
+}
+
 #nujel-editor-wrapper {
 	width:50%;
 	height:100%;
@@ -32,7 +42,7 @@ body,html {
 }
 
 #nujel-repl-wrapper {
-	width:50%;
+	width:35%;
 	height:100%;
 	background:#161616;
 	position:relative;

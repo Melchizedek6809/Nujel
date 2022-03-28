@@ -1,33 +1,35 @@
 const NujelEditor = (ele, opts) => {
+	ele.classList.add('nujel-editor');
 	let activeFile = null;
-	const buffers = {};
-	const {repl} = opts;
-	let buf = null;
-	const $content = ele.querySelector(".nujel-editor-content");
-	const $title = ele.querySelector(".nujel-editor-title");
+	const buffers  = {};
+	const {repl, files} = opts;
+	let buf        = null;
 
-	const newBuffer = name => ({
-		title: name,
-		range: null,
-		content: `; This is a scratch buffer, nothing here will be saved
-; But you can use it to experiment with Nujel!
-;
-; Ctrl-Alt-c Evaluates the entire buffer
-; Ctrl-Z switches between the Editor and REPL.`});
-/*
-; Alt-Return sends the current top-level Form to the repl
-; Ctrl-Return for the current form
-*/
+	const $title   = document.createElement("DIV");
+	$title.classList.add("nujel-editor-title");
+	const $titleFolderIcon = document.createElement("DIV");
+	$titleFolderIcon.classList.add("nujel-editor-title-folder");
+	const $titleFolderCrumbs = document.createElement("DIV");
+	$titleFolderCrumbs.classList.add("nujel-editor-title-crumbs");
+	$title.append($titleFolderIcon);
+	$title.append($titleFolderCrumbs);
+	const $content = document.createElement("DIV");
+	$content.classList.add("nujel-editor-content");
+	$content.setAttribute("contenteditable",true);
+	$content.setAttribute("spellcheck","false");
+	ele.append($title);
+	ele.append($content);
+
 
 	const openBuffer = name => {
-		if(!buffers[name]){buffers[name] = newBuffer(name);}
-		buf = buffers[name];
+		buf = files.getBuffer(name);
 		$content.innerText = buf.content;
-		$title.innerText = buf.title;
+		$titleFolderCrumbs.innerText = buf.name;
 	};
 
 	$content.addEventListener("input", e => {
-
+		buf.content = $content.innerText;
+		files.queueSave(buf.name);
 	});
 	$content.addEventListener("keydown", e => {
 		if ((e.keyCode == 10 || e.keyCode == 13)){
@@ -45,6 +47,9 @@ const NujelEditor = (ele, opts) => {
 		if((e.keyCode == 67) && e.ctrlKey && e.altKey){
 			e.preventDefault();
 			repl.sendForm($content.innerText,false);
+			$content.classList.add("visual-bell");
+			$content.offsetHeight;
+			$content.classList.remove("visual-bell");
 		}
 	});
 
@@ -56,9 +61,21 @@ const NujelEditor = (ele, opts) => {
 		$content.focus();
 		const sel = window.getSelection();
 		sel.removeAllRanges();
-		buf.range && sel.addRange(buf.range);
+		if(!buf.range){
+			buf.range = new Range();
+			const node = $content.childNodes[$content.childNodes.length-1];
+			buf.range.setStartAfter(node);
+			buf.range.setEndAfter(node);
+			buf.range.collapse();
+		}
+		sel.addRange(buf.range);
 	};
 
 	openBuffer(opts.file);
 	repl.setEditorFocus(refocus);
+	files.setSwitchBuffer(openBuffer);
+
+	return {
+		openBuffer
+	};
 }

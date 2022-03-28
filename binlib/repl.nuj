@@ -115,7 +115,7 @@
            repl/parse-args/run-repl]]
 
 [defun repl/init/wasm [args]
-       [println [cat "Die " [ansi-rainbow "Nujel"] " Lese-Auswertungs-Druck-Schlaufe ist zu allen Schandtaten bereit!"]]]
+       [println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]
 
 [defun repl/init/bin [args]
        [try repl/exception-handler

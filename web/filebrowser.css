@@ -1,0 +1,37 @@
+.nujel-editor-title-folder {
+	display:inline-block;
+	background:#007acc;
+	cursor:pointer;
+	padding:0 1em;
+	line-height:1.5rem;
+}
+
+.nujel-editor-title-folder::before {
+	content: '📁';
+	font-size:1rem;
+}
+
+.nujel-filebrowser-buffer {
+	padding:0.25rem 0.5rem;
+	cursor:pointer;
+}
+
+.nujel-filebrowser-buffer::before {
+	content:'🗋';
+	display:inline-block;
+	margin-right:0.5rem;
+}
+
+.nujel-filebrowser-buffer.active {
+	color:#007acc;
+}
+
+.nujel-filebrowser-titlebar {
+	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
+	line-height:1.5rem;
+	border-bottom:solid 1px #007acc;
+	display:block;
+	padding:0 0.25rem;
+	box-sizing:border-box;
+	margin-bottom:0.25rem;
+}
