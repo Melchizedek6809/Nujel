@@ -113,14 +113,14 @@ static lVal *lnfFileRead(lClosure *c, lVal *v){
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	(void)c;
 	const char *filename = castToString(lCadr(v),NULL);
-	const lVal *contentV = lCar(v);
+	lVal *contentV = lCar(v);
 	if((filename == NULL) || (contentV == NULL) || (contentV->type != ltString)){
 		lExceptionThrowValClo("type-error", "[file/write] expects two strings as arguments", v, c);
 	}
 	lString *content = contentV->vString;
 	const i64 len = content->bufEnd - content->buf;
 	saveFile(filename,content->data, len);
-	return NULL;
+	return contentV;
 }
 
 static lVal *lnfFileRemove(lClosure *c, lVal *v){
