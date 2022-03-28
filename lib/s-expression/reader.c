@@ -113,9 +113,6 @@ static lVal *lParseString(lString *s){
 			case '"':
 				*b++ = '"';
 				break;
-			case '\'':
-				*b++ = '\'';
-				break;
 			case '\\':
 				*b++ = '\\';
 				break;

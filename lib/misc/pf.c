@@ -267,9 +267,6 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 		case '"':
 			*cur++ = '\\'; *cur++ = '"';
 			break;
-		case '\'':
-			*cur++ = '\\'; *cur++ = '\'';
-			break;
 		case '\\':
 			*cur++ = '\\'; *cur++ = '\\';
 			break;
