@@ -112,14 +112,12 @@ static lVal *lnfFileRead(lClosure *c, lVal *v){
 
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	(void)c;
-	const char *filename = castToString(lCar(v),NULL);
-	lVal *cv  = lCadr(v);
-	if((filename == NULL)
-	   || (cv == NULL)
-	   || (cv->type != ltString)){
-		return NULL;
+	const char *filename = castToString(lCadr(v),NULL);
+	const lVal *contentV = lCar(v);
+	if((filename == NULL) || (contentV == NULL) || (contentV->type != ltString)){
+		lExceptionThrowValClo("type-error", "[file/write] expects two strings as arguments", v, c);
 	}
-	lString *content = cv->vString;
+	lString *content = contentV->vString;
 	const i64 len = content->bufEnd - content->buf;
 	saveFile(filename,content->data, len);
 	return NULL;
@@ -329,7 +327,7 @@ void lOperationsIO(lClosure *c){
 
 
 	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
-	lAddNativeFunc(c,"file/write",       "[path content]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
+	lAddNativeFunc(c,"file/write",       "[content path]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
 	lAddNativeFunc(c,"file/remove",      "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
 	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);

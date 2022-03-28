@@ -1294,6 +1294,7 @@
 [test/add :asd [string->keyword "asd"]]
 [test/add :type-error [try car [keyword->string 'asd]]]
 [test/add :type-error [try car [string->keyword asd:]]]
+[test/add @[:asd 123] [tree/set! #nil :asd 123]]
 
 ;[test/add "#{02i 1 02i 2 08i 2 v + 01}" [str/write [assemble* [bytecompile '[+ 1 2]]]]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]

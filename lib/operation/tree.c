@@ -98,7 +98,9 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
+	if(car == NULL){
+		car = lValTree(NULL);
+	}else if(car->type != ltTree){
 		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
 		/* Never Returns */
 	}

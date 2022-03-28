@@ -17,8 +17,8 @@
         "Compile a Nujel source file into optimized object code"
         [def source [cons 'do [read [file/read path]]]]
         [def object-code [compile/forms source environment]]
-        [when-not no-write [file/write [cat [path/without-extension path] ".no"]
-                                       [if object-code [str/write object-code] ""]]]
+        [when-not no-write [file/write [if object-code [str/write object-code] ""]
+                                       [cat [path/without-extension path] ".no"]]]
         object-code]
 
 [defun file/eval [path environment]
