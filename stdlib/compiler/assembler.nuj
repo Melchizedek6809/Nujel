@@ -63,6 +63,7 @@
        "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
        [case arg-count 2
              [2 [case fun
+                      [add/int [$add/int]]
                       [< [$<]]
                       [<= [$<=]]
                       [== [$==]]

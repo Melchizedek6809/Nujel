@@ -343,4 +343,6 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"mul", "[a b]", "Return a * b",  lnfMulAst);
 	lAddNativeFunc(c,"div", "[a b]", "Return a / b",  lnfDivAst);
 	lAddNativeFunc(c,"mod", "[a b]", "Return a % b",  lnfModAst);
+
+	lOperationsArithmeticInteger(c);
 }

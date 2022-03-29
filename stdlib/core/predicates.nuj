@@ -29,7 +29,7 @@
 
 [defun even? [a]
         "Predicate that returns #t if a is even"
-        [== [mod [int a] 2] 0]]
+        [== [mod/int [int a] 2] 0]]
 
 [defun zero? [val]
         "#t if VAL is zero"
