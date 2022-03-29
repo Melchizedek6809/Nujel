@@ -12,7 +12,7 @@
 }
 
 .nujel-filebrowser-buffer {
-	padding:0.25rem 0.5rem;
+	padding:0.1rem 0;
 	cursor:pointer;
 	width: 100%;
 	overflow: hidden;
@@ -25,16 +25,20 @@
 	content:'🗋';
 	display:inline-block;
 	margin-right:0.5rem;
+	text-align:center;
+	width:1.6rem;
 }
 
 .nujel-filebrowser-directory-title {
 	display:block;
 	cursor:pointer;
+	user-select:none;
+	padding:0.1rem 0;
 }
 
 .nujel-filebrowser-directory-children {
 	display:none;
-	padding-left:1.5rem;
+	padding-left:0.5rem;
 }
 
 .nujel-filebrowser-directory-children.active {
@@ -45,6 +49,8 @@
 	content: '📁';
 	display:inline-block;
 	margin-right:0.5rem;
+	text-align:center;
+	width:1.6rem;
 }
 
 .nujel-filebrowser-directory-title.active::before {
