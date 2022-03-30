@@ -110,6 +110,18 @@ lVal *lnfTan(lClosure *c, lVal *v){
 	}
 }
 
+lVal *lnfAtanTwo(lClosure *c, lVal *v){
+	lVal *y =  lCar(v);
+	lVal *x = lCadr(v);
+	if((y == NULL) || (x == NULL)){
+		lExceptionThrowValClo("arity-error", "[atan2] expects 2 arguments", v, c);
+	}
+	if((y->type != ltFloat) || (x->type != ltFloat)){
+		lExceptionThrowValClo("type-error", "[atan2] only works on floats", v, c);
+	}
+	return lValFloat(atan2(y->vFloat,x->vFloat));
+}
+
 lVal *lnfVMag(lClosure *c, lVal *v){
 	lVal *t = lCar(lCast(c,v,ltVec));
 	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
@@ -126,6 +138,7 @@ void lOperationsMath(lClosure *c){
 	lAddNativeFunc(c,"sin",  "[a]", "Sin A",                          lnfSin);
 	lAddNativeFunc(c,"cos",  "[a]", "Cos A",                          lnfCos);
 	lAddNativeFunc(c,"tan",  "[a]", "Tan A",                          lnfTan);
+	lAddNativeFunc(c,"atan2","[y x]", "Arc tangent of y/x",           lnfAtanTwo);
 
 	lAddNativeFunc(c,"vec/magnitude","[vec]","Return the magnitude of VEC", lnfVMag);
 }
