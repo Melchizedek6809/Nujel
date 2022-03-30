@@ -132,5 +132,5 @@ void lOperationsArray(lClosure *c){
 	             lAddNativeFunc(c,"array/length!",  "[array size]",  "Set a new LENGTH for ARRAY",                  lnfArrLengthSet);
 	             lAddNativeFunc(c,"array/set!",     "[array index &...values]","Set ARRAY at INDEX to &...VALUES",  lnfArrSet);
 	             lAddNativeFunc(c,"array/allocate", "[size]",     "Allocate a new array of SIZE",                   lnfArrAllocate);
-	             lAddNativeFunc(c,"array/new",      "[...args]",  "Create a new array from ...ARGS",                lnfArrNew);
+	             lAddNativeFunc(c,"array/new",      "args",  "Create a new array from ...ARGS",                lnfArrNew);
 }

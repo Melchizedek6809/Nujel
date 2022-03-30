@@ -331,11 +331,11 @@ lVal *lnfPow(lClosure *c, lVal *v){
 
 void lOperationsArithmeticInteger(lClosure *c);
 void lOperationsArithmetic(lClosure *c){
-	lAddNativeFunc(c,"%", "[...args]", "Modulo",        lnfMod);
-	lAddNativeFunc(c,"/", "[...args]", "Division",      lnfDiv);
-	lAddNativeFunc(c,"*", "[...args]", "Multiplication",lnfMul);
-	lAddNativeFunc(c,"-", "[...args]", "Substraction",  lnfSub);
-	lAddNativeFunc(c,"+", "[...args]", "Addition",      lnfAdd);
+	lAddNativeFunc(c,"%", "args", "Modulo",        lnfMod);
+	lAddNativeFunc(c,"/", "args", "Division",      lnfDiv);
+	lAddNativeFunc(c,"*", "args", "Multiplication",lnfMul);
+	lAddNativeFunc(c,"-", "args", "Substraction",  lnfSub);
+	lAddNativeFunc(c,"+", "args", "Addition",      lnfAdd);
 	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
 	lAddNativeFunc(c,"add", "[a b]", "Return a + b",  lnfAddAst);

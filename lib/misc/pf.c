@@ -231,6 +231,7 @@ static char *writeString(char *buf, char *bufEnd, const char *s){
 	return cur;
 }
 
+
 static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
 	if((cur+1) >= bufEnd){return buf;}
@@ -309,12 +310,20 @@ static char *writeXint(char *buf, char *bufEnd, u64 v){
 static char *writeFloat(char *buf, char *bufEnd, double v){
 	double fract, integer;
 	fract = fabs(modf(v, &integer));
+	fract = round(fract * 100000.0) / 100000.0;
+	if(fract > (1.0-DBL_EPSILON)){
+		fract = 0;
+		if(integer > 0){
+			integer++;
+		}else{
+			integer--;
+		}
+	}
 	char *cur = buf;
 	if((v < 0) && (cur < bufEnd)){*cur++ = '-';}
 	cur = writeInt(cur, bufEnd, (i64)fabs(integer));
 	int zeroes = 0;
 	int digits = 0;
-	fract = round(fract * 100000.0) / 100000.0;
 	while((modf(fract, &integer) > DBL_EPSILON) && (++digits < 7)){
 		fract *= 10.;
 		if((i64)integer == 0){

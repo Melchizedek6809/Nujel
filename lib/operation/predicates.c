@@ -52,12 +52,12 @@ static lVal *lnfKeywordPred(lClosure *c, lVal *v){
 }
 
 void lOperationsPredicate(lClosure *c){
-	lAddNativeFunc(c,"<",    "[α β]","Return true if α is less than β",  lnfLess);
-	lAddNativeFunc(c,"<=",   "[α β]","Return true if α is less or equal to β", lnfLessEqual);
-	lAddNativeFunc(c,"==",   "[α β]","Return true if α is equal to β", lnfEqual);
-	lAddNativeFunc(c,"!=",   "[α β]","Return true if α is not equal to  β", lnfUnequal);
-	lAddNativeFunc(c,">=",   "[α β]","Return true if α is greater or equal than β", lnfGreaterEqual);
-	lAddNativeFunc(c,">",    "[α β]","Return true if α is greater than β",  lnfGreater);
-	lAddNativeFunc(c,"nil?", "[α]",  "Return true if α is #nil", lnfNilPred);
-	lAddNativeFunc(c,"keyword?", "[α]",  "Return true if α is a keyword symbol", lnfKeywordPred);
+	lAddNativeFunc(c,"<",        "[α β]", "Return true if α is less than β",             lnfLess);
+	lAddNativeFunc(c,"<=",       "[α β]", "Return true if α is less or equal to β",      lnfLessEqual);
+	lAddNativeFunc(c,"==",       "[α β]", "Return true if α is equal to β",              lnfEqual);
+	lAddNativeFunc(c,"!=",       "[α β]", "Return true if α is not equal to  β",         lnfUnequal);
+	lAddNativeFunc(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
+	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
+	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
+	lAddNativeFunc(c,"keyword?", "[α]",   "Return true if α is a keyword symbol",        lnfKeywordPred);
 }

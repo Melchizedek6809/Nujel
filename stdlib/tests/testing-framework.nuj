@@ -19,8 +19,6 @@
        "Add a test where EXPR must eval to RESULT"
        `[test/add* ~result ~[list 'quote [cons 'do expr]]]]
 
-[test/add 4 [+ 3 1]]
-
 [defun display-results []
        "Prints the result Message"
        [random/seed-initialize!]
@@ -38,7 +36,7 @@
 [defun test-success [res-should res-is expr i]
        "Should be called after a test has finished successfully"
        [when print-passes
-             [eval '[efmtln "tests/suite/tests.nuj:{i}:1 {} == {}\r\n{}\r\n\r\n"
+             [eval '[efmtln "{} == {}\r\n{}\r\n\r\n"
                             [ansi-green [str/write res-is]]
                             [ansi-green [str/write res-should]]
                             [str/write expr]]]]
@@ -47,7 +45,7 @@
 [defun test-failure [res-should res-is expr i]
        "Should be called if EXPR does not equal RES"
        [when print-errors
-             [eval '[efmtln "tests/suite/tests.nuj:{i}:1 {} != {}\r\n{}\r\n\r\n"
+             [eval '[efmtln "{} != {}\r\n{}\r\n\r\n"
                             [ansi-red [str/write res-is]]
                             [ansi-green [str/write res-should]]
                             [str/write expr]]]]
@@ -109,4 +107,5 @@
        [set! print-passes  [bool output-passes]]
        [test-run-real [test-forked nujel-runtime]]]
 
+[test/add 4 [+ 3 1]] ; Not much of a test, but that way we always have at least one test
 ; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

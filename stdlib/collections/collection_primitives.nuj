@@ -44,14 +44,15 @@
 [defun map [l f]
        "Runs f over every item in collection l and returns the resulting list"
        [case [type-of l]
-             [[:nil]    #nil]
-             [[:pair]   [list/map l f]]
-             [[:array]  [array/map l f]]
+             [:nil    #nil]
+             [:pair   [list/map l f]]
+             [:array  [array/map l f]]
              [otherwise [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]
 
 [defun sort [l]
        "Sorts the collection L"
        [case [type-of l]
+             [:nil      #nil]
              [:pair     [list/sort l]]
              [:array    [array/sort l]]
              [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]

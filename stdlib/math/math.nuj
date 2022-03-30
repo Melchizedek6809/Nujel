@@ -1,8 +1,8 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-[def PI 3.14159]
-[def π  3.14159]
+[def PI 3.141592653589793]
+[def π  3.141592653589793]
 
 [defmacro ++ [i]
           "Increment I by 1 and store the result in I"

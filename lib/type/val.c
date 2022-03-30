@@ -70,7 +70,6 @@ int lValCompare(const lVal *a, const lVal *b){
 	}
 	if(a->type != b->type){return 2;}
 	switch(a->type){
-	case ltNoAlloc:
 	default:
 		return 2;
 	case ltArray:
@@ -129,21 +128,16 @@ int lValCompare(const lVal *a, const lVal *b){
 	case ltString: {
 		const uint alen = lStringLength(a->vString);
 		const uint blen = lStringLength(b->vString);
+		const uint len = MIN(alen,blen);
 		const char *ab = a->vString->buf;
 		const char *bb = b->vString->buf;
-		for(uint i=0;i<alen;i++){
-			const u8 ac = ab[i];
-			const u8 bc = bb[i];
-			if(ac == bc){continue;}
-			if(ac < bc){return -1;}
-			return 1;
-		}
-		if(alen != blen){
-			if(alen < blen){
-				return -1;
+		for(uint i=0;i<len;i++){
+			const u8 ac = *ab++;
+			const u8 bc = *bb++;
+			if(ac != bc){
+				return ac < bc ? -1 : 1;
 			}
-			return -1;
 		}
-		return 0; }
+		return alen == blen ? 0 : (alen < blen ? -1 : 1);}
 	}
 }

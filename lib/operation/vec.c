@@ -53,11 +53,11 @@ static lVal *lnfVReflect(lClosure *c, lVal *v){
 }
 
 void lOperationsVector(lClosure *c){
-	lAddNativeFunc(c,"vec/x", "[vec]", "Return x part of VEC", lnfVX);
-	lAddNativeFunc(c,"vec/y", "[vec]", "Return y part of VEC", lnfVY);
-	lAddNativeFunc(c,"vec/z", "[vec]", "Return z part of VEC", lnfVZ);
-	lAddNativeFunc(c,"vec/dot", "[a b]", "Return the dot product of A and B", lnfVDot);
+	lAddNativeFunc(c,"vec/x",         "[vec]", "Return x part of VEC", lnfVX);
+	lAddNativeFunc(c,"vec/y",         "[vec]", "Return y part of VEC", lnfVY);
+	lAddNativeFunc(c,"vec/z",         "[vec]", "Return z part of VEC", lnfVZ);
+	lAddNativeFunc(c,"vec/dot",       "[a b]", "Return the dot product of A and B", lnfVDot);
 	lAddNativeFunc(c,"vec/magnitude", "[vec]", "Return length of VEC", lnfVMagnitude);
 	lAddNativeFunc(c,"vec/normalize", "[vec]", "Return a normalized version of VEC", lnfVNormalize);
-	lAddNativeFunc(c,"vec/reflect", "[i n]", "Calculate the reflection direction for an incident vector", lnfVReflect);
+	lAddNativeFunc(c,"vec/reflect",   "[i n]", "Calculate the reflection direction for an incident vector", lnfVReflect);
 }

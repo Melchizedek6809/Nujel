@@ -180,12 +180,12 @@ static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
 
 /* Add typing and casting operators to c */
 void lOperationsTypeSystem(lClosure *c){
-	lAddNativeFunc(c,"bool",    "[α]",     "Convert α into a boolean value, true or false", lnfBool);
-	lAddNativeFunc(c,"int",     "[α]",     "Convert α into an integer number", lnfInt);
-	lAddNativeFunc(c,"float",   "[α]",     "Convert α into a floating-point number", lnfFloat);
-	lAddNativeFunc(c,"vec",     "[x y z]", "Convert α into a vector value consistig of 3 floats x,y and z", lnfVec);
-	lAddNativeFunc(c,"string",  "[α]",     "Convert α into a printable and readable string", lnfCat);
-	lAddNativeFunc(c,"symbol->keyword", "[α]", "Convert symbol α into a keyword", lnfSymbolToKeyword);
-	lAddNativeFunc(c,"keyword->symbol", "[α]", "Convert keyword α into a symbol", lnfKeywordToSymbol);
-	lAddNativeFunc(c,"type-of", "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
+	lAddNativeFunc(c,"bool",            "[α]",     "Convert α into a boolean value, true or false", lnfBool);
+	lAddNativeFunc(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
+	lAddNativeFunc(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
+	lAddNativeFunc(c,"vec",             "[x y z]", "Convert α into a vector value consistig of 3 floats x,y and z", lnfVec);
+	lAddNativeFunc(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfCat);
+	lAddNativeFunc(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
+	lAddNativeFunc(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
+	lAddNativeFunc(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
 }

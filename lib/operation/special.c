@@ -82,13 +82,13 @@ static lVal *lnfThrow(lClosure *c, lVal *v){
 }
 
 void lOperationsSpecial(lClosure *c){
-	lnfvDo    = lAddSpecialForm(c,"do",    "[...body]",        "Evaluate ...body in order and returns the last result", lnfDo);
+	lnfvDo    = lAddSpecialForm(c,"do",    "body",             "Evaluate body in order and returns the last result", lnfDo);
 	lnfvQuote = lAddSpecialForm(c,"quote", "[v]",              "Return v as is without evaluating", lnfQuote);
 	            lAddSpecialForm(c,"if",    "[cond then else]", "Evalute then if pred? is #t, otherwise evaluates ...else", lnfIf);
-	            lAddSpecialForm(c,"and",   "[...args]",        "#t if all ARGS evaluate to true",   lnfAnd);
-	            lAddSpecialForm(c,"or" ,   "[...args]",        "#t if one member of ARGS evaluates to true", lnfOr);
-	            lAddSpecialForm(c,"while", "[cond ...body]",   "Evaluate ...BODY for as long as COND is true, return the value of the last iteration of ...BODY or #nil when COND was false from the start", lnfWhile);
-	            lAddSpecialForm(c,"try",   "[catch ...body]",  "Try evaluating ...BODY, and if an exception is thrown handle it using CATCH", lnfTry);
+	            lAddSpecialForm(c,"and",   "args",             "#t if all ARGS evaluate to true",   lnfAnd);
+	            lAddSpecialForm(c,"or" ,   "args",             "#t if one member of ARGS evaluates to true", lnfOr);
+	            lAddSpecialForm(c,"while", "[cond . body]",    "Evaluate ...BODY for as long as COND is true, return the value of the last iteration of ...BODY or #nil when COND was false from the start", lnfWhile);
+	            lAddSpecialForm(c,"try",   "[catch . body]",   "Try evaluating ...BODY, and if an exception is thrown handle it using CATCH", lnfTry);
 
 	lAddNativeFunc(c,"throw",   "[v]",             "Throw V to the closest exception handler", lnfThrow);
 }

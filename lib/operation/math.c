@@ -87,7 +87,7 @@ lVal *lnfSin(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastAuto(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
-		default:      return exceptionThrowFloat(c, v,"sinus");
+		default:      return exceptionThrowFloat(c, v,"sin");
 		case ltFloat: return lValFloat(sin(t->vFloat));
 	}
 }
@@ -96,7 +96,7 @@ lVal *lnfCos(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastAuto(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
-		default:      return exceptionThrowFloat(c, v,"cosine");
+		default:      return exceptionThrowFloat(c, v,"cos");
 		case ltFloat: return lValFloat(cos(t->vFloat));
 	}
 }
@@ -105,7 +105,7 @@ lVal *lnfTan(lClosure *c, lVal *v){
 	lVal *t = lCar(lCastAuto(c,v));
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
-		default:      return exceptionThrowFloat(c, v,"tangent");
+		default:      return exceptionThrowFloat(c, v,"tan");
 		case ltFloat: return lValFloat(tan(t->vFloat));
 	}
 }

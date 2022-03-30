@@ -297,7 +297,7 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"def",           "[sym val]",     "Define a new symbol SYM and link it to value VAL", lnfDef);
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",   lnfSet);
-	lAddSpecialForm(c,"let*",          "[...body]",     "Run body wihtin a new closure",  lnfLetRaw);
+	lAddSpecialForm(c,"let*",          "body",          "Run BODY wihtin a new closure",  lnfLetRaw);
 
 	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
 	lAddSpecialForm(c,"λδ*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
