@@ -11,22 +11,13 @@ uint     lNFuncActive = 0;
 uint     lNFuncMax    = 0;
 lNFunc  *lNFuncFFree  = NULL;
 
+/* Initialize the NFunc allocator */
 void lNativeFunctionsInit(){
 	lNFuncActive = 0;
 	lNFuncMax    = 0;
 }
 
-void lNFuncFree(uint i){
-	if((i == 0) || (i >= lNFuncMax)){return;}
-	lNFunc *nfn = &lNFuncList[i];
-	if(nfn->nextFree != 0){return;}
-	lNFuncActive--;
-	nfn->fp       = NULL;
-	nfn->doc      = NULL;
-	nfn->nextFree = lNFuncFFree;
-	lNFuncFFree   = nfn;
-}
-
+/* Allocate a new NFunc */
 lNFunc *lNFuncAlloc(){
 	lNFunc *ret;
 	if(lNFuncFFree == NULL){
@@ -42,4 +33,9 @@ lNFunc *lNFuncAlloc(){
 	lNFuncActive++;
 	memset(ret, 0, sizeof(lNFunc));
 	return ret;
+}
+
+/* Return the Index of NFunc n */
+int lNFuncID(const lNFunc *n){
+	return n - lNFuncList;
 }

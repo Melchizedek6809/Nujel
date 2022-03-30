@@ -46,6 +46,7 @@ NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal 
 	lExceptionThrowRaw(l);
 }
 
+/* Last resort exception Handler */
 static void exceptionCatchExit(lVal *exc){
 	epf("Root Exception:\n%V\n",exc);
 	exit(200);
@@ -56,6 +57,10 @@ void *lExceptionTryExit(void *(*body)(void *,void *), void *a, void *b){
 	return lExceptionTryCatch(body, a, b, exceptionCatchExit);
 }
 
+/* Return the result of running body with a and b after installing the exception handler
+ * a should be the lClosure
+ * b should be the lVal
+ */
 void *lExceptionTryCatch(void *(*body)(void *,void *), void *a, void *b, void (*handler)(lVal *exceptionValue)){
 	jmp_buf oldExceptionTarget;
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));

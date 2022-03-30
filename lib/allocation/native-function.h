@@ -8,7 +8,6 @@ extern uint     lNFuncMax;
 extern uint     lNFuncActive;
 
 void      lNativeFunctionsInit();
-void      lNFuncFree          (uint i);
 lNFunc   *lNFuncAlloc         ();
 int       lNFuncID            (const lNFunc *n);
 

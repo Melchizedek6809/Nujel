@@ -9,6 +9,7 @@
 #include "../s-expression/reader.h"
 #include "../type/closure.h"
 
+/* Create a new NFunc,should only be used during root closure creation  */
 static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *docString){
 	lVal *v = lRootsValPush(lValAlloc(ltNativeFunc));
 	v->vNFunc = lNFuncAlloc();
@@ -19,17 +20,16 @@ static lVal *lValNativeFunc(lVal *(*func)(lClosure *,lVal *), lVal *args, lVal *
 	return v;
 }
 
+/* Add a NFunc to closure C, should only be used during root closure creation */
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
 	lVal *lNF = lValNativeFunc(func,RVP(lCar(lRead(args))),RVP(lValString(doc)));
 	return lDefineAliased(c,lNF,sym);
 }
 
+/* Add a Special Form to closure C, should only be used during root closure creation */
 lVal *lAddSpecialForm(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
 	lVal *lNF = lValNativeFunc(func,RVP(lCar(lRead(args))),RVP(lValString(doc)));
 	lNF->type = ltSpecialForm;
 	return lDefineAliased(c,lNF,sym);
 }
 
-int lNFuncID(const lNFunc *n){
-	return n - lNFuncList;
-}

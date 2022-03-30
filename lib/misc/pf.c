@@ -17,6 +17,7 @@ int         writeValSP = 0;
 
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display);
 
+/* Write left part, current node and then the right part of a tree */
 static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	if((v == NULL) || (v->key == NULL)){return cur;}
 
@@ -27,6 +28,7 @@ static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	return cur;
 }
 
+/* Write an entire Tree structure, including @[] wrapping */
 static char *writeTree(char *cur, char *bufEnd, const lTree *v){
 	cur = spf(cur,bufEnd,"@[");
 	char *new = writeTreeRec(cur, bufEnd, v);
@@ -39,6 +41,7 @@ static char *writeTree(char *cur, char *bufEnd, const lTree *v){
 	return cur;
 }
 
+/* Write a tree as a list of value definitions */
 static char *writeTreeDef(char *cur, char *bufEnd, const lTree *v){
 	if(v == NULL){return cur;}
 
@@ -47,6 +50,7 @@ static char *writeTreeDef(char *cur, char *bufEnd, const lTree *v){
 	return writeTreeDef(cur, bufEnd, v->right);
 }
 
+/* Write an entire array including #[] wrapper */
 static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 	cur = spf(cur, bufEnd, "#[");
 	if(v && v->data != NULL){
@@ -57,11 +61,13 @@ static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 	return spf(cur, bufEnd, "]");
 }
 
+/* Return character of the lowest nibble of c */
 static char getHexChar(int c){
 	c &= 0xF;
 	return (c < 0xA) ? '0' + c : 'A' + (c - 10);
 }
 
+/* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	cur = spf(cur, bufEnd, "#{");
 	if(v && v->data != NULL){
@@ -116,6 +122,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 	return spf(cur, bufEnd, "}");
 }
 
+/* Write pair/list V, including dotted pair notation */
 static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	const lVal *carSym = v->vList.car;
 	if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
@@ -137,6 +144,7 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	return spf(cur, bufEnd, "]");
 }
 
+/* Write boxed value V, display determines if it should be machine- or human-readable */
 static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	char *cur = buf;
 	char *ret = buf;
@@ -222,6 +230,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	return ret;
 }
 
+/* Write the string S into the buffer */
 static char *writeString(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
 	if(s == NULL){return NULL;}
@@ -231,7 +240,8 @@ static char *writeString(char *buf, char *bufEnd, const char *s){
 	return cur;
 }
 
-
+/* Write the string S into the buffer while escaping all characters and wrapping
+ * everything in quotes */
 static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
 	if((cur+1) >= bufEnd){return buf;}
@@ -281,6 +291,7 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	return cur;
 }
 
+/* Write the integer V into BUF */
 static char *writeInt(char *buf, char *bufEnd, i64 v){
 	if(v < 0){
 		if(buf < bufEnd){ *buf++ = '-'; }
@@ -292,12 +303,14 @@ static char *writeInt(char *buf, char *bufEnd, i64 v){
 	return buf;
 }
 
+/* Write the unsigned integer V into BUF */
 static char *writeUint(char *buf, char *bufEnd, u64 v){
 	if(v >= 10){ buf = writeUint(buf, bufEnd, v / 10); }
 	if(buf < bufEnd){ *buf++ = '0' + (v % 10);}
 	return buf;
 }
 
+/* Write the integer V into BUF in hexadecimal notation */
 static char *writeXint(char *buf, char *bufEnd, u64 v){
 	if(v >= 16){ buf = writeXint(buf, bufEnd, v >> 4); }
 	if(buf < bufEnd){
@@ -307,6 +320,7 @@ static char *writeXint(char *buf, char *bufEnd, u64 v){
 	return buf;
 }
 
+/* Write out the floating point number V into BUF */
 static char *writeFloat(char *buf, char *bufEnd, double v){
 	double fract, integer;
 	fract = fabs(modf(v, &integer));

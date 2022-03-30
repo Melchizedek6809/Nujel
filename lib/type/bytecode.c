@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+/* Push the list args onto the stack, return the new SP */
 int pushList(lVal **stack, int sp, lVal *args){
 	if(!args){return sp;}
 	sp = pushList(stack, sp, lCdr(args));
@@ -18,6 +19,7 @@ int pushList(lVal **stack, int sp, lVal *args){
 	return sp + 1;
 }
 
+/* Print the contents of the stack, mostly used for debuggin */
 void printStack(lVal **stack, int sp, lClosure **cloStack, int csp){
 	(void)cloStack;
 	pf("-- Debug Output [SP:%u CSP:%u] -- %v\n", sp, csp);
@@ -26,6 +28,7 @@ void printStack(lVal **stack, int sp, lClosure **cloStack, int csp){
 	}
 }
 
+/* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	lVal *ret, *t = NULL;
 	ret = RVP(lCons(NULL,NULL));
@@ -41,6 +44,7 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	return ret;
 }
 
+/* Read a value referenced at IP and store it in RET, retuns the new IP */
 static const lBytecodeOp *lBytecodeReadOPVal(const lBytecodeOp *ip, lVal **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
@@ -49,6 +53,7 @@ static const lBytecodeOp *lBytecodeReadOPVal(const lBytecodeOp *ip, lVal **ret){
 	return ip;
 }
 
+/* Read a symbol referenced at IP and store it in RET, retuns the new IP */
 static const lBytecodeOp *lBytecodeReadOPSym(const lBytecodeOp *ip, lSymbol **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
@@ -57,11 +62,13 @@ static const lBytecodeOp *lBytecodeReadOPSym(const lBytecodeOp *ip, lSymbol **re
 	return ip;
 }
 
+/* Read an encoded signed 16-bit offset at ip */
 static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 	const int x = (ip[0] << 8) | ip[1];
 	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
 
+/* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
 	jmp_buf oldExceptionTarget;
 	const lBytecodeOp *ip;
@@ -366,6 +373,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	return NULL;
 }
 
+/* Return the overall length of opcode op */
 static int lBytecodeOpLength(const lBytecodeOp op){
 	switch(op){
 	default:
@@ -394,6 +402,7 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 	}
 }
 
+/* Mark all objects references within v, should only be called from the GC */
 void lBytecodeArrayMark(const lBytecodeArray *v){
 	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){

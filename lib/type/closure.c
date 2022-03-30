@@ -94,6 +94,7 @@ void lDefineVal(lClosure *c, const char *str, lVal *val){
 	lDefineClosureSym(c,lSymS(str),val);
 }
 
+/* Create a new Lambda Value */
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
