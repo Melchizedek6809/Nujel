@@ -2,11 +2,27 @@ Nujel
 --------------------------------------------------------
 A Lisp inspired language for games and other latency sensitive applications.
 Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting runtime.
-While Nujel is still very early in development, and for the most part just a terrible Scheme, it is stabilizing
-rapidly. Even though the language is still very much in flux, the following points might give
-you an idea as to which direction Nujel is going in and which tradeoffs have been made.
+While Nujel is still very early in development, and for the most part just a terrible Scheme, it is evolving
+rapidly.
 
-If you want to give it a spin, you can try out a current [WASM Build](https://wolkenwelten.net/nujel/).
+## Future direction
+To get an idea about the design and future direction of Nujel have a look at the [FUTURE.md](/FUTURE.md).
+
+## Current status
+Here is a collection of features already implemented, or about to be finished.
+- [X] Extensive test suite
+- [X] Lexical scoping
+- [X] Exceptions
+- [X] WASM support
+- [X] Formated output (inspired by python3/rust/zig)
+- [X] Maps (using binary Trees)
+- [X] Garbage Collection (Mark-and-Sweep)
+- [X] Macros (expander written in Nujel itself)
+- [ ] Continuations
+- [ ] Bytecoded (already included but not used by default)
+
+## Try it out
+You can try out a current [WASM Build over here](https://wolkenwelten.net/nujel/).
 
 ### GitHub CI (Windows/MacOS/Ubuntu)
 | Master | Develop   |
