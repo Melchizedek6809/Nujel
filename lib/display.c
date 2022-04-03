@@ -19,7 +19,7 @@ char dispWriteBuf[1<<18];
 
 /* Display v on the default channel, most likely stdout */
 void lDisplayVal(lVal *v){
-	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%v",v);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%v",v);
 	#ifdef __EMSCRIPTEN__
 	wasmConsoleLog(dispWriteBuf);
 	#endif
@@ -28,13 +28,13 @@ void lDisplayVal(lVal *v){
 
 /* Display v on the default channel, most likely stdout */
 const char *lReturnDisplayVal(lVal *v){
-	spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%v",v);
+	spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%v",v);
 	return dispWriteBuf;
 }
 
 /* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
-	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%V",v);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%V",v);
 	#ifdef __EMSCRIPTEN__
 	wasmConsoleError(dispWriteBuf);
 	#endif
@@ -43,7 +43,7 @@ void lDisplayErrorVal(lVal *v){
 
 /* Write a machine-readable presentation of v to stdout */
 void lWriteVal(lVal *v){
-	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)],"%V",v);
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%V",v);
 	#ifdef __EMSCRIPTEN__
 	wasmConsoleLog(dispWriteBuf);
 	#endif

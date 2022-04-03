@@ -455,7 +455,7 @@ void lBytecodeLink(lClosure *clo){
 		case lopPushLVal:
 			if(&c[3] >= v->dataEnd){break;}
 			lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-			if(raw || (raw->type != ltSymbol)){break;}
+			if(!raw || (raw->type != ltSymbol)){break;}
 			lVal *n = lGetClosureSym(clo, raw->vSymbol);
 			if(n == raw){break;}
 			int i = lValIndex(n);

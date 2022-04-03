@@ -5,9 +5,11 @@
 
 [defun let/arg [arg]
        [when arg
-             [when-not [pair? arg] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
-             [when-not [symbol? [car arg]] [throw `[:invalid-let-form "Please fix the structure of the let form" ~arg]]]
+             [when [or [not [pair? arg]]
+                       [not [symbol? [car arg]]]]
+                   [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]]
              `[def ~[car arg] ~[cadr arg]]]]
+
 [defun let/args [args]
        [if-not args #nil
                [cons [let/arg [car args]]
