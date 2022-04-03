@@ -1,0 +1,21 @@
+#!/usr/bin/env nujel
+; Multiples of 3 or 5
+; https://projecteuler.net/problem=1
+;
+; Find the sum of all the multiples of 3 or 5 below 1000.
+
+[defun multiple-of-3? [α]
+       [zero? [% α 3]]]
+
+[defun multiple-of-5? [α]
+       [zero? [% α 5]]]
+
+[defun multiple-of-3-or-5? [α]
+       [or [multiple-of-3? α]
+           [multiple-of-5? α]]]
+
+[def result [-> [range 1000]
+                [filter multiple-of-3-or-5?]
+                [sum]]]
+[when [!= result 233168]
+      [throw [list :wrong-result "Wrong result" result]]]

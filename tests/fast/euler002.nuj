@@ -1,0 +1,20 @@
+#!/usr/bin/env nujel
+; Even Fibonacci numbers
+; https://projecteuler.net/problem=2
+;
+; By considering the terms in the Fibonacci sequence whose values do not exceed four million, find the sum of the even-valued terms.
+
+[defun fib-range/iter [l max]
+       [def v [+ [car l] [cadr l]]]
+       [if [> v max]
+           l
+           [fib-range/iter [cons v l] max]]]
+
+[defun fib-range [max]
+       [nreverse [fib-range/iter [list 2 1] max]]]
+
+[def ret [-> [fib-range 4,000,000]
+             [filter even?]
+             [sum]]]
+[when [!= ret 4613732]
+      [throw [list :wrong-result "Wrong result" ret]]]
