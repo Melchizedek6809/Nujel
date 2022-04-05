@@ -14,6 +14,7 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -350,20 +351,36 @@ static lVal *lParseBytecodeArray(lString *s){
 			size = MAX(size,128) * 2;
 			d = realloc(d, size);
 		}
+		lStringAdvanceToNextCharacter(s);
 		char c = *s->data++;
 		int t = 0;
-		if((c >= '0')  && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
-		if((c >= 'A')  && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
-		if((c >= 'a')  && (c <= 'f')){t = ((c - 'a')+0xA) << 4; goto readSecondNibble;}
+		if((c >= '0') && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
+		if((c >= 'A') && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
+		if((c >= 'a') && (c <= 'f')){t = ((c - 'a')+0xA) << 4; goto readSecondNibble;}
 		if(c == '}'){break;}
+		if(c == 'o'){
+			lStringAdvanceToNextCharacter(s);
+			lVal *tv = lParseNumber(s,lParseNumberDecimal);
+			if(!tv || (tv->type != ltInt)){
+				lExceptionThrowValClo("invalid-literal", "Invalid offset in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			}
+			const int v = tv->vInt;
+			if((v > SHRT_MAX) || (v < SHRT_MIN)){
+				lExceptionThrowValClo("invalid-literal", "Invalid offset in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			}
+			d[len++] = (v >> 8) & 0xFF;
+			d[len++] =  v       & 0xFF;
+			lStringAdvanceToNextCharacter(s);
+			continue;
+		}
 		if(c == 'i'){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lParseNumber(s,lParseNumberDecimal);
 			if(!tv || (tv->type != ltInt)){
-				lExceptionThrowValClo("invalid-literal", "Invalid integer constant in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+				lExceptionThrowValClo("invalid-literal", "Invalid integer constant in bytecode array literal", lCons(tv,lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), readClosure);
 			}
 			const int v = tv->vInt;
-			if((v > 127) || (v < -128)){
+			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){
 				lExceptionThrowValClo("invalid-literal", "Invalid integer constant in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
 			}
 			d[len++] = v;
@@ -402,7 +419,7 @@ static lVal *lParseBytecodeArray(lString *s){
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
-		lExceptionThrowValClo("invalid-literal", "Unexpected character found in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+		lExceptionThrowValClo("invalid-literal", "Unexpected character found in bytecode array literal", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1), readClosure);
 
 		storeOP:
 		d[len++] = (u8)t;

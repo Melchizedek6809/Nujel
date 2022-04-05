@@ -167,6 +167,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		printStack(stack, sp, cloStack, csp);
 		ip++;
 		break;
+	case lopPushNil:
+		stack[sp++] = NULL;
+		ip++;
+		break;
 	case lopPushLVal:
 		ip = lBytecodeReadOPVal(ip+1, &stack[sp++]);
 		break;

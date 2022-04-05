@@ -45,6 +45,8 @@
 
 [defun $push/lval [v]
        "- v | Pushes v onto the stack"
+       [when [nil? v]
+             [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
        [list #$5 [val->bytecode-op v]]]
 
 [defun $push/symbol [v]
@@ -169,6 +171,9 @@
 
 [defun $> []
        '[#$22]]
+
+[defun $push/nil []
+       '[#$24]]
 
 [defun assemble/build-sym-map [code sym-map pos]
        [while code

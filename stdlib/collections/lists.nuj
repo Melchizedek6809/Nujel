@@ -102,18 +102,18 @@
               [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]]]
 
 [defun list-head [l k]
-        "Returns the first k elemnts of list l"
+        "Returns the first k elements of list l"
         [sublist l 0 k]]
 
 [defun list-tail [l k]
         "Returns the sublist of l obtained by omitting the first l elements"
         [sublist l k [length l]]]
 
-[defun list/member [l m]
+[defnd list/member [l m]
        "Returns the first pair of list l whose car is equal to m"
        [cond [[nil? l] #f]
              [[== [car l] m] l]
-             [#t [member [cdr l] m]]]]
+             [#t [list/member [cdr l] m]]]]
 
 [defun getf [l key]
        "Return the value in LIST following KEY"

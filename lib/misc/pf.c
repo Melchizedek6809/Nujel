@@ -9,6 +9,7 @@
 #include "../type/bytecode.h"
 
 #include <float.h>
+#include <limits.h>
 #include <math.h>
 #include <stdarg.h>
 
@@ -67,30 +68,62 @@ static char getHexChar(int c){
 	return (c < 0xA) ? '0' + c : 'A' + (c - 10);
 }
 
+static char *writeBytecodeArrayValue(char *cur, char *bufEnd, i64 index){
+	if((index < 0) || (index > lValMax)){
+		return spf(cur, bufEnd, "v :INVALID-VALUE ");
+	}else{
+		return spf(cur, bufEnd, "v %v ", lIndexVal(index));
+	}
+}
+
+static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
+	if((index < 0) || (index >= lSymbolMax)){
+		return spf(cur, bufEnd, "s --INVALID-SYMBOL-- ");
+	}else{
+		return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
+	}
+}
+
+static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
+	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
+		return spf(cur, bufEnd, "o { %i } ", offset);
+	}else{
+		return spf(cur, bufEnd, "o %i ", offset);
+	}
+}
+
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	cur = spf(cur, bufEnd, "#{");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
-			cur = spf(cur, bufEnd, "%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
+			if(cur[-1] == ' '){--cur;}
+			cur = spf(cur, bufEnd, "\n%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
 			switch(*c){
+			case lopJt:
+			case lopJf:
+			case lopJmp: {
+				const int off = ((i16)((c[1] << 8) | c[2]));
+				cur = writeBytecodeArrayOffset(cur, bufEnd, off);
+				c+=2;
+				break;}
 			case lopDef:
 			case lopGet:
 			case lopSet: {
 				if(&c[3] < v->dataEnd){
-					lSymbol *sym = lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]);
-					cur = spf(cur, bufEnd, "s %s ", sym->c);
+					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
+					cur = writeBytecodeArraySymbol(cur, bufEnd, i);
 				}
 				c+=3;
-				break;}
+				break; }
 			case lopApply: {
 				if(&c[4] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
-					lVal *tv = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
-					cur = spf(cur, bufEnd, "v %V ", tv);
+					const i64 i = ((c[2] << 16) | (c[3] << 8) | c[4]);
+					cur = writeBytecodeArrayValue(cur, bufEnd, i);
 				}
 				c+=4;
-				break;}
+				break; }
 			case lopLambda:
 			case lopMacro: {
 				if(&c[12] >= v->dataEnd){
@@ -98,28 +131,28 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 					break;
 				}
 				for(int i=0;i<4;i++){
-					lVal *tv = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-					cur = spf(cur, bufEnd, "v %V ", tv);
+					const i64 val = (c[1] << 16) | (c[2] << 8) | c[3];
+					cur = writeBytecodeArrayValue(cur, bufEnd, val);
 					c+=3;
 				}
 				break;}
 			case lopIntByte: {
 				if(&c[1] < v->dataEnd){
-					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
+					cur = spf(cur, bufEnd, "i %i ", (i64)((i8)c[1]));
 				}
 				c++;
 				break;}
 			case lopPushLVal: {
 				if(&c[3] < v->dataEnd){
-					lVal *tv = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-					cur = spf(cur, bufEnd, "v %V ", tv);
+					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
+					cur = writeBytecodeArrayValue(cur, bufEnd, i);
 				}
 				c+=3;
 				break;}
 			}
 		}
 	}
-	return spf(cur, bufEnd, "}");
+	return spf(cur, bufEnd, "\n}");
 }
 
 /* Write pair/list V, including dotted pair notation */

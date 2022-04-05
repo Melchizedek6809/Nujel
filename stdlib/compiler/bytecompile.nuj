@@ -11,6 +11,7 @@
                                      [$push/lval source]
                                      [$get source]]]
              [:int      [$push/int source]]
+             [:nil      [$push/nil]]
              [otherwise [$push/lval source]]]]
 
 [defun bytecompile/quote [source]
