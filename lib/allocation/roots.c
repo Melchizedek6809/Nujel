@@ -19,8 +19,7 @@ typedef struct {
 		lString  *vString;
 		lSymbol  *vSymbol;
 		void     *vPointer;
-		lVal     **vValRef;
-		lClosure **vClosureRef;
+		lContext *vContext;
 	};
 } rootEntry;
 
@@ -73,16 +72,8 @@ lSymbol *lRootsSymbolPush(lSymbol *s){
 	return s;
 }
 
-void lRootsBytecodePush(lVal *start){
-	lRootsPush(ltBytecodeOp, start);
-}
-
-void lRootsValStackPush  (lVal **c){
-	lRootsPush(ltValueStack, c);
-}
-
-void lRootsCallStackPush (lClosure **c){
-	lRootsPush(ltCallStack, c);
+void lRootsContextPush(lContext *c){
+	lRootsPush(ltContext, c);
 }
 
 void (*rootsMarkerChain)() = NULL;
@@ -90,11 +81,8 @@ void (*rootsMarkerChain)() = NULL;
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){
-		case ltValueStack:
-			lValStackGCMark(rootStack[i].vValRef);
-			break;
-		case ltCallStack:
-			lCallStackGCMark(rootStack[i].vClosureRef);
+		case ltContext:
+			lContextGCMark(rootStack[i].vContext);
 			break;
 		case ltLambda:
 			lClosureGCMark(rootStack[i].vClosure);
@@ -111,8 +99,6 @@ void lRootsMark(){
 		case ltTree:
 			lTreeGCMark(rootStack[i].vTree);
 			break;
-		case ltBytecodeOp:
-			lBytecodeStackMark(rootStack[i].vPointer);
 		default:
 			break;
 		}

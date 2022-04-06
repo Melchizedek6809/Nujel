@@ -9,7 +9,7 @@
 
 ;[println [str/write [byterun '[do [== :bool [type-of #f]]]]]]
 
-[def expr '[if #t 1 #nil]]
+[def expr '[for [i 1 100] [println [cat "Hello for the " [str/write i]]]]]
 
 [println [str/write [bytecompile [compile expr]]]]
 

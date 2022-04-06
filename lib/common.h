@@ -55,8 +55,6 @@ typedef struct lBytecodeArray{
 typedef enum lType {
 	ltNoAlloc = 0,
 	ltComment,
-	ltValueStack,
-	ltCallStack,
 
 	ltSymbol,
 	ltKeyword,
@@ -73,6 +71,7 @@ typedef enum lType {
 	ltLambda,
 	ltObject,
 	ltMacro,
+	ltContext,
 	ltNativeFunc,
 	ltSpecialForm,
 	ltBytecodeOp,
@@ -83,6 +82,7 @@ typedef enum lType {
 
 typedef struct lArray   lArray;
 typedef struct lClosure lClosure;
+typedef struct lContext lContext;
 typedef struct lNFunc   lNFunc;
 typedef struct lSymbol  lSymbol;
 typedef struct lString  lString;
@@ -151,9 +151,19 @@ struct lClosure {
 		int sp;
 	};
 	lVal *doc;
-	lClosure *caller;
 	const lSymbol *name;
+	lClosure *caller;
 	u8 type;
+	u32 rsp;
+};
+
+struct lContext {
+	lVal **valueStack;
+	int sp;
+	int valueStackSize;
+	lClosure **closureStack;
+	int csp;
+	int closureStackSize;
 };
 
 struct lString{

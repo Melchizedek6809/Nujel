@@ -19,6 +19,7 @@
 lClosure *lClosureNew(lClosure *parent){
 	lClosure *c = lClosureAlloc();
 	c->parent = parent;
+	c->rsp = lRootsGet();
 	return c;
 }
 

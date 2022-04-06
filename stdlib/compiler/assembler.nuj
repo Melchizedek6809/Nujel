@@ -148,14 +148,11 @@
 [defun $closure/pop []
        '[#$16]]
 
-[defun $roots/push []
+[defun $roots/save []
        '[#$1B]]
 
-[defun $roots/pop []
+[defun $roots/restore []
        '[#$1C]]
-
-[defun $roots/peek []
-       '[#$1D]]
 
 [defun $< []
        '[#$1E]]

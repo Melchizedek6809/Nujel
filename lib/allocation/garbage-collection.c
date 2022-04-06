@@ -26,17 +26,13 @@ u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
 u8 lSymbolMarkMap [SYM_MAX];
 
-void lValStackGCMark(lVal **v){
-	if(v == NULL){return;}
-	for(int i=0;i<VALUE_STACK_SIZE;i++){
-		lValGCMark(v[i]);
+void lContextGCMark(lContext *c){
+	if(c == NULL){return;}
+	for(int i=0;i<=c->csp;i++){
+		lClosureGCMark(c->closureStack[i]);
 	}
-}
-
-void lCallStackGCMark(lClosure **v){
-	if(v == NULL){return;}
-	for(int i=0;i<CALL_STACK_SIZE;i++){
-		lClosureGCMark(v[i]);
+	for(int i=0;i<=c->sp;i++){
+		lValGCMark(c->valueStack[i]);
 	}
 }
 
@@ -54,12 +50,6 @@ void lSymbolGCMark(const lSymbol *v){
 	const uint ci = v - lSymbolList;
 	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
-}
-
-void lBytecodeStackMark(lVal **v){
-	for(int i=0; i < CALL_STACK_SIZE; i++){
-		lValGCMark(v[i]);
-	}
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
