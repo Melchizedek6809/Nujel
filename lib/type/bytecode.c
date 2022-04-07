@@ -207,9 +207,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break; }
 	case lopApplyDynamic: {
 		const int len = *++ip;
-		lVal *fun = RVP(ctx.valueStack[--ctx.sp]);
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp -= len;
+		lVal *fun = RVP(ctx.valueStack[--ctx.sp]);
 		ip++;
 		ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun, fun);
 		break; }

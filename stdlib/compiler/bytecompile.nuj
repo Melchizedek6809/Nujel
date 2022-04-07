@@ -90,8 +90,8 @@
 
 [defun bytecompile/procedure/dynamic [op args env]
        [def arg-count [length args]]
-       [list [when args [bytecompile/procedure/arg args]]
-             [bytecompile* op env]
+       [list [bytecompile* op env]
+             [when args [bytecompile/procedure/arg args]]
              [$apply/dynamic arg-count]]]
 
 [defun bytecompile/and/rec [source env label-end]

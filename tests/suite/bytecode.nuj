@@ -81,7 +81,7 @@
 [test/add '[1 . 2] [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$ret]]]
 [test/add 1 [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]
 [test/add 1 [bytecode-eval [apply assemble [list [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]]]
-[test/add 37 [asmrun [$push/int 12] [$push/int 25] [$push/lval +] [$apply/dynamic 2] [$ret]]]
+[test/add 37 [asmrun [$push/lval +] [$push/int 12] [$push/int 25] [$apply/dynamic 2] [$ret]]]
 [test/add 22 [byterun '[[resolve [str->sym "+"]] 10 12]]]
 [test/add 22 [byterun '[[tree/ref @[:asd + :qwe -] :asd] 10 12]]]
 [test/add 1 [byterun '[car '[1 2]]]]
