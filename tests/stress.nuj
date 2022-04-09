@@ -11,8 +11,8 @@
 [defnd test-bytecode [runs]
        [def ret 0]
        [for [i 0 runs]
-            [set! ret [+ ret i]]]
+            [set! ret [add/int ret i]]]
        ret]
 
-[pfmtln "The result is: {}" [test-walker run-count]]
+#;[pfmtln "The result is: {}" [test-walker run-count]]
 [pfmtln "The bytecode result is: {}" [test-bytecode run-count]]

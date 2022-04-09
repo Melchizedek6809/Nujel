@@ -83,12 +83,8 @@ int lValCompare(const lVal *a, const lVal *b){
 	case ltTree:
 		return (a->vTree == b->vTree) ? 0 : -1;
 	case ltPair:
-		if(b->type != ltPair){
-			return -1;
-		}else{
-			return !((a->vList.car == b->vList.car)
+		return !((a->vList.car == b->vList.car)
 				&& (a->vList.cdr == b->vList.cdr));
-		}
 	case ltKeyword:
 	case ltSymbol:
 		return (b->vSymbol != a->vSymbol) ? -1 : 0;
@@ -104,16 +100,10 @@ int lValCompare(const lVal *a, const lVal *b){
 	case ltBool:
 		return a->vBool != b->vBool;
         case ltGUIWidget:
-		if(a->vInt == b->vInt){
-			return  0;
-		} else if(a->vInt < b->vInt) {
-			return -1;
-		} else {
-			return  1;
-		}
+		return (b->vPointer != a->vPointer) ? -1 : 0;
 	case ltInt: {
-		const i64 av = castToInt(a,0);
-		const i64 bv = castToInt(b,0);
+		const i64 av = a->vInt;
+		const i64 bv = b->vInt;
 		if(bv == av){
 			return  0;
 		}else if(av < bv){
@@ -122,8 +112,8 @@ int lValCompare(const lVal *a, const lVal *b){
 			return  1;
 		}}
 	case ltFloat: {
-		const float av = castToFloat(a,0.f);
-		const float bv = castToFloat(b,0.f);
+		const float av = a->vFloat;
+		const float bv = b->vFloat;
 		if(bv == av){
 			return  0;
 		}else if(av < bv){
