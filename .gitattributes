@@ -9,3 +9,4 @@
 vendor/ linguist-vendored
 tools/ linguist-vendored
 web/ linguist-vendored
+benchmark/ linguist-vendored
