@@ -109,7 +109,7 @@
         "Returns the sublist of l obtained by omitting the first l elements"
         [sublist l k [length l]]]
 
-[defnd list/member [l m]
+[defun list/member [l m]
        "Returns the first pair of list l whose car is equal to m"
        [cond [[nil? l] #f]
              [[== [car l] m] l]

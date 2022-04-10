@@ -1,7 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "val.h"
-#include <math.h>
 
 #include "../exception.h"
 #include "../allocation/garbage-collection.h"
@@ -9,6 +8,9 @@
 #include "../collection/string.h"
 #include "../collection/tree.h"
 #include "../type/closure.h"
+
+#include <math.h>
+#include <string.h>
 
 /* Return a newly allocated Nujel int of value V */
 lVal *lValInt(i64 v){
@@ -64,63 +66,23 @@ lVal *lValLambda(lClosure *v){
 	return ret;
 }
 
-/* Compare two values, returns an integer with multiple meanings:
- *   1 -> a > b
- *   0 -> a == b
- *  -1 -> a < b
- *   2 -> a != b
+
+
+/* Checks if A is greater than B, returns 0 if the two values can't be compared
+ | or if they are equal.
  */
-int lValCompare(const lVal *a, const lVal *b){
-	if((a == NULL) || (b == NULL)){
-		return ((a == NULL) && (b == NULL)) ? 0 : 2;
-	}
-	if(a->type != b->type){return 2;}
+i64 lValGreater(const lVal *a, const lVal *b){
+	if((a == NULL) || (b == NULL) || (a->type != b->type)){return 0;}
 	switch(a->type){
 	default:
-		return 2;
-	case ltArray:
-		return (a->vArray == b->vArray) ? 0 : -1;
-	case ltTree:
-		return (a->vTree == b->vTree) ? 0 : -1;
-	case ltPair:
-		return !((a->vList.car == b->vList.car)
-				&& (a->vList.cdr == b->vList.cdr));
+		return 0;
 	case ltKeyword:
 	case ltSymbol:
-		return (b->vSymbol != a->vSymbol) ? -1 : 0;
-	case ltObject:
-	case ltMacro:
-	case ltLambda:
-		return (b->vClosure != a->vClosure) ? -1 : 0;
-	case ltNativeFunc:
-	case ltSpecialForm:
-		return (b->vNFunc != a->vNFunc) ? -1 : 0;
-	case ltBytecodeOp:
-		return a->vBytecodeOp != b->vBytecodeOp;
-	case ltBool:
-		return a->vBool != b->vBool;
-        case ltGUIWidget:
-		return (b->vPointer != a->vPointer) ? -1 : 0;
-	case ltInt: {
-		const i64 av = a->vInt;
-		const i64 bv = b->vInt;
-		if(bv == av){
-			return  0;
-		}else if(av < bv){
-			return -1;
-		}else{
-			return  1;
-		}}
-	case ltFloat: {
-		const float av = a->vFloat;
-		const float bv = b->vFloat;
-		if(bv == av){
-			return  0;
-		}else if(av < bv){
-			return -1;
-		}else{
-			return  1;
-		}}
+		return 0;
+	case ltInt:
+		return a->vInt - b->vInt;
+	case ltFloat:
+		return a->vFloat < b->vFloat ? -1 : 1;
 	case ltString: {
 		const uint alen = lStringLength(a->vString);
 		const uint blen = lStringLength(b->vString);
@@ -131,9 +93,51 @@ int lValCompare(const lVal *a, const lVal *b){
 			const u8 ac = *ab++;
 			const u8 bc = *bb++;
 			if(ac != bc){
-				return ac < bc ? -1 : 1;
+				return ac - bc;
 			}
 		}
-		return alen == blen ? 0 : (alen < blen ? -1 : 1);}
+		return alen - blen;
+	}}
+}
+
+/* Check two values for equality */
+bool lValEqual(const lVal *a, const lVal *b){
+	if((a == NULL) || (b == NULL)){
+		return ((a == NULL) && (b == NULL));
 	}
+	if(a->type != b->type){return false;}
+	switch(a->type){
+	default:
+		return false;
+	case ltPair:
+		return (a->vList.car == b->vList.car) && (a->vList.cdr == b->vList.cdr);
+	case ltArray:
+		return a->vArray == b->vArray;
+	case ltTree:
+		return a->vTree == b->vTree;
+	case ltKeyword:
+	case ltSymbol:
+		return b->vSymbol == a->vSymbol;
+	case ltObject:
+	case ltMacro:
+	case ltLambda:
+		return b->vClosure == a->vClosure;
+	case ltNativeFunc:
+	case ltSpecialForm:
+		return b->vNFunc == a->vNFunc;
+	case ltBytecodeOp:
+		return a->vBytecodeOp == b->vBytecodeOp;
+	case ltBool:
+		return a->vBool == b->vBool;
+        case ltGUIWidget:
+		return b->vPointer == a->vPointer;
+	case ltInt:
+		return a->vInt == b->vInt;
+	case ltFloat:
+		return a->vFloat == b->vFloat;
+	case ltString: {
+		const uint alen = lStringLength(a->vString);
+		const uint blen = lStringLength(b->vString);
+		return (alen == blen) && (strncmp(a->vString->data, b->vString->data, alen) == 0);
+	}}
 }

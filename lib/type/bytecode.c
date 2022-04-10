@@ -139,32 +139,33 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break;
 	case lopLessPred:
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		ctx.valueStack[ctx.sp-2] = lValBool(lValCompare(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]) == -1);
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]) < 0);
 		ctx.sp--;
 		ip++;
 		break;
 	case lopLessEqPred:
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		ctx.valueStack[ctx.sp-2] = lValBool(lValCompare(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) <= 0);
+		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1])
+			|| (lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) < 0));
 		ctx.sp--;
 		ip++;
 		break;
 	case lopEqualPred:
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		ctx.valueStack[ctx.sp-2] = lValBool(lValCompare(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) == 0);
+		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]));
 		ctx.sp--;
 		ip++;
 		break;
-	case lopGreaterEqPred: {
+	case lopGreaterEqPred:
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		const int cmp = lValCompare(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.valueStack[ctx.sp-2] = lValBool((cmp == 1) || (cmp == 0));
+		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1])
+			|| lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) > 0);
 		ctx.sp--;
 		ip++;
-		break; }
+		break;
 	case lopGreaterPred:
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
-		ctx.valueStack[ctx.sp-2] = lValBool(lValCompare(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) == 1);
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) > 0);
 		ctx.sp--;
 		ip++;
 		break;

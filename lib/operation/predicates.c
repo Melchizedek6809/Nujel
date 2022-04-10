@@ -3,41 +3,40 @@
 #include "../operation.h"
 #include "../type/native-function.h"
 #include "../type/val.h"
+#include "../misc/pf.h"
 
 static lVal *lnfLess(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(cmp == 2 ? false : cmp < 0);
+	return lValBool(lValGreater(lCar(v), lCadr(v)) < 0);
 }
 
 static lVal *lnfUnequal(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(!(cmp == 2 ? false : cmp == 0));
+	return lValBool(!lValEqual(lCar(v), lCadr(v)));
 }
 
 static lVal *lnfEqual(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(cmp == 2 ? false : cmp == 0);
+	return lValBool(lValEqual(lCar(v), lCadr(v)));
 }
 
 static lVal *lnfLessEqual(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(cmp == 2 ? false : cmp <= 0);
+	lVal *a = lCar(v);
+	lVal *b = lCadr(v);
+	return lValBool(lValEqual(a,b) || (lValGreater(a, b) < 0));
 }
 
 static lVal *lnfGreater(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(cmp == 2 ? false : cmp > 0);
+	return lValBool(lValGreater(lCar(v), lCadr(v)) > 0);
 }
 
 static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 	(void)c;
-	const int cmp = lValCompare(lCar(v), lCadr(v));
-	return lValBool(cmp == 2 ? false : cmp >= 0);
+	lVal *a = lCar(v);
+	lVal *b = lCadr(v);
+	return lValBool(lValEqual(a,b) || (lValGreater(a, b) > 0));
 }
 
 static lVal *lnfNilPred(lClosure *c, lVal *v){

@@ -597,7 +597,6 @@
 [test/add '[0] [range 1]]
 [test/add '[-1 0] [range 1 -1]]
 [test/add '[1 0 -1] [range -2 1 -1]]
-[test/add '[1.0 0.0 -1.0] [range -2.0 1.0 -1.0]]
 [test/add 19 [int [reduce [range 2.0 0.0 0.1] +]]]
 [test/add 45 [reduce [range 10] +]]
 [test/add 123456789 [read/single [reduce [range 10] cat]]]
