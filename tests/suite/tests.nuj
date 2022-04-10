@@ -617,6 +617,12 @@
 [test/add 123 [index->val [val->index 123]]]
 [test/add #t [int? [sym->index 'asd]]]
 [test/add 'asd [index->sym [sym->index 'asd]]]
+[test/add #t [> :b :a]]
+[test/add #f [< :b :a]]
+[test/add #t [> 'b 'a]]
+[test/add #f [< 'b 'a]]
+[test/add '[:a :b :c] [sort '[:b :c :a]]]
+[test/add '[a b c] [sort '[b c a]]]
 
 ;[test/add "#{02i 1 02i 2 08i 2 v + 01}" [str/write [assemble* [bytecompile '[+ 1 2]]]]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]

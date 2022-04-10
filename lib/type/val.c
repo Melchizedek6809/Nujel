@@ -77,8 +77,22 @@ i64 lValGreater(const lVal *a, const lVal *b){
 	default:
 		return 0;
 	case ltKeyword:
-	case ltSymbol:
-		return 0;
+	case ltSymbol: {
+		const uint alen = strnlen(a->vSymbol->c, sizeof(a->vSymbol->c));
+		const uint blen = strnlen(b->vSymbol->c, sizeof(b->vSymbol->c));
+		const uint len = MIN(alen,blen);
+		const char *ab = a->vSymbol->c;
+		const char *bb = b->vSymbol->c;
+		for(uint i=0;i<len;i++){
+			const u8 ac = *ab++;
+			const u8 bc = *bb++;
+			if(ac != bc){
+				return ac - bc;
+			}
+		}
+		return alen - blen;
+	}
+
 	case ltInt:
 		return a->vInt - b->vInt;
 	case ltFloat:
