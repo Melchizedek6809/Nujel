@@ -3,14 +3,14 @@
 					;
 ;; Contains some routines for working with 2d data
 
-[defun array/2d/allocate [width height]
+[defn array/2d/allocate [width height]
        @[:data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]
 
-[defun array/2d/fill! [data v]
+[defn array/2d/fill! [data v]
        [array/fill! [tree/ref data :data] v]
        data]
 
-[defun array/2d/ref [data x y oob-val]
+[defn array/2d/ref [data x y oob-val]
        [if [or [>= x [tree/ref data :width]]
                [>= y [tree/ref data :height]]
                [< x 0]
@@ -18,7 +18,7 @@
 	   oob-val
            [array/ref [tree/ref data :data] [add x [mul y [tree/ref data :width]]]]]]
 
-[defun array/2d/set! [data x y val]
+[defn array/2d/set! [data x y val]
        [if [or [>= x [tree/ref data :width]]
                [>= y [tree/ref data :height]]
                [< x 0]
@@ -27,7 +27,7 @@
            [array/set! [tree/ref data :data] [add x [mul y [tree/ref data :width]]] val]]
            data]
 
-[defun array/2d/print [data]
+[defn array/2d/print [data]
        [for [y 0 [tree/ref data :height]]
        [for [x 0 [tree/ref data :width]]
 	    [display [cat [array/2d/ref data x y] " "]]]

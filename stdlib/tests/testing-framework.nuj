@@ -11,7 +11,7 @@
 [def print-errors  #t]
 [def print-passes  #f]
 
-[defun test/add* [result expr]
+[defn test/add* [result expr]
        [set! test-list [cons [cons result expr] test-list]]
        [set! test-count [+ test-count 1]]]
 
@@ -19,7 +19,7 @@
        "Add a test where EXPR must eval to RESULT"
        `[test/add* ~result ~[list 'quote [cons 'do expr]]]]
 
-[defun display-results []
+[defn display-results []
        "Prints the result Message"
        [random/seed-initialize!]
        [eval '[efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
@@ -33,7 +33,7 @@
                    [ansi-rainbow "Everything is working, very nice!"]
                    [ansi-red "Better fix those!"]]]]]
 
-[defun test-success [res-should res-is expr i]
+[defn test-success [res-should res-is expr i]
        "Should be called after a test has finished successfully"
        [when print-passes
              [eval '[efmtln "{} == {}\r\n{}\r\n\r\n"
@@ -42,7 +42,7 @@
                             [str/write expr]]]]
        [set! success-count [+ 1 success-count]]]
 
-[defun test-failure [res-should res-is expr i]
+[defn test-failure [res-should res-is expr i]
        "Should be called if EXPR does not equal RES"
        [when print-errors
              [eval '[efmtln "{} != {}\r\n{}\r\n\r\n"
@@ -67,7 +67,7 @@
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]
 
-[defun test-forked [nujel-runtime]
+[defn test-forked [nujel-runtime]
        [\ [result rawexpr i]
           "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
           [def eval-result [eval/forked nujel-runtime rawexpr]]
@@ -79,7 +79,7 @@
               [test-success result expr rawexpr i]
               [test-failure result expr rawexpr i]]]]
 
-[defun test-run-real [test]
+[defn test-run-real [test]
        [set! nujel-start    [time/milliseconds]]
        [set! success-count  0]
        [set! error-count    0]
@@ -89,19 +89,19 @@
        [display-results]
        error-count]
 
-[defun test-run [output-passes hide-errors]
+[defn test-run [output-passes hide-errors]
        "Run through all automated Tests"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
        [test-run-real test-default]]
 
-[defun test-run-bytecode [output-passes hide-errors]
+[defn test-run-bytecode [output-passes hide-errors]
        "Run through all automated Tests"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
        [test-run-real test-bytecode]]
 
-[defun test-run-forked [nujel-runtime output-passes hide-errors]
+[defn test-run-forked [nujel-runtime output-passes hide-errors]
        "Run through all automated Tests in a separate runtime"
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]

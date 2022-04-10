@@ -1,7 +1,7 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-[defun describe/closure [c i]
+[defn describe/closure [c i]
        [when c
              [def info [closure c]]
              [when [and info [ref info :call]]

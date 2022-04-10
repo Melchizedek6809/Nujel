@@ -20,17 +20,17 @@
        "Shifts VAL by AMOUNT bits to the right"
        [ash val [- amount]]]
 
-[defun fib [i]
+[defn fib [i]
            "Terribly inefficient, but, useful for testing the GC"
            [if [< i 2] i
                [+ [fib [- i 2]] [fib [- i 1]]]]]
 
-[defun wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
+[defn wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
         [+ min [% [- val min] [- max min]]]]
 
 [defmacro +1 [v]
           `[+ 1 ~v]]
 
-[defun radians [degrees]
+[defn radians [degrees]
   "Convert a quantity in degrees to radians"
   [/ [* π degrees] 180.0]]

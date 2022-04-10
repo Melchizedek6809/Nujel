@@ -15,62 +15,62 @@
           "[set! l [cdr l]]"
           `[set! ~l [cdr ~l]]]
 
-[defun not [v]
+[defn not [v]
        "Return true if V is false"
        [if v #f #t]]
 
-[defun identity [α]
+[defn identity [α]
        "Returns its argument"
        α]
 
-[defun list arguments
+[defn list arguments
        "Return ARGUMENTS as a list"
        arguments]
 
-[defun default [arg default-value]
+[defn default [arg default-value]
        "Returns ARG or DEFAULT-VALUE if ARG is #nil"
        [if arg arg default-value]]
 
-[defun caar [p]
+[defn caar [p]
        "[car [car p]]"
        [car [car p]]]
 
-[defun cadr [p]
+[defn cadr [p]
        "[car [cdr p]]"
        [car [cdr p]]]
 
-[defun cdar [p]
+[defn cdar [p]
        "[cdr [car p]]"
        [cdr [car p]]]
 
-[defun cddr [p]
+[defn cddr [p]
        "[cdr [cdr p]]"
        [cdr [cdr p]]]
 
-[defun cadar [p]
+[defn cadar [p]
        "[cdr [car p]]"
        [car [cdr [car p]]]]
 
-[defun caddr [p]
+[defn caddr [p]
        "[car [cdr [cdr p]]]"
        [car [cdr [cdr p]]]]
 
-[defun cdddr [p]
+[defn cdddr [p]
        "[cdr [cdr [cdr p]]]"
        [cdr [cdr [cdr p]]]]
 
-[defun cadddr [p]
+[defn cadddr [p]
        "[car [cdr [cdr [cdr p]]]]"
        [car [cdr [cdr [cdr p]]]]]
 
-[defun caddddr [p]
+[defn caddddr [p]
        "[car [cdr [cdr [cdr p]]]]"
        [car [cdr [cdr [cdr [cdr p]]]]]]
 
-[defun keyword->string [α]
+[defn keyword->string [α]
        [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]
        [sym->str [keyword->symbol α]]]
 
-[defun string->keyword [α]
+[defn string->keyword [α]
        [when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]]
        [symbol->keyword [str->sym α]]]

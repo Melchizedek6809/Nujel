@@ -8,7 +8,7 @@
      :padding-char " "
 ]]
 
-[defun fmt/find-non-digit-from-right [s i]
+[defn fmt/find-non-digit-from-right [s i]
        [if [< i 0]
            -1
            [do [def char [char-at s i]]
@@ -49,7 +49,7 @@
                                       [string/cut spec 0 [- [string/length spec] 1]]]]
                  [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
-[defun fmt/debug [opts]
+[defn fmt/debug [opts]
        [if-not [tree/ref opts :debug]
                opts
                [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]
@@ -71,7 +71,7 @@
      :HEXADECIMAL "#x"
 ]]
 
-[defun fmt/number-format-prefix [opts]
+[defn fmt/number-format-prefix [opts]
        [if [or [not [tree/ref opts :debug]] [not [tree/ref opts :base]]] opts
            [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [tree/ref opts :base]]
                    [tree/set! opts :argument [list cat
@@ -80,7 +80,7 @@
                    opts]
                [tree/set! :debug #f]]]]
 
-[defun fmt/add-padding [opts]
+[defn fmt/add-padding [opts]
        [if-not [tree/ref opts :width]
                opts
                [tree/set! opts :argument [list [case [tree/ref opts :align]
@@ -93,14 +93,14 @@
                                                    [tree/ref opts :width]]
                                                [tree/ref opts :padding-char]]]]]
 
-[defun fmt/precision [opts]
+[defn fmt/precision [opts]
        [if-not [tree/ref opts :precision]
                opts
                [tree/set! opts :argument [list string/round
                                                [tree/ref opts :argument]
                                                [tree/ref opts :precision]]]]]
 
-[defun fmt/truncate [opts]
+[defn fmt/truncate [opts]
        [if-not [tree/ref opts :width]
                opts
                [tree/set! opts :argument [list string/cut
@@ -108,10 +108,10 @@
                                                0
                                                [+ 1 [tree/ref opts :width]]]]]]
 
-[defun fmt/output [opts]
+[defn fmt/output [opts]
        [tree/ref opts :argument]]
 
-[defun fmt/format-arg [spec argument]
+[defn fmt/format-arg [spec argument]
        [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
            fmt/number-format
            fmt/precision
@@ -121,11 +121,11 @@
            fmt/debug
            fmt/output]]
 
-[defun fmt/valid-argument? [argument]
+[defn fmt/valid-argument? [argument]
        [or [int? argument] [symbol? argument]]]
 
 [def fmt/expr/count 0]
-[defun fmt/expr [expr arguments-used]
+[defn fmt/expr [expr arguments-used]
        [when-not [string? expr]
                  [throw [list :format-error "fmt needs a string literal as a first argument, since it is implemented as a macro" expr [current-lambda]]]]
        [def split-expr  [split expr ":"]]
@@ -148,7 +148,7 @@
                 [fmt/format-arg format-spec [str->sym [string [car read-vals]]]]]]]
 
 [def fmt/args/map-fun/count 0]
-[defun fmt/args/map-fun [arg]
+[defn fmt/args/map-fun [arg]
        [def s [str->sym [string fmt/args/map-fun/count]]]
        [++ fmt/args/map-fun/count]
        [list 'def s arg]]

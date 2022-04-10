@@ -86,11 +86,13 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 	ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("type")),lRootsValPush(lValSymS(getTypeSymbol(car))));
 	if((car->type == ltSpecialForm) || (car->type == ltNativeFunc)){
 		lNFunc *nf = car->vNFunc;
+		if(nf == NULL){return ret;}
 		ret->vTree = lTreeInsert(ret->vTree, symDocumentation,nf->doc);
 		ret->vTree = lTreeInsert(ret->vTree, symArguments,nf->args);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
+		if(clo == NULL){return ret;}
 		ret->vTree = lTreeInsert(ret->vTree, symDocumentation, clo->doc);
 		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")), RVP(lValSymS(clo->name)));
@@ -299,8 +301,8 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",   lnfSet);
 	lAddSpecialForm(c,"let*",          "body",          "Run BODY wihtin a new closure",  lnfLetRaw);
 
+	lAddSpecialForm(c,"fn* λδ*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
 	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
-	lAddSpecialForm(c,"λδ*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
 	lAddSpecialForm(c,"μ*",           "[name args source body]", "Create a new, raw, macro",  lnfMacroAst);
 	lAddSpecialForm(c,"ω*",           "[body]",                  "Create a new object",       lnfObjectAst);
 }

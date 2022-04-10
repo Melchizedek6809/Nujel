@@ -198,26 +198,32 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		break;
 	case lopApply: {
-		const int len = *++ip;
+		const int len = ip[1];
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp -= len;
-		ip++;
-		lVal *fun = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
-		ip += 3;
-		ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun, fun);
+		ctx.sp = ctx.sp - len + 1;
+		lVal *fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+		ip += 5;
+		ctx.valueStack[ctx.sp-1] = cargs;
+		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun, fun);
 		break; }
 	case lopApplyDynamic: {
-		const int len = *++ip;
+		const int len = ip[1];
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp -= len;
-		lVal *fun = RVP(ctx.valueStack[--ctx.sp]);
-		ip++;
-		ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun, fun);
+		ctx.sp = ctx.sp - len + 1;
+		ctx.valueStack[ctx.sp-1] = cargs;
+		lVal *fun = ctx.valueStack[ctx.sp-2];
+		ip+=2;
+		ctx.valueStack[ctx.sp-2] = lApply(c, cargs, fun, fun);
+		ctx.sp--;
 		break; }
 	case lopDup:
 		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ctx.valueStack[ctx.sp] = ctx.valueStack[ctx.sp-1];
 		ctx.sp++;
+		ip++;
+		break;
+	case lopDrop:
+		if(--ctx.sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
 		ip++;
 		break;
 	case lopJmp:
@@ -228,10 +234,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break;
 	case lopJf:
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip+1) : 3;
-		break;
-	case lopDrop:
-		if(--ctx.sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
-		ip++;
 		break;
 	case lopDef: {
 		lSymbol *sym;
@@ -263,7 +265,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip = lBytecodeReadOPVal(ip, &cDocs);
 		ip = lBytecodeReadOPVal(ip, &cBody);
 		ctx.valueStack[ctx.sp] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
-		if(ctx.valueStack[ctx.sp]){ctx.valueStack[ctx.sp-1]->type = ltMacro;}
+		if(ctx.valueStack[ctx.sp]){
+			ctx.valueStack[ctx.sp]->type = ltMacro;
+		}
 		ctx.sp++;
 		break; }
 	case lopRootsSave:

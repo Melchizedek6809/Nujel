@@ -3,14 +3,14 @@
 
 ;; Mostly macros for all kinds of let varieties
 
-[defun let/arg [arg]
+[defn let/arg [arg]
        [when arg
              [when [or [not [pair? arg]]
                        [not [symbol? [car arg]]]]
                    [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]]
              `[def ~[car arg] ~[cadr arg]]]]
 
-[defun let/args [args]
+[defn let/args [args]
        [if-not args #nil
                [cons [let/arg [car args]]
                      [let/args [cdr args]]]]]

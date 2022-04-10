@@ -3,40 +3,40 @@
 
 ;; Some nujel string λs
 
-[defun string->keyword [α]
+[defn string->keyword [α]
        "Return string α as a keyword"
        [symbol->keyword [str->sym α]]]
 
-[defun string->byte-array [a]
+[defn string->byte-array [a]
        "Turn a string into an UTF-8 encoded byte array"
        [def ret [array/allocate [string/length a]]]
        [for [i 0 [string/length a]]
             [array/set! ret i [char-at a i]]]
        ret]
 
-[defun println [str]
+[defn println [str]
        "Print STR on a single line"
        [print [cat str "\r\n"]]]
 
-[defun errorln [str]
+[defn errorln [str]
        "Print to stderr STR on a single line"
        [print [cat str "\r\n"]]]
 
-[defun display [value]
+[defn display [value]
         "Display VALUE"
         [print value]]
 
-[defun newline []
+[defn newline []
         "Print a single line feed character"
         [display "\r\n"]]
 
-[defun br [num]
+[defn br [num]
        "Return NUM=1 linebreaks"
        [if [or [nil? num] [<= [int num] 1]]
            "\n"
            [cat "\n" [br [+ -1 num]]]]]
 
-[defun path/ext?! [ext]
+[defn path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
        [case [type-of ext]
          [:string [λ [path] [== ext [lowercase [path/extension path]]]]]
@@ -46,21 +46,21 @@
          [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
 
 
-[defun path/extension [path]
+[defn path/extension [path]
        "Return the extension of PATH"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
            [string/cut path [+ 1 last-period] [string/length path]]
            path]]
 
-[defun path/without-extension [path]
+[defn path/without-extension [path]
        "Return PATH, but without the extension part"
        [def last-period [last-index-of path "."]]
        [if [>= last-period 0]
            [string/cut path 0 last-period]
            path]]
 
-[defun int->string/binary [α]
+[defn int->string/binary [α]
        "Turn α into a its **binary** string representation"
        [def ret ""]
        [when-not α [def α 0]]
@@ -70,7 +70,7 @@
               [set! α [ash α -1]]]
        ret]
 
-[defun int->string/octal [α]
+[defn int->string/octal [α]
        "Turn α into a its **octal** string representation"
        [def ret ""]
        [when-not α [def α 0]]
@@ -148,7 +148,7 @@
            [string/cut text 0 [+ pos 1 decimal-digits]]
            text]]
 
-[defun split/empty [str separator]
+[defn split/empty [str separator]
        [def slen [string/length str]]
        [def start 0]
        [def ret #nil]
@@ -157,7 +157,7 @@
 	      [++ start]]
        [reverse ret]]
 
-[defun split/string [str separator start]
+[defn split/string [str separator start]
        [when-not start [set! start 0]]
        [def pos-found [index-of str separator start]]
        [if [>= pos-found 0]
@@ -171,14 +171,14 @@
              [[0] [split/empty str]]
              [otherwise [split/string str separator 0]]]]
 
-[defun read/single [text]
+[defn read/single [text]
        [car [read text]]]
 
-[defun string/length?! [chars]
+[defn string/length?! [chars]
        [λ [a] [== chars [string/length a]]]]
 
-[defun contains-any? [str chars]
+[defn contains-any? [str chars]
        [apply or [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]
 
-[defun contains-all? [str chars]
+[defn contains-all? [str chars]
        [apply and [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]

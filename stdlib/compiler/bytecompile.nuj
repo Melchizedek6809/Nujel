@@ -1,11 +1,11 @@
 ; Contains the low level Nujel -> Bytecode compiler
 
 [def bytecompile/gen-label/counter 0]
-[defun bytecompile/gen-label [prefix]
+[defn bytecompile/gen-label [prefix]
        [++ bytecompile/gen-label/counter]
        [str->sym [cat prefix "label-" bytecompile/gen-label/counter]]]
 
-[defun bytecompile/literal [source]
+[defn bytecompile/literal [source]
        [case [type-of source]
              [[:symbol :keyword] [if [keyword? source]
                                      [$push/lval source]
@@ -14,27 +14,27 @@
              [:nil      [$push/nil]]
              [otherwise [$push/lval source]]]]
 
-[defun bytecompile/quote [source]
+[defn bytecompile/quote [source]
        [case [type-of source]
              [:int      [$push/int source]]
              [:symbol   [$push/symbol source]]
              [otherwise [$push/lval source]]]]
 
-[defun bytecompile/do/form [source env]
+[defn bytecompile/do/form [source env]
        [when source [cons [cons [bytecompile* [car source] env]
                                 [if [last? source] #nil
                                     [cons [$drop] #nil]]]
                           [bytecompile/do/form [cdr source] env]]]]
 
-[defun bytecompile/do [source env]
+[defn bytecompile/do [source env]
        [list [bytecompile/do/form [cdr source] env]]]
 
-[defun bytecompile/procedure [op source env]
+[defn bytecompile/procedure [op source env]
       [def args [map [cdr source] bytecompile*]]
       [list args
             [$apply [length args] op]]]
 
-[defun bytecompile/def [source env]
+[defn bytecompile/def [source env]
        [when [or [not [symbol? [cadr source]]]
                  [not [cddr source]]]
              [throw [list :type-error
@@ -42,7 +42,7 @@
        [list [bytecompile* [caddr source] env]
              [$def [cadr source]]]]
 
-[defun bytecompile/set! [source env]
+[defn bytecompile/set! [source env]
        [when [or [not [symbol? [cadr source]]]
                  [not [cddr source]]]
              [throw [list :type-error
@@ -50,7 +50,7 @@
        [list [bytecompile* [caddr source] env]
              [$set [cadr source]]]]
 
-[defun bytecompile/if [source env]
+[defn bytecompile/if [source env]
        [let [[sym-else [bytecompile/gen-label]]
              [sym-after [bytecompile/gen-label]]]
             [list [bytecompile* [cadr source] env]
@@ -61,7 +61,7 @@
                   [bytecompile* [cadddr source] env]
                   [list :label sym-after]]]]
 
-[defun bytecompile/while [source env]
+[defn bytecompile/while [source env]
        [def sym-start [bytecompile/gen-label]]
        [def sym-end [bytecompile/gen-label]]
        [list [$push/int 0]
@@ -75,26 +75,26 @@
              [$jmp sym-start]
              [list :label sym-end]]]
 
-[defun bytecompile/procedure/arg [source env]
+[defn bytecompile/procedure/arg [source env]
        [if [last? source]
            [bytecompile* [car source] env]
            [cons [bytecompile* [car source] env]
                  [bytecompile/procedure/arg [cdr source] env]]]]
 
-[defun bytecompile/procedure [op args env]
+[defn bytecompile/procedure [op args env]
        [def arg-count [length args]]
        [if args
            [list [bytecompile/procedure/arg args]
                  [$apply arg-count op]]
            [$apply 0 op]]]
 
-[defun bytecompile/procedure/dynamic [op args env]
+[defn bytecompile/procedure/dynamic [op args env]
        [def arg-count [length args]]
        [list [bytecompile* op env]
              [when args [bytecompile/procedure/arg args]]
              [$apply/dynamic arg-count]]]
 
-[defun bytecompile/and/rec [source env label-end]
+[defn bytecompile/and/rec [source env label-end]
        [list [bytecompile* [car source] env]
              [when [cdr source]
                    [list [$dup]
@@ -102,51 +102,51 @@
                          [$drop]
                          [bytecompile/and/rec [cdr source] env label-end]]]]]
 
-[defun bytecompile/and [source env]
+[defn bytecompile/and [source env]
        [def label-end [bytecompile/gen-label]]
             [list [bytecompile/and/rec [cdr source] env label-end]
                   [list :label label-end]]]
 
-[defun bytecompile/or/rec [source env label-end]
+[defn bytecompile/or/rec [source env label-end]
        [when source[list [bytecompile* [car source] env]
                          [$dup]
                          [$jt label-end]
                          [$drop]
                          [bytecompile/or/rec [cdr source] env label-end]]]]
 
-[defun bytecompile/or [source env]
+[defn bytecompile/or [source env]
        [def label-end [bytecompile/gen-label]]
        [list [bytecompile/or/rec [cdr source] env label-end]
              [$push/lval #f]
              [list :label label-end]]]
 
-[defun bytecompile/string [source env]
+[defn bytecompile/string [source env]
        [bytecompile/procedure cat source env]]
 
-[defun bytecompile/array [source env]
+[defn bytecompile/array [source env]
        [bytecompile/procedure array/ref source env]]
 
-[defun bytecompile/tree [source env]
+[defn bytecompile/tree [source env]
        [bytecompile/procedure tree/ref source env]]
 
-[defun bytecompile/λ* [source env]
+[defn bytecompile/λ* [source env]
        [apply $lambda [cdr source]]]
 
-[defun bytecompile/μ* [source env]
+[defn bytecompile/μ* [source env]
        [apply $macro [cdr source]]]
 
-[defun bytecompile/ω*  [source env]
+[defn bytecompile/ω*  [source env]
        [list [$let]
              [bytecompile/do [cdr source] env]
              [$closure/push]
              [$closure/pop]]]
 
-[defun bytecompile/let*  [source env]
+[defn bytecompile/let*  [source env]
        [list [$let]
              [bytecompile/do [cadr source] env]
              [$closure/pop]]]
 
-[defun bytecompile/try  [source env]
+[defn bytecompile/try  [source env]
        [def handler-sym [bytecompile/gen-label]]
        [def end-sym [bytecompile/gen-label]]
        [list [bytecompile* [cadr source] env]
@@ -157,7 +157,7 @@
              [$apply/dynamic 1]
              [list :label end-sym]]]
 
-[defun bytecompile* [source env]
+[defn bytecompile* [source env]
        "Compile the forms in source"
        [def op [if [resolves? [car source] env]
                    [resolve [car source] env]
@@ -185,7 +185,7 @@
              [:tree   [bytecompile/tree source env]]
              [otherwise [bytecompile/literal source]]]]
 
-[defun bytecompile [form environment]
+[defn bytecompile [form environment]
        [list [bytecompile* form environment] [$ret]]]
 
 [defmacro byterun [form]

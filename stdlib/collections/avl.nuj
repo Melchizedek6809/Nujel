@@ -9,24 +9,24 @@
 
 [def avl/empty :e]
 
-[defun avl/empty? [n] [== :e n]]
-[defun avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
-[defun avl/typecheck [r k]
+[defn avl/empty? [n] [== :e n]]
+[defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
+[defn avl/typecheck [r k]
   [or [avl/empty? [avl/root r]]
       [== [type-of k] [type-of [avl/key [avl/root r]]]]
       [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
-[defun avl/tree [cmp]
+[defn avl/tree [cmp]
   #[avl/empty [or cmp avl/default-cmp]]]
 
-[defun avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]]
-[defun avl/key    [n] [array/ref n 1]]
-[defun avl/left   [n] [array/ref n 2]]
-[defun avl/right  [n] [array/ref n 3]]
+[defn avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]]
+[defn avl/key    [n] [array/ref n 1]]
+[defn avl/left   [n] [array/ref n 2]]
+[defn avl/right  [n] [array/ref n 3]]
 
-[defun avl/root   [r] [array/ref r 0]]
-[defun avl/cmp    [r] [array/ref r 1]]
+[defn avl/root   [r] [array/ref r 0]]
+[defn avl/cmp    [r] [array/ref r 1]]
 
-[defun avl/min-node [n]
+[defn avl/min-node [n]
   [if [avl/empty? n]
       avl/empty
       [let [[l [avl/left n]]]
@@ -34,13 +34,13 @@
             n
             [avl/min-mode l]]]]]
 
-[defun avl/update-left   [n l] [array/set! [array/dup n] 2 l]]
-[defun avl/update-right  [n r] [array/set! [array/dup n] 3 r]]
-[defun avl/update-key    [n k] [array/set! [array/dup n] 1 k]]
+[defn avl/update-left   [n l] [array/set! [array/dup n] 2 l]]
+[defn avl/update-right  [n r] [array/set! [array/dup n] 3 r]]
+[defn avl/update-key    [n k] [array/set! [array/dup n] 1 k]]
 
-[defun avl/update-root   [t r] [array/set! [array/dup t] 0 r]]
+[defn avl/update-root   [t r] [array/set! [array/dup t] 0 r]]
 
-[defun avl/update-height [n]
+[defn avl/update-height [n]
   [array/set! [array/dup n] 0
     [+ 1 [max [avl/height [avl/left n]]
               [avl/height [avl/right n]]]]]]
@@ -56,15 +56,15 @@
 ;; rotate-left  transforms the left node configuration to the right.
 ;; rotate-right transforms the right node configuration to the left.
 
-[defun avl/rotate-right [y]
+[defn avl/rotate-right [y]
   [let [[x [avl/left y]]]
     [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]
 
-[defun avl/rotate-left [x]
+[defn avl/rotate-left [x]
   [let [[y [avl/right x]]]
     [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]
 
-[defun avl/balance [n]
+[defn avl/balance [n]
   [if [avl/empty? n]
       0
       [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]
@@ -92,7 +92,7 @@
           [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
           [0  [avl/update-key n v]]]]]
 
-[defun avl/insert [t v]
+[defn avl/insert [t v]
   "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
   [avl/typecheck t v]
   [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
@@ -105,18 +105,18 @@
         [-1 [avl/node-get [avl/left  n] cmp v]]
         [1  [avl/node-get [avl/right n] cmp v]]]]]
 
-[defun avl/get [t v]
+[defn avl/get [t v]
   "Retrieve the key V from tree T, or #nil if V is not in it"
   [if [or [avl/empty? [avl/root t]]
           [!= [type-of v] [type-of [avl/key [avl/root t]]]]]
       #nil
       [avl/node-get [avl/root t] [avl/cmp t] v]]]
 
-[defun avl/from-list [l cmp]
+[defn avl/from-list [l cmp]
   "Create a new avl tree using the keys in L and the comparison function CMP"
   [list/reduce l avl/insert [avl/tree cmp]]]
 
-[defun avl/remove-rebalance [n]
+[defn avl/remove-rebalance [n]
   [if [avl/empty? n]
     n
     [let [[b [avl/balance n]]
@@ -140,7 +140,7 @@
               [case [cmp v [avl/key n]]
                 [-1 [avl/update-left  n [avl/node-remove [avl/left  n] cmp v]]]
                 [1  [avl/update-right n [avl/node-remove [avl/right n] cmp v]]]
-                [0 [cond
+                [0  [cond
                     [[avl/empty? [avl/left  n]] [avl/right n]]
                     [[avl/empty? [avl/right n]] [avl/left  n]]
                     [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]]
@@ -148,50 +148,50 @@
         [set! root [avl/update-height root]]
         [avl/remove-rebalance root]]]]
 
-[defun avl/remove [t v]
+[defn avl/remove [t v]
   "Remove the key V from tree T if it is contained within it"
   [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]
 
-[defun avl/equal-node? [a b]
+[defn avl/equal-node? [a b]
   [if [avl/empty? a]
       [avl/empty? b]
       [and [equal? [avl/key a] [avl/key b]]
            [avl/equal-node? [avl/left a] [avl/left b]]
            [avl/equal-node? [avl/right a] [avl/right b]]]]]
 
-[defun avl/equal? [a b]
+[defn avl/equal? [a b]
   "Test if two avl trees are equal"
   [avl/equal-node? [avl/root a] [avl/root b]]]
 
-[defun avl/reduce-node [node o s]
+[defn avl/reduce-node [node o s]
   [if [avl/empty? node]
     s
     [o [avl/key node]
        [avl/reduce-node [avl/right node] o
                         [avl/reduce-node [avl/left node] o s]]]]]
 
-[defun avl/reduce [t o s]
+[defn avl/reduce [t o s]
   "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
   [avl/reduce-node [avl/root t] o s]]
 
-[defun avl/reduce-node-bin [n o s]
+[defn avl/reduce-node-bin [n o s]
   [if [avl/empty? n]
     s
     [o [avl/key n]
        [avl/reduce-node-bin [avl/left n] o s]
        [avl/reduce-node-bin [avl/right n] o s]]]]
 
-[defun avl/reduce-bin [t o s]
+[defn avl/reduce-bin [t o s]
   "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"
   [avl/reduce-node-bin [avl/root t] o s]]
 
-[defun avl/map [t f]
+[defn avl/map [t f]
   "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
   [avl/reduce t [\ [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
 
-[defun avl/map-to [t f cmp]
+[defn avl/map-to [t f cmp]
   "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
   [avl/reduce t [\ [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
 
-[defun avl/to-list [t]
+[defn avl/to-list [t]
   [avl/reduce t cons #nil]]

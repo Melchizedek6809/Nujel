@@ -7,7 +7,7 @@
        [cat "[" [fun-color [string/pad-start i 2]]
             "/" [string/pad-start test/count 2]
 	    "] " [string/pad-end [cut path 2 [length path]] 32]
-	    [if start [cat " " [ansi-blue [string/pad-start [- [time/milliseconds] start] 5]] "ms"] #nil]]]
+	    [if start [cat " " [ansi-blue [string/pad-start [- [time/milliseconds] start] 6]] "ms"] #nil]]]
 
 [when [not [tree/has? repl/options :only-test-suite]]
       [println [ansi-purple "First we test the basic functions of the runtime."]]]
@@ -55,8 +55,8 @@
 [newline]
 [def dur [- [time/milliseconds] test/start]]
 [if [and [> test/success 0] [zero? test/errors]]
-    [do [println [cat [ansi-green "AoC Tests succeeded"] " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]
-    [do [println [cat [ansi-red   "AoC Tests failed"]    " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]]
+    [do [println [cat [ansi-green "Extended Tests succeeded"] " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]
+    [do [println [cat [ansi-red   "Extended Tests failed"]    " - [" [ansi-green test/success] " / " [ansi-red test/errors] "] in " dur "ms"]]]]
 
 [println [cat "Running everything took " [ansi-blue [- [time/milliseconds] test/beginning]] "ms"]]
 [exit test/errors + test/testsuite-errors]

@@ -6,7 +6,7 @@
 [def compile/environment [current-closure]]
 [def compile/verbose #f]
 
-[defun compile/do/args [args]
+[defn compile/do/args [args]
        [if [last? args]
            [cons [compile* [car args]] #nil]
            [if [pair? [car args]]
@@ -35,8 +35,8 @@
              [cadddr source]
              [compile [caddddr source]]]]
 
-[defun compile/λδ* [source]
-       [list 'λδ*
+[defun compile/fn* [source]
+       [list 'fn*
              [cadr source]
              [caddr source]
              [cadddr source]
@@ -78,7 +78,7 @@
              [cons [compile* [car source]]
                    [compile/procedure/arg [cdr source]]]]]
 
-[defun compile/procedure [proc source]
+[defn compile/procedure [proc source]
        [compile/procedure/arg source]]
 
 [defun compile* [source]
@@ -93,7 +93,7 @@
                     [set!   [compile/set!   source]]
                     [let*   [compile/let*   source]]
                     [λ*     [compile/λ*     source]]
-                    [λδ*    [compile/λδ*    source]]
+                    [fn*    [compile/fn*    source]]
                     [μ*     [compile/μ*     source]]
                     [ω*     [compile/ω*     source]]
                     [if     [compile/if     source]]
@@ -115,7 +115,7 @@
                                               source
                                               [compile/procedure/arg source]]]]]]
 
-[defun compile [source new-environment new-verbose]
+[defn compile [source new-environment new-verbose]
        "Compile the forms in source"
        [when-not new-environment [set! new-environment [current-closure]]]
        [when-not new-verbose [set! new-verbose #f]]
@@ -180,20 +180,20 @@
           [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
 [def λ \]
 
-[defmacro λδ [args . body]
+[defmacro fn [args . body]
           "Define a λδ with the self-hosting Nujel compiler"
           [def doc-string [if-not [string? [car body]] ""
                                   [car body]]]
-          `[λδ* #nil ~args ~doc-string ~[-> [cons 'do body]
+          `[fn* #nil ~args ~doc-string ~[-> [cons 'do body]
                                         [compile [current-closure]]
                                         bytecompile
                                         assemble*]]]
 
-[defmacro defnd [name args . body]
+[defmacro defn [name args . body]
               "Define a new bytecoded function"
               [def doc-string [if-not [string? [car body]] ""
                                       [car body]]]
-              [list 'def name `[λδ* ~name ~args ~doc-string ~[-> [cons 'do body]
+              [list 'def name `[fn* ~name ~args ~doc-string ~[-> [cons 'do body]
                                         [compile [current-closure]]
                                         bytecompile
                                         assemble*]]]]
@@ -211,36 +211,14 @@
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
        [try display/error [eval* [compile expr closure]]]]
 
-[defun read-eval-compile [expr closure]
+[defn read-eval-compile [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
        [try display/error [eval* [compile [read expr] closure]]]]
 
-[defun eval-load [expr closure]
+[defn eval-load [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
        [try display/error [load/forms expr closure]]]
 
-[defun read-eval-load [expr closure]
+[defn read-eval-load [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
        [try display/error [load/forms [read expr] closure]]]
-
-[defun optimize/code/rest [code]
-       [if-not [pair? code] code
-               [cons [optimize/code      [car code]]
-                     [optimize/code/rest [cdr code]]]]]
-
-[defun optimize/code [code]
-       [if-not [pair? code] code
-               [if [and [symbol? [car code]] [resolves? [car code]]]
-                   [cons [resolve [car code]]
-                         [optimize/code/rest [cdr code]]]
-                   [cons [optimize/code [car code]]
-                         [optimize/code/rest [cdr code]]]]]]
-
-[defun optimize! [fun]
-       "Optimize FUN via mutation"
-       [if-not [lambda? fun] #f
-               [closure! fun @[:code [optimize/code [tree/ref [closure fun] :code]]]]]]
-
-[defun optimize-all! []
-       "Return a list of all lambdas in CTX"
-       [for-each [filter [map [symbol-table] resolve] lambda?] optimize!]]

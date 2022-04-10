@@ -3,38 +3,39 @@
 
 ;; Introspection and procedures returning info about the runtime
 
-[defun display/error/wrap [i text]
-       [cond [[== i 0] [ansi-red text]]
-             [[== i 1] [string text]]
-             [[== i 2] [ansi-yellow [str/write text]]]
-             [[== i 3] [describe/closure text]]
-             [#t text]]]
+[defn display/error/wrap [i text]
+      [case i
+            [0 [ansi-red text]]
+            [1 [string text]]
+            [2 [ansi-yellow [str/write text]]]
+            [3 [describe/closure text]]
+            [otherwise text]]]
 
-[defun display/error/iter [error i]
+[defn display/error/iter [error i]
        [if error
            [cons [display/error/wrap i [car error]]
                  [display/error/iter [cdr error] [+ 1 i]]]
            [cons "" #nil]]]
 
-[defun display/error [error]
+[defn display/error [error]
                 "Display ERROR in a nice, human readable way"
                 [display [join [display/error/iter error 0] "\r\n"]]]
 
-[defun describe/thing [o]
+[defn describe/thing [o]
        "Describe a specific value O"
        [def doc [closure o]]
        [cat [str/write [ref doc :arguments]] " - " [ref doc :documentation]]]
 
-[defun describe/string [a]
+[defn describe/string [a]
        "Descibe whatever value string A resolves to"
        [describe/thing [resolve [str->sym a]]]]
 
-[defun describe [fun] "Describe FUN, if there is documentation available"
+[defn describe [fun] "Describe FUN, if there is documentation available"
        [if [string? fun]
            [describe/string fun]
            [describe/thing fun]]]
 
-[defun mem []
+[defn mem []
        "Return some pretty printed memory usage information"
        [def info [memory-info]]
        [cat [ansi-white  "Memory Info"] "\n"
@@ -52,12 +53,8 @@
        [when-not len [set! len 9999999]]
        [sublist [environment [symbol-table*]] off [+ off len] #nil]]
 
-[defun arg-list [f]
-        "Return the Argument list of f which can be a Native Function or a Lambda"
-        [throw [list :gotta-implement-it]]]
-
 [def gensym/counter 0]
-[defun gensym [prefix]
+[defn gensym [prefix]
        [++ gensym/counter]
        [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
 

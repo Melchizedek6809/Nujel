@@ -40,7 +40,7 @@ void lContextGCMark(lContext *c){
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
-	if(lStringMarkMap[ci]){return;}
+	if((ci >= lStringMax) || lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
 }
 
@@ -48,7 +48,7 @@ void lStringGCMark(const lString *v){
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
-	if(lSymbolMarkMap[ci]){return;}
+	if((ci >= lSymbolMax) || lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
 }
 
@@ -56,7 +56,7 @@ void lSymbolGCMark(const lSymbol *v){
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
-	if(lValMarkMap[ci]){return;}
+	if((ci > lValMax) || lValMarkMap[ci]){return;}
 	lValMarkMap[ci] = 1;
 
 	switch(v->type){
@@ -102,7 +102,7 @@ void lValGCMark(lVal *v){
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
-	if(lTreeMarkMap[ci]){return;}
+	if((ci >= lTreeMax) || lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
@@ -115,7 +115,7 @@ void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
 
-	if(lClosureMarkMap[ci]){return;}
+	if((ci >= lClosureMax) || lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);
@@ -131,7 +131,7 @@ void lClosureGCMark(const lClosure *c){
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
-	if(lArrayMarkMap[ci]){return;}
+	if((ci > lArrayMax) || lArrayMarkMap[ci]){return;}
 	lArrayMarkMap[ci] = 1;
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);

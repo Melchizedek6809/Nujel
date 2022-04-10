@@ -3,22 +3,22 @@
 
 ;; Some functions dealing with arrays
 
-[defun array/+= [a i v]
+[defn array/+= [a i v]
        "Add V to the value in A at position I and store the result in A returning A"
        [array/set! a i [+ v [array/ref a i]]]]
 
-[defun array/++ [a i]
+[defn array/++ [a i]
        "Increment position I in A and return A"
        [array/+= a i 1]]
 
-[defun array/fill! [a v i]
+[defn array/fill! [a v]
        "Fills array a with value v"
        [def len [array/length a]]
        [for [i 0 len]
             [array/set! a i v]]
        a]
 
-[defun array/append [a b]
+[defn array/append [a b]
        "Append array A to array B"
        [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
        [def ret [array/allocate [+ [array/length a] [array/length b]]]]
@@ -28,25 +28,25 @@
             [array/set! ret i [array/ref b [- i [array/length a]]]]]
        ret]
 
-[defun array/dup [a]
+[defn array/dup [a]
        "Duplicate Array A"
        [array/append a #[]]]
 
-[defun array/reduce [arr fun α]
+[defn array/reduce [arr fun α]
        "Reduce an array, [reduce] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
               [set! α [fun α [array/ref arr i]]]]
        α]
 
-[defun array/map [arr fun]
+[defn array/map [arr fun]
        "Map an array, [map] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
               [array/set! arr i [fun [array/ref arr i]]]]
        arr]
 
-[defun array/filter [arr pred]
+[defn array/filter [arr pred]
        "Filter an array, [filter] should be preferred"
        [def ri 0]
        [def len [array/length arr]]
@@ -57,7 +57,7 @@
                     [++ ri]]]
        [array/length! ret ri]]
 
-[defun array/equal? [a b]
+[defn array/equal? [a b]
        [if [or [not [array? a]]
                [not [array? b]]
                [!= [array/length a]
@@ -71,19 +71,19 @@
                                [set! i [array/length a]]]]
                 ret]]]
 
-[defun array/push [arr . val]
+[defn array/push [arr . val]
        "Append all arguments following ARR to ARR"
        [for-in [v val]
               [array/length! arr [+ 1 [array/length arr]]]
               [array/set! arr [- [array/length arr] 1] v]]
        arr]
 
-[defun array/swap [arr i j]
+[defn array/swap [arr i j]
        [def tmp [array/ref arr i]]
        [array/set! arr i [array/ref arr j]]
        [array/set! arr j tmp]]
 
-[defun array/heapify [arr n at]
+[defn array/heapify [arr n at]
        "bubble up the element from index AT to until the max-heap property is satisfied"
        [def top at]
        [def looping #t]
@@ -100,7 +100,7 @@
                       [set! at top]]]]
         arr]
 
-[defun array/make-heap [arr]
+[defn array/make-heap [arr]
        [def l [array/length arr]]
        [def l2 [/ l 2]]
        [while [>= l2 0]
@@ -108,7 +108,7 @@
               [-- l2]]
        arr]
 
-[defun array/heap-sort [arr]
+[defn array/heap-sort [arr]
        [array/make-heap arr]
        [def l [array/length arr]]
        [while [> l 0]
@@ -119,7 +119,7 @@
 
 [def array/sort array/heap-sort]
 
-[defun array/cut [arr start end]
+[defn array/cut [arr start end]
        "Return a newly allocated array with the values of ARR from START to END"
        [set! start [max 0 start]]
        [set! end [min [array/length arr] end]]

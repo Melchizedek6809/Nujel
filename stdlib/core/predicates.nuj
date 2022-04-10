@@ -3,43 +3,43 @@
 
 ;; Some predicates that were simpler to do in nujel
 
-[defun numeric? [a]
+[defn numeric? [a]
         "Return #t if a is a number"
         [or [int? a] [float? a] [vec? a]]]
 
-[defun last? [a]
+[defn last? [a]
         "Return #t if a is the last pair in a list"
         [nil? [cdr a]]]
 
-[defun pos? [a]
+[defn pos? [a]
         "Return #t if a is positive"
         [and [numeric? a] [>= [float a] 0.0]]]
 
-[defun zero-neg? [a]
+[defn zero-neg? [a]
         "Return #t if a is zero or negative"
         [and [numeric? a] [<= [float a] 0.0]]]
 
-[defun neg? [a]
+[defn neg? [a]
         "Returns #t if a is negative"
         [and [numeric? a] [< [float a] 0.0]]]
 
-[defun odd? [a]
+[defn odd? [a]
         "Predicate that returns #t if a is odd"
         [== [% [int a] 2] 1]]
 
-[defun even? [a]
+[defn even? [a]
         "Predicate that returns #t if a is even"
         [== [mod/int [int a] 2] 0]]
 
-[defun zero? [val]
+[defn zero? [val]
         "#t if VAL is zero"
         [== 0 val]]
 
-[defun not-zero? [val]
+[defn not-zero? [val]
         "#t if VAL is not zero"
         [!= 0 val]]
 
-[defun equal? [a b]
+[defn equal? [a b]
        "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow."
        [def cur-type [type-of a]]
        [if [!= cur-type [type-of b]]
@@ -50,75 +50,75 @@
                  [:pair [list/equal? a b]]
                  [otherwise [== a b]]]]]
 
-[defun inequal? [a b]
+[defn inequal? [a b]
        "High level inequality comparator"
        [not [equal? a b]]]
 
-[defun int? [val]
+[defn int? [val]
         "#t if VAL is a integer"
         [== :int [type-of val]]]
 
-[defun float? [val]
+[defn float? [val]
         "#t if VAL is a floating-point number"
         [== :float [type-of val]]]
 
-[defun vec? [val]
+[defn vec? [val]
         "#t if VAL is a vector"
         [== :vec [type-of val]]]
 
-[defun bool? [val]
+[defn bool? [val]
         "#t if VAL is a boolean"
         [== :bool [type-of val]]]
 
-[defun pair? [val]
+[defn pair? [val]
         "#t if VAL is a pair"
         [== :pair [type-of val]]]
 
-[defun array? [val]
+[defn array? [val]
 	"#t if VAL is an array"
 	[== :array [type-of val]]]
 
-[defun string? [val]
+[defn string? [val]
         "#t if VAL is a string"
         [== :string [type-of val]]]
 
-[defun symbol? [val]
+[defn symbol? [val]
         "#t if VAL is a symbol"
         [== :symbol [type-of val]]]
 
-[defun object? [val]
+[defn object? [val]
         "#t if VAL is an object"
         [== :object [type-of val]]]
 
-[defun tree? [val]
+[defn tree? [val]
         "#t if VAL is an object"
         [== :tree [type-of val]]]
 
-[defun macro? [val]
+[defn macro? [val]
         "#t if VAL is an object"
         [== :macro [type-of val]]]
 
-[defun lambda? [val]
+[defn lambda? [val]
         "#t if VAL is a lambda"
         [or [== :lambda [type-of val]]]]
 
-[defun native? [val]
+[defn native? [val]
         "#t if VAL is a native function"
         [== :native-function [type-of val]]]
 
-[defun special-form? [val]
+[defn special-form? [val]
         "#t if VAL is a native function"
         [== :special-form [type-of val]]]
 
-[defun procedure? [val]
+[defn procedure? [val]
         "#t if VAL is a native or lisp function"
         [or [lambda? val] [native? val] [special-form? val]]]
 
-[defun bytecode-array? [v]
+[defn bytecode-array? [v]
        [== :bytecode-array [type-of v]]]
 
-[defun bytecode-op? [v]
+[defn bytecode-op? [v]
        [== :bytecode-op [type-of v]]]
 
-[defun in-range? [v min max]
+[defn in-range? [v min max]
        [and [>= v min] [<= v max]]]

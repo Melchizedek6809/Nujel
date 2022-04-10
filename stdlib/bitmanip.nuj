@@ -3,14 +3,14 @@
 
 ;; Some functions manipulating binary date
 
-[defun lognand l
-        "Returns the Nand of its arguments"
-        [lognot [apply logand l]]]
+[defn lognand l
+      "Returns the Nand of its arguments"
+      [lognot [apply logand l]]]
 
-[defun bit-set?! [i]
-       [def mask [ash 1 i]]
-       [λ [α] [not [zero? [logand α mask]]]]]
+[defn bit-set?! [i]
+      [def mask [ash 1 i]]
+      [λ [α] [not [zero? [logand α mask]]]]]
 
-[defun bit-clear?! [i]
-       [def mask [ash 1 i]]
-       [λ [α] [zero? [logand α mask]]]]
+[defn bit-clear?! [i]
+      [def mask [ash 1 i]]
+      [λ [α] [zero? [logand α mask]]]]

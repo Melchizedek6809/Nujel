@@ -3,11 +3,11 @@
 
 ;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
-[defun sum [c]
+[defn sum [c]
        "Return the sum of every value in collection C"
        [reduce c + 0]]
 
-[defun join [l glue]
+[defn join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]
        [if-not l "" [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
@@ -22,28 +22,28 @@
            [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]
            [reduce l [λ [a b] [+ a 1]] 0]]]
 
-[defun min/λ [a b] [if [< a b] a b]]
-[defun min l
+[defn min/λ [a b] [if [< a b] a b]]
+[defn min l
        "Returns the minimum value of its arguments, or collection"
        [reduce [if [cdr l] l [car l]] min/λ #nil]]
 
-[defun max/λ [a b] [if [> a b] a b]]
-[defun max l
+[defn max/λ [a b] [if [> a b] a b]]
+[defn max l
        "Returns the minimum value of its arguments, or collection"
        [reduce [if [cdr l] l [car l]] max/λ #nil]]
 
-[defun delete [l e]
+[defn delete [l e]
        "Returns a filtered list l with all elements equal to e omitted"
        [filter l [λ [a] [not [== a e]]]]]
 
-[defun remove [l p]
+[defn remove [l p]
        "Returns a filtered list l with all elements where P equal true removed"
        [filter l [λ [a] [not [p a]]]]]
 
-[defun flatten/λ [a b]
+[defn flatten/λ [a b]
        [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
              [#t [cons b a]]]]
-[defun flatten [l]
+[defn flatten [l]
        "Flatten a collection of collections into a simple list"
        [if-not [collection? l] l
                [nreverse [reduce l flatten/λ #nil]]]]

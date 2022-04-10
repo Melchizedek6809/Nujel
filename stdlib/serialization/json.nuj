@@ -1,5 +1,5 @@
 ; Contains subroutines for (de-)serializing JSON
-[defun tree->json [v]
+[defn tree->json [v]
        "Converts a tree into a JSON encoded string, you should prefer VAL->JSON"
        [cat "{"
             [join [map [tree/keys v]

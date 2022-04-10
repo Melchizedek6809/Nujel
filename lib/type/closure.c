@@ -72,7 +72,7 @@ lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
 		lVal *ret;
 		if(lTreeHas(cc->data,s,&ret)){return ret;}
 	}
-	lExceptionThrowValClo("unbound-variable","can't resolve symbol", RVP(lValSymS(s)), c);
+	lExceptionThrowValClo("unbound-variable","Can't resolve symbol", lValSymS(s), c);
 	return NULL;
 }
 

@@ -1,67 +1,67 @@
 ; Contains the bytecode assembler, so we don't have to write opcodes directly
 
-[defun val->bytecode-op [v]
+[defn val->bytecode-op [v]
        [def i [val->index v]]
        [list [int->bytecode-op [logand [>> i 16] #xFF]]
              [int->bytecode-op [logand [>> i  8] #xFF]]
              [int->bytecode-op [logand     i     #xFF]]]]
 
-[defun sym->bytecode-op [v]
+[defn sym->bytecode-op [v]
        [def i [sym->index v]]
        [list [int->bytecode-op [logand [>> i 16] #xFF]]
              [int->bytecode-op [logand [>> i  8] #xFF]]
              [int->bytecode-op [logand     i     #xFF]]]]
 
-[defun int-fit-in-byte? [a]
+[defn int-fit-in-byte? [a]
        [and [<= a 127] [>= a -128]]]
 
-[defun $nop []
+[defn $nop []
        "- | Do nothing"
        '[#$0]]
 
-[defun $ret []
+[defn $ret []
        "a - | Return top of value stack"
        '[#$1]]
 
-[defun $push/int/byte [a]
+[defn $push/int/byte [a]
        "- a | Return top of value stack"
        [when-not [int-fit-in-byte? a]
                  [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
        [list #$2 [int->bytecode-op a]]]
 
-[defun $push/int [a]
+[defn $push/int [a]
        "- a | Return top of value stack"
        [if [int-fit-in-byte? a]
            [$push/int/byte a]
            [$push/lval a]]]
 
-[defun $add/int []
+[defn $add/int []
        "a b - c | Adds the two topmost values and pushes the result"
        '[#$3]]
 
-[defun $debug/print-stack []
+[defn $debug/print-stack []
        "- | Print out the stack for the current closure"
        '[#$4]]
 
-[defun $push/lval [v]
+[defn $push/lval [v]
        "- v | Pushes v onto the stack"
        [when [nil? v]
              [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
        [list #$5 [val->bytecode-op v]]]
 
-[defun $push/symbol [v]
+[defn $push/symbol [v]
        "- v | Pushes v onto the stack"
        [list #$23 [sym->bytecode-op v]]]
 
-[defun $make-list [item-count]
+[defn $make-list [item-count]
        "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list"
        [list #$6 [int->bytecode-op item-count]]]
 
-[defun $eval [a]
+[defn $eval [a]
        "form - | Evaluates the form from the top of the stack"
        '[#$7]]
 
-[defun $apply [arg-count fun]
+[defn $apply [arg-count fun]
        "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
        [case arg-count 2
              [2 [case fun
@@ -78,101 +78,101 @@
                               [int->bytecode-op arg-count]
                               [val->bytecode-op fun]]]]]
 
-[defun $apply/dynamic [arg-count fun]
+[defn $apply/dynamic [arg-count fun]
        [list #$1A [int->bytecode-op arg-count]]]
 
-[defun $call [target]
+[defn $call [target]
        " - | Call a bytecode subroutine"
        [list #$17 [list :relocate target 8 0 [int->bytecode-op 0]]
                   [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defun $try [target]
+[defn $try [target]
        " - | Try something, jumping to target if an exception occurs"
        [list #$18 [list :relocate target 8 0 [int->bytecode-op 0]]
                   [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defun $throw []
+[defn $throw []
        " - | Return to the closest exception handler"
        [list #$19]]
 
-[defun $jmp [target]
+[defn $jmp [target]
        [list #$9 [list :relocate target 8 0 [int->bytecode-op 0]]
                  [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defun $jt [target]
+[defn $jt [target]
        [list #$A [list :relocate target 8 0 [int->bytecode-op 0]]
                  [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defun $jf [target]
+[defn $jf [target]
        [list #$B [list :relocate target 8 0 [int->bytecode-op 0]]
                  [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defun $dup []
+[defn $dup []
        '[#$C]]
 
-[defun $drop []
+[defn $drop []
        '[#$D]]
 
-[defun $def [v]
+[defn $def [v]
        [list #$E [sym->bytecode-op v]]]
 
-[defun $set [v]
+[defn $set [v]
        [list #$F [sym->bytecode-op v]]]
 
-[defun $get [v]
+[defn $get [v]
        [list #$10 [sym->bytecode-op v]]]
 
-[defun $lambda [name args docs body]
+[defn $lambda [name args docs body]
        [list #$11
              [val->bytecode-op name]
              [val->bytecode-op args]
              [val->bytecode-op docs]
              [val->bytecode-op body]]]
 
-[defun $macro [name args docs body]
+[defn $macro [name args docs body]
        [list #$12
              [val->bytecode-op name]
              [val->bytecode-op args]
              [val->bytecode-op docs]
              [val->bytecode-op body]]]
 
-[defun $closure/push []
+[defn $closure/push []
        '[#$13]]
 
-[defun $closure/enter []
+[defn $closure/enter []
        '[#$14]]
 
-[defun $let []
+[defn $let []
        '[#$15]]
 
-[defun $closure/pop []
+[defn $closure/pop []
        '[#$16]]
 
-[defun $roots/save []
+[defn $roots/save []
        '[#$1B]]
 
-[defun $roots/restore []
+[defn $roots/restore []
        '[#$1C]]
 
-[defun $< []
+[defn $< []
        '[#$1E]]
 
-[defun $<= []
+[defn $<= []
        '[#$1F]]
 
-[defun $== []
+[defn $== []
        '[#$20]]
 
-[defun $>= []
+[defn $>= []
        '[#$21]]
 
-[defun $> []
+[defn $> []
        '[#$22]]
 
-[defun $push/nil []
+[defn $push/nil []
        '[#$24]]
 
-[defun assemble/build-sym-map [code sym-map pos]
+[defn assemble/build-sym-map [code sym-map pos]
        [while code
               [case [type-of [car code]]
                     [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
@@ -182,13 +182,13 @@
               [cdr! code]]
        pos]
 
-[defun assemble/relocate-op [code sym-map pos out]
+[defn assemble/relocate-op [code sym-map pos out]
        [def target [tree/ref sym-map [cadr code]]]
        [def off [- [+ target [cadddr code]] pos]]
        [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
        pos]
 
-[defun assemble/emit-relocated-ops [code sym-map pos out]
+[defn assemble/emit-relocated-ops [code sym-map pos out]
        [if [== [car code] :relocate]
            [set! pos [assemble/relocate-op code sym-map pos out]]
            [for-in [op code]
@@ -198,7 +198,7 @@
        pos]
 
 [def assemble/verbose #f]
-[defun assemble* [code]
+[defn assemble* [code]
        "Assemble all arguments into a single :bytecode-array"
        [def sym-map @[]]
 
@@ -211,7 +211,7 @@
 
        [arr->bytecode-arr out]]
 
-[defun assemble l
+[defn assemble l
        "Assemble all arguments into a single :bytecode-array"
        [assemble* l]]
 
