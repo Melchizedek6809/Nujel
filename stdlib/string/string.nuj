@@ -38,8 +38,13 @@
 
 [defun path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
-       [λ [path]
-          [== ext [lowercase [path/extension path]]]]]
+       [case [type-of ext]
+         [:string [λ [path] [== ext [lowercase [path/extension path]]]]]
+         [:pair [λ [path]
+                   [def cext [lowercase [path/extension path]]]
+                   [reduce ext [λ [α β] [or α [== β cext]]]]]]
+         [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
+
 
 [defun path/extension [path]
        "Return the extension of PATH"

@@ -623,6 +623,11 @@
 [test/add #f [< 'b 'a]]
 [test/add '[:a :b :c] [sort '[:b :c :a]]]
 [test/add '[a b c] [sort '[b c a]]]
+[test/add #t [[path/ext?! "asd"] "qwe.asd"]]
+[test/add #f [[path/ext?! "as"] "qwe.asd"]]
+[test/add #f [[path/ext?! "asd"] "qwe.as"]]
+[test/add #t [[path/ext?! '["as" "asd"]] "qwe.as"]]
+[test/add #t [[path/ext?! '["as" "asd"]] "qwe.asd"]]
 
 ;[test/add "#{02i 1 02i 2 08i 2 v + 01}" [str/write [assemble* [bytecompile '[+ 1 2]]]]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]
