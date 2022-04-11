@@ -49,3 +49,13 @@
 
 [defun file/dir? [filename]
        [ref [file/stat filename] :directory?]]
+
+[defun directory/read-relative [path]
+       [map [directory/read path]
+            [\ [α] [cat path "/" α]]]]
+
+[defun directory/read-recursive [path]
+       [flatten [map [directory/read-relative path]
+                     [\ [A] [if [file/dir? A]
+                                [directory/read-recursive A]
+                                A]]]]]

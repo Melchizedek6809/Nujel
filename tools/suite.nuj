@@ -1,9 +1,6 @@
 #!/usr/bin/env nujel
 
 [println "Entered SUITE.NUJ"]
-[defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
 [for-each [directory/read-relative "tests/suite"] file/eval]
 [println "Loaded all Tests"]
 

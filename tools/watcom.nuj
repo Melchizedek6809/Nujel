@@ -22,16 +22,6 @@
        [run [cat WCC WCC-OPTS " -fo=" out-file " " cur-name]]
        [path/change cwd]]
 
-[defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
-
-[defun directory/read-recursive [path]
-       [flatten [map [directory/read-relative path]
-                     [\ [A] [if [file/dir? A]
-                                [directory/read-recursive A]
-                                A]]]]]
-
 [when-not [and [file/file? "tmp/stdlib.c"]
                [file/file? "tmp/binlib.c"]]
           [println [ansi-red "Can't find tmp/stdlib.c or tmp/binlib.c, please build a native version first, which in the process creates the assets necessary."]]

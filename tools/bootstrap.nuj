@@ -6,15 +6,11 @@
 
 [def environment [ω]]
 [def ext-nuj? [path/ext?! "nuj"]]
-[defun directory/read-relative [path]
-       [-> [directory/read path]
-           [map [\ [α] [cat path "/" α]]]
-           [map [\ [α] [if-not [file/dir? α] α
-                                [directory/read-relative α]]]]
-           [flatten]]]
-[def stdlib-files [sort [filter [append [directory/read-relative "stdlib"]
-                                        [directory/read-relative "binlib"]]
-                                ext-nuj?]]]
+[def stdlib-files [-> [directory/read-recursive "stdlib"]
+                      [append [directory/read-recursive "binlib"]]
+                      [flatten]
+                      [filter ext-nuj?]
+                      [sort]]]
 
 ; If something happens, we just print the responsible error and exit immediately,
 ; since we can't really fix things, we could only make things worse.

@@ -3,16 +3,6 @@
 [def directories '["binlib" "stdlib" "tests" "tools"]]
 [def output-file "web/filesystem.json"]
 
-[defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
-
-[defun directory/read-recursive [path]
-       [flatten [map [directory/read-relative path]
-                     [\ [A] [if [file/dir? A]
-                                [directory/read-recursive A]
-                                A]]]]]
-
 [-> directories
     [map directory/read-recursive]
     [flatten]

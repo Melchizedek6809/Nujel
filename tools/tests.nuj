@@ -3,10 +3,6 @@
 [def test/beginning [time/milliseconds]]
 [def test/testsuite-errors 0]
 
-[defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
-
 [defun prog-str [fun-color i path start]
        [cat "[" [fun-color [string/pad-start i 2]]
             "/" [string/pad-start test/count 2]
