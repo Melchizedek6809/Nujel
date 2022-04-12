@@ -14,11 +14,11 @@
           "Evalutes to BODY if PRED is true"
           `[if ~pred [do ~@body] #nil]]
 
-[defun case/clauses/multiple [key-sym cases]
+[defn case/clauses/multiple [key-sym cases]
        [when cases
              [cons [list '== key-sym [car cases]]
                    [case/clauses/multiple key-sym [cdr cases]]]]]
-[defun case/clauses [key-sym clauses]
+[defn case/clauses [key-sym clauses]
        [when clauses
              [if [== [caar clauses] 'otherwise]
                  [cons 'do [cdar clauses]]
@@ -77,7 +77,7 @@
                              ~@body
                              [cdr! ~symbol-name]]]]]
 
-[defun thread/-> [init fun]
+[defn thread/-> [init fun]
        [if-not fun init
                [if [pair? [car fun]]
                    `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
@@ -87,14 +87,14 @@
           "Thread init as the first argument through every function in fun"
           [thread/-> init [reverse fun]]]
 
-[defun thread/->> [init fun]
+[defn thread/->> [init fun]
        [if-not fun init
            [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
 [defmacro ->> [init . fun]
           "Thread init as the last argument through every function in fun"
           [thread/->> init [reverse fun]]]
 
-[defun returnable/λ [e]
+[defn returnable/λ [e]
   [if [== [car e] :return] [cdr e] [throw e]]]
 
 [defmacro returnable body

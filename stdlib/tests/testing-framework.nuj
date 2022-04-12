@@ -51,7 +51,7 @@
                             [str/write expr]]]]
        [set! error-count [+ 1 error-count]]]
 
-[defun test-bytecode [result rawexpr i]
+[defn test-bytecode [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter"
        [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [byterun rawexpr]]
@@ -59,7 +59,7 @@
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]
 
-[defun test-default [result rawexpr i]
+[defn test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
        [try [\ [err] [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [eval rawexpr]]

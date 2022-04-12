@@ -107,6 +107,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				cur = writeBytecodeArrayOffset(cur, bufEnd, off);
 				c+=2;
 				break;}
+			case lopPushSymbol:
 			case lopDef:
 			case lopGet:
 			case lopSet: {
@@ -115,6 +116,13 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 					cur = writeBytecodeArraySymbol(cur, bufEnd, i);
 				}
 				c+=3;
+				break; }
+			case lopMakeList:
+			case lopApplyDynamic: {
+				if(&c[1] < v->dataEnd){
+					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
+				}
+				c++;
 				break; }
 			case lopApply: {
 				if(&c[4] < v->dataEnd){

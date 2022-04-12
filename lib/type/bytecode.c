@@ -73,13 +73,13 @@ static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
 	jmp_buf oldExceptionTarget;
 	const lBytecodeOp *ip;
-	lClosure *c;
+	lClosure * volatile c = callingClosure;
 	lContext ctx;
 	ctx.closureStackSize = 16;
 	ctx.valueStackSize = 32;
 	ctx.closureStack = malloc(sizeof(lClosure *) * ctx.closureStackSize);
 	ctx.valueStack = malloc(sizeof(lVal *) * ctx.valueStackSize);
-	ctx.closureStack[0] = c = lClosureNew(callingClosure);
+	ctx.closureStack[0] = c;
 	ctx.csp = 1;
 	ctx.sp = 0;
 
@@ -106,8 +106,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 	}else{
 		ip = ops->data;
+		(void)args;
 		ctx.sp = pushList(ctx.valueStack, 0, args);
-		ctx.csp = 1;
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
@@ -132,39 +132,39 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		break;}
 	case lopIntAdd:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopIntAdd", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValInt(castToInt(ctx.valueStack[ctx.sp-2],0) + castToInt(ctx.valueStack[ctx.sp-1],0));
 		ctx.sp--;
 		ip++;
 		break;
 	case lopLessPred:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopLessPred", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]) < 0);
 		ctx.sp--;
 		ip++;
 		break;
 	case lopLessEqPred:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopLessEqPred", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1])
 			|| (lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) < 0));
 		ctx.sp--;
 		ip++;
 		break;
 	case lopEqualPred:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopEqualPred", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]));
 		ctx.sp--;
 		ip++;
 		break;
 	case lopGreaterEqPred:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopGreaterEqPred", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1])
 			|| lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) > 0);
 		ctx.sp--;
 		ip++;
 		break;
 	case lopGreaterPred:
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "A stack underflow occured", NULL, c);}
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopGreaterPred", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]) > 0);
 		ctx.sp--;
 		ip++;
@@ -217,13 +217,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ctx.sp--;
 		break; }
 	case lopDup:
-		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
+		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDup", NULL, c);}
 		ctx.valueStack[ctx.sp] = ctx.valueStack[ctx.sp-1];
 		ctx.sp++;
 		ip++;
 		break;
 	case lopDrop:
-		if(--ctx.sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
+		if(--ctx.sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDrop", NULL, c);}
 		ip++;
 		break;
 	case lopJmp:
@@ -310,7 +310,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		if(ctx.csp == 0){
 			if(ctx.sp < 1){
-				lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);
+				lExceptionThrowValClo("stack-underflow", "Underflowed during lopClosurePop", NULL, c);
 			}
 			return NULL;
 		}
@@ -350,7 +350,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		if(ctx.csp == 0){
 			if(ctx.sp < 1){
-				lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);
+				lExceptionThrowValClo("stack-underflow", "Underflow during lopRet", NULL, c);
 				return NULL;
 			}
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
@@ -373,7 +373,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			break;
 		}
 		if(ctx.csp == 0){
-			if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed the stack while returning", NULL, c);}
+			if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during lopThrow", NULL, c);}
 			lExceptionThrowRaw(ctx.valueStack[--ctx.sp]);
 			return NULL;
 		}

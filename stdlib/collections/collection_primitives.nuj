@@ -41,7 +41,7 @@
              [:tree   [tree/size     α]]
              [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]
 
-[defun map [l f]
+[defn map [l f]
        "Runs f over every item in collection l and returns the resulting list"
        [case [type-of l]
              [:nil    #nil]

@@ -69,7 +69,7 @@
       0
       [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]
 
-[defun avl/insert-rebalance [n cmp v]
+[defn avl/insert-rebalance [n cmp v]
   [let [[b [avl/balance n]]]
     [cond
       [[> b 1]
@@ -84,7 +84,7 @@
           [0  n]]]
       [#t n]]]]
 
-[defun avl/node-insert [n cmp v]
+[defn avl/node-insert [n cmp v]
   [if [avl/empty? n]
         #[1 v avl/empty avl/empty]
         [case [cmp v [avl/key n]]
@@ -97,7 +97,7 @@
   [avl/typecheck t v]
   [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
 
-[defun avl/node-get [n cmp v]
+[defn avl/node-get [n cmp v]
   [if [avl/empty? n]
       #nil
       [case [cmp v [avl/key n]]
@@ -133,7 +133,7 @@
               [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]]
         [#t n]]]]]
 
-[defun avl/node-remove [n cmp v]
+[defn avl/node-remove [n cmp v]
   [if [avl/empty? n]
       n
       [let [[root

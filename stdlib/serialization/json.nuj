@@ -8,7 +8,7 @@
                   ",\n"]
             "}"]]
 
-[defun val->json [v]
+[defn val->json [v]
        "Return V as a JSON encoded string"
        [case [type-of v]
              [:nil "null"]

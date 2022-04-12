@@ -1,26 +1,26 @@
-[do [def lognand [λδ* lognand l "Returns the Nand of its arguments" #{
+[do [def lognand [fn* lognand l "Returns the Nand of its arguments" #{
 10s logand
 10s l
 08i 2 v apply
 08i 1 v lognot
 01
-}]] [def bit-set?! [λδ* bit-set?! [i] "" #{
+}]] [def bit-set?! [fn* bit-set?! [i] "" #{
 02i 1
 10s i
 08i 2 v ash
 0Es mask
 0D
-11v [:symbol :symbol] v [α] v "" v [not [zero? [logand α mask]]]
+11v :INVALID-VALUE v [α] v "" v [not [zero? [logand α mask]]]
 01
-}]] [def bit-clear?! [λδ* bit-clear?! [i] "" #{
+}]] [def bit-clear?! [fn* bit-clear?! [i] "" #{
 02i 1
 10s i
 08i 2 v ash
 0Es mask
 0D
-11v [:symbol :symbol] v [α] v "" v [zero? [logand α mask]]
+11v :INVALID-VALUE v [α] v "" v [zero? [logand α mask]]
 01
-}]]][do [def array/+= [λδ* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
+}]]][do [def array/+= [fn* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
 10s a
 10s i
 10s v
@@ -30,13 +30,13 @@
 08i 2 v +
 08i 3 v array/set!
 01
-}]] [def array/++ [λδ* array/++ [a i] "Increment position I in A and return A" #{
+}]] [def array/++ [fn* array/++ [a i] "Increment position I in A and return A" #{
 10s a
 10s i
 02i 1
 08i 3 v array/+=
 01
-}]] [def array/fill! [λδ* array/fill! [a v] "Fills array a with value v" #{
+}]] [def array/fill! [fn* array/fill! [a v] "Fills array a with value v" #{
 10s a
 08i 1 v array/length
 0Es len
@@ -46,13 +46,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-129
+0Es ΓεnΣym-125
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-129
+10s ΓεnΣym-125
 1E
 0Bo 36
 0D
@@ -70,7 +70,7 @@
 0D
 10s a
 01
-}]] [def array/append [λδ* array/append [a b] "Append array A to array B" #{
+}]] [def array/append [fn* array/append [a b] "Append array A to array B" #{
 10s a
 08i 1 v array?
 0C
@@ -102,13 +102,13 @@
 0D
 10s a
 08i 1 v array/length
-0Es ΓεnΣym-130
+0Es ΓεnΣym-126
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-130
+10s ΓεnΣym-126
 1E
 0Bo 45
 0D
@@ -133,13 +133,13 @@
 0D
 10s ret
 08i 1 v array/length
-0Es ΓεnΣym-131
+0Es ΓεnΣym-127
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-131
+10s ΓεnΣym-127
 1E
 0Bo 59
 0D
@@ -162,13 +162,13 @@
 0D
 10s ret
 01
-}]] [def array/dup [λδ* array/dup [a] "Duplicate Array A" #{
+}]] [def array/dup [fn* array/dup [a] "Duplicate Array A" #{
 10s a
 24
 08i 1 v array/new
 08i 2 v array/append
 01
-}]] [def array/reduce [λδ* array/reduce [arr fun α] "Reduce an array, [reduce] should be preferred" #{
+}]] [def array/reduce [fn* array/reduce [arr fun α] "Reduce an array, [reduce] should be preferred" #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -178,13 +178,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-132
+0Es ΓεnΣym-128
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-132
+10s ΓεnΣym-128
 1E
 0Bo 46
 0D
@@ -208,7 +208,7 @@
 0D
 10s α
 01
-}]] [def array/map [λδ* array/map [arr fun] "Map an array, [map] should be preferred" #{
+}]] [def array/map [fn* array/map [arr fun] "Map an array, [map] should be preferred" #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -218,13 +218,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-133
+0Es ΓεnΣym-129
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-133
+10s ΓεnΣym-129
 1E
 0Bo 51
 0D
@@ -247,7 +247,7 @@
 0D
 10s arr
 01
-}]] [def array/filter [λδ* array/filter [arr pred] "Filter an array, [filter] should be preferred" #{
+}]] [def array/filter [fn* array/filter [arr pred] "Filter an array, [filter] should be preferred" #{
 02i 0
 0Es ri
 0D
@@ -264,13 +264,13 @@
 0Es ai
 0D
 10s len
-0Es ΓεnΣym-134
+0Es ΓεnΣym-130
 0D
 02i 0
 1B
 1C
 10s ai
-10s ΓεnΣym-134
+10s ΓεnΣym-130
 1E
 0Bo 87
 0D
@@ -306,7 +306,7 @@
 10s ri
 08i 2 v array/length!
 01
-}]] [def array/equal? [λδ* array/equal? [a b] "" #{
+}]] [def array/equal? [fn* array/equal? [a b] "" #{
 10s a
 08i 1 v array?
 08i 1 v not
@@ -341,13 +341,13 @@
 0D
 10s a
 08i 1 v array/length
-0Es ΓεnΣym-135
+0Es ΓεnΣym-131
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-135
+10s ΓεnΣym-131
 1E
 0Bo 79
 0D
@@ -378,20 +378,20 @@
 10s ret
 16
 01
-}]] [def array/push [λδ* array/push [arr . val] "Append all arguments following ARR to ARR" #{
+}]] [def array/push [fn* array/push [arr . val] "Append all arguments following ARR to ARR" #{
 15
 10s val
-0Es ΓεnΣym-136
+0Es ΓεnΣym-132
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-132
 0Bo 104
 02i 0
 1B
 1C
-10s ΓεnΣym-136
+10s ΓεnΣym-132
 0Bo 90
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-132
 08i 1 v car
 0Es v
 0D
@@ -410,9 +410,9 @@
 10s v
 08i 3 v array/set!
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-132
 08i 1 v cdr
-0Fs ΓεnΣym-136
+0Fs ΓεnΣym-132
 09o -92
 09o 4
 24
@@ -420,7 +420,7 @@
 0D
 10s arr
 01
-}]] [def array/swap [λδ* array/swap [arr i j] "" #{
+}]] [def array/swap [fn* array/swap [arr i j] "" #{
 10s arr
 10s i
 08i 2 v array/ref
@@ -438,7 +438,7 @@
 10s tmp
 08i 3 v array/set!
 01
-}]] [def array/heapify [λδ* array/heapify [arr n at] "bubble up the element from index AT to until the max-heap property is satisfied" #{
+}]] [def array/heapify [fn* array/heapify [arr n at] "bubble up the element from index AT to until the max-heap property is satisfied" #{
 10s at
 0Es top
 0D
@@ -521,7 +521,7 @@
 0D
 10s arr
 01
-}]] [def array/make-heap [λδ* array/make-heap [arr] "" #{
+}]] [def array/make-heap [fn* array/make-heap [arr] "" #{
 10s arr
 08i 1 v array/length
 0Es l
@@ -552,7 +552,7 @@
 0D
 10s arr
 01
-}]] [def array/heap-sort [λδ* array/heap-sort [arr] "" #{
+}]] [def array/heap-sort [fn* array/heap-sort [arr] "" #{
 10s arr
 08i 1 v array/make-heap
 0D
@@ -586,7 +586,7 @@
 0D
 10s arr
 01
-}]] [def array/sort array/heap-sort] [def array/cut [λδ* array/cut [arr start end] "Return a newly allocated array with the values of ARR from START to END" #{
+}]] [def array/sort array/heap-sort] [def array/cut [fn* array/cut [arr start end] "Return a newly allocated array with the values of ARR from START to END" #{
 02i 0
 10s start
 08i 2 v max
@@ -611,13 +611,13 @@
 0Es i
 0D
 10s end
-0Es ΓεnΣym-137
+0Es ΓεnΣym-133
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-137
+10s ΓεnΣym-133
 1E
 0Bo 54
 0D
@@ -639,7 +639,7 @@
 0D
 10s ret
 01
-}]]][do [def array/2d/allocate [λδ* array/2d/allocate [width height] "" #{
+}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
 05v :data
 10s width
 10s height
@@ -653,7 +653,7 @@
 10s height
 08i 6 v tree/new
 01
-}]] [def array/2d/fill! [λδ* array/2d/fill! [data v] "" #{
+}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
 10s data
 05v :data
 08i 2 v tree/ref
@@ -662,7 +662,7 @@
 0D
 10s data
 01
-}]] [def array/2d/ref [λδ* array/2d/ref [data x y oob-val] "" #{
+}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
 10s x
 10s data
 05v :width
@@ -707,7 +707,7 @@
 08i 2 v add
 08i 2 v array/ref
 01
-}]] [def array/2d/set! [λδ* array/2d/set! [data x y val] "" #{
+}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
 10s x
 10s data
 05v :width
@@ -760,7 +760,7 @@
 0D
 10s data
 01
-}]] [def array/2d/print [λδ* array/2d/print [data] "" #{
+}]] [def array/2d/print [fn* array/2d/print [data] "" #{
 15
 02i 0
 0Es y
@@ -768,13 +768,13 @@
 10s data
 05v :height
 08i 2 v tree/ref
-0Es ΓεnΣym-138
+0Es ΓεnΣym-134
 0D
 02i 0
 1B
 1C
 10s y
-10s ΓεnΣym-138
+10s ΓεnΣym-134
 1E
 0Bo 115
 0D
@@ -785,13 +785,13 @@
 10s data
 05v :width
 08i 2 v tree/ref
-0Es ΓεnΣym-139
+0Es ΓεnΣym-135
 0D
 02i 0
 1B
 1C
 10s x
-10s ΓεnΣym-139
+10s ΓεnΣym-135
 1E
 0Bo 50
 0D
@@ -821,12 +821,12 @@
 0D
 10s data
 01
-}]]][do [def avl/empty :e] [def avl/empty? [λδ* avl/empty? [n] "" #{
+}]]][do [def avl/empty :e] [def avl/empty? [fn* avl/empty? [n] "" #{
 05v :e
 10s n
 20
 01
-}]] [def avl/default-cmp [λδ* avl/default-cmp [x y] "" #{
+}]] [def avl/default-cmp [fn* avl/default-cmp [x y] "" #{
 10s x
 10s y
 1E
@@ -841,7 +841,7 @@
 09o 5
 02i 0
 01
-}]] [def avl/typecheck [λδ* avl/typecheck [r k] "" #{
+}]] [def avl/typecheck [fn* avl/typecheck [r k] "" #{
 10s r
 08i 1 v avl/root
 08i 1 v avl/empty?
@@ -869,7 +869,7 @@
 0D
 05v #f
 01
-}]] [def avl/tree [λδ* avl/tree [cmp] "" #{
+}]] [def avl/tree [fn* avl/tree [cmp] "" #{
 10s avl/empty
 10s cmp
 0C
@@ -882,7 +882,7 @@
 05v #f
 08i 2 v array/new
 01
-}]] [def avl/height [λδ* avl/height [n] "" #{
+}]] [def avl/height [fn* avl/height [n] "" #{
 10s n
 08i 1 v avl/empty?
 0Bo 8
@@ -892,32 +892,32 @@
 02i 0
 08i 2 v array/ref
 01
-}]] [def avl/key [λδ* avl/key [n] "" #{
+}]] [def avl/key [fn* avl/key [n] "" #{
 10s n
 02i 1
 08i 2 v array/ref
 01
-}]] [def avl/left [λδ* avl/left [n] "" #{
+}]] [def avl/left [fn* avl/left [n] "" #{
 10s n
 02i 2
 08i 2 v array/ref
 01
-}]] [def avl/right [λδ* avl/right [n] "" #{
+}]] [def avl/right [fn* avl/right [n] "" #{
 10s n
 02i 3
 08i 2 v array/ref
 01
-}]] [def avl/root [λδ* avl/root [r] "" #{
+}]] [def avl/root [fn* avl/root [r] "" #{
 10s r
 02i 0
 08i 2 v array/ref
 01
-}]] [def avl/cmp [λδ* avl/cmp [r] "" #{
+}]] [def avl/cmp [fn* avl/cmp [r] "" #{
 10s r
 02i 1
 08i 2 v array/ref
 01
-}]] [def avl/min-node [λδ* avl/min-node [n] "" #{
+}]] [def avl/min-node [fn* avl/min-node [n] "" #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -939,35 +939,35 @@
 01
 16
 01
-}]] [def avl/update-left [λδ* avl/update-left [n l] "" #{
+}]] [def avl/update-left [fn* avl/update-left [n l] "" #{
 10s n
 08i 1 v array/dup
 02i 2
 10s l
 08i 3 v array/set!
 01
-}]] [def avl/update-right [λδ* avl/update-right [n r] "" #{
+}]] [def avl/update-right [fn* avl/update-right [n r] "" #{
 10s n
 08i 1 v array/dup
 02i 3
 10s r
 08i 3 v array/set!
 01
-}]] [def avl/update-key [λδ* avl/update-key [n k] "" #{
+}]] [def avl/update-key [fn* avl/update-key [n k] "" #{
 10s n
 08i 1 v array/dup
 02i 1
 10s k
 08i 3 v array/set!
 01
-}]] [def avl/update-root [λδ* avl/update-root [t r] "" #{
+}]] [def avl/update-root [fn* avl/update-root [t r] "" #{
 10s t
 08i 1 v array/dup
 02i 0
 10s r
 08i 3 v array/set!
 01
-}]] [def avl/update-height [λδ* avl/update-height [n] "" #{
+}]] [def avl/update-height [fn* avl/update-height [n] "" #{
 10s n
 08i 1 v array/dup
 02i 0
@@ -982,7 +982,7 @@
 08i 2 v +
 08i 3 v array/set!
 01
-}]] [def avl/rotate-right [λδ* avl/rotate-right [y] "" #{
+}]] [def avl/rotate-right [fn* avl/rotate-right [y] "" #{
 15
 10s y
 08i 1 v avl/left
@@ -998,7 +998,7 @@
 08i 1 v avl/update-height
 16
 01
-}]] [def avl/rotate-left [λδ* avl/rotate-left [x] "" #{
+}]] [def avl/rotate-left [fn* avl/rotate-left [x] "" #{
 15
 10s x
 08i 1 v avl/right
@@ -1014,7 +1014,7 @@
 08i 1 v avl/update-height
 16
 01
-}]] [def avl/balance [λδ* avl/balance [n] "" #{
+}]] [def avl/balance [fn* avl/balance [n] "" #{
 10s n
 08i 1 v avl/empty?
 0Bo 8
@@ -1028,7 +1028,7 @@
 08i 1 v avl/height
 08i 2 v -
 01
-}]] [def avl/insert-rebalance [λ* avl/insert-rebalance [n cmp v] "" [let* [do [def b [avl/balance n]] [if [> b 1] [let* [do [def ΓεnΣym-145 [cmp v [avl/key [avl/left n]]]] [if [== ΓεnΣym-145 -1] [avl/rotate-right n] [if [== ΓεnΣym-145 1] [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]] [if [== ΓεnΣym-145 0] n #nil]]]]] [if [< b -1] [let* [do [def ΓεnΣym-146 [cmp v [avl/key [avl/right n]]]] [if [== ΓεnΣym-146 1] [avl/rotate-left n] [if [== ΓεnΣym-146 -1] [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]] [if [== ΓεnΣym-146 0] n #nil]]]]] [if #t n #nil]]]]]]] [def avl/node-insert [λ* avl/node-insert [n cmp v] "" [if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [let* [do [def ΓεnΣym-147 [cmp v [avl/key n]]] [if [== ΓεnΣym-147 -1] [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v] [if [== ΓεnΣym-147 1] [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v] [if [== ΓεnΣym-147 0] [avl/update-key n v] #nil]]]]]]]] [def avl/insert [λδ* avl/insert [t v] "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" #{
+}]] [def avl/insert-rebalance [λ* avl/insert-rebalance [n cmp v] "" [let* [do [def b [avl/balance n]] [if [> b 1] [let* [do [def ΓεnΣym-141 [cmp v [avl/key [avl/left n]]]] [if [== ΓεnΣym-141 -1] [avl/rotate-right n] [if [== ΓεnΣym-141 1] [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]] [if [== ΓεnΣym-141 0] n #nil]]]]] [if [< b -1] [let* [do [def ΓεnΣym-142 [cmp v [avl/key [avl/right n]]]] [if [== ΓεnΣym-142 1] [avl/rotate-left n] [if [== ΓεnΣym-142 -1] [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]] [if [== ΓεnΣym-142 0] n #nil]]]]] [if #t n #nil]]]]]]] [def avl/node-insert [λ* avl/node-insert [n cmp v] "" [if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [let* [do [def ΓεnΣym-143 [cmp v [avl/key n]]] [if [== ΓεnΣym-143 -1] [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v] [if [== ΓεnΣym-143 1] [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v] [if [== ΓεnΣym-143 0] [avl/update-key n v] #nil]]]]]]]] [def avl/insert [fn* avl/insert [t v] "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" #{
 10s t
 10s v
 08i 2 v avl/typecheck
@@ -1042,7 +1042,7 @@
 08i 3 v avl/node-insert
 08i 2 v avl/update-root
 01
-}]] [def avl/node-get [λ* avl/node-get [n cmp v] "" [if [avl/empty? n] #nil [let* [do [def ΓεnΣym-148 [cmp v [avl/key n]]] [if [== ΓεnΣym-148 0] [avl/key n] [if [== ΓεnΣym-148 -1] [avl/node-get [avl/left n] cmp v] [if [== ΓεnΣym-148 1] [avl/node-get [avl/right n] cmp v] #nil]]]]]]]] [def avl/get [λδ* avl/get [t v] "Retrieve the key V from tree T, or #nil if V is not in it" #{
+}]] [def avl/node-get [λ* avl/node-get [n cmp v] "" [if [avl/empty? n] #nil [let* [do [def ΓεnΣym-144 [cmp v [avl/key n]]] [if [== ΓεnΣym-144 0] [avl/key n] [if [== ΓεnΣym-144 -1] [avl/node-get [avl/left n] cmp v] [if [== ΓεnΣym-144 1] [avl/node-get [avl/right n] cmp v] #nil]]]]]]]] [def avl/get [fn* avl/get [t v] "Retrieve the key V from tree T, or #nil if V is not in it" #{
 10s t
 08i 1 v avl/root
 08i 1 v avl/empty?
@@ -1070,14 +1070,14 @@
 10s v
 08i 3 v avl/node-get
 01
-}]] [def avl/from-list [λδ* avl/from-list [l cmp] "Create a new avl tree using the keys in L and the comparison function CMP" #{
+}]] [def avl/from-list [fn* avl/from-list [l cmp] "Create a new avl tree using the keys in L and the comparison function CMP" #{
 10s l
 10s avl/insert
 10s cmp
 08i 1 v avl/tree
 08i 3 v list/reduce
 01
-}]] [def avl/remove-rebalance [λδ* avl/remove-rebalance [n] "" #{
+}]] [def avl/remove-rebalance [fn* avl/remove-rebalance [n] "" #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -1139,7 +1139,7 @@
 24
 16
 01
-}]] [def avl/node-remove [λ* avl/node-remove [n cmp v] "" [if [avl/empty? n] n [let* [do [def root [let* [do [def ΓεnΣym-149 [cmp v [avl/key n]]] [if [== ΓεnΣym-149 -1] [avl/update-left n [avl/node-remove [avl/left n] cmp v]] [if [== ΓεnΣym-149 1] [avl/update-right n [avl/node-remove [avl/right n] cmp v]] [if [== ΓεnΣym-149 0] [if [avl/empty? [avl/left n]] [avl/right n] [if [avl/empty? [avl/right n]] [avl/left n] [if #t [let* [do [def k [avl/key [avl/min-node [avl/right n]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]] #nil]]] #nil]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]]]] [def avl/remove [λδ* avl/remove [t v] "Remove the key V from tree T if it is contained within it" #{
+}]] [def avl/node-remove [λ* avl/node-remove [n cmp v] "" [if [avl/empty? n] n [let* [do [def root [let* [do [def ΓεnΣym-145 [cmp v [avl/key n]]] [if [== ΓεnΣym-145 -1] [avl/update-left n [avl/node-remove [avl/left n] cmp v]] [if [== ΓεnΣym-145 1] [avl/update-right n [avl/node-remove [avl/right n] cmp v]] [if [== ΓεnΣym-145 0] [if [avl/empty? [avl/left n]] [avl/right n] [if [avl/empty? [avl/right n]] [avl/left n] [if #t [let* [do [def k [avl/key [avl/min-node [avl/right n]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]] #nil]]] #nil]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]]]] [def avl/remove [fn* avl/remove [t v] "Remove the key V from tree T if it is contained within it" #{
 10s t
 10s t
 08i 1 v avl/root
@@ -1149,7 +1149,7 @@
 08i 3 v avl/node-remove
 08i 2 v avl/update-root
 01
-}]] [def avl/equal-node? [λδ* avl/equal-node? [a b] "" #{
+}]] [def avl/equal-node? [fn* avl/equal-node? [a b] "" #{
 10s a
 08i 1 v avl/empty?
 0Bo 15
@@ -1178,14 +1178,14 @@
 08i 1 v avl/right
 08i 2 v avl/equal-node?
 01
-}]] [def avl/equal? [λδ* avl/equal? [a b] "Test if two avl trees are equal" #{
+}]] [def avl/equal? [fn* avl/equal? [a b] "Test if two avl trees are equal" #{
 10s a
 08i 1 v avl/root
 10s b
 08i 1 v avl/root
 08i 2 v avl/equal-node?
 01
-}]] [def avl/reduce-node [λδ* avl/reduce-node [node o s] "" #{
+}]] [def avl/reduce-node [fn* avl/reduce-node [node o s] "" #{
 10s node
 08i 1 v avl/empty?
 0Bo 10
@@ -1205,14 +1205,14 @@
 08i 3 v avl/reduce-node
 1A
 02i 1 
-}]] [def avl/reduce [λδ* avl/reduce [t o s] "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" #{
+}]] [def avl/reduce [fn* avl/reduce [t o s] "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" #{
 10s t
 08i 1 v avl/root
 10s o
 10s s
 08i 3 v avl/reduce-node
 01
-}]] [def avl/reduce-node-bin [λδ* avl/reduce-node-bin [n o s] "" #{
+}]] [def avl/reduce-node-bin [fn* avl/reduce-node-bin [n o s] "" #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -1234,41 +1234,41 @@
 1A
 03
 01
-}]] [def avl/reduce-bin [λδ* avl/reduce-bin [t o s] "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" #{
+}]] [def avl/reduce-bin [fn* avl/reduce-bin [t o s] "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" #{
 10s t
 08i 1 v avl/root
 10s o
 10s s
 08i 3 v avl/reduce-node-bin
 01
-}]] [def avl/map [λδ* avl/map [t f] "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" #{
+}]] [def avl/map [fn* avl/map [t f] "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" #{
 10s t
-11v [:symbol :symbol] v [x acc] v "" v [avl/insert acc [f x]]
+11v :INVALID-VALUE v [x acc] v "" v [avl/insert acc [f x]]
 10s t
 08i 1 v avl/cmp
 08i 1 v avl/tree
 08i 3 v avl/reduce
 01
-}]] [def avl/map-to [λδ* avl/map-to [t f cmp] "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" #{
+}]] [def avl/map-to [fn* avl/map-to [t f cmp] "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" #{
 10s t
-11v [:symbol :symbol] v [x acc] v "" v [avl/insert acc [f x]]
+11v :INVALID-VALUE v [x acc] v "" v [avl/insert acc [f x]]
 10s cmp
 08i 1 v avl/tree
 08i 3 v avl/reduce
 01
-}]] [def avl/to-list [λδ* avl/to-list [t] "" #{
+}]] [def avl/to-list [fn* avl/to-list [t] "" #{
 10s t
 10s cons
 24
 08i 3 v avl/reduce
 01
-}]]][do [def sum [λδ* sum [c] "Return the sum of every value in collection C" #{
+}]]][do [def sum [fn* sum [c] "Return the sum of every value in collection C" #{
 10s c
 10s +
 02i 0
 08i 3 v reduce
 01
-}]] [def join [λδ* join [l glue] "Join every element of α together into a string with GLUE inbetween" #{
+}]] [def join [fn* join [l glue] "Join every element of α together into a string with GLUE inbetween" #{
 10s glue
 0Bo 7
 24
@@ -1279,13 +1279,13 @@
 10s l
 0Bo 29
 10s l
-11v [:symbol :symbol] v [a b] v "" v [if a [cat a glue b] b]
+11v :INVALID-VALUE v [a b] v "" v [if a [cat a glue b] b]
 24
 08i 3 v reduce
 09o 7
 05v ""
 01
-}]] [def for-each [λ* for-each [l f] "Runs F over every item in collection L" [reduce l [λ* #nil [a b] "" [f b]] #nil]]] [def count [λ* count [l p] "Count the number of items in L where P is true" [if p [reduce l [λ* #nil [a b] "" [+ a [if [p b] 1 0]]] 0] [reduce l [λ* #nil [a b] "" [+ a 1]] 0]]]] [def min/λ [λδ* min/λ [a b] "" #{
+}]] [def for-each [λ* for-each [l f] "Runs F over every item in collection L" [reduce l [λ* #nil [a b] "" [f b]] #nil]]] [def count [λ* count [l p] "Count the number of items in L where P is true" [if p [reduce l [λ* #nil [a b] "" [+ a [if [p b] 1 0]]] 0] [reduce l [λ* #nil [a b] "" [+ a 1]] 0]]]] [def min/λ [fn* min/λ [a b] "" #{
 10s a
 10s b
 1E
@@ -1294,7 +1294,7 @@
 09o 7
 10s b
 01
-}]] [def min [λδ* min l "Returns the minimum value of its arguments, or collection" #{
+}]] [def min [fn* min l "Returns the minimum value of its arguments, or collection" #{
 10s l
 08i 1 v cdr
 0Bo 10
@@ -1306,7 +1306,7 @@
 24
 08i 3 v reduce
 01
-}]] [def max/λ [λδ* max/λ [a b] "" #{
+}]] [def max/λ [fn* max/λ [a b] "" #{
 10s a
 10s b
 22
@@ -1315,7 +1315,7 @@
 09o 7
 10s b
 01
-}]] [def max [λδ* max l "Returns the minimum value of its arguments, or collection" #{
+}]] [def max [fn* max l "Returns the minimum value of its arguments, or collection" #{
 10s l
 08i 1 v cdr
 0Bo 10
@@ -1327,17 +1327,17 @@
 24
 08i 3 v reduce
 01
-}]] [def delete [λδ* delete [l e] "Returns a filtered list l with all elements equal to e omitted" #{
+}]] [def delete [fn* delete [l e] "Returns a filtered list l with all elements equal to e omitted" #{
 10s l
-11v [:symbol :symbol] v [a] v "" v [not [== a e]]
+11v :INVALID-VALUE v [a] v "" v [not [== a e]]
 08i 2 v filter
 01
-}]] [def remove [λδ* remove [l p] "Returns a filtered list l with all elements where P equal true removed" #{
+}]] [def remove [fn* remove [l p] "Returns a filtered list l with all elements where P equal true removed" #{
 10s l
-11v [:symbol :symbol] v [a] v "" v [not [p a]]
+11v :INVALID-VALUE v [a] v "" v [not [p a]]
 08i 2 v filter
 01
-}]] [def flatten/λ [λδ* flatten/λ [a b] "" #{
+}]] [def flatten/λ [fn* flatten/λ [a b] "" #{
 10s b
 08i 1 v collection?
 0Bo 29
@@ -1356,7 +1356,7 @@
 09o 4
 24
 01
-}]] [def flatten [λδ* flatten [l] "Flatten a collection of collections into a simple list" #{
+}]] [def flatten [fn* flatten [l] "Flatten a collection of collections into a simple list" #{
 10s l
 08i 1 v collection?
 0Bo 25
@@ -1368,19 +1368,19 @@
 09o 7
 10s l
 01
-}]]][do [def ref [λδ* ref [l i] "Return whatver is at position I in L" #{
+}]]][do [def ref [fn* ref [l i] "Return whatver is at position I in L" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-26
+0Es ΓεnΣym-30
 0D
-10s ΓεnΣym-26
+10s ΓεnΣym-30
 05v :nil
 20
 0Bo 7
 24
 09o 142
-10s ΓεnΣym-26
+10s ΓεnΣym-30
 05v :tree
 20
 0Bo 19
@@ -1388,7 +1388,7 @@
 10s i
 08i 2 v tree/ref
 09o 114
-10s ΓεnΣym-26
+10s ΓεnΣym-30
 05v :string
 20
 0Bo 19
@@ -1396,7 +1396,7 @@
 10s i
 08i 2 v char-at
 09o 86
-10s ΓεnΣym-26
+10s ΓεnΣym-30
 05v :array
 20
 0Bo 19
@@ -1404,7 +1404,7 @@
 10s i
 08i 2 v array/ref
 09o 58
-10s ΓεnΣym-26
+10s ΓεnΣym-30
 05v :pair
 20
 0Bo 19
@@ -1420,19 +1420,19 @@
 08i 1 v throw
 16
 01
-}]] [def filter [λδ* filter [l p] "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" #{
+}]] [def filter [fn* filter [l p] "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-151
+0Es ΓεnΣym-147
 0D
-10s ΓεnΣym-151
+10s ΓεnΣym-147
 05v :nil
 20
 0Bo 7
 24
 09o 114
-10s ΓεnΣym-151
+10s ΓεnΣym-147
 05v :tree
 20
 0Bo 19
@@ -1440,7 +1440,7 @@
 10s p
 08i 2 v tree/filter
 09o 86
-10s ΓεnΣym-151
+10s ΓεnΣym-147
 05v :pair
 20
 0Bo 19
@@ -1448,7 +1448,7 @@
 10s p
 08i 2 v list/filter
 09o 58
-10s ΓεnΣym-151
+10s ΓεnΣym-147
 05v :array
 20
 0Bo 19
@@ -1464,19 +1464,19 @@
 08i 1 v throw
 16
 01
-}]] [def reduce [λδ* reduce [l f α] "Combine all elements in collection l using operation F and starting value α" #{
+}]] [def reduce [fn* reduce [l f α] "Combine all elements in collection l using operation F and starting value α" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-152
+0Es ΓεnΣym-148
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-148
 05v :nil
 20
 0Bo 10
 10s α
 09o 113
-10s ΓεnΣym-152
+10s ΓεnΣym-148
 05v :tree
 20
 0Bo 23
@@ -1485,7 +1485,7 @@
 10s α
 08i 3 v tree/reduce
 09o 81
-10s ΓεnΣym-152
+10s ΓεnΣym-148
 05v :pair
 20
 0Bo 23
@@ -1494,7 +1494,7 @@
 10s α
 08i 3 v list/reduce
 09o 49
-10s ΓεnΣym-152
+10s ΓεnΣym-148
 05v :array
 20
 0Bo 23
@@ -1509,40 +1509,40 @@
 1A
 02i 22
 01
-}]] [def length [λδ* length [α] "Returns the length of collection α" #{
+}]] [def length [fn* length [α] "Returns the length of collection α" #{
 15
 10s α
 08i 1 v type-of
-0Es ΓεnΣym-153
+0Es ΓεnΣym-149
 0D
-10s ΓεnΣym-153
+10s ΓεnΣym-149
 05v :nil
 20
 0Bo 8
 02i 0
 09o 126
-10s ΓεnΣym-153
+10s ΓεnΣym-149
 05v :array
 20
 0Bo 15
 10s α
 08i 1 v array/length
 09o 102
-10s ΓεnΣym-153
+10s ΓεnΣym-149
 05v :pair
 20
 0Bo 15
 10s α
 08i 1 v list/length
 09o 78
-10s ΓεnΣym-153
+10s ΓεnΣym-149
 05v :string
 20
 0Bo 15
 10s α
 08i 1 v string/length
 09o 54
-10s ΓεnΣym-153
+10s ΓεnΣym-149
 05v :tree
 20
 0Bo 15
@@ -1557,26 +1557,26 @@
 08i 1 v throw
 16
 01
-}]] [def map [λ* map [l f] "Runs f over every item in collection l and returns the resulting list" [let* [do [def ΓεnΣym-154 [type-of l]] [if [== ΓεnΣym-154 :nil] #nil [if [== ΓεnΣym-154 :pair] [list/map l f] [if [== ΓεnΣym-154 :array] [array/map l f] [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]]]]] [def sort [λδ* sort [l] "Sorts the collection L" #{
+}]] [def map [λ* map [l f] "Runs f over every item in collection l and returns the resulting list" [let* [do [def ΓεnΣym-150 [type-of l]] [if [== ΓεnΣym-150 :nil] #nil [if [== ΓεnΣym-150 :pair] [list/map l f] [if [== ΓεnΣym-150 :array] [array/map l f] [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]]]]] [def sort [fn* sort [l] "Sorts the collection L" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-155
+0Es ΓεnΣym-151
 0D
-10s ΓεnΣym-155
+10s ΓεnΣym-151
 05v :nil
 20
 0Bo 7
 24
 09o 78
-10s ΓεnΣym-155
+10s ΓεnΣym-151
 05v :pair
 20
 0Bo 15
 10s l
 08i 1 v list/sort/merge
 09o 54
-10s ΓεnΣym-155
+10s ΓεnΣym-151
 05v :array
 20
 0Bo 15
@@ -1591,13 +1591,13 @@
 08i 1 v throw
 16
 01
-}]] [def member [λδ* member [l m] "Returns the first pair/item of collection l whose car is equal to m" #{
+}]] [def member [fn* member [l m] "Returns the first pair/item of collection l whose car is equal to m" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-156
+0Es ΓεnΣym-152
 0D
-10s ΓεnΣym-156
+10s ΓεnΣym-152
 05v :pair
 20
 0Bo 19
@@ -1613,13 +1613,13 @@
 08i 1 v throw
 16
 01
-}]] [def cut [λδ* cut [l start end] "Return a subcollection of L from START to END" #{
+}]] [def cut [fn* cut [l start end] "Return a subcollection of L from START to END" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-157
+0Es ΓεnΣym-153
 0D
-10s ΓεnΣym-157
+10s ΓεnΣym-153
 05v :array
 20
 0Bo 23
@@ -1628,7 +1628,7 @@
 10s end
 08i 3 v array/cut
 09o 94
-10s ΓεnΣym-157
+10s ΓεnΣym-153
 05v :pair
 20
 0Bo 23
@@ -1637,7 +1637,7 @@
 10s end
 08i 3 v list/cut
 09o 62
-10s ΓεnΣym-157
+10s ΓεnΣym-153
 05v :string
 20
 0Bo 23
@@ -1654,25 +1654,25 @@
 08i 1 v throw
 16
 01
-}]] [def collection? [λδ* collection? [l] "" #{
+}]] [def collection? [fn* collection? [l] "" #{
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-158
+0Es ΓεnΣym-154
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-154
 05v :pair
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-154
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-154
 05v :tree
 20
 0C
@@ -1685,7 +1685,7 @@
 05v #f
 16
 01
-}]]][do [def except-last-pair/iter [λδ* except-last-pair/iter [list rest] "Iterator for except-last-pair" #{
+}]]][do [def except-last-pair/iter [fn* except-last-pair/iter [list rest] "Iterator for except-last-pair" #{
 10s list
 08i 1 v cdr
 08i 1 v nil?
@@ -1701,12 +1701,12 @@
 08i 2 v cons
 08i 2 v except-last-pair/iter
 01
-}]] [def except-last-pair [λδ* except-last-pair [list] "Return a copy of LIST without the last pair" #{
+}]] [def except-last-pair [fn* except-last-pair [list] "Return a copy of LIST without the last pair" #{
 10s list
 24
 08i 2 v except-last-pair/iter
 01
-}]] [def last-pair [λδ* last-pair [list] "Return the last pair of LIST" #{
+}]] [def last-pair [fn* last-pair [list] "Return the last pair of LIST" #{
 02i 0
 1B
 1C
@@ -1721,7 +1721,7 @@
 0D
 10s list
 01
-}]] [def make-list [λδ* make-list [number value] "Return a list of NUMBER elements containing VALUE in every car" #{
+}]] [def make-list [fn* make-list [number value] "Return a list of NUMBER elements containing VALUE in every car" #{
 24
 0Es list
 0D
@@ -1744,7 +1744,7 @@
 0D
 10s list
 01
-}]] [def range [λδ* range [end start step] "Return a list containing values from START (inclusive) to END (exclusive) by STEP" #{
+}]] [def range [fn* range [end start step] "Return a list containing values from START (inclusive) to END (exclusive) by STEP" #{
 10s end
 0Bo 7
 24
@@ -1804,20 +1804,20 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def list/reduce [λδ* list/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
+}]] [def list/reduce [fn* list/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
 15
 10s l
-0Es ΓεnΣym-159
+0Es ΓεnΣym-155
 0D
-10s ΓεnΣym-159
+10s ΓεnΣym-155
 0Bo 67
 02i 0
 1B
 1C
-10s ΓεnΣym-159
+10s ΓεnΣym-155
 0Bo 53
 0D
-10s ΓεnΣym-159
+10s ΓεnΣym-155
 08i 1 v car
 0Es e
 0D
@@ -1830,9 +1830,9 @@
 00
 8A
 0D
-10s ΓεnΣym-159
+10s ΓεnΣym-155
 08i 1 v cdr
-0Fs ΓεnΣym-159
+0Fs ΓεnΣym-155
 09o -55
 09o 4
 24
@@ -1840,7 +1840,7 @@
 0D
 10s s
 01
-}]] [def list/ref [λδ* list/ref [l i] "Returns the the element of list l at location i" #{
+}]] [def list/ref [fn* list/ref [l i] "Returns the the element of list l at location i" #{
 02i 0
 1B
 1C
@@ -1866,23 +1866,23 @@
 10s l
 08i 1 v car
 01
-}]] [def reverse [λδ* reverse [l] "Return the list l in reverse order" #{
+}]] [def reverse [fn* reverse [l] "Return the list l in reverse order" #{
 24
 0Es ret
 0D
 15
 10s l
-0Es ΓεnΣym-160
+0Es ΓεnΣym-156
 0D
-10s ΓεnΣym-160
+10s ΓεnΣym-156
 0Bo 66
 02i 0
 1B
 1C
-10s ΓεnΣym-160
+10s ΓεnΣym-156
 0Bo 52
 0D
-10s ΓεnΣym-160
+10s ΓεnΣym-156
 08i 1 v car
 0Es e
 0D
@@ -1891,9 +1891,9 @@
 08i 2 v cons
 0Fs ret
 0D
-10s ΓεnΣym-160
+10s ΓεnΣym-156
 08i 1 v cdr
-0Fs ΓεnΣym-160
+0Fs ΓεnΣym-156
 09o -54
 09o 4
 24
@@ -1901,23 +1901,23 @@
 0D
 10s ret
 01
-}]] [def list/length [λδ* list/length [l] "Returns the length of list l" #{
+}]] [def list/length [fn* list/length [l] "Returns the length of list l" #{
 02i 0
 0Es ret
 0D
 15
 10s l
-0Es ΓεnΣym-161
+0Es ΓεnΣym-157
 0D
-10s ΓεnΣym-161
+10s ΓεnΣym-157
 0Bo 64
 02i 0
 1B
 1C
-10s ΓεnΣym-161
+10s ΓεnΣym-157
 0Bo 50
 0D
-10s ΓεnΣym-161
+10s ΓεnΣym-157
 08i 1 v car
 0Es e
 0D
@@ -1926,9 +1926,9 @@
 08i 2 v +
 0Fs ret
 0D
-10s ΓεnΣym-161
+10s ΓεnΣym-157
 08i 1 v cdr
-0Fs ΓεnΣym-161
+0Fs ΓεnΣym-157
 09o -52
 09o 4
 24
@@ -1936,23 +1936,23 @@
 0D
 10s ret
 01
-}]] [def list/filter [λδ* list/filter [l p] "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" #{
+}]] [def list/filter [fn* list/filter [l p] "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" #{
 24
 0Es ret
 0D
 15
 10s l
-0Es ΓεnΣym-162
+0Es ΓεnΣym-158
 0D
-10s ΓεnΣym-162
+10s ΓεnΣym-158
 0Bo 83
 02i 0
 1B
 1C
-10s ΓεnΣym-162
+10s ΓεnΣym-158
 0Bo 69
 0D
-10s ΓεnΣym-162
+10s ΓεnΣym-158
 08i 1 v car
 0Es e
 0D
@@ -1968,9 +1968,9 @@
 09o 4
 24
 0D
-10s ΓεnΣym-162
+10s ΓεnΣym-158
 08i 1 v cdr
-0Fs ΓεnΣym-162
+0Fs ΓεnΣym-158
 09o -71
 09o 4
 24
@@ -1979,23 +1979,23 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def list/map [λδ* list/map [l f] "Runs f over every item in list l and returns the resulting list" #{
+}]] [def list/map [fn* list/map [l f] "Runs f over every item in list l and returns the resulting list" #{
 24
 0Es ret
 0D
 15
 10s l
-0Es ΓεnΣym-163
+0Es ΓεnΣym-159
 0D
-10s ΓεnΣym-163
+10s ΓεnΣym-159
 0Bo 72
 02i 0
 1B
 1C
-10s ΓεnΣym-163
+10s ΓεnΣym-159
 0Bo 58
 0D
-10s ΓεnΣym-163
+10s ΓεnΣym-159
 08i 1 v car
 0Es e
 0D
@@ -2007,9 +2007,9 @@
 08i 2 v cons
 0Fs ret
 0D
-10s ΓεnΣym-163
+10s ΓεnΣym-159
 08i 1 v cdr
-0Fs ΓεnΣym-163
+0Fs ΓεnΣym-159
 09o -60
 09o 4
 24
@@ -2018,7 +2018,7 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def append/iter [λδ* append/iter [a b] "Iterator for append" #{
+}]] [def append/iter [fn* append/iter [a b] "Iterator for append" #{
 10s a
 08i 1 v nil?
 0Bo 10
@@ -2032,7 +2032,7 @@
 08i 2 v cons
 08i 2 v append/iter
 01
-}]] [def append [λδ* append [a . b] "Appends two lists A and B together" #{
+}]] [def append [fn* append [a . b] "Appends two lists A and B together" #{
 02i 0
 1B
 1C
@@ -2053,7 +2053,7 @@
 0D
 10s a
 01
-}]] [def sublist [λδ* sublist [l start end ret] "Returns a new list containing all elements of l from start to end" #{
+}]] [def sublist [fn* sublist [l start end ret] "Returns a new list containing all elements of l from start to end" #{
 10s l
 08i 1 v nil?
 0Bo 15
@@ -2110,20 +2110,20 @@
 09o 4
 24
 01
-}]] [def list-head [λδ* list-head [l k] "Returns the first k elements of list l" #{
+}]] [def list-head [fn* list-head [l k] "Returns the first k elements of list l" #{
 10s l
 02i 0
 10s k
 08i 3 v sublist
 01
-}]] [def list-tail [λδ* list-tail [l k] "Returns the sublist of l obtained by omitting the first l elements" #{
+}]] [def list-tail [fn* list-tail [l k] "Returns the sublist of l obtained by omitting the first l elements" #{
 10s l
 10s k
 10s l
 08i 1 v length
 08i 3 v sublist
 01
-}]] [def list/member [λδ* list/member [l m] "Returns the first pair of list l whose car is equal to m" #{
+}]] [def list/member [fn* list/member [l m] "Returns the first pair of list l whose car is equal to m" #{
 10s l
 08i 1 v nil?
 0Bo 10
@@ -2145,7 +2145,7 @@
 09o 4
 24
 01
-}]] [def getf [λδ* getf [l key] "Return the value in LIST following KEY" #{
+}]] [def getf [fn* getf [l key] "Return the value in LIST following KEY" #{
 10s l
 08i 1 v nil?
 0Bo 7
@@ -2168,7 +2168,7 @@
 09o 4
 24
 01
-}]] [def list/sort/bubble [λδ* list/sort/bubble [l] "Terribly slow way to sort a list, though it was simple to write" #{
+}]] [def list/sort/bubble [fn* list/sort/bubble [l] "Terribly slow way to sort a list, though it was simple to write" #{
 10s l
 0Bo 161
 10s l
@@ -2220,7 +2220,7 @@
 09o 4
 24
 01
-}]] [def list/merge-sorted-lists [λ* list/merge-sorted-lists [l1 l2] "" [if [nil? l1] l2 [if [nil? l2] l1 [if #t [if [< [car l1] [car l2]] [cons [car l1] [list/merge-sorted-lists [cdr l1] l2]] [cons [car l2] [list/merge-sorted-lists l1 [cdr l2]]]] #nil]]]]] [def list/split-half-rec [λ* list/split-half-rec [l acc1 acc2] "" [if [nil? l] [cons acc1 acc2] [if [nil? [cdr l]] [cons [cons [car l] acc1] acc2] [if #t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]] #nil]]]]] [def list/split-half [λ* list/split-half [l] "" [list/split-half-rec l #nil #nil]]] [def list/sort/merge [λδ* list/sort/merge [l] "Sorts a list" #{
+}]] [def list/merge-sorted-lists [λ* list/merge-sorted-lists [l1 l2] "" [if [nil? l1] l2 [if [nil? l2] l1 [if #t [if [< [car l1] [car l2]] [cons [car l1] [list/merge-sorted-lists [cdr l1] l2]] [cons [car l2] [list/merge-sorted-lists l1 [cdr l2]]]] #nil]]]]] [def list/split-half-rec [λ* list/split-half-rec [l acc1 acc2] "" [if [nil? l] [cons acc1 acc2] [if [nil? [cdr l]] [cons [cons [car l] acc1] acc2] [if #t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]] #nil]]]]] [def list/split-half [λ* list/split-half [l] "" [list/split-half-rec l #nil #nil]]] [def list/sort/merge [fn* list/sort/merge [l] "Sorts a list" #{
 10s l
 08i 1 v cdr
 08i 1 v nil?
@@ -2239,7 +2239,7 @@
 08i 1 v list/sort/merge
 08i 2 v list/merge-sorted-lists
 01
-}]] [def list/sort list/sort/merge] [def list/equal? [λδ* list/equal? [a b] "#t if A and B are equal" #{
+}]] [def list/sort list/sort/merge] [def list/equal? [fn* list/equal? [a b] "#t if A and B are equal" #{
 10s a
 08i 1 v pair?
 0Bo 57
@@ -2261,7 +2261,7 @@
 10s b
 08i 2 v equal?
 01
-}]] [def list/take [λδ* list/take [l count] "Take the first COUNT elements from list L" #{
+}]] [def list/take [fn* list/take [l count] "Take the first COUNT elements from list L" #{
 10s count
 02i 0
 1F
@@ -2278,7 +2278,7 @@
 08i 2 v list/take
 08i 2 v cons
 01
-}]] [def list/drop [λδ* list/drop [l count] "Drop the final COUNT elements from list L" #{
+}]] [def list/drop [fn* list/drop [l count] "Drop the final COUNT elements from list L" #{
 10s count
 02i 0
 1F
@@ -2292,7 +2292,7 @@
 08i 2 v -
 08i 2 v list/drop
 01
-}]] [def list/cut [λδ* list/cut [l start end] "Return a subsequence of L from START to END" #{
+}]] [def list/cut [fn* list/cut [l start end] "Return a subsequence of L from START to END" #{
 10s l
 02i 0
 10s start
@@ -2305,24 +2305,24 @@
 08i 2 v -
 08i 2 v list/take
 01
-}]]][do [def tree/zip [λδ* tree/zip [keys values] "Return a tree where KEYS point to VALUES" #{
+}]]][do [def tree/zip [fn* tree/zip [keys values] "Return a tree where KEYS point to VALUES" #{
 24
 08i 1 v tree/new
 0Es ret
 0D
 15
 10s keys
-0Es ΓεnΣym-35
+0Es ΓεnΣym-39
 0D
-10s ΓεnΣym-35
+10s ΓεnΣym-39
 0Bo 85
 02i 0
 1B
 1C
-10s ΓεnΣym-35
+10s ΓεnΣym-39
 0Bo 71
 0D
-10s ΓεnΣym-35
+10s ΓεnΣym-39
 08i 1 v car
 0Es key
 0D
@@ -2336,9 +2336,9 @@
 08i 1 v cdr
 0Fs values
 0D
-10s ΓεnΣym-35
+10s ΓεnΣym-39
 08i 1 v cdr
-0Fs ΓεnΣym-35
+0Fs ΓεnΣym-39
 09o -73
 09o 4
 24
@@ -2346,7 +2346,7 @@
 0D
 10s ret
 01
-}]] [def tree/+= [λδ* tree/+= [t k v] "Increment value at K in T by V" #{
+}]] [def tree/+= [fn* tree/+= [t k v] "Increment value at K in T by V" #{
 10s t
 10s k
 10s v
@@ -2357,7 +2357,7 @@
 08i 2 v +
 08i 3 v tree/set!
 01
-}]] [def tree/-= [μ* tree/-= [t k v] "Decrement value at K in T by V" [cons 'tree/+= [cons t [cons k [cons [cons '- [cons v #nil]] #nil]]]]]] [def tree/++ [μ* tree/++ [t k] "Increment value at K in T by 1" [cons 'tree/+= [cons t [cons k [cons 1 #nil]]]]]] [def tree/-- [μ* tree/-- [t k] "Increment value at K in T by 1" [cons 'tree/-= [cons t [cons k [cons 1 #nil]]]]]] [def tree/equal? [λδ* tree/equal? [a b] "Compares two trees for equality" #{
+}]] [def tree/-= [μ* tree/-= [t k v] "Decrement value at K in T by V" [cons 'tree/+= [cons t [cons k [cons [cons '- [cons v #nil]] #nil]]]]]] [def tree/++ [μ* tree/++ [t k] "Increment value at K in T by 1" [cons 'tree/+= [cons t [cons k [cons 1 #nil]]]]]] [def tree/-- [μ* tree/-- [t k] "Increment value at K in T by 1" [cons 'tree/-= [cons t [cons k [cons 1 #nil]]]]]] [def tree/equal? [fn* tree/equal? [a b] "Compares two trees for equality" #{
 10s a
 08i 1 v tree?
 0C
@@ -2400,21 +2400,21 @@
 10s b
 08i 2 v equal?
 01
-}]] [def tree/reduce [λδ* tree/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
+}]] [def tree/reduce [fn* tree/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
 15
 10s l
 08i 1 v tree/keys
-0Es ΓεnΣym-164
+0Es ΓεnΣym-160
 0D
-10s ΓεnΣym-164
+10s ΓεnΣym-160
 0Bo 80
 02i 0
 1B
 1C
-10s ΓεnΣym-164
+10s ΓεnΣym-160
 0Bo 66
 0D
-10s ΓεnΣym-164
+10s ΓεnΣym-160
 08i 1 v car
 0Es e
 0D
@@ -2428,9 +2428,9 @@
 03
 0Fs s
 0D
-10s ΓεnΣym-164
+10s ΓεnΣym-160
 08i 1 v cdr
-0Fs ΓεnΣym-164
+0Fs ΓεnΣym-160
 09o -68
 09o 4
 24
@@ -2438,7 +2438,7 @@
 0D
 10s s
 01
-}]] [def tree/filter [λδ* tree/filter [l f] "Return a new tree with all elements from L where F retunrs true" #{
+}]] [def tree/filter [fn* tree/filter [l f] "Return a new tree with all elements from L where F retunrs true" #{
 24
 08i 1 v tree/new
 0Es ret
@@ -2446,17 +2446,17 @@
 15
 10s l
 08i 1 v tree/keys
-0Es ΓεnΣym-165
+0Es ΓεnΣym-161
 0D
-10s ΓεnΣym-165
+10s ΓεnΣym-161
 0Bo 101
 02i 0
 1B
 1C
-10s ΓεnΣym-165
+10s ΓεnΣym-161
 0Bo 87
 0D
-10s ΓεnΣym-165
+10s ΓεnΣym-161
 08i 1 v car
 0Es e
 0D
@@ -2477,9 +2477,9 @@
 09o 4
 24
 0D
-10s ΓεnΣym-165
+10s ΓεnΣym-161
 08i 1 v cdr
-0Fs ΓεnΣym-165
+0Fs ΓεnΣym-161
 09o -89
 09o 4
 24
@@ -2487,7 +2487,7 @@
 0D
 10s ret
 01
-}]]][do [def val->bytecode-op [λδ* val->bytecode-op [v] "" #{
+}]]][do [def val->bytecode-op [fn* val->bytecode-op [v] "" #{
 10s v
 08i 1 v val->index
 0Es i
@@ -2510,7 +2510,7 @@
 08i 1 v int->bytecode-op
 08i 3 v list
 01
-}]] [def sym->bytecode-op [λδ* sym->bytecode-op [v] "" #{
+}]] [def sym->bytecode-op [fn* sym->bytecode-op [v] "" #{
 10s v
 08i 1 v sym->index
 0Es i
@@ -2533,7 +2533,7 @@
 08i 1 v int->bytecode-op
 08i 3 v list
 01
-}]] [def int-fit-in-byte? [λδ* int-fit-in-byte? [a] "" #{
+}]] [def int-fit-in-byte? [fn* int-fit-in-byte? [a] "" #{
 10s a
 02i 127
 1F
@@ -2544,13 +2544,13 @@
 02i -128
 21
 01
-}]] [def $nop [λδ* $nop [] "- | Do nothing" #{
+}]] [def $nop [fn* $nop [] "- | Do nothing" #{
 05v [#$0]
 01
-}]] [def $ret [λδ* $ret [] "a - | Return top of value stack" #{
+}]] [def $ret [fn* $ret [] "a - | Return top of value stack" #{
 05v [#$1]
 01
-}]] [def $push/int/byte [λδ* $push/int/byte [a] "- a | Return top of value stack" #{
+}]] [def $push/int/byte [fn* $push/int/byte [a] "- a | Return top of value stack" #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 7
@@ -2568,7 +2568,7 @@
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $push/int [λδ* $push/int [a] "- a | Return top of value stack" #{
+}]] [def $push/int [fn* $push/int [a] "- a | Return top of value stack" #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 15
@@ -2578,13 +2578,13 @@
 10s a
 08i 1 v $push/lval
 01
-}]] [def $add/int [λδ* $add/int [] "a b - c | Adds the two topmost values and pushes the result" #{
+}]] [def $add/int [fn* $add/int [] "a b - c | Adds the two topmost values and pushes the result" #{
 05v [#$3]
 01
-}]] [def $debug/print-stack [λδ* $debug/print-stack [] "- | Print out the stack for the current closure" #{
+}]] [def $debug/print-stack [fn* $debug/print-stack [] "- | Print out the stack for the current closure" #{
 05v [#$4]
 01
-}]] [def $push/lval [λδ* $push/lval [v] "- v | Pushes v onto the stack" #{
+}]] [def $push/lval [fn* $push/lval [v] "- v | Pushes v onto the stack" #{
 10s v
 08i 1 v nil?
 0Bo 33
@@ -2602,71 +2602,71 @@
 08i 1 v val->bytecode-op
 08i 2 v list
 01
-}]] [def $push/symbol [λδ* $push/symbol [v] "- v | Pushes v onto the stack" #{
+}]] [def $push/symbol [fn* $push/symbol [v] "- v | Pushes v onto the stack" #{
 05v #$23
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $make-list [λδ* $make-list [item-count] "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list" #{
+}]] [def $make-list [fn* $make-list [item-count] "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list" #{
 05v #$6
 10s item-count
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $eval [λδ* $eval [a] "form - | Evaluates the form from the top of the stack" #{
+}]] [def $eval [fn* $eval [a] "form - | Evaluates the form from the top of the stack" #{
 05v [#$7]
 01
-}]] [def $apply [λδ* $apply [arg-count fun] "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" #{
+}]] [def $apply [fn* $apply [arg-count fun] "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" #{
 15
 10s arg-count
-0Es ΓεnΣym-166
+0Es ΓεnΣym-162
 0D
-10s ΓεnΣym-166
+10s ΓεnΣym-162
 24
 20
 0Bo 10
 10s do
 09o 201
-10s ΓεnΣym-166
+10s ΓεnΣym-162
 02i 2
 20
 0Bo 164
 15
 10s fun
-0Es ΓεnΣym-167
+0Es ΓεnΣym-163
 0D
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s add/int
 20
 0Bo 11
 08i 0 v $add/int
 09o 130
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s <
 20
 0Bo 11
 08i 0 v $<
 09o 110
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s <=
 20
 0Bo 11
 08i 0 v $<=
 09o 90
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s ==
 20
 0Bo 11
 08i 0 v $==
 09o 70
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s >=
 20
 0Bo 11
 08i 0 v $>=
 09o 50
-10s ΓεnΣym-167
+10s ΓεnΣym-163
 10s >
 20
 0Bo 11
@@ -2688,13 +2688,13 @@
 08i 3 v list
 16
 01
-}]] [def $apply/dynamic [λδ* $apply/dynamic [arg-count fun] "" #{
+}]] [def $apply/dynamic [fn* $apply/dynamic [arg-count fun] "" #{
 05v #$1A
 10s arg-count
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $call [λδ* $call [target] " - | Call a bytecode subroutine" #{
+}]] [def $call [fn* $call [target] " - | Call a bytecode subroutine" #{
 05v #$17
 05v :relocate
 10s target
@@ -2712,7 +2712,7 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $try [λδ* $try [target] " - | Try something, jumping to target if an exception occurs" #{
+}]] [def $try [fn* $try [target] " - | Try something, jumping to target if an exception occurs" #{
 05v #$18
 05v :relocate
 10s target
@@ -2730,11 +2730,11 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $throw [λδ* $throw [] " - | Return to the closest exception handler" #{
+}]] [def $throw [fn* $throw [] " - | Return to the closest exception handler" #{
 05v #$19
 08i 1 v list
 01
-}]] [def $jmp [λδ* $jmp [target] "" #{
+}]] [def $jmp [fn* $jmp [target] "" #{
 05v #$9
 05v :relocate
 10s target
@@ -2752,7 +2752,7 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $jt [λδ* $jt [target] "" #{
+}]] [def $jt [fn* $jt [target] "" #{
 05v #$A
 05v :relocate
 10s target
@@ -2770,7 +2770,7 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $jf [λδ* $jf [target] "" #{
+}]] [def $jf [fn* $jf [target] "" #{
 05v #$B
 05v :relocate
 10s target
@@ -2788,31 +2788,31 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $dup [λδ* $dup [] "" #{
+}]] [def $dup [fn* $dup [] "" #{
 05v [#$C]
 01
-}]] [def $drop [λδ* $drop [] "" #{
+}]] [def $drop [fn* $drop [] "" #{
 05v [#$D]
 01
-}]] [def $def [λδ* $def [v] "" #{
+}]] [def $def [fn* $def [v] "" #{
 05v #$E
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $set [λδ* $set [v] "" #{
+}]] [def $set [fn* $set [v] "" #{
 05v #$F
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $get [λδ* $get [v] "" #{
+}]] [def $get [fn* $get [v] "" #{
 05v #$10
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $lambda [λδ* $lambda [name args docs body] "" #{
+}]] [def $lambda [fn* $lambda [name args docs body] "" #{
 05v #$11
 10s name
 08i 1 v val->bytecode-op
@@ -2824,7 +2824,7 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $macro [λδ* $macro [name args docs body] "" #{
+}]] [def $macro [fn* $macro [name args docs body] "" #{
 05v #$12
 10s name
 08i 1 v val->bytecode-op
@@ -2836,43 +2836,43 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $closure/push [λδ* $closure/push [] "" #{
+}]] [def $closure/push [fn* $closure/push [] "" #{
 05v [#$13]
 01
-}]] [def $closure/enter [λδ* $closure/enter [] "" #{
+}]] [def $closure/enter [fn* $closure/enter [] "" #{
 05v [#$14]
 01
-}]] [def $let [λδ* $let [] "" #{
+}]] [def $let [fn* $let [] "" #{
 05v [#$15]
 01
-}]] [def $closure/pop [λδ* $closure/pop [] "" #{
+}]] [def $closure/pop [fn* $closure/pop [] "" #{
 05v [#$16]
 01
-}]] [def $roots/save [λδ* $roots/save [] "" #{
+}]] [def $roots/save [fn* $roots/save [] "" #{
 05v [#$1B]
 01
-}]] [def $roots/restore [λδ* $roots/restore [] "" #{
+}]] [def $roots/restore [fn* $roots/restore [] "" #{
 05v [#$1C]
 01
-}]] [def $< [λδ* $< [] "" #{
+}]] [def $< [fn* $< [] "" #{
 05v [#$1E]
 01
-}]] [def $<= [λδ* $<= [] "" #{
+}]] [def $<= [fn* $<= [] "" #{
 05v [#$1F]
 01
-}]] [def $== [λδ* $== [] "" #{
+}]] [def $== [fn* $== [] "" #{
 05v [#$20]
 01
-}]] [def $>= [λδ* $>= [] "" #{
+}]] [def $>= [fn* $>= [] "" #{
 05v [#$21]
 01
-}]] [def $> [λδ* $> [] "" #{
+}]] [def $> [fn* $> [] "" #{
 05v [#$22]
 01
-}]] [def $push/nil [λδ* $push/nil [] "" #{
+}]] [def $push/nil [fn* $push/nil [] "" #{
 05v [#$24]
 01
-}]] [def assemble/build-sym-map [λδ* assemble/build-sym-map [code sym-map pos] "" #{
+}]] [def assemble/build-sym-map [fn* assemble/build-sym-map [code sym-map pos] "" #{
 02i 0
 1B
 1C
@@ -2883,9 +2883,9 @@
 10s code
 08i 1 v car
 08i 1 v type-of
-0Es ΓεnΣym-168
+0Es ΓεnΣym-164
 0D
-10s ΓεnΣym-168
+10s ΓεnΣym-164
 05v :bytecode-op
 20
 0Bo 34
@@ -2897,13 +2897,13 @@
 0Fs pos
 08i 3 v tree/set!
 09o 124
-10s ΓεnΣym-168
+10s ΓεnΣym-164
 05v :symbol
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-168
+10s ΓεnΣym-164
 05v :keyword
 20
 0C
@@ -2924,7 +2924,7 @@
 10s pos
 08i 3 v tree/set!
 09o 45
-10s ΓεnΣym-168
+10s ΓεnΣym-164
 05v :pair
 20
 0Bo 32
@@ -2945,7 +2945,7 @@
 0D
 10s pos
 01
-}]] [def assemble/relocate-op [λδ* assemble/relocate-op [code sym-map pos out] "" #{
+}]] [def assemble/relocate-op [fn* assemble/relocate-op [code sym-map pos out] "" #{
 10s sym-map
 10s code
 08i 1 v cadr
@@ -2976,7 +2976,7 @@
 0D
 10s pos
 01
-}]] [def assemble/emit-relocated-ops [λδ* assemble/emit-relocated-ops [code sym-map pos out] "" #{
+}]] [def assemble/emit-relocated-ops [fn* assemble/emit-relocated-ops [code sym-map pos out] "" #{
 10s code
 08i 1 v car
 05v :relocate
@@ -2991,26 +2991,26 @@
 09o 168
 15
 10s code
-0Es ΓεnΣym-169
+0Es ΓεnΣym-165
 0D
-10s ΓεnΣym-169
+10s ΓεnΣym-165
 0Bo 149
 02i 0
 1B
 1C
-10s ΓεnΣym-169
+10s ΓεnΣym-165
 0Bo 135
 0D
-10s ΓεnΣym-169
+10s ΓεnΣym-165
 08i 1 v car
 0Es op
 0D
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-170
+0Es ΓεnΣym-166
 0D
-10s ΓεnΣym-170
+10s ΓεnΣym-166
 05v :bytecode-op
 20
 0Bo 34
@@ -3022,7 +3022,7 @@
 10s op
 08i 3 v array/set!
 09o 44
-10s ΓεnΣym-170
+10s ΓεnΣym-166
 05v :pair
 20
 0Bo 31
@@ -3036,9 +3036,9 @@
 24
 16
 0D
-10s ΓεnΣym-169
+10s ΓεnΣym-165
 08i 1 v cdr
-0Fs ΓεnΣym-169
+0Fs ΓεnΣym-165
 09o -137
 09o 4
 24
@@ -3046,7 +3046,7 @@
 0D
 10s pos
 01
-}]] [def assemble/verbose #f] [def assemble* [λδ* assemble* [code] "Assemble all arguments into a single :bytecode-array" #{
+}]] [def assemble/verbose #f] [def assemble* [fn* assemble* [code] "Assemble all arguments into a single :bytecode-array" #{
 24
 08i 1 v tree/new
 0Es sym-map
@@ -3104,11 +3104,11 @@
 10s out
 08i 1 v arr->bytecode-arr
 01
-}]] [def assemble [λδ* assemble l "Assemble all arguments into a single :bytecode-array" #{
+}]] [def assemble [fn* assemble l "Assemble all arguments into a single :bytecode-array" #{
 10s l
 08i 1 v assemble*
 01
-}]] [def asmrun [μ* asmrun ops "Assemble and evaluate all bytecode arguments" [cons 'bytecode-eval [cons [cons 'assemble [append ops #nil]] #nil]]]]][do [def bytecompile/gen-label/counter 0] [def bytecompile/gen-label [λδ* bytecompile/gen-label [prefix] "" #{
+}]] [def asmrun [μ* asmrun ops "Assemble and evaluate all bytecode arguments" [cons 'bytecode-eval [cons [cons 'assemble [append ops #nil]] #nil]]]]][do [def bytecompile/gen-label/counter 0] [def bytecompile/gen-label [fn* bytecompile/gen-label [prefix] "" #{
 02i 1
 10s bytecompile/gen-label/counter
 08i 2 v +
@@ -3120,19 +3120,19 @@
 08i 3 v cat
 08i 1 v str->sym
 01
-}]] [def bytecompile/literal [λδ* bytecompile/literal [source] "" #{
+}]] [def bytecompile/literal [fn* bytecompile/literal [source] "" #{
 15
 10s source
 08i 1 v type-of
-0Es ΓεnΣym-171
+0Es ΓεnΣym-167
 0D
-10s ΓεnΣym-171
+10s ΓεnΣym-167
 05v :symbol
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-171
+10s ΓεnΣym-167
 05v :keyword
 20
 0C
@@ -3149,14 +3149,14 @@
 10s source
 08i 1 v $get
 09o 56
-10s ΓεnΣym-171
+10s ΓεnΣym-167
 05v :int
 20
 0Bo 15
 10s source
 08i 1 v $push/int
 09o 32
-10s ΓεnΣym-171
+10s ΓεnΣym-167
 05v :nil
 20
 0Bo 11
@@ -3166,20 +3166,20 @@
 08i 1 v $push/lval
 16
 01
-}]] [def bytecompile/quote [λδ* bytecompile/quote [source] "" #{
+}]] [def bytecompile/quote [fn* bytecompile/quote [source] "" #{
 15
 10s source
 08i 1 v type-of
-0Es ΓεnΣym-172
+0Es ΓεnΣym-168
 0D
-10s ΓεnΣym-172
+10s ΓεnΣym-168
 05v :int
 20
 0Bo 15
 10s source
 08i 1 v $push/int
 09o 36
-10s ΓεnΣym-172
+10s ΓεnΣym-168
 05v :symbol
 20
 0Bo 15
@@ -3190,7 +3190,7 @@
 08i 1 v $push/lval
 16
 01
-}]] [def bytecompile/do/form [λδ* bytecompile/do/form [source env] "" #{
+}]] [def bytecompile/do/form [fn* bytecompile/do/form [source env] "" #{
 10s source
 0Bo 79
 10s source
@@ -3214,14 +3214,14 @@
 09o 4
 24
 01
-}]] [def bytecompile/do [λδ* bytecompile/do [source env] "" #{
+}]] [def bytecompile/do [fn* bytecompile/do [source env] "" #{
 10s source
 08i 1 v cdr
 10s env
 08i 2 v bytecompile/do/form
 08i 1 v list
 01
-}]] [def bytecompile/procedure [λδ* bytecompile/procedure [op source env] "" #{
+}]] [def bytecompile/procedure [fn* bytecompile/procedure [op source env] "" #{
 10s source
 08i 1 v cdr
 10s bytecompile*
@@ -3235,7 +3235,7 @@
 08i 2 v $apply
 08i 2 v list
 01
-}]] [def bytecompile/def [λδ* bytecompile/def [source env] "" #{
+}]] [def bytecompile/def [fn* bytecompile/def [source env] "" #{
 10s source
 08i 1 v cadr
 08i 1 v symbol?
@@ -3269,7 +3269,7 @@
 08i 1 v $def
 08i 2 v list
 01
-}]] [def bytecompile/set! [λδ* bytecompile/set! [source env] "" #{
+}]] [def bytecompile/set! [fn* bytecompile/set! [source env] "" #{
 10s source
 08i 1 v cadr
 08i 1 v symbol?
@@ -3303,7 +3303,7 @@
 08i 1 v $set
 08i 2 v list
 01
-}]] [def bytecompile/if [λδ* bytecompile/if [source env] "" #{
+}]] [def bytecompile/if [fn* bytecompile/if [source env] "" #{
 15
 08i 0 v bytecompile/gen-label
 0Es sym-else
@@ -3336,7 +3336,7 @@
 08i 7 v list
 16
 01
-}]] [def bytecompile/while [λδ* bytecompile/while [source env] "" #{
+}]] [def bytecompile/while [fn* bytecompile/while [source env] "" #{
 08i 0 v bytecompile/gen-label
 0Es sym-start
 0D
@@ -3368,7 +3368,7 @@
 08i 2 v list
 08i 10 v list
 01
-}]] [def bytecompile/procedure/arg [λδ* bytecompile/procedure/arg [source env] "" #{
+}]] [def bytecompile/procedure/arg [fn* bytecompile/procedure/arg [source env] "" #{
 10s source
 08i 1 v last?
 0Bo 24
@@ -3387,7 +3387,7 @@
 08i 2 v bytecompile/procedure/arg
 08i 2 v cons
 01
-}]] [def bytecompile/procedure [λδ* bytecompile/procedure [op args env] "" #{
+}]] [def bytecompile/procedure [fn* bytecompile/procedure [op args env] "" #{
 10s args
 08i 1 v length
 0Es arg-count
@@ -3405,7 +3405,7 @@
 10s op
 08i 2 v $apply
 01
-}]] [def bytecompile/procedure/dynamic [λδ* bytecompile/procedure/dynamic [op args env] "" #{
+}]] [def bytecompile/procedure/dynamic [fn* bytecompile/procedure/dynamic [op args env] "" #{
 10s args
 08i 1 v length
 0Es arg-count
@@ -3423,7 +3423,7 @@
 08i 1 v $apply/dynamic
 08i 3 v list
 01
-}]] [def bytecompile/and/rec [λδ* bytecompile/and/rec [source env label-end] "" #{
+}]] [def bytecompile/and/rec [fn* bytecompile/and/rec [source env label-end] "" #{
 10s source
 08i 1 v car
 10s env
@@ -3445,7 +3445,7 @@
 24
 08i 2 v list
 01
-}]] [def bytecompile/and [λδ* bytecompile/and [source env] "" #{
+}]] [def bytecompile/and [fn* bytecompile/and [source env] "" #{
 08i 0 v bytecompile/gen-label
 0Es label-end
 0D
@@ -3459,7 +3459,7 @@
 08i 2 v list
 08i 2 v list
 01
-}]] [def bytecompile/or/rec [λδ* bytecompile/or/rec [source env label-end] "" #{
+}]] [def bytecompile/or/rec [fn* bytecompile/or/rec [source env label-end] "" #{
 10s source
 0Bo 70
 10s source
@@ -3479,7 +3479,7 @@
 09o 4
 24
 01
-}]] [def bytecompile/or [λδ* bytecompile/or [source env] "" #{
+}]] [def bytecompile/or [fn* bytecompile/or [source env] "" #{
 08i 0 v bytecompile/gen-label
 0Es label-end
 0D
@@ -3495,37 +3495,37 @@
 08i 2 v list
 08i 3 v list
 01
-}]] [def bytecompile/string [λδ* bytecompile/string [source env] "" #{
+}]] [def bytecompile/string [fn* bytecompile/string [source env] "" #{
 10s cat
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/array [λδ* bytecompile/array [source env] "" #{
+}]] [def bytecompile/array [fn* bytecompile/array [source env] "" #{
 10s array/ref
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/tree [λδ* bytecompile/tree [source env] "" #{
+}]] [def bytecompile/tree [fn* bytecompile/tree [source env] "" #{
 10s tree/ref
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/λ* [λδ* bytecompile/λ* [source env] "" #{
+}]] [def bytecompile/λ* [fn* bytecompile/λ* [source env] "" #{
 10s $lambda
 10s source
 08i 1 v cdr
 08i 2 v apply
 01
-}]] [def bytecompile/μ* [λδ* bytecompile/μ* [source env] "" #{
+}]] [def bytecompile/μ* [fn* bytecompile/μ* [source env] "" #{
 10s $macro
 10s source
 08i 1 v cdr
 08i 2 v apply
 01
-}]] [def bytecompile/ω* [λδ* bytecompile/ω* [source env] "" #{
+}]] [def bytecompile/ω* [fn* bytecompile/ω* [source env] "" #{
 08i 0 v $let
 10s source
 08i 1 v cdr
@@ -3535,7 +3535,7 @@
 08i 0 v $closure/pop
 08i 4 v list
 01
-}]] [def bytecompile/let* [λδ* bytecompile/let* [source env] "" #{
+}]] [def bytecompile/let* [fn* bytecompile/let* [source env] "" #{
 08i 0 v $let
 10s source
 08i 1 v cadr
@@ -3544,7 +3544,7 @@
 08i 0 v $closure/pop
 08i 3 v list
 01
-}]] [def bytecompile/try [λδ* bytecompile/try [source env] "" #{
+}]] [def bytecompile/try [fn* bytecompile/try [source env] "" #{
 08i 0 v bytecompile/gen-label
 0Es handler-sym
 0D
@@ -3573,7 +3573,7 @@
 08i 2 v list
 08i 7 v list
 01
-}]] [def bytecompile* [λδ* bytecompile* [source env] "Compile the forms in source" #{
+}]] [def bytecompile* [fn* bytecompile* [source env] "Compile the forms in source" #{
 10s source
 08i 1 v car
 10s env
@@ -3591,17 +3591,17 @@
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-173
+0Es ΓεnΣym-169
 0D
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :special-form
 20
 0Bo 409
 15
 10s op
-0Es ΓεnΣym-174
+0Es ΓεnΣym-170
 0D
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s do
 20
 0Bo 19
@@ -3609,7 +3609,7 @@
 10s env
 08i 2 v bytecompile/do
 09o 367
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s let*
 20
 0Bo 19
@@ -3617,7 +3617,7 @@
 10s env
 08i 2 v bytecompile/let*
 09o 339
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s def
 20
 0Bo 19
@@ -3625,7 +3625,7 @@
 10s env
 08i 2 v bytecompile/def
 09o 311
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s set!
 20
 0Bo 19
@@ -3633,7 +3633,7 @@
 10s env
 08i 2 v bytecompile/set!
 09o 283
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s if
 20
 0Bo 19
@@ -3641,7 +3641,7 @@
 10s env
 08i 2 v bytecompile/if
 09o 255
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s while
 20
 0Bo 19
@@ -3649,7 +3649,7 @@
 10s env
 08i 2 v bytecompile/while
 09o 227
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s and
 20
 0Bo 19
@@ -3657,7 +3657,7 @@
 10s env
 08i 2 v bytecompile/and
 09o 199
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s or
 20
 0Bo 19
@@ -3665,7 +3665,7 @@
 10s env
 08i 2 v bytecompile/or
 09o 171
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s λ*
 20
 0Bo 19
@@ -3673,7 +3673,7 @@
 10s env
 08i 2 v bytecompile/λ*
 09o 143
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s μ*
 20
 0Bo 19
@@ -3681,7 +3681,7 @@
 10s env
 08i 2 v bytecompile/μ*
 09o 115
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s ω*
 20
 0Bo 19
@@ -3689,7 +3689,7 @@
 10s env
 08i 2 v bytecompile/ω*
 09o 87
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s try
 20
 0Bo 19
@@ -3697,7 +3697,7 @@
 10s env
 08i 2 v bytecompile/try
 09o 59
-10s ΓεnΣym-174
+10s ΓεnΣym-170
 10s quote
 20
 0Bo 20
@@ -3713,13 +3713,13 @@
 08i 1 v throw
 16
 09o 216
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :lambda
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :native-function
 20
 0C
@@ -3733,13 +3733,13 @@
 10s env
 08i 3 v bytecompile/procedure
 09o 156
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :pair
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :symbol
 20
 0C
@@ -3753,7 +3753,7 @@
 10s env
 08i 3 v bytecompile/procedure/dynamic
 09o 96
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :string
 20
 0Bo 19
@@ -3761,7 +3761,7 @@
 10s env
 08i 2 v bytecompile/string
 09o 68
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :array
 20
 0Bo 19
@@ -3769,7 +3769,7 @@
 10s env
 08i 2 v bytecompile/array
 09o 40
-10s ΓεnΣym-173
+10s ΓεnΣym-169
 05v :tree
 20
 0Bo 19
@@ -3781,14 +3781,14 @@
 08i 1 v bytecompile/literal
 16
 01
-}]] [def bytecompile [λδ* bytecompile [form environment] "" #{
+}]] [def bytecompile [fn* bytecompile [form environment] "" #{
 10s form
 10s environment
 08i 2 v bytecompile*
 08i 0 v $ret
 08i 2 v list
 01
-}]] [def byterun [μ* byterun [form] "" [cons '-> [cons [cons 'compile [cons form #nil]] [cons 'bytecompile [cons 'assemble* [cons 'bytecode-eval #nil]]]]]]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [λδ* compile/do/args [args] "" #{
+}]] [def byterun [μ* byterun [form] "" [cons '-> [cons [cons 'compile [cons form #nil]] [cons 'bytecompile [cons 'assemble* [cons 'bytecode-eval #nil]]]]]]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [fn* compile/do/args [args] "" #{
 10s args
 08i 1 v last?
 0Bo 26
@@ -3826,11 +3826,158 @@
 08i 1 v cdr
 08i 1 v compile/do/args
 01
-}]] [def compile/do [λ* compile/do [source] "" [let* [do [def args [compile/do/args source]] [if [last? args] [car args] [cons 'do args]]]]]] [def compile/def [λ* compile/def [source] "" [list 'def [cadr source] [compile* [caddr source]]]]] [def compile/set! [λ* compile/set! [source] "" [list 'set! [cadr source] [compile* [caddr source]]]]] [def compile/λ* [λ* compile/λ* [source] "" [list 'λ* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]] [def compile/fn* [λ* compile/fn* [source] "" [list 'fn* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]] [def compile/μ* [λ* compile/μ* [source] "" [list 'μ* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]] [def compile/ω* [λ* compile/ω* [source] "" [list 'ω* [compile/do [cdr source]]]]] [def compile/try [λ* compile/try [source] "" [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]] [def compile/if [λ* compile/if [source] "" [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]] [def compile/let* [λ* compile/let* [source] "" [list 'let* [compile/do [cdr source]]]]] [def compile/and [λ* compile/and [source] "" [compile/procedure/arg source]]] [def compile/or [λ* compile/or [source] "" [compile/procedure/arg source]]] [def compile/while [λ* compile/while [source] "" [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]] [def compile/macro [λ* compile/macro [macro source] "" [compile* [macro-apply macro [cdr source]]]]] [def compile/procedure/arg [λ* compile/procedure/arg [source] "" [if [pair? source] [cons [compile* [car source]] [compile/procedure/arg [cdr source]]] #nil]]] [def compile/procedure [λδ* compile/procedure [proc source] "" #{
+}]] [def compile/do [λ* compile/do [source] "" [let* [do [def args [compile/do/args source]] [if [last? args] [car args] [cons 'do args]]]]]] [def compile/def [fn* compile/def [source] "" #{
+23
+00
+00
+89
+10s source
+08i 1 v cadr
+10s source
+08i 1 v caddr
+08i 1 v compile*
+08i 3 v list
+01
+}]] [def compile/set! [fn* compile/set! [source] "" #{
+23
+00
+00
+8B
+10s source
+08i 1 v cadr
+10s source
+08i 1 v caddr
+08i 1 v compile*
+08i 3 v list
+01
+}]] [def compile/λ* [λ* compile/λ* [source] "" [list 'λ* [cadr source] [caddr source] [cadddr source] [compile [caddddr source]]]]] [def compile/fn* [fn* compile/fn* [source] "" #{
+23
+00
+00
+90
+10s source
+08i 1 v cadr
+10s source
+08i 1 v caddr
+10s source
+08i 1 v cadddr
+10s source
+08i 1 v caddddr
+08i 1 v compile
+08i 5 v list
+01
+}]] [def compile/μ* [fn* compile/μ* [source] "" #{
+23
+00
+00
+92
+10s source
+08i 1 v cadr
+10s source
+08i 1 v caddr
+10s source
+08i 1 v cadddr
+10s source
+08i 1 v caddddr
+08i 1 v compile
+08i 5 v list
+01
+}]] [def compile/ω* [fn* compile/ω* [source] "" #{
+23
+00
+00
+93
+10s source
+08i 1 v cdr
+08i 1 v compile/do
+08i 2 v list
+01
+}]] [def compile/try [fn* compile/try [source] "" #{
+23
+00
+00
+AF
+10s source
+08i 1 v cadr
+08i 1 v compile*
+10s source
+08i 1 v cddr
+08i 1 v compile/do
+08i 3 v list
+01
+}]] [def compile/if [fn* compile/if [source] "" #{
+23
+00
+00
+03
+10s source
+08i 1 v cadr
+08i 1 v compile*
+10s source
+08i 1 v caddr
+08i 1 v compile*
+10s source
+08i 1 v cadddr
+08i 1 v compile*
+08i 4 v list
+01
+}]] [def compile/let* [fn* compile/let* [source] "" #{
+23
+00
+00
+8D
+10s source
+08i 1 v cdr
+08i 1 v compile/do
+08i 2 v list
+01
+}]] [def compile/and [fn* compile/and [source] "" #{
 10s source
 08i 1 v compile/procedure/arg
 01
-}]] [def compile* [λ* compile* [source] "Compile the forms in source" [let* [do [def op [if [apply compile/environment [cons 'do [cons [cons 'resolves? [cons [list 'quote [car source]] #nil]] #nil]]] [apply compile/environment [cons 'do [cons [cons 'resolve [cons [list 'quote [car source]] #nil]] #nil]]] [car source]]] [let* [do [def ΓεnΣym-179 [type-of op]] [if [== ΓεnΣym-179 :special-form] [let* [do [def ΓεnΣym-180 op] [if [== ΓεnΣym-180 do] [compile/do source] [if [== ΓεnΣym-180 def] [compile/def source] [if [== ΓεnΣym-180 set!] [compile/set! source] [if [== ΓεnΣym-180 let*] [compile/let* source] [if [== ΓεnΣym-180 λ*] [compile/λ* source] [if [== ΓεnΣym-180 fn*] [compile/fn* source] [if [== ΓεnΣym-180 μ*] [compile/μ* source] [if [== ΓεnΣym-180 ω*] [compile/ω* source] [if [== ΓεnΣym-180 if] [compile/if source] [if [== ΓεnΣym-180 try] [compile/try source] [if [== ΓεnΣym-180 and] [compile/and source] [if [== ΓεnΣym-180 or] [compile/or source] [if [== ΓεnΣym-180 while] [compile/while source] [if [== ΓεnΣym-180 quote] source [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]]]]]]]]]]]]]] [if [== ΓεnΣym-179 :macro] [compile/macro op source] [if [or [== ΓεnΣym-179 :lambda] [== ΓεnΣym-179 :native-function]] [compile/procedure op source] [if [== ΓεnΣym-179 :object] [compile/procedure/arg source] [if [== ΓεnΣym-179 :pair] [compile/procedure/arg source] [if [or [== ΓεnΣym-179 :int] [== ΓεnΣym-179 :float] [== ΓεnΣym-179 :vec]] [compile/procedure/arg source] [if [== ΓεnΣym-179 :array] [compile/procedure/arg source] [if [== ΓεnΣym-179 :string] [compile/procedure/arg source] [if [== ΓεnΣym-179 :tree] [compile/procedure/arg source] [if [last? source] source [compile/procedure/arg source]]]]]]]]]]]]]]]]] [def compile [λδ* compile [source new-environment new-verbose] "Compile the forms in source" #{
+}]] [def compile/or [fn* compile/or [source] "" #{
+10s source
+08i 1 v compile/procedure/arg
+01
+}]] [def compile/while [fn* compile/while [source] "" #{
+23
+00
+00
+AD
+10s source
+08i 1 v cadr
+08i 1 v compile*
+10s source
+08i 1 v cddr
+08i 1 v compile/do
+08i 3 v list
+01
+}]] [def compile/macro [fn* compile/macro [macro source] "" #{
+10s macro
+10s source
+08i 1 v cdr
+08i 2 v macro-apply
+08i 1 v compile*
+01
+}]] [def compile/procedure/arg [fn* compile/procedure/arg [source] "" #{
+10s source
+08i 1 v pair?
+0Bo 39
+10s source
+08i 1 v car
+08i 1 v compile*
+10s source
+08i 1 v cdr
+08i 1 v compile/procedure/arg
+08i 2 v cons
+09o 4
+24
+01
+}]] [def compile/procedure [fn* compile/procedure [proc source] "" #{
+10s source
+08i 1 v compile/procedure/arg
+01
+}]] [def compile* [λ* compile* [source] "Compile the forms in source" [do [def op [if [apply compile/environment [cons 'do [cons [cons 'resolves? [cons [list 'quote [car source]] #nil]] #nil]]] [apply compile/environment [cons 'do [cons [cons 'resolve [cons [list 'quote [car source]] #nil]] #nil]]] [car source]]] [let* [do [def ΓεnΣym-175 [type-of op]] [if [== ΓεnΣym-175 :special-form] [let* [do [def ΓεnΣym-176 op] [if [== ΓεnΣym-176 do] [compile/do source] [if [== ΓεnΣym-176 def] [compile/def source] [if [== ΓεnΣym-176 set!] [compile/set! source] [if [== ΓεnΣym-176 let*] [compile/let* source] [if [== ΓεnΣym-176 λ*] [compile/λ* source] [if [== ΓεnΣym-176 fn*] [compile/fn* source] [if [== ΓεnΣym-176 μ*] [compile/μ* source] [if [== ΓεnΣym-176 ω*] [compile/ω* source] [if [== ΓεnΣym-176 if] [compile/if source] [if [== ΓεnΣym-176 try] [compile/try source] [if [== ΓεnΣym-176 and] [compile/and source] [if [== ΓεnΣym-176 or] [compile/or source] [if [== ΓεnΣym-176 while] [compile/while source] [if [== ΓεnΣym-176 quote] source [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]]]]]]]]]]]]]] [if [== ΓεnΣym-175 :macro] [compile/macro op source] [if [or [== ΓεnΣym-175 :lambda] [== ΓεnΣym-175 :native-function]] [compile/procedure op source] [if [== ΓεnΣym-175 :object] [compile/procedure/arg source] [if [== ΓεnΣym-175 :pair] [compile/procedure/arg source] [if [or [== ΓεnΣym-175 :int] [== ΓεnΣym-175 :float] [== ΓεnΣym-175 :vec]] [compile/procedure/arg source] [if [== ΓεnΣym-175 :array] [compile/procedure/arg source] [if [== ΓεnΣym-175 :string] [compile/procedure/arg source] [if [== ΓεnΣym-175 :tree] [compile/procedure/arg source] [if [last? source] source [compile/procedure/arg source]]]]]]]]]]]]]]]] [def compile [fn* compile [source new-environment new-verbose] "Compile the forms in source" #{
 10s new-environment
 0Bo 7
 24
@@ -3854,7 +4001,146 @@
 10s source
 08i 1 v compile*
 01
-}]] [def load/forms [λ* load/forms [source-raw environment] "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [do [def source #nil] [def source-next source-raw] [def forms-compiled 0] [def try-again [λ* try-again [source] "" [set! source-next [cons source source-next]]]] [while source-next [do [def forms-compiled-last forms-compiled] [set! source source-next] [set! source-next #nil] [def errors #nil] [let* [do [def ΓεnΣym-181 source] [if ΓεnΣym-181 [while ΓεnΣym-181 [do [def form [car ΓεnΣym-181]] [try [λ* #nil [err] "" [do [set! errors [cons err errors]] [let* [do [def ΓεnΣym-182 [car err]] [if [== ΓεnΣym-182 :unresolved-procedure] [try-again [car source]] [if [== ΓεnΣym-182 :runtime-macro] [try-again [car source]] [throw err]]]]]]] [do [def compiled-form [compile form environment #t]] [if compiled-form [do [apply environment [cons 'eval* [cons compiled-form #nil]]] [set! forms-compiled [+ 1 forms-compiled]]] #nil]]] [set! ΓεnΣym-181 [cdr ΓεnΣym-181]]]] #nil]]] [set! source-next [nreverse source-next]] [if [<= forms-compiled forms-compiled-last] [do [for-each errors display/error] [throw [list :you-can-not-advance "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"]]] #nil]]]]]] [def compile/forms [λ* compile/forms [source-raw environment] "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined" [do [if environment #nil [set! environment [ω* #nil]]] [load/forms source-raw environment] [compile source-raw environment]]]] [def defmacro [μ* defmacro [name args . body] "Define a new macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def defun [μ* defun [name args . body] "Define a new function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'λ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def μ [μ* μ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def \ [μ* \ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def λ \] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [cons 'fn* [cons #nil [cons args [cons doc-string [cons [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]] #nil]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [cons 'fn* [cons name [cons args [cons doc-string [cons [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]] #nil]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [λ* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" [try display/error [eval* [compile expr closure]]]]] [def read-eval-compile [λδ* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def load/forms [fn* load/forms [source-raw environment] "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" #{
+24
+0Es source
+0D
+10s source-raw
+0Es source-next
+0D
+02i 0
+0Es forms-compiled
+0D
+11v try-again v [source] v "" v [set! source-next [cons source source-next]]
+0Es try-again
+0D
+02i 0
+1B
+1C
+10s source-next
+0Bo 263
+0D
+10s forms-compiled
+0Es forms-compiled-last
+0D
+10s source-next
+0Fs source
+0D
+24
+0Fs source-next
+0D
+24
+0Es errors
+0D
+15
+10s source
+0Es ΓεnΣym-177
+0D
+10s ΓεnΣym-177
+0Bo 147
+02i 0
+1B
+1C
+10s ΓεnΣym-177
+0Bo 133
+0D
+10s ΓεnΣym-177
+08i 1 v car
+0Es form
+0D
+11v :INVALID-VALUE v [err] v "" v [do [set! errors [cons err errors]] [let* [do [def ΓεnΣym-178 [car err]] [if [== ΓεnΣym-178 :unresolved-procedure] [try-again [car source]] [if [== ΓεnΣym-178 :runtime-macro] [try-again [car source]] [throw err]]]]]]
+18
+00
+53
+10s form
+10s environment
+05v #t
+08i 3 v compile
+0Es compiled-form
+0D
+10s compiled-form
+0Bo 50
+10s environment
+23
+00
+00
+99
+10s compiled-form
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v apply
+0D
+02i 1
+10s forms-compiled
+08i 2 v +
+0Fs forms-compiled
+09o 4
+24
+09o 5
+1A
+01
+0D
+10s ΓεnΣym-177
+08i 1 v cdr
+0Fs ΓεnΣym-177
+09o -135
+09o 4
+24
+16
+0D
+10s source-next
+08i 1 v nreverse
+0Fs source-next
+0D
+10s forms-compiled
+10s forms-compiled-last
+1F
+0Bo 38
+10s errors
+10s display/error
+08i 2 v for-each
+0D
+05v :you-can-not-advance
+05v "The compiler got stuck trying to compile various forms, the final pass did not have a single form that compiled without errors"
+08i 2 v list
+08i 1 v throw
+09o 4
+24
+09o -265
+01
+}]] [def compile/forms [fn* compile/forms [source-raw environment] "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined" #{
+10s environment
+0Bo 7
+24
+09o 10
+15
+13
+16
+0Fs environment
+0D
+10s source-raw
+10s environment
+08i 2 v load/forms
+0D
+10s source-raw
+10s environment
+08i 2 v compile
+01
+}]] [def defmacro [μ* defmacro [name args . body] "Define a new macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def defun [μ* defun [name args . body] "Define a new function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'λ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def μ [μ* μ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def \ [μ* \ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def λ \] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [cons 'fn* [cons #nil [cons args [cons doc-string [cons [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]] #nil]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [cons 'fn* [cons name [cons args [cons doc-string [cons [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]] #nil]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+10s display/error
+18
+00
+18
+10s expr
+10s closure
+08i 2 v compile
+08i 1 v eval*
+09o 5
+1A
+01
+01
+}]] [def read-eval-compile [fn* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18
 00
@@ -3868,7 +4154,7 @@
 1A
 01
 01
-}]] [def eval-load [λδ* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def eval-load [fn* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18
 00
@@ -3880,7 +4166,7 @@
 1A
 01
 01
-}]] [def read-eval-load [λδ* read-eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def read-eval-load [fn* read-eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18
 00
@@ -3893,126 +4179,126 @@
 1A
 01
 01
-}]]][do [def disassemble/length [λδ* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
+}]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
 15
 10s op
-0Es ΓεnΣym-47
+0Es ΓεnΣym-51
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$0
 20
 0C
 0Ao 274
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1
 20
 0C
 0Ao 260
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$3
 20
 0C
 0Ao 246
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$4
 20
 0C
 0Ao 232
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$7
 20
 0C
 0Ao 218
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$C
 20
 0C
 0Ao 204
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$D
 20
 0C
 0Ao 190
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$13
 20
 0C
 0Ao 176
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$14
 20
 0C
 0Ao 162
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$15
 20
 0C
 0Ao 148
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$16
 20
 0C
 0Ao 134
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$19
 20
 0C
 0Ao 120
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1B
 20
 0C
 0Ao 106
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1C
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1E
 20
 0C
 0Ao 78
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1F
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$20
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$21
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$22
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$24
 20
 0C
@@ -4022,19 +4308,19 @@
 0Bo 8
 02i 1
 09o 314
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$2
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$6
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$1A
 20
 0C
@@ -4044,31 +4330,31 @@
 0Bo 8
 02i 2
 09o 260
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$9
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$A
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$B
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$17
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$18
 20
 0C
@@ -4078,31 +4364,31 @@
 0Bo 8
 02i 3
 09o 178
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$5
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$E
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$F
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$10
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$23
 20
 0C
@@ -4112,7 +4398,7 @@
 0Bo 8
 02i 4
 09o 96
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$8
 20
 0C
@@ -4122,13 +4408,13 @@
 0Bo 8
 02i 5
 09o 70
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$11
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-51
 05v #$12
 20
 0C
@@ -4146,7 +4432,7 @@
 08i 1 v throw
 16
 01
-}]] [def bytecode/nil-catcher [λδ* bytecode/nil-catcher [error] "" #{
+}]] [def bytecode/nil-catcher [fn* bytecode/nil-catcher [error] "" #{
 10s error
 08i 1 v car
 05v :argument-mismatch
@@ -4157,7 +4443,7 @@
 10s error
 08i 1 v throw
 01
-}]] [def bytecode-op->val [λδ* bytecode-op->val [a b c] "Turn three bytecode ops representing an encoded value into an actual value" #{
+}]] [def bytecode-op->val [fn* bytecode-op->val [a b c] "Turn three bytecode ops representing an encoded value into an actual value" #{
 10s a
 08i 1 v bytecode-op->int
 02i 16
@@ -4171,7 +4457,7 @@
 08i 3 v logior
 08i 1 v index->val
 01
-}]] [def bytecode-arr->val [λδ* bytecode-arr->val [a i] "Read a bytecode encoded value in A at I and return it" #{
+}]] [def bytecode-arr->val [fn* bytecode-arr->val [a i] "Read a bytecode encoded value in A at I and return it" #{
 10s bytecode/nil-catcher
 18
 00
@@ -4194,7 +4480,7 @@
 1A
 01
 01
-}]] [def bytecode-op->sym [λδ* bytecode-op->sym [a b c] "Turn three bytecode ops representing an encoded symbol into an actual symbol" #{
+}]] [def bytecode-op->sym [fn* bytecode-op->sym [a b c] "Turn three bytecode ops representing an encoded symbol into an actual symbol" #{
 10s a
 08i 1 v bytecode-op->int
 02i 16
@@ -4208,7 +4494,7 @@
 08i 3 v logior
 08i 1 v index->sym
 01
-}]] [def bytecode-arr->sym [λδ* bytecode-arr->sym [a i] "Read a bytecode encoded symbol in A at I and return it" #{
+}]] [def bytecode-arr->sym [fn* bytecode-arr->sym [a i] "Read a bytecode encoded symbol in A at I and return it" #{
 10s bytecode/nil-catcher
 18
 00
@@ -4231,7 +4517,7 @@
 1A
 01
 01
-}]] [def bytecode-op->offset [λδ* bytecode-op->offset [a b] "Turn two bytecode ops encoding an offset into the integer representation" #{
+}]] [def bytecode-op->offset [fn* bytecode-op->offset [a b] "Turn two bytecode ops encoding an offset into the integer representation" #{
 10s a
 08i 1 v bytecode-op->int
 02i 8
@@ -4252,7 +4538,7 @@
 09o 7
 10s t
 01
-}]] [def bytecode-arr->offset [λδ* bytecode-arr->offset [a i] "Read a bytecode encoded offset in A at I and return it as a signed integer" #{
+}]] [def bytecode-arr->offset [fn* bytecode-arr->offset [a i] "Read a bytecode encoded offset in A at I and return it as a signed integer" #{
 10s a
 10s i
 08i 2 v ref
@@ -4263,33 +4549,33 @@
 08i 2 v ref
 08i 2 v bytecode-op->offset
 01
-}]] [def disassemble/op [λδ* disassemble/op [a i] "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" #{
+}]] [def disassemble/op [fn* disassemble/op [a i] "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" #{
 15
 10s a
 10s i
 08i 2 v ref
-0Es ΓεnΣym-183
+0Es ΓεnΣym-179
 0D
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$0
 20
 0Bo 10
 05v [$nop]
 09o 1436
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$1
 20
 0Bo 10
 05v [$ret]
 09o 1417
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$2
 20
 0Bo 46
 23
 00
 01
-C1
+C2
 10s a
 10s i
 02i 1
@@ -4300,26 +4586,26 @@ C1
 08i 2 v cons
 08i 2 v cons
 09o 1362
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$3
 20
 0Bo 10
 05v [$add/int]
 09o 1343
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$4
 20
 0Bo 10
 05v [$debug/print-stack]
 09o 1324
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$5
 20
 0Bo 41
 23
 00
 01
-C4
+C5
 10s a
 10s i
 02i 1
@@ -4329,14 +4615,14 @@ C4
 08i 2 v cons
 08i 2 v cons
 09o 1274
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$6
 20
 0Bo 46
 23
 00
 01
-C8
+C9
 10s a
 10s i
 02i 1
@@ -4347,20 +4633,20 @@ C8
 08i 2 v cons
 08i 2 v cons
 09o 1219
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$7
 20
 0Bo 10
 05v [$eval]
 09o 1200
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$8
 20
 0Bo 71
 23
 00
 01
-CB
+CC
 10s a
 10s i
 02i 1
@@ -4377,14 +4663,15 @@ CB
 08i 2 v cons
 08i 2 v cons
 09o 1120
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$9
 20
 0Bo 41
 23
 00
-02i -127
-10s a
+05v :INVALID-VALUE
+00
+3C
 10s i
 02i 1
 08i 2 v +
@@ -4393,14 +4680,15 @@ CB
 08i 2 v cons
 08i 2 v cons
 09o 1070
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$A
 20
 0Bo 41
 23
 00
-02i -126
-10s a
+05v :INVALID-VALUE
+00
+3C
 10s i
 02i 1
 08i 2 v +
@@ -4409,14 +4697,15 @@ CB
 08i 2 v cons
 08i 2 v cons
 09o 1020
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$B
 20
 0Bo 41
 23
 00
-02i -125
-10s a
+05v :INVALID-VALUE
+00
+3C
 10s i
 02i 1
 08i 2 v +
@@ -4425,37 +4714,20 @@ CB
 08i 2 v cons
 08i 2 v cons
 09o 970
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$C
 20
 0Bo 10
 05v [$dup]
 09o 951
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$D
 20
 0Bo 10
 05v [$drop]
 09o 932
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$E
-20
-0Bo 41
-23
-00
-01
-DF
-10s a
-10s i
-02i 1
-08i 2 v +
-08i 2 v bytecode-arr->sym
-24
-08i 2 v cons
-08i 2 v cons
-09o 882
-10s ΓεnΣym-183
-05v #$F
 20
 0Bo 41
 23
@@ -4470,9 +4742,9 @@ E0
 24
 08i 2 v cons
 08i 2 v cons
-09o 832
-10s ΓεnΣym-183
-05v #$10
+09o 882
+10s ΓεnΣym-179
+05v #$F
 20
 0Bo 41
 23
@@ -4487,15 +4759,32 @@ E1
 24
 08i 2 v cons
 08i 2 v cons
+09o 832
+10s ΓεnΣym-179
+05v #$10
+20
+0Bo 41
+23
+00
+01
+E2
+10s a
+10s i
+02i 1
+08i 2 v +
+08i 2 v bytecode-arr->sym
+24
+08i 2 v cons
+08i 2 v cons
 09o 782
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$11
 20
 0Bo 116
 23
 00
 01
-E2
+E3
 10s a
 10s i
 02i 1
@@ -4523,14 +4812,14 @@ E2
 08i 2 v cons
 08i 2 v cons
 09o 657
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$12
 20
 0Bo 116
 23
 00
 01
-E4
+E5
 10s a
 10s i
 02i 1
@@ -4558,38 +4847,38 @@ E4
 08i 2 v cons
 08i 2 v cons
 09o 532
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$13
 20
 0Bo 10
 05v [$closure/push]
 09o 513
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$14
 20
 0Bo 10
 05v [$closure/enter]
 09o 494
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$15
 20
 0Bo 10
 05v [$let]
 09o 475
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$16
 20
 0Bo 10
 05v [$closure/pop]
 09o 456
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$17
 20
 0Bo 41
 23
 00
 01
-D5
+D6
 10s a
 10s i
 02i 1
@@ -4599,14 +4888,14 @@ D5
 08i 2 v cons
 08i 2 v cons
 09o 406
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$18
 20
 0Bo 41
 23
 00
 01
-D8
+D9
 10s a
 10s i
 02i 1
@@ -4616,20 +4905,20 @@ D8
 08i 2 v cons
 08i 2 v cons
 09o 356
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$19
 20
 0Bo 10
 05v [$throw]
 09o 337
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$1A
 20
 0Bo 46
 23
 00
 01
-D4
+D5
 10s a
 10s i
 02i 1
@@ -4640,49 +4929,41 @@ D4
 08i 2 v cons
 08i 2 v cons
 09o 282
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$1B
 20
 0Bo 16
 23
 00
-02i -124
-24
-08i 2 v cons
+05v :INVALID-VALUE
+02i 0
+01
+B5
 09o 257
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$1C
 20
 0Bo 16
 23
 00
-02i -123
-24
-08i 2 v cons
+05v :INVALID-VALUE
+02i 0
+01
+B5
 09o 232
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$1D
 20
 0Bo 16
 23
 00
-02i -122
-24
-08i 2 v cons
-09o 207
-10s ΓεnΣym-183
-05v #$1E
-20
-0Bo 16
-23
-00
+05v :INVALID-VALUE
+02i 0
 01
-CF
-24
-08i 2 v cons
-09o 182
-10s ΓεnΣym-183
-05v #$1F
+B5
+09o 207
+10s ΓεnΣym-179
+05v #$1E
 20
 0Bo 16
 23
@@ -4691,9 +4972,9 @@ CF
 D0
 24
 08i 2 v cons
-09o 157
-10s ΓεnΣym-183
-05v #$20
+09o 182
+10s ΓεnΣym-179
+05v #$1F
 20
 0Bo 16
 23
@@ -4702,9 +4983,9 @@ D0
 D1
 24
 08i 2 v cons
-09o 132
-10s ΓεnΣym-183
-05v #$21
+09o 157
+10s ΓεnΣym-179
+05v #$20
 20
 0Bo 16
 23
@@ -4713,9 +4994,9 @@ D1
 D2
 24
 08i 2 v cons
-09o 107
-10s ΓεnΣym-183
-05v #$22
+09o 132
+10s ΓεnΣym-179
+05v #$21
 20
 0Bo 16
 23
@@ -4724,15 +5005,26 @@ D2
 D3
 24
 08i 2 v cons
+09o 107
+10s ΓεnΣym-179
+05v #$22
+20
+0Bo 16
+23
+00
+01
+D4
+24
+08i 2 v cons
 09o 82
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$23
 20
 0Bo 41
 23
 00
 01
-C7
+C8
 10s a
 10s i
 02i 1
@@ -4742,21 +5034,21 @@ C7
 08i 2 v cons
 08i 2 v cons
 09o 32
-10s ΓεnΣym-183
+10s ΓεnΣym-179
 05v #$24
 20
 0Bo 16
 23
 00
 01
-EB
+EC
 24
 08i 2 v cons
 09o 7
 05v :unknown-op
 16
 01
-}]] [def disassemble/array [λδ* disassemble/array [a i] "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" #{
+}]] [def disassemble/array [fn* disassemble/array [a i] "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" #{
 24
 0Es ret
 0D
@@ -4790,19 +5082,19 @@ EB
 10s ret
 08i 1 v nreverse
 01
-}]] [def disassemble [λδ* disassemble [code] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
+}]] [def disassemble [fn* disassemble [code] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
 10s code
 08i 1 v bytecode-arr->arr
 02i 0
 08i 2 v disassemble/array
 01
-}]] [def disassemble/raw [λδ* disassemble/raw [bc] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
+}]] [def disassemble/raw [fn* disassemble/raw [bc] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
 10s bc
 08i 1 v disassemble
-11v [:symbol :symbol] v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
+11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
 08i 2 v for-each
 01
-}]] [def disassemble/test [λδ* disassemble/test [asm] "Verbose way of testing the disassembler" #{
+}]] [def disassemble/test [fn* disassemble/test [asm] "Verbose way of testing the disassembler" #{
 05v "--------- Assembly -----------"
 08i 1 v ansi-blue
 08i 1 v println
@@ -4811,7 +5103,7 @@ EB
 0Es cur-line
 0D
 10s asm
-11v [:symbol :symbol] v [a] v "" v [println [cat [ansi-yellow [string/pad-start [set! cur-line [+ 1 cur-line]] 6]] " - " a]]
+11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-yellow [string/pad-start [set! cur-line [+ 1 cur-line]] 6]] " - " a]]
 08i 2 v for-each
 0D
 05v "--------- Raw Bytecode -----------"
@@ -4833,7 +5125,7 @@ EB
 0D
 10s bc
 08i 1 v disassemble
-11v [:symbol :symbol] v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
+11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
 08i 2 v for-each
 0D
 05v "--------- Fin -----------\n"
@@ -4852,7 +5144,108 @@ EB
 1A
 01
 01
-}]]][do [def yield-queue #nil] [def yield [λ* yield [pred fun] "Evaluates FUN once PRED is true" [do [set! yield-queue [cons [cons pred fun] yield-queue]] #t]]] [def yield-run [λ* yield-run [] "Executes pending coroutines if their predicate evaluates to #t" [do [def new #nil] [let* [do [def ΓεnΣym-186 yield-queue] [if ΓεnΣym-186 [while ΓεnΣym-186 [do [def cur [car ΓεnΣym-186]] [if [[car cur]] [[cdr cur]] [set! new [cons cur new]]] [set! ΓεnΣym-186 [cdr ΓεnΣym-186]]]] #nil]]] [set! yield-queue new]]]] [def timeout [λ* timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed" [do [def goal [+ [time/milliseconds] milliseconds]] [λ* #nil [] "" [> [time/milliseconds] goal]]]]] [def event-bind [λ* event-bind [event id handler] "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." [tree/set! event id handler]]] [def event-clear [μ* event-clear [event] "Clears all event handlers for event-name" [cons 'set! [cons event [cons [cons 'tree/new [cons #nil #nil]] #nil]]]]] [def event-fire [λ* event-fire [event . val] "Applies ...val to all event handlers associated with event-name" [let* [do [def ΓεnΣym-187 [tree/values event]] [if ΓεnΣym-187 [while ΓεnΣym-187 [do [def h [car ΓεnΣym-187]] [h val] [set! ΓεnΣym-187 [cdr ΓεnΣym-187]]]] #nil]]]]]][do [def let/arg [λδ* let/arg [arg] "" #{
+}]]][do [def yield-queue #nil] [def yield [fn* yield [pred fun] "Evaluates FUN once PRED is true" #{
+10s pred
+10s fun
+08i 2 v cons
+10s yield-queue
+08i 2 v cons
+0Fs yield-queue
+0D
+05v #t
+01
+}]] [def yield-run [fn* yield-run [] "Executes pending coroutines if their predicate evaluates to #t" #{
+24
+0Es new
+0D
+15
+10s yield-queue
+0Es ΓεnΣym-180
+0D
+10s ΓεnΣym-180
+0Bo 94
+02i 0
+1B
+1C
+10s ΓεnΣym-180
+0Bo 80
+0D
+10s ΓεnΣym-180
+08i 1 v car
+0Es cur
+0D
+10s cur
+08i 1 v car
+1A
+00
+0Bo 17
+10s cur
+08i 1 v cdr
+1A
+00
+09o 20
+10s cur
+10s new
+08i 2 v cons
+0Fs new
+0D
+10s ΓεnΣym-180
+08i 1 v cdr
+0Fs ΓεnΣym-180
+09o -82
+09o 4
+24
+16
+0D
+10s new
+0Fs yield-queue
+01
+}]] [def timeout [fn* timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed" #{
+08i 0 v time/milliseconds
+10s milliseconds
+08i 2 v +
+0Es goal
+0D
+11v :INVALID-VALUE v [] v "" v [> [time/milliseconds] goal]
+01
+}]] [def event-bind [fn* event-bind [event id handler] "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." #{
+10s event
+10s id
+10s handler
+08i 3 v tree/set!
+01
+}]] [def event-clear [μ* event-clear [event] "Clears all event handlers for event-name" [cons 'set! [cons event [cons [cons 'tree/new [cons #nil #nil]] #nil]]]]] [def event-fire [fn* event-fire [event . val] "Applies ...val to all event handlers associated with event-name" #{
+15
+10s event
+08i 1 v tree/values
+0Es ΓεnΣym-181
+0D
+10s ΓεnΣym-181
+0Bo 59
+02i 0
+1B
+1C
+10s ΓεnΣym-181
+0Bo 45
+0D
+10s ΓεnΣym-181
+08i 1 v car
+0Es h
+0D
+10s h
+10s val
+1A
+01
+0D
+10s ΓεnΣym-181
+08i 1 v cdr
+0Fs ΓεnΣym-181
+09o -47
+09o 4
+24
+16
+01
+}]]][do [def let/arg [fn* let/arg [arg] "" #{
 10s arg
 0Bo 121
 10s arg
@@ -4893,7 +5286,7 @@ EB
 09o 4
 24
 01
-}]] [def let/args [λδ* let/args [args] "" #{
+}]] [def let/args [fn* let/args [args] "" #{
 10s args
 0Bo 39
 10s args
@@ -4906,80 +5299,80 @@ EB
 09o 4
 24
 01
-}]] [def let [μ* let [bindings . body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append body #nil]]] #nil]]]] [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]] [def when-let [μ* when-let [binding . body] "" [cons 'if-let [cons binding [cons [cons 'do body] [cons #nil #nil]]]]]]][do [def comment [μ* comment body "Does nothing" #nil]] [def += [μ* += [val inc] "" [cons 'set! [cons val [cons [cons '+ [cons val [cons inc #nil]]] #nil]]]]] [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]] [def not [λδ* not [v] "Return true if V is false" #{
+}]] [def let [μ* let [bindings . body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append body #nil]]] #nil]]]] [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]] [def when-let [μ* when-let [binding . body] "" [cons 'if-let [cons binding [cons [cons 'do body] [cons #nil #nil]]]]]]][do [def comment [μ* comment body "Does nothing" #nil]] [def += [μ* += [val inc] "" [cons 'set! [cons val [cons [cons '+ [cons val [cons inc #nil]]] #nil]]]]] [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]] [def not [fn* not [v] "Return true if V is false" #{
 10s v
 0Bo 10
 05v #f
 09o 7
 05v #t
 01
-}]] [def identity [λδ* identity [α] "Returns its argument" #{
+}]] [def identity [fn* identity [α] "Returns its argument" #{
 10s α
 01
-}]] [def list [λδ* list arguments "Return ARGUMENTS as a list" #{
+}]] [def list [fn* list arguments "Return ARGUMENTS as a list" #{
 10s arguments
 01
-}]] [def default [λδ* default [arg default-value] "Returns ARG or DEFAULT-VALUE if ARG is #nil" #{
+}]] [def default [fn* default [arg default-value] "Returns ARG or DEFAULT-VALUE if ARG is #nil" #{
 10s arg
 0Bo 10
 10s arg
 09o 7
 10s default-value
 01
-}]] [def caar [λδ* caar [p] "[car [car p]]" #{
+}]] [def caar [fn* caar [p] "[car [car p]]" #{
 10s p
 08i 1 v car
 08i 1 v car
 01
-}]] [def cadr [λδ* cadr [p] "[car [cdr p]]" #{
+}]] [def cadr [fn* cadr [p] "[car [cdr p]]" #{
 10s p
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cdar [λδ* cdar [p] "[cdr [car p]]" #{
+}]] [def cdar [fn* cdar [p] "[cdr [car p]]" #{
 10s p
 08i 1 v car
 08i 1 v cdr
 01
-}]] [def cddr [λδ* cddr [p] "[cdr [cdr p]]" #{
+}]] [def cddr [fn* cddr [p] "[cdr [cdr p]]" #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def cadar [λδ* cadar [p] "[cdr [car p]]" #{
+}]] [def cadar [fn* cadar [p] "[cdr [car p]]" #{
 10s p
 08i 1 v car
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def caddr [λδ* caddr [p] "[car [cdr [cdr p]]]" #{
+}]] [def caddr [fn* caddr [p] "[car [cdr [cdr p]]]" #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cdddr [λδ* cdddr [p] "[cdr [cdr [cdr p]]]" #{
+}]] [def cdddr [fn* cdddr [p] "[cdr [cdr [cdr p]]]" #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def cadddr [λδ* cadddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+}]] [def cadddr [fn* cadddr [p] "[car [cdr [cdr [cdr p]]]]" #{
 10s p
-08i 1 v cdr
-08i 1 v cdr
-08i 1 v cdr
-08i 1 v car
-01
-}]] [def caddddr [λδ* caddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
-10s p
-08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def keyword->string [λδ* keyword->string [α] "" #{
+}]] [def caddddr [fn* caddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+10s p
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v car
+01
+}]] [def keyword->string [fn* keyword->string [α] "" #{
 10s α
 08i 1 v keyword?
 0Bo 7
@@ -4996,7 +5389,7 @@ EB
 08i 1 v keyword->symbol
 08i 1 v sym->str
 01
-}]] [def string->keyword [λδ* string->keyword [α] "" #{
+}]] [def string->keyword [fn* string->keyword [α] "" #{
 10s α
 08i 1 v string?
 0Bo 7
@@ -5013,7 +5406,64 @@ EB
 08i 1 v str->sym
 08i 1 v symbol->keyword
 01
-}]]][do [def if-not [μ* if-not [pred then else] "" [cons 'if [cons pred [cons else [cons then #nil]]]]]] [def when-not [μ* when-not [pred . body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append body #nil]] #nil]]]]]] [def when [μ* when [pred . body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append body #nil]] [cons #nil #nil]]]]]] [def case/clauses/multiple [λ* case/clauses/multiple [key-sym cases] "" [if cases [cons [list '== key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]] #nil]]] [def case/clauses [λ* case/clauses [key-sym clauses] "" [if clauses [if [== [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [== [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '== key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '== key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]] #nil]]] [def case [μ* case [key-form . clauses] "" [do [def key-sym [gensym]] [list 'let* [list 'def key-sym key-form] [case/clauses key-sym clauses]]]]] [def cond [μ* cond body "Contains multiple cond clauses" [if [and body [caar body]] [list 'if [caar body] [cons 'do [cdar body]] [macro-apply cond [cdr body]]] #nil]]] [def for [μ* for [for-loop . body] "For loops, [for [name start stop] body]" [do [def symbol-name [car for-loop]] [def loop-start [cadr for-loop]] [def loop-stop [caddr for-loop]] [def stop-var [gensym]] [def dir 1] [if [cadddr for-loop] [set! dir [cadddr for-loop]] #nil] [if [symbol? symbol-name] #nil [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]] [if loop-start #nil [throw [list :invalid-for "Expected a start value at the second position" for-loop]]] [if loop-stop #nil [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]] [def pred [if [> dir 0] < >]] [cons 'let [cons [cons [cons symbol-name [cons loop-start #nil]] [cons [cons stop-var [cons loop-stop #nil]] #nil]] [cons [cons 'while [cons [cons pred [cons symbol-name [cons stop-var #nil]]] [append body [cons [cons 'set! [cons symbol-name [cons [cons 'add/int [cons dir [cons symbol-name #nil]]] #nil]]] #nil]]]] #nil]]]]]] [def for-in [μ* for-in [for-loop . body] "[for-in [l [list 1 2 3 4]] [println l]]" [do [def symbol-name [gensym]] [cons 'let [cons [cons [cons symbol-name [cons [cadr for-loop] #nil]] #nil] [cons [cons 'when [cons symbol-name [cons [cons 'while [cons symbol-name [cons [cons 'def [cons [car for-loop] [cons [cons 'car [cons symbol-name #nil]] #nil]]] [append body [cons [cons 'cdr! [cons symbol-name #nil]] #nil]]]]] #nil]]] #nil]]]]]] [def thread/-> [λ* thread/-> [init fun] "" [if fun [if [pair? [car fun]] [cons [caar fun] [cons [thread/-> init [cdr fun]] [append [cdar fun] #nil]]] [list [car fun] [thread/-> init [cdr fun]]]] init]]] [def -> [μ* -> [init . fun] "Thread init as the first argument through every function in fun" [thread/-> init [reverse fun]]]] [def thread/->> [λ* thread/->> [init fun] "" [if fun [append [car fun] [cons [thread/->> init [cdr fun]] #nil]] init]]] [def ->> [μ* ->> [init . fun] "Thread init as the last argument through every function in fun" [thread/->> init [reverse fun]]]] [def returnable/λ [λ* returnable/λ [e] "" [if [== [car e] :return] [cdr e] [throw e]]]] [def returnable [μ* returnable body "" [cons 'try [cons 'returnable/λ [append body #nil]]]]] [def return [μ* return [v] "" [cons 'throw [cons [cons 'cons [cons :return [cons v #nil]]] #nil]]]]][do [def numeric? [λδ* numeric? [a] "Return #t if a is a number" #{
+}]]][do [def if-not [μ* if-not [pred then else] "" [cons 'if [cons pred [cons else [cons then #nil]]]]]] [def when-not [μ* when-not [pred . body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append body #nil]] #nil]]]]]] [def when [μ* when [pred . body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append body #nil]] [cons #nil #nil]]]]]] [def case/clauses/multiple [λ* case/clauses/multiple [key-sym cases] "" [if cases [cons [list '== key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]] #nil]]] [def case/clauses [λ* case/clauses [key-sym clauses] "" [if clauses [if [== [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [== [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '== key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '== key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]] #nil]]] [def case [μ* case [key-form . clauses] "" [do [def key-sym [gensym]] [list 'let* [list 'def key-sym key-form] [case/clauses key-sym clauses]]]]] [def cond [μ* cond body "Contains multiple cond clauses" [if [and body [caar body]] [list 'if [caar body] [cons 'do [cdar body]] [macro-apply cond [cdr body]]] #nil]]] [def for [μ* for [for-loop . body] "For loops, [for [name start stop] body]" [do [def symbol-name [car for-loop]] [def loop-start [cadr for-loop]] [def loop-stop [caddr for-loop]] [def stop-var [gensym]] [def dir 1] [if [cadddr for-loop] [set! dir [cadddr for-loop]] #nil] [if [symbol? symbol-name] #nil [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]] [if loop-start #nil [throw [list :invalid-for "Expected a start value at the second position" for-loop]]] [if loop-stop #nil [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]] [def pred [if [> dir 0] < >]] [cons 'let [cons [cons [cons symbol-name [cons loop-start #nil]] [cons [cons stop-var [cons loop-stop #nil]] #nil]] [cons [cons 'while [cons [cons pred [cons symbol-name [cons stop-var #nil]]] [append body [cons [cons 'set! [cons symbol-name [cons [cons 'add/int [cons dir [cons symbol-name #nil]]] #nil]]] #nil]]]] #nil]]]]]] [def for-in [μ* for-in [for-loop . body] "[for-in [l [list 1 2 3 4]] [println l]]" [do [def symbol-name [gensym]] [cons 'let [cons [cons [cons symbol-name [cons [cadr for-loop] #nil]] #nil] [cons [cons 'when [cons symbol-name [cons [cons 'while [cons symbol-name [cons [cons 'def [cons [car for-loop] [cons [cons 'car [cons symbol-name #nil]] #nil]]] [append body [cons [cons 'cdr! [cons symbol-name #nil]] #nil]]]]] #nil]]] #nil]]]]]] [def thread/-> [fn* thread/-> [init fun] "" #{
+10s fun
+0Bo 110
+10s fun
+08i 1 v car
+08i 1 v pair?
+0Bo 58
+10s fun
+08i 1 v caar
+10s init
+10s fun
+08i 1 v cdr
+08i 2 v thread/->
+10s fun
+08i 1 v cdar
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+09o 35
+10s fun
+08i 1 v car
+10s init
+10s fun
+08i 1 v cdr
+08i 2 v thread/->
+08i 2 v list
+09o 7
+10s init
+01
+}]] [def -> [μ* -> [init . fun] "Thread init as the first argument through every function in fun" [thread/-> init [reverse fun]]]] [def thread/->> [fn* thread/->> [init fun] "" #{
+10s fun
+0Bo 44
+10s fun
+08i 1 v car
+10s init
+10s fun
+08i 1 v cdr
+08i 2 v thread/->>
+24
+08i 2 v cons
+08i 2 v append
+09o 7
+10s init
+01
+}]] [def ->> [μ* ->> [init . fun] "Thread init as the last argument through every function in fun" [thread/->> init [reverse fun]]]] [def returnable/λ [fn* returnable/λ [e] "" #{
+10s e
+08i 1 v car
+05v :return
+20
+0Bo 15
+10s e
+08i 1 v cdr
+09o 12
+10s e
+08i 1 v throw
+01
+}]] [def returnable [μ* returnable body "" [cons 'try [cons 'returnable/λ [append body #nil]]]]] [def return [μ* return [v] "" [cons 'throw [cons [cons 'cons [cons :return [cons v #nil]]] #nil]]]]][do [def numeric? [fn* numeric? [a] "Return #t if a is a number" #{
 10s a
 08i 1 v int?
 0C
@@ -5031,12 +5481,12 @@ EB
 0D
 05v #f
 01
-}]] [def last? [λδ* last? [a] "Return #t if a is the last pair in a list" #{
+}]] [def last? [fn* last? [a] "Return #t if a is the last pair in a list" #{
 10s a
 08i 1 v cdr
 08i 1 v nil?
 01
-}]] [def pos? [λδ* pos? [a] "Return #t if a is positive" #{
+}]] [def pos? [fn* pos? [a] "Return #t if a is positive" #{
 10s a
 08i 1 v numeric?
 0C
@@ -5047,7 +5497,7 @@ EB
 05v 0.0
 21
 01
-}]] [def zero-neg? [λδ* zero-neg? [a] "Return #t if a is zero or negative" #{
+}]] [def zero-neg? [fn* zero-neg? [a] "Return #t if a is zero or negative" #{
 10s a
 08i 1 v numeric?
 0C
@@ -5058,7 +5508,7 @@ EB
 05v 0.0
 1F
 01
-}]] [def neg? [λδ* neg? [a] "Returns #t if a is negative" #{
+}]] [def neg? [fn* neg? [a] "Returns #t if a is negative" #{
 10s a
 08i 1 v numeric?
 0C
@@ -5069,7 +5519,7 @@ EB
 05v 0.0
 1E
 01
-}]] [def odd? [λδ* odd? [a] "Predicate that returns #t if a is odd" #{
+}]] [def odd? [fn* odd? [a] "Predicate that returns #t if a is odd" #{
 10s a
 08i 1 v int
 02i 2
@@ -5077,7 +5527,7 @@ EB
 02i 1
 20
 01
-}]] [def even? [λδ* even? [a] "Predicate that returns #t if a is even" #{
+}]] [def even? [fn* even? [a] "Predicate that returns #t if a is even" #{
 10s a
 08i 1 v int
 02i 2
@@ -5085,17 +5535,17 @@ EB
 02i 0
 20
 01
-}]] [def zero? [λδ* zero? [val] "#t if VAL is zero" #{
+}]] [def zero? [fn* zero? [val] "#t if VAL is zero" #{
 02i 0
 10s val
 20
 01
-}]] [def not-zero? [λδ* not-zero? [val] "#t if VAL is not zero" #{
+}]] [def not-zero? [fn* not-zero? [val] "#t if VAL is not zero" #{
 02i 0
 10s val
 08i 2 v !=
 01
-}]] [def equal? [λδ* equal? [a b] "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." #{
+}]] [def equal? [fn* equal? [a b] "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." #{
 10s a
 08i 1 v type-of
 0Es cur-type
@@ -5109,9 +5559,9 @@ EB
 09o 107
 15
 10s cur-type
-0Es ΓεnΣym-188
+0Es ΓεnΣym-182
 0D
-10s ΓεnΣym-188
+10s ΓεnΣym-182
 05v :array
 20
 0Bo 19
@@ -5119,7 +5569,7 @@ EB
 10s b
 08i 2 v array/equal?
 09o 68
-10s ΓεnΣym-188
+10s ΓεnΣym-182
 05v :tree
 20
 0Bo 19
@@ -5127,7 +5577,7 @@ EB
 10s b
 08i 2 v tree/equal?
 09o 40
-10s ΓεnΣym-188
+10s ΓεnΣym-182
 05v :pair
 20
 0Bo 19
@@ -5140,79 +5590,79 @@ EB
 20
 16
 01
-}]] [def inequal? [λδ* inequal? [a b] "High level inequality comparator" #{
+}]] [def inequal? [fn* inequal? [a b] "High level inequality comparator" #{
 10s a
 10s b
 08i 2 v equal?
 08i 1 v not
 01
-}]] [def int? [λδ* int? [val] "#t if VAL is a integer" #{
+}]] [def int? [fn* int? [val] "#t if VAL is a integer" #{
 05v :int
 10s val
 08i 1 v type-of
 20
 01
-}]] [def float? [λδ* float? [val] "#t if VAL is a floating-point number" #{
+}]] [def float? [fn* float? [val] "#t if VAL is a floating-point number" #{
 05v :float
 10s val
 08i 1 v type-of
 20
 01
-}]] [def vec? [λδ* vec? [val] "#t if VAL is a vector" #{
+}]] [def vec? [fn* vec? [val] "#t if VAL is a vector" #{
 05v :vec
 10s val
 08i 1 v type-of
 20
 01
-}]] [def bool? [λδ* bool? [val] "#t if VAL is a boolean" #{
+}]] [def bool? [fn* bool? [val] "#t if VAL is a boolean" #{
 05v :bool
 10s val
 08i 1 v type-of
 20
 01
-}]] [def pair? [λδ* pair? [val] "#t if VAL is a pair" #{
+}]] [def pair? [fn* pair? [val] "#t if VAL is a pair" #{
 05v :pair
 10s val
 08i 1 v type-of
 20
 01
-}]] [def array? [λδ* array? [val] "#t if VAL is an array" #{
+}]] [def array? [fn* array? [val] "#t if VAL is an array" #{
 05v :array
 10s val
 08i 1 v type-of
 20
 01
-}]] [def string? [λδ* string? [val] "#t if VAL is a string" #{
+}]] [def string? [fn* string? [val] "#t if VAL is a string" #{
 05v :string
 10s val
 08i 1 v type-of
 20
 01
-}]] [def symbol? [λδ* symbol? [val] "#t if VAL is a symbol" #{
+}]] [def symbol? [fn* symbol? [val] "#t if VAL is a symbol" #{
 05v :symbol
 10s val
 08i 1 v type-of
 20
 01
-}]] [def object? [λδ* object? [val] "#t if VAL is an object" #{
+}]] [def object? [fn* object? [val] "#t if VAL is an object" #{
 05v :object
 10s val
 08i 1 v type-of
 20
 01
-}]] [def tree? [λδ* tree? [val] "#t if VAL is an object" #{
+}]] [def tree? [fn* tree? [val] "#t if VAL is an object" #{
 05v :tree
 10s val
 08i 1 v type-of
 20
 01
-}]] [def macro? [λδ* macro? [val] "#t if VAL is an object" #{
+}]] [def macro? [fn* macro? [val] "#t if VAL is an object" #{
 05v :macro
 10s val
 08i 1 v type-of
 20
 01
-}]] [def lambda? [λδ* lambda? [val] "#t if VAL is a lambda" #{
+}]] [def lambda? [fn* lambda? [val] "#t if VAL is a lambda" #{
 05v :lambda
 10s val
 08i 1 v type-of
@@ -5222,19 +5672,19 @@ EB
 0D
 05v #f
 01
-}]] [def native? [λδ* native? [val] "#t if VAL is a native function" #{
+}]] [def native? [fn* native? [val] "#t if VAL is a native function" #{
 05v :native-function
 10s val
 08i 1 v type-of
 20
 01
-}]] [def special-form? [λδ* special-form? [val] "#t if VAL is a native function" #{
+}]] [def special-form? [fn* special-form? [val] "#t if VAL is a native function" #{
 05v :special-form
 10s val
 08i 1 v type-of
 20
 01
-}]] [def procedure? [λδ* procedure? [val] "#t if VAL is a native or lisp function" #{
+}]] [def procedure? [fn* procedure? [val] "#t if VAL is a native or lisp function" #{
 10s val
 08i 1 v lambda?
 0C
@@ -5252,19 +5702,19 @@ EB
 0D
 05v #f
 01
-}]] [def bytecode-array? [λδ* bytecode-array? [v] "" #{
+}]] [def bytecode-array? [fn* bytecode-array? [v] "" #{
 05v :bytecode-array
 10s v
 08i 1 v type-of
 20
 01
-}]] [def bytecode-op? [λδ* bytecode-op? [v] "" #{
+}]] [def bytecode-op? [fn* bytecode-op? [v] "" #{
 05v :bytecode-op
 10s v
 08i 1 v type-of
 20
 01
-}]] [def in-range? [λδ* in-range? [v min max] "" #{
+}]] [def in-range? [fn* in-range? [v min max] "" #{
 10s v
 10s min
 21
@@ -5275,7 +5725,19 @@ EB
 10s max
 1F
 01
-}]]][do [def quasiquote-real [λ* quasiquote-real [l depth] "" [if [nil? l] #nil [if [pair? l] [if [== [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l]] l]]]]] [def quasiquote [μ* quasiquote [l] "" [quasiquote-real l 0]]] [def unquote [λ* unquote [expr] "" [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]] [def unquote-splicing [λ* unquote-splicing [expr] "" [throw [list :unquote-splicing-without-quasiq "unquote-splicing should only occur inside a quasiquote, never evaluated directly"]]]]][do [def describe/closure [λδ* describe/closure [c i] "" #{
+}]]][do [def quasiquote-real [λ* quasiquote-real [l depth] "" [if [nil? l] #nil [if [pair? l] [if [== [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l]] l]]]]] [def quasiquote [μ* quasiquote [l] "" [quasiquote-real l 0]]] [def unquote [fn* unquote [expr] "" #{
+05v :unquote-without-quasiquote
+05v "unquote should only occur inside a quasiquote, never evaluated directly"
+08i 2 v list
+08i 1 v throw
+01
+}]] [def unquote-splicing [fn* unquote-splicing [expr] "" #{
+05v :unquote-splicing-without-quasiq
+05v "unquote-splicing should only occur inside a quasiquote, never evaluated directly"
+08i 2 v list
+08i 1 v throw
+01
+}]]][do [def describe/closure [fn* describe/closure [c i] "" #{
 10s c
 0Bo 142
 10s c
@@ -5316,14 +5778,20 @@ EB
 09o 4
 24
 01
-}]] [def stacktrace [λ* stacktrace [] "" [display [describe/closure [closure-caller [current-lambda]]]]]]][do [def time/seconds [λδ* time/seconds [timestamp] "Return the seconds part of TIMESTAMP, defaults to current time" #{
+}]] [def stacktrace [fn* stacktrace [] "" #{
+08i 0 v current-lambda
+08i 1 v closure-caller
+08i 1 v describe/closure
+08i 1 v display
+01
+}]]][do [def time/seconds [fn* time/seconds [timestamp] "Return the seconds part of TIMESTAMP, defaults to current time" #{
 10s timestamp
 08i 0 v time
 08i 2 v default
 02i 60
 08i 2 v %
 01
-}]] [def time/minutes [λδ* time/minutes [timestamp] "Return the minutes part of TIMESTAMP, defaults to current time" #{
+}]] [def time/minutes [fn* time/minutes [timestamp] "Return the minutes part of TIMESTAMP, defaults to current time" #{
 10s timestamp
 08i 0 v time
 08i 2 v default
@@ -5332,7 +5800,7 @@ EB
 02i 60
 08i 2 v %
 01
-}]] [def time/hours [λδ* time/hours [timestamp] "Return the hours part of TIMESTAMP, defaults to current time" #{
+}]] [def time/hours [fn* time/hours [timestamp] "Return the hours part of TIMESTAMP, defaults to current time" #{
 10s timestamp
 08i 0 v time
 08i 2 v default
@@ -5341,7 +5809,7 @@ EB
 02i 24
 08i 2 v %
 01
-}]] [def profile-form [λδ* profile-form [raw] "" #{
+}]] [def profile-form [fn* profile-form [raw] "" #{
 08i 0 v time/milliseconds
 0Es start-time
 0D
@@ -5373,7 +5841,7 @@ EB
 08i 6 v cat
 08i 1 v display
 01
-}]] [def profile [μ* profile body "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? body] [car body] [cons 'do body]] #nil]] #nil]]]]][def hash/adler32 [λδ* hash/adler32 [data] "" #{
+}]] [def profile [μ* profile body "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? body] [car body] [cons 'do body]] #nil]] #nil]]]]][def hash/adler32 [fn* hash/adler32 [data] "" #{
 02i 1
 0Es a
 0D
@@ -5386,13 +5854,13 @@ EB
 0D
 10s data
 08i 1 v string/length
-0Es ΓεnΣym-50
+0Es ΓεnΣym-56
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-50
+10s ΓεnΣym-56
 1E
 0Bo 73
 0D
@@ -5425,7 +5893,16 @@ EB
 08i 2 v ash
 08i 2 v logior
 01
-}]][do [def PI 3.14159] [def π 3.14159] [def ++ [μ* ++ [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [λ* +x [α] "Return a function that adds α to it's argument, useful for mapping" [λ* #nil [β] "" [+ α β]]]] [def >> [λ* >> [val amount] "Shifts VAL by AMOUNT bits to the right" [ash val [- amount]]]] [def fib [λδ* fib [i] "Terribly inefficient, but, useful for testing the GC" #{
+}]][do [def PI 3.14159] [def π 3.14159] [def ++ [μ* ++ [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
+11v :INVALID-VALUE v [β] v "" v [+ α β]
+01
+}]] [def >> [fn* >> [val amount] "Shifts VAL by AMOUNT bits to the right" #{
+10s val
+10s amount
+08i 1 v -
+08i 2 v ash
+01
+}]] [def fib [fn* fib [i] "Terribly inefficient, but, useful for testing the GC" #{
 10s i
 02i 2
 1E
@@ -5442,7 +5919,7 @@ EB
 08i 1 v fib
 08i 2 v +
 01
-}]] [def wrap-value [λδ* wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around" #{
+}]] [def wrap-value [fn* wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around" #{
 10s min
 10s val
 10s min
@@ -5453,14 +5930,14 @@ EB
 08i 2 v %
 08i 2 v +
 01
-}]] [def +1 [μ* +1 [v] "" [cons '+ [cons 1 [cons v #nil]]]]] [def radians [λδ* radians [degrees] "Convert a quantity in degrees to radians" #{
+}]] [def +1 [μ* +1 [v] "" [cons '+ [cons 1 [cons v #nil]]]]] [def radians [fn* radians [degrees] "Convert a quantity in degrees to radians" #{
 10s π
 10s degrees
 08i 2 v *
 05v 180.0
 08i 2 v /
 01
-}]]][do [def display/error/wrap [λδ* display/error/wrap [i text] "" #{
+}]]][do [def display/error/wrap [fn* display/error/wrap [i text] "" #{
 15
 10s i
 0Es ΓεnΣym-1
@@ -5497,7 +5974,7 @@ EB
 10s text
 16
 01
-}]] [def display/error/iter [λδ* display/error/iter [error i] "" #{
+}]] [def display/error/iter [fn* display/error/iter [error i] "" #{
 10s error
 0Bo 54
 10s i
@@ -5516,7 +5993,7 @@ EB
 24
 08i 2 v cons
 01
-}]] [def display/error [λδ* display/error [error] "Display ERROR in a nice, human readable way" #{
+}]] [def display/error [fn* display/error [error] "Display ERROR in a nice, human readable way" #{
 10s error
 02i 0
 08i 2 v display/error/iter
@@ -5524,7 +6001,7 @@ EB
 08i 2 v join
 08i 1 v display
 01
-}]] [def describe/thing [λδ* describe/thing [o] "Describe a specific value O" #{
+}]] [def describe/thing [fn* describe/thing [o] "Describe a specific value O" #{
 10s o
 08i 1 v closure
 0Es doc
@@ -5539,13 +6016,13 @@ EB
 08i 2 v ref
 08i 3 v cat
 01
-}]] [def describe/string [λδ* describe/string [a] "Descibe whatever value string A resolves to" #{
+}]] [def describe/string [fn* describe/string [a] "Descibe whatever value string A resolves to" #{
 10s a
 08i 1 v str->sym
 08i 1 v resolve
 08i 1 v describe/thing
 01
-}]] [def describe [λδ* describe [fun] "Describe FUN, if there is documentation available" #{
+}]] [def describe [fn* describe [fun] "Describe FUN, if there is documentation available" #{
 10s fun
 08i 1 v string?
 0Bo 15
@@ -5555,7 +6032,7 @@ EB
 10s fun
 08i 1 v describe/thing
 01
-}]] [def mem [λδ* mem [] "Return some pretty printed memory usage information" #{
+}]] [def mem [fn* mem [] "Return some pretty printed memory usage information" #{
 08i 0 v memory-info
 0Es info
 0D
@@ -5595,7 +6072,7 @@ EB
 10s ansi-reset
 08i 18 v cat
 01
-}]] [def symbol-table [λ* symbol-table [off len environment] "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF" [do [if environment #nil [set! environment root-closure]] [if off #nil [set! off 0]] [if len #nil [set! len 9999999]] [sublist [environment [symbol-table*]] off [+ off len] #nil]]]] [def gensym/counter 0] [def gensym [λδ* gensym [prefix] "" #{
+}]] [def symbol-table [λ* symbol-table [off len environment] "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF" [do [if environment #nil [set! environment root-closure]] [if off #nil [set! off 0]] [if len #nil [set! len 9999999]] [sublist [environment [symbol-table*]] off [+ off len] #nil]]]] [def gensym/counter 0] [def gensym [fn* gensym [prefix] "" #{
 02i 1
 10s gensym/counter
 08i 2 v +
@@ -5607,13 +6084,13 @@ EB
 08i 3 v cat
 08i 1 v str->sym
 01
-}]] [def root-closure [current-closure]]][do [def random/seed 0] [def random/seed-initialize! [λδ* random/seed-initialize! [] "" #{
+}]] [def root-closure [current-closure]]][do [def random/seed 0] [def random/seed-initialize! [fn* random/seed-initialize! [] "" #{
 08i 0 v time
 08i 0 v time/milliseconds
 08i 2 v logxor
 0Fs random/seed
 01
-}]] [def random/rng! [λδ* random/rng! [] "" #{
+}]] [def random/rng! [fn* random/rng! [] "" #{
 05v 12345
 10s random/seed
 05v 1103515245
@@ -5633,14 +6110,14 @@ EB
 08i 2 v logand
 08i 2 v logior
 01
-}]] [def random/seed! [λδ* random/seed! [new-seed] "Set a new seed value for the RNG" #{
+}]] [def random/seed! [fn* random/seed! [new-seed] "Set a new seed value for the RNG" #{
 10s new-seed
 0Fs seed
 01
-}]] [def random/seed [λδ* random/seed [] "Return the current RNG seed value" #{
+}]] [def random/seed [fn* random/seed [] "Return the current RNG seed value" #{
 10s seed
 01
-}]] [def random [λδ* random [max] "Return a value from 0 to MAX, or, if left out, a random int" #{
+}]] [def random [fn* random [max] "Return a value from 0 to MAX, or, if left out, a random int" #{
 10s max
 08i 1 v numeric?
 0Bo 25
@@ -5651,18 +6128,122 @@ EB
 09o 8
 08i 0 v random/rng!
 01
-}]] [random/seed-initialize!]][do [def tree->json [λδ* tree->json [v] "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" #{
+}]] [random/seed-initialize!]][do [def tree->json [fn* tree->json [v] "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" #{
 05v "{"
 10s v
 08i 1 v tree/keys
-11v [:symbol :symbol] v [k] v "" v [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]
+11v :INVALID-VALUE v [k] v "" v [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]
 08i 2 v map
 05v ",\n"
 08i 2 v join
 05v "}"
 08i 3 v cat
 01
-}]] [def val->json [λ* val->json [v] "Return V as a JSON encoded string" [let* [do [def ΓεnΣym-190 [type-of v]] [if [== ΓεnΣym-190 :nil] "null" [if [or [== ΓεnΣym-190 :int] [== ΓεnΣym-190 :float]] [string v] [if [== ΓεnΣym-190 :bool] [if v "true" "false"] [if [or [== ΓεnΣym-190 :array] [== ΓεnΣym-190 :pair]] [cat "[" [join [map v val->json] ","] "]"] [if [== ΓεnΣym-190 :string] [str/write v] [if [== ΓεnΣym-190 :symbol] [cat "\"" [sym->str v] "\""] [if [== ΓεnΣym-190 :keyword] [cat "\"" [keyword->string v] "\""] [if [== ΓεnΣym-190 :tree] [tree->json v] [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]]]]]]]]]]][do [def ansi/disabled #f] [def ansi-reset "\e[0m"] [def ansi-fg-reset "\e[0;39m"] [def ansi-bg-reset "\e[49m"] [def ansi-fg [array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]] [def ansi-reset "\e[0m"] [def ansi-bg [array/new "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]] [def ansi-wrap [λδ* ansi-wrap [code string] "Wrap STRING in the ansi color CODE" #{
+}]] [def val->json [fn* val->json [v] "Return V as a JSON encoded string" #{
+15
+10s v
+08i 1 v type-of
+0Es ΓεnΣym-183
+0D
+10s ΓεnΣym-183
+05v :nil
+20
+0Bo 10
+05v "null"
+09o 305
+10s ΓεnΣym-183
+05v :int
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-183
+05v :float
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 15
+10s v
+08i 1 v string
+09o 258
+10s ΓεnΣym-183
+05v :bool
+20
+0Bo 24
+10s v
+0Bo 10
+05v "true"
+09o 7
+05v "false"
+09o 225
+10s ΓεnΣym-183
+05v :array
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-183
+05v :pair
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 41
+05v "["
+10s v
+10s val->json
+08i 2 v map
+05v ","
+08i 2 v join
+05v "]"
+08i 3 v cat
+09o 152
+10s ΓεnΣym-183
+05v :string
+20
+0Bo 15
+10s v
+08i 1 v str/write
+09o 128
+10s ΓεnΣym-183
+05v :symbol
+20
+0Bo 28
+05v "\""
+10s v
+08i 1 v sym->str
+05v "\""
+08i 3 v cat
+09o 91
+10s ΓεnΣym-183
+05v :keyword
+20
+0Bo 28
+05v "\""
+10s v
+08i 1 v keyword->string
+05v "\""
+08i 3 v cat
+09o 54
+10s ΓεnΣym-183
+05v :tree
+20
+0Bo 15
+10s v
+08i 1 v tree->json
+09o 30
+05v :type-error
+05v "Can't encode the value into JSON"
+10s v
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+16
+01
+}]]][do [def ansi/disabled #f] [def ansi-reset "\e[0m"] [def ansi-fg-reset "\e[0;39m"] [def ansi-bg-reset "\e[49m"] [def ansi-fg [array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]] [def ansi-reset "\e[0m"] [def ansi-bg [array/new "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]] [def ansi-wrap [fn* ansi-wrap [code string] "Wrap STRING in the ansi color CODE" #{
 10s ansi/disabled
 0C
 0Ao 26
@@ -5686,119 +6267,119 @@ EB
 05v #f
 08i 3 v cat
 01
-}]] [def ansi-black [λδ* ansi-black args "Wrap ARGS in black" #{
+}]] [def ansi-black [fn* ansi-black args "Wrap ARGS in black" #{
 02i 0
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-red [λδ* ansi-dark-red args "Wrap ARGS in dark red" #{
+}]] [def ansi-dark-red [fn* ansi-dark-red args "Wrap ARGS in dark red" #{
 02i 1
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-green [λδ* ansi-dark-green args "Wrap ARGS in dark green" #{
+}]] [def ansi-dark-green [fn* ansi-dark-green args "Wrap ARGS in dark green" #{
 02i 2
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-brown [λδ* ansi-brown args "Wrap ARGS in brown" #{
+}]] [def ansi-brown [fn* ansi-brown args "Wrap ARGS in brown" #{
 02i 3
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-blue [λδ* ansi-dark-blue args "Wrap ARGS in dark blue" #{
+}]] [def ansi-dark-blue [fn* ansi-dark-blue args "Wrap ARGS in dark blue" #{
 02i 4
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-purple [λδ* ansi-purple args "Wrap ARGS in purple" #{
+}]] [def ansi-purple [fn* ansi-purple args "Wrap ARGS in purple" #{
 02i 5
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-teal [λδ* ansi-teal args "Wrap ARGS in teal" #{
+}]] [def ansi-teal [fn* ansi-teal args "Wrap ARGS in teal" #{
 02i 6
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-gray [λδ* ansi-dark-gray args "Wrap ARGS in dark gray" #{
+}]] [def ansi-dark-gray [fn* ansi-dark-gray args "Wrap ARGS in dark gray" #{
 02i 7
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-gray [λδ* ansi-gray args "Wrap ARGS in gray" #{
+}]] [def ansi-gray [fn* ansi-gray args "Wrap ARGS in gray" #{
 02i 8
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-red [λδ* ansi-red args "Wrap ARGS in red" #{
+}]] [def ansi-red [fn* ansi-red args "Wrap ARGS in red" #{
 02i 9
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-green [λδ* ansi-green args "Wrap ARGS in green" #{
+}]] [def ansi-green [fn* ansi-green args "Wrap ARGS in green" #{
 02i 10
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-yellow [λδ* ansi-yellow args "Wrap ARGS in yellow" #{
+}]] [def ansi-yellow [fn* ansi-yellow args "Wrap ARGS in yellow" #{
 02i 11
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-blue [λδ* ansi-blue args "Wrap ARGS in blue" #{
+}]] [def ansi-blue [fn* ansi-blue args "Wrap ARGS in blue" #{
 02i 12
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-pink [λδ* ansi-pink args "Wrap ARGS in pink" #{
+}]] [def ansi-pink [fn* ansi-pink args "Wrap ARGS in pink" #{
 02i 13
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-cyan [λδ* ansi-cyan args "Wrap ARGS in cyan" #{
+}]] [def ansi-cyan [fn* ansi-cyan args "Wrap ARGS in cyan" #{
 02i 14
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-white [λδ* ansi-white args "Wrap ARGS in white" #{
+}]] [def ansi-white [fn* ansi-white args "Wrap ARGS in white" #{
 02i 15
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-rainbow [λδ* ansi-rainbow args "Wrap ARGS in the colors of the rainbow!" #{
+}]] [def ansi-rainbow [fn* ansi-rainbow args "Wrap ARGS in the colors of the rainbow!" #{
 15
 02i 0
 0Es count
@@ -5808,7 +6389,7 @@ EB
 08i 2 v apply
 05v ""
 08i 2 v split
-11v [:symbol :symbol] v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]
+11v :INVALID-VALUE v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]
 08i 2 v map
 05v ""
 08i 2 v join
@@ -5824,7 +6405,7 @@ EB
 08i 2 v cat
 16
 01
-}]] [def ansi-rainbow-bg [λδ* ansi-rainbow-bg args "Wrap ARGS in the colors of the rainbow!" #{
+}]] [def ansi-rainbow-bg [fn* ansi-rainbow-bg args "Wrap ARGS in the colors of the rainbow!" #{
 02i 0
 0Es count
 0D
@@ -5833,7 +6414,7 @@ EB
 08i 2 v apply
 05v ""
 08i 2 v split
-11v [:symbol :symbol] v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [logxor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]
+11v :INVALID-VALUE v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [logxor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]
 08i 2 v map
 0Es colored-list
 0D
@@ -5851,7 +6432,7 @@ EB
 05v #f
 08i 2 v cat
 01
-}]] [def reprint-line [λδ* reprint-line [text width] "" #{
+}]] [def reprint-line [fn* reprint-line [text width] "" #{
 10s width
 0Bo 7
 24
@@ -5867,13 +6448,13 @@ EB
 0Es i
 0D
 10s width
-0Es ΓεnΣym-191
+0Es ΓεnΣym-184
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-191
+10s ΓεnΣym-184
 1E
 0Bo 28
 0D
@@ -5893,7 +6474,7 @@ EB
 10s text
 08i 1 v print
 01
-}]]][do [def fmt/format-arg/default [tree/new :align :right :debug #f :base #f :width #nil :padding-char " "]] [def fmt/find-non-digit-from-right [λδ* fmt/find-non-digit-from-right [s i] "" #{
+}]]][do [def fmt/format-arg/default [tree/new :align :right :debug #f :base #f :width #nil :padding-char " "]] [def fmt/find-non-digit-from-right [fn* fmt/find-non-digit-from-right [s i] "" #{
 10s i
 02i 0
 1E
@@ -5923,7 +6504,310 @@ EB
 09o 7
 10s i
 01
-}]] [def fmt/parse-spec [λ* fmt/parse-spec [opts spec] "" [if [zero? [string/length spec]] opts [let* [do [def ΓεnΣym-198 [char-at spec [- [string/length spec] 1]]] [if [or [== ΓεnΣym-198 48] [== ΓεnΣym-198 49] [== ΓεnΣym-198 50] [== ΓεnΣym-198 51] [== ΓεnΣym-198 52] [== ΓεnΣym-198 53] [== ΓεnΣym-198 54] [== ΓεnΣym-198 55] [== ΓεnΣym-198 56] [== ΓεnΣym-198 57]] [do [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]] [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]] [tree/set! opts :width [read/single number]] [if [== 48 [char-at number 0]] [tree/set! opts :padding-char "0"] #nil] [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]] [if [== ΓεnΣym-198 63] [fmt/parse-spec [tree/set! opts :debug #t] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 88] [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 120] [fmt/parse-spec [tree/set! opts :base :hexadecimal] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 100] [fmt/parse-spec [tree/set! opts :base :decimal] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 111] [fmt/parse-spec [tree/set! opts :base :octal] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 98] [fmt/parse-spec [tree/set! opts :base :binary] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 60] [fmt/parse-spec [tree/set! opts :align :left] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 94] [fmt/parse-spec [tree/set! opts :align :center] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 62] [fmt/parse-spec [tree/set! opts :align :right] [string/cut spec 0 [- [string/length spec] 1]]] [if [== ΓεnΣym-198 46] [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]] [string/cut spec 0 [- [string/length spec] 1]]] [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]]]]]]]]]]]]] [def fmt/debug [λδ* fmt/debug [opts] "" #{
+}]] [def fmt/parse-spec [fn* fmt/parse-spec [opts spec] "" #{
+10s spec
+08i 1 v string/length
+08i 1 v zero?
+0Bo 10
+10s opts
+09o 978
+15
+10s spec
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 2 v char-at
+0Es ΓεnΣym-189
+0D
+10s ΓεnΣym-189
+02i 48
+20
+0C
+0Ao 116
+0D
+10s ΓεnΣym-189
+02i 49
+20
+0C
+0Ao 104
+0D
+10s ΓεnΣym-189
+02i 50
+20
+0C
+0Ao 92
+0D
+10s ΓεnΣym-189
+02i 51
+20
+0C
+0Ao 80
+0D
+10s ΓεnΣym-189
+02i 52
+20
+0C
+0Ao 68
+0D
+10s ΓεnΣym-189
+02i 53
+20
+0C
+0Ao 56
+0D
+10s ΓεnΣym-189
+02i 54
+20
+0C
+0Ao 44
+0D
+10s ΓεnΣym-189
+02i 55
+20
+0C
+0Ao 32
+0D
+10s ΓεnΣym-189
+02i 56
+20
+0C
+0Ao 20
+0D
+10s ΓεnΣym-189
+02i 57
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 163
+10s spec
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 2 v fmt/find-non-digit-from-right
+0Es next-non-digit
+0D
+10s spec
+02i 1
+10s next-non-digit
+08i 2 v +
+10s spec
+08i 1 v string/length
+08i 3 v string/cut
+0Es number
+0D
+10s opts
+05v :width
+10s number
+08i 1 v read/single
+08i 3 v tree/set!
+0D
+02i 48
+10s number
+02i 0
+08i 2 v char-at
+20
+0Bo 23
+10s opts
+05v :padding-char
+05v "0"
+08i 3 v tree/set!
+09o 4
+24
+0D
+10s opts
+10s spec
+02i 0
+02i 1
+10s next-non-digit
+08i 2 v +
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 659
+10s ΓεnΣym-189
+02i 63
+20
+0Bo 55
+10s opts
+05v :debug
+05v #t
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 597
+10s ΓεnΣym-189
+02i 88
+20
+0Bo 55
+10s opts
+05v :base
+05v :HEXADECIMAL
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 535
+10s ΓεnΣym-189
+02i 120
+20
+0Bo 55
+10s opts
+05v :base
+05v :hexadecimal
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 473
+10s ΓεnΣym-189
+02i 100
+20
+0Bo 55
+10s opts
+05v :base
+05v :decimal
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 411
+10s ΓεnΣym-189
+02i 111
+20
+0Bo 55
+10s opts
+05v :base
+05v :octal
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 349
+10s ΓεnΣym-189
+02i 98
+20
+0Bo 55
+10s opts
+05v :base
+05v :binary
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 287
+10s ΓεnΣym-189
+02i 60
+20
+0Bo 55
+10s opts
+05v :align
+05v :left
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 225
+10s ΓεnΣym-189
+02i 94
+20
+0Bo 55
+10s opts
+05v :align
+05v :center
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 163
+10s ΓεnΣym-189
+02i 62
+20
+0Bo 55
+10s opts
+05v :align
+05v :right
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 101
+10s ΓεnΣym-189
+02i 46
+20
+0Bo 64
+10s opts
+05v :precision
+10s opts
+05v :width
+08i 2 v tree/ref
+08i 3 v tree/set!
+10s spec
+02i 0
+10s spec
+08i 1 v string/length
+02i 1
+08i 2 v -
+08i 3 v string/cut
+08i 2 v fmt/parse-spec
+09o 30
+05v :format-error
+05v "Unknown form-spec option"
+10s spec
+08i 0 v current-closure
+08i 4 v list
+08i 1 v throw
+16
+01
+}]] [def fmt/debug [fn* fmt/debug [opts] "" #{
 10s opts
 05v :debug
 08i 2 v tree/ref
@@ -5939,7 +6823,82 @@ EB
 09o 7
 10s opts
 01
-}]] [def fmt/number-format [λ* fmt/number-format [opts] "" [let* [do [def ΓεnΣym-199 [tree/ref opts :base]] [if [== ΓεnΣym-199 :binary] [tree/set! opts :argument [list int->string/binary [tree/ref opts :argument]]] [if [== ΓεnΣym-199 :octal] [tree/set! opts :argument [list int->string/octal [tree/ref opts :argument]]] [if [== ΓεnΣym-199 :decimal] [tree/set! opts :argument [list int->string/decimal [tree/ref opts :argument]]] [if [== ΓεnΣym-199 :hexadecimal] [tree/set! opts :argument [list int->string/hex [tree/ref opts :argument]]] [if [== ΓεnΣym-199 :HEXADECIMAL] [tree/set! opts :argument [list int->string/HEX [tree/ref opts :argument]]] opts]]]]]]]]] [def fmt/number-format-prefixex [tree/new :binary "#b" :octal "#o" :decimal "#d" :hexadecimal "#x" :HEXADECIMAL "#x"]] [def fmt/number-format-prefix [λδ* fmt/number-format-prefix [opts] "" #{
+}]] [def fmt/number-format [fn* fmt/number-format [opts] "" #{
+15
+10s opts
+05v :base
+08i 2 v tree/ref
+0Es ΓεnΣym-190
+0D
+10s ΓεnΣym-190
+05v :binary
+20
+0Bo 41
+10s opts
+05v :argument
+10s int->string/binary
+10s opts
+05v :argument
+08i 2 v tree/ref
+08i 2 v list
+08i 3 v tree/set!
+09o 207
+10s ΓεnΣym-190
+05v :octal
+20
+0Bo 41
+10s opts
+05v :argument
+10s int->string/octal
+10s opts
+05v :argument
+08i 2 v tree/ref
+08i 2 v list
+08i 3 v tree/set!
+09o 157
+10s ΓεnΣym-190
+05v :decimal
+20
+0Bo 41
+10s opts
+05v :argument
+10s int->string/decimal
+10s opts
+05v :argument
+08i 2 v tree/ref
+08i 2 v list
+08i 3 v tree/set!
+09o 107
+10s ΓεnΣym-190
+05v :hexadecimal
+20
+0Bo 41
+10s opts
+05v :argument
+10s int->string/hex
+10s opts
+05v :argument
+08i 2 v tree/ref
+08i 2 v list
+08i 3 v tree/set!
+09o 57
+10s ΓεnΣym-190
+05v :HEXADECIMAL
+20
+0Bo 41
+10s opts
+05v :argument
+10s int->string/HEX
+10s opts
+05v :argument
+08i 2 v tree/ref
+08i 2 v list
+08i 3 v tree/set!
+09o 7
+10s opts
+16
+01
+}]] [def fmt/number-format-prefixex [tree/new :binary "#b" :octal "#o" :decimal "#d" :hexadecimal "#x" :HEXADECIMAL "#x"]] [def fmt/number-format-prefix [fn* fmt/number-format-prefix [opts] "" #{
 10s opts
 05v :debug
 08i 2 v tree/ref
@@ -5983,7 +6942,7 @@ EB
 05v #f
 08i 3 v tree/set!
 01
-}]] [def fmt/add-padding [λδ* fmt/add-padding [opts] "" #{
+}]] [def fmt/add-padding [fn* fmt/add-padding [opts] "" #{
 10s opts
 05v :width
 08i 2 v tree/ref
@@ -5994,21 +6953,21 @@ EB
 10s opts
 05v :align
 08i 2 v tree/ref
-0Es ΓεnΣym-200
+0Es ΓεnΣym-191
 0D
-10s ΓεnΣym-200
+10s ΓεnΣym-191
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-200
+10s ΓεnΣym-191
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-200
+10s ΓεnΣym-191
 05v :left
 20
 0Bo 10
@@ -6046,7 +7005,7 @@ EB
 09o 7
 10s opts
 01
-}]] [def fmt/precision [λδ* fmt/precision [opts] "" #{
+}]] [def fmt/precision [fn* fmt/precision [opts] "" #{
 10s opts
 05v :precision
 08i 2 v tree/ref
@@ -6065,7 +7024,7 @@ EB
 09o 7
 10s opts
 01
-}]] [def fmt/truncate [λδ* fmt/truncate [opts] "" #{
+}]] [def fmt/truncate [fn* fmt/truncate [opts] "" #{
 10s opts
 05v :width
 08i 2 v tree/ref
@@ -6087,12 +7046,12 @@ EB
 09o 7
 10s opts
 01
-}]] [def fmt/output [λδ* fmt/output [opts] "" #{
+}]] [def fmt/output [fn* fmt/output [opts] "" #{
 10s opts
 05v :argument
 08i 2 v tree/ref
 01
-}]] [def fmt/format-arg [λδ* fmt/format-arg [spec argument] "" #{
+}]] [def fmt/format-arg [fn* fmt/format-arg [spec argument] "" #{
 10s fmt/format-arg/default
 08i 1 v tree/dup
 10s spec
@@ -6108,7 +7067,7 @@ EB
 08i 1 v fmt/debug
 08i 1 v fmt/output
 01
-}]] [def fmt/valid-argument? [λδ* fmt/valid-argument? [argument] "" #{
+}]] [def fmt/valid-argument? [fn* fmt/valid-argument? [argument] "" #{
 10s argument
 08i 1 v int?
 0C
@@ -6121,7 +7080,7 @@ EB
 0D
 05v #f
 01
-}]] [def fmt/expr/count 0] [def fmt/expr [λδ* fmt/expr [expr arguments-used] "" #{
+}]] [def fmt/expr/count 0] [def fmt/expr [fn* fmt/expr [expr arguments-used] "" #{
 10s expr
 08i 1 v string?
 0Bo 7
@@ -6249,7 +7208,7 @@ EB
 08i 2 v fmt/format-arg
 16
 01
-}]] [def fmt/args/map-fun/count 0] [def fmt/args/map-fun [λδ* fmt/args/map-fun [arg] "" #{
+}]] [def fmt/args/map-fun/count 0] [def fmt/args/map-fun [fn* fmt/args/map-fun [arg] "" #{
 10s fmt/args/map-fun/count
 08i 1 v string
 08i 1 v str->sym
@@ -6268,12 +7227,12 @@ EB
 10s arg
 08i 3 v list
 01
-}]] [def fmt [μ* fmt [format-string . args] "Return a formatted string" [do [if [string? format-string] #nil [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [let* [do [def i 0] [def ΓεnΣym-201 [string/length format-string]] [while [< i ΓεnΣym-201] [do [let* [do [def ΓεnΣym-202 [char-at format-string i]] [if [== ΓεnΣym-202 123] [do [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [set! cuts [cons i cuts]]] [if [== ΓεnΣym-202 125] [do [if [int? [car cuts]] #nil [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]] #nil]]]] [set! i [add/int 1 i]]]]]] [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [array/fill! [array/allocate [length args]] #f]] [set! fmt/expr/count [array/length arguments-used]] [let* [do [def ΓεnΣym-203 cuts] [if ΓεnΣym-203 [while ΓεnΣym-203 [do [def c [car ΓεnΣym-203]] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [if [== "" lit] #nil [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]] [set! ΓεnΣym-203 [cdr ΓεnΣym-203]]]] #nil]]] [if [> last-pos 0] [do [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] #nil] [let* [do [def i 0] [def ΓεnΣym-204 [array/length arguments-used]] [while [< i ΓεnΣym-204] [do [if [array/ref arguments-used i] #nil [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]] [set! i [add/int 1 i]]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [set! fmt/args/map-fun/count 0] [if args [cons 'let* [append [map args fmt/args/map-fun] [cons expr #nil]]] expr]]]] [def pfmt [μ* pfmt [format-string . args] "Print a formatted string" [cons 'print [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmt [μ* efmt [format-string . args] "Print a formatted string" [cons 'error [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def pfmtln [μ* pfmtln [format-string . args] "Print a formatted string" [cons 'println [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmtln [μ* efmtln [format-string . args] "Print a formatted string" [cons 'errorln [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]]][do [def string->keyword [λδ* string->keyword [α] "Return string α as a keyword" #{
+}]] [def fmt [μ* fmt [format-string . args] "Return a formatted string" [do [if [string? format-string] #nil [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [let* [do [def i 0] [def ΓεnΣym-192 [string/length format-string]] [while [< i ΓεnΣym-192] [do [let* [do [def ΓεnΣym-193 [char-at format-string i]] [if [== ΓεnΣym-193 123] [do [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [set! cuts [cons i cuts]]] [if [== ΓεnΣym-193 125] [do [if [int? [car cuts]] #nil [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]] #nil]]]] [set! i [add/int 1 i]]]]]] [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [array/fill! [array/allocate [length args]] #f]] [set! fmt/expr/count [array/length arguments-used]] [let* [do [def ΓεnΣym-194 cuts] [if ΓεnΣym-194 [while ΓεnΣym-194 [do [def c [car ΓεnΣym-194]] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [if [== "" lit] #nil [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]] [set! ΓεnΣym-194 [cdr ΓεnΣym-194]]]] #nil]]] [if [> last-pos 0] [do [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] #nil] [let* [do [def i 0] [def ΓεnΣym-195 [array/length arguments-used]] [while [< i ΓεnΣym-195] [do [if [array/ref arguments-used i] #nil [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]] [set! i [add/int 1 i]]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [set! fmt/args/map-fun/count 0] [if args [cons 'let* [append [map args fmt/args/map-fun] [cons expr #nil]]] expr]]]] [def pfmt [μ* pfmt [format-string . args] "Print a formatted string" [cons 'print [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmt [μ* efmt [format-string . args] "Print a formatted string" [cons 'error [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def pfmtln [μ* pfmtln [format-string . args] "Print a formatted string" [cons 'println [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmtln [μ* efmtln [format-string . args] "Print a formatted string" [cons 'errorln [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
 10s α
 08i 1 v str->sym
 08i 1 v symbol->keyword
 01
-}]] [def string->byte-array [λδ* string->byte-array [a] "Turn a string into an UTF-8 encoded byte array" #{
+}]] [def string->byte-array [fn* string->byte-array [a] "Turn a string into an UTF-8 encoded byte array" #{
 10s a
 08i 1 v string/length
 08i 1 v array/allocate
@@ -6285,13 +7244,13 @@ EB
 0D
 10s a
 08i 1 v string/length
-0Es ΓεnΣym-206
+0Es ΓεnΣym-196
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-206
+10s ΓεnΣym-196
 1E
 0Bo 45
 0D
@@ -6311,27 +7270,27 @@ EB
 0D
 10s ret
 01
-}]] [def println [λδ* println [str] "Print STR on a single line" #{
+}]] [def println [fn* println [str] "Print STR on a single line" #{
 10s str
 05v "\r\n"
 08i 2 v cat
 08i 1 v print
 01
-}]] [def errorln [λδ* errorln [str] "Print to stderr STR on a single line" #{
+}]] [def errorln [fn* errorln [str] "Print to stderr STR on a single line" #{
 10s str
 05v "\r\n"
 08i 2 v cat
 08i 1 v print
 01
-}]] [def display [λδ* display [value] "Display VALUE" #{
+}]] [def display [fn* display [value] "Display VALUE" #{
 10s value
 08i 1 v print
 01
-}]] [def newline [λδ* newline [] "Print a single line feed character" #{
+}]] [def newline [fn* newline [] "Print a single line feed character" #{
 05v "\r\n"
 08i 1 v display
 01
-}]] [def br [λδ* br [num] "Return NUM=1 linebreaks" #{
+}]] [def br [fn* br [num] "Return NUM=1 linebreaks" #{
 10s num
 08i 1 v nil?
 0C
@@ -6355,23 +7314,23 @@ EB
 08i 1 v br
 08i 2 v cat
 01
-}]] [def path/ext?! [λδ* path/ext?! [ext] "Return a predicate that checks if a path ends on EXT" #{
+}]] [def path/ext?! [fn* path/ext?! [ext] "Return a predicate that checks if a path ends on EXT" #{
 15
 10s ext
 08i 1 v type-of
-0Es ΓεnΣym-207
+0Es ΓεnΣym-197
 0D
-10s ΓεnΣym-207
+10s ΓεnΣym-197
 05v :string
 20
 0Bo 19
-11v [:symbol :symbol] v [path] v "" v [== ext [lowercase [path/extension path]]]
+11v :INVALID-VALUE v [path] v "" v [== ext [lowercase [path/extension path]]]
 09o 53
-10s ΓεnΣym-207
+10s ΓεnΣym-197
 05v :pair
 20
 0Bo 19
-11v [:symbol :symbol] v [path] v "" v [do [def cext [lowercase [path/extension path]]] [reduce ext [λ* #nil [α β] "" [or α [== β cext]]]]]
+11v :INVALID-VALUE v [path] v "" v [do [def cext [lowercase [path/extension path]]] [reduce ext [λ* #nil [α β] "" [or α [== β cext]]]]]
 09o 25
 05v :type-error
 05v "Expected a :string or :list"
@@ -6380,7 +7339,7 @@ EB
 08i 1 v throw
 16
 01
-}]] [def path/extension [λδ* path/extension [path] "Return the extension of PATH" #{
+}]] [def path/extension [fn* path/extension [path] "Return the extension of PATH" #{
 10s path
 05v "."
 08i 2 v last-index-of
@@ -6400,7 +7359,7 @@ EB
 09o 7
 10s path
 01
-}]] [def path/without-extension [λδ* path/without-extension [path] "Return PATH, but without the extension part" #{
+}]] [def path/without-extension [fn* path/without-extension [path] "Return PATH, but without the extension part" #{
 10s path
 05v "."
 08i 2 v last-index-of
@@ -6417,7 +7376,7 @@ EB
 09o 7
 10s path
 01
-}]] [def int->string/binary [λδ* int->string/binary [α] "Turn α into a its **binary** string representation" #{
+}]] [def int->string/binary [fn* int->string/binary [α] "Turn α into a its **binary** string representation" #{
 05v ""
 0Es ret
 0D
@@ -6461,7 +7420,7 @@ EB
 0D
 10s ret
 01
-}]] [def int->string/octal [λδ* int->string/octal [α] "Turn α into a its **octal** string representation" #{
+}]] [def int->string/octal [fn* int->string/octal [α] "Turn α into a its **octal** string representation" #{
 05v ""
 0Es ret
 0D
@@ -6505,7 +7464,285 @@ EB
 0D
 10s ret
 01
-}]] [def int->string/HEX [let* [do [def conversion-arr [array/new "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]] [λ* #nil [α] "" [do [def ret ""] [if α #nil [def α 0]] [if [zero? α] [set! ret "0"] #nil] [if [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]] #nil] [while [not-zero? α] [do [set! ret [cat [array/ref conversion-arr [logand α 15]] ret]] [set! α [ash α -4]]]] ret]]]]] [def int->string/hex [λ* int->string/hex [α] "Turn α into a its **hexadecimal** string representation" [lowercase [int->string/HEX α]]]] [def int->string/decimal [λ* int->string/decimal [α] "Turn α into a its **decimal** string representation" [string α]]] [def int->string int->string/decimal] [def string/pad-start [λ* string/pad-start [text goal-length char] "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string" [do [if char #nil [set! char " "]] [if [string? text] #nil [set! text [string text]]] [if [string? char] #nil [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]] [while [< [string/length text] goal-length] [set! text [cat char text]]] [if [> [string/length text] goal-length] [string/cut text [- [string/length text] goal-length] [string/length text]] text]]]] [def string/pad-end [λ* string/pad-end [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" [do [if char #nil [set! char " "]] [if [string? text] #nil [set! text [string text]]] [if [string? char] #nil [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]] [while [< [string/length text] goal-length] [set! text [cat text char]]] [if [> [string/length text] goal-length] [string/cut text 0 goal-length] text]]]] [def string/pad-middle [λ* string/pad-middle [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" [do [if char #nil [set! char " "]] [if [string? text] #nil [set! text [string text]]] [if [string? char] #nil [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]] [while [< [string/length text] goal-length] [set! text [cat char text char]]] [if [> [string/length text] goal-length] [let* [do [def end-overflow [/ [- [string/length text] goal-length] 2]] [def start-overflow [- [- [string/length text] goal-length] end-overflow]] [string/cut text start-overflow [+ start-overflow goal-length]]]] text]]]] [def string/round [λ* string/round [text decimal-digits] "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period" [do [def pos [last-index-of text "."]] [if [>= pos 0] [string/cut text 0 [+ pos 1 decimal-digits]] text]]]] [def split/empty [λδ* split/empty [str separator] "" #{
+}]] [def int->string/hex/conversion-arr [array/new "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]] [def int->string/HEX [fn* int->string/HEX [α] "Turn α into a its **hexadecimal** string representation" #{
+05v ""
+0Es ret
+0D
+10s α
+0Bo 7
+24
+09o 9
+02i 0
+0Es α
+0D
+10s α
+08i 1 v zero?
+0Bo 14
+05v "0"
+0Fs ret
+09o 4
+24
+0D
+10s α
+02i 0
+1E
+0Bo 33
+05v :type-error
+05v "Can't print negative numbers in hex for now"
+10s α
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
+02i 0
+1B
+1C
+10s α
+08i 1 v not-zero?
+0Bo 56
+0D
+10s int->string/hex/conversion-arr
+10s α
+02i 15
+08i 2 v logand
+08i 2 v array/ref
+10s ret
+08i 2 v cat
+0Fs ret
+0D
+10s α
+02i -4
+08i 2 v ash
+0Fs α
+09o -63
+0D
+10s ret
+01
+}]] [def int->string/hex [fn* int->string/hex [α] "Turn α into a its **hexadecimal** string representation" #{
+10s α
+08i 1 v int->string/HEX
+08i 1 v lowercase
+01
+}]] [def int->string/decimal [fn* int->string/decimal [α] "Turn α into a its **decimal** string representation" #{
+10s α
+08i 1 v string
+01
+}]] [def int->string int->string/decimal] [def string/pad-start [fn* string/pad-start [text goal-length char] "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string" #{
+10s char
+0Bo 7
+24
+09o 11
+05v " "
+0Fs char
+0D
+10s text
+08i 1 v string?
+0Bo 7
+24
+09o 16
+10s text
+08i 1 v string
+0Fs text
+0D
+10s char
+08i 1 v string?
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "string/pad-start needs char as a string, so that one can pad with multiple characters"
+10s char
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+02i 0
+1B
+1C
+10s text
+08i 1 v string/length
+10s goal-length
+1E
+0Bo 24
+0D
+10s char
+10s text
+08i 2 v cat
+0Fs text
+09o -36
+0D
+10s text
+08i 1 v string/length
+10s goal-length
+22
+0Bo 42
+10s text
+10s text
+08i 1 v string/length
+10s goal-length
+08i 2 v -
+10s text
+08i 1 v string/length
+08i 3 v string/cut
+09o 7
+10s text
+01
+}]] [def string/pad-end [fn* string/pad-end [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" #{
+10s char
+0Bo 7
+24
+09o 11
+05v " "
+0Fs char
+0D
+10s text
+08i 1 v string?
+0Bo 7
+24
+09o 16
+10s text
+08i 1 v string
+0Fs text
+0D
+10s char
+08i 1 v string?
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "string/pad-start needs char as a string, so that one can pad with multiple characters"
+10s char
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+02i 0
+1B
+1C
+10s text
+08i 1 v string/length
+10s goal-length
+1E
+0Bo 24
+0D
+10s text
+10s char
+08i 2 v cat
+0Fs text
+09o -36
+0D
+10s text
+08i 1 v string/length
+10s goal-length
+22
+0Bo 21
+10s text
+02i 0
+10s goal-length
+08i 3 v string/cut
+09o 7
+10s text
+01
+}]] [def string/pad-middle [fn* string/pad-middle [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" #{
+10s char
+0Bo 7
+24
+09o 11
+05v " "
+0Fs char
+0D
+10s text
+08i 1 v string?
+0Bo 7
+24
+09o 16
+10s text
+08i 1 v string
+0Fs text
+0D
+10s char
+08i 1 v string?
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "string/pad-middle needs char as a string, so that one can pad with multiple characters"
+10s char
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+02i 0
+1B
+1C
+10s text
+08i 1 v string/length
+10s goal-length
+1E
+0Bo 28
+0D
+10s char
+10s text
+10s char
+08i 3 v cat
+0Fs text
+09o -40
+0D
+10s text
+08i 1 v string/length
+10s goal-length
+22
+0Bo 96
+15
+10s text
+08i 1 v string/length
+10s goal-length
+08i 2 v -
+02i 2
+08i 2 v /
+0Es end-overflow
+0D
+10s text
+08i 1 v string/length
+10s goal-length
+08i 2 v -
+10s end-overflow
+08i 2 v -
+0Es start-overflow
+0D
+10s text
+10s start-overflow
+10s start-overflow
+10s goal-length
+08i 2 v +
+08i 3 v string/cut
+16
+09o 7
+10s text
+01
+}]] [def string/round [fn* string/round [text decimal-digits] "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period" #{
+10s text
+05v "."
+08i 2 v last-index-of
+0Es pos
+0D
+10s pos
+02i 0
+21
+0Bo 32
+10s text
+02i 0
+10s pos
+02i 1
+10s decimal-digits
+08i 3 v +
+08i 3 v string/cut
+09o 7
+10s text
+01
+}]] [def split/empty [fn* split/empty [str separator] "" #{
 10s str
 08i 1 v string/length
 0Es slen
@@ -6543,7 +7780,7 @@ EB
 10s ret
 08i 1 v reverse
 01
-}]] [def split/string [λδ* split/string [str separator start] "" #{
+}]] [def split/string [fn* split/string [str separator start] "" #{
 10s start
 0Bo 7
 24
@@ -6582,33 +7819,56 @@ EB
 24
 08i 2 v cons
 01
-}]] [def split [λ* split [str separator] "" [let* [do [def ΓεnΣym-208 [string/length separator]] [if [or [== ΓεnΣym-208 0]] [split/empty str] [split/string str separator 0]]]]]] [def read/single [λδ* read/single [text] "" #{
+}]] [def split [fn* split [str separator] "" #{
+15
+10s separator
+08i 1 v string/length
+0Es ΓεnΣym-198
+0D
+10s ΓεnΣym-198
+02i 0
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 15
+10s str
+08i 1 v split/empty
+09o 18
+10s str
+10s separator
+02i 0
+08i 3 v split/string
+16
+01
+}]] [def read/single [fn* read/single [text] "" #{
 10s text
 08i 1 v read
 08i 1 v car
 01
-}]] [def string/length?! [λδ* string/length?! [chars] "" #{
-11v [:symbol :symbol] v [a] v "" v [== chars [string/length a]]
+}]] [def string/length?! [fn* string/length?! [chars] "" #{
+11v :INVALID-VALUE v [a] v "" v [== chars [string/length a]]
 01
-}]] [def contains-any? [λδ* contains-any? [str chars] "" #{
+}]] [def contains-any? [fn* contains-any? [str chars] "" #{
 10s or
 10s chars
 05v ""
 08i 2 v split
-11v [:symbol :symbol] v [a] v "" v [>= [index-of str a] 0]
+11v :INVALID-VALUE v [a] v "" v [>= [index-of str a] 0]
 08i 2 v map
 08i 2 v apply
 01
-}]] [def contains-all? [λδ* contains-all? [str chars] "" #{
+}]] [def contains-all? [fn* contains-all? [str chars] "" #{
 10s and
 10s chars
 05v ""
 08i 2 v split
-11v [:symbol :symbol] v [a] v "" v [>= [index-of str a] 0]
+11v :INVALID-VALUE v [a] v "" v [>= [index-of str a] 0]
 08i 2 v map
 08i 2 v apply
 01
-}]]][do [def test-context "Nujel"] [def test-list #nil] [def test-count 0] [def nujel-start 0] [def success-count 0] [def error-count 0] [def print-errors #t] [def print-passes #f] [def test/add* [λδ* test/add* [result expr] "" #{
+}]]][do [def test-context "Nujel"] [def test-list #nil] [def test-count 0] [def nujel-start 0] [def success-count 0] [def error-count 0] [def print-errors #t] [def print-passes #f] [def test/add* [fn* test/add* [result expr] "" #{
 10s result
 10s expr
 08i 2 v cons
@@ -6621,7 +7881,7 @@ EB
 08i 2 v +
 0Fs test-count
 01
-}]] [def test/add [μ* test/add [result . expr] "Add a test where EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do expr]] #nil]]]]] [def display-results [λδ* display-results [] "Prints the result Message" #{
+}]] [def test/add [μ* test/add [result . expr] "Add a test where EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do expr]] #nil]]]]] [def display-results [fn* display-results [] "Prints the result Message" #{
 08i 0 v random/seed-initialize!
 0D
 05v [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]
@@ -6629,7 +7889,7 @@ EB
 08i 2 v compile
 08i 1 v eval*
 01
-}]] [def test-success [λδ* test-success [res-should res-is expr i] "Should be called after a test has finished successfully" #{
+}]] [def test-success [fn* test-success [res-should res-is expr i] "Should be called after a test has finished successfully" #{
 10s print-passes
 0Bo 25
 05v [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]
@@ -6644,7 +7904,7 @@ EB
 08i 2 v +
 0Fs success-count
 01
-}]] [def test-failure [λδ* test-failure [res-should res-is expr i] "Should be called if EXPR does not equal RES" #{
+}]] [def test-failure [fn* test-failure [res-should res-is expr i] "Should be called if EXPR does not equal RES" #{
 10s print-errors
 0Bo 25
 05v [efmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]
@@ -6659,10 +7919,71 @@ EB
 08i 2 v +
 0Fs error-count
 01
-}]] [def test-bytecode [λ* test-bytecode [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter" [try [λ* #nil [err] "" [test-failure result [list :exception-caught err] rawexpr i]] [do [def expr [bytecode-eval [assemble* [bytecompile [compile rawexpr]]]]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]] [def test-default [λ* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" [try [λ* #nil [err] "" [test-failure result [list :exception-caught err] rawexpr i]] [do [def expr [eval* [compile rawexpr [current-closure]]]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]] [def test-forked [λδ* test-forked [nujel-runtime] "" #{
-11v [:symbol :symbol] v [result rawexpr i] v "Tests that RAWEXPR evaluates to RESULT in a separate runtime" v [do [def eval-result [eval/forked nujel-runtime rawexpr]] [def expr [cdr eval-result]] [if [string? result] #nil [set! expr [car [read expr]]]] [if [and [zero? [car eval-result]] [equal? result expr]] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]
+}]] [def test-bytecode [fn* test-bytecode [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter" #{
+11v :INVALID-VALUE v [err] v "" v [test-failure result [list :exception-caught err] rawexpr i]
+18
+00
+60
+10s rawexpr
+08i 1 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+08i 1 v bytecode-eval
+0Es expr
+0D
+10s result
+10s expr
+08i 2 v equal?
+0Bo 27
+10s result
+10s expr
+10s rawexpr
+10s i
+08i 4 v test-success
+09o 24
+10s result
+10s expr
+10s rawexpr
+10s i
+08i 4 v test-failure
+09o 5
+1A
 01
-}]] [def test-run-real [λδ* test-run-real [test] "" #{
+01
+}]] [def test-default [fn* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" #{
+11v :INVALID-VALUE v [err] v "" v [test-failure result [list :exception-caught err] rawexpr i]
+18
+00
+5B
+10s rawexpr
+08i 0 v current-closure
+08i 2 v compile
+08i 1 v eval*
+0Es expr
+0D
+10s result
+10s expr
+08i 2 v equal?
+0Bo 27
+10s result
+10s expr
+10s rawexpr
+10s i
+08i 4 v test-success
+09o 24
+10s result
+10s expr
+10s rawexpr
+10s i
+08i 4 v test-failure
+09o 5
+1A
+01
+01
+}]] [def test-forked [fn* test-forked [nujel-runtime] "" #{
+11v :INVALID-VALUE v [result rawexpr i] v "Tests that RAWEXPR evaluates to RESULT in a separate runtime" v [do [def eval-result [eval/forked nujel-runtime rawexpr]] [def expr [cdr eval-result]] [if [string? result] #nil [set! expr [car [read expr]]]] [if [and [zero? [car eval-result]] [equal? result expr]] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]
+01
+}]] [def test-run-real [fn* test-run-real [test] "" #{
 08i 0 v time/milliseconds
 0Fs nujel-start
 0D
@@ -6679,17 +8000,17 @@ EB
 0D
 15
 10s test-list
-0Es ΓεnΣym-209
+0Es ΓεnΣym-199
 0D
-10s ΓεnΣym-209
+10s ΓεnΣym-199
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-209
+10s ΓεnΣym-199
 0Bo 74
 0D
-10s ΓεnΣym-209
+10s ΓεnΣym-199
 08i 1 v car
 0Es cur-test
 0D
@@ -6705,9 +8026,9 @@ EB
 1A
 03
 0D
-10s ΓεnΣym-209
+10s ΓεnΣym-199
 08i 1 v cdr
-0Fs ΓεnΣym-209
+0Fs ΓεnΣym-199
 09o -76
 09o 4
 24
@@ -6717,7 +8038,7 @@ EB
 0D
 10s error-count
 01
-}]] [def test-run [λδ* test-run [output-passes hide-errors] "Run through all automated Tests" #{
+}]] [def test-run [fn* test-run [output-passes hide-errors] "Run through all automated Tests" #{
 10s hide-errors
 08i 1 v bool
 08i 1 v not
@@ -6730,7 +8051,7 @@ EB
 10s test-default
 08i 1 v test-run-real
 01
-}]] [def test-run-bytecode [λδ* test-run-bytecode [output-passes hide-errors] "Run through all automated Tests" #{
+}]] [def test-run-bytecode [fn* test-run-bytecode [output-passes hide-errors] "Run through all automated Tests" #{
 10s hide-errors
 08i 1 v bool
 08i 1 v not
@@ -6743,7 +8064,7 @@ EB
 10s test-bytecode
 08i 1 v test-run-real
 01
-}]] [def test-run-forked [λδ* test-run-forked [nujel-runtime output-passes hide-errors] "Run through all automated Tests in a separate runtime" #{
+}]] [def test-run-forked [fn* test-run-forked [nujel-runtime output-passes hide-errors] "Run through all automated Tests in a separate runtime" #{
 10s hide-errors
 08i 1 v bool
 08i 1 v not

@@ -12,11 +12,11 @@
           "Decrement I by 1 and store the result in I"
           `[set! ~i [+ -1 ~i]]]
 
-[defun +x [α]
+[defn +x [α]
        "Return a function that adds α to it's argument, useful for mapping"
        [\ [β] [+ α β]]]
 
-[defun >> [val amount]
+[defn >> [val amount]
        "Shifts VAL by AMOUNT bits to the right"
        [ash val [- amount]]]
 

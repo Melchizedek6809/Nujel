@@ -5,10 +5,10 @@
 
 [def yield-queue #nil]
 
-[defun yield [pred fun] "Evaluates FUN once PRED is true"
+[defn yield [pred fun] "Evaluates FUN once PRED is true"
         [set! yield-queue [cons [cons pred fun] yield-queue]] #t]
 
-[defun yield-run []
+[defn yield-run []
        "Executes pending coroutines if their predicate evaluates to #t"
        [def new #nil]
        [for-in [cur yield-queue]
@@ -17,12 +17,12 @@
                    [set! new [cons cur new]]]]
        [set! yield-queue new]]
 
-[defun timeout [milliseconds]
+[defn timeout [milliseconds]
        "Returns a function that evaluates to true once MILLISECONDS have passed"
        [def goal [+ [time/milliseconds] milliseconds]]
        [\ [] [> [time/milliseconds] goal]]]
 
-[defun event-bind [event id handler]
+[defn event-bind [event id handler]
        "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before."
        [tree/set! event id handler]]
 
@@ -30,7 +30,7 @@
           "Clears all event handlers for event-name"
           `[set! ~event @[]]]
 
-[defun event-fire [event . val]
+[defn event-fire [event . val]
        "Applies ...val to all event handlers associated with event-name"
        [for-in [h [tree/values event]]
                [h val]]]

@@ -1,7 +1,7 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-[defun quasiquote-real [l depth]
+[defn quasiquote-real [l depth]
        [if [nil? l] #nil
            [if [pair? l]
                [if [== [caar l] 'unquote-splicing]
@@ -31,8 +31,8 @@
 [defmacro quasiquote [l]
           [quasiquote-real l 0]]
 
-[defun unquote [expr]
+[defn unquote [expr]
        [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]
 
-[defun unquote-splicing [expr]
+[defn unquote-splicing [expr]
        [throw [list :unquote-splicing-without-quasiquote "unquote-splicing should only occur inside a quasiquote, never evaluated directly"]]]

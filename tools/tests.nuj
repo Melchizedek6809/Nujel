@@ -3,7 +3,7 @@
 [def test/beginning [time/milliseconds]]
 [def test/testsuite-errors 0]
 
-[defun prog-str [fun-color i path start]
+[defn prog-str [fun-color i path start]
        [cat "[" [fun-color [string/pad-start i 2]]
             "/" [string/pad-start test/count 2]
 	    "] " [string/pad-end [cut path 2 [length path]] 32]
@@ -30,7 +30,7 @@
 [def test/success 0]
 [def test/errors 0]
 [def i]
-[defun file/test [path]
+[defn file/test [path]
        [++ i]
        [def test/start/file [time/milliseconds]]
        [try [\ [err]

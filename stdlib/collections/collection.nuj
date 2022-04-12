@@ -12,11 +12,11 @@
        [when-not glue [set! glue ""]]
        [if-not l "" [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
 
-[defun for-each [l f]
+[defn for-each [l f]
        "Runs F over every item in collection L"
        [reduce l [λ [a b] [f b]] #nil]]
 
-[defun count [l p]
+[defn count [l p]
        "Count the number of items in L where P is true"
        [if p
            [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]

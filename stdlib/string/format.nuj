@@ -16,7 +16,7 @@
                    [fmt/find-non-digit-from-right s [- i 1]]
                    i]]]]
 
-[defun fmt/parse-spec [opts spec]
+[defn fmt/parse-spec [opts spec]
        [if [zero? [string/length spec]]
            opts
            [case [char-at spec [- [string/length spec] 1]]
@@ -54,7 +54,7 @@
                opts
                [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]
 
-[defun fmt/number-format [opts]
+[defn fmt/number-format [opts]
        [case [tree/ref opts :base]
              [:binary      [tree/set! opts :argument [list int->string/binary  [tree/ref opts :argument]]]]
              [:octal       [tree/set! opts :argument [list int->string/octal   [tree/ref opts :argument]]]]

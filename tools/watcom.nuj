@@ -7,13 +7,13 @@
 [when [file/dir? "/opt/watcom/h/"]
       [set! WCC-OPTS [cat WCC-OPTS " -i=/opt/watcom/h/"]]]
 
-[defun run [cmd]
+[defn run [cmd]
        [def ret [popen cmd]]
        [when-not [zero? [car ret]]
                  [println [cat [ansi-red "StdOut:\n"] [cdr ret]]]
                  [throw [list :error "Subprocess return non-zero exit code" [list cmd [car ret]]]]]]
 
-[defun watcom/compile [file]
+[defn watcom/compile [file]
        [def cwd [path/working-directory]]
        [println [cat [ansi-green "[CC] "] file]]
        [path/change [join [except-last-pair [split file "/"]] "/"]]
