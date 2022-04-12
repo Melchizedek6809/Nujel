@@ -10,9 +10,13 @@
 [def avl/empty :e]
 
 [defun avl/empty? [n] [== :e n]]
-
+[defun avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
+[defun avl/typecheck [r k]
+  [or [avl/empty? [avl/root r]]
+      [== [type-of k] [type-of [avl/key [avl/root r]]]]
+      [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
 [defun avl/tree [cmp]
-  #[avl/empty [or cmp [\ [x y] [if [< x y] -1 [if [> x y] 1 0]]]]]]
+  #[avl/empty [or cmp avl/default-cmp]]]
 
 [defun avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]]
 [defun avl/key    [n] [array/ref n 1]]
@@ -90,6 +94,7 @@
 
 [defun avl/insert [t v]
   "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
+  [avl/typecheck t v]
   [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
 
 [defun avl/node-get [n cmp v]
@@ -102,7 +107,10 @@
 
 [defun avl/get [t v]
   "Retrieve the key V from tree T, or #nil if V is not in it"
-  [avl/node-get [avl/root t] [avl/cmp t] v]]
+  [if [or [avl/empty? [avl/root t]]
+          [!= [type-of v] [type-of [avl/key [avl/root t]]]]]
+      #nil
+      [avl/node-get [avl/root t] [avl/cmp t] v]]]
 
 [defun avl/from-list [l cmp]
   "Create a new avl tree using the keys in L and the comparison function CMP"
@@ -178,7 +186,7 @@
   [avl/reduce-node-bin [avl/root t] o s]]
 
 [defun avl/map [t f]
-  "Create a new avl tree by mapping each key in in T using F, using the same comparison function as T"
+  "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
   [avl/reduce t [\ [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
 
 [defun avl/map-to [t f cmp]
