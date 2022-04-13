@@ -36,7 +36,7 @@
            [describe/thing fun]]]
 
 [defn mem []
-       "Return some pretty printed memory usage information"
+       "Return some pretty printed memory usage information" ;
        [def info [memory-info]]
        [cat [ansi-white  "Memory Info"] "\n"
             [ansi-green  "Values:   "] [getf info :value]   "\n"

@@ -13,8 +13,9 @@
           `[set! ~i [+ -1 ~i]]]
 
 [defn +x [α]
-       "Return a function that adds α to it's argument, useful for mapping"
-       [\ [β] [+ α β]]]
+      "Return a function that adds α to it's argument, useful for mapping"
+      [fn [β]
+          [+ α β]]]
 
 [defn >> [val amount]
        "Shifts VAL by AMOUNT bits to the right"

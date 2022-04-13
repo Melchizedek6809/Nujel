@@ -3,8 +3,8 @@
        "Converts a tree into a JSON encoded string, you should prefer VAL->JSON"
        [cat "{"
             [join [map [tree/keys v]
-                       [λ [k]
-                          [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]]
+                       [fn [k]
+                           [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]]
                   ",\n"]
             "}"]]
 

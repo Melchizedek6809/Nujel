@@ -9,8 +9,10 @@
 
 [defn bit-set?! [i]
       [def mask [ash 1 i]]
-      [\ [α] [not [zero? [logand α mask]]]]]
+      [fn [α]
+          [not [zero? [logand α mask]]]]]
 
 [defn bit-clear?! [i]
       [def mask [ash 1 i]]
-      [\ [α] [zero? [logand α mask]]]]
+      [fn [α]
+          [zero? [logand α mask]]]]

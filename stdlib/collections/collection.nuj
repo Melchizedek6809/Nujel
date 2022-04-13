@@ -10,35 +10,36 @@
 [defn join [l glue]
        "Join every element of α together into a string with GLUE inbetween"
        [when-not glue [set! glue ""]]
-       [if-not l "" [reduce l [λ [a b] [if a [cat a glue b] b]] #nil]]]
+       [if-not l "" [reduce l [fn [a b] [if a [cat a glue b] b]] #nil]]]
 
 [defn for-each [l f]
        "Runs F over every item in collection L"
-       [reduce l [λ [a b] [f b]] #nil]]
+       [reduce l [fn [a b] [f b]] #nil]]
 
-[defn count [l p]
+[defun count [l p]
        "Count the number of items in L where P is true"
        [if p
-           [reduce l [λ [a b] [+ a [if [p b] 1 0]]] 0]
-           [reduce l [λ [a b] [+ a 1]] 0]]]
+           [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]
+           [reduce l [fn [a b] [+ a 1]] 0]]]
 
-[defn min/λ [a b] [if [< a b] a b]]
+
 [defn min l
        "Returns the minimum value of its arguments, or collection"
-       [reduce [if [cdr l] l [car l]] min/λ #nil]]
+       [reduce [if [cdr l] l [car l]]
+               [fn [a b] [if [< a b] a b]]]]
 
-[defn max/λ [a b] [if [> a b] a b]]
 [defn max l
-       "Returns the minimum value of its arguments, or collection"
-       [reduce [if [cdr l] l [car l]] max/λ #nil]]
+      "Returns the minimum value of its arguments, or collection"
+      [reduce [if [cdr l] l [car l]]
+              [fn [a b] [if [> a b] a b]]]]
 
 [defn delete [l e]
        "Returns a filtered list l with all elements equal to e omitted"
-       [filter l [λ [a] [not [== a e]]]]]
+       [filter l [fn [a] [not [== a e]]]]]
 
 [defn remove [l p]
        "Returns a filtered list l with all elements where P equal true removed"
-       [filter l [λ [a] [not [p a]]]]]
+       [filter l [fn [a] [not [p a]]]]]
 
 [defn flatten/λ [a b]
        [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]

@@ -20,7 +20,8 @@
 [defn timeout [milliseconds]
        "Returns a function that evaluates to true once MILLISECONDS have passed"
        [def goal [+ [time/milliseconds] milliseconds]]
-       [\ [] [> [time/milliseconds] goal]]]
+       [fn []
+           [> [time/milliseconds] goal]]]
 
 [defn event-bind [event id handler]
        "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before."

@@ -152,19 +152,28 @@
 }]] [def directory/read-relative [fn* directory/read-relative [path] "" #{
 10s path
 08i 1 v directory/read
-11v :INVALID-VALUE v [a] v "" v [cat path "/" a]
-08i 2 v map
-01
-}]] [def directory/rr [fn* directory/rr [path] "" #{
+25v anonymous v [a] v "" v #{
 10s path
-08i 1 v directory/read
-11v :INVALID-VALUE v [a] v "" v [cat path "/" a]
+05v "/"
+10s a
+08i 3 v cat
+01
+}
 08i 2 v map
 01
 }]] [def directory/read-recursive [fn* directory/read-recursive [path] "" #{
 10s path
 08i 1 v directory/read-relative
-11v :INVALID-VALUE v [A] v "" v [if [file/dir? A] [directory/read-recursive A] A]
+25v anonymous v [A] v "" v #{
+10s A
+08i 1 v file/dir?
+0Bo 15
+10s A
+08i 1 v directory/read-recursive
+09o 7
+10s A
+01
+}
 08i 2 v map
 08i 1 v flatten
 01

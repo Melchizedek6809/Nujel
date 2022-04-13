@@ -116,18 +116,18 @@
         "Wrap ARGS in the colors of the rainbow!"
         [let* [def count 0]
               [cat [join [map [split [apply cat args] ""]
-                              [\ [a]
-                                 [set! count [logand [+ 1 count] #x7]]
-                                 [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
+                              [fn [a]
+                                  [set! count [logand [+ 1 count] #x7]]
+                                  [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
                    [or ansi/disabled ansi-fg-reset]]]]
 
 [defn ansi-rainbow-bg args
         "Wrap ARGS in the colors of the rainbow!"
         [def count 0]
 	[def colored-list [map [split [apply cat args] ""]
-			  [\ [a]
-			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
+			  [fn [a]
+			      [set! count [logand [+ 1 count] #x7]]
+			      [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
         [cat [join colored-list ""]
              [or ansi/disabled ansi-reset]]]
 
@@ -135,6 +135,6 @@
        [when-not width [set! width 20]]
        [print "\r"]
        [for [i 0 width]
-              [print " "]]
+            [print " "]]
        [print "\r"]
        [print text]]

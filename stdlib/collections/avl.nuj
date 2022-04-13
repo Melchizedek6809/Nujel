@@ -187,11 +187,11 @@
 
 [defn avl/map [t f]
   "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
-  [avl/reduce t [\ [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
+  [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
 
 [defn avl/map-to [t f cmp]
   "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
-  [avl/reduce t [\ [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
+  [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
 
 [defn avl/to-list [t]
   [avl/reduce t cons #nil]]

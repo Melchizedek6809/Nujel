@@ -10,7 +10,14 @@
 08i 2 v ash
 0Es mask
 0D
-11v :INVALID-VALUE v [α] v "" v [not [zero? [logand α mask]]]
+25v anonymous v [α] v "" v #{
+10s α
+10s mask
+08i 2 v logand
+08i 1 v zero?
+08i 1 v not
+01
+}
 01
 }]] [def bit-clear?! [fn* bit-clear?! [i] "" #{
 02i 1
@@ -18,7 +25,13 @@
 08i 2 v ash
 0Es mask
 0D
-11v :INVALID-VALUE v [α] v "" v [zero? [logand α mask]]
+25v anonymous v [α] v "" v #{
+10s α
+10s mask
+08i 2 v logand
+08i 1 v zero?
+01
+}
 01
 }]]][do [def array/+= [fn* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
 10s a
@@ -1526,7 +1539,14 @@
 01
 }]] [def avl/map [fn* avl/map [t f] "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" #{
 10s t
-11v :INVALID-VALUE v [x acc] v "" v [avl/insert acc [f x]]
+25v anonymous v [x acc] v "" v #{
+10s acc
+10s f
+10s x
+1Ai 1
+08i 2 v avl/insert
+01
+}
 10s t
 08i 1 v avl/cmp
 08i 1 v avl/tree
@@ -1534,7 +1554,14 @@
 01
 }]] [def avl/map-to [fn* avl/map-to [t f cmp] "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" #{
 10s t
-11v :INVALID-VALUE v [x acc] v "" v [avl/insert acc [f x]]
+25v anonymous v [x acc] v "" v #{
+10s acc
+10s f
+10s x
+1Ai 1
+08i 2 v avl/insert
+01
+}
 10s cmp
 08i 1 v avl/tree
 08i 3 v avl/reduce
@@ -1562,7 +1589,17 @@
 10s l
 0Bo 29
 10s l
-11v :INVALID-VALUE v [a b] v "" v [if a [cat a glue b] b]
+25v anonymous v [a b] v "" v #{
+10s a
+0Bo 23
+10s a
+10s glue
+10s b
+08i 3 v cat
+09o 7
+10s b
+01
+}
 24
 08i 3 v reduce
 09o 7
@@ -1570,24 +1607,40 @@
 01
 }]] [def for-each [fn* for-each [l f] "Runs F over every item in collection L" #{
 10s l
-11v :INVALID-VALUE v [a b] v "" v [f b]
+25v anonymous v [a b] v "" v #{
+10s f
+10s b
+1Ai 1
+01
+}
 24
 08i 3 v reduce
 01
-}]] [def count [fn* count [l p] "Count the number of items in L where P is true" #{
+}]] [def count [λ* count [l p] "Count the number of items in L where P is true" [if p [reduce l [fn* anonymous [a b] "" #{
+10s a
 10s p
-0Bo 30
-10s l
-11v :INVALID-VALUE v [a b] v "" v [+ a [if [p b] 1 0]]
+10s b
+1Ai 1
+0Bo 8
+02i 1
+09o 5
 02i 0
-08i 3 v reduce
-09o 27
-10s l
-11v :INVALID-VALUE v [a b] v "" v [+ a 1]
-02i 0
-08i 3 v reduce
+08i 2 v +
 01
-}]] [def min/λ [fn* min/λ [a b] "" #{
+}] 0] [reduce l [fn* anonymous [a b] "" #{
+10s a
+02i 1
+08i 2 v +
+01
+}] 0]]]] [def min [fn* min l "Returns the minimum value of its arguments, or collection" #{
+10s l
+08i 1 v cdr
+0Bo 10
+10s l
+09o 12
+10s l
+08i 1 v car
+25v anonymous v [a b] v "" v #{
 10s a
 10s b
 1E
@@ -1596,26 +1649,8 @@
 09o 7
 10s b
 01
-}]] [def min [fn* min l "Returns the minimum value of its arguments, or collection" #{
-10s l
-08i 1 v cdr
-0Bo 10
-10s l
-09o 12
-10s l
-08i 1 v car
-10s min/λ
-24
-08i 3 v reduce
-01
-}]] [def max/λ [fn* max/λ [a b] "" #{
-10s a
-10s b
-22
-0Bo 10
-10s a
-09o 7
-10s b
+}
+08i 2 v reduce
 01
 }]] [def max [fn* max l "Returns the minimum value of its arguments, or collection" #{
 10s l
@@ -1625,18 +1660,38 @@
 09o 12
 10s l
 08i 1 v car
-10s max/λ
-24
-08i 3 v reduce
+25v anonymous v [a b] v "" v #{
+10s a
+10s b
+22
+0Bo 10
+10s a
+09o 7
+10s b
+01
+}
+08i 2 v reduce
 01
 }]] [def delete [fn* delete [l e] "Returns a filtered list l with all elements equal to e omitted" #{
 10s l
-11v :INVALID-VALUE v [a] v "" v [not [== a e]]
+25v anonymous v [a] v "" v #{
+10s a
+10s e
+20
+08i 1 v not
+01
+}
 08i 2 v filter
 01
 }]] [def remove [fn* remove [l p] "Returns a filtered list l with all elements where P equal true removed" #{
 10s l
-11v :INVALID-VALUE v [a] v "" v [not [p a]]
+25v anonymous v [a] v "" v #{
+10s p
+10s a
+1Ai 1
+08i 1 v not
+01
+}
 08i 2 v filter
 01
 }]] [def flatten/λ [fn* flatten/λ [a b] "" #{
@@ -4039,7 +4094,7 @@
 10s ΓεnΣym-84
 05v :special-form
 20
-0Bo 472
+0Bo 470
 15
 10s op
 0Es ΓεnΣym-85
@@ -4051,7 +4106,7 @@
 10s source
 10s env
 08i 2 v bytecompile/do
-09o 430
+09o 428
 10s ΓεnΣym-85
 10s let*
 20
@@ -4059,7 +4114,7 @@
 10s source
 10s env
 08i 2 v bytecompile/let*
-09o 402
+09o 400
 10s ΓεnΣym-85
 10s def
 20
@@ -4067,7 +4122,7 @@
 10s source
 10s env
 08i 2 v bytecompile/def
-09o 374
+09o 372
 10s ΓεnΣym-85
 10s set!
 20
@@ -4075,7 +4130,7 @@
 10s source
 10s env
 08i 2 v bytecompile/set!
-09o 346
+09o 344
 10s ΓεnΣym-85
 10s if
 20
@@ -4083,7 +4138,7 @@
 10s source
 10s env
 08i 2 v bytecompile/if
-09o 318
+09o 316
 10s ΓεnΣym-85
 10s while
 20
@@ -4091,7 +4146,7 @@
 10s source
 10s env
 08i 2 v bytecompile/while
-09o 290
+09o 288
 10s ΓεnΣym-85
 10s and
 20
@@ -4099,7 +4154,7 @@
 10s source
 10s env
 08i 2 v bytecompile/and
-09o 262
+09o 260
 10s ΓεnΣym-85
 10s or
 20
@@ -4107,24 +4162,22 @@
 10s source
 10s env
 08i 2 v bytecompile/or
-09o 234
+09o 232
 10s ΓεnΣym-85
 10s fn*
 20
-0Bo 20
-10s bytecompile/fn*
+0Bo 19
 10s source
 10s env
-1Ai 2
-09o 205
+08i 2 v bytecompile/fn*
+09o 204
 10s ΓεnΣym-85
 10s macro*
 20
-0Bo 20
-10s bytecompile/macro*
+0Bo 19
 10s source
 10s env
-1Ai 2
+08i 2 v bytecompile/macro*
 09o 176
 10s ΓεnΣym-85
 10s λ*
@@ -4776,7 +4829,40 @@
 08i 1 v car
 0Es form
 0D
-11v :INVALID-VALUE v [err] v "" v [do [set! errors [cons err errors]] [let* [do [def ΓεnΣym-93 [car err]] [if [== ΓεnΣym-93 :unresolved-procedure] [try-again [car source]] [if [== ΓεnΣym-93 :runtime-macro] [try-again [car source]] [throw err]]]]]]
+25v anonymous v [err] v "" v #{
+10s err
+10s errors
+08i 2 v cons
+0Fs errors
+0D
+15
+10s err
+08i 1 v car
+0Es ΓεnΣym-93
+0D
+10s ΓεnΣym-93
+05v :unresolved-procedure
+20
+0Bo 21
+10s try-again
+10s source
+08i 1 v car
+1Ai 1
+09o 42
+10s ΓεnΣym-93
+05v :runtime-macro
+20
+0Bo 21
+10s try-again
+10s source
+08i 1 v car
+1Ai 1
+09o 12
+10s err
+08i 1 v throw
+16
+01
+}
 18o 83
 10s form
 10s environment
@@ -4889,7 +4975,7 @@
 09o 5
 1Ai 1
 01
-}]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
+}]] [def typecheck/only [μ* typecheck/only [v t] "" [cons 'when-not [cons [cons '== [cons [cons 'type-of [cons v #nil]] [cons t #nil]]] [cons [cons 'throw [cons [cons 'list [cons :type-error [cons [cat "Expected a value of type " t] [cons v [cons [cons 'current-lambda #nil] #nil]]]]] #nil]] #nil]]]]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
 15
 10s op
 0Es ΓεnΣym-96
@@ -5796,7 +5882,20 @@
 }]] [def disassemble/raw [fn* disassemble/raw [bc] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
 10s bc
 08i 1 v disassemble
-11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
+25v anonymous v [a] v "" v #{
+10s a
+08i 1 v car
+08i 1 v string
+02i 6
+08i 2 v string/pad-start
+08i 1 v ansi-blue
+05v " - "
+10s a
+08i 1 v cdr
+08i 3 v cat
+08i 1 v println
+01
+}
 08i 2 v for-each
 01
 }]] [def disassemble/test [fn* disassemble/test [asm] "Verbose way of testing the disassembler" #{
@@ -5808,7 +5907,20 @@
 0Es cur-line
 0D
 10s asm
-11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-yellow [string/pad-start [set! cur-line [+ 1 cur-line]] 6]] " - " a]]
+25v anonymous v [a] v "" v #{
+02i 1
+10s cur-line
+08i 2 v +
+0Fs cur-line
+02i 6
+08i 2 v string/pad-start
+08i 1 v ansi-yellow
+05v " - "
+10s a
+08i 3 v cat
+08i 1 v println
+01
+}
 08i 2 v for-each
 0D
 05v "--------- Raw Bytecode -----------"
@@ -5830,7 +5942,20 @@
 0D
 10s bc
 08i 1 v disassemble
-11v :INVALID-VALUE v [a] v "" v [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]
+25v anonymous v [a] v "" v #{
+10s a
+08i 1 v car
+08i 1 v string
+02i 6
+08i 2 v string/pad-start
+08i 1 v ansi-blue
+05v " - "
+10s a
+08i 1 v cdr
+08i 3 v cat
+08i 1 v println
+01
+}
 08i 2 v for-each
 0D
 05v "--------- Fin -----------\n"
@@ -5906,7 +6031,12 @@
 08i 2 v +
 0Es goal
 0D
-11v :INVALID-VALUE v [] v "" v [> [time/milliseconds] goal]
+25v anonymous v [] v "" v #{
+08i 0 v time/milliseconds
+10s goal
+22
+01
+}
 01
 }]] [def event-bind [fn* event-bind [event id handler] "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." #{
 10s event
@@ -6783,7 +6913,12 @@
 08i 2 v logior
 01
 }]][do [def PI 3.14159] [def π 3.14159] [def ++ [μ* ++ [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
-11v :INVALID-VALUE v [β] v "" v [+ α β]
+25v anonymous v [β] v "" v #{
+10s α
+10s β
+08i 2 v +
+01
+}
 01
 }]] [def >> [fn* >> [val amount] "Shifts VAL by AMOUNT bits to the right" #{
 10s val
@@ -7053,7 +7188,18 @@
 05v "{"
 10s v
 08i 1 v tree/keys
-11v :INVALID-VALUE v [k] v "" v [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]
+25v anonymous v [k] v "" v #{
+05v "\""
+10s k
+08i 1 v keyword->string
+05v "\": "
+10s v
+10s k
+08i 2 v tree/ref
+08i 1 v val->json
+08i 4 v cat
+01
+}
 08i 2 v map
 05v ",\n"
 08i 2 v join
@@ -7310,7 +7456,36 @@
 08i 2 v apply
 05v ""
 08i 2 v split
-11v :INVALID-VALUE v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]
+25v anonymous v [a] v "" v #{
+02i 1
+10s count
+08i 2 v +
+02i 7
+08i 2 v logand
+0Fs count
+0D
+10s ansi/disabled
+0C
+0Ao 50
+0D
+10s ansi-fg
+10s count
+08i 1 v zero?
+0Bo 8
+02i 7
+09o 14
+10s count
+02i 8
+08i 2 v +
+08i 2 v array/ref
+0C
+0Ao 8
+0D
+05v #f
+10s a
+08i 2 v cat
+01
+}
 08i 2 v map
 05v ""
 08i 2 v join
@@ -7335,7 +7510,42 @@
 08i 2 v apply
 05v ""
 08i 2 v split
-11v :INVALID-VALUE v [a] v "" v [do [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [logxor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]
+25v anonymous v [a] v "" v #{
+02i 1
+10s count
+08i 2 v +
+02i 7
+08i 2 v logand
+0Fs count
+0D
+10s ansi/disabled
+0C
+0Ao 33
+0D
+10s ansi-fg
+10s count
+02i 7
+08i 2 v logxor
+08i 2 v array/ref
+0C
+0Ao 8
+0D
+05v #f
+10s ansi/disabled
+0C
+0Ao 26
+0D
+10s ansi-bg
+10s count
+08i 2 v array/ref
+0C
+0Ao 8
+0D
+05v #f
+10s a
+08i 3 v cat
+01
+}
 08i 2 v map
 0Es colored-list
 0D
@@ -8242,13 +8452,43 @@
 05v :string
 20
 0Bo 19
-11v :INVALID-VALUE v [path] v "" v [== ext [lowercase [path/extension path]]]
+25v anonymous v [path] v "" v #{
+10s ext
+10s path
+08i 1 v path/extension
+08i 1 v lowercase
+20
+01
+}
 09o 53
 10s ΓεnΣym-121
 05v :pair
 20
 0Bo 19
-11v :INVALID-VALUE v [path] v "" v [do [def cext [lowercase [path/extension path]]] [reduce ext [λ* #nil [α β] "" [or α [== β cext]]]]]
+25v anonymous v [path] v "" v #{
+10s path
+08i 1 v path/extension
+08i 1 v lowercase
+0Es cext
+0D
+10s ext
+25v anonymous v [α β] v "" v #{
+10s α
+0C
+0Ao 22
+0D
+10s β
+10s cext
+20
+0C
+0Ao 8
+0D
+05v #f
+01
+}
+08i 2 v reduce
+01
+}
 09o 25
 05v :type-error
 05v "Expected a :string or :list"
@@ -8737,7 +8977,7 @@
 24
 08i 2 v cons
 01
-}]] [def split [fn* split [str separator] "" #{
+}]] [def split [fn* split [str separator] "Splits STR into a list at every occurunse of SEPARATOR" #{
 15
 10s separator
 08i 1 v string/length
@@ -8746,10 +8986,51 @@
 10s ΓεnΣym-122
 02i 0
 20
-0C
-0Ao 8
+0Bo 15
+10s str
+08i 1 v split/empty
+09o 18
+10s str
+10s separator
+02i 0
+08i 3 v split/string
+16
+01
+}]] [def split/new [fn* split/new [str separator] "Splits STR into a list at every occurunse of SEPARATOR" #{
+10s str
+08i 1 v type-of
+05v :string
+20
+0Bo 7
+24
+09o 25
+05v :type-error
+05v "Expected a value of type :string"
+10s str
+08i 0 v current-lambda
+08i 4 v throw
 0D
-05v #f
+10s separator
+08i 1 v type-of
+05v :string
+20
+0Bo 7
+24
+09o 25
+05v :type-error
+05v "Expected a value of type :string"
+10s separator
+08i 0 v current-lambda
+08i 4 v throw
+0D
+15
+10s separator
+08i 1 v string/length
+0Es ΓεnΣym-123
+0D
+10s ΓεnΣym-123
+02i 0
+20
 0Bo 15
 10s str
 08i 1 v split/empty
@@ -8766,14 +9047,27 @@
 08i 1 v car
 01
 }]] [def string/length?! [fn* string/length?! [chars] "" #{
-11v :INVALID-VALUE v [a] v "" v [== chars [string/length a]]
+25v anonymous v [a] v "" v #{
+10s chars
+10s a
+08i 1 v string/length
+20
+01
+}
 01
 }]] [def contains-any? [fn* contains-any? [str chars] "" #{
 10s or
 10s chars
 05v ""
 08i 2 v split
-11v :INVALID-VALUE v [a] v "" v [>= [index-of str a] 0]
+25v anonymous v [a] v "" v #{
+10s str
+10s a
+08i 2 v index-of
+02i 0
+21
+01
+}
 08i 2 v map
 08i 2 v apply
 01
@@ -8782,7 +9076,14 @@
 10s chars
 05v ""
 08i 2 v split
-11v :INVALID-VALUE v [a] v "" v [>= [index-of str a] 0]
+25v anonymous v [a] v "" v #{
+10s str
+10s a
+08i 2 v index-of
+02i 0
+21
+01
+}
 08i 2 v map
 08i 2 v apply
 01
@@ -8912,17 +9213,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-123
+0Es ΓεnΣym-124
 0D
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 0Bo 74
 0D
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 08i 1 v car
 0Es cur-test
 0D
@@ -8937,9 +9238,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 08i 1 v cdr
-0Fs ΓεnΣym-123
+0Fs ΓεnΣym-124
 09o -76
 09o 4
 24

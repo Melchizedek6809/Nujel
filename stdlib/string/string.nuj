@@ -39,10 +39,10 @@
 [defn path/ext?! [ext]
        "Return a predicate that checks if a path ends on EXT"
        [case [type-of ext]
-         [:string [λ [path] [== ext [lowercase [path/extension path]]]]]
-         [:pair [λ [path]
+         [:string [fn [path] [== ext [lowercase [path/extension path]]]]]
+         [:pair [fn [path]
                    [def cext [lowercase [path/extension path]]]
-                   [reduce ext [λ [α β] [or α [== β cext]]]]]]
+                   [reduce ext [fn [α β] [or α [== β cext]]]]]]
          [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
 
 
@@ -165,18 +165,24 @@
 		 #nil]]]
 
 [defn split [str separator]
-       [case [string/length separator]
-             [[0] [split/empty str]]
-             [otherwise [split/string str separator 0]]]]
+      "Splits STR into a list at every occurunse of SEPARATOR"
+      [typecheck/only str :string]
+      [typecheck/only separator :string]
+      [case [string/length separator]
+            [0 [split/empty str]]
+            [otherwise [split/string str separator 0]]]]
 
 [defn read/single [text]
-       [car [read text]]]
+      [typecheck/only text :string]
+      [car [read text]]]
 
 [defn string/length?! [chars]
-       [λ [a] [== chars [string/length a]]]]
+       [fn [a] [== chars [string/length a]]]]
 
 [defn contains-any? [str chars]
-       [apply or [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]
+      [apply or [map [split chars ""]
+                     [fn [a] [>= [index-of str a] 0]]]]]
 
 [defn contains-all? [str chars]
-       [apply and [map [split chars ""] [λ [a] [>= [index-of str a] 0]]]]]
+      [apply and [map [split chars ""]
+                      [fn [a] [>= [index-of str a] 0]]]]]

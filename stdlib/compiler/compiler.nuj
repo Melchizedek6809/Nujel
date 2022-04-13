@@ -145,7 +145,7 @@
                [set! source-next #nil]
                [def errors #nil]
                [for-in [form source]
-                       [try [\ [err]
+                       [try [fn [err]
                                 [set! errors [cons err errors]]
                                 [case [car err]
                                       [:unresolved-procedure [try-again [car source]]]
@@ -232,3 +232,6 @@
 [defn read-eval-load [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
        [try display/error [load/forms [read expr] closure]]]
+
+[defmacro typecheck/only [v t]
+          `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
