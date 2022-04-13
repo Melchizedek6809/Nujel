@@ -3,7 +3,7 @@
 [def lines [split [file/read "tests/fast/day8.dat"] "\n"]]
 [def counts [-> [array/allocate 10] [array/fill! 0]]]
 
-[defun output/count [entry]
+[defn output/count [entry]
        [def len [string/length entry]]
        [case len
              [2 [array/++ counts 1]]
@@ -12,7 +12,7 @@
              [7 [array/++ counts 8]]
              [otherwise #f]]]
 
-[defun find/by-length [vals arr len pos]
+[defn find/by-length [vals arr len pos]
        [if-not vals #nil
                [if [== len [popcount [car vals]]]
                    [do [array/set! arr pos [car vals]]
@@ -20,57 +20,57 @@
                    [cons [car vals]
                          [find/by-length [cdr vals] arr len pos]]]]]
 
-[defun find/six [vals numbers]
+[defn find/six [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 6]]]
-                [filter [\ [α] [== [popcount [logand α [array/ref numbers 1]]] 1]]]
+                [filter [fn [α] [== [popcount α] 6]]]
+                [filter [fn [α] [== [popcount [logand α [array/ref numbers 1]]] 1]]]
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 6 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun find/five [vals numbers]
+[defn find/five [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logand α [array/ref numbers 6]]]]]]]
+                [filter [fn [α] [== [popcount α] 5]]]
+                [filter [fn [α] [== α [logand α [array/ref numbers 6]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 5 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun find/nine [vals numbers]
+[defn find/nine [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 6]]]
-                [filter [\ [α] [== α [logior α [array/ref numbers 4]]]]]]]
+                [filter [fn [α] [== [popcount α] 6]]]
+                [filter [fn [α] [== α [logior α [array/ref numbers 4]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 9 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun find/zero [vals numbers]
+[defn find/zero [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 6]]]]]
+                [filter [fn [α] [== [popcount α] 6]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 0 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun find/three [vals numbers]
+[defn find/three [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [== α [logior α [array/ref numbers 1]]]]]]]
+                [filter [fn [α] [== [popcount α] 5]]]
+                [filter [fn [α] [== α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 3 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun find/two [vals numbers]
+[defn find/two [vals numbers]
        [def ret [-> vals
-                [filter [\ [α] [== [popcount α] 5]]]
-                [filter [\ [α] [!= α [logior α [array/ref numbers 1]]]]]]]
+                [filter [fn [α] [== [popcount α] 5]]]
+                [filter [fn [α] [!= α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 2 [car ret]]
-       [filter vals [\ [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [!= α [car ret]]]]]
 
-[defun seven-seg->binary [str]
+[defn seven-seg->binary [str]
        [reduce [split str ""]
-               [\ [α β] [logior α [case β ["a" #x01]
+               [fn [α β] [logior α [case β ["a" #x01]
                                           ["b" #x02]
                                           ["c" #x04]
                                           ["d" #x08]
@@ -78,7 +78,7 @@
                                           ["f" #x20]
                                           ["g" #x40]]]] 0]]
 
-[defun translate [vals out-vals]
+[defn translate [vals out-vals]
        [def numbers [-> [array/allocate 10]
                         [array/fill! #nil]]]
 
@@ -94,15 +94,15 @@
            [find/three numbers]
            [find/two numbers]]
 
-       [defun translate/val [val i]
+       [defn translate/val [val i]
               [when-not i [def i 0]]
               [when [> i 10] [throw [list :error ""]]]
               [if [== [array/ref numbers i] val]
                   i
                   [translate/val val [+ 1 i]]]]
-       [reduce [map [map out-vals seven-seg->binary] translate/val] [\ [α β] [+ [* α 10] β]] 0]]
+       [reduce [map [map out-vals seven-seg->binary] translate/val] [fn [α β] [+ [* α 10] β]] 0]]
 
-[def part-2 [reduce lines [\ [Σ line]
+[def part-2 [reduce lines [fn [Σ line]
           [def split-args [split line "|"]]
           [def output-raw [map [read [cadr split-args]] string]]
           [for-each output-raw output/count]

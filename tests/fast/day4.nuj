@@ -12,7 +12,7 @@
        [reverse qq]]
 
 [defun parse/board [board-raw]
-       @[:score 0 :order 0 :board [apply array/new [map board-raw [\ [row] [apply array/new [read row]]]]]]]
+       @[:score 0 :order 0 :board [apply array/new [map board-raw [fn [row] [apply array/new [read row]]]]]]]
 
 [defun print/board/line/number [num marks]
        [if [marks num]
@@ -61,7 +61,7 @@
 
 [def board/get-order]
 [let [[cur-order 0]]
-     [set! board/get-order [\ [] [++ cur-order]]]]
+     [set! board/get-order [fn [] [++ cur-order]]]]
 
 [defun board/score! [board marks last-num]
        [defun board/score/num [a b] [+ a [if [ref marks b] 0 b]]]
@@ -84,7 +84,7 @@
 
 [defun check/boards [boards marks last-num]
        [for-each boards
-                 [\ [board]
+                 [fn [board]
                     [when [and [zero? [ref board :order]]
                                [bingo? [ref board :board] marks]]
                           [board/score! board marks last-num]]]]]
@@ -98,7 +98,7 @@
        [def first-board [car boards]]
        [def last-board [car boards]]
        [for-each boards
-                 [\ [board] [when [< [ref board :order] [ref first-board :order]]
+                 [fn [board] [when [< [ref board :order] [ref first-board :order]]
                                   [set! first-board board]]
                             [when [> [ref board :order] [ref last-board :order]]
                                   [set! last-board board]]]]

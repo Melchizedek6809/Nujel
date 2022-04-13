@@ -61,7 +61,7 @@
 [test/add 2.0 [cbrt 8.0]]
 [test/add "3.0" [str/write [cbrt 27.0]]]
 [test/add 2.0 [vec/x [cbrt [vec 8]]]]
-[test/add 14 [def abs [λ [a] [if [neg? a] [- 0 a] a]]] [+ [abs -7] [abs 7]]]
+[test/add 14 [def abs [fn [a] [if [neg? a] [- 0 a] a]]] [+ [abs -7] [abs 7]]]
 [test/add 3 [abs -3]]
 [test/add 3 [abs 3]]
 [test/add 0 [abs 0]]

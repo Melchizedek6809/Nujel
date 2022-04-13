@@ -63,7 +63,7 @@
              [def z [/ [vec/y size] [tan [/ [radians fieldOfView] 2]]]]
              [vec/normalize [vec [vec/x xy] [vec/y xy] z]]]
 
-           [λ [fragCoord resolution]
+           [fn [fragCoord resolution]
              [def dir [rayDirection 50.0 resolution fragCoord]]
              [def eye [vec 0 0 -5]]
              [def dist [shortestDistanceToSurface eye dir MIN_DIST MAX_DIST]]
@@ -212,7 +212,7 @@
                      [vec 0.80 0.85 0.1]
                      [vec 0.1 0.7 0.4]]]]
 
-           [λ [fragCoord resolution]
+           [fn [fragCoord resolution]
              [def uv [/ fragCoord resolution]]
              [def dir [rayDirection 50.0 resolution fragCoord]]
              [def eye [vec 0 0 -12]]

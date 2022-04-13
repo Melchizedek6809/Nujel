@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun step [a]
+[defn step [a]
        #[[ref a 1]
          [ref a 2]
 	 [ref a 3]
@@ -11,12 +11,12 @@
 	 [ref a 8]
 	 [ref a 0]]]
 
-[defun do-steps [l count]
+[defn do-steps [l count]
        [for [i 0 count]
             [set! l [step l]]]
        l]
 
-[defun input/parse [l]
+[defn input/parse [l]
        [def ret #[0 0 0 0 0 0 0 0 0]]
        [while l
               [array/++ ret [car l]]

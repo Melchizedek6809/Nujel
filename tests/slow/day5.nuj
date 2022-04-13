@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun array/2d/new [width height val]
+[defn array/2d/new [width height val]
        [def ret [array/allocate width]]
        [def x 0]
        [while [< x width]
@@ -8,15 +8,15 @@
 	      [++ x]]
        ret]
 
-[defun parse/point [text]
+[defn parse/point [text]
        [tree/zip '[:x :y] [map [split text ","] read/single]]]
 
-[defun line/dir [start end]
+[defn line/dir [start end]
        [cond [[== start end] 0]
 	     [[< start end] 1]
 	     [#t -1]]]
 
-[defun line/draw [x y end-x end-y]
+[defn line/draw [x y end-x end-y]
        [def dir-x [line/dir x end-x]]
        [def dir-y [line/dir y end-y]]
        [while [or [!= x end-x] [!= y end-y]]
@@ -25,25 +25,25 @@
 	      [+= y dir-y]]
        [array/++ [ref vents x] y 1]]
 
-[defun line/horiz? [line]
+[defn line/horiz? [line]
        [== [ref [ref line :a] :y]
            [ref [ref line :b] :y]]]
 
-[defun line/vert? [line]
+[defn line/vert? [line]
        [== [ref [ref line :a] :x]
            [ref [ref line :b] :x]]]
 
-[defun line/draw-vents [line]
+[defn line/draw-vents [line]
        [when [or [line/horiz? line] [line/vert? line]]
              [line/draw [ref [ref line :a] :x]
                         [ref [ref line :a] :y]
                         [ref [ref line :b] :x]
                         [ref [ref line :b] :y]]]]
 
-[defun points/count [v num]
-       [reduce v [\ [a b] [+ a [reduce b [\ [a b] [+ a [if [> b num] 1 0]]] 0]]] 0]]
+[defn points/count [v num]
+       [reduce v [fn [a b] [+ a [reduce b [fn [a b] [+ a [if [> b num] 1 0]]] 0]]] 0]]
 
-[defun parse/line [line]
+[defn parse/line [line]
        [line/draw-vents [tree/zip '[:b :a] [map [split line "->"] parse/point]]]]
 
 [def vents [array/2d/new 1000 1000 0]]

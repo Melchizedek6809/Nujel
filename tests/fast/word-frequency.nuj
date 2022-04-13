@@ -10,18 +10,18 @@
 
 [defun count-words [text]
        [-> [split text "\n"]
-           [map [\ [v] [split v " "]]]
+           [map [fn [v] [split v " "]]]
            [flatten]
            [map trim]
-           [filter [\ [a] [!= a ""]]]
-           [reduce [\ [freq word]
+           [filter [fn [a] [!= a ""]]]
+           [reduce [fn [freq word]
                       [let [[old-entry [avl/get freq #[word 1]]]
                             [new-entry #[word [if old-entry
                                                   [+ 1 [array/ref old-entry 1]]
                                                   1]]]]
                            [avl/insert freq new-entry]]]
                    [avl/tree wordfreq-cmp]]
-           [avl/reduce [\ [e sum]
+           [avl/reduce [fn [e sum]
                           [+ sum [max 0 [- [array/ref e 1] 5]]]]]]]
 
 [def words [count-words [string [file/read "CODE_OF_CONDUCT.md"]]]]

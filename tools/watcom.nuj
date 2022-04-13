@@ -29,7 +29,7 @@
 
 [def source-files [filter [flatten [map '["bin" "lib" "tmp" "vendor"] directory/read-recursive]]
                           [path/ext?! "c"]]]
-[def object-files [map source-files [\ [α] [cat [path/without-extension α] ".obj"]]]]
+[def object-files [map source-files [fn [α] [cat [path/without-extension α] ".obj"]]]]
 
 [for-each object-files file/remove]
 [file/remove "DOSNUJEL.EXE"]

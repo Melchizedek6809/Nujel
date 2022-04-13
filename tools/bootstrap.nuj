@@ -14,10 +14,10 @@
 
 ; If something happens, we just print the responsible error and exit immediately,
 ; since we can't really fix things, we could only make things worse.
-[try [\ [err]
-        [println "Exception during stdlib compilation"]
-        [display/error err]
-        [exit 2]]
+[try [fn [err]
+         [println "Exception during stdlib compilation"]
+         [display/error err]
+         [exit 2]]
      [for-in [cur-path stdlib-files]
              [println [cat [ansi-green " [NUJ]  "] cur-path]]
              [file/compile cur-path #f environment]]]

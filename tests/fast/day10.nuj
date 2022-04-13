@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun char-to-score [cc]
+[defn char-to-score [cc]
        [case cc
              [#\)     3]
              [#\]    57]
@@ -8,7 +8,7 @@
              [#\> 25137]
              [otherwise 0]]]
 
-[defun p2-score [cc]
+[defn p2-score [cc]
        [case cc
              [#\) 1]
              [#\] 2]
@@ -16,15 +16,15 @@
              [#\> 4]
              [otherwise 0]]]
 
-[defun calc-part2-score [stack α]
+[defn calc-part2-score [stack α]
        [if-not stack α
                [calc-part2-score [cdr stack]
                                  [+ [* 5 α]
                                     [p2-score [car stack]]]]]]
 
-[defun find-first-syntax-error [line]
+[defn find-first-syntax-error [line]
        [def stack #nil]
-       [try [\ [ε] [if [== [car ε] :return]
+       [try [fn [ε] [if [== [car ε] :return]
                        [cons :part1 [char-to-score [cadr ε]]]
                        [throw ε]]]
             [for [i 0 [string/length line]]
@@ -41,8 +41,8 @@
 
 [def lines [split [file/read "tests/fast/day10.dat"] "\n"]]
 [def res [map lines find-first-syntax-error]]
-[def p1-res [reduce res [\ [α β] [if [== :part1 [car β]] [+ α [cdr β]] α]] 0]]
-[def incomplete-lines [list/sort [filter res [\ [α] [!= :part1 [car α]]]]]]
+[def p1-res [reduce res [fn [α β] [if [== :part1 [car β]] [+ α [cdr β]] α]] 0]]
+[def incomplete-lines [list/sort [filter res [fn [α] [!= :part1 [car α]]]]]]
 [def p2-res [list/ref incomplete-lines [/ [length incomplete-lines] 2]]]
 [when [!= p1-res 315693]
       [throw [list :wrong-result "Wrong result" p1-res]]]

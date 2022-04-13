@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun polymer/read [line]
+[defn polymer/read [line]
        [def eles @[]]
        [def pairs @[]]
        [for [i 0 [string/length line]]
@@ -9,12 +9,12 @@
                   [tree/++ pairs [str->sym [string/cut line i [+ i 2]]]]]]
        @[:pairs pairs :eles eles :combinations '[]]]
 
-[defun combination/parse [recipe last-recipe]
+[defn combination/parse [recipe last-recipe]
        [def source [str->sym [car recipe]]]
        [def new    [str->sym [cadr recipe]]]
        [def new-α [str->sym [cat [string/cut [car recipe] 0 1] [cadr recipe]]]]
        [def new-β [str->sym [cat [cadr recipe] [string/cut [car recipe] 1 2]]]]
-       [\ [α Ω]
+       [fn [α Ω]
           [def count [int [ref [ref α :pairs] source]]]
           [tree/+= [ref Ω :eles] new count]
           [tree/+= [ref Ω :pairs] source [- count]]
@@ -22,29 +22,29 @@
           [tree/+= [ref Ω :pairs] new-β count]
           [if [lambda? last-recipe] [last-recipe α Ω] Ω]]]
 
-[defun combination/add [state recipe]
+[defn combination/add [state recipe]
        [tree/set! state :combinations [combination/parse recipe [ref state :combinations]]]]
 
-[defun combinations/read [state lines]
-       [for-each lines [\ [line] [combination/add state [split line " -> "]]]]
+[defn combinations/read [state lines]
+       [for-each lines [fn [line] [combination/add state [split line " -> "]]]]
        state]
 
-[defun state/read [fn]
+[defn state/read [fn]
        [def input-raw [split [file/read fn] "\n"]]
        [def state [polymer/read [car input-raw]]]
        [combinations/read state [cddr input-raw]]]
 
-[defun state/dup [α]
+[defn state/dup [α]
        @[:combinations [ref α :combinations] :pairs [tree/dup [ref α :pairs]] :eles [tree/dup [ref α :eles]]]]
 
-[defun state/run/once [α]
+[defn state/run/once [α]
        [[ref α :combinations] α [state/dup α]]]
 
-[defun state/run/many [α steps]
+[defn state/run/many [α steps]
        [if [<= steps 0] α
            [state/run/many [state/run/once α] [- steps 1]]]]
 
-[defun result [state]
+[defn result [state]
   [- [max [tree/values [ref state :eles]]]
      [min [tree/values [ref state :eles]]]]]
 

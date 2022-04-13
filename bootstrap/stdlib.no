@@ -8978,6 +8978,34 @@
 08i 2 v cons
 01
 }]] [def split [fn* split [str separator] "Splits STR into a list at every occurunse of SEPARATOR" #{
+10s str
+08i 1 v type-of
+05v :string
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :string"
+10s str
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+10s separator
+08i 1 v type-of
+05v :string
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :string"
+10s separator
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
 15
 10s separator
 08i 1 v string/length
@@ -8996,52 +9024,21 @@
 08i 3 v split/string
 16
 01
-}]] [def split/new [fn* split/new [str separator] "Splits STR into a list at every occurunse of SEPARATOR" #{
-10s str
-08i 1 v type-of
-05v :string
-20
-0Bo 7
-24
-09o 25
-05v :type-error
-05v "Expected a value of type :string"
-10s str
-08i 0 v current-lambda
-08i 4 v throw
-0D
-10s separator
-08i 1 v type-of
-05v :string
-20
-0Bo 7
-24
-09o 25
-05v :type-error
-05v "Expected a value of type :string"
-10s separator
-08i 0 v current-lambda
-08i 4 v throw
-0D
-15
-10s separator
-08i 1 v string/length
-0Es ΓεnΣym-123
-0D
-10s ΓεnΣym-123
-02i 0
-20
-0Bo 15
-10s str
-08i 1 v split/empty
-09o 18
-10s str
-10s separator
-02i 0
-08i 3 v split/string
-16
-01
 }]] [def read/single [fn* read/single [text] "" #{
+10s text
+08i 1 v type-of
+05v :string
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :string"
+10s text
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
 10s text
 08i 1 v read
 08i 1 v car
@@ -9213,17 +9210,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-124
+0Es ΓεnΣym-123
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-123
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-124
+10s ΓεnΣym-123
 0Bo 74
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-123
 08i 1 v car
 0Es cur-test
 0D
@@ -9238,9 +9235,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-123
 08i 1 v cdr
-0Fs ΓεnΣym-124
+0Fs ΓεnΣym-123
 09o -76
 09o 4
 24

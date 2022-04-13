@@ -1,9 +1,9 @@
 #!/usr/bin/env nujel
 
-[defun fold/load [filename]
+[defn fold/load [filename]
        [def points #nil]
        [def γ [reduce [split [file/read filename] "\n"]
-                       [\ [α β]
+                       [fn [α β]
                          [cond [[zero? [string/length β]] α]
                                [[== [char-at β 0] #\f]
                                 [tree/set! α :folds [cons [split [caddr [split β " "]] "="] [ref α :folds]]]]
@@ -18,7 +18,7 @@
               [cdr! points]]
        [tree/set! γ :folds [reverse [ref γ :folds]]]]
 
-[defun fold-y [data y]
+[defn fold-y [data y]
        [def ret [array/2d/allocate [ref data :width] [/ [ref data :height] 2]]]
        [def dh [ref data :height]]
        [def rw [ref ret :width]]
@@ -30,7 +30,7 @@
                                       [array/2d/ref data x [- dh y 1]]]]]]
        [tree/set! ret :folds [cdr [ref data :folds]]]]
 
-[defun fold-x [data y]
+[defn fold-x [data y]
        [def ret [array/2d/allocate [/ [ref data :width] 2] [ref data :height]]]
        [def dw [ref data :width]]
        [def rw [ref ret :width]]
@@ -42,17 +42,17 @@
                                       [array/2d/ref data [- dw x 1] y]]]]]
        [tree/set! ret :folds [cdr [ref data :folds]]]]
 
-[defun do-fold [α]
+[defn do-fold [α]
        [if [== [caar [ref α :folds]] "x"]
            [fold-x α [cadr [ref α :folds]]]
            [fold-y α [cadr [ref α :folds]]]]]
 
-[defun do-all-folds [α]
+[defn do-all-folds [α]
        [while [ref α :folds]
               [set! α [do-fold α]]]
        α]
 
-[defun dot-count [α]
+[defn dot-count [α]
        [def β [ref α :data]]
        [def len [array/length β]]
        [def ret 0]
@@ -60,7 +60,7 @@
             [when [> [array/ref β i] 0] [++ ret]]]
        ret]
 
-[defun print-folded [α]
+[defn print-folded [α]
        [for [y 0 [ref α :height]]
        [for [x 0 [ref α :width]]
             [if [zero? [array/2d/ref α x y]]

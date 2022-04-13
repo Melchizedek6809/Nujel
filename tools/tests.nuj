@@ -32,7 +32,7 @@
 [defn file/test [path]
        [++ i]
        [def test/start/file [time/milliseconds]]
-       [try [\ [err]
+       [try [fn [err]
                [print "\r"]
 	       [println [prog-str ansi-red i path test/start/file]]
 	       [++ test/errors]

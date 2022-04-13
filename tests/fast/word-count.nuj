@@ -9,8 +9,8 @@
        [def text [string [file/read filename]]]
        [-> text
            [split "\n"]
-           [reduce [\ [a b]
-                      [+ a [count [split b " "] [\ [a] [> [string/length [trim a]] 0]]]]]
+           [reduce [fn [a b]
+                       [+ a [count [split b " "] [fn [a] [> [string/length [trim a]] 0]]]]]
                    0]]]
 
 [def lines [count-lines "CODE_OF_CONDUCT.md"]]

@@ -3,12 +3,12 @@
 [def example-data "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"]
 [def input-data [file/read "tests/fast/day3.dat"]]
 
-[defun read-data [lines]
+[defn read-data [lines]
        [map [split lines "\n"]
-            [λ [line]
+            [fn [line]
                 [car [read [cat "#b" line]]]]]]
 
-[defun count-bits/single [number state bit-count]
+[defn count-bits/single [number state bit-count]
        [def i 0]
        [while [< i bit-count]
               [def mask [ash 1 i]]
@@ -16,7 +16,7 @@
                     [array/set! state i [+ 1 [ref state i]]]]
               [++ i]]]
 
-[defun count-bits [numbers bit-count]
+[defn count-bits [numbers bit-count]
        [def count 0]
        [def state [array/allocate bit-count]]
        [array/fill! state 0]
@@ -26,7 +26,7 @@
               [++ count]]
        @[:bit-count bit-count :count count :zeroes state]]
 
-[defun calc-γε [state]
+[defn calc-γε [state]
        [def i 0]
        [def γ 0]
        [def ε 0]

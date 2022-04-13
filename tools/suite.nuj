@@ -1,9 +1,0 @@
-#!/usr/bin/env nujel
-
-[println "Entered SUITE.NUJ"]
-[for-each [directory/read-relative "tests/suite"] file/eval]
-[println "Loaded all Tests"]
-
-[if [ref repl/options :bytecoded]
-    [exit [test-run-bytecode]]
-    [exit [test-run]]]

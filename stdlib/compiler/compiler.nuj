@@ -183,13 +183,6 @@
                                   [car body]]]
           [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]
 
-[defmacro \ [args . body]
-          "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
-[def λ \]
-
 [defmacro fn [args . body]
           "Define a λδ with the self-hosting Nujel compiler"
           [def doc-string [if-not [string? [car body]] ""

@@ -2,28 +2,28 @@
 
 [def counter 0]
 
-[defun in-area? [x y]
+[defn in-area? [x y]
        [and [>= x 144]
 	    [<= x 178]
 	    [>= y -100]
 	    [<= y -76]]]
 
-[defun over? [x y]
+[defn over? [x y]
        [or [> x 178]
 	   [< y -100]]]
 
-[defun zdir [a]
+[defn zdir [a]
        [cond [[zero? a] 0]
              [[> a 0] -1]
 	     [#t 1]]]
 
-[defun shoot [x y vx vy max-y]
+[defn shoot [x y vx vy max-y]
        ;[println [cat x " " y " " vx " " vy]]
        [cond [[in-area? x y] [++ counter] max-y]
 	     [[over? x y] 0]
 	     [#t [shoot [+ x vx] [+ y vy] [+ vx [zdir vx]] [+ vy -1] [max y max-y]]]]]
 
-[defun find-max []
+[defn find-max []
        [def ret 0]
        [for [vx 0 300]
        [for [vy -300 300]
