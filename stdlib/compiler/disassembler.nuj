@@ -108,25 +108,29 @@
 
 [defn disassemble/raw [bc]
        "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
-       [for-each [disassemble bc] [\ [a]
-                                   [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
-                                                 " - "
-                                                 [cdr a]]]]]]
+       [for-each [disassemble bc]
+                 [\ [a]
+                     [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+                                   " - "
+                                   [cdr a]]]]]]
 
 [defn disassemble/test [asm]
        "Verbose way of testing the disassembler"
        [println [ansi-blue "--------- Assembly -----------"]]
        [def cur-line 0]
-       [for-each asm [\ [a] [println [cat [ansi-yellow [string/pad-start [++ cur-line] 6]]
-                                          " - "
-                                          a]]]]
+       [for-each asm
+                 [\ [a]
+                    [println [cat [ansi-yellow [string/pad-start [++ cur-line] 6]]
+                                       " - "
+                                       a]]]]
        [println [ansi-yellow "--------- Raw Bytecode -----------"]]
        [def bc [apply assemble asm]]
        [println [str/write bc]]
        [println [ansi-green "--------- Now for the disassembly -----------"]]
-       [for-each [disassemble bc] [\ [a]
-                                   [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
-                                                 " - "
-                                                 [cdr a]]]]]
+       [for-each [disassemble bc]
+                 [\ [a]
+                     [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+                                   " - "
+                                   [cdr a]]]]]
        [println [ansi-red "--------- Fin -----------\n"]]
        [try display/error [println [str/write [bytecode-eval bc]]]]]

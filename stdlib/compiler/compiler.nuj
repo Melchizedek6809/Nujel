@@ -35,6 +35,13 @@
              [cadddr source]
              [compile [caddddr source]]]]
 
+[defn compile/macro* [source]
+       [list 'macro*
+             [cadr source]
+             [caddr source]
+             [cadddr source]
+             [compile [caddddr source]]]]
+
 [defn compile/fn* [source]
        [list 'fn*
              [cadr source]
@@ -86,6 +93,7 @@
        [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
                          [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
                          [car source]]]
+
        [case [type-of op]
              [:special-form [case op
                     [do     [compile/do     source]]
@@ -94,6 +102,7 @@
                     [let*   [compile/let*   source]]
                     [λ*     [compile/λ*     source]]
                     [fn*    [compile/fn*    source]]
+                    [macro* [compile/macro* source]]
                     [μ*     [compile/μ*     source]]
                     [ω*     [compile/ω*     source]]
                     [if     [compile/if     source]]
@@ -102,7 +111,7 @@
                     [or     [compile/or     source]]
                     [while  [compile/while  source]]
                     [quote                  source ]
-                    [otherwise [throw [list :unknown-special-form "The compiler does not know the current special form, please fix the compiler!" [car source]]]]]]
+                    [otherwise [throw [list :panic "Unknown special form, please fix the compiler!" source]]]]]
              [:macro                      [compile/macro      op  source]]
              [[:lambda :native-function]  [compile/procedure  op  source]]
              [:object                     [compile/procedure/arg  source]]
@@ -184,19 +193,19 @@
           "Define a λδ with the self-hosting Nujel compiler"
           [def doc-string [if-not [string? [car body]] ""
                                   [car body]]]
-          `[fn* #nil ~args ~doc-string ~[-> [cons 'do body]
-                                        [compile [current-closure]]
-                                        bytecompile
-                                        assemble*]]]
+          [list fn* #nil args doc-string [-> [cons 'do body]
+                                             [compile [current-closure]]
+                                             bytecompile
+                                             assemble*]]]
 
 [defmacro defn [name args . body]
               "Define a new bytecoded function"
               [def doc-string [if-not [string? [car body]] ""
                                       [car body]]]
-              [list 'def name `[fn* ~name ~args ~doc-string ~[-> [cons 'do body]
-                                        [compile [current-closure]]
-                                        bytecompile
-                                        assemble*]]]]
+              [list 'def name [list fn* name args doc-string [-> [cons 'do body]
+                                                                 [compile [current-closure]]
+                                                                 bytecompile
+                                                                 assemble*]]]]
 
 [defmacro ω body
           "Defines and returns new object after evaluating body within"
