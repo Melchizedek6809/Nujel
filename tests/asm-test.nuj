@@ -11,9 +11,13 @@
 
 [def expr '[for [i 1 100] [println [cat "Hello for the " [str/write i]]]]]
 
+[println [ansi-rainbow "Start!"]]
 [println [str/write [bytecompile [compile expr]]]]
 
+[println [ansi-rainbow "Bytecompilation"]]
 [def a [assemble [bytecompile [compile expr]]]]
+[println [ansi-rainbow "Assembled!"]]
+[println [str/write [closure disassemble/raw]]]
 [disassemble/raw a]
 [println [ansi-rainbow "Done!!!! => " [bytecode-eval a]]]
 ;[disassemble/test '[bytecompile [compile '[- 7 1]]]]

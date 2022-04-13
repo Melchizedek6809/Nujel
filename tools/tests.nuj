@@ -11,12 +11,11 @@
 
 [when [not [tree/has? repl/options :only-test-suite]]
       [println [ansi-purple "First we test the basic functions of the runtime."]]]
-[for-each [directory/read-relative "tests/suite"] file/eval]
-
+[for-each [directory/read-relative "tests/suite"]
+          file/eval]
 [when [tree/has? repl/options :only-test-suite]
-      [exit [if [ref repl/options :bytecoded]
-                [test-run-bytecode]
-                [test-run]]]]
+      [exit [test-run]]]
+
 
 [if [ref repl/options :bytecoded]
     [set! test/testsuite-errors [test-run-bytecode]]

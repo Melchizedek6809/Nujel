@@ -108,3 +108,18 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *bod
 
 	return ret;
 }
+
+/* Create a new Lambda Value */
+lVal *lLambdaBytecodeNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
+	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
+
+	lVal *ret = RVP(lValAlloc(ltLambda));
+	ret->vClosure       = lClosureNew(parent);
+	ret->vClosure->name = sym;
+	ret->vClosure->args = args;
+	ret->vClosure->doc  = docs;
+	ret->vClosure->text = body;
+	ret->vClosure->type = closureUnlinkedBytecode;
+
+	return ret;
+}

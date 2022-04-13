@@ -342,8 +342,8 @@ static lVal *lParseBytecodeOp(lString *s){
 
 /* Read a literal array and return it as a lVal */
 static lVal *lParseBytecodeArray(lString *s){
-	static u8 *d = NULL;
-	static int size = 0;
+	u8 *d = NULL;
+	int size = 0;
 	int len = 0;
 
 	while(s->data < s->bufEnd){
@@ -428,6 +428,7 @@ static lVal *lParseBytecodeArray(lString *s){
 	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
 	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
 	memcpy(ret->vBytecodeArr.data, d, len);
+	free(d);
 	return ret;
 }
 

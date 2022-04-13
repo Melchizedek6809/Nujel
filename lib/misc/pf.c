@@ -86,7 +86,7 @@ static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
 
 static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
-		return spf(cur, bufEnd, "o { %i } ", offset);
+		return spf(cur, bufEnd, "o --INVALID-OFFSET--", offset);
 	}else{
 		return spf(cur, bufEnd, "o %i ", offset);
 	}
@@ -100,6 +100,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 			if(cur[-1] == ' '){--cur;}
 			cur = spf(cur, bufEnd, "\n%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
 			switch(*c){
+			case lopTry:
 			case lopJt:
 			case lopJf:
 			case lopJmp: {
@@ -132,7 +133,9 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c+=4;
 				break; }
+			case lopFn:
 			case lopLambda:
+			case lopMacroAst:
 			case lopMacro: {
 				if(&c[12] >= v->dataEnd){
 					c+=12;

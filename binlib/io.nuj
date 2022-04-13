@@ -3,17 +3,17 @@
 
 [def test-context "Nujel Standalone"]
 
-[defun help [i]
+[defn help [i]
        "Describe 10 functions at offset 1"
        [when-not [int? i] [set! i [int i]]]
        [def off [* i 10]]
        [for-each [map [symbol-table off 10] string]
                  [\ [l] [def desc [describe l]]
-                        [pfmtln "{l} {desc}"]]]
+                         [pfmtln "{l} {desc}"]]]
        [def sc [/ [symbol-count] 10]]
        [pfmtln "Help page {i} of {sc}"]]
 
-[defun file/compile [path no-write environment]
+[defn file/compile [path no-write environment]
         "Compile a Nujel source file into optimized object code"
         [def source [cons 'do [read [file/read path]]]]
         [def object-code [compile/forms source environment]]
@@ -21,20 +21,20 @@
                                        [cat [path/without-extension path] ".no"]]]
         object-code]
 
-[defun file/eval [path environment]
+[defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
        [def source [cons 'do [read [file/read path]]]]
        [compile/forms [cons 'do source] environment]]
 
-[defun file/eval/bytecode [path]
+[defn file/eval/bytecode [path]
        "Evaluate a Nujel source file in the current context"
        [def source [cons 'do [read [file/read path]]]]
        [def bc [assemble [bytecompile [compile [cons 'do source]]]]]
        [disassemble/raw bc]
        [bytecode-eval bc]]
 
-[defun eval/forked [nujel-binary raw-expr]
+[defn eval/forked [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
         [def expr [cat "[print [str/write " [str/write raw-expr]] "]] "]
         [def tmp-path [file/temp expr]]
@@ -44,18 +44,24 @@
         [file/remove tmp-path]
         [cons [car res] [cdr res]]]
 
-[defun file/file? [filename]
+[defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]
 
-[defun file/dir? [filename]
+[defn file/dir? [filename]
        [ref [file/stat filename] :directory?]]
 
-[defun directory/read-relative [path]
-       [map [directory/read path]
-            [\ [α] [cat path "/" α]]]]
+[defn directory/read-relative [path]
+      [map [directory/read path]
+           [\ [a]
+               [cat path "/" a]]]]
 
-[defun directory/read-recursive [path]
+[defn directory/rr [path]
+      [map [directory/read path]
+           [\ [a]
+               [cat path "/" a]]]]
+
+[defn directory/read-recursive [path]
        [flatten [map [directory/read-relative path]
                      [\ [A] [if [file/dir? A]
-                                [directory/read-recursive A]
-                                A]]]]]
+                                 [directory/read-recursive A]
+                                 A]]]]]

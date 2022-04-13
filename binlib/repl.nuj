@@ -8,23 +8,23 @@
 [def repl/options @[]]
 [def repl/option-map @[]]
 
-[defun repl/exception-handler [error]
+[defn repl/exception-handler [error]
         [display/error error]]
 
 [def repl/history #nil]
 
 
-[defun repl/prompt []
+[defn repl/prompt []
            "> "]
 
-[defun repl/wasm [line]
+[defn repl/wasm [line]
        "Evaluate LINE in the wasm context"
        [try repl/exception-handler
             [def raw [read line]]
             [def cexpr [list [compile [cons 'do raw]]]]
             [apply root-closure cexpr]]]
 
-[defun repl/readline [ctx]
+[defn repl/readline [ctx]
         [def line [readline [repl/prompt]]]
         [when [nil? line]
               [display "Bye!\r\n"]
@@ -38,12 +38,12 @@
                           ""
                           [str/write result]]]]]
 
-[defun repl []
+[defn repl []
         [while #t
                [try repl/exception-handler
                     [repl/readline root-closure]]]]
 
-[defun repl/print-help []
+[defn repl/print-help []
        [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
        [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]]
        [println [cat "\nLow-level options - for work on the runtime itself"]]
@@ -58,7 +58,7 @@
        [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]]
        [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]
 
-[defun repl/run-forked* [expr]
+[defn repl/run-forked* [expr]
        [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
        [popen command]]
 
@@ -87,16 +87,16 @@
            [\ [option]
               [tree/set! repl/options option #t]]]
 
-[defun repl/parse-option [option]
+[defn repl/parse-option [option]
        [[or [ref repl/option-map option]
             [ref repl/option-map :default]] option]]
 
-[defun repl/parse-options [options]
+[defn repl/parse-options [options]
        [if [== [char-at options 0] #\-]
            [repl/parse-option [string->keyword [cut options 1]]]
            [for-each [map [split options ""] str->sym] repl/parse-option]]]
 
-[defun repl/parse-arg [arg]
+[defn repl/parse-arg [arg]
        [cond [repl/parse-args/bytecode-eval-next [try display/error
                                                       [file/eval/bytecode arg]]
                                                  [set! repl/parse-args/bytecode-eval-next #f]]
@@ -108,21 +108,21 @@
                       [file/eval arg]]
                  [set! repl/parse-args/run-repl #f]]]]
 
-[defun repl/parse-args [args]
+[defn repl/parse-args [args]
        [if args
            [do [repl/parse-arg [car args]]
                [repl/parse-args [cdr args]]]
            repl/parse-args/run-repl]]
 
-[defun repl/init/wasm [args]
+[defn repl/init/wasm [args]
        [println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]
 
-[defun repl/init/bin [args]
+[defn repl/init/bin [args]
        [try repl/exception-handler
             [set! repl/executable-name [car args]]
             [when [repl/parse-args [cdr args]] [repl]]]]
 
-[defun repl/init args
+[defn repl/init args
        [if [== System/Architecture 'wasm]
            [repl/init/wasm args]
            [repl/init/bin args]]]

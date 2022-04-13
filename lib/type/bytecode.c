@@ -258,6 +258,14 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip = lBytecodeReadOPVal(ip, &cBody);
 		ctx.valueStack[ctx.sp++] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
 		break;}
+	case lopFn: {
+		lVal *cName, *cArgs, *cDocs, *cBody;
+		ip = lBytecodeReadOPVal(ip+1, &cName);
+		ip = lBytecodeReadOPVal(ip, &cArgs);
+		ip = lBytecodeReadOPVal(ip, &cDocs);
+		ip = lBytecodeReadOPVal(ip, &cBody);
+		ctx.valueStack[ctx.sp++] = lLambdaBytecodeNew(c, cName, cArgs, cDocs, cBody);
+		break;}
 	case lopMacro: {
 		lVal *cName, *cArgs, *cDocs, *cBody;
 		ip = lBytecodeReadOPVal(ip+1, &cName);
@@ -265,6 +273,18 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip = lBytecodeReadOPVal(ip, &cDocs);
 		ip = lBytecodeReadOPVal(ip, &cBody);
 		ctx.valueStack[ctx.sp] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
+		if(ctx.valueStack[ctx.sp]){
+			ctx.valueStack[ctx.sp]->type = ltMacro;
+		}
+		ctx.sp++;
+		break; }
+	case lopMacroAst: {
+		lVal *cName, *cArgs, *cDocs, *cBody;
+		ip = lBytecodeReadOPVal(ip+1, &cName);
+		ip = lBytecodeReadOPVal(ip, &cArgs);
+		ip = lBytecodeReadOPVal(ip, &cDocs);
+		ip = lBytecodeReadOPVal(ip, &cBody);
+		ctx.valueStack[ctx.sp] = lLambdaBytecodeNew(c, cName, cArgs, cDocs, cBody);
 		if(ctx.valueStack[ctx.sp]){
 			ctx.valueStack[ctx.sp]->type = ltMacro;
 		}
@@ -430,6 +450,8 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 			break;
 		case lopLambda:
 		case lopMacro:
+		case lopMacroAst:
+		case lopFn:
 			if(&c[12] >= v->dataEnd){break;}
 			lValGCMark(lIndexVal((c[ 1] << 16) | (c[ 2] << 8) | c[ 3]));
 			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));
