@@ -402,7 +402,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		}
 		break;
 	}}
-	lExceptionThrowValClo("expected-return", "The bytecode evaluator expected and explicit return operation", NULL, c);
+	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	return NULL;
 }
 

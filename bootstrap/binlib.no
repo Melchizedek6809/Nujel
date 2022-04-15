@@ -112,8 +112,9 @@
 08i 1 v assemble
 0Es bc
 0D
+10s disassemble/raw
 10s bc
-08i 1 v disassemble/raw
+1Ai 1
 0D
 10s bc
 08i 1 v bytecode-eval
@@ -214,10 +215,9 @@
 08i 2 v apply
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
 01
 }]] [def repl/readline [fn* repl/readline [ctx] "" #{
 08i 0 v repl/prompt
@@ -274,7 +274,7 @@
 1B
 1C
 05v #t
-0Bo 34
+0Bo 33
 0D
 10s repl/exception-handler
 18o 15
@@ -282,11 +282,10 @@
 08i 1 v repl/readline
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
-09o -36
+09o -35
 01
 }]] [def repl/print-help [fn* repl/print-help [] "" #{
 05v "Nujel"
@@ -421,23 +420,22 @@
 01
 }]] [def repl/parse-arg [fn* repl/parse-arg [arg] "" #{
 10s repl/parse-args/bytecode-eval-n
-0Bo 42
+0Bo 41
 10s display/error
 18o 15
 10s arg
 08i 1 v file/eval/bytecode
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
 0D
 05v #f
 0Fs repl/parse-args/bytecode-eval-n
-09o 160
+09o 158
 10s repl/parse-args/eval-next
-0Bo 70
+0Bo 69
 10s display/error
 18o 43
 10s root-closure
@@ -450,14 +448,13 @@
 08i 2 v apply
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
 0D
 05v #f
 0Fs repl/parse-args/eval-next
-09o 86
+09o 85
 10s arg
 02i 0
 08i 2 v char-at
@@ -468,19 +465,18 @@
 02i 1
 08i 2 v string/cut
 08i 1 v repl/parse-options
-09o 50
+09o 49
 05v #t
-0Bo 42
+0Bo 41
 10s display/error
 18o 15
 10s arg
 08i 1 v file/eval
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
 0D
 05v #f
 0Fs repl/parse-args/run-repl
@@ -523,10 +519,9 @@
 24
 09o 8
 1Ai 1
-09o 6
+09o 5
 27
 0D
-16
 01
 }]] [def repl/init [fn* repl/init args "" #{
 10s System/Architecture

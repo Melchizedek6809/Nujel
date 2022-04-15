@@ -100,6 +100,7 @@
                              ~[bytecode-arr->val a [+ i 4]]
                              ~[bytecode-arr->val a [+ i 7]]
                              ~[bytecode-arr->val a [+ i 10]]]]
+             [#$27 `[$swap]]
              [otherwise :unknown-op]]]
 
 [defn disassemble/array [a i]
@@ -110,35 +111,35 @@
               [set! i [+ i [disassemble/length [ref a i]]]]]
        [nreverse ret]]
 
-[defn disassemble [code]
+[defn disassemble/bytecode-array [code]
        "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
        [disassemble/array [bytecode-arr->arr code] 0]]
 
-[defn disassemble/raw [bc]
-  "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
-       [for-each [disassemble bc]
-                 [fn [a]
-                     [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
-                                   " - "
-                                   [cdr a]]]]]]
+[defn disassemble/print [bc]
+      [for-in [a [disassemble/bytecode-array bc]]
+              [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+                            " - "
+                            [cdr a]]]]]
+
+[defn disassemble [bc]
+      "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
+      [case [type-of bc]
+            [[:lambda :macro] [disassemble/print [ref [closure bc] :code]]]
+            [:bytecode-array  [disassemble/print bc]]
+            [otherwise [throw [list :type-error "Can't disassemble that" bc [current-lambda]]]]]]
 
 [defn disassemble/test [asm]
        "Verbose way of testing the disassembler"
        [println [ansi-blue "--------- Assembly -----------"]]
        [def cur-line 0]
-       [for-each asm
-                 [fn [a]
-                     [println [cat [ansi-yellow [string/pad-start [++ cur-line] 6]]
+       [for-in [a asm]
+               [println [cat [ansi-yellow [string/pad-start [++ cur-line] 6]]
                                        " - "
-                                       a]]]]
+                                       a]]]
        [println [ansi-yellow "--------- Raw Bytecode -----------"]]
        [def bc [apply assemble asm]]
        [println [str/write bc]]
        [println [ansi-green "--------- Now for the disassembly -----------"]]
-       [for-each [disassemble bc]
-                 [fn [a]
-                     [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
-                                   " - "
-                                   [cdr a]]]]]
+       [disassemble bc]
        [println [ansi-red "--------- Fin -----------\n"]]
        [try display/error [println [str/write [bytecode-eval bc]]]]]
