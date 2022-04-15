@@ -45,7 +45,8 @@ typedef enum lOpcode {
 	lopPushSymbol      = 0x23,
 	lopPushNil         = 0x24,
 	lopFn              = 0x25,
-	lopMacroAst        = 0x26
+	lopMacroAst        = 0x26,
+	lopSwap            = 0x27
 } lOpcode;
 
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops);

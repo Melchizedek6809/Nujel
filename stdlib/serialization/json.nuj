@@ -4,12 +4,13 @@
        [cat "{"
             [join [map [tree/keys v]
                        [fn [k]
-                           [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]]
+                           [cat "\"" [keyword->string k] "\": "
+                                [val->json [tree/ref v k]]]]]
                   ",\n"]
             "}"]]
 
 [defn val->json [v]
-       "Return V as a JSON encoded string"
+      "Return V as a JSON encoded string"
        [case [type-of v]
              [:nil "null"]
              [[:int :float] [string v]]

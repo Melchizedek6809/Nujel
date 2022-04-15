@@ -8,7 +8,7 @@
        [when-not [int? i] [set! i [int i]]]
        [def off [* i 10]]
        [for-each [map [symbol-table off 10] string]
-                 [\ [l] [def desc [describe l]]
+                 [fn [l] [def desc [describe l]]
                          [pfmtln "{l} {desc}"]]]
        [def sc [/ [symbol-count] 10]]
        [pfmtln "Help page {i} of {sc}"]]

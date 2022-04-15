@@ -226,6 +226,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if(--ctx.sp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDrop", NULL, c);}
 		ip++;
 		break;
+	case lopSwap: {
+		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDup", NULL, c);}
+		lVal *t = ctx.valueStack[ctx.sp-2];
+		ctx.valueStack[ctx.sp-2] = ctx.valueStack[ctx.sp-1];
+		ctx.valueStack[ctx.sp-1] = t;
+		ip++;
+		break; }
 	case lopJmp:
 		ip += lBytecodeGetOffset16(ip+1);
 		break;
@@ -319,22 +326,18 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		c->type = closureLet;
 		ctx.closureStack[ctx.csp] = c;
 		break;
-	case lopClosurePop:
+	case lopClosurePop: {
 		ip++;
-		while(ctx.csp > 0){
-			lClosure *nclo = ctx.closureStack[--ctx.csp];
-			if(nclo->type == closureTry){continue;}
-			c = nclo;
-			lRootsRet(c->rsp);
-			break;
-		}
+		lClosure *nclo = ctx.closureStack[--ctx.csp];
+		c = nclo;
+		lRootsRet(c->rsp);
 		if(ctx.csp == 0){
 			if(ctx.sp < 1){
 				lExceptionThrowValClo("stack-underflow", "Underflowed during lopClosurePop", NULL, c);
 			}
 			return NULL;
 		}
-		break;
+		break; }
 	case lopCall:
 		c->ip = ip+3;
 		c->sp = ctx.sp;

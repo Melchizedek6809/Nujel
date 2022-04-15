@@ -65,13 +65,13 @@ lVal *lnfTreeGet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
+		lExceptionThrowValClo("type-error","[tree/ref] - expected argument to be of type :tree", car, c);
 		/* Never Returns */
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
 	if(key == NULL){
-		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		lExceptionThrowValClo("type-error","[tree/ref] - should be a :symbol", lCadr(v), c);
 		/* Never Returns */
 	}
 	return key ? lTreeGet(tre, key, NULL) : car;
@@ -82,13 +82,13 @@ static lVal *lnfTreeHas(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
+		lExceptionThrowValClo("type-error","[tree/has?] - needs a :tree", car, c);
 		/* Never Returns */
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
 	if(key == NULL){
-		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		lExceptionThrowValClo("type-error","[tree/has?] - needs a :symbol", lCadr(v), c);
 		/* Never Returns */
 	}
 	return lValBool(key ? lTreeHas(tre, key, NULL) : false);
@@ -101,13 +101,13 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 	if(car == NULL){
 		car = lValTree(NULL);
 	}else if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
+		lExceptionThrowValClo("type-error","[tree/set!] - needs a :tree", car, c);
 		/* Never Returns */
 	}
 	lTree *tre = car->vTree;
 	const lSymbol *key = castToSymbol(lCadr(v), NULL);
 	if(key == NULL){
-		lExceptionThrowValClo("type-error","expected argument to be of type :symbol", lCadr(v), c);
+		lExceptionThrowValClo("type-error","[tree/set!] - needs a :symbol", lCadr(v), c);
 		/* Never Returns */
 	}
 	car->vTree = lTreeInsert(tre, key, lCaddr(v));

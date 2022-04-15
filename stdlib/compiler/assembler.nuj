@@ -186,6 +186,9 @@
 [defn $push/nil []
        '[#$24]]
 
+[defn $swap []
+      '[#$27]]
+
 [defn assemble/build-sym-map [code sym-map pos]
        [while code
               [case [type-of [car code]]

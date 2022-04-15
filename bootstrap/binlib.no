@@ -18,7 +18,18 @@
 08i 2 v symbol-table
 10s string
 08i 2 v map
-11v :INVALID-VALUE v [l] v "" v [do [def desc [describe l]] [println [cat l " " desc]]]
+25v anonymous v [l] v "" v #{
+10s l
+08i 1 v describe
+0Es desc
+0D
+10s l
+05v " "
+10s desc
+08i 3 v cat
+08i 1 v println
+01
+}
 08i 2 v for-each
 0D
 08i 0 v symbol-count
@@ -201,8 +212,12 @@
 10s root-closure
 10s cexpr
 08i 2 v apply
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def repl/readline [fn* repl/readline [ctx] "" #{
 08i 0 v repl/prompt
@@ -259,15 +274,19 @@
 1B
 1C
 05v #t
-0Bo 28
+0Bo 34
 0D
 10s repl/exception-handler
 18o 15
 10s root-closure
 08i 1 v repl/readline
-09o 5
+09o 8
 1Ai 1
-09o -30
+09o 6
+27
+0D
+16
+09o -36
 01
 }]] [def repl/print-help [fn* repl/print-help [] "" #{
 05v "Nujel"
@@ -402,19 +421,23 @@
 01
 }]] [def repl/parse-arg [fn* repl/parse-arg [arg] "" #{
 10s repl/parse-args/bytecode-eval-n
-0Bo 36
+0Bo 42
 10s display/error
 18o 15
 10s arg
 08i 1 v file/eval/bytecode
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 0D
 05v #f
 0Fs repl/parse-args/bytecode-eval-n
-09o 148
+09o 160
 10s repl/parse-args/eval-next
-0Bo 64
+0Bo 70
 10s display/error
 18o 43
 10s root-closure
@@ -425,12 +448,16 @@
 08i 1 v compile
 08i 1 v cons
 08i 2 v apply
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 0D
 05v #f
 0Fs repl/parse-args/eval-next
-09o 80
+09o 86
 10s arg
 02i 0
 08i 2 v char-at
@@ -441,15 +468,19 @@
 02i 1
 08i 2 v string/cut
 08i 1 v repl/parse-options
-09o 44
+09o 50
 05v #t
-0Bo 36
+0Bo 42
 10s display/error
 18o 15
 10s arg
 08i 1 v file/eval
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 0D
 05v #f
 0Fs repl/parse-args/run-repl
@@ -490,8 +521,12 @@
 08i 0 v repl
 09o 4
 24
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def repl/init [fn* repl/init args "" #{
 10s System/Architecture

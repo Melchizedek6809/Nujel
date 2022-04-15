@@ -154,14 +154,19 @@
 
 [defn bytecompile/try  [source env]
        [def handler-sym [bytecompile/gen-label]]
-       [def end-sym [bytecompile/gen-label]]
+       [def end-sym     [bytecompile/gen-label]]
+       [def final-sym   [bytecompile/gen-label]]
        [list [bytecompile* [cadr source] env]
              [$try handler-sym]
              [bytecompile/do/form [cddr source] env]
              [$jmp end-sym]
              [list :label handler-sym]
              [$apply/dynamic 1]
-             [list :label end-sym]]]
+             [$jmp final-sym]
+             [list :label end-sym]
+             [$swap]
+             [$drop]
+             [list :label final-sym]]]
 
 [defn bytecompile* [source env]
        "Compile the forms in source"

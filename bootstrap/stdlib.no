@@ -3358,6 +3358,9 @@
 }]] [def $push/nil [fn* $push/nil [] "" #{
 05v [#$24]
 01
+}]] [def $swap [fn* $swap [] "" #{
+05v [#$27]
+01
 }]] [def assemble/build-sym-map [fn* assemble/build-sym-map [code sym-map pos] "" #{
 02i 0
 1B
@@ -4049,6 +4052,9 @@
 08i 0 v bytecompile/gen-label
 0Es end-sym
 0D
+08i 0 v bytecompile/gen-label
+0Es final-sym
+0D
 10s source
 08i 1 v cadr
 10s env
@@ -4066,10 +4072,17 @@
 08i 2 v list
 02i 1
 08i 1 v $apply/dynamic
+10s final-sym
+08i 1 v $jmp
 05v :label
 10s end-sym
 08i 2 v list
-08i 7 v list
+08i 0 v $swap
+08i 0 v $drop
+05v :label
+10s final-sym
+08i 2 v list
+08i 11 v list
 01
 }]] [def bytecompile* [fn* bytecompile* [source env] "Compile the forms in source" #{
 10s source
@@ -4799,7 +4812,7 @@
 1B
 1C
 10s source-next
-0Bo 263
+0Bo 269
 0D
 10s forms-compiled
 0Es forms-compiled-last
@@ -4818,12 +4831,12 @@
 0Es ΓεnΣym-92
 0D
 10s ΓεnΣym-92
-0Bo 147
+0Bo 153
 02i 0
 1B
 1C
 10s ΓεnΣym-92
-0Bo 133
+0Bo 139
 0D
 10s ΓεnΣym-92
 08i 1 v car
@@ -4886,13 +4899,17 @@
 0Fs forms-compiled
 09o 4
 24
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 0D
 10s ΓεnΣym-92
 08i 1 v cdr
 0Fs ΓεnΣym-92
-09o -135
+09o -141
 09o 4
 24
 16
@@ -4915,7 +4932,7 @@
 08i 1 v throw
 09o 4
 24
-09o -265
+09o -271
 01
 }]] [def compile/forms [fn* compile/forms [source-raw environment] "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined" #{
 10s environment
@@ -4942,8 +4959,12 @@
 10s closure
 08i 2 v compile
 08i 1 v eval*
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def read-eval-compile [fn* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
@@ -4953,8 +4974,12 @@
 10s closure
 08i 2 v compile
 08i 1 v eval*
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def eval-load [fn* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
@@ -4962,8 +4987,12 @@
 10s expr
 10s closure
 08i 2 v load/forms
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def read-eval-load [fn* read-eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
@@ -4972,8 +5001,12 @@
 08i 1 v read
 10s closure
 08i 2 v load/forms
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def typecheck/only [μ* typecheck/only [v t] "" [cons 'when-not [cons [cons '== [cons [cons 'type-of [cons v #nil]] [cons t #nil]]] [cons [cons 'throw [cons [cons 'list [cons :type-error [cons [cat "Expected a value of type " t] [cons v [cons [cons 'current-lambda #nil] #nil]]]]] #nil]] #nil]]]]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
 15
@@ -4984,118 +5017,124 @@
 05v #$0
 20
 0C
-0Ao 274
+0Ao 288
 0D
 10s ΓεnΣym-96
 05v #$1
 20
 0C
-0Ao 260
+0Ao 274
 0D
 10s ΓεnΣym-96
 05v #$3
 20
 0C
-0Ao 246
+0Ao 260
 0D
 10s ΓεnΣym-96
 05v #$4
 20
 0C
-0Ao 232
+0Ao 246
 0D
 10s ΓεnΣym-96
 05v #$7
 20
 0C
-0Ao 218
+0Ao 232
 0D
 10s ΓεnΣym-96
 05v #$C
 20
 0C
-0Ao 204
+0Ao 218
 0D
 10s ΓεnΣym-96
 05v #$D
 20
 0C
-0Ao 190
+0Ao 204
 0D
 10s ΓεnΣym-96
 05v #$13
 20
 0C
-0Ao 176
+0Ao 190
 0D
 10s ΓεnΣym-96
 05v #$14
 20
 0C
-0Ao 162
+0Ao 176
 0D
 10s ΓεnΣym-96
 05v #$15
 20
 0C
-0Ao 148
+0Ao 162
 0D
 10s ΓεnΣym-96
 05v #$16
 20
 0C
-0Ao 134
+0Ao 148
 0D
 10s ΓεnΣym-96
 05v #$19
 20
 0C
-0Ao 120
+0Ao 134
 0D
 10s ΓεnΣym-96
 05v #$1B
 20
 0C
-0Ao 106
+0Ao 120
 0D
 10s ΓεnΣym-96
 05v #$1C
 20
 0C
-0Ao 92
+0Ao 106
 0D
 10s ΓεnΣym-96
 05v #$1E
 20
 0C
-0Ao 78
+0Ao 92
 0D
 10s ΓεnΣym-96
 05v #$1F
 20
 0C
-0Ao 64
+0Ao 78
 0D
 10s ΓεnΣym-96
 05v #$20
 20
 0C
-0Ao 50
+0Ao 64
 0D
 10s ΓεnΣym-96
 05v #$21
 20
 0C
-0Ao 36
+0Ao 50
 0D
 10s ΓεnΣym-96
 05v #$22
 20
 0C
-0Ao 22
+0Ao 36
 0D
 10s ΓεnΣym-96
 05v #$24
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-96
+05v #$27
 20
 0C
 0Ao 8
@@ -5282,8 +5321,12 @@
 08i 2 v +
 08i 2 v ref
 08i 3 v bytecode-op->val
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def bytecode-op->sym [fn* bytecode-op->sym [a b c] "Turn three bytecode ops representing an encoded symbol into an actual symbol" #{
 10s a
@@ -5316,8 +5359,12 @@
 08i 2 v +
 08i 2 v ref
 08i 3 v bytecode-op->sym
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def bytecode-op->offset [fn* bytecode-op->offset [a b] "Turn two bytecode ops encoding an offset into the integer representation" #{
 10s a
@@ -5968,8 +6015,12 @@
 08i 1 v bytecode-eval
 08i 1 v str/write
 08i 1 v println
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]]][do [def yield-queue #nil] [def yield [fn* yield [pred fun] "Evaluates FUN once PRED is true" #{
 10s pred
@@ -9160,8 +9211,12 @@
 10s rawexpr
 10s i
 08i 4 v test-failure
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def test-default [fn* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" #{
 11v :INVALID-VALUE v [err] v "" v [test-failure result [list :exception-caught err] rawexpr i]
@@ -9187,8 +9242,12 @@
 10s rawexpr
 10s i
 08i 4 v test-failure
-09o 5
+09o 8
 1Ai 1
+09o 6
+27
+0D
+16
 01
 }]] [def test-forked [fn* test-forked [nujel-runtime] "" #{
 11v :INVALID-VALUE v [result rawexpr i] v "Tests that RAWEXPR evaluates to RESULT in a separate runtime" v [do [def eval-result [eval/forked nujel-runtime rawexpr]] [def expr [cdr eval-result]] [if [string? result] #nil [set! expr [car [read expr]]]] [if [and [zero? [car eval-result]] [equal? result expr]] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]

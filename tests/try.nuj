@@ -1,0 +1,8 @@
+#!/usr/bin/env nujel
+
+
+[defn z [] 0]
+[defn add-connections []
+      [try car [throw [list :success]] #f]]
+[disassemble/raw [ref [closure add-connections] code:]]
+[println [str/write [add-connections]]]

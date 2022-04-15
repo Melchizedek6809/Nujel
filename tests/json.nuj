@@ -1,0 +1,3 @@
+#!/usr/bin/env nujel
+
+[println [tree->json [tree/new :asd 123 :qwe #t]]]
