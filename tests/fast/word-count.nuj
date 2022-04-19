@@ -1,11 +1,11 @@
 #!/usr/bin/env nujel
 ;; Simple test program that should give the same result as `wc -l` or `wc -w`
 
-[defun count-lines [filename]
+[defn count-lines [filename]
        [def text [string [file/read filename]]]
        [- [count [split text "\n"]] 1]]
 
-[defun count-words [filename]
+[defn count-words [filename]
        [def text [string [file/read filename]]]
        [-> text
            [split "\n"]

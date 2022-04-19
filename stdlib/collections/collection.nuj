@@ -16,7 +16,7 @@
        "Runs F over every item in collection L"
        [reduce l [fn [a b] [f b]] #nil]]
 
-[defun count [l p]
+[defn count [l p]
        "Count the number of items in L where P is true"
        [if p
            [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]

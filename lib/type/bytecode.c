@@ -407,9 +407,32 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 }
 
 /* Return the overall length of opcode op */
-static int lBytecodeOpLength(const lBytecodeOp op){
+static int lBytecodeOpLength(lBytecodeOp op){
 	switch(op){
 	default:
+		fprintf(stderr,"Unknown bytecodeOp length: %x\n",op);
+		exit(3);
+	case lopNOP:
+	case lopRet:
+	case lopIntAdd:
+	case lopDebugPrintStack:
+	case lopEval:
+	case lopDup:
+	case lopDrop:
+	case lopClosurePush:
+	case lopClosureEnter:
+	case lopLet:
+	case lopClosurePop:
+	case lopThrow:
+	case lopRootsSave:
+	case lopRootsRestore:
+	case lopLessPred:
+	case lopLessEqPred:
+	case lopEqualPred:
+	case lopGreaterEqPred:
+	case lopGreaterPred:
+	case lopPushNil:
+	case lopSwap:
 		return 1;
 	case lopMakeList:
 	case lopApplyDynamic:
@@ -429,6 +452,8 @@ static int lBytecodeOpLength(const lBytecodeOp op){
 		return 4;
 	case lopApply:
 		return 5;
+	case lopMacroAst:
+	case lopFn:
 	case lopLambda:
 	case lopMacro:
 		return 4*3+1;

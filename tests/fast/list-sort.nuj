@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun test-sort [times sort-func]
+[defn test-sort [times sort-func]
        [def l #nil]
        [for [i 0 times]
             [set! l [cons [random/rng!] l]]]

@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[defun split/boards [l]
+[defn split/boards [l]
        [def qq #nil]
        [def q #nil]
        [while l
@@ -11,15 +11,15 @@
               [cdr! l]]
        [reverse qq]]
 
-[defun parse/board [board-raw]
+[defn parse/board [board-raw]
        @[:score 0 :order 0 :board [apply array/new [map board-raw [fn [row] [apply array/new [read row]]]]]]]
 
-[defun print/board/line/number [num marks]
+[defn print/board/line/number [num marks]
        [if [marks num]
            [display [ansi-green [string/pad-start num 3]]]
            [display [string/pad-start num 3]]]]
 
-[defun print/board/line [board marks]
+[defn print/board/line [board marks]
        [print/board/line/number [array/ref board 0] marks]
        [print/board/line/number [array/ref board 1] marks]
        [print/board/line/number [array/ref board 2] marks]
@@ -27,35 +27,35 @@
        [print/board/line/number [array/ref board 4] marks]
        [newline]]
 
-[defun bingo/row? [board marks row]
+[defn bingo/row? [board marks row]
        [and [ref marks [ref [ref board row] 0]]
             [ref marks [ref [ref board row] 1]]
             [ref marks [ref [ref board row] 2]]
             [ref marks [ref [ref board row] 3]]
             [ref marks [ref [ref board row] 4]]]]
 
-[defun bingo/rows? [board marks]
+[defn bingo/rows? [board marks]
        [or [bingo/row? board marks 0]
            [bingo/row? board marks 1]
            [bingo/row? board marks 2]
            [bingo/row? board marks 3]
            [bingo/row? board marks 4]]]
 
-[defun bingo/col? [board marks col]
+[defn bingo/col? [board marks col]
        [and [ref marks [ref [ref board 0] col]]
             [ref marks [ref [ref board 1] col]]
             [ref marks [ref [ref board 2] col]]
             [ref marks [ref [ref board 3] col]]
             [ref marks [ref [ref board 4] col]]]]
 
-[defun bingo/cols? [board marks]
+[defn bingo/cols? [board marks]
        [or [bingo/col? board marks 0]
            [bingo/col? board marks 1]
            [bingo/col? board marks 2]
            [bingo/col? board marks 3]
            [bingo/col? board marks 4]]]
 
-[defun bingo? [board marks]
+[defn bingo? [board marks]
        [or [bingo/rows? board marks]
            [bingo/cols? board marks]]]
 
@@ -63,13 +63,13 @@
 [let [[cur-order 0]]
      [set! board/get-order [fn [] [++ cur-order]]]]
 
-[defun board/score! [board marks last-num]
-       [defun board/score/num [a b] [+ a [if [ref marks b] 0 b]]]
-       [defun board/score/row [a b] [reduce b board/score/num a]]
+[defn board/score! [board marks last-num]
+       [defn board/score/num [a b] [+ a [if [ref marks b] 0 b]]]
+       [defn board/score/row [a b] [reduce b board/score/num a]]
        [tree/set! board :score [* last-num [reduce [ref board :board] board/score/row 0]]]
        [tree/set! board :order [board/get-order]]]
 
-[defun print/board [board marks last-num]
+[defn print/board [board marks last-num]
        [if [not [zero? [ref board :order]]]
            [do [println [ansi-rainbow "BINGO!!!!"]]
                [println ["Score: " [ansi-blue [ref board :score]]]]
@@ -82,14 +82,14 @@
        [print/board/line [array/ref [ref board :board] 4] marks]
        [newline]]
 
-[defun check/boards [boards marks last-num]
+[defn check/boards [boards marks last-num]
        [for-each boards
                  [fn [board]
                     [when [and [zero? [ref board :order]]
                                [bingo? [ref board :board] marks]]
                           [board/score! board marks last-num]]]]]
 
-[defun take-turns [boards turns]
+[defn take-turns [boards turns]
        [def marks [array/fill! [array/allocate 100] #f]]
        [while [int? [car turns]]
               [array/set! marks [car turns] #t]

@@ -21,7 +21,7 @@
 
 [def valid-routes 0]
 
-[defun calc-routes [position s twice]
+[defn calc-routes [position s twice]
        [if [== position 'start]
            [++ valid-routes]
            [when-not [and [== position 'end]

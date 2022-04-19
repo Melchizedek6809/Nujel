@@ -47,6 +47,7 @@ typedef enum lOpcode {
 	lopFn              = 0x25,
 	lopMacroAst        = 0x26,
 	lopSwap            = 0x27
+	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
 
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops);

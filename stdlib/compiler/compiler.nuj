@@ -137,8 +137,8 @@
         [def source #nil]
         [def source-next source-raw]
         [def forms-compiled 0]
-        [defun try-again [source]
-               [set! source-next [cons source source-next]]]
+        [defn try-again [source]
+              [set! source-next [cons source source-next]]]
         [while source-next
                [def forms-compiled-last forms-compiled]
                [set! source source-next]

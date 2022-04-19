@@ -4,13 +4,13 @@
 ;
 ; Find the sum of all the multiples of 3 or 5 below 1000.
 
-[defun multiple-of-3? [α]
+[defn multiple-of-3? [α]
        [zero? [% α 3]]]
 
-[defun multiple-of-5? [α]
+[defn multiple-of-5? [α]
        [zero? [% α 5]]]
 
-[defun multiple-of-3-or-5? [α]
+[defn multiple-of-3-or-5? [α]
        [or [multiple-of-3? α]
            [multiple-of-5? α]]]
 
