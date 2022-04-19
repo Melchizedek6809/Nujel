@@ -88,7 +88,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	return r;
 }
 
-static lVal *lnfArrNew(lClosure *c, lVal *v){
+lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	int length = v ? lListLength(v) : 0;
 	lVal *r = lRootsValPush(lValAlloc(ltArray));

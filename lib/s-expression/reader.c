@@ -11,6 +11,7 @@
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
+#include "../operation.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -338,8 +339,6 @@ static lVal *lParseBytecodeOp(lString *s){
 	return ret;
 }
 
-#include "../misc/pf.h"
-
 /* Read a literal array and return it as a lVal */
 static lVal *lParseBytecodeArray(lString *s){
 	u8 *d = NULL;
@@ -464,13 +463,22 @@ static lVal *lParseSpecial(lString *s){
 		return lValBool(false);
 	case '{':
 		return lParseBytecodeArray(s);
+	case '#':
+		s->data++;
+		return lnfArrNew(readClosure, lReadList(s, false));
 	case '[':{
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
 		ret->vList.car = lValSymS(symArr);
 		ret->vList.cdr = lReadList(s,false);
+		return ret; }
+	case '@':{
+		s->data++;
+		lVal *ret = lnfTreeNew(readClosure, lReadList(s,false));
+		if(ret && (ret->type == ltTree)){
+			ret->vTree->flags |= TREE_IMMUTABLE;
+		}
 		return ret;
 	}}
-
 }
 
 /* Read the string in s and parse all escape sequences */

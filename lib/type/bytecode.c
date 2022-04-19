@@ -410,7 +410,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 static int lBytecodeOpLength(lBytecodeOp op){
 	switch(op){
 	default:
-		fprintf(stderr,"Unknown bytecodeOp length: %x\n",op);
+		epf("Unknown bytecodeOp length: %x\n",op);
 		exit(3);
 	case lopNOP:
 	case lopRet:

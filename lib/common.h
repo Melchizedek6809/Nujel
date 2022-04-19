@@ -122,7 +122,9 @@ struct lArray {
 		lArray *nextFree;
 	};
 	i32 length;
+	u8 flags;
 };
+#define ARRAY_IMMUTABLE 1
 
 typedef enum closureType {
 	closureDefault = 0,
@@ -172,20 +174,22 @@ struct lString{
 		const char *data;
 		lString *nextFree;
 	};
-	u16 flags;
+	u8 flags;
 };
-#define HEAP_ALLOCATED 1
+#define HEAP_ALLOCATED 2
 
 struct lTree {
 	lTree *left;
 	lTree *right;
 	const lSymbol *key;
-	int height;
 	union {
 		lVal *value;
 		lTree *nextFree;
 	};
+	i16 height;
+	u8 flags;
 };
+#define TREE_IMMUTABLE 1
 
 struct lNFunc {
 	union {

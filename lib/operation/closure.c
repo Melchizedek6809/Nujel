@@ -149,7 +149,12 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 	}else if(data->key == symCode){
 		clo->text = data->value;
 	}else if(data->key == symData){
-		clo->data = castToTree(data->value,NULL);
+		lTree *newData = castToTree(data->value,NULL);
+		if(newData && (newData->flags & TREE_IMMUTABLE)){
+			lExceptionThrowValClo("type-error","Closures need a mutable data tree", data->value, clo);
+		}else{
+			clo->data = newData;
+		}
 	}else {
 		lExceptionThrowValClo("invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
 	}

@@ -31,7 +31,7 @@ static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 
 /* Write an entire Tree structure, including @[] wrapping */
 static char *writeTree(char *cur, char *bufEnd, const lTree *v){
-	cur = spf(cur,bufEnd,"@[");
+	cur = spf(cur,bufEnd,"#@[");
 	char *new = writeTreeRec(cur, bufEnd, v);
 	if(new != cur){
 		cur = new;
@@ -53,7 +53,7 @@ static char *writeTreeDef(char *cur, char *bufEnd, const lTree *v){
 
 /* Write an entire array including #[] wrapper */
 static char *writeArray(char *cur, char *bufEnd, const lArray *v){
-	cur = spf(cur, bufEnd, "#[");
+	cur = spf(cur, bufEnd, "##[");
 	if(v && v->data != NULL){
 		for(int i=0;i<v->length;i++){
 			cur = spf(cur, bufEnd, "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");

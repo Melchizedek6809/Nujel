@@ -8,7 +8,9 @@ lVal *lnfCat     (lClosure *c, lVal *v);
 lVal *lnfTry     (lClosure *c, lVal *v);
 lVal *lnfDo      (lClosure *c, lVal *v);
 lVal *lnfArrRef  (lClosure *c, lVal *v);
+lVal *lnfArrNew  (lClosure *c, lVal *v);
 lVal *lnfTreeGet (lClosure *c, lVal *v);
+lVal *lnfTreeNew (lClosure *c, lVal *v);
 
 u64 getMSecs     ();
 

@@ -8,15 +8,22 @@
 #include "../type/val.h"
 
 /* [tree/new ...plist] - Return a new tree, initialized with PLIST */
-static lVal *lnfTreeNew(lClosure *c, lVal *v){
+lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
 	lVal *ret = lRootsValPush(lValAlloc(ltTree));
 	ret->vTree = NULL;
 
 	while(v != NULL){
+		lVal *car = lCar(v);
 		const lSymbol *sym = castToSymbol(lCar(v), NULL);
-		if(sym == NULL){break;}
+		if(sym == NULL){
+			if(car == NULL){
+				break;
+			}else{
+				lExceptionThrowValClo("type-error","Expected a :symbol or :keyword, got:", car, c);
+			}
+		}
 		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(v));
 		v = lCddr(v);
 	}
@@ -27,7 +34,7 @@ static lVal *lnfTreeNew(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* [tree/list tree] - eturn a TREE as a plist */
+/* [tree/list tree] - return a TREE as a plist */
 static lVal *lnfTreeGetList(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -102,6 +109,9 @@ static lVal *lnfTreeSet(lClosure *c, lVal *v){
 		car = lValTree(NULL);
 	}else if(car->type != ltTree){
 		lExceptionThrowValClo("type-error","[tree/set!] - needs a :tree", car, c);
+		/* Never Returns */
+	}else if(car->vTree->flags & TREE_IMMUTABLE){
+		lExceptionThrowValClo("type-error","[tree/set!] - needs a MUTABLE :tree", car, c);
 		/* Never Returns */
 	}
 	lTree *tre = car->vTree;
