@@ -28,7 +28,7 @@
 [def test/start [time/milliseconds]]
 [def test/success 0]
 [def test/errors 0]
-[def i]
+[def i 0]
 [defn file/test [path]
        [++ i]
        [def test/start/file [time/milliseconds]]

@@ -60,30 +60,6 @@ lVal *lnfFloat(lClosure *c, lVal *v){
 	}
 }
 
-/* [vec v] - Convert v into a vector value consistig of 3 floats x,y and z */
-lVal *lnfVec(lClosure *c, lVal *v){
-	vec nv = vecNew(0,0,0);
-	if(v == NULL){return lValVec(nv);}
-	if(v->type == ltVec){return v;}
-	if(v->type != ltPair){
-		v = lnfFloat(c,v);
-		return lValVec(vecNew(v->vFloat,v->vFloat,v->vFloat));
-	}
-	int i = 0;
-	forEach(cv,v){
-		lVal *t = lEval(c,lCar(cv));
-		if(t == NULL){break;}
-		if(t->type == ltVec){return t;}
-		t = lnfFloat(c,t);
-		if(t == NULL){break;}
-		for(int ii=i;ii<3;ii++){
-			nv.v[ii] = t->vFloat;
-		}
-		if(++i >= 3){break;}
-	}
-	return lValVec(nv);
-}
-
 /* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
@@ -97,6 +73,41 @@ static lVal *lCastString(lClosure *c, lVal *v){
 	return lValString(dispWriteBuf);
 }
 
+static lVal *lCastInt(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	case ltInt:
+		return v;
+	case ltFloat:
+		return lValInt(v->vFloat);
+	default:
+		lExceptionThrowValClo("type-error", "Can't convert this to a :int", v, c);
+	}
+}
+
+static lVal *lCastFloat(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	case ltFloat:
+		return v;
+	case ltInt:
+		return lValFloat(v->vInt);
+	default:
+		lExceptionThrowValClo("type-error", "Can't convert this to a :float", v, c);
+	}
+}
+
+static lVal *lCastVec(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	case ltVec:
+		return v;
+	case ltInt:
+		return lValVec(vecNew(v->vInt, v->vInt, v->vInt));
+	case ltFloat:
+		return lValVec(vecNew(v->vFloat, v->vFloat, v->vFloat));
+	default:
+		lExceptionThrowValClo("type-error", "Can't convert this to a :vec", v, c);
+	}
+}
+
 /* Cast all values in list v to be of type t */
 lVal *lCast(lClosure *c, lVal *v, lType t){
 	switch(t){
@@ -105,11 +116,11 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 	case ltString:
 		return lMap(c,v,lCastString);
 	case ltInt:
-		return lMap(c,v,lnfInt);
+		return lMap(c,v,lCastInt);
 	case ltFloat:
-		return lMap(c,v,lnfFloat);
+		return lMap(c,v,lCastFloat);
 	case ltVec:
-		return lMap(c,v,lnfVec);
+		return lMap(c,v,lCastVec);
 	case ltBool:
 		return lMap(c,v,lnfBool);
 	case ltNoAlloc:
@@ -183,7 +194,6 @@ void lOperationsTypeSystem(lClosure *c){
 	lAddNativeFunc(c,"bool",            "[α]",     "Convert α into a boolean value, true or false", lnfBool);
 	lAddNativeFunc(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
 	lAddNativeFunc(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
-	lAddNativeFunc(c,"vec",             "[x y z]", "Convert α into a vector value consistig of 3 floats x,y and z", lnfVec);
 	lAddNativeFunc(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfCat);
 	lAddNativeFunc(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
 	lAddNativeFunc(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);

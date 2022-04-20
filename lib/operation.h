@@ -11,6 +11,8 @@ lVal *lnfArrRef  (lClosure *c, lVal *v);
 lVal *lnfArrNew  (lClosure *c, lVal *v);
 lVal *lnfTreeGet (lClosure *c, lVal *v);
 lVal *lnfTreeNew (lClosure *c, lVal *v);
+lVal *lnfVec     (lClosure *c, lVal *v);
+lVal *lnfFloat   (lClosure *c, lVal *v);
 
 u64 getMSecs     ();
 

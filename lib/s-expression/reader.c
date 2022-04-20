@@ -466,6 +466,9 @@ static lVal *lParseSpecial(lString *s){
 	case '#':
 		s->data++;
 		return lnfArrNew(readClosure, lReadList(s, false));
+	case 'v':
+		s->data++;
+		return lnfVec(readClosure, lReadList(s, false));
 	case '[':{
 		lVal *ret = lRootsValPush(lCons(NULL,NULL));
 		ret->vList.car = lValSymS(symArr);
@@ -474,9 +477,7 @@ static lVal *lParseSpecial(lString *s){
 	case '@':{
 		s->data++;
 		lVal *ret = lnfTreeNew(readClosure, lReadList(s,false));
-		if(ret && (ret->type == ltTree)){
-			ret->vTree->flags |= TREE_IMMUTABLE;
-		}
+		ret->vTree->flags |= TREE_IMMUTABLE;
 		return ret;
 	}}
 }

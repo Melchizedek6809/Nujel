@@ -43,9 +43,7 @@
 
 [defn tree/reduce [l o s]
        "Combine all elements in l using operation o and starting value s"
-       [for-in [e [tree/keys l]]
-               [set! s [o [tree/ref l e] s e]]]
-       s]
+       [list/reduce [tree/values l] o s]]
 
 [defn tree/filter [l f]
        "Return a new tree with all elements from L where F retunrs true"

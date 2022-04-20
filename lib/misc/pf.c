@@ -246,7 +246,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		ret = spf(cur , bufEnd, "%f" ,v->vFloat);
 		break;
 	case ltVec:
-		ret = spf(cur, bufEnd, "[vec %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
+		ret = spf(cur, bufEnd, "#v[%f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
 		break;
 	case ltString:
 		ret = spf(buf, bufEnd, display ? "%s" : "%S", v->vString->data);
