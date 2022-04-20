@@ -35,15 +35,15 @@
              [cadddr source]
              [compile [caddddr source]]]]
 
-[defn compile/macro* [source]
-       [list 'macro*
+[defn compile/fn* [source]
+       [list 'fn*
              [cadr source]
              [caddr source]
              [cadddr source]
              [compile [caddddr source]]]]
 
-[defn compile/fn* [source]
-       [list 'fn*
+[defn compile/macro* [source]
+       [list 'macro*
              [cadr source]
              [caddr source]
              [cadddr source]
@@ -180,8 +180,14 @@
                                                                 bytecompile
                                                                 assemble*]]]]
 
-[defmac test-macro [v]
-        [list [+ 1 v]]]
+[defmacro macro [args . body]
+          "Return a new bytecoded macro"
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [list macro* name args doc-string [-> [cons 'do body]
+                                                [compile [current-closure]]
+                                                bytecompile
+                                                assemble*]]]
 
 [defmacro μ [args . body]
           "Define a λ with the self-hosting Nujel compiler"

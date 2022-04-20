@@ -34,7 +34,7 @@ static lVal *lnfMacroApply(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
 		return NULL;
 	}
-	return lMacro(c, lCadr(v),fun);
+	return lLambda(c, lCadr(v), fun);
 }
 
 void lOperationsEval(lClosure *c){

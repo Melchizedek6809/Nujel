@@ -132,14 +132,14 @@
 [defn bytecompile/λ* [source env]
        [apply $lambda [cdr source]]]
 
-[defn bytecompile/μ* [source env]
-       [apply $macro [cdr source]]]
-
 [defn bytecompile/fn* [source env]
        [apply $fn [cdr source]]]
 
 [defn bytecompile/macro* [source env]
        [apply $macro* [cdr source]]]
+
+[defn bytecompile/μ* [source env]
+       [apply $macro [cdr source]]]
 
 [defn bytecompile/ω*  [source env]
        [list [$let]
@@ -184,8 +184,8 @@
                                   [and    [bytecompile/and     source env]]
                                   [or     [bytecompile/or      source env]]
                                   [fn*    [bytecompile/fn*     source env]]
-                                  [macro* [bytecompile/macro*  source env]]
                                   [λ*    [bytecompile/λ*     source env]]
+                                  [macro* [bytecompile/macro*  source env]]
                                   [μ*    [bytecompile/μ*     source env]]
                                   [ω*    [bytecompile/ω*     source env]]
                                   [try    [bytecompile/try     source env]]

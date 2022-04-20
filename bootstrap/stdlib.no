@@ -3277,8 +3277,8 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $macro [fn* $macro [name args docs body] "" #{
-05v #$12
+}]] [def $fn [fn* $fn [name args docs body] "" #{
+05v #$25
 10s name
 08i 1 v val->bytecode-op
 10s args
@@ -3289,8 +3289,8 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $fn [fn* $fn [name args docs body] "" #{
-05v #$25
+}]] [def $macro [fn* $macro [name args docs body] "" #{
+05v #$12
 10s name
 08i 1 v val->bytecode-op
 10s args
@@ -3999,12 +3999,6 @@
 08i 1 v cdr
 08i 2 v apply
 01
-}]] [def bytecompile/μ* [fn* bytecompile/μ* [source env] "" #{
-10s $macro
-10s source
-08i 1 v cdr
-08i 2 v apply
-01
 }]] [def bytecompile/fn* [fn* bytecompile/fn* [source env] "" #{
 10s $fn
 10s source
@@ -4013,6 +4007,12 @@
 01
 }]] [def bytecompile/macro* [fn* bytecompile/macro* [source env] "" #{
 10s $macro*
+10s source
+08i 1 v cdr
+08i 2 v apply
+01
+}]] [def bytecompile/μ* [fn* bytecompile/μ* [source env] "" #{
+10s $macro
 10s source
 08i 1 v cdr
 08i 2 v apply
@@ -4176,20 +4176,20 @@
 08i 2 v bytecompile/fn*
 09o 204
 10s ΓεnΣym-83
-10s macro*
-20
-0Bo 19
-10s source
-10s env
-08i 2 v bytecompile/macro*
-09o 176
-10s ΓεnΣym-83
 10s λ*
 20
 0Bo 19
 10s source
 10s env
 08i 2 v bytecompile/λ*
+09o 176
+10s ΓεnΣym-83
+10s macro*
+20
+0Bo 19
+10s source
+10s env
+08i 2 v bytecompile/macro*
 09o 148
 10s ΓεnΣym-83
 10s μ*
@@ -4391,8 +4391,8 @@
 08i 1 v compile
 08i 5 v list
 01
-}]] [def compile/macro* [fn* compile/macro* [source] "" #{
-23s macro*
+}]] [def compile/fn* [fn* compile/fn* [source] "" #{
+23s fn*
 10s source
 08i 1 v cadr
 10s source
@@ -4404,8 +4404,8 @@
 08i 1 v compile
 08i 5 v list
 01
-}]] [def compile/fn* [fn* compile/fn* [source] "" #{
-23s fn*
+}]] [def compile/macro* [fn* compile/macro* [source] "" #{
+23s macro*
 10s source
 08i 1 v cadr
 10s source
@@ -4948,13 +4948,7 @@
 10s environment
 08i 2 v compile
 01
-}]] [def defmacro [μ* defmacro [name args . body] "Define a new macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def defmac [μ* defmac [name args . body] "Define a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def test-macro [macro* test-macro [v] "" #{
-02i 1
-10s v
-08i 2 v +
-08i 1 v list
-01
-}]] [def μ [μ* μ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [list fn* 'anonymous args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list fn* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defmacro [μ* defmacro [name args . body] "Define a new macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def defmac [μ* defmac [name args . body] "Define a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def macro [μ* macro [args . body] "Return a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def μ [μ* μ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [list fn* 'anonymous args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list fn* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18o 24
 10s expr

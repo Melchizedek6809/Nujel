@@ -30,34 +30,6 @@ void lInit(){
 	lTreeInit();
 }
 
-/* Evaluate the Nujel Macro and return the results */
-lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
-	(void)c;
-	if(lambda->type != ltMacro){
-		lExceptionThrowValClo("macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lambda, c);
-	}
-	const int SP = lRootsGet();
-	lVal *vn = args;
-	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
-	tmpc->text = lambda->vClosure->text;
-	tmpc->name = lambda->vClosure->name;
-	tmpc->type = closureCall;
-	tmpc->caller = c;
-	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
-		if(n->type == ltPair){
-			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
-			vn = lCdr(vn);
-		}else if(n->type == ltSymbol){
-			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
-		}else{
-			lExceptionThrowValClo("invalid-macro", "Incorrect type in argument list", lambda, c);
-		}
-	}
-	lVal *ret = lEval(tmpc,lambda->vClosure->text);
-	lRootsRet(SP);
-	return ret;
-}
-
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
