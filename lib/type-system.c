@@ -20,46 +20,6 @@
 
 #include <stdlib.h>
 
-/* [int v] - Convert v into an integer number */
-lVal *lnfInt(lClosure *c, lVal *v){
-	if(v == NULL){return lValInt(0);}
-	switch(v->type){
-	default: return lValInt(0);
-	case ltBool:
-		return lValInt(v->vBool ? 1 : 0);
-	case ltInt:
-		return v;
-	case ltFloat:
-		return lValInt(v->vFloat);
-	case ltVec:
-		return lValInt(v->vVec.x);
-	case ltString:
-		if(v->vString == NULL){return lValInt(0);}
-		return lValInt(atoi(v->vString->data));
-	case ltPair:
-		return lnfInt(c,lCar(v));
-	}
-}
-
-/* [float v] - Convert v into a floating-point number */
-lVal *lnfFloat(lClosure *c, lVal *v){
-	if(v == NULL){return lValFloat(0);}
-	switch(v->type){
-	default: return lValFloat(0);
-	case ltFloat:
-		return v;
-	case ltInt:
-		return lValFloat(v->vInt);
-	case ltVec:
-		return lValFloat(v->vVec.x);
-	case ltString:
-		if(v->vString == NULL){return lValFloat(0);}
-		return lValFloat(atof(v->vString->data));
-	case ltPair:
-		return lnfFloat(c,v->vList.car);
-	}
-}
-
 /* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
@@ -84,6 +44,11 @@ static lVal *lCastInt(lClosure *c, lVal *v){
 	}
 }
 
+/* [int v] - Convert v into an integer number */
+lVal *lnfInt(lClosure *c, lVal *v){
+	return lCastInt(c, lCar(v));
+}
+
 static lVal *lCastFloat(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
 	case ltFloat:
@@ -93,6 +58,11 @@ static lVal *lCastFloat(lClosure *c, lVal *v){
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert this to a :float", v, c);
 	}
+}
+
+/* [float v] - Convert v into a floating-point number */
+lVal *lnfFloat(lClosure *c, lVal *v){
+	return lCastFloat(c,lCar(v));
 }
 
 static lVal *lCastVec(lClosure *c, lVal *v){

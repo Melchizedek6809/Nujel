@@ -174,8 +174,17 @@
             [otherwise [split/string str separator 0]]]]
 
 [defn read/single [text]
+      "Uses the reader and returns the first single value read from string TEXT"
       [typecheck/only text :string]
       [car [read text]]]
+
+[defn read/int [text]
+      "Reads the first string from TEXT"
+      [int [read/single text]]]
+
+[defn read/float [text]
+      "Reads the first float from TEXT"
+      [float [read/single text]]]
 
 [defn string/length?! [chars]
        [fn [a] [== chars [string/length a]]]]

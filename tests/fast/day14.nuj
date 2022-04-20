@@ -4,9 +4,15 @@
        [def eles @[]]
        [def pairs @[]]
        [for [i 0 [string/length line]]
-            [tree/++ eles [str->sym [string/cut line i [+ i 1]]]]
+            [def key-a [str->sym [string/cut line i [+ i 1]]]]
+            [if [tree/has? eles key-a]
+                [tree/++ eles key-a]
+                [tree/set! eles key-a 1]]
             [when [< i [- [string/length line] 1]]
-                  [tree/++ pairs [str->sym [string/cut line i [+ i 2]]]]]]
+                  [def key-b [str->sym [string/cut line i [+ i 2]]]]
+                  [if [tree/has? pairs key-b]
+                      [tree/++ pairs key-b]
+                      [tree/set! pairs key-b 1]]]]
        @[:pairs pairs :eles eles :combinations '[]]]
 
 [defn combination/parse [recipe last-recipe]
@@ -15,7 +21,7 @@
        [def new-α [str->sym [cat [string/cut [car recipe] 0 1] [cadr recipe]]]]
        [def new-β [str->sym [cat [cadr recipe] [string/cut [car recipe] 1 2]]]]
        [fn [α Ω]
-          [def count [int [ref [ref α :pairs] source]]]
+          [def count [int [or [ref [ref α :pairs] source] 0]]]
           [tree/+= [ref Ω :eles] new count]
           [tree/+= [ref Ω :pairs] source [- count]]
           [tree/+= [ref Ω :pairs] new-α count]
@@ -42,7 +48,8 @@
 
 [defn state/run/many [α steps]
        [if [<= steps 0] α
-           [state/run/many [state/run/once α] [- steps 1]]]]
+           [state/run/many [state/run/once α]
+                           [- steps 1]]]]
 
 [defn result [state]
   [- [max [tree/values [ref state :eles]]]

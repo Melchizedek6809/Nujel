@@ -9,7 +9,7 @@
 [def p2-res 0]
 
 [defn map/set/row [data y line w]
-       [def cols [map [split line ""] int]]
+       [def cols [map [split line ""] read/int]]
        [for [x 0 w]
             [array/2d/set! data x y [car cols]]
             [cdr! cols]]]

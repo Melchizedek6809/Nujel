@@ -43,7 +43,7 @@
        @[:part1 low-point-sum :part2 [apply * biggest-3-basins]]]
 
 [defn map/set/row [data y line w]
-       [def cols [map [split line ""] int]]
+       [def cols [map [split line ""] read/int]]
        [for [x 0 w]
             [array/2d/set! data x y [car cols]]
             [cdr! cols]]]
