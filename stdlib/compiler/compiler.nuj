@@ -166,12 +166,6 @@
        [compile source-raw environment]]
 
 [defmacro defmacro [name args . body]
-          "Define a new macro"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]
-
-[defmacro defmac [name args . body]
           "Define a new bytecoded macro"
           [def doc-string [if-not [string? [car body]] ""
                                   [car body]]]
@@ -184,16 +178,10 @@
           "Return a new bytecoded macro"
           [def doc-string [if-not [string? [car body]] ""
                                   [car body]]]
-          [list macro* name args doc-string [-> [cons 'do body]
+          [list macro* #nil args doc-string [-> [cons 'do body]
                                                 [compile [current-closure]]
                                                 bytecompile
                                                 assemble*]]]
-
-[defmacro μ [args . body]
-          "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]
 
 [defmacro fn [args . body]
           "Define a λδ with the self-hosting Nujel compiler"

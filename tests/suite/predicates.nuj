@@ -83,7 +83,7 @@
 [test/add #f [== '[1] '[1]]]
 [test/add #t [list/equal? '[1] '[1]]]
 [test/add #f [== '[] #nil]]
-[test/add #t [macro? [μ [] #f]]]
+[test/add #t [macro? [macro [] #f]]]
 [test/add #t [macro? +1]]
 [test/add #f [macro? min]]
 [test/add #f [macro? 123]]

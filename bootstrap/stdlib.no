@@ -4948,7 +4948,7 @@
 10s environment
 08i 2 v compile
 01
-}]] [def defmacro [μ* defmacro [name args . body] "Define a new macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]] [def defmac [μ* defmac [name args . body] "Define a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def macro [μ* macro [args . body] "Return a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def μ [μ* μ [args . body] "Define a λ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]]] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [list fn* 'anonymous args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list fn* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defmacro [μ* defmacro [name args . body] "Define a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def macro [μ* macro [args . body] "Return a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list macro* #nil args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [list fn* 'anonymous args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list fn* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18o 24
 10s expr
@@ -6237,7 +6237,10 @@
 09o 4
 24
 01
-}]] [def let [μ* let [bindings . body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append body #nil]]] #nil]]]] [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]] [def when-let [μ* when-let [binding . body] "" [cons 'if-let [cons binding [cons [cons 'do body] [cons #nil #nil]]]]]]][do [def comment [μ* comment body "Does nothing" #nil]] [def += [μ* += [val inc] "" [cons 'set! [cons val [cons [cons '+ [cons val [cons inc #nil]]] #nil]]]]] [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]] [def not [fn* not [v] "Return true if V is false" #{
+}]] [def let [μ* let [bindings . body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append body #nil]]] #nil]]]] [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]] [def when-let [μ* when-let [binding . body] "" [cons 'if-let [cons binding [cons [cons 'do body] [cons #nil #nil]]]]]]][do [def comment [macro* comment body "Does nothing" #{
+24
+01
+}]] [def += [μ* += [val inc] "" [cons 'set! [cons val [cons [cons '+ [cons val [cons inc #nil]]] #nil]]]]] [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]] [def not [fn* not [v] "Return true if V is false" #{
 10s v
 0Bo 10
 05v #f
@@ -6344,7 +6347,18 @@
 08i 1 v str->sym
 08i 1 v symbol->keyword
 01
-}]]][do [def if-not [μ* if-not [pred then else] "" [cons 'if [cons pred [cons else [cons then #nil]]]]]] [def when-not [μ* when-not [pred . body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append body #nil]] #nil]]]]]] [def when [μ* when [pred . body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append body #nil]] [cons #nil #nil]]]]]] [def case/clauses/multiple [fn* case/clauses/multiple [key-sym cases] "" #{
+}]]][do [def if-not [macro* if-not [pred then else] "" #{
+23s if
+10s pred
+10s else
+10s then
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def when-not [μ* when-not [pred . body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append body #nil]] #nil]]]]]] [def when [μ* when [pred . body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append body #nil]] [cons #nil #nil]]]]]] [def case/clauses/multiple [fn* case/clauses/multiple [key-sym cases] "" #{
 10s cases
 0Bo 51
 23s ==
@@ -7040,7 +7054,22 @@
 08i 2 v ash
 08i 2 v logior
 01
-}]][do [def PI 3.14159] [def π 3.14159] [def ++ [μ* ++ [i] "Increment I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons 1 [cons i #nil]]] #nil]]]]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
+}]][do [def PI 3.14159] [def π 3.14159] [def ++ [macro* ++ [i] "Increment I by 1 and store the result in I" #{
+23s set!
+10s i
+23s +
+02i 1
+10s i
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
 25v anonymous v [β] v "" v #{
 10s α
 10s β
@@ -7092,23 +7121,23 @@
 }]]][do [def display/error/wrap [fn* display/error/wrap [i text] "" #{
 15
 10s i
-0Es ΓεnΣym-1
+0Es ΓεnΣym-111
 0D
-10s ΓεnΣym-1
+10s ΓεnΣym-111
 02i 0
 20
 0Bo 15
 10s text
 08i 1 v ansi-red
 09o 78
-10s ΓεnΣym-1
+10s ΓεnΣym-111
 02i 1
 20
 0Bo 15
 10s text
 08i 1 v string
 09o 56
-10s ΓεnΣym-1
+10s ΓεnΣym-111
 02i 2
 20
 0Bo 20
@@ -7116,7 +7145,7 @@
 08i 1 v str/write
 08i 1 v ansi-yellow
 09o 29
-10s ΓεnΣym-1
+10s ΓεnΣym-111
 02i 3
 20
 0Bo 15
@@ -7338,21 +7367,21 @@
 15
 10s v
 08i 1 v type-of
-0Es ΓεnΣym-111
+0Es ΓεnΣym-113
 0D
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :nil
 20
 0Bo 10
 05v "null"
 09o 305
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :int
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :float
 20
 0C
@@ -7363,7 +7392,7 @@
 10s v
 08i 1 v string
 09o 258
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :bool
 20
 0Bo 24
@@ -7373,13 +7402,13 @@
 09o 7
 05v "false"
 09o 225
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :pair
 20
 0C
@@ -7396,14 +7425,14 @@
 05v "]"
 08i 3 v cat
 09o 152
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :string
 20
 0Bo 15
 10s v
 08i 1 v str/write
 09o 128
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :symbol
 20
 0Bo 28
@@ -7413,7 +7442,7 @@
 05v "\""
 08i 3 v cat
 09o 91
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :keyword
 20
 0Bo 28
@@ -7423,7 +7452,7 @@
 05v "\""
 08i 3 v cat
 09o 54
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 05v :tree
 20
 0Bo 15
@@ -7707,13 +7736,13 @@
 0Es i
 0D
 10s width
-0Es ΓεnΣym-112
+0Es ΓεnΣym-115
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-112
+10s ΓεnΣym-115
 1E
 0Bo 28
 0D
@@ -7777,63 +7806,63 @@
 02i 1
 08i 2 v -
 08i 2 v char-at
-0Es ΓεnΣym-117
+0Es ΓεnΣym-123
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 57
 20
 0C
@@ -7886,7 +7915,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 659
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 63
 20
 0Bo 55
@@ -7903,7 +7932,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 597
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 88
 20
 0Bo 55
@@ -7920,7 +7949,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 535
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 120
 20
 0Bo 55
@@ -7937,7 +7966,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 473
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 100
 20
 0Bo 55
@@ -7954,7 +7983,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 411
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 111
 20
 0Bo 55
@@ -7971,7 +8000,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 349
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 98
 20
 0Bo 55
@@ -7988,7 +8017,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 287
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 60
 20
 0Bo 55
@@ -8005,7 +8034,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 225
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 94
 20
 0Bo 55
@@ -8022,7 +8051,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 163
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 62
 20
 0Bo 55
@@ -8039,7 +8068,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 101
-10s ΓεnΣym-117
+10s ΓεnΣym-123
 02i 46
 20
 0Bo 64
@@ -8087,9 +8116,9 @@
 10s opts
 05v :base
 08i 2 v tree/ref
-0Es ΓεnΣym-118
+0Es ΓεnΣym-124
 0D
-10s ΓεnΣym-118
+10s ΓεnΣym-124
 05v :binary
 20
 0Bo 41
@@ -8102,7 +8131,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 207
-10s ΓεnΣym-118
+10s ΓεnΣym-124
 05v :octal
 20
 0Bo 41
@@ -8115,7 +8144,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 157
-10s ΓεnΣym-118
+10s ΓεnΣym-124
 05v :decimal
 20
 0Bo 41
@@ -8128,7 +8157,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 107
-10s ΓεnΣym-118
+10s ΓεnΣym-124
 05v :hexadecimal
 20
 0Bo 41
@@ -8141,7 +8170,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 57
-10s ΓεnΣym-118
+10s ΓεnΣym-124
 05v :HEXADECIMAL
 20
 0Bo 41
@@ -8212,21 +8241,21 @@
 10s opts
 05v :align
 08i 2 v tree/ref
-0Es ΓεnΣym-119
+0Es ΓεnΣym-125
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-125
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-119
+10s ΓεnΣym-125
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-119
+10s ΓεnΣym-125
 05v :left
 20
 0Bo 10
@@ -8483,7 +8512,7 @@
 10s arg
 08i 3 v list
 01
-}]] [def fmt [μ* fmt [format-string . args] "Return a formatted string" [do [if [string? format-string] #nil [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [let* [do [def i 0] [def ΓεnΣym-120 [string/length format-string]] [while [< i ΓεnΣym-120] [do [let* [do [def ΓεnΣym-121 [char-at format-string i]] [if [== ΓεnΣym-121 123] [do [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [set! cuts [cons i cuts]]] [if [== ΓεnΣym-121 125] [do [if [int? [car cuts]] #nil [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]] #nil]]]] [set! i [add/int 1 i]]]]]] [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [array/fill! [array/allocate [length args]] #f]] [set! fmt/expr/count [array/length arguments-used]] [let* [do [def ΓεnΣym-122 cuts] [if ΓεnΣym-122 [while ΓεnΣym-122 [do [def c [car ΓεnΣym-122]] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [if [== "" lit] #nil [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]] [set! ΓεnΣym-122 [cdr ΓεnΣym-122]]]] #nil]]] [if [> last-pos 0] [do [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] #nil] [let* [do [def i 0] [def ΓεnΣym-123 [array/length arguments-used]] [while [< i ΓεnΣym-123] [do [if [array/ref arguments-used i] #nil [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]] [set! i [add/int 1 i]]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [set! fmt/args/map-fun/count 0] [if args [cons 'let* [append [map args fmt/args/map-fun] [cons expr #nil]]] expr]]]] [def pfmt [μ* pfmt [format-string . args] "Print a formatted string" [cons 'print [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmt [μ* efmt [format-string . args] "Print a formatted string" [cons 'error [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def pfmtln [μ* pfmtln [format-string . args] "Print a formatted string" [cons 'println [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmtln [μ* efmtln [format-string . args] "Print a formatted string" [cons 'errorln [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
+}]] [def fmt [μ* fmt [format-string . args] "Return a formatted string" [do [if [string? format-string] #nil [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [let* [do [def i 0] [def ΓεnΣym-126 [string/length format-string]] [while [< i ΓεnΣym-126] [do [let* [do [def ΓεnΣym-127 [char-at format-string i]] [if [== ΓεnΣym-127 123] [do [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [set! cuts [cons i cuts]]] [if [== ΓεnΣym-127 125] [do [if [int? [car cuts]] #nil [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]] #nil]]]] [set! i [add/int 1 i]]]]]] [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [array/fill! [array/allocate [length args]] #f]] [set! fmt/expr/count [array/length arguments-used]] [let* [do [def ΓεnΣym-128 cuts] [if ΓεnΣym-128 [while ΓεnΣym-128 [do [def c [car ΓεnΣym-128]] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [if [== "" lit] #nil [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]] [set! ΓεnΣym-128 [cdr ΓεnΣym-128]]]] #nil]]] [if [> last-pos 0] [do [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] #nil] [let* [do [def i 0] [def ΓεnΣym-129 [array/length arguments-used]] [while [< i ΓεnΣym-129] [do [if [array/ref arguments-used i] #nil [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]] [set! i [add/int 1 i]]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [set! fmt/args/map-fun/count 0] [if args [cons 'let* [append [map args fmt/args/map-fun] [cons expr #nil]]] expr]]]] [def pfmt [μ* pfmt [format-string . args] "Print a formatted string" [cons 'print [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmt [μ* efmt [format-string . args] "Print a formatted string" [cons 'error [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def pfmtln [μ* pfmtln [format-string . args] "Print a formatted string" [cons 'println [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmtln [μ* efmtln [format-string . args] "Print a formatted string" [cons 'errorln [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
 10s α
 08i 1 v str->sym
 08i 1 v symbol->keyword
@@ -8500,13 +8529,13 @@
 0D
 10s a
 08i 1 v string/length
-0Es ΓεnΣym-124
+0Es ΓεnΣym-133
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-124
+10s ΓεnΣym-133
 1E
 0Bo 45
 0D
@@ -8574,9 +8603,9 @@
 15
 10s ext
 08i 1 v type-of
-0Es ΓεnΣym-125
+0Es ΓεnΣym-134
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-134
 05v :string
 20
 0Bo 19
@@ -8589,7 +8618,7 @@
 01
 }
 09o 53
-10s ΓεnΣym-125
+10s ΓεnΣym-134
 05v :pair
 20
 0Bo 19
@@ -9137,9 +9166,9 @@
 15
 10s separator
 08i 1 v string/length
-0Es ΓεnΣym-126
+0Es ΓεnΣym-135
 0D
-10s ΓεnΣym-126
+10s ΓεnΣym-135
 02i 0
 20
 0Bo 15
@@ -9414,17 +9443,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-127
+0Es ΓεnΣym-137
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-137
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-127
+10s ΓεnΣym-137
 0Bo 74
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-137
 08i 1 v car
 0Es cur-test
 0D
@@ -9439,9 +9468,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-137
 08i 1 v cdr
-0Fs ΓεnΣym-127
+0Fs ΓεnΣym-137
 09o -76
 09o 4
 24
