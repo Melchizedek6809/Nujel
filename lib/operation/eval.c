@@ -4,6 +4,7 @@
 #include "../collection/list.h"
 #include "../type/closure.h"
 #include "../type/native-function.h"
+#include "../exception.h"
 
 /* [eval* expr] - Evaluate the already compiled EXPR */
 static lVal *lnfEvalRaw(lClosure *c, lVal *v){
@@ -13,23 +14,26 @@ static lVal *lnfEvalRaw(lClosure *c, lVal *v){
 /* Handler for [apply fn list] */
 static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
-	if(fun == NULL){return NULL;}
-	lVal *resolved = fun;
-	if(resolved->type == ltSymbol){
-		resolved = lGetClosureSym(c,fun->vSymbol);
+	switch(fun ? fun->type : ltNoAlloc){
+	default:
+		lExceptionThrowValClo("type-error", "Can't apply to that", v, c);
+		return NULL;
+	case ltObject:
+	case ltLambda:
+	case ltNativeFunc:
+	case ltSpecialForm:
+		break;
 	}
-	return lApply(c, lCadr(v), resolved, fun);
+	return lApply(c, lCadr(v), fun, fun);
 }
 
 /* Handler for [apply fn list] */
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
-	if(fun == NULL){return NULL;}
-	if(fun->type == ltSymbol){ fun = lGetClosureSym(c,fun->vSymbol); }
-	if(fun->type != ltMacro){
-		fun = lEval(c,fun);
+	if((fun == NULL) || (fun->type != ltMacro)){
+		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
+		return NULL;
 	}
-
 	return lMacro(c, lCadr(v),fun);
 }
 

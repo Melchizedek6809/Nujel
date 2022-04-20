@@ -165,30 +165,29 @@
        [load/forms source-raw environment]
        [compile source-raw environment]]
 
-[def defmacro [μ* defmacro [name args . body]
-              "Define a new macro"
-              [do [def doc-string [if-not [string? [car body]] ""
-                                          [car body]]]
-                  [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]]]
+[defmacro defmacro [name args . body]
+          "Define a new macro"
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [list 'def name [compile [list 'μ* name args doc-string [cons 'do body]] [current-closure]]]]
 
-[defmacro defun [name args . body]
-              "Define a new function"
-              [def doc-string [if-not [string? [car body]] ""
-                                      [car body]]]
-              [list 'def name [compile [list 'λ* name args doc-string [cons 'do body]] [current-closure]]]]
+[defmacro defmac [name args . body]
+          "Define a new bytecoded macro"
+          [def doc-string [if-not [string? [car body]] ""
+                                  [car body]]]
+          [list 'def name [list macro* name args doc-string [-> [cons 'do body]
+                                                                [compile [current-closure]]
+                                                                bytecompile
+                                                                assemble*]]]]
+
+[defmac test-macro [v]
+        [list [+ 1 v]]]
 
 [defmacro μ [args . body]
           "Define a λ with the self-hosting Nujel compiler"
           [def doc-string [if-not [string? [car body]] ""
                                   [car body]]]
           [compile [list 'μ* #nil args doc-string [cons 'do body]] [current-closure]]]
-
-[defmacro \ [args . body]
-          "Define a λ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [compile [list 'λ* #nil args doc-string [cons 'do body]] [current-closure]]]
-[def λ \]
 
 [defmacro fn [args . body]
           "Define a λδ with the self-hosting Nujel compiler"

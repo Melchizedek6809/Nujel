@@ -380,7 +380,41 @@
 10s command
 08i 1 v popen
 01
-}]] [def repl/run-forked [μ* repl/run-forked [expr] "" [cons 'repl/run-forked* [cons [list 'quote expr] #nil]]]] [tree/set! repl/option-map 'b [λ* #nil [option] "" [do [set! repl/parse-args/bytecode-eval-n #t] [set! repl/parse-args/run-repl #f]]]] [tree/set! repl/option-map 'h [λ* #nil [option] "" [do [repl/print-help] [set! repl/parse-args/run-repl #f]]]] [tree/set! repl/option-map 'no-color [λ* #nil [option] "" [set! ansi/disabled ""]]] [tree/set! repl/option-map 'color [λ* #nil [option] "" [set! ansi/disabled #f]]] [tree/set! repl/option-map 'x [λ* #nil [option] "" [do [set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]]] [tree/set! repl/option-map :default [λ* #nil [option] "" [tree/set! repl/options option #t]]] [def repl/parse-option [fn* repl/parse-option [option] "" #{
+}]] [def repl/run-forked [μ* repl/run-forked [expr] "" [cons 'repl/run-forked* [cons [list 'quote expr] #nil]]]] [tree/set! repl/option-map 'b [fn* anonymous [option] "" #{
+05v #t
+0Fs repl/parse-args/bytecode-eval-n
+0D
+05v #f
+0Fs repl/parse-args/run-repl
+01
+}]] [tree/set! repl/option-map 'h [fn* anonymous [option] "" #{
+08i 0 v repl/print-help
+0D
+05v #f
+0Fs repl/parse-args/run-repl
+01
+}]] [tree/set! repl/option-map 'no-color [fn* anonymous [option] "" #{
+05v ""
+0Fs ansi/disabled
+01
+}]] [tree/set! repl/option-map 'color [fn* anonymous [option] "" #{
+05v #f
+0Fs ansi/disabled
+01
+}]] [tree/set! repl/option-map 'x [fn* anonymous [option] "" #{
+05v #t
+0Fs repl/parse-args/eval-next
+0D
+05v #f
+0Fs repl/parse-args/run-repl
+01
+}]] [tree/set! repl/option-map :default [fn* anonymous [option] "" #{
+10s repl/options
+10s option
+05v #t
+08i 3 v tree/set!
+01
+}]] [def repl/parse-option [fn* repl/parse-option [option] "" #{
 10s repl/option-map
 10s option
 08i 2 v ref

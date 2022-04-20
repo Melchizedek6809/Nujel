@@ -29,3 +29,4 @@
 [test/add :type-error [try car [int "a1"]]]
 [test/add :type-error [try car [int "1a"]]]
 [test/add :type-error [try car [int "1 a"]]]
+[test/add :type-error [try car [def cb '+] [apply cb]]]
