@@ -43,7 +43,7 @@
        "Map an array, [map] should be preferred"
        [def len [array/length arr]]
        [for [i 0 len]
-              [array/set! arr i [fun [array/ref arr i]]]]
+            [array/set! arr i [fun [array/ref arr i]]]]
        arr]
 
 [defn array/filter [arr pred]
@@ -71,17 +71,18 @@
                                [set! i [array/length a]]]]
                 ret]]]
 
-[defn array/push [arr . val]
-       "Append all arguments following ARR to ARR"
-       [for-in [v val]
-              [array/length! arr [+ 1 [array/length arr]]]
-              [array/set! arr [- [array/length arr] 1] v]]
-       arr]
+[defn array/push [arr val]
+      "Append VAL to ARR"
+      [-> arr
+          [array/length! [+ 1 [array/length arr]]]
+          [array/set! [- [array/length arr] 1] val]]]
 
 [defn array/swap [arr i j]
-       [def tmp [array/ref arr i]]
-       [array/set! arr i [array/ref arr j]]
-       [array/set! arr j tmp]]
+      "Swap values at I and J in ARR"
+      [def tmp [array/ref arr i]]
+      [-> arr
+          [array/set! i [array/ref arr j]]
+          [array/set! j tmp]]]
 
 [defn array/heapify [arr n at]
        "bubble up the element from index AT to until the max-heap property is satisfied"
