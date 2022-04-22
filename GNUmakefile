@@ -111,12 +111,14 @@ nujel-bootstrap: $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 
 release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(STATIC_LIBS)
+	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(STRIP) -sSxXgd $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	@musl-clang -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@musl-gcc -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(STRIP) -sSxXgd $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 release.san: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c

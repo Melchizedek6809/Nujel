@@ -5,6 +5,7 @@ bindir                = $(exec_prefix)/bin/
 CC                   := cc
 AR                   := ar
 INSTALL              := install
+STRIP                := strip
 
 EMCC                 := emcc
 EMAR                 := emar
@@ -26,5 +27,3 @@ LIBS                 := -lm
 
 RELEASE_OPTIMIZATION := -O3 -flto
 VERSION_ARCH         := $(shell uname -m)
-
-STATIC_LIBS          := -static -lm
