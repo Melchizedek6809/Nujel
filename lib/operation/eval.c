@@ -22,9 +22,8 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 	case ltLambda:
 	case ltNativeFunc:
 	case ltSpecialForm:
-		break;
+		return lApply(c, lCadr(v), fun, fun);
 	}
-	return lApply(c, lCadr(v), fun, fun);
 }
 
 /* Handler for [apply fn list] */

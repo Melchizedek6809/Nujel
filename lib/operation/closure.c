@@ -191,27 +191,6 @@ static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lClosure *getNextObject(lClosure *c){
-	while(c != NULL){
-		if(c->type == closureConstant){return NULL;}
-		if(c->type == closureObject){return c;}
-		c = c->parent;
-	}
-	return NULL;
-}
-
-static lVal *lnfClSelf(lClosure *c, lVal *v){
-	c = getNextObject(c);
-	for(int i=castToInt(lCar(v),0);i>0;i--){
-		if(c == NULL){return NULL;}
-		c = getNextObject(c->parent);
-	}
-	if(c == NULL){return NULL;}
-	lVal *ret = lValAlloc(ltObject);
-	ret->vClosure = c;
-	return ret;
-}
-
 static lVal *lnfResolve(lClosure *c, lVal *v){
 	const lSymbol *sym = castToSymbol(lCar(v),NULL);
 	lVal *env = lCadr(v);
@@ -304,7 +283,6 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
 
-	lAddNativeFunc(c,"self",           "[n]",           "Return Nth closest object closure",          lnfClSelf);
 	lAddNativeFunc(c,"symbol-search",  "[str len]",     "Return a list of all symbols starting with STR",lnfSymbolSearch);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);

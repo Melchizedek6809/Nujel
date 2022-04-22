@@ -202,8 +202,8 @@ static lVal *lnfTreeRightAst(lClosure *c, lVal *v){
 }
 
 void lOperationsTree(lClosure *c){
-	lAddNativeFunc(c,"tree/ref",     "[tree sym]",     "Return the value of SYM in TREE, or #nil if not found", lnfTreeGet);
 	lAddNativeFunc(c,"tree/new",     "plist",          "Return a new tree", lnfTreeNew);
+	lAddNativeFunc(c,"tree/ref",     "[tree sym]",     "Return the value of SYM in TREE, or #nil if not found", lnfTreeGet);
 	lAddNativeFunc(c,"tree/list",    "[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c,"tree/keys",    "[tree]",         "Return each key of TREE in a list", lnfTreeGetKeys);
 	lAddNativeFunc(c,"tree/values",  "[tree]",         "Return each value of TREE in a list", lnfTreeGetValues);
