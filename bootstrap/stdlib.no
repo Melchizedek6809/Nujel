@@ -3276,32 +3276,8 @@
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $lambda [fn* $lambda [name args docs body] "" #{
-05v #$11
-10s name
-08i 1 v val->bytecode-op
-10s args
-08i 1 v val->bytecode-op
-10s docs
-08i 1 v val->bytecode-op
-10s body
-08i 1 v val->bytecode-op
-08i 5 v list
-01
 }]] [def $fn [fn* $fn [name args docs body] "" #{
 05v #$25
-10s name
-08i 1 v val->bytecode-op
-10s args
-08i 1 v val->bytecode-op
-10s docs
-08i 1 v val->bytecode-op
-10s body
-08i 1 v val->bytecode-op
-08i 5 v list
-01
-}]] [def $macro [fn* $macro [name args docs body] "" #{
-05v #$12
 10s name
 08i 1 v val->bytecode-op
 10s args
@@ -4015,12 +3991,6 @@
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/λ* [fn* bytecompile/λ* [source env] "" #{
-10s $lambda
-10s source
-08i 1 v cdr
-08i 2 v apply
-01
 }]] [def bytecompile/fn* [fn* bytecompile/fn* [source env] "" #{
 10s $fn
 10s source
@@ -4029,12 +3999,6 @@
 01
 }]] [def bytecompile/macro* [fn* bytecompile/macro* [source env] "" #{
 10s $macro*
-10s source
-08i 1 v cdr
-08i 2 v apply
-01
-}]] [def bytecompile/μ* [fn* bytecompile/μ* [source env] "" #{
-10s $macro
 10s source
 08i 1 v cdr
 08i 2 v apply
@@ -4401,19 +4365,6 @@
 08i 1 v compile*
 08i 3 v list
 01
-}]] [def compile/λ* [fn* compile/λ* [source] "" #{
-23s λ*
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-10s source
-08i 1 v cadddr
-10s source
-08i 1 v caddddr
-08i 1 v compile
-08i 5 v list
-01
 }]] [def compile/fn* [fn* compile/fn* [source] "" #{
 23s fn*
 10s source
@@ -4429,19 +4380,6 @@
 01
 }]] [def compile/macro* [fn* compile/macro* [source] "" #{
 23s macro*
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-10s source
-08i 1 v cadddr
-10s source
-08i 1 v caddddr
-08i 1 v compile
-08i 5 v list
-01
-}]] [def compile/μ* [fn* compile/μ* [source] "" #{
-23s μ*
 10s source
 08i 1 v cadr
 10s source
@@ -5303,7 +5241,7 @@
 05v #f
 0Bo 8
 02i 1
-09o 342
+09o 314
 10s ΓεnΣym-97
 05v #$2
 20
@@ -5325,7 +5263,7 @@
 05v #f
 0Bo 8
 02i 2
-09o 288
+09o 260
 10s ΓεnΣym-97
 05v #$9
 20
@@ -5359,7 +5297,7 @@
 05v #f
 0Bo 8
 02i 3
-09o 206
+09o 178
 10s ΓεnΣym-97
 05v #$5
 20
@@ -5393,7 +5331,7 @@
 05v #f
 0Bo 8
 02i 4
-09o 124
+09o 96
 10s ΓεnΣym-97
 05v #$8
 20
@@ -5403,19 +5341,7 @@
 05v #f
 0Bo 8
 02i 5
-09o 98
-10s ΓεnΣym-97
-05v #$11
-20
-0C
-0Ao 50
-0D
-10s ΓεnΣym-97
-05v #$12
-20
-0C
-0Ao 36
-0D
+09o 70
 10s ΓεnΣym-97
 05v #$25
 20
@@ -5569,13 +5495,13 @@
 20
 0Bo 10
 05v [$nop]
-09o 1711
+09o 1461
 10s ΓεnΣym-98
 05v #$1
 20
 0Bo 10
 05v [$ret]
-09o 1692
+09o 1442
 10s ΓεnΣym-98
 05v #$2
 20
@@ -5590,19 +5516,19 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1637
+09o 1387
 10s ΓεnΣym-98
 05v #$3
 20
 0Bo 10
 05v [$add/int]
-09o 1618
+09o 1368
 10s ΓεnΣym-98
 05v #$4
 20
 0Bo 10
 05v [$debug/print-stack]
-09o 1599
+09o 1349
 10s ΓεnΣym-98
 05v #$5
 20
@@ -5616,7 +5542,7 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1549
+09o 1299
 10s ΓεnΣym-98
 05v #$6
 20
@@ -5631,13 +5557,13 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1494
+09o 1244
 10s ΓεnΣym-98
 05v #$7
 20
 0Bo 10
 05v [$eval]
-09o 1475
+09o 1225
 10s ΓεnΣym-98
 05v #$8
 20
@@ -5658,7 +5584,7 @@
 08i 2 v cons
 08i 2 v cons
 08i 2 v cons
-09o 1395
+09o 1145
 10s ΓεnΣym-98
 05v #$9
 20
@@ -5672,7 +5598,7 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1345
+09o 1095
 10s ΓεnΣym-98
 05v #$A
 20
@@ -5686,7 +5612,7 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1295
+09o 1045
 10s ΓεnΣym-98
 05v #$B
 20
@@ -5700,19 +5626,19 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1245
+09o 995
 10s ΓεnΣym-98
 05v #$C
 20
 0Bo 10
 05v [$dup]
-09o 1226
+09o 976
 10s ΓεnΣym-98
 05v #$D
 20
 0Bo 10
 05v [$drop]
-09o 1207
+09o 957
 10s ΓεnΣym-98
 05v #$E
 20
@@ -5726,7 +5652,7 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1157
+09o 907
 10s ΓεnΣym-98
 05v #$F
 20
@@ -5740,7 +5666,7 @@
 24
 08i 2 v cons
 08i 2 v cons
-09o 1107
+09o 857
 10s ΓεnΣym-98
 05v #$10
 20
@@ -5752,70 +5678,6 @@
 08i 2 v +
 08i 2 v bytecode-arr->sym
 24
-08i 2 v cons
-08i 2 v cons
-09o 1057
-10s ΓεnΣym-98
-05v #$11
-20
-0Bo 116
-23s $lambda
-10s a
-10s i
-02i 1
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 4
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 7
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 10
-08i 2 v +
-08i 2 v bytecode-arr->val
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-09o 932
-10s ΓεnΣym-98
-05v #$12
-20
-0Bo 116
-23s $macro
-10s a
-10s i
-02i 1
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 4
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 7
-08i 2 v +
-08i 2 v bytecode-arr->val
-10s a
-10s i
-02i 10
-08i 2 v +
-08i 2 v bytecode-arr->val
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
 08i 2 v cons
 08i 2 v cons
 09o 807

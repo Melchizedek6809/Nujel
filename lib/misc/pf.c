@@ -134,9 +134,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				c+=4;
 				break; }
 			case lopFn:
-			case lopLambda:
-			case lopMacroAst:
-			case lopMacro: {
+			case lopMacroAst: {
 				if(&c[12] >= v->dataEnd){
 					c+=12;
 					break;

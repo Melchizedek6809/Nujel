@@ -28,13 +28,6 @@
 [defn compile/set! [source]
        [list 'set! [cadr source] [compile* [caddr source]]]]
 
-[defn compile/λ* [source]
-       [list 'λ*
-             [cadr source]
-             [caddr source]
-             [cadddr source]
-             [compile [caddddr source]]]]
-
 [defn compile/fn* [source]
        [list 'fn*
              [cadr source]
@@ -44,13 +37,6 @@
 
 [defn compile/macro* [source]
        [list 'macro*
-             [cadr source]
-             [caddr source]
-             [cadddr source]
-             [compile [caddddr source]]]]
-
-[defn compile/μ* [source]
-       [list 'μ*
              [cadr source]
              [caddr source]
              [cadddr source]

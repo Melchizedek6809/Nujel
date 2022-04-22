@@ -122,22 +122,8 @@
 [defn $get [v]
        [list #$10 [sym->bytecode-op v]]]
 
-[defn $lambda [name args docs body]
-       [list #$11
-             [val->bytecode-op name]
-             [val->bytecode-op args]
-             [val->bytecode-op docs]
-             [val->bytecode-op body]]]
-
 [defn $fn [name args docs body]
        [list #$25
-             [val->bytecode-op name]
-             [val->bytecode-op args]
-             [val->bytecode-op docs]
-             [val->bytecode-op body]]]
-
-[defn $macro [name args docs body]
-       [list #$12
              [val->bytecode-op name]
              [val->bytecode-op args]
              [val->bytecode-op docs]

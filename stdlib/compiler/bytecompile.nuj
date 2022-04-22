@@ -129,17 +129,11 @@
 [defn bytecompile/tree [source env]
        [bytecompile/procedure tree/ref source env]]
 
-[defn bytecompile/λ* [source env]
-       [apply $lambda [cdr source]]]
-
 [defn bytecompile/fn* [source env]
        [apply $fn [cdr source]]]
 
 [defn bytecompile/macro* [source env]
        [apply $macro* [cdr source]]]
-
-[defn bytecompile/μ* [source env]
-       [apply $macro [cdr source]]]
 
 [defn bytecompile/ω*  [source env]
        [list [$let]
