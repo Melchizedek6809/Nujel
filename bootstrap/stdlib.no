@@ -33,6 +33,188 @@
 01
 }
 01
+}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
+05v :data
+10s width
+10s height
+08i 2 v *
+08i 1 v array/allocate
+02i 0
+08i 2 v array/fill!
+05v :width
+10s width
+05v :height
+10s height
+08i 6 v tree/new
+01
+}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
+10s data
+05v :data
+08i 2 v tree/ref
+10s v
+08i 2 v array/fill!
+0D
+10s data
+01
+}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 52
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+08i 2 v array/ref
+01
+}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 33
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 56
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+10s val
+08i 3 v array/set!
+0D
+10s data
+01
+}]] [def array/2d/print [fn* array/2d/print [data] "" #{
+15
+02i 0
+0Es y
+0D
+10s data
+05v :height
+08i 2 v tree/ref
+0Es ΓεnΣym-20
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-20
+1E
+0Bo 115
+0D
+15
+02i 0
+0Es x
+0D
+10s data
+05v :width
+08i 2 v tree/ref
+0Es ΓεnΣym-21
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-21
+1E
+0Bo 50
+0D
+10s data
+10s x
+10s y
+08i 3 v array/2d/ref
+05v " "
+08i 2 v cat
+08i 1 v display
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -57
+16
+0D
+08i 0 v newline
+0D
+02i 1
+10s y
+03
+0Fs y
+09o -122
+16
+0D
+10s data
+01
 }]]][do [def array/+= [fn* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
 10s a
 10s i
@@ -59,13 +241,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-11
+0Es ΓεnΣym-10
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-11
+10s ΓεnΣym-10
 1E
 0Bo 36
 0D
@@ -115,13 +297,13 @@
 0D
 10s a
 08i 1 v array/length
-0Es ΓεnΣym-12
+0Es ΓεnΣym-11
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-12
+10s ΓεnΣym-11
 1E
 0Bo 45
 0D
@@ -146,13 +328,13 @@
 0D
 10s ret
 08i 1 v array/length
-0Es ΓεnΣym-13
+0Es ΓεnΣym-12
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-13
+10s ΓεnΣym-12
 1E
 0Bo 59
 0D
@@ -191,13 +373,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-14
+0Es ΓεnΣym-13
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-14
+10s ΓεnΣym-13
 1E
 0Bo 46
 0D
@@ -228,13 +410,13 @@
 0Es i
 0D
 10s len
-0Es ΓεnΣym-15
+0Es ΓεnΣym-14
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-15
+10s ΓεnΣym-14
 1E
 0Bo 51
 0D
@@ -273,13 +455,13 @@
 0Es ai
 0D
 10s len
-0Es ΓεnΣym-16
+0Es ΓεnΣym-15
 0D
 02i 0
 1B
 1C
 10s ai
-10s ΓεnΣym-16
+10s ΓεnΣym-15
 1E
 0Bo 87
 0D
@@ -349,13 +531,13 @@
 0D
 10s a
 08i 1 v array/length
-0Es ΓεnΣym-17
+0Es ΓεnΣym-16
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-17
+10s ΓεnΣym-16
 1E
 0Bo 79
 0D
@@ -386,49 +568,21 @@
 10s ret
 16
 01
-}]] [def array/push [fn* array/push [arr . val] "Append all arguments following ARR to ARR" #{
-15
-10s val
-0Es ΓεnΣym-18
-0D
-10s ΓεnΣym-18
-0Bo 104
-02i 0
-1B
-1C
-10s ΓεnΣym-18
-0Bo 90
-0D
-10s ΓεnΣym-18
-08i 1 v car
-0Es v
-0D
+}]] [def array/push [fn* array/push [arr val] "Append VAL to ARR" #{
 10s arr
 02i 1
 10s arr
 08i 1 v array/length
 08i 2 v +
 08i 2 v array/length!
-0D
-10s arr
 10s arr
 08i 1 v array/length
 02i 1
 08i 2 v -
-10s v
+10s val
 08i 3 v array/set!
-0D
-10s ΓεnΣym-18
-08i 1 v cdr
-0Fs ΓεnΣym-18
-09o -92
-09o 4
-24
-16
-0D
-10s arr
 01
-}]] [def array/swap [fn* array/swap [arr i j] "" #{
+}]] [def array/swap [fn* array/swap [arr i j] "Swap values at I and J in ARR" #{
 10s arr
 10s i
 08i 2 v array/ref
@@ -440,8 +594,6 @@
 10s j
 08i 2 v array/ref
 08i 3 v array/set!
-0D
-10s arr
 10s j
 10s tmp
 08i 3 v array/set!
@@ -619,13 +771,13 @@
 0Es i
 0D
 10s end
-0Es ΓεnΣym-19
+0Es ΓεnΣym-17
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-19
+10s ΓεnΣym-17
 1E
 0Bo 54
 0D
@@ -646,188 +798,6 @@
 16
 0D
 10s ret
-01
-}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
-05v :data
-10s width
-10s height
-08i 2 v *
-08i 1 v array/allocate
-02i 0
-08i 2 v array/fill!
-05v :width
-10s width
-05v :height
-10s height
-08i 6 v tree/new
-01
-}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
-10s data
-05v :data
-08i 2 v tree/ref
-10s v
-08i 2 v array/fill!
-0D
-10s data
-01
-}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 52
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-08i 2 v array/ref
-01
-}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 33
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 56
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-10s val
-08i 3 v array/set!
-0D
-10s data
-01
-}]] [def array/2d/print [fn* array/2d/print [data] "" #{
-15
-02i 0
-0Es y
-0D
-10s data
-05v :height
-08i 2 v tree/ref
-0Es ΓεnΣym-22
-0D
-02i 0
-1B
-1C
-10s y
-10s ΓεnΣym-22
-1E
-0Bo 115
-0D
-15
-02i 0
-0Es x
-0D
-10s data
-05v :width
-08i 2 v tree/ref
-0Es ΓεnΣym-23
-0D
-02i 0
-1B
-1C
-10s x
-10s ΓεnΣym-23
-1E
-0Bo 50
-0D
-10s data
-10s x
-10s y
-08i 3 v array/2d/ref
-05v " "
-08i 2 v cat
-08i 1 v display
-0D
-02i 1
-10s x
-03
-0Fs x
-09o -57
-16
-0D
-08i 0 v newline
-0D
-02i 1
-10s y
-03
-0Fs y
-09o -122
-16
-0D
-10s data
 01
 }]]][do [def avl/empty :e] [def avl/empty? [fn* avl/empty? [n] "" #{
 05v :e
@@ -1052,16 +1022,16 @@
 08i 1 v avl/left
 08i 1 v avl/key
 1Ai 2
-0Es ΓεnΣym-29
+0Es ΓεnΣym-27
 0D
-10s ΓεnΣym-29
+10s ΓεnΣym-27
 02i -1
 20
 0Bo 15
 10s n
 08i 1 v avl/rotate-right
 09o 62
-10s ΓεnΣym-29
+10s ΓεnΣym-27
 02i 1
 20
 0Bo 34
@@ -1072,7 +1042,7 @@
 08i 2 v avl/update-left
 08i 1 v avl/rotate-right
 09o 21
-10s ΓεnΣym-29
+10s ΓεnΣym-27
 02i 0
 20
 0Bo 10
@@ -1092,16 +1062,16 @@
 08i 1 v avl/right
 08i 1 v avl/key
 1Ai 2
-0Es ΓεnΣym-30
+0Es ΓεnΣym-28
 0D
-10s ΓεnΣym-30
+10s ΓεnΣym-28
 02i 1
 20
 0Bo 15
 10s n
 08i 1 v avl/rotate-left
 09o 62
-10s ΓεnΣym-30
+10s ΓεnΣym-28
 02i -1
 20
 0Bo 34
@@ -1112,7 +1082,7 @@
 08i 2 v avl/update-right
 08i 1 v avl/rotate-left
 09o 21
-10s ΓεnΣym-30
+10s ΓεnΣym-28
 02i 0
 20
 0Bo 10
@@ -1144,9 +1114,9 @@
 10s n
 08i 1 v avl/key
 1Ai 2
-0Es ΓεnΣym-31
+0Es ΓεnΣym-29
 0D
-10s ΓεnΣym-31
+10s ΓεnΣym-29
 02i -1
 20
 0Bo 55
@@ -1162,7 +1132,7 @@
 10s v
 08i 3 v avl/insert-rebalance
 09o 92
-10s ΓεnΣym-31
+10s ΓεnΣym-29
 02i 1
 20
 0Bo 55
@@ -1178,7 +1148,7 @@
 10s v
 08i 3 v avl/insert-rebalance
 09o 30
-10s ΓεnΣym-31
+10s ΓεnΣym-29
 02i 0
 20
 0Bo 19
@@ -1215,16 +1185,16 @@
 10s n
 08i 1 v avl/key
 1Ai 2
-0Es ΓεnΣym-32
+0Es ΓεnΣym-30
 0D
-10s ΓεnΣym-32
+10s ΓεnΣym-30
 02i 0
 20
 0Bo 15
 10s n
 08i 1 v avl/key
 09o 74
-10s ΓεnΣym-32
+10s ΓεnΣym-30
 02i -1
 20
 0Bo 28
@@ -1234,7 +1204,7 @@
 10s v
 08i 3 v avl/node-get
 09o 39
-10s ΓεnΣym-32
+10s ΓεnΣym-30
 02i 1
 20
 0Bo 28
@@ -1357,9 +1327,9 @@
 10s n
 08i 1 v avl/key
 1Ai 2
-0Es ΓεnΣym-33
+0Es ΓεnΣym-31
 0D
-10s ΓεnΣym-33
+10s ΓεnΣym-31
 02i -1
 20
 0Bo 37
@@ -1371,7 +1341,7 @@
 08i 3 v avl/node-remove
 08i 2 v avl/update-left
 09o 201
-10s ΓεnΣym-33
+10s ΓεnΣym-31
 02i 1
 20
 0Bo 37
@@ -1383,7 +1353,7 @@
 08i 3 v avl/node-remove
 08i 2 v avl/update-right
 09o 157
-10s ΓεnΣym-33
+10s ΓεnΣym-31
 02i 0
 20
 0Bo 146
@@ -1742,15 +1712,15 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-43
+0Es ΓεnΣym-41
 0D
-10s ΓεnΣym-43
+10s ΓεnΣym-41
 05v :nil
 20
 0Bo 7
 24
 09o 142
-10s ΓεnΣym-43
+10s ΓεnΣym-41
 05v :tree
 20
 0Bo 19
@@ -1758,7 +1728,7 @@
 10s i
 08i 2 v tree/ref
 09o 114
-10s ΓεnΣym-43
+10s ΓεnΣym-41
 05v :string
 20
 0Bo 19
@@ -1766,7 +1736,7 @@
 10s i
 08i 2 v char-at
 09o 86
-10s ΓεnΣym-43
+10s ΓεnΣym-41
 05v :array
 20
 0Bo 19
@@ -1774,7 +1744,7 @@
 10s i
 08i 2 v array/ref
 09o 58
-10s ΓεnΣym-43
+10s ΓεnΣym-41
 05v :pair
 20
 0Bo 19
@@ -1794,15 +1764,15 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-44
+0Es ΓεnΣym-42
 0D
-10s ΓεnΣym-44
+10s ΓεnΣym-42
 05v :nil
 20
 0Bo 7
 24
 09o 114
-10s ΓεnΣym-44
+10s ΓεnΣym-42
 05v :tree
 20
 0Bo 19
@@ -1810,7 +1780,7 @@
 10s p
 08i 2 v tree/filter
 09o 86
-10s ΓεnΣym-44
+10s ΓεnΣym-42
 05v :pair
 20
 0Bo 19
@@ -1818,7 +1788,7 @@
 10s p
 08i 2 v list/filter
 09o 58
-10s ΓεnΣym-44
+10s ΓεnΣym-42
 05v :array
 20
 0Bo 19
@@ -1838,15 +1808,15 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-45
+0Es ΓεnΣym-43
 0D
-10s ΓεnΣym-45
+10s ΓεnΣym-43
 05v :nil
 20
 0Bo 10
 10s α
 09o 113
-10s ΓεnΣym-45
+10s ΓεnΣym-43
 05v :tree
 20
 0Bo 23
@@ -1855,7 +1825,7 @@
 10s α
 08i 3 v tree/reduce
 09o 81
-10s ΓεnΣym-45
+10s ΓεnΣym-43
 05v :pair
 20
 0Bo 23
@@ -1864,7 +1834,7 @@
 10s α
 08i 3 v list/reduce
 09o 49
-10s ΓεnΣym-45
+10s ΓεnΣym-43
 05v :array
 20
 0Bo 23
@@ -1883,36 +1853,36 @@
 15
 10s α
 08i 1 v type-of
-0Es ΓεnΣym-46
+0Es ΓεnΣym-44
 0D
-10s ΓεnΣym-46
+10s ΓεnΣym-44
 05v :nil
 20
 0Bo 8
 02i 0
 09o 126
-10s ΓεnΣym-46
+10s ΓεnΣym-44
 05v :array
 20
 0Bo 15
 10s α
 08i 1 v array/length
 09o 102
-10s ΓεnΣym-46
+10s ΓεnΣym-44
 05v :pair
 20
 0Bo 15
 10s α
 08i 1 v list/length
 09o 78
-10s ΓεnΣym-46
+10s ΓεnΣym-44
 05v :string
 20
 0Bo 15
 10s α
 08i 1 v string/length
 09o 54
-10s ΓεnΣym-46
+10s ΓεnΣym-44
 05v :tree
 20
 0Bo 15
@@ -1931,15 +1901,15 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-47
+0Es ΓεnΣym-45
 0D
-10s ΓεnΣym-47
+10s ΓεnΣym-45
 05v :nil
 20
 0Bo 7
 24
 09o 86
-10s ΓεnΣym-47
+10s ΓεnΣym-45
 05v :pair
 20
 0Bo 19
@@ -1947,7 +1917,7 @@
 10s f
 08i 2 v list/map
 09o 58
-10s ΓεnΣym-47
+10s ΓεnΣym-45
 05v :array
 20
 0Bo 19
@@ -1967,22 +1937,22 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-48
+0Es ΓεnΣym-46
 0D
-10s ΓεnΣym-48
+10s ΓεnΣym-46
 05v :nil
 20
 0Bo 7
 24
 09o 78
-10s ΓεnΣym-48
+10s ΓεnΣym-46
 05v :pair
 20
 0Bo 15
 10s l
 08i 1 v list/sort/merge
 09o 54
-10s ΓεnΣym-48
+10s ΓεnΣym-46
 05v :array
 20
 0Bo 15
@@ -2001,9 +1971,9 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-49
+0Es ΓεnΣym-47
 0D
-10s ΓεnΣym-49
+10s ΓεnΣym-47
 05v :pair
 20
 0Bo 19
@@ -2023,9 +1993,9 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-50
+0Es ΓεnΣym-48
 0D
-10s ΓεnΣym-50
+10s ΓεnΣym-48
 05v :array
 20
 0Bo 23
@@ -2034,7 +2004,7 @@
 10s end
 08i 3 v array/cut
 09o 94
-10s ΓεnΣym-50
+10s ΓεnΣym-48
 05v :pair
 20
 0Bo 23
@@ -2043,7 +2013,7 @@
 10s end
 08i 3 v list/cut
 09o 62
-10s ΓεnΣym-50
+10s ΓεnΣym-48
 05v :string
 20
 0Bo 23
@@ -2064,21 +2034,21 @@
 15
 10s l
 08i 1 v type-of
-0Es ΓεnΣym-51
+0Es ΓεnΣym-49
 0D
-10s ΓεnΣym-51
+10s ΓεnΣym-49
 05v :pair
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-51
+10s ΓεnΣym-49
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-51
+10s ΓεnΣym-49
 05v :tree
 20
 0C
@@ -2211,17 +2181,17 @@
 }]] [def list/reduce [fn* list/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
 15
 10s l
-0Es ΓεnΣym-57
+0Es ΓεnΣym-56
 0D
-10s ΓεnΣym-57
+10s ΓεnΣym-56
 0Bo 67
 02i 0
 1B
 1C
-10s ΓεnΣym-57
+10s ΓεnΣym-56
 0Bo 53
 0D
-10s ΓεnΣym-57
+10s ΓεnΣym-56
 08i 1 v car
 0Es e
 0D
@@ -2231,9 +2201,9 @@
 1Ai 2
 0Fs s
 0D
-10s ΓεnΣym-57
+10s ΓεnΣym-56
 08i 1 v cdr
-0Fs ΓεnΣym-57
+0Fs ΓεnΣym-56
 09o -55
 09o 4
 24
@@ -2273,17 +2243,17 @@
 0D
 15
 10s l
-0Es ΓεnΣym-58
+0Es ΓεnΣym-57
 0D
-10s ΓεnΣym-58
+10s ΓεnΣym-57
 0Bo 66
 02i 0
 1B
 1C
-10s ΓεnΣym-58
+10s ΓεnΣym-57
 0Bo 52
 0D
-10s ΓεnΣym-58
+10s ΓεnΣym-57
 08i 1 v car
 0Es e
 0D
@@ -2292,9 +2262,9 @@
 08i 2 v cons
 0Fs ret
 0D
-10s ΓεnΣym-58
+10s ΓεnΣym-57
 08i 1 v cdr
-0Fs ΓεnΣym-58
+0Fs ΓεnΣym-57
 09o -54
 09o 4
 24
@@ -2308,17 +2278,17 @@
 0D
 15
 10s l
-0Es ΓεnΣym-59
+0Es ΓεnΣym-58
 0D
-10s ΓεnΣym-59
+10s ΓεnΣym-58
 0Bo 64
 02i 0
 1B
 1C
-10s ΓεnΣym-59
+10s ΓεnΣym-58
 0Bo 50
 0D
-10s ΓεnΣym-59
+10s ΓεnΣym-58
 08i 1 v car
 0Es e
 0D
@@ -2327,9 +2297,9 @@
 08i 2 v +
 0Fs ret
 0D
-10s ΓεnΣym-59
+10s ΓεnΣym-58
 08i 1 v cdr
-0Fs ΓεnΣym-59
+0Fs ΓεnΣym-58
 09o -52
 09o 4
 24
@@ -2343,17 +2313,17 @@
 0D
 15
 10s l
-0Es ΓεnΣym-60
+0Es ΓεnΣym-59
 0D
-10s ΓεnΣym-60
+10s ΓεnΣym-59
 0Bo 83
 02i 0
 1B
 1C
-10s ΓεnΣym-60
+10s ΓεnΣym-59
 0Bo 69
 0D
-10s ΓεnΣym-60
+10s ΓεnΣym-59
 08i 1 v car
 0Es e
 0D
@@ -2368,9 +2338,9 @@
 09o 4
 24
 0D
-10s ΓεnΣym-60
+10s ΓεnΣym-59
 08i 1 v cdr
-0Fs ΓεnΣym-60
+0Fs ΓεnΣym-59
 09o -71
 09o 4
 24
@@ -2385,17 +2355,17 @@
 0D
 15
 10s l
-0Es ΓεnΣym-61
+0Es ΓεnΣym-60
 0D
-10s ΓεnΣym-61
+10s ΓεnΣym-60
 0Bo 72
 02i 0
 1B
 1C
-10s ΓεnΣym-61
+10s ΓεnΣym-60
 0Bo 58
 0D
-10s ΓεnΣym-61
+10s ΓεnΣym-60
 08i 1 v car
 0Es e
 0D
@@ -2406,9 +2376,9 @@
 08i 2 v cons
 0Fs ret
 0D
-10s ΓεnΣym-61
+10s ΓεnΣym-60
 08i 1 v cdr
-0Fs ΓεnΣym-61
+0Fs ΓεnΣym-60
 09o -60
 09o 4
 24
@@ -2417,40 +2387,44 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def append/iter [fn* append/iter [a b] "Iterator for append" #{
-10s a
-08i 1 v nil?
-0Bo 10
+}]] [def append [fn* append [a b] "Appends two lists A and B together" #{
 10s b
-09o 35
-10s a
-08i 1 v cdr
-10s a
-08i 1 v car
-10s b
-08i 2 v cons
-08i 2 v append/iter
-01
-}]] [def append [fn* append [a . b] "Appends two lists A and B together" #{
-02i 0
-1B
-1C
-10s b
-0Bo 48
+0Es ret
 0D
 10s a
 08i 1 v reverse
-10s b
-08i 1 v car
-08i 2 v append/iter
 0Fs a
 0D
-10s b
-08i 1 v cdr
-0Fs b
-09o -50
-0D
+15
 10s a
+0Es ΓεnΣym-61
+0D
+10s ΓεnΣym-61
+0Bo 66
+02i 0
+1B
+1C
+10s ΓεnΣym-61
+0Bo 52
+0D
+10s ΓεnΣym-61
+08i 1 v car
+0Es t
+0D
+10s t
+10s ret
+08i 2 v cons
+0Fs ret
+0D
+10s ΓεnΣym-61
+08i 1 v cdr
+0Fs ΓεnΣym-61
+09o -54
+09o 4
+24
+16
+0D
+10s ret
 01
 }]] [def sublist [fn* sublist [l start end ret] "Returns a new list containing all elements of l from start to end" #{
 10s l
@@ -2842,7 +2816,44 @@
 08i 2 v +
 08i 3 v tree/set!
 01
-}]] [def tree/-= [μ* tree/-= [t k v] "Decrement value at K in T by V" [cons 'tree/+= [cons t [cons k [cons [cons '- [cons v #nil]] #nil]]]]]] [def tree/++ [μ* tree/++ [t k] "Increment value at K in T by 1" [cons 'tree/+= [cons t [cons k [cons 1 #nil]]]]]] [def tree/-- [μ* tree/-- [t k] "Increment value at K in T by 1" [cons 'tree/-= [cons t [cons k [cons 1 #nil]]]]]] [def tree/equal? [fn* tree/equal? [a b] "Compares two trees for equality" #{
+}]] [def tree/-= [macro* tree/-= [t k v] "Decrement value at K in T by V" #{
+23s tree/+=
+10s t
+10s k
+23s -
+10s v
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def tree/++ [macro* tree/++ [t k] "Increment value at K in T by 1" #{
+23s tree/+=
+10s t
+10s k
+02i 1
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def tree/-- [macro* tree/-- [t k] "Increment value at K in T by 1" #{
+23s tree/-=
+10s t
+10s k
+02i 1
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def tree/equal? [fn* tree/equal? [a b] "Compares two trees for equality" #{
 10s a
 08i 1 v tree?
 0C
@@ -3588,7 +3599,18 @@
 10s l
 08i 1 v assemble*
 01
-}]] [def asmrun [μ* asmrun ops "Assemble and evaluate all bytecode arguments" [cons 'bytecode-eval [cons [cons 'assemble [append ops #nil]] #nil]]]]][do [def bytecompile/gen-label/counter 0] [def bytecompile/gen-label [fn* bytecompile/gen-label [prefix] "" #{
+}]] [def asmrun [macro* asmrun ops "Assemble and evaluate all bytecode arguments" #{
+23s bytecode-eval
+23s assemble
+10s ops
+24
+08i 2 v append
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def bytecompile/gen-label/counter 0] [def bytecompile/gen-label [fn* bytecompile/gen-label [prefix] "" #{
 02i 1
 10s bytecompile/gen-label/counter
 08i 2 v +
@@ -4098,7 +4120,7 @@
 10s ΓεnΣym-82
 05v :special-form
 20
-0Bo 470
+0Bo 414
 15
 10s op
 0Es ΓεnΣym-83
@@ -4110,7 +4132,7 @@
 10s source
 10s env
 08i 2 v bytecompile/do
-09o 428
+09o 372
 10s ΓεnΣym-83
 10s let*
 20
@@ -4118,7 +4140,7 @@
 10s source
 10s env
 08i 2 v bytecompile/let*
-09o 400
+09o 344
 10s ΓεnΣym-83
 10s def
 20
@@ -4126,7 +4148,7 @@
 10s source
 10s env
 08i 2 v bytecompile/def
-09o 372
+09o 316
 10s ΓεnΣym-83
 10s set!
 20
@@ -4134,7 +4156,7 @@
 10s source
 10s env
 08i 2 v bytecompile/set!
-09o 344
+09o 288
 10s ΓεnΣym-83
 10s if
 20
@@ -4142,7 +4164,7 @@
 10s source
 10s env
 08i 2 v bytecompile/if
-09o 316
+09o 260
 10s ΓεnΣym-83
 10s while
 20
@@ -4150,7 +4172,7 @@
 10s source
 10s env
 08i 2 v bytecompile/while
-09o 288
+09o 232
 10s ΓεnΣym-83
 10s and
 20
@@ -4158,7 +4180,7 @@
 10s source
 10s env
 08i 2 v bytecompile/and
-09o 260
+09o 204
 10s ΓεnΣym-83
 10s or
 20
@@ -4166,7 +4188,7 @@
 10s source
 10s env
 08i 2 v bytecompile/or
-09o 232
+09o 176
 10s ΓεnΣym-83
 10s fn*
 20
@@ -4174,15 +4196,7 @@
 10s source
 10s env
 08i 2 v bytecompile/fn*
-09o 204
-10s ΓεnΣym-83
-10s λ*
-20
-0Bo 19
-10s source
-10s env
-08i 2 v bytecompile/λ*
-09o 176
+09o 148
 10s ΓεnΣym-83
 10s macro*
 20
@@ -4190,14 +4204,6 @@
 10s source
 10s env
 08i 2 v bytecompile/macro*
-09o 148
-10s ΓεnΣym-83
-10s μ*
-20
-0Bo 19
-10s source
-10s env
-08i 2 v bytecompile/μ*
 09o 120
 10s ΓεnΣym-83
 10s ω*
@@ -4307,7 +4313,24 @@
 08i 0 v $ret
 08i 2 v list
 01
-}]] [def byterun [μ* byterun [form] "" [cons '-> [cons [cons 'compile [cons form #nil]] [cons 'bytecompile [cons 'assemble* [cons 'bytecode-eval #nil]]]]]]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [fn* compile/do/args [args] "" #{
+}]] [def byterun [macro* byterun [form] "" #{
+23s ->
+23s compile
+10s form
+24
+08i 2 v cons
+08i 2 v cons
+23s bytecompile
+23s assemble*
+23s bytecode-eval
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [fn* compile/do/args [args] "" #{
 10s args
 08i 1 v last?
 0Bo 26
@@ -4553,7 +4576,7 @@
 10s ΓεnΣym-88
 05v :special-form
 20
-0Bo 394
+0Bo 346
 15
 10s op
 0Es ΓεnΣym-89
@@ -4564,55 +4587,41 @@
 0Bo 15
 10s source
 08i 1 v compile/do
-09o 356
+09o 308
 10s ΓεnΣym-89
 10s def
 20
 0Bo 15
 10s source
 08i 1 v compile/def
-09o 332
+09o 284
 10s ΓεnΣym-89
 10s set!
 20
 0Bo 15
 10s source
 08i 1 v compile/set!
-09o 308
+09o 260
 10s ΓεnΣym-89
 10s let*
 20
 0Bo 15
 10s source
 08i 1 v compile/let*
-09o 284
-10s ΓεnΣym-89
-10s λ*
-20
-0Bo 15
-10s source
-08i 1 v compile/λ*
-09o 260
+09o 236
 10s ΓεnΣym-89
 10s fn*
 20
 0Bo 15
 10s source
 08i 1 v compile/fn*
-09o 236
+09o 212
 10s ΓεnΣym-89
 10s macro*
 20
 0Bo 15
 10s source
 08i 1 v compile/macro*
-09o 212
-10s ΓεnΣym-89
-10s μ*
-20
-0Bo 15
-10s source
-08i 1 v compile/μ*
 09o 188
 10s ΓεnΣym-89
 10s ω*
@@ -4948,7 +4957,130 @@
 10s environment
 08i 2 v compile
 01
-}]] [def defmacro [μ* defmacro [name args . body] "Define a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list macro* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def macro [μ* macro [args . body] "Return a new bytecoded macro" [do [def doc-string [if [string? [car body]] [car body] ""]] [list macro* #nil args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def fn [μ* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" [do [def doc-string [if [string? [car body]] [car body] ""]] [list fn* 'anonymous args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]] [def defn [μ* defn [name args . body] "Define a new bytecoded function" [do [def doc-string [if [string? [car body]] [car body] ""]] [list 'def name [list fn* name args doc-string [assemble* [bytecompile [compile [cons 'do body] [current-closure]]]]]]]]] [def ω [μ* ω body "Defines and returns new object after evaluating body within" [compile [cons 'ω* body]]]] [def defobj ω] [def eval [μ* eval [expr] "Compile, Evaluate and then return the result of EXPR" [cons 'eval* [cons [cons 'compile [cons expr [cons [cons 'current-closure #nil] #nil]]] #nil]]]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defmacro [macro* defmacro [name args . body] "Define a new bytecoded macro" #{
+10s body
+08i 1 v car
+08i 1 v string?
+0Bo 15
+10s body
+08i 1 v car
+09o 7
+05v ""
+0Es doc-string
+0D
+23s def
+10s name
+10s macro*
+10s name
+10s args
+10s doc-string
+23s do
+10s body
+08i 2 v cons
+08i 0 v current-closure
+08i 2 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+08i 5 v list
+08i 3 v list
+01
+}]] [def macro [macro* macro [args . body] "Return a new bytecoded macro" #{
+10s body
+08i 1 v car
+08i 1 v string?
+0Bo 15
+10s body
+08i 1 v car
+09o 7
+05v ""
+0Es doc-string
+0D
+10s macro*
+24
+10s args
+10s doc-string
+23s do
+10s body
+08i 2 v cons
+08i 0 v current-closure
+08i 2 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+08i 5 v list
+01
+}]] [def fn [macro* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" #{
+10s body
+08i 1 v car
+08i 1 v string?
+0Bo 15
+10s body
+08i 1 v car
+09o 7
+05v ""
+0Es doc-string
+0D
+10s fn*
+23s anonymous
+10s args
+10s doc-string
+23s do
+10s body
+08i 2 v cons
+08i 0 v current-closure
+08i 2 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+08i 5 v list
+01
+}]] [def defn [macro* defn [name args . body] "Define a new bytecoded function" #{
+10s body
+08i 1 v car
+08i 1 v string?
+0Bo 15
+10s body
+08i 1 v car
+09o 7
+05v ""
+0Es doc-string
+0D
+23s def
+10s name
+10s fn*
+10s name
+10s args
+10s doc-string
+23s do
+10s body
+08i 2 v cons
+08i 0 v current-closure
+08i 2 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+08i 5 v list
+08i 3 v list
+01
+}]] [def ω [macro* ω body "Defines and returns new object after evaluating body within" #{
+23s ω*
+10s body
+08i 2 v cons
+08i 1 v compile
+01
+}]] [def defobj ω] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
+23s eval*
+23s compile
+10s expr
+23s current-closure
+24
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18o 24
 10s expr
@@ -5000,7 +5132,44 @@
 27
 0D
 01
-}]] [def typecheck/only [μ* typecheck/only [v t] "" [cons 'when-not [cons [cons '== [cons [cons 'type-of [cons v #nil]] [cons t #nil]]] [cons [cons 'throw [cons [cons 'list [cons :type-error [cons [cat "Expected a value of type " t] [cons v [cons [cons 'current-lambda #nil] #nil]]]]] #nil]] #nil]]]]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
+}]] [def typecheck/only [macro* typecheck/only [v t] "" #{
+23s when-not
+23s ==
+23s type-of
+10s v
+24
+08i 2 v cons
+08i 2 v cons
+10s t
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+23s throw
+23s list
+05v :type-error
+05v "Expected a value of type "
+10s t
+08i 2 v cat
+10s v
+23s current-lambda
+24
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
 15
 10s op
 0Es ΓεnΣym-97
@@ -6156,7 +6325,20 @@
 10s handler
 08i 3 v tree/set!
 01
-}]] [def event-clear [μ* event-clear [event] "Clears all event handlers for event-name" [cons 'set! [cons event [cons [cons 'tree/new [cons #nil #nil]] #nil]]]]] [def event-fire [fn* event-fire [event . val] "Applies ...val to all event handlers associated with event-name" #{
+}]] [def event-clear [macro* event-clear [event] "Clears all event handlers for event-name" #{
+23s set!
+10s event
+23s tree/new
+24
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def event-fire [fn* event-fire [event val] "Applies ...val to all event handlers associated with event-name" #{
 15
 10s event
 08i 1 v tree/values
@@ -6237,10 +6419,91 @@
 09o 4
 24
 01
-}]] [def let [μ* let [bindings . body] "Evalutes to BODY if PRED is true" [cons 'let* [cons [cons 'do [append [let/args bindings] [append body #nil]]] #nil]]]] [def if-let [μ* if-let [binding then else] "" [cons 'let* [cons [cons 'def [cons [car binding] [cons [cadr binding] #nil]]] [cons [cons 'if [cons [car binding] [cons then [cons else #nil]]]] #nil]]]]] [def when-let [μ* when-let [binding . body] "" [cons 'if-let [cons binding [cons [cons 'do body] [cons #nil #nil]]]]]]][do [def comment [macro* comment body "Does nothing" #{
+}]] [def let [macro* let [bindings . body] "Evalutes to BODY if PRED is true" #{
+23s let*
+23s do
+10s bindings
+08i 1 v let/args
+10s body
+24
+08i 2 v append
+08i 2 v append
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def if-let [macro* if-let [binding then else] "" #{
+23s let*
+23s def
+10s binding
+08i 1 v car
+10s binding
+08i 1 v cadr
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+23s if
+10s binding
+08i 1 v car
+10s then
+10s else
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def when-let [macro* when-let [binding . body] "" #{
+23s if-let
+10s binding
+23s do
+10s body
+08i 2 v cons
+24
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def comment [macro* comment body "Does nothing" #{
 24
 01
-}]] [def += [μ* += [val inc] "" [cons 'set! [cons val [cons [cons '+ [cons val [cons inc #nil]]] #nil]]]]] [def cdr! [μ* cdr! [l] "[set! l [cdr l]]" [cons 'set! [cons l [cons [cons 'cdr [cons l #nil]] #nil]]]]] [def not [fn* not [v] "Return true if V is false" #{
+}]] [def += [macro* += [val inc] "" #{
+23s set!
+10s val
+23s +
+10s val
+10s inc
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def cdr! [macro* cdr! [l] "[set! l [cdr l]]" #{
+23s set!
+10s l
+23s cdr
+10s l
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def not [fn* not [v] "Return true if V is false" #{
 10s v
 0Bo 10
 05v #f
@@ -6358,7 +6621,37 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def when-not [μ* when-not [pred . body] "Evalutes to BODY if PRED is false" [cons 'if [cons pred [cons #nil [cons [cons 'do [append body #nil]] #nil]]]]]] [def when [μ* when [pred . body] "Evalutes to BODY if PRED is true" [cons 'if [cons pred [cons [cons 'do [append body #nil]] [cons #nil #nil]]]]]] [def case/clauses/multiple [fn* case/clauses/multiple [key-sym cases] "" #{
+}]] [def when-not [macro* when-not [pred . body] "Evalutes to BODY if PRED is false" #{
+23s if
+10s pred
+24
+23s do
+10s body
+24
+08i 2 v append
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def when [macro* when [pred . body] "Evalutes to BODY if PRED is true" #{
+23s if
+10s pred
+23s do
+10s body
+24
+08i 2 v append
+08i 2 v cons
+24
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def case/clauses/multiple [fn* case/clauses/multiple [key-sym cases] "" #{
 10s cases
 0Bo 51
 23s ==
@@ -6442,7 +6735,208 @@
 09o 4
 24
 01
-}]] [def case [μ* case [key-form . clauses] "" [do [def key-sym [gensym]] [list 'let* [list 'def key-sym key-form] [case/clauses key-sym clauses]]]]] [def cond [μ* cond body "Contains multiple cond clauses" [if [and body [caar body]] [list 'if [caar body] [cons 'do [cdar body]] [macro-apply cond [cdr body]]] #nil]]] [def for [μ* for [for-loop . body] "For loops, [for [name start stop] body]" [do [def symbol-name [car for-loop]] [def loop-start [cadr for-loop]] [def loop-stop [caddr for-loop]] [def stop-var [gensym]] [def dir 1] [if [cadddr for-loop] [set! dir [cadddr for-loop]] #nil] [if [symbol? symbol-name] #nil [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]] [if loop-start #nil [throw [list :invalid-for "Expected a start value at the second position" for-loop]]] [if loop-stop #nil [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]] [def pred [if [> dir 0] < >]] [cons 'let [cons [cons [cons symbol-name [cons loop-start #nil]] [cons [cons stop-var [cons loop-stop #nil]] #nil]] [cons [cons 'while [cons [cons pred [cons symbol-name [cons stop-var #nil]]] [append body [cons [cons 'set! [cons symbol-name [cons [cons 'add/int [cons dir [cons symbol-name #nil]]] #nil]]] #nil]]]] #nil]]]]]] [def for-in [μ* for-in [for-loop . body] "[for-in [l [list 1 2 3 4]] [println l]]" [do [def symbol-name [gensym]] [cons 'let [cons [cons [cons symbol-name [cons [cadr for-loop] #nil]] #nil] [cons [cons 'when [cons symbol-name [cons [cons 'while [cons symbol-name [cons [cons 'def [cons [car for-loop] [cons [cons 'car [cons symbol-name #nil]] #nil]]] [append body [cons [cons 'cdr! [cons symbol-name #nil]] #nil]]]]] #nil]]] #nil]]]]]] [def thread/-> [fn* thread/-> [init fun] "" #{
+}]] [def case [macro* case [key-form . clauses] "" #{
+08i 0 v gensym
+0Es key-sym
+0D
+23s let*
+23s def
+10s key-sym
+10s key-form
+08i 3 v list
+10s key-sym
+10s clauses
+08i 2 v case/clauses
+08i 3 v list
+01
+}]] [def cond [macro* cond body "Contains multiple cond clauses" #{
+10s body
+0C
+0Bo 13
+0D
+10s body
+08i 1 v caar
+0Bo 60
+23s if
+10s body
+08i 1 v caar
+23s do
+10s body
+08i 1 v cdar
+08i 2 v cons
+10s cond
+10s body
+08i 1 v cdr
+08i 2 v macro-apply
+08i 4 v list
+09o 4
+24
+01
+}]] [def for [macro* for [for-loop . body] "For loops, [for [name start stop] body]" #{
+10s for-loop
+08i 1 v car
+0Es symbol-name
+0D
+10s for-loop
+08i 1 v cadr
+0Es loop-start
+0D
+10s for-loop
+08i 1 v caddr
+0Es loop-stop
+0D
+08i 0 v gensym
+0Es stop-var
+0D
+02i 1
+0Es dir
+0D
+10s for-loop
+08i 1 v cadddr
+0Bo 19
+10s for-loop
+08i 1 v cadddr
+0Fs dir
+09o 4
+24
+0D
+10s symbol-name
+08i 1 v symbol?
+0Bo 7
+24
+09o 25
+05v :invalid-for
+05v "Expected a symbol name within the for loop"
+10s symbol-name
+08i 3 v list
+08i 1 v throw
+0D
+10s loop-start
+0Bo 7
+24
+09o 25
+05v :invalid-for
+05v "Expected a start value at the second position"
+10s for-loop
+08i 3 v list
+08i 1 v throw
+0D
+10s loop-stop
+0Bo 7
+24
+09o 25
+05v :invalid-for
+05v "Expected a stop value at the third position"
+10s for-loop
+08i 3 v list
+08i 1 v throw
+0D
+10s dir
+02i 0
+22
+0Bo 10
+10s <
+09o 7
+10s >
+0Es pred
+0D
+23s let
+10s symbol-name
+10s loop-start
+24
+08i 2 v cons
+08i 2 v cons
+10s stop-var
+10s loop-stop
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+23s while
+10s pred
+10s symbol-name
+10s stop-var
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+10s body
+23s set!
+10s symbol-name
+23s add/int
+10s dir
+10s symbol-name
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def for-in [macro* for-in [for-loop . body] "[for-in [l [list 1 2 3 4]] [println l]]" #{
+08i 0 v gensym
+0Es symbol-name
+0D
+23s let
+10s symbol-name
+10s for-loop
+08i 1 v cadr
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+23s when
+10s symbol-name
+23s while
+10s symbol-name
+23s def
+10s for-loop
+08i 1 v car
+23s car
+10s symbol-name
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+10s body
+23s cdr!
+10s symbol-name
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def thread/-> [fn* thread/-> [init fun] "" #{
 10s fun
 0Bo 110
 10s fun
@@ -6472,7 +6966,13 @@
 09o 7
 10s init
 01
-}]] [def -> [μ* -> [init . fun] "Thread init as the first argument through every function in fun" [thread/-> init [reverse fun]]]] [def thread/->> [fn* thread/->> [init fun] "" #{
+}]] [def -> [macro* -> [init . fun] "Thread init as the first argument through every function in fun" #{
+10s init
+10s fun
+08i 1 v reverse
+08i 2 v thread/->
+01
+}]] [def thread/->> [fn* thread/->> [init fun] "" #{
 10s fun
 0Bo 44
 10s fun
@@ -6487,7 +6987,13 @@
 09o 7
 10s init
 01
-}]] [def ->> [μ* ->> [init . fun] "Thread init as the last argument through every function in fun" [thread/->> init [reverse fun]]]] [def returnable/λ [fn* returnable/λ [e] "" #{
+}]] [def ->> [macro* ->> [init . fun] "Thread init as the last argument through every function in fun" #{
+10s init
+10s fun
+08i 1 v reverse
+08i 2 v thread/->>
+01
+}]] [def returnable/λ [fn* returnable/λ [e] "" #{
 10s e
 08i 1 v car
 05v :return
@@ -6499,7 +7005,29 @@
 10s e
 08i 1 v throw
 01
-}]] [def returnable [μ* returnable body "" [cons 'try [cons 'returnable/λ [append body #nil]]]]] [def return [μ* return [v] "" [cons 'throw [cons [cons 'cons [cons :return [cons v #nil]]] #nil]]]]][do [def numeric? [fn* numeric? [a] "Return #t if a is a number" #{
+}]] [def returnable [macro* returnable body "" #{
+23s try
+23s returnable/λ
+10s body
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def return [macro* return [v] "" #{
+23s throw
+23s cons
+05v :return
+10s v
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def numeric? [fn* numeric? [a] "Return #t if a is a number" #{
 10s a
 08i 1 v int?
 0C
@@ -6870,7 +7398,12 @@
 09o 7
 10s l
 01
-}]] [def quasiquote [μ* quasiquote [l] "" [quasiquote-real l 0]]] [def unquote [fn* unquote [expr] "" #{
+}]] [def quasiquote [macro* quasiquote [l] "" #{
+10s l
+02i 0
+08i 2 v quasiquote-real
+01
+}]] [def unquote [fn* unquote [expr] "" #{
 05v :unquote-without-quasiquote
 05v "unquote should only occur inside a quasiquote, never evaluated directly"
 08i 2 v list
@@ -7002,7 +7535,26 @@
 08i 6 v cat
 08i 1 v display
 01
-}]] [def profile [μ* profile body "Measure and display how much time and ressources it takes for BODY to be evaluated" [cons 'profile-form [cons [cons 'quote [cons [if [last? body] [car body] [cons 'do body]] #nil]] #nil]]]]][def hash/adler32 [fn* hash/adler32 [data] "" #{
+}]] [def profile [macro* profile body "Measure and display how much time and ressources it takes for BODY to be evaluated" #{
+23s profile-form
+23s quote
+10s body
+08i 1 v last?
+0Bo 15
+10s body
+08i 1 v car
+09o 16
+23s do
+10s body
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]]][def hash/adler32 [fn* hash/adler32 [data] "" #{
 02i 1
 0Es a
 0D
@@ -7069,7 +7621,22 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def -- [μ* -- [i] "Decrement I by 1 and store the result in I" [cons 'set! [cons i [cons [cons '+ [cons -1 [cons i #nil]]] #nil]]]]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
+}]] [def -- [macro* -- [i] "Decrement I by 1 and store the result in I" #{
+23s set!
+10s i
+23s +
+02i -1
+10s i
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
 25v anonymous v [β] v "" v #{
 10s α
 10s β
@@ -7111,7 +7678,16 @@
 08i 2 v %
 08i 2 v +
 01
-}]] [def +1 [μ* +1 [v] "" [cons '+ [cons 1 [cons v #nil]]]]] [def radians [fn* radians [degrees] "Convert a quantity in degrees to radians" #{
+}]] [def +1 [macro* +1 [v] "" #{
+23s +
+02i 1
+10s v
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def radians [fn* radians [degrees] "Convert a quantity in degrees to radians" #{
 10s π
 10s degrees
 08i 2 v *
@@ -8512,7 +9088,344 @@
 10s arg
 08i 3 v list
 01
-}]] [def fmt [μ* fmt [format-string . args] "Return a formatted string" [do [if [string? format-string] #nil [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [let* [do [def i 0] [def ΓεnΣym-126 [string/length format-string]] [while [< i ΓεnΣym-126] [do [let* [do [def ΓεnΣym-127 [char-at format-string i]] [if [== ΓεnΣym-127 123] [do [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [set! cuts [cons i cuts]]] [if [== ΓεnΣym-127 125] [do [if [int? [car cuts]] #nil [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]] #nil]]]] [set! i [add/int 1 i]]]]]] [if [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]] #nil] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [array/fill! [array/allocate [length args]] #f]] [set! fmt/expr/count [array/length arguments-used]] [let* [do [def ΓεnΣym-128 cuts] [if ΓεnΣym-128 [while ΓεnΣym-128 [do [def c [car ΓεnΣym-128]] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [if [== "" lit] #nil [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]] [set! ΓεnΣym-128 [cdr ΓεnΣym-128]]]] #nil]]] [if [> last-pos 0] [do [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] #nil] [let* [do [def i 0] [def ΓεnΣym-129 [array/length arguments-used]] [while [< i ΓεnΣym-129] [do [if [array/ref arguments-used i] #nil [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]] [set! i [add/int 1 i]]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [set! fmt/args/map-fun/count 0] [if args [cons 'let* [append [map args fmt/args/map-fun] [cons expr #nil]]] expr]]]] [def pfmt [μ* pfmt [format-string . args] "Print a formatted string" [cons 'print [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmt [μ* efmt [format-string . args] "Print a formatted string" [cons 'error [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def pfmtln [μ* pfmtln [format-string . args] "Print a formatted string" [cons 'println [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]] [def efmtln [μ* efmtln [format-string . args] "Print a formatted string" [cons 'errorln [cons [cons 'fmt [cons format-string [append args #nil]]] #nil]]]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
+}]] [def fmt [macro* fmt [format-string . args] "Return a formatted string" #{
+10s format-string
+08i 1 v string?
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "fmt needs a string literal as a first argument, since it is implemented as a macro"
+10s format-string
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+24
+0Es cuts
+0D
+15
+02i 0
+0Es i
+0D
+10s format-string
+08i 1 v string/length
+0Es ΓεnΣym-126
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-126
+1E
+0Bo 217
+0D
+15
+10s format-string
+10s i
+08i 2 v char-at
+0Es ΓεnΣym-127
+0D
+10s ΓεnΣym-127
+02i 123
+20
+0Bo 72
+10s cuts
+08i 1 v car
+08i 1 v int?
+0Bo 33
+05v :format-error
+05v "fmt placeholders can't be nested"
+10s format-string
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
+10s i
+10s cuts
+08i 2 v cons
+0Fs cuts
+09o 102
+10s ΓεnΣym-127
+02i 125
+20
+0Bo 91
+10s cuts
+08i 1 v car
+08i 1 v int?
+0Bo 7
+24
+09o 30
+05v :format-error
+05v "fmt expects all brackets to be closed"
+10s format-string
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+10s cuts
+08i 1 v car
+10s i
+08i 2 v cons
+10s cuts
+08i 1 v cdr
+08i 2 v cons
+0Fs cuts
+09o 4
+24
+16
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -224
+16
+0D
+10s cuts
+08i 1 v car
+08i 1 v int?
+0Bo 33
+05v :format-error
+05v "fmt placeholders can't be nested"
+10s format-string
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
+24
+0Es expr-list
+0D
+10s format-string
+08i 1 v string/length
+0Es last-pos
+0D
+10s args
+08i 1 v length
+08i 1 v array/allocate
+05v #f
+08i 2 v array/fill!
+0Es arguments-used
+0D
+10s arguments-used
+08i 1 v array/length
+0Fs fmt/expr/count
+0D
+15
+10s cuts
+0Es ΓεnΣym-128
+0D
+10s ΓεnΣym-128
+0Bo 196
+02i 0
+1B
+1C
+10s ΓεnΣym-128
+0Bo 182
+0D
+10s ΓεnΣym-128
+08i 1 v car
+0Es c
+0D
+10s format-string
+10s c
+08i 1 v cdr
+02i 1
+08i 2 v +
+10s last-pos
+08i 3 v string/cut
+0Es lit
+0D
+05v ""
+10s lit
+20
+0Bo 7
+24
+09o 20
+10s lit
+10s expr-list
+08i 2 v cons
+0Fs expr-list
+0D
+10s format-string
+02i 1
+10s c
+08i 1 v car
+08i 2 v +
+10s c
+08i 1 v cdr
+08i 3 v string/cut
+10s arguments-used
+08i 2 v fmt/expr
+0Es expr
+0D
+10s expr
+10s expr-list
+08i 2 v cons
+0Fs expr-list
+0D
+10s c
+08i 1 v car
+0Fs last-pos
+0D
+10s ΓεnΣym-128
+08i 1 v cdr
+0Fs ΓεnΣym-128
+09o -184
+09o 4
+24
+16
+0D
+10s last-pos
+02i 0
+22
+0Bo 43
+10s format-string
+02i 0
+10s last-pos
+08i 3 v string/cut
+0Es lit
+0D
+10s lit
+10s expr-list
+08i 2 v cons
+0Fs expr-list
+09o 4
+24
+0D
+15
+02i 0
+0Es i
+0D
+10s arguments-used
+08i 1 v array/length
+0Es ΓεnΣym-129
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-129
+1E
+0Bo 84
+0D
+10s arguments-used
+10s i
+08i 2 v array/ref
+0Bo 7
+24
+09o 48
+05v :format-error
+05v "fmt expects all arguments to be used"
+10s format-string
+10s args
+10s i
+08i 2 v list/ref
+08i 2 v list
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -91
+16
+0D
+10s expr-list
+08i 1 v cdr
+0Bo 19
+23s cat
+10s expr-list
+08i 2 v cons
+09o 45
+10s expr-list
+08i 1 v car
+08i 1 v string?
+0Bo 15
+10s expr-list
+08i 1 v car
+09o 16
+23s string
+10s expr-list
+08i 2 v cons
+0Es expr
+0D
+02i 0
+0Fs fmt/args/map-fun/count
+0D
+10s args
+0Bo 43
+23s let*
+10s args
+10s fmt/args/map-fun
+08i 2 v map
+10s expr
+24
+08i 2 v cons
+08i 2 v append
+08i 2 v cons
+09o 7
+10s expr
+01
+}]] [def pfmt [macro* pfmt [format-string . args] "Print a formatted string" #{
+23s print
+23s fmt
+10s format-string
+10s args
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def efmt [macro* efmt [format-string . args] "Print a formatted string" #{
+23s error
+23s fmt
+10s format-string
+10s args
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def pfmtln [macro* pfmtln [format-string . args] "Print a formatted string" #{
+23s println
+23s fmt
+10s format-string
+10s args
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def efmtln [macro* efmtln [format-string . args] "Print a formatted string" #{
+23s errorln
+23s fmt
+10s format-string
+10s args
+24
+08i 2 v append
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
 10s α
 08i 1 v str->sym
 08i 1 v symbol->keyword
@@ -9264,7 +10177,20 @@
 08i 2 v +
 0Fs test-count
 01
-}]] [def test/add [μ* test/add [result . expr] "Add a test where EXPR must eval to RESULT" [cons 'test/add* [cons result [cons [list 'quote [cons 'do expr]] #nil]]]]] [def display-results [fn* display-results [] "Prints the result Message" #{
+}]] [def test/add [macro* test/add [result . expr] "Add a test where EXPR must eval to RESULT" #{
+23s test/add*
+10s result
+23s quote
+23s do
+10s expr
+08i 2 v cons
+08i 2 v list
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+01
+}]] [def display-results [fn* display-results [] "Prints the result Message" #{
 08i 0 v random/seed-initialize!
 0D
 05v [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]

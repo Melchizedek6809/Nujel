@@ -209,11 +209,6 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
 }
 
-/* Handler for [λ* name [..args] docstring body] */
-static lVal *lnfLambdaAst(lClosure *c, lVal *v){
-	return lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
-}
-
 /* Handler for [λδ name [..args] docstring body] */
 static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
 	lVal *ret = lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
@@ -224,13 +219,6 @@ static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
 /* Handler for [macro* [...args] ...body] */
 static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
 	lVal *ret = lnfLambdaBytecodeAst(c,v);
-	if(ret){ ret->type = ltMacro; }
-	return ret;
-}
-
-/* Handler for [μ* [...args] ...body] */
-static lVal *lnfMacroAst(lClosure *c, lVal *v){
-	lVal *ret = lnfLambdaAst(c,v);
 	if(ret){ ret->type = ltMacro; }
 	return ret;
 }
@@ -293,7 +281,5 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"macro*",       "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
 	lAddSpecialForm(c,"fn*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
-	lAddSpecialForm(c,"λ*",           "[name args source body]", "Create a new, raw, lambda", lnfLambdaAst);
-	lAddSpecialForm(c,"μ*",           "[name args source body]", "Create a new, raw, macro",  lnfMacroAst);
 	lAddSpecialForm(c,"ω*",           "[body]",                  "Create a new object",       lnfObjectAst);
 }

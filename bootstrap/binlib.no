@@ -380,7 +380,16 @@
 10s command
 08i 1 v popen
 01
-}]] [def repl/run-forked [μ* repl/run-forked [expr] "" [cons 'repl/run-forked* [cons [list 'quote expr] #nil]]]] [tree/set! repl/option-map 'b [fn* anonymous [option] "" #{
+}]] [def repl/run-forked [macro* repl/run-forked [expr] "" #{
+23s repl/run-forked*
+23s quote
+10s expr
+08i 2 v list
+24
+08i 2 v cons
+08i 2 v cons
+01
+}]] [tree/set! repl/option-map 'b [fn* anonymous [option] "" #{
 05v #t
 0Fs repl/parse-args/bytecode-eval-n
 0D
