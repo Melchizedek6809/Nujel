@@ -172,7 +172,7 @@
 [test/add 4 [>> 8 1]]
 [test/add 9 [- 10 1]]
 [test/add 5 [/ 10 2]]
-[test/add 256 [<< 1 8]]
+[test/add 256 [ash 1 8]]
 [test/add 2 [getf [list :a 1 :b 2 :c 3] :b]]
 [test/add "#nil" [str/write [getf [list :a 1 :b 2 :c 3] :d]]]
 [test/add "\n" "\n"]
