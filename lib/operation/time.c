@@ -46,22 +46,7 @@ static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
 	return lValInt(getMSecs());
 }
 
-/* [time/strftime ts format] - eturn TS as a date using FORMAT */
-static lVal *lnfStrftime(lClosure *c, lVal *v){
-	(void)c;
-	const int timestamp = castToInt(lCar(v),time(NULL));
-	const char *format  = castToString(lCadr(v),"%Y-%m-%d %H:%M:%S");
-
-	char buf[4096];
-	time_t ts = timestamp;
-	struct tm *info = localtime(&ts);
-	strftime(buf,sizeof(buf),format,info);
-
-	return lValString(buf);
-}
-
 void lOperationsTime(lClosure *c){
-	lAddNativeFunc(c,"time time/unix",   "[]",         "Return the current unix time",lnfTime);
-	lAddNativeFunc(c,"time/strftime",    "[ts format]","Return TS as a date using FORMAT (uses strftime)",lnfStrftime);
-	lAddNativeFunc(c,"time/milliseconds","[]",         "Return monotonic msecs",lnfTimeMsecs);
+	lAddNativeFunc(c,"time",   "          []", "Return the current unix time",lnfTime);
+	lAddNativeFunc(c,"time/milliseconds","[]", "Return monotonic msecs",lnfTimeMsecs);
 }

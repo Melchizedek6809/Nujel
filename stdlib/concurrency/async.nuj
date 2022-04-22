@@ -31,7 +31,7 @@
           "Clears all event handlers for event-name"
           `[set! ~event @[]]]
 
-[defn event-fire [event . val]
-       "Applies ...val to all event handlers associated with event-name"
-       [for-in [h [tree/values event]]
-               [h val]]]
+[defn event-fire [event val]
+      "Applies ...val to all event handlers associated with event-name"
+      [for-in [h [tree/values event]]
+              [h val]]]
