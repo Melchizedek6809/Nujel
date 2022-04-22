@@ -80,18 +80,13 @@
                [set! ret [cons [f e] ret]]]
         [nreverse ret]]
 
-[defn append/iter [a b]
-       "Iterator for append"
-       [if [nil? a]
-           b
-           [append/iter [cdr a] [cons [car a] b]]]]
-
-[defn append [a . b]
-       "Appends two lists A and B together"
-       [while b
-	      [set! a [append/iter [reverse a] [car b]]]
-	      [cdr! b]]
-       a]
+[defn append [a b]
+      "Appends two lists A and B together"
+      [def ret b]
+      [set! a [reverse a]]
+      [for-in [t a]
+              [set! ret [cons t ret]]]
+      ret]
 
 [defn sublist [l start end ret]
         "Returns a new list containing all elements of l from start to end"
