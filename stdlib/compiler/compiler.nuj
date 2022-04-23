@@ -6,6 +6,8 @@
 [def compile/environment [current-closure]]
 [def compile/verbose #f]
 
+;; Expands a do for, leaving out sub-expressions in the middle that are without
+;; side effects, which is simplified to mean anything that is not a pair.
 [defn compile/do/args [args]
        [if [last? args]
            [cons [compile* [car args]] #nil]
@@ -54,11 +56,8 @@
 [defn compile/let* [source]
        [list 'let* [compile/do [cdr source]]]]
 
-[defn compile/and [source]
-       [compile/procedure/arg source]]
-
-[defn compile/or [source]
-       [compile/procedure/arg source]]
+[defn compile/map [source]
+       [map source compile*]]
 
 [defn compile/while [source]
        [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]
@@ -66,21 +65,14 @@
 [defn compile/macro [macro source]
        [compile* [macro-apply macro [cdr source]]]]
 
-[defn compile/procedure/arg [source]
-       [when [pair? source]
-             [cons [compile* [car source]]
-                   [compile/procedure/arg [cdr source]]]]]
-
-[defn compile/procedure [proc source]
-       [compile/procedure/arg source]]
-
 [defn compile* [source]
-       "Compile the forms in source"
+       "Expand all macros within source"
        [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
-                         [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
-                         [car source]]]
+                   [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
+                   [car source]]]
 
        [case [type-of op]
+             [:nil source]
              [:special-form [case op
                                   [do     [compile/do     source]]
                                   [def    [compile/def    source]]
@@ -91,22 +83,12 @@
                                   [ω*     [compile/ω*     source]]
                                   [if     [compile/if     source]]
                                   [try    [compile/try    source]]
-                                  [and    [compile/and    source]]
-                                  [or     [compile/or     source]]
+                                  [[and or] [map source compile*]]
                                   [while  [compile/while  source]]
                                   [quote                  source ]
                                   [otherwise [throw [list :panic "Unknown special form, please fix the compiler!" source]]]]]
              [:macro                      [compile/macro      op  source]]
-             [[:lambda :native-function]  [compile/procedure  op  source]]
-             [:object                     [compile/procedure/arg  source]]
-             [:pair                       [compile/procedure/arg  source]]
-             [[:int :float :vec]          [compile/procedure/arg  source]]
-             [:array                      [compile/procedure/arg  source]]
-             [:string                     [compile/procedure/arg  source]]
-             [:tree                       [compile/procedure/arg  source]]
-             [otherwise                   [if [last? source]
-                                              source
-                                              [compile/procedure/arg source]]]]]
+             [otherwise                   [map source compile*]]]]
 
 [defn compile [source new-environment new-verbose]
       "Compile the forms in source"
