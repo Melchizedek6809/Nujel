@@ -9,6 +9,9 @@ vec         castToVec   (const lVal *v, vec         fallback);
 bool        castToBool  (const lVal *v);
 const char *castToString(const lVal *v, const char *fallback);
 lTree      *castToTree  (const lVal *v, lTree *     fallback);
+vec         requireVec  (lClosure *c, lVal *v);
+i64         requireInt  (lClosure *c, lVal *v);
+double      requireFloat(lClosure *c, lVal *v);
 const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback);
 
 lVal *lCast             (lClosure *c, lVal *v, lType t);

@@ -122,6 +122,30 @@ lVal *lCast(lClosure *c, lVal *v, lType t){
 	}
 }
 
+i64 requireInt(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltInt)){
+		lExceptionThrowValClo("type-error", "Expected an int, not: ", v, c);
+	}
+	return v->vInt;
+}
+
+double requireFloat(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	case ltFloat:
+		return v->vFloat;
+	case ltInt:
+		return v->vInt;
+	}
+	lExceptionThrowValClo("type-error", "Expected a float, not: ", v, c);
+}
+
+vec requireVec(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltVec)){
+		lExceptionThrowValClo("type-error", "Expected a vector, not: ", v, c);
+	}
+	return v->vVec;
+}
+
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal *v, i64 fallback){
 	switch(v ? v->type : ltNoAlloc){
