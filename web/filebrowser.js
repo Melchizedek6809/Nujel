@@ -18,7 +18,7 @@ const NujelFilebrowser = (ele, opts) => {
 		return segments.slice(0,segments.length - 1).join('/');
 	};
 
-	const $getActions = curBuf => {
+	const $getActions = (curBuf,$node) => {
 		const $ret = $Div("filebrowser-actions");
 		const $eval = $Div("filebrowser-eval", {
 			$parent: $ret,
@@ -26,6 +26,7 @@ const NujelFilebrowser = (ele, opts) => {
 			onClick: e => {
 				e.stopPropagation();
 				evalBuffer(curBuf);
+				visualBell($node);
 			}
 		});
 		const $delete = $Div("filebrowser-delete", {
@@ -42,13 +43,14 @@ const NujelFilebrowser = (ele, opts) => {
 		return $ret;
 	};
 
-	const $getDirActions = (name, $parent) => {
+	const $getDirActions = (name, $node) => {
 		const $ret = $Div("filebrowser-actions");
 		const $eval = $Div("filebrowser-eval", {
 			$parent: $ret,
 			text: "Evaluate Directory",
 			onClick: e => {
 				e.stopPropagation();
+				visualBell($node);
 				evalDir(name);
 			}
 		});
@@ -58,7 +60,7 @@ const NujelFilebrowser = (ele, opts) => {
 			onClick: e => {
 				e.stopPropagation();
 				if(!confirm(`Are you sure you want to delete ${name} and all its buffers?`)){return;}
-				const pred = (c) => c.name.startsWith(name);
+				const pred = c => c.name.startsWith(name);
 				Object.values(buffers).filter(pred).forEach(unlink);
 				refreshDOM();
 			}
@@ -75,7 +77,7 @@ const NujelFilebrowser = (ele, opts) => {
 		const $node = $Div("nujel-filebrowser-directory", {
 			$parent: $dir
 		});
-		$node.append($getDirActions(name));
+		$node.append($getDirActions(name,$node));
 		const $title = $Div("nujel-filebrowser-directory-title", {
 			text: segments[segments.length-1],
 			$parent: $node,
@@ -111,7 +113,7 @@ const NujelFilebrowser = (ele, opts) => {
 			});
 			curBuf.$dom = $node;
 			$dir.append($node);
-			$node.append($getActions(curBuf));
+			$node.append($getActions(curBuf,$node));
 		});
 	};
 
@@ -162,12 +164,16 @@ const NujelFilebrowser = (ele, opts) => {
 			throw new Error("Can't unlink that");
 		}
 	};
-	const evalBuffer = curBuf => {
-		repl.sendForm(curBuf.content ,false);
+	const evalBuffer = curBuf => repl.sendForm(curBuf.content ,false , false);
+	const evalBufferQueue = q => {
+		if(!q.length){return;}
+		evalBuffer(q.pop());
+		setTimeout(() => evalBufferQueue(q), 0);
 	};
 	const evalDir = name => {
 		const pred = (c) => c.name.startsWith(name);
-		Object.values(buffers).filter(pred).forEach(evalBuffer);
+		evalBufferQueue(Object.values(buffers).filter(pred).reverse());
+
 	};
 	const save = name => {
 		if(buffers[name].remote){return;}

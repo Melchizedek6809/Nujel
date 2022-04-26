@@ -3,6 +3,11 @@
 
 [def test-context "Nujel"]
 
+[defn test/reset []
+  [set! test-list #nil]
+  [set! test-count 0]
+  [test/add 4 [+ 3 1]]]
+
 [def test-list   #nil]
 [def test-count     0]
 [def nujel-start    0]
@@ -107,5 +112,5 @@
        [set! print-passes  [bool output-passes]]
        [test-run-real [test-forked nujel-runtime]]]
 
-[test/add 4 [+ 3 1]] ; Not much of a test, but that way we always have at least one test
+[test/reset]
 ; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

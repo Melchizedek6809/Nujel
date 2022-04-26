@@ -131,11 +131,12 @@ const NujelREPL = (ele, nuj) => {
 		output.scrollTop = output.scrollHeight;
 	};
 
-	const runForm = (form, echo=true) => {
+	const runForm = (form, echo=true, echoResult=true) => {
 		const result = nuj.run(form);
-		echo && outputWriteInput(form);
-		outputWrite(nuj.read() + result);
-		echo && historyAdd(form);
+		if(echo){outputWriteInput(form);}
+		outputWrite(nuj.read());
+		if(echoResult){outputWrite(result);}
+		if(echo){historyAdd(form);}
 		return result;
 	}
 

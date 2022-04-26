@@ -20,6 +20,9 @@
 	white-space:nowrap;
 	box-sizing: border-box;
 	user-select: none;
+	background:#161616;
+	display:block;
+	transition:background-color 350ms;
 }
 
 .nujel-filebrowser-buffer::before {
@@ -28,6 +31,12 @@
 	margin-right:0.5rem;
 	text-align:center;
 	width:1.6rem;
+}
+
+.nujel-filebrowser-directory {
+	background:#161616;
+	display:block;
+	transition:background-color 350ms;
 }
 
 .nujel-filebrowser-directory-title {

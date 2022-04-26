@@ -1,3 +1,6 @@
+[defmacro +123 [v]
+  `[+ 123 ~v]]
+
 [test/add 3 [def eins 1] [def zwei 2] [+ eins zwei]]
 [test/add -3 [def eins 1] [def zwei 2] [def drei [+ eins zwei]] [set! eins [- drei drei drei]]]
 [test/add 1073741824 [ash 1 30]]
@@ -624,11 +627,6 @@
 ;[test/add "#{02i 1 02i 2 08i 2 v + 01}" [str/write [assemble* [bytecompile '[+ 1 2]]]]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]
 ;[test/add "Testing!" [let* [defn a [] "Testing!" [tree/ref [closure [closure-parent [current-closure]]] :documentation]] [a]]]
-
-[def oneTwoThreeTest [+123 5]]
-[defmacro +123 [v]
-  `[+ 123 ~v]]
-
 
 ;[test/add 5 [def a 4] [for [i 0 10] [once [++ a]]] a]
 ;[test/add 102334155 [def fib-iter [fn [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [fn [n] [fib-iter 1 0 n]]] [fib 40]]

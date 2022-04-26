@@ -16,3 +16,9 @@ const $New = (opts = {}) => {
 	return $ret;
 };
 const $Div = (className, opts = {}) => $New({tagName: "DIV", className:className, ...opts});
+
+const visualBell = $ele => {
+	$ele.classList.add("visual-bell");
+	$ele.offsetHeight;
+	$ele.classList.remove("visual-bell");
+};

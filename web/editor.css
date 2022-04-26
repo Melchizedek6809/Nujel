@@ -42,7 +42,7 @@
 	padding:0.25rem 0.5rem;
 }
 
-.nujel-editor-content.visual-bell {
-	transition:none;
-	background-color: #1e2038;
+.visual-bell {
+	transition:none !important;
+	background-color: #1e2038 !important;
 }

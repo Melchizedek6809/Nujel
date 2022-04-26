@@ -1,0 +1,1 @@
+[when [== System/Architecture 'wasm] [test-run]]

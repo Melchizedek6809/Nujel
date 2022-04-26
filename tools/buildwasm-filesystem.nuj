@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[def directories '["binlib" "stdlib" "tests" "tools"]]
+[def directories '["binlib" "stdlib" "tests" "testsuite" "tools"]]
 [def output-file "web/filesystem.json"]
 
 [-> directories

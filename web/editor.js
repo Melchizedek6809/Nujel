@@ -28,10 +28,8 @@ const NujelEditor = (ele, opts) => {
 	};
 
 	const evalBuffer = () => {
-		repl.sendForm($content.innerText, false);
-		$content.classList.add("visual-bell");
-		$content.offsetHeight;
-		$content.classList.remove("visual-bell");
+		repl.sendForm($content.innerText, false, false);
+		visualBell($content);
 	};
 
 	$content.addEventListener("input", e => {
