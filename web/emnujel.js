@@ -19,12 +19,12 @@ var Module = {
 			const ret = stdoutBuffer;
 			stdoutBuffer = "";
 			return ret;
-		}
+		};
 		nujel = (line) => {
 			return nujelRun(line);
 		};
 		const repl = NujelREPL(document.getElementById("nujel-repl-wrapper"),{run: nujelRun, read: nujelRead});
-		const files = NujelFilebrowser(document.getElementById("nujel-filebrowser-wrapper",{}));
+		const files = NujelFilebrowser(document.getElementById("nujel-filebrowser-wrapper"),{repl});
 		NujelEditor(document.getElementById("nujel-editor-wrapper"),{file: "*scratch-buffer*", files, repl});
 	}],
 	print: function(text) {

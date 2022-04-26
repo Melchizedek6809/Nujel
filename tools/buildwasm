@@ -13,8 +13,12 @@ else
 fi
 cd emsdk/
 git pull
-./emsdk install "$EMSDK_TESTED_VERSION"
-./emsdk activate "$EMSDK_TESTED_VERSION"
+
+if [ $(uname -o) != "Msys" ]; then
+    ./emsdk install "$EMSDK_TESTED_VERSION"
+    ./emsdk activate "$EMSDK_TESTED_VERSION"
+fi
+
 
 source "emsdk_env.sh"
 cd ../../

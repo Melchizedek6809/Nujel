@@ -19,6 +19,7 @@
 	text-overflow: ellipsis;
 	white-space:nowrap;
 	box-sizing: border-box;
+	user-select: none;
 }
 
 .nujel-filebrowser-buffer::before {
@@ -77,9 +78,9 @@
 	overflow-y: scroll;
 	height:calc(100% - 1.5rem - 1px);
 	width:100%;
-    position: absolute;
-    left: 0;
-    top: calc(1.5rem + 1px);
+	position: absolute;
+	left: 0;
+	top: calc(1.5rem + 1px);
 }
 
 .nujel-filebrowser-files::-webkit-scrollbar {
@@ -93,4 +94,44 @@
 .nujel-filebrowser-files::-webkit-scrollbar-thumb {
 	background-color:#2e2e2e;
 	border: none;
+}
+
+.nujel-filebrowser-buffer::after,
+.nujel-filebrowser-directory:;after {
+	content:'';
+	clear:both;
+	position:relative;
+}
+
+.filebrowser-actions {
+	float:right;
+	text-align:left;
+}
+
+.filebrowser-actions > * {
+	margin-left:0.2rem;
+}
+
+.filebrowser-delete {
+	font-size:0;
+	display:inline-block;
+	cursor:pointer;
+}
+
+.filebrowser-delete::before {
+	content: '×';
+	color:#e06c75;
+	font-size:1rem;
+}
+
+.filebrowser-eval {
+	font-size:0;
+	display:inline-block;
+	cursor:pointer;
+}
+
+.filebrowser-eval::before {
+	content: '▷';
+	color:#98c379;
+	font-size:1rem;
 }

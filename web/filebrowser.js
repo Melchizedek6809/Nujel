@@ -3,6 +3,7 @@ const NujelFilebrowser = (ele, opts) => {
 	let buffers = {};
 	let $dirs = {};
 	let switchBuffer = null;
+	const {repl} = opts;
 	const LSPrefix = "nujel-buffer-";
 	const $title = document.createElement("DIV");
 	$title.classList.add("nujel-filebrowser-titlebar");
@@ -15,7 +16,55 @@ const NujelFilebrowser = (ele, opts) => {
 	const getDirname = name => {
 		const segments = name.split("/");
 		return segments.slice(0,segments.length - 1).join('/');
-	}
+	};
+
+	const $getActions = curBuf => {
+		const $ret = $Div("filebrowser-actions");
+		const $eval = $Div("filebrowser-eval", {
+			$parent: $ret,
+			text: "Evaluate Buffer",
+			onClick: e => {
+				e.stopPropagation();
+				evalBuffer(curBuf);
+			}
+		});
+		const $delete = $Div("filebrowser-delete", {
+			$parent: $ret,
+			text: "Delete Buffer",
+			onClick: e => {
+				e.stopPropagation();
+				if(!confirm(`Are you sure you want to delete ${curBuf.name}?`)){return;}
+				unlink(curBuf.name);
+				if(buf === curBuf){switchBuffer("*scratch-buffer*");}
+				refreshDOM();
+			}
+		});
+		return $ret;
+	};
+
+	const $getDirActions = (name, $parent) => {
+		const $ret = $Div("filebrowser-actions");
+		const $eval = $Div("filebrowser-eval", {
+			$parent: $ret,
+			text: "Evaluate Directory",
+			onClick: e => {
+				e.stopPropagation();
+				evalDir(name);
+			}
+		});
+		const $delete = $Div("filebrowser-delete", {
+			$parent: $ret,
+			text: "Delete Buffer",
+			onClick: e => {
+				e.stopPropagation();
+				if(!confirm(`Are you sure you want to delete ${name} and all its buffers?`)){return;}
+				const pred = (c) => c.name.startsWith(name);
+				Object.values(buffers).filter(pred).forEach(unlink);
+				refreshDOM();
+			}
+		});
+		return $ret;
+	};
 
 	const getDirNode = name => {
 		if($dirs[name]){return $dirs[name];}
@@ -23,45 +72,46 @@ const NujelFilebrowser = (ele, opts) => {
 		const segments = name.split("/");
 		const dirPath = segments.slice(0,segments.length - 1).join('/');
 		const $dir = getDirNode(dirPath);
-		const $node = document.createElement("DIV");
-		const $title = document.createElement("DIV");
-		$title.innerText = segments[segments.length-1];
-		$title.classList.add("nujel-filebrowser-directory-title")
-		const $newDir = document.createElement("DIV");
-		$newDir.classList.add("nujel-filebrowser-directory-children");
-		$node.append($title);
-		$node.append($newDir);
-		$title.addEventListener("click", () => {
-			$title.classList.toggle("active");
-			$newDir.classList.toggle("active");
+		const $node = $Div("nujel-filebrowser-directory", {
+			$parent: $dir
 		});
-		$node.classList.add("nujel-filebrowser-directory");
+		$node.append($getDirActions(name));
+		const $title = $Div("nujel-filebrowser-directory-title", {
+			text: segments[segments.length-1],
+			$parent: $node,
+			onClick: () => {
+				$title.classList.toggle("active");
+				$newDir.classList.toggle("active");
+			}
+		});
+		const $newDir = $Div("nujel-filebrowser-directory-children", {$parent: $node});
 		$dirs[name] = $newDir;
-		$dir.append($node);
 		return $newDir;
 	};
 
 	const refreshDOM = n => {
 		$files.innerHTML = "";
 		$dirs = {};
-		Object.values(buffers).sort((a,b) => a.name - b.name).forEach(curBuf => {
-			const $node = document.createElement("DIV");
-			$node.classList.add("nujel-filebrowser-buffer");
-			if(buf === curBuf){
-				$node.classList.add("active");
-			}
-			getDirNode(getDirname(curBuf.name)).append($node);
+		const bufferList = Object.values(buffers).sort((a,b) => a.name < b.name ? -1 : 1);
+		bufferList.forEach(curBuf => {
 			const segments = curBuf.name.split("/");
-			$node.innerText = segments[segments.length-1];
-			$node.addEventListener("click",() => {
-				switchBuffer(curBuf.name);
-				buf = curBuf;
-				for(const child of $files.querySelectorAll('.nujel-filebrowser-buffer.active')){
-					child.classList.remove('active');
+			const dirName  = getDirname(curBuf.name);
+			const $dir     = getDirNode(dirName);
+			const $node    = $Div("nujel-filebrowser-buffer", {
+				classList: (buf === curBuf ? ["active"] : null),
+				text: segments[segments.length-1],
+				onClick: () => {
+					switchBuffer(curBuf.name);
+					buf = curBuf;
+					for(const child of $files.querySelectorAll('.nujel-filebrowser-buffer.active')){
+						child.classList.remove('active');
+					}
+					$node.classList.add("active");
 				}
-				$node.classList.add("active");
 			});
 			curBuf.$dom = $node;
+			$dir.append($node);
+			$node.append($getActions(curBuf));
 		});
 	};
 
@@ -79,7 +129,6 @@ const NujelFilebrowser = (ele, opts) => {
 ; Alt-Return sends the current top-level Form to the repl
 ; Ctrl-Return for the current form
 */
-
 	const loadFilesystem = async () => {
 		try {
 			const resp = await fetch("./filesystem.json");
@@ -103,17 +152,34 @@ const NujelFilebrowser = (ele, opts) => {
 
 	const getBuffer = name => buf = (buffers[name] || (buffers[name] = newBuffer(name)));
 	let saveTimeoutHandle = null;
+	const unlink = name => {
+		if(typeof name === 'string'){
+			delete buffers[name];
+			localStorage.removeItem(`${LSPrefix}${name}`);
+		}else if(name.name){
+			unlink(name.name);
+		}else{
+			throw new Error("Can't unlink that");
+		}
+	};
+	const evalBuffer = curBuf => {
+		repl.sendForm(curBuf.content ,false);
+	};
+	const evalDir = name => {
+		const pred = (c) => c.name.startsWith(name);
+		Object.values(buffers).filter(pred).forEach(evalBuffer);
+	};
 	const save = name => {
 		if(buffers[name].remote){return;}
-		const data = JSON.stringify(buffers[name])
+		const data = JSON.stringify(buffers[name]);
 		localStorage.setItem(`${LSPrefix}${name}`, data);
 		saveTimeoutHandle = null;
-	}
+	};
 	const queueSave = name => {
 		if(buffers[name].remote){return;}
 		saveTimeoutHandle && clearTimeout(saveTimeoutHandle);
 		saveTimeoutHandle = setTimeout(() => save(name), 100);
-	}
+	};
 	const setSwitchBuffer = fun => switchBuffer = fun;
 
 	loadBuffers();
@@ -126,4 +192,4 @@ const NujelFilebrowser = (ele, opts) => {
 		setSwitchBuffer,
 		save
 	};
-}
+};
