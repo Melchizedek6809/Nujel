@@ -1,6 +1,3 @@
-[defmacro +123 [v]
-  `[+ 123 ~v]]
-
 [test/add 3 [def eins 1] [def zwei 2] [+ eins zwei]]
 [test/add -3 [def eins 1] [def zwei 2] [def drei [+ eins zwei]] [set! eins [- drei drei drei]]]
 [test/add 1073741824 [ash 1 30]]
@@ -491,7 +488,6 @@
 [test/add '[1 2 3 4 5] [flatten [list '[1 2] #[3] #['[[4] 5]]]]]
 [test/add "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" [cat "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"]]
 [test/add 6 [- 7 1]]
-[test/add 128 [eval-compile '[+123 5] [current-closure]]]
 [test/add '[:asd "Test"] [list :asd "Test"]]
 [test/add 10 [let [[t 0]] [for-in [l [list 1 2 3 4]] [+= t l]] t]]
 [test/add 1 [let [[t 0]] [for-in [l [list 1]] [+= t l]] t]]

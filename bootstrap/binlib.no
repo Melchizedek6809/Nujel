@@ -8,11 +8,6 @@
 08i 1 v int
 0Fs i
 0D
-10s i
-02i 10
-08i 2 v *
-0Es off
-0D
 10s off
 02i 10
 08i 2 v symbol-table
@@ -90,9 +85,7 @@
 08i 2 v cons
 0Es source
 0D
-23s do
 10s source
-08i 2 v cons
 10s environment
 08i 2 v compile/forms
 01
@@ -104,9 +97,7 @@
 08i 2 v cons
 0Es source
 0D
-23s do
 10s source
-08i 2 v cons
 08i 1 v compile
 08i 1 v bytecompile
 08i 1 v assemble
