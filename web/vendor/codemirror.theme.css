@@ -65,7 +65,7 @@
 
 .cm-s-ayu-dark span.cm-property, .cm-s-ayu-dark span.cm-attribute { color: #ffb454; }
 .cm-s-ayu-dark span.cm-keyword { color: #ff8f40; }
-.cm-s-ayu-dark span.cm-builtin { color: #98c379; }
+.cm-s-ayu-dark span.cm-builtin { color: #d7dae0; }
 .cm-s-ayu-dark span.cm-string { color: #e5c07b; }
 
 .cm-s-ayu-dark span.cm-variable { color: #b3b1ad; }
@@ -89,3 +89,6 @@
 .cm-s-ayu-dark span.cm-depth-1 {color:#c678dd;}
 .cm-s-ayu-dark span.cm-depth-2 {color:#e06c75;}
 .cm-s-ayu-dark span.cm-depth-3 {color:#e5c07b;}
+.cm-s-ayu-dark span.cm-nil { color: #626a73; }
+.cm-s-ayu-dark span.cm-true { color:#98c379; }
+.cm-s-ayu-dark span.cm-false { color: #e06c75; }

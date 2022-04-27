@@ -45,10 +45,10 @@ CodeMirror.defineMode("nujel", function () {
         state.indentStack = state.indentStack.prev;
     }
 
-    var binaryMatcher = new RegExp(/^(?:[-+]i|[-+][01]+#*(?:\/[01]+#*)?i|[-+]?[01]+#*(?:\/[01]+#*)?@[-+]?[01]+#*(?:\/[01]+#*)?|[-+]?[01]+#*(?:\/[01]+#*)?[-+](?:[01]+#*(?:\/[01]+#*)?)?i|[-+]?[01]+#*(?:\/[01]+#*)?)(?=[()\s;"]|$)/i);
-    var octalMatcher = new RegExp(/^(?:[-+]i|[-+][0-7]+#*(?:\/[0-7]+#*)?i|[-+]?[0-7]+#*(?:\/[0-7]+#*)?@[-+]?[0-7]+#*(?:\/[0-7]+#*)?|[-+]?[0-7]+#*(?:\/[0-7]+#*)?[-+](?:[0-7]+#*(?:\/[0-7]+#*)?)?i|[-+]?[0-7]+#*(?:\/[0-7]+#*)?)(?=[()\s;"]|$)/i);
-    var hexMatcher = new RegExp(/^(?:[-+]i|[-+][\da-f]+#*(?:\/[\da-f]+#*)?i|[-+]?[\da-f]+#*(?:\/[\da-f]+#*)?@[-+]?[\da-f]+#*(?:\/[\da-f]+#*)?|[-+]?[\da-f]+#*(?:\/[\da-f]+#*)?[-+](?:[\da-f]+#*(?:\/[\da-f]+#*)?)?i|[-+]?[\da-f]+#*(?:\/[\da-f]+#*)?)(?=[()\s;"]|$)/i);
-    var decimalMatcher = new RegExp(/^(?:[-+]i|[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)i|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)@[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)|[-+]?(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)[-+](?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*)?i|(?:(?:(?:\d+#+\.?#*|\d+\.\d*#*|\.\d+#*|\d+)(?:[esfdl][-+]?\d+)?)|\d+#*\/\d+#*))(?=[()\[\]{}\s;"]|$)/i);
+    var binaryMatcher = new RegExp(/^[-+]?[01,_]+/i);
+    var octalMatcher = new RegExp(/^[-+]?[0-7,_]+/i);
+    var hexMatcher = new RegExp(/^[-+]?[0-9A-Fa-f,_]+/i);
+    var decimalMatcher = new RegExp(/^[-+]?[0-9,_]+\.?[0-9,_]*/i);
 
     function isBinaryNumber (stream) {
         return stream.match(binaryMatcher);
@@ -167,18 +167,19 @@ CodeMirror.defineMode("nujel", function () {
                         if (stream.eat("|")) {                    // Multi-line comment
                             state.mode = "comment"; // toggle to comment mode
                             returnType = COMMENT;
-                        } else if (stream.eat(/[tf]/i)) {            // #t/#f (atom)
-                            returnType = ATOM;
                         } else if (stream.eat(';')) {                // S-Expr comment
                             state.mode = "s-expr-comment";
                             returnType = COMMENT;
+                        } else if (stream.eat('n')) {                // NIL
+                            returnType = "nil";
+                            stream.eatWhile(/[\w_\-!$%&*+\.\/:<=>?@\^~]/);
+                        } else if (stream.eat('t')) {                // True
+                            returnType = "true";
+                        } else if (stream.eat('f')) {                // NIL
+                            returnType = "false";
                         } else {
                             var numTest = null, hasExactness = false, hasRadix = true;
-                            if (stream.eat(/[ei]/i)) {
-                                hasExactness = true;
-                            } else {
-                                stream.backUp(1);       // must be radix specifier
-                            }
+                            stream.backUp(1);
                             if (stream.match(/^#b/i)) {
                                 numTest = isBinaryNumber;
                             } else if (stream.match(/^#o/i)) {
@@ -187,18 +188,9 @@ CodeMirror.defineMode("nujel", function () {
                                 numTest = isHexNumber;
                             } else if (stream.match(/^#d/i)) {
                                 numTest = isDecimalNumber;
-                            } else if (stream.match(/^[-+0-9.]/, false)) {
-                                hasRadix = false;
-                                numTest = isDecimalNumber;
-                            // re-consume the initial # if all matches failed
-                            } else if (!hasExactness) {
-                                stream.eat('#');
                             }
+                            stream.eat('#');
                             if (numTest != null) {
-                                if (hasRadix && !hasExactness) {
-                                    // consume optional exactness after radix
-                                    stream.match(/^#[ei]/i);
-                                }
                                 if (numTest(stream))
                                     returnType = NUMBER;
                             }
@@ -240,10 +232,10 @@ CodeMirror.defineMode("nujel", function () {
                         if(typeof state.sExprComment == "number") state.sExprComment++;
                         if(typeof state.sExprQuote == "number") state.sExprQuote++;
 
-                        const curDepth = state.indentStack.depth % 4;
+                        const curDepth = state.indentStack ? state.indentStack.depth % 4 : 0;
                         returnType = `${BRACKET} depth-${curDepth} `;
                     } else if (ch == ")" || ch == "]") {
-                        const curDepth = state.indentStack.depth % 4;
+                        const curDepth = state.indentStack ? state.indentStack.depth % 4 : 0;
                         returnType = `${BRACKET} depth-${curDepth} `;
                         if (state.indentStack != null && state.indentStack.type == (ch == ")" ? "(" : "[")) {
                             popStack(state);
@@ -266,7 +258,11 @@ CodeMirror.defineMode("nujel", function () {
 
                         if (keywords && keywords.propertyIsEnumerable(stream.current())) {
                             returnType = BUILTIN;
-                        } else returnType = "variable";
+                        } else if(ch == ':') {
+                            returnType = "keyword";
+                        } else {
+                            returnType = "variable";
+                        }
                     }
             }
             return (typeof state.sExprComment == "number") ? COMMENT : ((typeof state.sExprQuote == "number") ? ATOM : returnType);
