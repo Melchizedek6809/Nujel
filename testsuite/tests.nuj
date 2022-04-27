@@ -262,7 +262,6 @@
 [test/add 'v [car '[v]]]
 [test/add '+ [car '[+]]]
 [test/add #t [== '+ [str->sym "+"]]]
-[test/add 3 [[eval* [str->sym "+"]] 1 2]]
 [test/add '-- [car '[--]]]
 [test/add '- [car '[-]]]
 [test/add -1 [let* [def + -] [[resolve '+] 1 2]]]

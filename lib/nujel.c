@@ -62,13 +62,20 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	return ret;
 }
 
+#include "misc/pf.h"
+
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltMacro:
 		lExceptionThrowValClo("runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
-	case ltObject:
-		return lnfDo(fun->vClosure,args);
+	case ltObject: {
+		if(args && args->type == ltBytecodeArr){
+			RCP(c);
+			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr);
+		}else{
+			return lnfDo(fun->vClosure,args);
+		}}
 	case ltLambda:
 		return lLambda(c,args,fun);
 	case ltSpecialForm:

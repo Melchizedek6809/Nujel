@@ -79,7 +79,15 @@ static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 		lExceptionThrowValClo("argument-mismatch", "Expected first argument to be of type :bytecode-array", v, c);
 		return NULL;
 	}
-	return lBytecodeEval(c, lCdr(v), &opsArr->vBytecodeArr);
+	lVal *args = lCadr(v);
+	lVal *env = lCaddr(v);
+	if(env){
+		if(env->type != ltObject){
+			lExceptionThrowValClo("type-error", "Environments have to be of type :object", lCaddr(v), c);
+		}
+		return lBytecodeEval(env->vClosure, args, &opsArr->vBytecodeArr);
+	}
+	return lBytecodeEval(c, args, &opsArr->vBytecodeArr);
 }
 
 void lOperationsBytecode(lClosure *c){
@@ -87,5 +95,5 @@ void lOperationsBytecode(lClosure *c){
 	lAddNativeFunc(c,"bytecode-op->int",  "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
 	lAddNativeFunc(c,"arr->bytecode-arr", "[a]", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
 	lAddNativeFunc(c,"bytecode-arr->arr", "[a]", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
-	lAddNativeFunc(c,"bytecode-eval",     "[bc args]", "Evaluate a bytecode array and return the result", lnfBytecodeEval);
+	lAddNativeFunc(c,"bytecode-eval",     "[bc args environment]", "Evaluate a bytecode array and return the result", lnfBytecodeEval);
 }

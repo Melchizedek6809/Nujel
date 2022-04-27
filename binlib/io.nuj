@@ -6,7 +6,7 @@
 [defn help [i]
        "Describe 10 functions at offset 1"
        [when-not [int? i] [set! i [int i]]]
-       [def off [* i 10]]
+
        [for-each [map [symbol-table off 10] string]
                  [fn [l] [def desc [describe l]]
                          [pfmtln "{l} {desc}"]]]
@@ -25,12 +25,12 @@
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
        [def source [cons 'do [read [file/read path]]]]
-       [compile/forms [cons 'do source] environment]]
+       [compile/forms source environment]]
 
 [defn file/eval/bytecode [path]
        "Evaluate a Nujel source file in the current context"
        [def source [cons 'do [read [file/read path]]]]
-       [def bc [assemble [bytecompile [compile [cons 'do source]]]]]
+       [def bc [assemble [bytecompile [compile source]]]]
        [disassemble/raw bc]
        [bytecode-eval bc]]
 

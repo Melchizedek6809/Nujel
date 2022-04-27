@@ -281,5 +281,5 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"macro*",       "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
 	lAddSpecialForm(c,"fn*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
-	lAddSpecialForm(c,"ω*",           "[body]",                  "Create a new object",       lnfObjectAst);
+	lAddSpecialForm(c,"ω* environment*", "[body]",                  "Create a new object",       lnfObjectAst);
 }
