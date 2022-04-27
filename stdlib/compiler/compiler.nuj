@@ -111,7 +111,7 @@
               [-> [compile form environment]
                   bytecompile
                   assemble*
-                  [bytecode-eval environment]]]]
+                  [bytecode-eval #nil environment]]]]
 
 [defn compile/forms [source-raw environment]
        "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
@@ -161,8 +161,8 @@
 [def defobj ω]
 
 [defmacro eval [expr]
-          "Compile, Evaluate and then return the result of EXPR"
-          `[eval* [compile ~expr [current-closure]]]]
+  "Compile, Evaluate and then return the result of EXPR"
+  `[eval* [compile ~expr [current-closure]]]]
 
 [defn eval-compile [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"

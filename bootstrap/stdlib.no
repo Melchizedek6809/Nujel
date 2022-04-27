@@ -4658,12 +4658,12 @@
 0Es ΓεnΣym-89
 0D
 10s ΓεnΣym-89
-0Bo 81
+0Bo 82
 02i 0
 1B
 1C
 10s ΓεnΣym-89
-0Bo 67
+0Bo 68
 0D
 10s ΓεnΣym-89
 08i 1 v car
@@ -4674,13 +4674,14 @@
 08i 2 v compile
 08i 1 v bytecompile
 08i 1 v assemble*
+24
 10s environment
-08i 2 v bytecode-eval
+08i 3 v bytecode-eval
 0D
 10s ΓεnΣym-89
 08i 1 v cdr
 0Fs ΓεnΣym-89
-09o -69
+09o -70
 09o 4
 24
 16
