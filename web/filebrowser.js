@@ -126,7 +126,8 @@ const NujelFilebrowser = (ele, opts) => {
 ; you can use it to experiment with Nujel!
 ;
 ; Ctrl-Alt-C Evaluates the entire buffer
-; Ctrl-Alt-O switches between the Editor and REPL.`});
+; Ctrl-Alt-O Switches between the Editor and REPL.
+; Ctrl-Return Evaluates the current S-Expression`});
 /*
 ; Alt-Return sends the current top-level Form to the repl
 ; Ctrl-Return for the current form
