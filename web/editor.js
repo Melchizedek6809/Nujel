@@ -6,12 +6,12 @@ const NujelEditor = ($ele, opts) => {
 	const $title = $Div("nujel-editor-title", { $parent: $ele });
 	const $titleFolderIcon = $Div("nujel-editor-title-folder", {$parent: $title});
 	const $titleFolderCrumbs = $Div("nujel-editor-title-crumbs", {$parent: $title});
-	
+
 	const $content = $Div("nujel-editor-content", {
 		$parent: $ele
 	});
 	const mirror = new CodeMirror($content, {
-		mode:  "scheme",
+		mode:  "nujel",
 		inputStyle: "contenteditable",
 		lineNumbers: true,
 		theme: "ayu-dark"
