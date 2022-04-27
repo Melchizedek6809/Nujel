@@ -1,35 +1,3 @@
-.nujel-editor-content {
-	scrollbar-width: auto;
-	scrollbar-color: #2e2e2e #1f1f1f;
-	overflow-y:scroll;
-}
-
-.nujel-editor-content::-webkit-scrollbar {
-	width: 1rem;
-}
-
-.nujel-editor-content::-webkit-scrollbar-track {
-	background: #1f1f1f;
-}
-
-.nujel-editor-content::-webkit-scrollbar-thumb {
-	background-color:#2e2e2e;
-	border: none;
-}
-
-.nujel-editor-content {
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
-	color: #abb2bf;
-	padding:0.25rem 0 0.25rem 0.5rem;
-	padding-top:0.25rem;
-	box-sizing:border-box;
-	cursor:text;
-	height:calc(100% - 1.5rem);
-	outline:none;
-	white-space:pre;
-	transition:background-color 350ms;
-}
-
 .nujel-editor-title {
 	background: #161616;
 	font-size:0.8em;
@@ -40,6 +8,11 @@
 .nujel-editor-title-crumbs {
 	display:inline-block;
 	padding:0.25rem 0.5rem;
+}
+
+.nujel-editor-content {
+	background: #1f1f1f;
+	transition: background-color 400ms;
 }
 
 .visual-bell {

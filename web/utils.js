@@ -1,5 +1,5 @@
 const $New = (opts = {}) => {
-	const {$parent, className, classList, text, html, tagName, onClick} = opts;
+	const {$parent, className, classList, text, html, tagName, attributes, onClick} = opts;
 	if(!tagName){
 		throw new Error('You need to provide a valid tagName!!!');
 	}
@@ -8,6 +8,11 @@ const $New = (opts = {}) => {
 	if(classList){
 		const adder = c => $ret.classList.add(c);
 		classList.forEach(adder);
+	}
+	if(attributes){
+		for(const attribute in attributes){
+			$ret.setAttribute(attribute, attributes[attribute]);
+		}
 	}
 	if($parent){$parent.append($ret);}
 	if(text){$ret.innerText = text;}

@@ -125,8 +125,8 @@ const NujelFilebrowser = (ele, opts) => {
 		content: content || `; This is a scratch buffer,
 ; you can use it to experiment with Nujel!
 ;
-; Ctrl-Alt-c Evaluates the entire buffer
-; Ctrl-Z switches between the Editor and REPL.`});
+; Ctrl-Alt-C Evaluates the entire buffer
+; Ctrl-Alt-O switches between the Editor and REPL.`});
 /*
 ; Alt-Return sends the current top-level Form to the repl
 ; Ctrl-Return for the current form

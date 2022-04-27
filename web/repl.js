@@ -156,7 +156,7 @@ const NujelREPL = (ele, nuj) => {
 				historyNext();
 				break;
 		}
-		if((ev.keyCode == 90) && ev.ctrlKey){
+		if((ev.keyCode == 79) && ev.ctrlKey && ev.altKey){
 			ev.preventDefault();
 			console.log("OI!");
 			editorFocus && editorFocus();

@@ -11,8 +11,13 @@
 	font-size:1rem;
 }
 
+.nujel-filebrowser-directory {
+	position:relative;
+}
+
+.nujel-filebrowser-directory-title,
 .nujel-filebrowser-buffer {
-	padding:0.1rem 0;
+	padding:0.1rem 2.5rem 0.1rem 0;
 	cursor:pointer;
 	width: 100%;
 	overflow: hidden;
@@ -22,6 +27,7 @@
 	user-select: none;
 	background:#161616;
 	display:block;
+	position:relative;
 	transition:background-color 350ms;
 }
 
@@ -37,13 +43,6 @@
 	background:#161616;
 	display:block;
 	transition:background-color 350ms;
-}
-
-.nujel-filebrowser-directory-title {
-	display:block;
-	cursor:pointer;
-	user-select:none;
-	padding:0.1rem 0;
 }
 
 .nujel-filebrowser-directory-children {
@@ -113,7 +112,10 @@
 }
 
 .filebrowser-actions {
-	float:right;
+	position:absolute;
+	right:0;
+	top:0;
+	z-index:5;
 	text-align:left;
 }
 
