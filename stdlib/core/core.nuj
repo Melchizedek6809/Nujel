@@ -4,6 +4,8 @@
 ;; Contains native nujel implementations of some
 ;; core language constructs and essential macros
 
+[def otherwise #t]
+
 [defmacro comment body
           "Does nothing"
           #nil]
