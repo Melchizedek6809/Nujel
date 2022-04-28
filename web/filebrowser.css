@@ -6,6 +6,11 @@
 	line-height:1.5rem;
 }
 
+.nujel-filebrowser-files {
+	font-family: monospace, mono;
+	line-height:1.2rem;
+}
+
 .nujel-editor-title-folder::before {
 	content: '📁';
 	font-size:1rem;
@@ -71,8 +76,8 @@
 }
 
 .nujel-filebrowser-titlebar {
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
-	line-height:1.5rem;
+	font-family: monospace, mono;
+	line-height:1.2rem;
 	border-bottom:solid 1px #007acc;
 	display:block;
 	padding:0 0.25rem;
@@ -144,5 +149,5 @@
 .filebrowser-eval::before {
 	content: '▷';
 	color:#98c379;
-	font-size:1rem;
+	font-size:1.3rem;
 }

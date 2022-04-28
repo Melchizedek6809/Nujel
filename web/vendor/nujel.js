@@ -271,6 +271,8 @@ CodeMirror.defineMode("nujel", function () {
                             returnType = BUILTIN;
                         } else if(ch == ':') {
                             returnType = "keyword";
+                        } else if(stream.current() == 'otherwise'){
+                            returnType = "true";
                         } else {
                             returnType = "variable";
                         }

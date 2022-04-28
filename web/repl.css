@@ -55,7 +55,8 @@ body,html {
 	border:none;
 	box-sizing:border-box;
 	white-space:pre;
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
+	line-height: 1.2em;
+	font-family: monospace, mono;
 	outline:none;
 }
 
@@ -74,7 +75,8 @@ body,html {
 	color:#abb2bf;
 	border:none;
 	box-sizing:border-box;
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
+	line-height: 1.2em;
+	font-family: monospace, mono;
 }
 
 .nujel-repl-input {
@@ -93,7 +95,7 @@ body,html {
 
 input.nujel-repl {
 	height:2em;
-	line-height:1.35em;
+	line-height:1.2em;
 	padding:0 0.25em;
 	background:#1f1f1f;
 	color:#f8f8f0;
@@ -102,7 +104,7 @@ input.nujel-repl {
 	left:0;
 	z-index:1;
 	font-size:1rem;
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
+	font-family: monospace, mono;
 }
 
 ansi-seq[ansi-fg="0"] {color:#2d3139;}

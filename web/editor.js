@@ -36,7 +36,7 @@ const NujelEditor = ($ele, opts) => {
 	mirror.on("cursorActivity", () => {
 		if(!evalInFlight){return;}
 		evalInFlight = null;
-		repl.sendForm(mirror.getSelection(), true, true);
+		repl.sendForm(mirror.getSelection(), false, true);
 		mirror.getDoc().setSelection(evalInFlightCursor);
 		evalInFlightCursor = null;
 	});

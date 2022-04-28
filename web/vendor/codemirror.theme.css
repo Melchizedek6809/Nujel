@@ -9,7 +9,8 @@
 }
 
 .cm-s-ayu-dark.CodeMirror {
-	font-family: JetBrains Mono, Terminus, Consolas, monospace, mono;
+	font-family: monospace, mono;
+	line-height: 1.2em;
 	height:100%;
 }
 
