@@ -166,11 +166,13 @@
 
 [defn eval-compile [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [eval* [compile expr closure]]]]
+       [try display/error [bytecode-eval [-> [compile expr closure]
+                                             bytecompile
+                                             assemble*] closure]]]
 
 [defn read-eval-compile [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [eval* [compile [read expr] closure]]]]
+       [eval-compile [read expr] closure]]
 
 [defn eval-load [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
@@ -178,7 +180,7 @@
 
 [defn read-eval-load [expr closure]
        "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [load/forms [read expr] closure]]]
+       [eval-load [read expr] closure]]
 
 [defmacro typecheck/only [v t]
           `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
