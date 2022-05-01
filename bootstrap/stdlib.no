@@ -7111,7 +7111,7 @@
 08i 1 v str/write
 05v "\r\n"
 10s c
-08i 1 v closure-caller
+08i 1 v closure/caller
 10s i
 0C
 0Ao 15
@@ -7133,7 +7133,7 @@
 01
 }]] [def stacktrace [fn* stacktrace [] "" #{
 08i 0 v current-lambda
-08i 1 v closure-caller
+08i 1 v closure/caller
 08i 1 v describe/closure
 08i 1 v display
 01
