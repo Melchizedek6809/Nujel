@@ -7076,6 +7076,11 @@
 01
 }]]][do [def describe/closure [fn* describe/closure [c i] "" #{
 10s c
+08i 1 v closure
+08i 1 v str/write
+08i 1 v println
+0D
+10s c
 0Bo 174
 10s c
 08i 1 v closure

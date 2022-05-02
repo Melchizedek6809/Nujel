@@ -24,6 +24,6 @@
            [avl/reduce [fn [e sum]
                           [+ sum [max 0 [- [array/ref e 1] 5]]]]]]]
 
-[def words [count-words [string [file/read "CODE_OF_CONDUCT.md"]]]]
+[def words [count-words [string [or [file/read "CODE_OF_CONDUCT.md"] ""]]]]
 [when [!= words 122]
       [throw [list :wrong-result "CoC Words Wrong" words]]]

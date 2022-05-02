@@ -315,7 +315,7 @@ lVal *lQuote(lVal *v){
 lClosure *lNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
-	c->type = closureObject;
+	c->type = closureLet;
 	lRootsClosurePush(c);
 	lAddCoreFuncs(c);
 	lAddPlatformVars(c);

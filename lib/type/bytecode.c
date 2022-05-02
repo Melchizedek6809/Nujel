@@ -84,7 +84,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	ctx.sp = 0;
 
 	int exceptionCount = 0;
-	c->type = closureLet;
 	lRootsContextPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
@@ -94,7 +93,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		while((ctx.csp >= 0) && (c->type != closureTry)){
 			c = ctx.closureStack[--ctx.csp];
 		}
-		if((ctx.csp >= 0) && (++exceptionCount < 100000) && (c->type == closureTry)){
+		if((ctx.csp >= 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
 			ip = c->ip;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = exceptionValue;
@@ -342,6 +341,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			lClosure *nclo = ctx.closureStack[--ctx.csp];
 			if(ctx.csp == 0){break;}
 			if((nclo->type == closureTry)
+			|| (nclo->type == closureCall)
 			|| (nclo->type == closureLet)){
 				continue;
 			}
@@ -364,11 +364,14 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break;
 	case lopThrow:
 		ip++;
+		lVal *rv = ctx.valueStack[ctx.sp-1];
 		while(ctx.csp > 0){
-			lVal *rv = ctx.valueStack[ctx.sp-1];
-			lClosure *nclo = ctx.closureStack[--ctx.csp];
+			lClosure *nclo = ctx.closureStack[ctx.csp];
 			if(!nclo || ctx.csp == 0){break;}
-			if(nclo->type != closureTry){continue;}
+			if(nclo->type != closureTry){
+				--ctx.csp;
+				continue;
+			}
 			ip = nclo->ip;
 			ctx.sp = nclo->sp;
 			lRootsRet(nclo->rsp);
