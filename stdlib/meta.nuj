@@ -59,3 +59,7 @@
        [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
 
 [def root-closure [current-closure]]
+
+[defn test-des-stack-traces [] [array/set! #[] -1]]
+
+[defn t [] [test-des-stack-traces]]

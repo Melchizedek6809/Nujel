@@ -3,13 +3,16 @@
 
 [defn describe/closure [c i]
   [when c
-    [def info [closure c]]
-    [when [and info [ref info :call]]
-      [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]]
-           " - "
-           [str/write [ref info :data]]
-           "\r\n"
-           [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]
+    [if [== c root-closure]
+        [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]]
+                   "\r\n"]
+        [do [def info [closure c]]
+            [when info
+              [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]]
+                   " - "
+                   [str/write [ref info :data]]
+                   "\r\n"
+                   [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
 
 [defn stacktrace []
   [display [describe/closure [closure/caller [current-lambda]]]]]

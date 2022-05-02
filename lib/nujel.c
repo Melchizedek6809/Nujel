@@ -41,10 +41,11 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	tmpc->caller = c;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(n->type == ltPair){
-			lDefineClosureSym(tmpc, lGetSymbol(lCar(n)), lCar(vn));
+			lVal *car = lCar(n);
+			if(car){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(vn));}
 			vn = lCdr(vn);
 		}else if(n->type == ltSymbol){
-			lDefineClosureSym(tmpc, lGetSymbol(n), vn);
+			if(n){lDefineClosureSym(tmpc, lGetSymbol(n), vn);}
 		}else{
 			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
@@ -61,8 +62,6 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	lRootsRet(SP);
 	return ret;
 }
-
-#include "misc/pf.h"
 
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
