@@ -28,9 +28,7 @@ u8 lSymbolMarkMap [SYM_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
-	if(c->csp > 8192){
-		pf("We might have prevented a problem\n");
-	}
+	if(c->csp > 8192){return;}
 	for(int i=0;i<=c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}

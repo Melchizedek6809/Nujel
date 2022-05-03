@@ -103,8 +103,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
 			free(ctx.valueStack);
-			lRootsRet(ctx.closureStack[0]->rsp);
-			//lRootsRet(RSP);
 			lExceptionThrowRaw(exceptionValue);
 			return NULL;
 		}
