@@ -84,17 +84,16 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	ctx.sp = 0;
 
 	int exceptionCount = 0;
-	c->type = closureLet;
 	lRootsThreadPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(setjmpRet){
-		while((ctx.csp >= 0) && (c->type != closureTry)){
+		while((ctx.csp > 0) && (c->type != closureTry)){
 			c = ctx.closureStack[--ctx.csp];
 		}
-		if((ctx.csp >= 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
+		if((ctx.csp > 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
 			ip = c->ip;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = exceptionValue;
