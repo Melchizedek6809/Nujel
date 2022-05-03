@@ -101,6 +101,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			c = ctx.closureStack[--ctx.csp];
 		}else{
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
+			free(ctx.closureStack);
+			free(ctx.valueStack);
 			lExceptionThrowRaw(exceptionValue);
 			return NULL;
 		}
@@ -360,7 +362,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			exceptionTargetDepth--;
 			lRootsRet(ctx.closureStack[0]->rsp);
-			return ctx.valueStack[--ctx.sp];
+			lVal *ret = RVP(ctx.valueStack[--ctx.sp]);
+			free(ctx.closureStack);
+			free(ctx.valueStack);
+			return ret;
 		}
 		break;
 	case lopThrow:
