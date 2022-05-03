@@ -188,17 +188,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip = lBytecodeReadOPSym(ip+1, &sym);
 		ctx.valueStack[ctx.sp++] = lValSymS(sym);
 		break;}
-	case lopMakeList: {
-		const int len = *++ip;
-		lVal *ret = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp -= len;
-		ctx.valueStack[ctx.sp++] = ret;
-		ip++;
-		break;}
-	case lopEval:
-		ctx.valueStack[ctx.sp-1] = lEval(c,ctx.valueStack[ctx.sp-1]);
-		ip++;
-		break;
 	case lopApply: {
 		const int len = ip[1];
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
@@ -349,28 +338,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			return ret;
 		}
 		break;
-	case lopThrow:
-		ip++;
-		lVal *rv = ctx.valueStack[ctx.sp-1];
-		while(ctx.csp > 0){
-			lClosure *nclo = ctx.closureStack[ctx.csp];
-			if(!nclo || ctx.csp == 0){break;}
-			if(nclo->type != closureTry){
-				--ctx.csp;
-				continue;
-			}
-			ip = nclo->ip;
-			ctx.sp = nclo->sp;
-			lRootsRet(nclo->rsp);
-			ctx.valueStack[ctx.sp++] = rv;
-			break;
-		}
-		if(ctx.csp == 0){
-			if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during lopThrow", NULL, c);}
-			lExceptionThrowRaw(ctx.valueStack[--ctx.sp]);
-			return NULL;
-		}
-		break;
 	}}
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	return NULL;
@@ -386,13 +353,11 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopRet:
 	case lopIntAdd:
 	case lopDebugPrintStack:
-	case lopEval:
 	case lopDup:
 	case lopDrop:
 	case lopClosurePush:
 	case lopLet:
 	case lopClosurePop:
-	case lopThrow:
 	case lopRootsSave:
 	case lopRootsRestore:
 	case lopLessPred:
@@ -403,7 +368,6 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopPushNil:
 	case lopSwap:
 		return 1;
-	case lopMakeList:
 	case lopApplyDynamic:
 	case lopIntByte:
 		return 2;

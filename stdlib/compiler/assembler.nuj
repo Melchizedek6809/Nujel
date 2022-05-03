@@ -53,14 +53,6 @@
        "- v | Pushes v onto the stack"
        [list #$23 [sym->bytecode-op v]]]
 
-[defn $make-list [item-count]
-       "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list"
-       [list #$6 [int->bytecode-op item-count]]]
-
-[defn $eval [a]
-       "form - | Evaluates the form from the top of the stack"
-       '[#$7]]
-
 [defn $apply [arg-count fun]
        "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
        [case arg-count 2
@@ -85,10 +77,6 @@
        " - | Try something, jumping to target if an exception occurs"
        [list #$18 [list :relocate target 8 0 [int->bytecode-op 0]]
                   [list :relocate target 0 1 [int->bytecode-op 0]]]]
-
-[defn $throw []
-       " - | Return to the closest exception handler"
-       [list #$19]]
 
 [defn $jmp [target]
        [list #$9 [list :relocate target 8 0 [int->bytecode-op 0]]

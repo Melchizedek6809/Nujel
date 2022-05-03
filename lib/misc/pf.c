@@ -118,7 +118,6 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c+=3;
 				break; }
-			case lopMakeList:
 			case lopApplyDynamic: {
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
