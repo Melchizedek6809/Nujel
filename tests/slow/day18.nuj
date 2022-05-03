@@ -90,8 +90,6 @@
                  [def cs [snail/add [snail/read [array/ref vals b]] [snail/read [array/ref vals a]]]]
                  [set! cmax [max cmax [snail/mag cs]]]]]]
       cmax]
-[optimize-all!]
-
 
 [def res-p1 [snail/mag [snail/sum [file/read "tests/slow/day18.input"]]]]
 [when [!= res-p1 3725]
