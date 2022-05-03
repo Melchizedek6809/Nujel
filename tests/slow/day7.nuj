@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 
-[def real-data [apply array/new [map [split [file/read "tests/slow/day7.input"] ","] int]]]
+[def real-data [apply array/new [map [split [file/read "tests/slow/day7.input"] ","] read/int]]]
 
 [defn fancy/calc []
        [def ret [array/allocate 2000]]
@@ -30,7 +30,7 @@
 
 [def result [calc/optimal real-data calc/fuel/simple]]
 [when [!= [ref result :fuel] 355989]
-      [throw [list :wrong-result "Wrong result" result]]]
+  [throw [list :wrong-result "Wrong result" result]]]
 [def result [calc/optimal real-data calc/fuel/complex]]
 [when [!= [ref result :fuel] 102245489]
-      [throw [list :wrong-result "Wrong result" result]]]
+  [throw [list :wrong-result "Wrong result" result]]]

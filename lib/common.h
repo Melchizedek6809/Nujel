@@ -144,26 +144,22 @@ struct lClosure {
 		lClosure *nextFree;
 	};
 	lTree *data;
-	union {
-		lVal *text;
-		const lBytecodeOp *ip;
-	};
-	union {
-		lVal *args;
-		int sp;
-	};
+	lVal *text;
+	const lBytecodeOp *ip;
+	lVal *args;
 	lVal *doc;
 	const lSymbol *name;
 	lClosure *caller;
+	int sp;
 	u8 type;
 	u32 rsp;
 };
 
 struct lThread {
 	lVal **valueStack;
-	int sp;
-	int valueStackSize;
 	lClosure **closureStack;
+	int valueStackSize;
+	int sp;
 	int csp;
 	int closureStackSize;
 };
@@ -182,10 +178,8 @@ struct lTree {
 	lTree *left;
 	lTree *right;
 	const lSymbol *key;
-	union {
-		lVal *value;
-		lTree *nextFree;
-	};
+	lVal *value;
+	lTree *nextFree;
 	i16 height;
 	u8 flags;
 };
