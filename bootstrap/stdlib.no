@@ -33,188 +33,6 @@
 01
 }
 01
-}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
-05v :data
-10s width
-10s height
-08i 2 v *
-08i 1 v array/allocate
-02i 0
-08i 2 v array/fill!
-05v :width
-10s width
-05v :height
-10s height
-08i 6 v tree/new
-01
-}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
-10s data
-05v :data
-08i 2 v tree/ref
-10s v
-08i 2 v array/fill!
-0D
-10s data
-01
-}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 52
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-08i 2 v array/ref
-01
-}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 33
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 56
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-10s val
-08i 3 v array/set!
-0D
-10s data
-01
-}]] [def array/2d/print [fn* array/2d/print [data] "" #{
-15
-02i 0
-0Es y
-0D
-10s data
-05v :height
-08i 2 v tree/ref
-0Es ΓεnΣym-20
-0D
-02i 0
-1B
-1C
-10s y
-10s ΓεnΣym-20
-1E
-0Bo 115
-0D
-15
-02i 0
-0Es x
-0D
-10s data
-05v :width
-08i 2 v tree/ref
-0Es ΓεnΣym-21
-0D
-02i 0
-1B
-1C
-10s x
-10s ΓεnΣym-21
-1E
-0Bo 50
-0D
-10s data
-10s x
-10s y
-08i 3 v array/2d/ref
-05v " "
-08i 2 v cat
-08i 1 v display
-0D
-02i 1
-10s x
-03
-0Fs x
-09o -57
-16
-0D
-08i 0 v newline
-0D
-02i 1
-10s y
-03
-0Fs y
-09o -122
-16
-0D
-10s data
-01
 }]]][do [def array/+= [fn* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
 10s a
 10s i
@@ -798,6 +616,188 @@
 16
 0D
 10s ret
+01
+}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
+05v :data
+10s width
+10s height
+08i 2 v *
+08i 1 v array/allocate
+02i 0
+08i 2 v array/fill!
+05v :width
+10s width
+05v :height
+10s height
+08i 6 v tree/new
+01
+}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
+10s data
+05v :data
+08i 2 v tree/ref
+10s v
+08i 2 v array/fill!
+0D
+10s data
+01
+}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 52
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+08i 2 v array/ref
+01
+}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 33
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 56
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+10s val
+08i 3 v array/set!
+0D
+10s data
+01
+}]] [def array/2d/print [fn* array/2d/print [data] "" #{
+15
+02i 0
+0Es y
+0D
+10s data
+05v :height
+08i 2 v tree/ref
+0Es ΓεnΣym-20
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-20
+1E
+0Bo 115
+0D
+15
+02i 0
+0Es x
+0D
+10s data
+05v :width
+08i 2 v tree/ref
+0Es ΓεnΣym-21
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-21
+1E
+0Bo 50
+0D
+10s data
+10s x
+10s y
+08i 3 v array/2d/ref
+05v " "
+08i 2 v cat
+08i 1 v display
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -57
+16
+0D
+08i 0 v newline
+0D
+02i 1
+10s y
+03
+0Fs y
+09o -122
+16
+0D
+10s data
 01
 }]]][do [def avl/empty :e] [def avl/empty? [fn* avl/empty? [n] "" #{
 05v :e
@@ -3072,15 +3072,6 @@
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $make-list [fn* $make-list [item-count] "items ... - list | Makes a list of item-count items from the stack and pushes the resulting list" #{
-05v #$6
-10s item-count
-08i 1 v int->bytecode-op
-08i 2 v list
-01
-}]] [def $eval [fn* $eval [a] "form - | Evaluates the form from the top of the stack" #{
-05v [#$7]
-01
 }]] [def $apply [fn* $apply [arg-count fun] "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" #{
 15
 10s arg-count
@@ -3158,24 +3149,6 @@
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $call [fn* $call [target] " - | Call a bytecode subroutine" #{
-05v #$17
-05v :relocate
-10s target
-02i 8
-02i 0
-02i 0
-08i 1 v int->bytecode-op
-08i 5 v list
-05v :relocate
-10s target
-02i 0
-02i 1
-02i 0
-08i 1 v int->bytecode-op
-08i 5 v list
-08i 3 v list
-01
 }]] [def $try [fn* $try [target] " - | Try something, jumping to target if an exception occurs" #{
 05v #$18
 05v :relocate
@@ -3193,10 +3166,6 @@
 08i 1 v int->bytecode-op
 08i 5 v list
 08i 3 v list
-01
-}]] [def $throw [fn* $throw [] " - | Return to the closest exception handler" #{
-05v #$19
-08i 1 v list
 01
 }]] [def $jmp [fn* $jmp [target] "" #{
 05v #$9
@@ -3302,9 +3271,6 @@
 01
 }]] [def $closure/push [fn* $closure/push [] "" #{
 05v [#$13]
-01
-}]] [def $closure/enter [fn* $closure/enter [] "" #{
-05v [#$14]
 01
 }]] [def $let [fn* $let [] "" #{
 05v [#$15]
@@ -4913,70 +4879,52 @@
 05v #$0
 20
 0C
-0Ao 288
+0Ao 246
 0D
 10s ΓεnΣym-95
 05v #$1
 20
 0C
-0Ao 274
+0Ao 232
 0D
 10s ΓεnΣym-95
 05v #$3
 20
 0C
-0Ao 260
+0Ao 218
 0D
 10s ΓεnΣym-95
 05v #$4
 20
 0C
-0Ao 246
-0D
-10s ΓεnΣym-95
-05v #$7
-20
-0C
-0Ao 232
+0Ao 204
 0D
 10s ΓεnΣym-95
 05v #$C
 20
 0C
-0Ao 218
+0Ao 190
 0D
 10s ΓεnΣym-95
 05v #$D
 20
 0C
-0Ao 204
+0Ao 176
 0D
 10s ΓεnΣym-95
 05v #$13
 20
 0C
-0Ao 190
-0D
-10s ΓεnΣym-95
-05v #$14
-20
-0C
-0Ao 176
+0Ao 162
 0D
 10s ΓεnΣym-95
 05v #$15
 20
 0C
-0Ao 162
-0D
-10s ΓεnΣym-95
-05v #$16
-20
-0C
 0Ao 148
 0D
 10s ΓεnΣym-95
-05v #$19
+05v #$16
 20
 0C
 0Ao 134
@@ -5038,15 +4986,9 @@
 05v #f
 0Bo 8
 02i 1
-09o 314
+09o 286
 10s ΓεnΣym-95
 05v #$2
-20
-0C
-0Ao 36
-0D
-10s ΓεnΣym-95
-05v #$6
 20
 0C
 0Ao 22
@@ -5060,27 +5002,21 @@
 05v #f
 0Bo 8
 02i 2
-09o 260
+09o 246
 10s ΓεnΣym-95
 05v #$9
-20
-0C
-0Ao 64
-0D
-10s ΓεnΣym-95
-05v #$A
 20
 0C
 0Ao 50
 0D
 10s ΓεnΣym-95
-05v #$B
+05v #$A
 20
 0C
 0Ao 36
 0D
 10s ΓεnΣym-95
-05v #$17
+05v #$B
 20
 0C
 0Ao 22
@@ -7076,23 +7012,32 @@
 01
 }]]][do [def describe/closure [fn* describe/closure [c i] "" #{
 10s c
-08i 1 v closure
-08i 1 v str/write
-08i 1 v println
-0D
+0Bo 219
 10s c
-0Bo 174
+10s root-closure
+20
+0Bo 54
+10s i
+0C
+0Ao 15
+0D
+02i 0
+0C
+0Ao 8
+0D
+05v #f
+08i 1 v int
+05v "# <root environment>"
+08i 2 v cat
+08i 1 v ansi-blue
+05v "\r\n"
+08i 2 v cat
+09o 153
 10s c
 08i 1 v closure
 0Es info
 0D
 10s info
-0C
-0Bo 17
-0D
-10s info
-05v :call
-08i 2 v ref
 0Bo 131
 10s i
 0C
@@ -7537,7 +7482,16 @@
 08i 3 v cat
 08i 1 v str->sym
 01
-}]] [def root-closure [current-closure]]][do [def random/seed 0] [def random/seed-initialize! [fn* random/seed-initialize! [] "" #{
+}]] [def root-closure [current-closure]] [def test-des-stack-traces [fn* test-des-stack-traces [] "" #{
+24
+08i 1 v array/new
+02i -1
+08i 2 v array/set!
+01
+}]] [def t [fn* t [] "" #{
+08i 0 v test-des-stack-traces
+01
+}]]][do [def random/seed 0] [def random/seed-initialize! [fn* random/seed-initialize! [] "" #{
 08i 0 v time
 08i 0 v time/milliseconds
 08i 2 v logxor
