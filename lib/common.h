@@ -71,7 +71,7 @@ typedef enum lType {
 	ltLambda,
 	ltObject,
 	ltMacro,
-	ltContext,
+	ltThread,
 	ltNativeFunc,
 	ltSpecialForm,
 	ltBytecodeOp,
@@ -82,7 +82,7 @@ typedef enum lType {
 
 typedef struct lArray   lArray;
 typedef struct lClosure lClosure;
-typedef struct lContext lContext;
+typedef struct lThread  lThread;
 typedef struct lNFunc   lNFunc;
 typedef struct lSymbol  lSymbol;
 typedef struct lString  lString;
@@ -159,7 +159,7 @@ struct lClosure {
 	u32 rsp;
 };
 
-struct lContext {
+struct lThread {
 	lVal **valueStack;
 	int sp;
 	int valueStackSize;

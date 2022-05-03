@@ -74,7 +74,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	jmp_buf oldExceptionTarget;
 	const lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
-	lContext ctx;
+	lThread ctx;
 	ctx.closureStackSize = 16;
 	ctx.valueStackSize = 32;
 	ctx.closureStack = malloc(sizeof(lClosure *) * ctx.closureStackSize);
@@ -84,7 +84,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	ctx.sp = 0;
 
 	int exceptionCount = 0;
-	lRootsContextPush(&ctx);
+	c->type = closureLet;
+	lRootsThreadPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;

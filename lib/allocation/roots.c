@@ -19,7 +19,7 @@ typedef struct {
 		lString  *vString;
 		lSymbol  *vSymbol;
 		void     *vPointer;
-		lContext *vContext;
+		lThread  *vThread;
 	};
 } rootEntry;
 
@@ -72,8 +72,8 @@ lSymbol *lRootsSymbolPush(lSymbol *s){
 	return s;
 }
 
-void lRootsContextPush(lContext *c){
-	lRootsPush(ltContext, c);
+void lRootsThreadPush(lThread *c){
+	lRootsPush(ltThread, c);
 }
 
 void (*rootsMarkerChain)() = NULL;
@@ -81,8 +81,8 @@ void (*rootsMarkerChain)() = NULL;
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){
-		case ltContext:
-			lContextGCMark(rootStack[i].vContext);
+		case ltThread:
+			lThreadGCMark(rootStack[i].vThread);
 			break;
 		case ltLambda:
 			lClosureGCMark(rootStack[i].vClosure);

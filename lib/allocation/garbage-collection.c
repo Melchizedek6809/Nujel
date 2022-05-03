@@ -26,7 +26,7 @@ u8 lArrayMarkMap  [ARR_MAX];
 u8 lStringMarkMap [STR_MAX];
 u8 lSymbolMarkMap [SYM_MAX];
 
-void lContextGCMark(lContext *c){
+void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
 	for(int i=0;i<=c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
