@@ -291,16 +291,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ip++;
 		ctx.valueStack[ctx.sp++] = lValObject(c);
 		break;
-	case lopClosureEnter: {
-		ip++;
-		lVal *cObj = ctx.valueStack[--ctx.sp];
-		if((cObj->type != ltLambda) && (cObj->type != ltObject)){
-			lExceptionThrowValClo("invalid-closure", "Error while trying to enter a closure", cObj, c);
-		}
-		ctx.closureStack[ctx.csp++] = c;
-		c = cObj->vClosure;
-		ctx.closureStack[ctx.csp] = c;
-		break; }
 	case lopLet:
 		ip++;
 		ctx.closureStack[ctx.csp++] = c;
@@ -320,15 +310,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			return NULL;
 		}
 		break; }
-	case lopCall:
-		c->ip = ip+3;
-		c->sp = ctx.sp;
-		ctx.closureStack[ctx.csp++] = c;
-		c = lClosureNew(c);
-		c->type = closureCall;
-		ctx.closureStack[ctx.csp] = c;
-		ip += lBytecodeGetOffset16(ip+1);
-		break;
 	case lopTry:
 		ctx.closureStack[ctx.csp++] = c;
 		c = lClosureNew(c);
@@ -409,7 +390,6 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopDup:
 	case lopDrop:
 	case lopClosurePush:
-	case lopClosureEnter:
 	case lopLet:
 	case lopClosurePop:
 	case lopThrow:
@@ -427,7 +407,6 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopApplyDynamic:
 	case lopIntByte:
 		return 2;
-	case lopCall:
 	case lopTry:
 	case lopJmp:
 	case lopJf:

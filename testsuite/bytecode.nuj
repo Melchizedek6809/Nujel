@@ -75,7 +75,6 @@
 [test/add '[:asd "Test"] [try [fn [a] :shouldnt-have-caught-that] [asmrun [$jmp :start] [list :label :handle] [$ret] [list :label :start] [$try :handle] [$let] [$push/lval '[:asd "Test"]] [$throw]]]]
 [test/add :asd [car [asmrun [$nop] [$nop] [$try :handle] [$let] [$push/lval '[:asd "Test"]] [$throw] [$nop] [$push/lval :error] [list :label :handle] [$ret]]]]
 [test/add 3 [asmrun [$jmp :start] [list :label :ret] [$push/int 3] [$ret] [list :label :start] [$push/int 2] [$jmp :ret] [$ret]]]
-[test/add 5 [asmrun [$jmp :start] [list :label :func] [$push/int 2] [$add/int] [$ret] [list :label :start] [$push/int 3] [$call :func] [$ret]]]
 [test/add 5 [asmrun [$jmp :start] [list :label :func] [$push/int 2] [$add/int] [$ret] [list :label :start] [$push/int 3] [$jmp :func]]]
 [test/add 1 [byterun '[car [cons 1 2]]]]
 [test/add '[1 . 2] [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$ret]]]
