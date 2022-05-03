@@ -123,7 +123,7 @@ release.musl: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 
 release.san: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@rm -f $(NUJEL)
-	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -march="x86-64" -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
+	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
