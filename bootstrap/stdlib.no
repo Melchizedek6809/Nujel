@@ -4008,10 +4008,11 @@
 10s source
 08i 1 v cdr
 10s env
-08i 2 v bytecompile/do
+08i 2 v bytecompile/do/form
+08i 0 v $drop
 08i 0 v $closure/push
 08i 0 v $closure/pop
-08i 4 v list
+08i 5 v list
 01
 }]] [def bytecompile/let* [fn* bytecompile/let* [source env] "" #{
 08i 0 v $let
@@ -4294,18 +4295,12 @@
 08i 2 v list
 01
 }]] [def byterun [macro* byterun [form] "" #{
-23s ->
-23s compile
+23s eval-in
 10s form
+23s current-closure
 24
 08i 2 v cons
-08i 2 v cons
-23s bytecompile
-23s assemble*
-23s bytecode-eval
 24
-08i 2 v cons
-08i 2 v cons
 08i 2 v cons
 08i 2 v cons
 08i 2 v cons
@@ -4792,8 +4787,10 @@
 10s environment
 0Bo 7
 24
-09o 10
+09o 12
 15
+24
+0D
 13
 16
 0Fs environment
@@ -4931,17 +4928,13 @@
 0D
 01
 }]] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
-23s eval*
-23s compile
+23s eval-in
 10s expr
 23s current-closure
 24
 08i 2 v cons
 24
 08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-24
 08i 2 v cons
 08i 2 v cons
 01
@@ -5238,7 +5231,7 @@
 }]] [def bytecode/nil-catcher [fn* bytecode/nil-catcher [error] "" #{
 10s error
 08i 1 v car
-05v :argument-mismatch
+05v :type-error
 20
 0Bo 7
 24
@@ -7129,7 +7122,7 @@
 01
 }]]][do [def describe/closure [fn* describe/closure [c i] "" #{
 10s c
-0Bo 219
+0Bo 259
 10s c
 10s root-closure
 20
@@ -7149,13 +7142,22 @@
 08i 1 v ansi-blue
 05v "\r\n"
 08i 2 v cat
-09o 153
+09o 193
 10s c
 08i 1 v closure
 0Es info
 0D
 10s info
-0Bo 131
+0Bo 171
+10s info
+05v :data
+08i 2 v ref
+0Es data
+0D
+10s data
+08i 1 v length
+0Es l
+0D
 10s i
 0C
 0Ao 15
@@ -7172,10 +7174,14 @@
 08i 3 v cat
 08i 1 v ansi-blue
 05v " - "
-10s info
-05v :data
-08i 2 v ref
+10s l
+02i 16
+1E
+0Bo 15
+10s data
 08i 1 v str/write
+09o 7
+05v "-+- Very big tree structure -+-"
 05v "\r\n"
 10s c
 08i 1 v closure/caller
@@ -10133,12 +10139,10 @@
 08i 4 v test-failure
 01
 }
-18o 96
+18o 86
 10s rawexpr
-08i 1 v compile
-08i 1 v bytecompile
-08i 1 v assemble*
-08i 1 v bytecode-eval
+08i 0 v current-closure
+08i 2 v eval-in
 0Es expr
 0D
 10s result
@@ -10176,11 +10180,10 @@
 08i 4 v test-failure
 01
 }
-18o 91
+18o 86
 10s rawexpr
 08i 0 v current-closure
-08i 2 v compile
-08i 1 v eval*
+08i 2 v eval-in
 0Es expr
 0D
 10s result

@@ -182,10 +182,9 @@ static lVal *lnfClosureSet(lClosure *c, lVal *v){
 
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
 	const int SP = lRootsGet();
-	lClosure *nc = lRootsClosurePush(lClosureNew(c));
+	lClosure *nc = lRootsClosurePush(lClosureNew(c, c->type));
 	nc->name     = c->name;
 	nc->caller   = c->caller;
-	nc->type     = c->type;
 	lVal *ret    = lnfDo(nc,v);
 	lRootsRet(SP);
 	return ret;
@@ -226,8 +225,7 @@ static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
 /* Handler for [ω* ...body] */
 static lVal *lnfObjectAst(lClosure *c, lVal *v){
 	lVal *ret = lRootsValPush(lValAlloc(ltObject));
-	ret->vClosure = lClosureNew(c);
-	ret->vClosure->type = closureObject;
+	ret->vClosure = lClosureNew(c, closureObject);
 	lnfDo(ret->vClosure,v);
 	return ret;
 }

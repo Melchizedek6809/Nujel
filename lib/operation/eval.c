@@ -6,11 +6,6 @@
 #include "../type/native-function.h"
 #include "../exception.h"
 
-/* [eval* expr] - Evaluate the already compiled EXPR */
-static lVal *lnfEvalRaw(lClosure *c, lVal *v){
-	return lEval(c,lCar(v));
-}
-
 /* Handler for [apply fn list] */
 static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
@@ -39,5 +34,4 @@ static lVal *lnfMacroApply(lClosure *c, lVal *v){
 void lOperationsEval(lClosure *c){
 	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
 	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
-	lAddNativeFunc(c,"eval*",       "[expr]",       "Evaluate the already compiled EXPR",    lnfEvalRaw);
 }

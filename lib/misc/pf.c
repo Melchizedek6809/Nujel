@@ -214,13 +214,17 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		}
 		break;
 	case ltMacro:
-	case ltLambda:
-		if(v->vClosure && v->vClosure->name){
+	case ltLambda: {
+		const int ID = lClosureID(v->vClosure);
+		if(ID == 0){
+			ret = spf(cur, bufEnd, "root-closure");
+		}else if(v->vClosure && v->vClosure->name){
 			ret = spf(cur, bufEnd, "%s", v->vClosure->name->c);
 		}else{
-			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", (i64)lClosureID(v->vClosure));
+			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", (i64)ID);
 		}
 		break;
+	}
 	case ltPair:
 		ret = writePair(cur, bufEnd, v);
 		break;

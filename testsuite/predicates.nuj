@@ -170,7 +170,7 @@
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:c 1 :b 2]]]
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:b 1 :b 2]]]
 [test/add #t [procedure? car]]
-[test/add #t [procedure? eval*]]
+[test/add #t [procedure? string/length]]
 [test/add #t [procedure? procedure?]]
 [test/add #t [keyword? [read/single ":asd"]]]
 [test/add #t [keyword? [read/single "asd:"]]]

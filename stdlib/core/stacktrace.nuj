@@ -8,9 +8,13 @@
                    "\r\n"]
         [do [def info [closure c]]
             [when info
+              [def data [ref info :data]]
+              [def l [length data]]
               [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]]
                    " - "
-                   [str/write [ref info :data]]
+                   [if [< l 16]
+                       [str/write data]
+                       "-+- Very big tree structure -+-"]
                    "\r\n"
                    [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
 

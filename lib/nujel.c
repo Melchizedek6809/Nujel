@@ -34,10 +34,9 @@ void lInit(){
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lVal *vn = args;
-	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
+	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure, closureCall));
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
-	tmpc->type = closureCall;
 	tmpc->caller = c;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(n->type == ltPair){
@@ -53,9 +52,9 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	lVal *ret;
 	if(lambda->vClosure->type == closureUnlinkedBytecode){
 		lBytecodeLink(lambda->vClosure);
-		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr);
+		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	}else if(lambda->vClosure->type == closureBytecoded){
-		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr);
+		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	}else{
 		ret = lEval(tmpc,lambda->vClosure->text);
 	}
@@ -71,7 +70,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	case ltObject: {
 		if(args && args->type == ltBytecodeArr){
 			RCP(c);
-			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr);
+			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
 		}else{
 			return lnfDo(fun->vClosure,args);
 		}}

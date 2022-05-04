@@ -12,7 +12,7 @@
              [[#$25 #$26] 13]
              [otherwise [throw [list :unknown-op "This op needs its length specified for disassembly to work" op [current-lambda]]]]]]
 
-[defn bytecode/nil-catcher [error] [if [== [car error] :argument-mismatch] #nil [throw error]]]
+[defn bytecode/nil-catcher [error] [if [== [car error] :type-error] #nil [throw error]]]
 
 [defn bytecode-op->val [a b c]
        "Turn three bytecode ops representing an encoded value into an actual value"

@@ -69,7 +69,7 @@
        [try [fn [err]
                 [display/error err]
                 [test-failure result [list :exception-caught err] rawexpr i]]
-            [def expr [eval rawexpr]]
+            [def expr [byterun rawexpr]]
             [if [equal? result expr]
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]

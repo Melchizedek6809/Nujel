@@ -16,9 +16,10 @@
 #include <string.h>
 
 /* Return a new closure, setting the parent field */
-lClosure *lClosureNew(lClosure *parent){
+lClosure *lClosureNew(lClosure *parent, closureType t){
 	lClosure *c = lClosureAlloc();
 	c->parent = parent;
+	c->type = t;
 	if(parent){
 		c->caller = parent->caller;
 		c->name = parent->name;
@@ -104,7 +105,7 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *bod
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
 	lVal *ret = RVP(lValAlloc(ltLambda));
-	ret->vClosure       = lClosureNew(parent);
+	ret->vClosure       = lClosureNew(parent, closureDefault);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->doc  = docs;
@@ -118,12 +119,11 @@ lVal *lLambdaBytecodeNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, l
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
 	lVal *ret = RVP(lValAlloc(ltLambda));
-	ret->vClosure       = lClosureNew(parent);
+	ret->vClosure       = lClosureNew(parent, closureUnlinkedBytecode);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->doc  = docs;
 	ret->vClosure->text = body;
-	ret->vClosure->type = closureUnlinkedBytecode;
 
 	return ret;
 }

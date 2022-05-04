@@ -181,7 +181,7 @@
 
 [defmacro eval [expr]
   "Compile, Evaluate and then return the result of EXPR"
-  `[eval* [compile ~expr [current-closure]]]]
+  `[eval-in ~expr [current-closure]]]
 
 [defn read-eval-compile [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"

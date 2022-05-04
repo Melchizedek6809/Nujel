@@ -137,7 +137,8 @@
 
 [defn bytecompile/ω*  [source env]
        [list [$let]
-             [bytecompile/do [cdr source] env]
+             [bytecompile/do/form [cdr source] env]
+             [$drop]
              [$closure/push]
              [$closure/pop]]]
 
@@ -202,4 +203,4 @@
        [list [bytecompile* form environment] [$ret]]]
 
 [defmacro byterun [form]
-          `[-> [compile ~form] bytecompile assemble* bytecode-eval]]
+  `[eval-in ~form [current-closure]]]

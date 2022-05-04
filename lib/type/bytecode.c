@@ -70,7 +70,7 @@ static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 }
 
 /* Evaluate ops within callingClosure after pushing args on the stack */
-lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops){
+lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops, bool trace){
 	jmp_buf oldExceptionTarget;
 	const lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
@@ -80,7 +80,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
 	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
 	ctx.closureStack[0] = c;
-	ctx.csp = 1;
+	ctx.csp = 0;
 	ctx.sp = 0;
 
 	int exceptionCount = 0;
@@ -90,15 +90,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(setjmpRet){
-		while((ctx.csp > 1) && (c->type != closureTry)){
+		while((ctx.csp > 0) && (c->type != closureTry)){
 			ctx.csp--;
-			c = ctx.closureStack[ctx.csp - 1];
+			c = ctx.closureStack[ctx.csp];
 		}
 		if((ctx.csp > 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
 			ip = c->ip;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = exceptionValue;
-			c = ctx.closureStack[ctx.csp-1];
+			c = ctx.closureStack[--ctx.csp];
 		}else{
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
@@ -114,15 +114,24 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
-		if(ctx.csp == ctx.closureStackSize){
+		if(trace){
+			pf("[%u]: %x [csp:%i | sp:%i]\n", (ip - ops->data), (i64)*ip, (i64)ctx.csp, (i64)ctx.sp);
+			for(int i=ctx.csp;i>=0;i--){
+				pf("#%u: %i\n", i, (i64)(ctx.closureStack[i] ? ctx.closureStack[i]->type : 0));
+			}
+			for(int i=ctx.sp-1;i>=0;i--){
+				pf("!%u: %V\n", i, ctx.valueStack[i]);
+			}
+		}
+		if(ctx.csp == ctx.closureStackSize-1){
 			ctx.closureStackSize *= 2;
 			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
 		}
-		if(ctx.sp == ctx.valueStackSize){
+		if(ctx.sp == ctx.valueStackSize-1){
 			ctx.valueStackSize *= 2;
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
 		}
-		if(ctx.csp < 1){
+		if(ctx.csp < 0){
 			epf("CSP Error!");
 			exit(1);
 		}
@@ -305,25 +314,24 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		break;
 	case lopLet:
 		ip++;
-		ctx.closureStack[ctx.csp++] = c;
-		c = lClosureNew(c);
+		//ctx.closureStack[ctx.csp] = c;
+		c = lClosureNew(c, closureLet);
 		c->type = closureLet;
-		ctx.closureStack[ctx.csp] = c;
+		ctx.closureStack[++ctx.csp] = c;
 		break;
 	case lopClosurePop: {
 		ip++;
 		lClosure *nclo = ctx.closureStack[--ctx.csp];
 		c = nclo;
 		lRootsRet(c->rsp);
-		if(ctx.csp <= 0){lExceptionThrowValClo("stack-underflow", "Underflowed during lopClosurePop", NULL, c);}
+		if(ctx.csp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed during lopClosurePop", NULL, c);}
 		break; }
 	case lopTry:
-		ctx.closureStack[ctx.csp++] = c;
-		c = lClosureNew(c);
-		c->type = closureTry;
+		//ctx.closureStack[ctx.csp] = c;
+		c = lClosureNew(c, closureTry);
 		c->ip = ip + lBytecodeGetOffset16(ip+1);
 		c->sp = ctx.sp;
-		ctx.closureStack[ctx.csp] = c;
+		ctx.closureStack[++ctx.csp] = c;
 		ip+=3;
 		break;
 	case lopRet:
@@ -339,6 +347,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		free(ctx.valueStack);
 		return ret;
 	}}
+	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
+	exceptionTargetDepth--;
+	lRootsRet(callingClosure->rsp);
+	free(ctx.closureStack);
+	free(ctx.valueStack);
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	return NULL;
 }

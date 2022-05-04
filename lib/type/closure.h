@@ -2,7 +2,7 @@
 #define NUJEL_LIB_TYPE_CLOSURE
 #include "../nujel.h"
 
-lClosure *lClosureNew        (lClosure *parent);
+lClosure *lClosureNew        (lClosure *parent, closureType t);
 
 lVal     *lSearchClosureSym  (lClosure *c, lVal *ret, const char *str, uint len);
 lVal     *lDefineAliased     (lClosure *c, lVal *lNF, const char *sym);

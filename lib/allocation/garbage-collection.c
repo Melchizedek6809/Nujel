@@ -30,7 +30,7 @@ u8 lSymbolMarkMap [SYM_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
-	if((c->csp > 8192) || (c->csp < 1)){
+	if((c->csp > 8192) || (c->csp < 0)){
 		epf("Unlikely csp: %u\n", (i64)c->csp);
 		exit(1);
 	}
