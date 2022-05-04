@@ -173,19 +173,19 @@
   [compile [cons 'ω* body]]]
 [def defobj ω]
 
-[defmacro eval [expr]
-  "Compile, Evaluate and then return the result of EXPR"
-  `[eval* [compile ~expr [current-closure]]]]
-
-[defn eval-compile [expr closure]
+[defn eval-in [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
   [try display/error [bytecode-eval [-> [compile expr closure]
                                         bytecompile
                                         assemble*] closure]]]
 
+[defmacro eval [expr]
+  "Compile, Evaluate and then return the result of EXPR"
+  `[eval* [compile ~expr [current-closure]]]]
+
 [defn read-eval-compile [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [eval-compile [read expr] closure]]
+  [eval-in [read expr] closure]]
 
 [defn eval-load [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"

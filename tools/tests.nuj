@@ -13,13 +13,15 @@
       [println [ansi-purple "First we test the basic functions of the runtime."]]]
 [for-each [sort [directory/read-relative "testsuite"]]
           file/eval]
+
+[def output-passes #f]
+[when [tree/has? repl/options :verbose]
+  [set! output-passes #t]]
+
+[set! test/testsuite-errors [test-run output-passes]]
+
 [when [tree/has? repl/options :only-test-suite]
-      [exit [test-run]]]
-
-
-[if [ref repl/options :bytecoded]
-    [set! test/testsuite-errors [test-run-bytecode]]
-    [set! test/testsuite-errors [test-run]]]
+  [exit test/testsuite-errors]]
 
 [println [ansi-green "Great, Now we can do some more complicated and thorough tests."]]
 

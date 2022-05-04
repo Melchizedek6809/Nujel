@@ -27,33 +27,33 @@
 [defn display-results []
        "Prints the result Message"
        [random/seed-initialize!]
-       [eval '[efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
+       [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
                [if [and [zero? error-count] [> test-count 0]]
-                       "Success"
-                       "Failed!"]
+                   "Success"
+                   "Failed!"]
                [ansi-green success-count]
                [ansi-red error-count]
                [- [time/milliseconds] nujel-start]
                [if [and [zero? error-count] [> test-count 0]]
                    [ansi-rainbow "Everything is working, very nice!"]
-                   [ansi-red "Better fix those!"]]]]]
+                   [ansi-red "Better fix those!"]]]]
 
 [defn test-success [res-should res-is expr i]
        "Should be called after a test has finished successfully"
        [when print-passes
-             [eval '[efmtln "{} == {}\r\n{}\r\n\r\n"
-                            [ansi-green [str/write res-is]]
-                            [ansi-green [str/write res-should]]
-                            [str/write expr]]]]
+         [efmtln "{} == {}\r\n{}\r\n\r\n"
+                 [ansi-green [str/write res-is]]
+                 [ansi-green [str/write res-should]]
+                 [str/write expr]]]
        [set! success-count [+ 1 success-count]]]
 
 [defn test-failure [res-should res-is expr i]
        "Should be called if EXPR does not equal RES"
        [when print-errors
-             [eval '[efmtln "{} != {}\r\n{}\r\n\r\n"
-                            [ansi-red [str/write res-is]]
-                            [ansi-green [str/write res-should]]
-                            [str/write expr]]]]
+         [pfmtln "{} != {}\r\n{}\r\n\r\n"
+                 [ansi-red [str/write res-is]]
+                 [ansi-green [str/write res-should]]
+                 [str/write expr]]]
        [set! error-count [+ 1 error-count]]]
 
 [defn test-bytecode [result rawexpr i]
@@ -66,7 +66,9 @@
 
 [defn test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
-       [try [fn [err] [test-failure result [list :exception-caught err] rawexpr i]]
+       [try [fn [err]
+                [display/error err]
+                [test-failure result [list :exception-caught err] rawexpr i]]
             [def expr [eval rawexpr]]
             [if [equal? result expr]
                 [test-success result expr rawexpr i]

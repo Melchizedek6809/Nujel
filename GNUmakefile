@@ -172,6 +172,10 @@ tmp/binlib.h: tmp/binlib.c
 test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj
 
+.PHONY: test.verbose
+test.verbose: $(NUJEL)
+	@./$(NUJEL) --verbose --only-test-suite tools/tests.nuj
+
 .PHONY: check
 check: test
 
@@ -198,10 +202,6 @@ test.ridiculous: $(NUJEL)
 .PHONY: run
 run: $(NUJEL)
 	@./$(NUJEL) --only-test-suite tools/tests.nuj
-
-.PHONY: runl
-runl: $(NUJEL)
-	@./$(NUJEL) --only-test-suite --bytecoded tools/tests.nuj
 
 .PHONY: rund
 rund: $(NUJEL)

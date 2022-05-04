@@ -2061,7 +2061,41 @@
 05v #f
 16
 01
-}]]][do [def except-last-pair/iter [fn* except-last-pair/iter [list rest] "Iterator for except-last-pair" #{
+}]]][do [def array->list [fn* array->list [arr] "" #{
+10s arr
+08i 1 v array/length
+02i 1
+08i 2 v -
+0Es i
+0D
+24
+0Es ret
+0D
+02i 0
+1B
+1C
+10s i
+02i 0
+21
+0Bo 49
+0D
+10s arr
+10s i
+08i 2 v array/ref
+10s ret
+08i 2 v cons
+0Fs ret
+0D
+02i -1
+10s i
+08i 2 v +
+0Fs i
+09o -54
+0D
+10s ret
+01
+01
+}]] [def except-last-pair/iter [fn* except-last-pair/iter [list rest] "Iterator for except-last-pair" #{
 10s list
 08i 1 v cdr
 08i 1 v nil?
@@ -4880,22 +4914,7 @@
 08i 2 v cons
 08i 1 v compile
 01
-}]] [def defobj ω] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
-23s eval*
-23s compile
-10s expr
-23s current-closure
-24
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
-01
-}]] [def eval-compile [fn* eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defobj ω] [def eval-in [fn* eval-in [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18o 38
 10s expr
@@ -4911,11 +4930,26 @@
 27
 0D
 01
+}]] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
+23s eval*
+23s compile
+10s expr
+23s current-closure
+24
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+08i 2 v cons
+24
+08i 2 v cons
+08i 2 v cons
+01
 }]] [def read-eval-compile [fn* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s expr
 08i 1 v read
 10s closure
-08i 2 v eval-compile
+08i 2 v eval-in
 01
 }]] [def eval-load [fn* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
@@ -8083,63 +8117,63 @@
 02i 1
 08i 2 v -
 08i 2 v char-at
-0Es ΓεnΣym-121
+0Es ΓεnΣym-122
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 57
 20
 0C
@@ -8192,7 +8226,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 659
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 63
 20
 0Bo 55
@@ -8209,7 +8243,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 597
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 88
 20
 0Bo 55
@@ -8226,7 +8260,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 535
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 120
 20
 0Bo 55
@@ -8243,7 +8277,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 473
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 100
 20
 0Bo 55
@@ -8260,7 +8294,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 411
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 111
 20
 0Bo 55
@@ -8277,7 +8311,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 349
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 98
 20
 0Bo 55
@@ -8294,7 +8328,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 287
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 60
 20
 0Bo 55
@@ -8311,7 +8345,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 225
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 94
 20
 0Bo 55
@@ -8328,7 +8362,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 163
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 62
 20
 0Bo 55
@@ -8345,7 +8379,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 101
-10s ΓεnΣym-121
+10s ΓεnΣym-122
 02i 46
 20
 0Bo 64
@@ -8393,9 +8427,9 @@
 10s opts
 05v :base
 08i 2 v tree/ref
-0Es ΓεnΣym-122
+0Es ΓεnΣym-123
 0D
-10s ΓεnΣym-122
+10s ΓεnΣym-123
 05v :binary
 20
 0Bo 41
@@ -8408,7 +8442,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 207
-10s ΓεnΣym-122
+10s ΓεnΣym-123
 05v :octal
 20
 0Bo 41
@@ -8421,7 +8455,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 157
-10s ΓεnΣym-122
+10s ΓεnΣym-123
 05v :decimal
 20
 0Bo 41
@@ -8434,7 +8468,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 107
-10s ΓεnΣym-122
+10s ΓεnΣym-123
 05v :hexadecimal
 20
 0Bo 41
@@ -8447,7 +8481,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 57
-10s ΓεnΣym-122
+10s ΓεnΣym-123
 05v :HEXADECIMAL
 20
 0Bo 41
@@ -8518,21 +8552,21 @@
 10s opts
 05v :align
 08i 2 v tree/ref
-0Es ΓεnΣym-123
+0Es ΓεnΣym-124
 0D
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-123
+10s ΓεnΣym-124
 05v :left
 20
 0Bo 10
@@ -8645,7 +8679,44 @@
 0D
 05v #f
 01
-}]] [def fmt/expr/count 0] [def fmt/expr [fn* fmt/expr [expr arguments-used] "" #{
+}]] [def fmt/arg-sym [fn* fmt/arg-sym [v] "" #{
+15
+10s v
+08i 1 v type-of
+0Es ΓεnΣym-125
+0D
+10s ΓεnΣym-125
+05v :int
+20
+0Bo 29
+05v "fmt-arg-"
+10s v
+08i 1 v string
+08i 2 v cat
+08i 1 v fmt/arg-sym
+09o 73
+10s ΓεnΣym-125
+05v :symbol
+20
+0Bo 10
+10s v
+09o 54
+10s ΓεnΣym-125
+05v :string
+20
+0Bo 15
+10s v
+08i 1 v str->sym
+09o 30
+05v :type-error
+05v "Invalid fmt argument name"
+10s v
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+16
+01
+}]] [def fmt/expr [fn* fmt/expr [expr arguments-used opts] "" #{
 10s expr
 08i 1 v string?
 0Bo 7
@@ -8682,21 +8753,27 @@
 05v ""
 10s argument
 20
-0Bo 58
+0Bo 81
+10s opts
+05v :expr-count
+02i 1
+08i 1 v -
+08i 3 v tree/+=
+0D
 10s arguments-used
-02i -1
-10s fmt/expr/count
-08i 2 v +
-0Fs fmt/expr/count
+10s opts
+05v :expr-count
+08i 2 v tree/ref
 05v #t
 08i 3 v array/set!
 0D
 10s format-spec
-10s fmt/expr/count
-08i 1 v string
-08i 1 v str->sym
+10s opts
+05v :expr-count
+08i 2 v tree/ref
+08i 1 v fmt/arg-sym
 08i 2 v fmt/format-arg
-09o 264
+09o 259
 15
 10s argument
 08i 1 v read
@@ -8768,26 +8845,9 @@
 10s format-spec
 10s read-vals
 08i 1 v car
-08i 1 v string
-08i 1 v str->sym
+08i 1 v fmt/arg-sym
 08i 2 v fmt/format-arg
 16
-01
-}]] [def fmt/args/map-fun/count 0] [def fmt/args/map-fun [fn* fmt/args/map-fun [arg] "" #{
-10s fmt/args/map-fun/count
-08i 1 v string
-08i 1 v str->sym
-0Es s
-0D
-02i 1
-10s fmt/args/map-fun/count
-08i 2 v +
-0Fs fmt/args/map-fun/count
-0D
-23s def
-10s s
-10s arg
-08i 3 v list
 01
 }]] [def fmt [macro* fmt [format-string . args] "Return a formatted string" #{
 10s format-string
@@ -8811,13 +8871,13 @@
 0D
 10s format-string
 08i 1 v string/length
-0Es ΓεnΣym-124
+0Es ΓεnΣym-126
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 1E
 0Bo 217
 0D
@@ -8825,9 +8885,9 @@
 10s format-string
 10s i
 08i 2 v char-at
-0Es ΓεnΣym-125
+0Es ΓεnΣym-127
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 123
 20
 0Bo 72
@@ -8849,7 +8909,7 @@
 08i 2 v cons
 0Fs cuts
 09o 102
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 125
 20
 0Bo 91
@@ -8912,23 +8972,25 @@
 08i 2 v array/fill!
 0Es arguments-used
 0D
+05v :expr-count
 10s arguments-used
 08i 1 v array/length
-0Fs fmt/expr/count
+08i 2 v tree/new
+0Es opts
 0D
 15
 10s cuts
-0Es ΓεnΣym-126
+0Es ΓεnΣym-128
 0D
-10s ΓεnΣym-126
-0Bo 196
+10s ΓεnΣym-128
+0Bo 200
 02i 0
 1B
 1C
-10s ΓεnΣym-126
-0Bo 182
+10s ΓεnΣym-128
+0Bo 186
 0D
-10s ΓεnΣym-126
+10s ΓεnΣym-128
 08i 1 v car
 0Es c
 0D
@@ -8961,7 +9023,8 @@
 08i 1 v cdr
 08i 3 v string/cut
 10s arguments-used
-08i 2 v fmt/expr
+10s opts
+08i 3 v fmt/expr
 0Es expr
 0D
 10s expr
@@ -8973,10 +9036,10 @@
 08i 1 v car
 0Fs last-pos
 0D
-10s ΓεnΣym-126
+10s ΓεnΣym-128
 08i 1 v cdr
-0Fs ΓεnΣym-126
-09o -184
+0Fs ΓεnΣym-128
+09o -188
 09o 4
 24
 16
@@ -9004,13 +9067,13 @@
 0D
 10s arguments-used
 08i 1 v array/length
-0Es ΓεnΣym-127
+0Es ΓεnΣym-129
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 1E
 0Bo 84
 0D
@@ -9058,7 +9121,28 @@
 0Es expr
 0D
 02i 0
+0Es fmt/args/map-fun/count
+0D
+25v fmt/args/map-fun v [arg] v "" v #{
+05v "fmt-arg-"
+10s fmt/args/map-fun/count
+08i 1 v string
+08i 2 v cat
+08i 1 v str->sym
+0Es s
+0D
+02i 1
+10s fmt/args/map-fun/count
+08i 2 v +
 0Fs fmt/args/map-fun/count
+0D
+23s def
+10s s
+10s arg
+08i 3 v list
+01
+}
+0Es fmt/args/map-fun
 0D
 10s args
 0Bo 43
@@ -9143,13 +9227,13 @@
 0D
 10s a
 08i 1 v string/length
-0Es ΓεnΣym-131
+0Es ΓεnΣym-133
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-131
+10s ΓεnΣym-133
 1E
 0Bo 45
 0D
@@ -9179,7 +9263,7 @@
 10s str
 05v "\r\n"
 08i 2 v cat
-08i 1 v print
+08i 1 v error
 01
 }]] [def display [fn* display [value] "Display VALUE" #{
 10s value
@@ -9217,9 +9301,9 @@
 15
 10s ext
 08i 1 v type-of
-0Es ΓεnΣym-132
+0Es ΓεnΣym-134
 0D
-10s ΓεnΣym-132
+10s ΓεnΣym-134
 05v :string
 20
 0Bo 19
@@ -9232,7 +9316,7 @@
 01
 }
 09o 53
-10s ΓεnΣym-132
+10s ΓεnΣym-134
 05v :pair
 20
 0Bo 19
@@ -9780,9 +9864,9 @@
 15
 10s separator
 08i 1 v string/length
-0Es ΓεnΣym-133
+0Es ΓεnΣym-135
 0D
-10s ΓεnΣym-133
+10s ΓεnΣym-135
 02i 0
 20
 0Bo 15
@@ -9905,18 +9989,96 @@
 }]] [def display-results [fn* display-results [] "Prints the result Message" #{
 08i 0 v random/seed-initialize!
 0D
-05v [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]
-08i 0 v current-closure
-08i 2 v compile
-08i 1 v eval*
+15
+10s error-count
+08i 1 v zero?
+0C
+0Bo 11
+0D
+10s test-count
+02i 0
+22
+0Bo 10
+05v "Success"
+09o 7
+05v "Failed!"
+0Es fmt-arg-0
+0D
+10s success-count
+08i 1 v ansi-green
+0Es fmt-arg-1
+0D
+10s error-count
+08i 1 v ansi-red
+0Es fmt-arg-2
+0D
+08i 0 v time/milliseconds
+10s nujel-start
+08i 2 v -
+0Es fmt-arg-3
+0D
+10s error-count
+08i 1 v zero?
+0C
+0Bo 11
+0D
+10s test-count
+02i 0
+22
+0Bo 15
+05v "Everything is working, very nice!"
+08i 1 v ansi-rainbow
+09o 12
+05v "Better fix those!"
+08i 1 v ansi-red
+0Es fmt-arg-4
+0D
+10s test-context
+05v " ["
+10s System/OS
+05v " "
+10s System/Architecture
+05v "] - "
+10s fmt-arg-0
+05v " - ["
+10s fmt-arg-1
+05v " / "
+10s fmt-arg-2
+05v "] in "
+10s fmt-arg-3
+05v " ms - "
+10s fmt-arg-4
+08i 15 v cat
+16
+08i 1 v errorln
 01
 }]] [def test-success [fn* test-success [res-should res-is expr i] "Should be called after a test has finished successfully" #{
 10s print-passes
-0Bo 25
-05v [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]
-08i 0 v current-closure
-08i 2 v compile
-08i 1 v eval*
+0Bo 94
+15
+10s res-is
+08i 1 v str/write
+08i 1 v ansi-green
+0Es fmt-arg-0
+0D
+10s res-should
+08i 1 v str/write
+08i 1 v ansi-green
+0Es fmt-arg-1
+0D
+10s expr
+08i 1 v str/write
+0Es fmt-arg-2
+0D
+10s fmt-arg-0
+05v " == "
+10s fmt-arg-1
+05v "\r\n"
+10s fmt-arg-2
+05v "\r\n\r\n"
+08i 6 v cat
+16
+08i 1 v errorln
 09o 4
 24
 0D
@@ -9927,11 +10089,31 @@
 01
 }]] [def test-failure [fn* test-failure [res-should res-is expr i] "Should be called if EXPR does not equal RES" #{
 10s print-errors
-0Bo 25
-05v [efmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]
-08i 0 v current-closure
-08i 2 v compile
-08i 1 v eval*
+0Bo 94
+15
+10s res-is
+08i 1 v str/write
+08i 1 v ansi-red
+0Es fmt-arg-0
+0D
+10s res-should
+08i 1 v str/write
+08i 1 v ansi-green
+0Es fmt-arg-1
+0D
+10s expr
+08i 1 v str/write
+0Es fmt-arg-2
+0D
+10s fmt-arg-0
+05v " != "
+10s fmt-arg-1
+05v "\r\n"
+10s fmt-arg-2
+05v "\r\n\r\n"
+08i 6 v cat
+16
+08i 1 v println
 09o 4
 24
 0D
@@ -9982,6 +10164,9 @@
 01
 }]] [def test-default [fn* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" #{
 25v anonymous v [err] v "" v #{
+10s err
+08i 1 v display/error
+0D
 10s result
 05v :exception-caught
 10s err
@@ -10081,17 +10266,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-135
+0Es ΓεnΣym-137
 0D
-10s ΓεnΣym-135
+10s ΓεnΣym-137
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-135
+10s ΓεnΣym-137
 0Bo 74
 0D
-10s ΓεnΣym-135
+10s ΓεnΣym-137
 08i 1 v car
 0Es cur-test
 0D
@@ -10106,9 +10291,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-135
+10s ΓεnΣym-137
 08i 1 v cdr
-0Fs ΓεnΣym-135
+0Fs ΓεnΣym-137
 09o -76
 09o 4
 24

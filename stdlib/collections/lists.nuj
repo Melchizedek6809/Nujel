@@ -3,6 +3,14 @@
 
 ;; Put all the LISt Processing stuff in here
 
+[defn array->list [arr]
+  [def i [- [array/length arr] 1]]
+  [def ret #nil]
+  [while [>= i 0]
+    [set! ret [cons [array/ref arr i] ret]]
+    [-- i]]
+  [return ret]]
+
 [defn except-last-pair/iter [list rest]
        "Iterator for except-last-pair"
        [if [nil? [cdr list]]
