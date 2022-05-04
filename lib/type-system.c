@@ -41,6 +41,7 @@ static lVal *lCastInt(lClosure *c, lVal *v){
 		return lValInt(v->vFloat);
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert this to a :int", v, c);
+		return NULL;
 	}
 }
 

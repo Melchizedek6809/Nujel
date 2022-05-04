@@ -28,11 +28,14 @@ u8 lSymbolMarkMap [SYM_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
-	if(c->csp > 8192){return;}
+	if(c->csp > 8192){
+		epf("Prevented an error: %u\n", (u64)c->csp);
+		return;
+	}
 	for(int i=0;i<=c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
-	for(int i=0;i<=c->sp;i++){
+	for(int i=0;i<c->sp;i++){
 		lValGCMark(c->valueStack[i]);
 	}
 }

@@ -117,10 +117,8 @@ struct lVal {
 };
 
 struct lArray {
-	union {
-		lVal **data;
-		lArray *nextFree;
-	};
+	lVal **data;
+	lArray *nextFree;
 	i32 length;
 	u8 flags;
 };
