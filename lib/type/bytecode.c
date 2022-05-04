@@ -77,8 +77,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	lThread ctx;
 	ctx.closureStackSize = 16;
 	ctx.valueStackSize = 32;
-	ctx.closureStack = malloc(sizeof(lClosure *) * ctx.closureStackSize);
-	ctx.valueStack = malloc(sizeof(lVal *) * ctx.valueStackSize);
+	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
+	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
 	ctx.closureStack[0] = c;
 	ctx.csp = 1;
 	ctx.sp = 0;
@@ -102,6 +102,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
 			free(ctx.valueStack);
+			lRootsRet(callingClosure->rsp);
 			lExceptionThrowRaw(exceptionValue);
 			return NULL;
 		}
@@ -119,6 +120,14 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		if(ctx.sp == ctx.valueStackSize){
 			ctx.valueStackSize *= 2;
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
+		}
+		if(ctx.csp < 1){
+			epf("CSP Error!");
+			exit(1);
+		}
+		if(ctx.sp < 0){
+			epf("SP Error!");
+			exit(1);
 		}
 	switch(*ip){
 	default:

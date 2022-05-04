@@ -17,6 +17,8 @@
 #include "../misc/pf.h"
 #include "../type/bytecode.h"
 
+#include <stdlib.h>
+
 int lGCRuns = 0;
 
 u8 lValMarkMap    [VAL_MAX];
@@ -28,9 +30,9 @@ u8 lSymbolMarkMap [SYM_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
-	if(c->csp > 8192){
-		epf("Prevented an error: %u\n", (u64)c->csp);
-		return;
+	if((c->csp > 8192) || (c->csp < 1)){
+		epf("Unlikely csp: %u\n", (i64)c->csp);
+		exit(1);
 	}
 	for(int i=0;i<=c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
@@ -44,7 +46,11 @@ void lThreadGCMark(lThread *c){
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
-	if((ci >= lStringMax) || lStringMarkMap[ci]){return;}
+	if(ci > lStringMax){
+		epf("Tried to mark invalid lString\n");
+		exit(1);
+	}
+	if(lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
 }
 
@@ -52,7 +58,11 @@ void lStringGCMark(const lString *v){
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
-	if((ci >= lSymbolMax) || lSymbolMarkMap[ci]){return;}
+	if(ci > lSymbolMax){
+		epf("Tried to mark invalid lSymbol\n");
+		exit(1);
+	}
+	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
 }
 
@@ -60,7 +70,11 @@ void lSymbolGCMark(const lSymbol *v){
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
-	if((ci > lValMax) || lValMarkMap[ci]){return;}
+	if(ci > lValMax){
+		epf("Tried to mark out of bounds lVal\n");
+		exit(1);
+	}
+	if(lValMarkMap[ci]){return;}
 	lValMarkMap[ci] = 1;
 
 	switch(v->type){
@@ -106,7 +120,11 @@ void lValGCMark(lVal *v){
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
-	if((ci >= lTreeMax) || lTreeMarkMap[ci]){return;}
+	if(ci > lTreeMax){
+		epf("Tried to mark invalid lTree\n");
+		exit(1);
+	}
+	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
@@ -118,8 +136,12 @@ void lTreeGCMark(const lTree *v){
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
-
-	if((ci >= lClosureMax) || lClosureMarkMap[ci]){return;}
+	if(ci >= lClosureMax){
+		epf("Tried to mark out of bounds lClosure: %i\n", (i64)ci);
+		//return;
+		exit(1);
+	}
+	if(lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);
@@ -135,7 +157,11 @@ void lClosureGCMark(const lClosure *c){
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
-	if((ci > lArrayMax) || lArrayMarkMap[ci]){return;}
+	if(ci > lArrayMax){
+		epf("Tried to mark invalid lArray\n");
+		exit(1);
+	}
+	if(lArrayMarkMap[ci]){return;}
 	lArrayMarkMap[ci] = 1;
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);
