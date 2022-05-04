@@ -9,94 +9,107 @@
 ;; Expands a do for, leaving out sub-expressions in the middle that are without
 ;; side effects, which is simplified to mean anything that is not a pair.
 [defn compile/do/args [args]
-       [if [last? args]
-           [cons [compile* [car args]] #nil]
-           [if [pair? [car args]]
-               [let* [def ocar [compile* [car args]]]
-                     [if [pair? ocar]
-                         [cons ocar [compile/do/args [cdr args]]]
-                         [compile/do/args [cdr args]]]]
-               [compile/do/args [cdr args]]]]]
+  [if [last? args]
+      [cons [compile* [car args]] #nil]
+      [if [pair? [car args]]
+          [let* [def ocar [compile* [car args]]]
+            [if [pair? ocar]
+                [cons ocar [compile/do/args [cdr args]]]
+                [compile/do/args [cdr args]]]]
+          [compile/do/args [cdr args]]]]]
 
 [defn compile/do [source]
-       [def args [compile/do/args source]]
-       [if [last? args]
-           [car args]
-           [cons 'do args]]]
+  [def args [compile/do/args source]]
+  [if [last? args]
+      [car args]
+      [cons 'do args]]]
 
 [defn compile/def [source]
-       [list 'def [cadr source] [compile* [caddr source]]]]
+  [when [cdddr source] [throw [list :arity-error "[def] can only have 2 arguments" source [current-lambda]]]]
+  [list 'def [cadr source] [compile* [caddr source]]]]
 
 [defn compile/set! [source]
-       [list 'set! [cadr source] [compile* [caddr source]]]]
+  [when [cdddr source] [throw [list :arity-error "[set!] can only have 2 arguments" source [current-lambda]]]]
+  [list 'set! [cadr source] [compile* [caddr source]]]]
 
 [defn compile/fn* [source]
-       [list 'fn*
-             [cadr source]
-             [caddr source]
-             [cadddr source]
-             [compile [caddddr source]]]]
+  [when [cdddddr source] [throw [list :arity-error "[fn*] can only have 4 arguments" source [current-lambda]]]]
+  [list 'fn*
+        [cadr source]
+        [caddr source]
+        [cadddr source]
+        [compile [caddddr source]]]]
 
 [defn compile/macro* [source]
-       [list 'macro*
-             [cadr source]
-             [caddr source]
-             [cadddr source]
-             [compile [caddddr source]]]]
+  [when [cdddddr source] [throw [list :arity-error "[macro*] can only have 4 arguments" source [current-lambda]]]]
+  [list 'macro*
+        [cadr source]
+        [caddr source]
+        [cadddr source]
+        [compile [caddddr source]]]]
 
 [defn compile/ω* [source]
-       [list 'ω* [compile/do [cdr source]]]]
+  [list 'ω* [compile/do [cdr source]]]]
 
 [defn compile/try [source]
-       [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]
+  [list 'try [compile* [cadr source]] [compile/do [cddr source]]]]
+
+[defn compile/return [source]
+  [when [cddr source] [throw [list :arity-error "[return] can only return a single value" source [current-lambda]]]]
+  [list 'return [compile* [cadr source]]]]
 
 [defn compile/if [source]
-       [list 'if [compile* [cadr source]] [compile* [caddr source]] [compile* [cadddr source]]]]
+  [when [cddddr source] [throw [list :arity-error "[if] can only have 3 arguments" source [current-lambda]]]]
+  [list 'if
+        [compile* [cadr source]]
+        [compile* [caddr source]]
+        [compile* [cadddr source]]]]
 
 [defn compile/let* [source]
-       [list 'let* [compile/do [cdr source]]]]
+  [list 'let* [compile/do [cdr source]]]]
 
 [defn compile/map [source]
-       [map source compile*]]
+  [map source compile*]]
 
 [defn compile/while [source]
-       [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]
+  [list 'while [compile* [cadr source]] [compile/do [cddr source]]]]
 
 [defn compile/macro [macro source]
-       [compile* [macro-apply macro [cdr source]]]]
+  [compile* [macro-apply macro [cdr source]]]]
 
 [defn compile* [source]
-       "Expand all macros within source"
-       [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
-                   [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
-                   [car source]]]
+  "Expand all macros within source"
+  [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
+              [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
+              [car source]]]
 
-       [case [type-of op]
-             [:nil source]
-             [:special-form [case op
-                                  [do     [compile/do     source]]
-                                  [def    [compile/def    source]]
-                                  [set!   [compile/set!   source]]
-                                  [let*   [compile/let*   source]]
-                                  [fn*    [compile/fn*    source]]
-                                  [macro* [compile/macro* source]]
-                                  [ω*     [compile/ω*     source]]
-                                  [if     [compile/if     source]]
-                                  [try    [compile/try    source]]
-                                  [[and or] [map source compile*]]
-                                  [while  [compile/while  source]]
-                                  [quote                  source ]
-                                  [otherwise [throw [list :panic "Unknown special form, please fix the compiler!" source]]]]]
-             [:macro                      [compile/macro      op  source]]
-             [otherwise                   [map source compile*]]]]
+  [case [type-of op]
+    [:nil source]
+    [:special-form [case op
+                     [do     [compile/do     source]]
+                     [def    [compile/def    source]]
+                     [set!   [compile/set!   source]]
+                     [let*   [compile/let*   source]]
+                     [fn*    [compile/fn*    source]]
+                     [macro* [compile/macro* source]]
+                     [ω*     [compile/ω*     source]]
+                     [if     [compile/if     source]]
+                     [try    [compile/try    source]]
+                     [[and or] [map source compile*]]
+                     [while  [compile/while  source]]
+                     [return [compile/return source]]
+                     [quote                  source ]
+                     [otherwise [throw [list :panic "Unknown special form, please fix the compiler!" source]]]]]
+    [:macro                      [compile/macro      op  source]]
+    [otherwise                   [map source compile*]]]]
 
 [defn compile [source new-environment new-verbose]
-      "Compile the forms in source"
-       [when-not new-environment [set! new-environment [current-closure]]]
-       [when-not new-verbose [set! new-verbose #f]]
-       [set! compile/environment new-environment]
-       [set! compile/verbose new-verbose]
-       [compile* source]]
+  "Compile the forms in source"
+  [when-not new-environment [set! new-environment [current-closure]]]
+  [when-not new-verbose [set! new-verbose #f]]
+  [set! compile/environment new-environment]
+  [set! compile/verbose new-verbose]
+  [compile* source]]
 
 [defn eval-in [environment expr]
   "Expands, Compiles and Assembles EXPR and evaluates it in ENVIRONMENT"
@@ -106,58 +119,58 @@
       [bytecode-eval #nil environment]]]
 
 [defn load/forms [source environment]
-      "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
-      [for-in [form source]
-              [-> [compile form environment]
-                  bytecompile
-                  assemble*
-                  [bytecode-eval #nil environment]]]]
+  "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
+  [for-in [form source]
+          [-> [compile form environment]
+              bytecompile
+              assemble*
+              [bytecode-eval #nil environment]]]]
 
 [defn compile/forms [source-raw environment]
-       "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
-       [when-not environment [set! environment [ω]]]
-       [load/forms source-raw environment]
-       [compile source-raw environment]]
+  "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+  [when-not environment [set! environment [ω]]]
+  [load/forms source-raw environment]
+  [compile source-raw environment]]
 
 [defmacro defmacro [name args . body]
-          "Define a new bytecoded macro"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [list 'def name [list macro* name args doc-string [-> [cons 'do body]
-                                                                [compile [current-closure]]
-                                                                bytecompile
-                                                                assemble*]]]]
+  "Define a new bytecoded macro"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  [list 'def name [list macro* name args doc-string [-> [cons 'do body]
+                                                        [compile [current-closure]]
+                                                        bytecompile
+                                                        assemble*]]]]
 
 [defmacro macro [args . body]
-          "Return a new bytecoded macro"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [list macro* #nil args doc-string [-> [cons 'do body]
-                                                [compile [current-closure]]
-                                                bytecompile
-                                                assemble*]]]
+  "Return a new bytecoded macro"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  [list macro* #nil args doc-string [-> [cons 'do body]
+                                        [compile [current-closure]]
+                                        bytecompile
+                                        assemble*]]]
 
 [defmacro fn [args . body]
-          "Define a λδ with the self-hosting Nujel compiler"
-          [def doc-string [if-not [string? [car body]] ""
-                                  [car body]]]
-          [list fn* 'anonymous args doc-string [-> [cons 'do body]
-                                             [compile [current-closure]]
-                                             bytecompile
-                                             assemble*]]]
+  "Define a λδ with the self-hosting Nujel compiler"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  [list fn* 'anonymous args doc-string [-> [cons 'do body]
+                                           [compile [current-closure]]
+                                           bytecompile
+                                           assemble*]]]
 
 [defmacro defn [name args . body]
-              "Define a new bytecoded function"
-              [def doc-string [if-not [string? [car body]] ""
-                                      [car body]]]
-              [list 'def name [list fn* name args doc-string [-> [cons 'do body]
-                                                                 [compile [current-closure]]
-                                                                 bytecompile
-                                                                 assemble*]]]]
+  "Define a new bytecoded function"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  [list 'def name [list fn* name args doc-string [-> [cons 'do body]
+                                                     [compile [current-closure]]
+                                                     bytecompile
+                                                     assemble*]]]]
 
 [defmacro ω body
-          "Defines and returns new object after evaluating body within"
-          [compile [cons 'ω* body]]]
+  "Defines and returns new object after evaluating body within"
+  [compile [cons 'ω* body]]]
 [def defobj ω]
 
 [defmacro eval [expr]
@@ -165,22 +178,22 @@
   `[eval* [compile ~expr [current-closure]]]]
 
 [defn eval-compile [expr closure]
-       "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [bytecode-eval [-> [compile expr closure]
-                                             bytecompile
-                                             assemble*] closure]]]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [try display/error [bytecode-eval [-> [compile expr closure]
+                                        bytecompile
+                                        assemble*] closure]]]
 
 [defn read-eval-compile [expr closure]
-       "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [eval-compile [read expr] closure]]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [eval-compile [read expr] closure]]
 
 [defn eval-load [expr closure]
-       "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [try display/error [load/forms expr closure]]]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [try display/error [load/forms expr closure]]]
 
 [defn read-eval-load [expr closure]
-       "Compile and the immediatly evaluate the result, mostly used by lRun()"
-       [eval-load [read expr] closure]]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [eval-load [read expr] closure]]
 
 [defmacro typecheck/only [v t]
-          `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
+  `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]

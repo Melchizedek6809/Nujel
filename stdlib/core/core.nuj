@@ -65,9 +65,17 @@
        "[car [cdr [cdr [cdr p]]]]"
        [car [cdr [cdr [cdr p]]]]]
 
+[defn cddddr [p]
+       "[car [cdr [cdr [cdr p]]]]"
+       [cdr [cdr [cdr [cdr p]]]]]
+
 [defn caddddr [p]
        "[car [cdr [cdr [cdr p]]]]"
        [car [cdr [cdr [cdr [cdr p]]]]]]
+
+[defn cdddddr [p]
+       "[cdr [cdr [cdr [cdr p]]]]"
+       [cdr [cdr [cdr [cdr [cdr p]]]]]]
 
 [defn keyword->string [α]
        [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]

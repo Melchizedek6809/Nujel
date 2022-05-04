@@ -90,8 +90,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(setjmpRet){
-		while((ctx.csp > 0) && (c->type != closureTry)){
-			c = ctx.closureStack[--ctx.csp];
+		while((ctx.csp > 1) && (c->type != closureTry)){
+			ctx.csp--;
+			c = ctx.closureStack[ctx.csp - 1];
 		}
 		if((ctx.csp > 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
 			ip = c->ip;

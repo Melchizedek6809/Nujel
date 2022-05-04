@@ -93,12 +93,3 @@
 [defmacro ->> [init . fun]
           "Thread init as the last argument through every function in fun"
           [thread/->> init [reverse fun]]]
-
-[defn returnable/λ [e]
-  [if [== [car e] :return] [cdr e] [throw e]]]
-
-[defmacro returnable body
-  `[try returnable/λ ~@body]]
-
-[defmacro return [v]
-  `[throw [cons :return ~v]]]

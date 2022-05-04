@@ -146,6 +146,10 @@
              [bytecompile/do [cadr source] env]
              [$closure/pop]]]
 
+[defn bytecompile/return [source env]
+       [list [bytecompile* [cadr source] env]
+             [$ret]]]
+
 [defn bytecompile/try  [source env]
        [def handler-sym [bytecompile/gen-label]]
        [def end-sym     [bytecompile/gen-label]]
@@ -181,6 +185,7 @@
                                   [macro* [bytecompile/macro*  source env]]
                                   [ω*    [bytecompile/ω*     source env]]
                                   [try    [bytecompile/try     source env]]
+                                  [return [bytecompile/return  source env]]
                                   [quote  [bytecompile/quote   [cadr source]]]
                                   [otherwise [throw [list :panic
                                                           "Found unknown special form in the bytecode compiler"

@@ -36,7 +36,7 @@
 
 [defn eval/forked [nujel-binary raw-expr]
         "Evaluate @EXPR in a separate process running NUJEL-BINARY"
-        [def expr [cat "[print [str/write " [str/write raw-expr]] "]] "]
+        [def expr [cat "[print [str/write " [str/write raw-expr] "]] "]]
         [def tmp-path [file/temp expr]]
 
         [def command [cat nujel-binary " " tmp-path]]

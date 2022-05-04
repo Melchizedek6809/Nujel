@@ -3988,6 +3988,14 @@
 08i 0 v $closure/pop
 08i 3 v list
 01
+}]] [def bytecompile/return [fn* bytecompile/return [source env] "" #{
+10s source
+08i 1 v cadr
+10s env
+08i 2 v bytecompile*
+08i 0 v $ret
+08i 2 v list
+01
 }]] [def bytecompile/try [fn* bytecompile/try [source env] "" #{
 08i 0 v bytecompile/gen-label
 0Es handler-sym
@@ -4050,7 +4058,7 @@
 10s ΓεnΣym-82
 05v :special-form
 20
-0Bo 414
+0Bo 442
 15
 10s op
 0Es ΓεnΣym-83
@@ -4062,7 +4070,7 @@
 10s source
 10s env
 08i 2 v bytecompile/do
-09o 372
+09o 400
 10s ΓεnΣym-83
 10s let*
 20
@@ -4070,7 +4078,7 @@
 10s source
 10s env
 08i 2 v bytecompile/let*
-09o 344
+09o 372
 10s ΓεnΣym-83
 10s def
 20
@@ -4078,7 +4086,7 @@
 10s source
 10s env
 08i 2 v bytecompile/def
-09o 316
+09o 344
 10s ΓεnΣym-83
 10s set!
 20
@@ -4086,7 +4094,7 @@
 10s source
 10s env
 08i 2 v bytecompile/set!
-09o 288
+09o 316
 10s ΓεnΣym-83
 10s if
 20
@@ -4094,7 +4102,7 @@
 10s source
 10s env
 08i 2 v bytecompile/if
-09o 260
+09o 288
 10s ΓεnΣym-83
 10s while
 20
@@ -4102,7 +4110,7 @@
 10s source
 10s env
 08i 2 v bytecompile/while
-09o 232
+09o 260
 10s ΓεnΣym-83
 10s and
 20
@@ -4110,7 +4118,7 @@
 10s source
 10s env
 08i 2 v bytecompile/and
-09o 204
+09o 232
 10s ΓεnΣym-83
 10s or
 20
@@ -4118,7 +4126,7 @@
 10s source
 10s env
 08i 2 v bytecompile/or
-09o 176
+09o 204
 10s ΓεnΣym-83
 10s fn*
 20
@@ -4126,7 +4134,7 @@
 10s source
 10s env
 08i 2 v bytecompile/fn*
-09o 148
+09o 176
 10s ΓεnΣym-83
 10s macro*
 20
@@ -4134,7 +4142,7 @@
 10s source
 10s env
 08i 2 v bytecompile/macro*
-09o 120
+09o 148
 10s ΓεnΣym-83
 10s ω*
 20
@@ -4142,7 +4150,7 @@
 10s source
 10s env
 08i 2 v bytecompile/ω*
-09o 92
+09o 120
 10s ΓεnΣym-83
 10s try
 20
@@ -4150,6 +4158,14 @@
 10s source
 10s env
 08i 2 v bytecompile/try
+09o 92
+10s ΓεnΣym-83
+10s return
+20
+0Bo 19
+10s source
+10s env
+08i 2 v bytecompile/return
 09o 64
 10s ΓεnΣym-83
 10s quote
@@ -4314,6 +4330,18 @@
 08i 2 v cons
 01
 }]] [def compile/def [fn* compile/def [source] "" #{
+10s source
+08i 1 v cdddr
+0Bo 33
+05v :arity-error
+05v "[def] can only have 2 arguments"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
 23s def
 10s source
 08i 1 v cadr
@@ -4323,6 +4351,18 @@
 08i 3 v list
 01
 }]] [def compile/set! [fn* compile/set! [source] "" #{
+10s source
+08i 1 v cdddr
+0Bo 33
+05v :arity-error
+05v "[set!] can only have 2 arguments"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
 23s set!
 10s source
 08i 1 v cadr
@@ -4332,6 +4372,18 @@
 08i 3 v list
 01
 }]] [def compile/fn* [fn* compile/fn* [source] "" #{
+10s source
+08i 1 v cdddddr
+0Bo 33
+05v :arity-error
+05v "[fn*] can only have 4 arguments"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
 23s fn*
 10s source
 08i 1 v cadr
@@ -4345,6 +4397,18 @@
 08i 5 v list
 01
 }]] [def compile/macro* [fn* compile/macro* [source] "" #{
+10s source
+08i 1 v cdddddr
+0Bo 33
+05v :arity-error
+05v "[macro*] can only have 4 arguments"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
 23s macro*
 10s source
 08i 1 v cadr
@@ -4374,7 +4438,38 @@
 08i 1 v compile/do
 08i 3 v list
 01
+}]] [def compile/return [fn* compile/return [source] "" #{
+10s source
+08i 1 v cddr
+0Bo 33
+05v :arity-error
+05v "[return] can only return a single value"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
+23s return
+10s source
+08i 1 v cadr
+08i 1 v compile*
+08i 2 v list
+01
 }]] [def compile/if [fn* compile/if [source] "" #{
+10s source
+08i 1 v cddddr
+0Bo 33
+05v :arity-error
+05v "[if] can only have 3 arguments"
+10s source
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 4
+24
+0D
 23s if
 10s source
 08i 1 v cadr
@@ -4461,11 +4556,11 @@
 20
 0Bo 10
 10s source
-09o 402
+09o 426
 10s ΓεnΣym-87
 05v :special-form
 20
-0Bo 349
+0Bo 373
 15
 10s op
 0Es ΓεnΣym-88
@@ -4476,63 +4571,63 @@
 0Bo 15
 10s source
 08i 1 v compile/do
-09o 311
+09o 335
 10s ΓεnΣym-88
 10s def
 20
 0Bo 15
 10s source
 08i 1 v compile/def
-09o 287
+09o 311
 10s ΓεnΣym-88
 10s set!
 20
 0Bo 15
 10s source
 08i 1 v compile/set!
-09o 263
+09o 287
 10s ΓεnΣym-88
 10s let*
 20
 0Bo 15
 10s source
 08i 1 v compile/let*
-09o 239
+09o 263
 10s ΓεnΣym-88
 10s fn*
 20
 0Bo 15
 10s source
 08i 1 v compile/fn*
-09o 215
+09o 239
 10s ΓεnΣym-88
 10s macro*
 20
 0Bo 15
 10s source
 08i 1 v compile/macro*
-09o 191
+09o 215
 10s ΓεnΣym-88
 10s ω*
 20
 0Bo 15
 10s source
 08i 1 v compile/ω*
-09o 167
+09o 191
 10s ΓεnΣym-88
 10s if
 20
 0Bo 15
 10s source
 08i 1 v compile/if
-09o 143
+09o 167
 10s ΓεnΣym-88
 10s try
 20
 0Bo 15
 10s source
 08i 1 v compile/try
-09o 119
+09o 143
 10s ΓεnΣym-88
 10s and
 20
@@ -4550,13 +4645,20 @@
 10s source
 10s compile*
 08i 2 v map
-09o 68
+09o 92
 10s ΓεnΣym-88
 10s while
 20
 0Bo 15
 10s source
 08i 1 v compile/while
+09o 68
+10s ΓεnΣym-88
+10s return
+20
+0Bo 15
+10s source
+08i 1 v compile/return
 09o 44
 10s ΓεnΣym-88
 10s quote
@@ -6163,6 +6265,13 @@
 08i 1 v cdr
 08i 1 v car
 01
+}]] [def cddddr [fn* cddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+10s p
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+01
 }]] [def caddddr [fn* caddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
 10s p
 08i 1 v cdr
@@ -6170,6 +6279,14 @@
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v car
+01
+}]] [def cdddddr [fn* cdddddr [p] "[cdr [cdr [cdr [cdr p]]]]" #{
+10s p
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
+08i 1 v cdr
 01
 }]] [def keyword->string [fn* keyword->string [α] "" #{
 10s α
@@ -6587,40 +6704,6 @@
 10s fun
 08i 1 v reverse
 08i 2 v thread/->>
-01
-}]] [def returnable/λ [fn* returnable/λ [e] "" #{
-10s e
-08i 1 v car
-05v :return
-20
-0Bo 15
-10s e
-08i 1 v cdr
-09o 12
-10s e
-08i 1 v throw
-01
-}]] [def returnable [macro* returnable body "" #{
-23s try
-23s returnable/λ
-10s body
-24
-08i 2 v append
-08i 2 v cons
-08i 2 v cons
-01
-}]] [def return [macro* return [v] "" #{
-23s throw
-23s cons
-05v :return
-10s v
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
 01
 }]]][do [def numeric? [fn* numeric? [a] "Return #t if a is a number" #{
 10s a

@@ -80,7 +80,7 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
 	r->vArray->length = len;
-	r->vArray->data = calloc(len,sizeof(*r->vArray->data));
+	r->vArray->data = calloc(len, sizeof(*r->vArray->data));
 	if(len && (r->vArray->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
 		return NULL;
@@ -94,7 +94,7 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
 	r->vArray->length = length;
-	r->vArray->data = calloc(length,sizeof(*r->vArray->data));
+	r->vArray->data = calloc(length, sizeof(*r->vArray->data));
 	if(length && (r->vArray->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","[array/new] couldn't allocate its array", lValInt(length), c);
 		return NULL;

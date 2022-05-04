@@ -58,6 +58,7 @@ static lVal *lCastFloat(lClosure *c, lVal *v){
 		return lValFloat(v->vInt);
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert this to a :float", v, c);
+		return NULL;
 	}
 }
 
@@ -76,6 +77,7 @@ static lVal *lCastVec(lClosure *c, lVal *v){
 		return lValVec(vecNew(v->vFloat, v->vFloat, v->vFloat));
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert this to a :vec", v, c);
+		return NULL;
 	}
 }
 

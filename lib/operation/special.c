@@ -81,6 +81,11 @@ static lVal *lnfThrow(lClosure *c, lVal *v){
 	return NULL;
 }
 
+static lVal *lnfReturn(lClosure *c, lVal *v){
+	lExceptionThrowValClo("vm-error", "Can't return via apply, only the bytecode VM can do that", v, c);
+	return NULL;
+}
+
 void lOperationsSpecial(lClosure *c){
 	lnfvDo    = lAddSpecialForm(c,"do",    "body",             "Evaluate body in order and returns the last result", lnfDo);
 	lnfvQuote = lAddSpecialForm(c,"quote", "[v]",              "Return v as is without evaluating", lnfQuote);
@@ -89,6 +94,7 @@ void lOperationsSpecial(lClosure *c){
 	            lAddSpecialForm(c,"or" ,   "args",             "#t if one member of ARGS evaluates to true", lnfOr);
 	            lAddSpecialForm(c,"while", "[cond . body]",    "Evaluate ...BODY for as long as COND is true, return the value of the last iteration of ...BODY or #nil when COND was false from the start", lnfWhile);
 	            lAddSpecialForm(c,"try",   "[catch . body]",   "Try evaluating ...BODY, and if an exception is thrown handle it using CATCH", lnfTry);
+	            lAddSpecialForm(c,"return","[v]",              "Do an early return with V", lnfReturn);
 
 	lAddNativeFunc(c,"throw",   "[v]",             "Throw V to the closest exception handler", lnfThrow);
 }

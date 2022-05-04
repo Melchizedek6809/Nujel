@@ -49,14 +49,13 @@
              [sphereSDF samplePoint]]
 
            [defn shortestDistanceToSurface [eye marchingDirection start end]
-             [returnable
-              [def depth start]
-              [for [i 0 MAX_MARCHING_STEPS]
-                [def dist [sceneSDF [+ eye [* [vec depth] marchingDirection]]]]
-                [when [< dist EPSILON] [return depth]]
-                [set! depth [+ depth dist]]
-                [when [>= depth end] [return end]]]
-              [return end]]]
+             [def depth start]
+             [for [i 0 MAX_MARCHING_STEPS]
+                  [def dist [sceneSDF [+ eye [* [vec depth] marchingDirection]]]]
+                  [when [< dist EPSILON] [return depth]]
+                  [set! depth [+ depth dist]]
+                  [when [>= depth end] [return end]]]
+             [return end]]
 
            [defn rayDirection [fieldOfView size fragCoord]
              [def xy [- fragCoord [/ size [vec 2]]]]
@@ -182,14 +181,13 @@
             | end: the max distance away from the ey to march before giving up
             |#
            [defn shortestDistanceToSurface [eye marchingDirection start end]
-             [returnable
-              [def depth start]
-              [for [i 0 MAX_MARCHING_STEPS]
-                [def dist [sceneSDF [+ eye [* [vec depth] marchingDirection]]]]
-                [when [< dist EPSILON] [return depth]]
-                [set! depth [+ depth dist]]
-                [when [>= depth end] [return end]]]
-              [return end]]]
+             [def depth start]
+             [for [i 0 MAX_MARCHING_STEPS]
+                  [def dist [sceneSDF [+ eye [* [vec depth] marchingDirection]]]]
+                  [when [< dist EPSILON] [return depth]]
+                  [set! depth [+ depth dist]]
+                  [when [>= depth end] [return end]]]
+             [return end]]
 
            #|
             | Return the normalized direction to march in from the eye point for a single pixel.
