@@ -56,35 +56,15 @@
                  [str/write expr]]]
        [set! error-count [+ 1 error-count]]]
 
-[defn test-bytecode [result rawexpr i]
-       "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter"
-       [try [fn [err] [test-failure result [list :exception-caught err] rawexpr i]]
-            [def expr [byterun rawexpr]]
-            [if [equal? result expr]
-                [test-success result expr rawexpr i]
-                [test-failure result expr rawexpr i]]]]
-
 [defn test-default [result rawexpr i]
        "Tests that RAWEXPR evaluates to RESULT"
        [try [fn [err]
                 [display/error err]
                 [test-failure result [list :exception-caught err] rawexpr i]]
-            [def expr [byterun rawexpr]]
+            [def expr [eval rawexpr]]
             [if [equal? result expr]
                 [test-success result expr rawexpr i]
                 [test-failure result expr rawexpr i]]]]
-
-[defn test-forked [nujel-runtime]
-       [fn [result rawexpr i]
-          "Tests that RAWEXPR evaluates to RESULT in a separate runtime"
-          [def eval-result [eval/forked nujel-runtime rawexpr]]
-          [def expr [cdr eval-result]]
-          [when-not [string? result]
-                    [set! expr [car [read expr]]]]
-          [if [and [zero? [car eval-result]]
-                   [equal? result expr]]
-              [test-success result expr rawexpr i]
-              [test-failure result expr rawexpr i]]]]
 
 [defn test-run-real [test]
        [set! nujel-start    [time/milliseconds]]
@@ -101,18 +81,6 @@
        [set! print-errors  [not [bool hide-errors]]]
        [set! print-passes  [bool output-passes]]
        [test-run-real test-default]]
-
-[defn test-run-bytecode [output-passes hide-errors]
-       "Run through all automated Tests"
-       [set! print-errors  [not [bool hide-errors]]]
-       [set! print-passes  [bool output-passes]]
-       [test-run-real test-bytecode]]
-
-[defn test-run-forked [nujel-runtime output-passes hide-errors]
-       "Run through all automated Tests in a separate runtime"
-       [set! print-errors  [not [bool hide-errors]]]
-       [set! print-passes  [bool output-passes]]
-       [test-run-real [test-forked nujel-runtime]]]
 
 [test/reset]
 ; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

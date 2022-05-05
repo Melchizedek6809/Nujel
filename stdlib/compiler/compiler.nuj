@@ -79,8 +79,9 @@
 
 [defn compile* [source]
   "Expand all macros within source"
-  [def op [if [apply compile/environment `[do [resolves? ~[list 'quote [car source]]]]]
-              [apply compile/environment `[do [resolve ~[list 'quote [car source]]]]]
+
+  [def op [if [resolves? [car source] compile/environment]
+              [resolve [car source] compile/environment]
               [car source]]]
 
   [case [type-of op]
@@ -110,13 +111,6 @@
   [set! compile/environment new-environment]
   [set! compile/verbose new-verbose]
   [compile* source]]
-
-[defn eval-in [environment expr]
-  "Expands, Compiles and Assembles EXPR and evaluates it in ENVIRONMENT"
-  [-> [compile expr environment]
-      bytecompile
-      assemble*
-      [bytecode-eval #nil environment]]]
 
 [defn load/forms [source environment]
   "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
@@ -173,20 +167,30 @@
   [compile [cons 'ω* body]]]
 [def defobj ω]
 
-[defn eval-in [expr closure]
+[defn eval-in [closure expr]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [try display/error [bytecode-eval [-> [compile expr closure]
-                                        bytecompile
-                                        assemble*] closure]]]
+  [try display/error [-> [compile expr closure]
+                         bytecompile
+                         assemble*
+                         [bytecode-eval #nil closure]]]]
+
+[defn eval-int [closure expr]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [try display/error [def bc [-> [compile expr closure]
+                                 bytecompile
+                                 assemble*]]
+       [println [str/write bc]]
+       [bytecode-eval bc #nil closure]]]
 
 [defmacro eval [expr]
   "Compile, Evaluate and then return the result of EXPR"
-  `[eval-in ~expr [current-closure]]]
+  `[eval-in [current-closure] ~expr]]
 
 [defn read-eval-compile [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [eval-in [read expr] closure]]
+  [eval-in closure [read expr]]]
 
+;; TODO REMOVE!!!
 [defn eval-load [expr closure]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
   [try display/error [load/forms expr closure]]]

@@ -75,13 +75,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 	const lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
-	ctx.closureStackSize = 16;
-	ctx.valueStackSize = 32;
+	ctx.closureStackSize = 8;
+	ctx.valueStackSize = 8;
 	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
 	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
-	ctx.closureStack[0] = c;
 	ctx.csp = 0;
 	ctx.sp = 0;
+	ctx.closureStack[ctx.csp] = c;
 
 	int exceptionCount = 0;
 	lRootsThreadPush(&ctx);

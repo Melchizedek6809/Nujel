@@ -227,23 +227,12 @@
 09o 4
 24
 0D
+10s ctx
+10s do
 10s line
 08i 1 v read
-0Es raw
-0D
-23s do
-10s raw
 08i 2 v cons
-0Es expr
-0D
-10s expr
-08i 1 v compile
-08i 1 v cons
-0Es cexpr
-0D
-10s ctx
-10s cexpr
-08i 2 v apply
+08i 2 v eval-in
 0Es result
 0D
 10s line
@@ -359,27 +348,6 @@
 05v " - Enable ANSI color"
 08i 3 v cat
 08i 1 v println
-01
-}]] [def repl/run-forked* [fn* repl/run-forked* [expr] "" #{
-10s repl/executable-name
-05v " -x \""
-10s expr
-08i 1 v str/write
-05v "\""
-08i 4 v cat
-0Es command
-0D
-10s command
-08i 1 v popen
-01
-}]] [def repl/run-forked [macro* repl/run-forked [expr] "" #{
-23s repl/run-forked*
-23s quote
-10s expr
-08i 2 v list
-24
-08i 2 v cons
-08i 2 v cons
 01
 }]] [tree/set! repl/option-map 'b [fn* anonymous [option] "" #{
 05v #t

@@ -4294,17 +4294,6 @@
 08i 0 v $ret
 08i 2 v list
 01
-}]] [def byterun [macro* byterun [form] "" #{
-23s eval-in
-10s form
-23s current-closure
-24
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v cons
-01
 }]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [fn* compile/do/args [args] "" #{
 10s args
 08i 1 v last?
@@ -4541,35 +4530,15 @@
 08i 1 v compile*
 01
 }]] [def compile* [fn* compile* [source] "Expand all macros within source" #{
-10s compile/environment
-23s do
-23s resolves?
-23s quote
 10s source
 08i 1 v car
-08i 2 v list
-24
-08i 2 v cons
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v apply
-0Bo 63
 10s compile/environment
-23s do
-23s resolve
-23s quote
+08i 2 v resolves?
+0Bo 24
 10s source
 08i 1 v car
-08i 2 v list
-24
-08i 2 v cons
-08i 2 v cons
-24
-08i 2 v cons
-08i 2 v cons
-08i 2 v apply
+10s compile/environment
+08i 2 v resolve
 09o 12
 10s source
 08i 1 v car
@@ -4739,16 +4708,6 @@
 10s source
 08i 1 v compile*
 01
-}]] [def eval-in [fn* eval-in [environment expr] "Expands, Compiles and Assembles EXPR and evaluates it in ENVIRONMENT" #{
-10s expr
-10s environment
-08i 2 v compile
-08i 1 v bytecompile
-08i 1 v assemble*
-24
-10s environment
-08i 3 v bytecode-eval
-01
 }]] [def load/forms [fn* load/forms [source environment] "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" #{
 15
 10s source
@@ -4911,7 +4870,23 @@
 08i 2 v cons
 08i 1 v compile
 01
-}]] [def defobj ω] [def eval-in [fn* eval-in [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defobj ω] [def eval-in* [fn* eval-in* [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+10s display/error
+18o 38
+10s expr
+10s closure
+08i 2 v compile
+08i 1 v bytecompile
+08i 1 v assemble*
+10s closure
+08i 2 v bytecode-eval
+09o 8
+1Ai 1
+09o 5
+27
+0D
+01
+}]] [def eval-in [fn* eval-in [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
 18o 38
 10s expr
@@ -4929,19 +4904,19 @@
 01
 }]] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
 23s eval-in
-10s expr
 23s current-closure
 24
 08i 2 v cons
+10s expr
 24
 08i 2 v cons
 08i 2 v cons
 08i 2 v cons
 01
 }]] [def read-eval-compile [fn* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+10s closure
 10s expr
 08i 1 v read
-10s closure
 08i 2 v eval-in
 01
 }]] [def eval-load [fn* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
@@ -7239,10 +7214,9 @@
 08i 0 v time/milliseconds
 0Es start-time
 0D
-10s raw
 08i 0 v current-closure
-08i 2 v compile
-08i 1 v eval*
+10s raw
+08i 2 v eval-in
 0Es val
 0D
 08i 0 v time/milliseconds
@@ -7584,8 +7558,8 @@
 0Fs len
 0D
 10s environment
-05v [[symbol-table*]]
-08i 2 v apply
+05v [symbol-table*]
+08i 2 v eval-in
 10s off
 10s off
 10s len
@@ -10128,44 +10102,6 @@
 08i 2 v +
 0Fs error-count
 01
-}]] [def test-bytecode [fn* test-bytecode [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT when run through the bytecode interpreter" #{
-25v anonymous v [err] v "" v #{
-10s result
-05v :exception-caught
-10s err
-08i 2 v list
-10s rawexpr
-10s i
-08i 4 v test-failure
-01
-}
-18o 86
-10s rawexpr
-08i 0 v current-closure
-08i 2 v eval-in
-0Es expr
-0D
-10s result
-10s expr
-08i 2 v equal?
-0Bo 27
-10s result
-10s expr
-10s rawexpr
-10s i
-08i 4 v test-success
-09o 24
-10s result
-10s expr
-10s rawexpr
-10s i
-08i 4 v test-failure
-09o 8
-1Ai 1
-09o 5
-27
-0D
-01
 }]] [def test-default [fn* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" #{
 25v anonymous v [err] v "" v #{
 10s err
@@ -10181,8 +10117,8 @@
 01
 }
 18o 86
-10s rawexpr
 08i 0 v current-closure
+10s rawexpr
 08i 2 v eval-in
 0Es expr
 0D
@@ -10206,51 +10142,6 @@
 09o 5
 27
 0D
-01
-}]] [def test-forked [fn* test-forked [nujel-runtime] "" #{
-25v anonymous v [result rawexpr i] v "Tests that RAWEXPR evaluates to RESULT in a separate runtime" v #{
-10s nujel-runtime
-10s rawexpr
-08i 2 v eval/forked
-0Es eval-result
-0D
-10s eval-result
-08i 1 v cdr
-0Es expr
-0D
-10s result
-08i 1 v string?
-0Bo 7
-24
-09o 21
-10s expr
-08i 1 v read
-08i 1 v car
-0Fs expr
-0D
-10s eval-result
-08i 1 v car
-08i 1 v zero?
-0C
-0Bo 17
-0D
-10s result
-10s expr
-08i 2 v equal?
-0Bo 27
-10s result
-10s expr
-10s rawexpr
-10s i
-08i 4 v test-success
-09o 24
-10s result
-10s expr
-10s rawexpr
-10s i
-08i 4 v test-failure
-01
-}
 01
 }]] [def test-run-real [fn* test-run-real [test] "" #{
 08i 0 v time/milliseconds
@@ -10317,33 +10208,6 @@
 0Fs print-passes
 0D
 10s test-default
-08i 1 v test-run-real
-01
-}]] [def test-run-bytecode [fn* test-run-bytecode [output-passes hide-errors] "Run through all automated Tests" #{
-10s hide-errors
-08i 1 v bool
-08i 1 v not
-0Fs print-errors
-0D
-10s output-passes
-08i 1 v bool
-0Fs print-passes
-0D
-10s test-bytecode
-08i 1 v test-run-real
-01
-}]] [def test-run-forked [fn* test-run-forked [nujel-runtime output-passes hide-errors] "Run through all automated Tests in a separate runtime" #{
-10s hide-errors
-08i 1 v bool
-08i 1 v not
-0Fs print-errors
-0D
-10s output-passes
-08i 1 v bool
-0Fs print-passes
-0D
-10s nujel-runtime
-08i 1 v test-forked
 08i 1 v test-run-real
 01
 }]] [test/reset]]

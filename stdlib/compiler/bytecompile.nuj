@@ -201,6 +201,3 @@
 
 [defn bytecompile [form environment]
        [list [bytecompile* form environment] [$ret]]]
-
-[defmacro byterun [form]
-  `[eval-in ~form [current-closure]]]

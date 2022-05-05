@@ -51,7 +51,7 @@
       [when-not environment [set! environment root-closure]]
       [when-not off [set! off 0]]
       [when-not len [set! len 9999999]]
-      [sublist [apply environment '[[symbol-table*]]] off [+ off len] #nil]]
+      [sublist [eval-in environment '[symbol-table*]] off [+ off len] #nil]]
 
 [def gensym/counter 0]
 [defn gensym [prefix]

@@ -81,14 +81,15 @@ static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	}
 	lVal *args = lCadr(v);
 	lVal *env = lCaddr(v);
+	lClosure *bcc = c;
 	const bool trace = castToBool(lCadddr(v));
 	if(env){
 		if(env->type != ltObject){
 			lExceptionThrowValClo("type-error", "Environments have to be of type :object", lCaddr(v), c);
 		}
-		return lBytecodeEval(env->vClosure, args, &opsArr->vBytecodeArr, trace);
+		bcc = env->vClosure;
 	}
-	return lBytecodeEval(c, args, &opsArr->vBytecodeArr, trace);
+	return lBytecodeEval(bcc, args, &opsArr->vBytecodeArr, trace);
 }
 
 void lOperationsBytecode(lClosure *c){

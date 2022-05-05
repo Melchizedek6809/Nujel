@@ -580,7 +580,17 @@
 [test/add 4 [identity 4]]
 [test/add "4" [identity "4"]]
 [test/add #[1 2 3] [identity #[1 2 3]]]
-[test/add "Polizei" [def eins [ω [def say [fn [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [fn [] "Polizei"]]] [zwei [say]]]
+;[test/add "Polizei" [def eins [ω [def say [fn [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [fn [] "Polizei"]]] [zwei [say]]]
+[test/add "Polizei"
+          [def eins [environment*]]
+          [eval-in eins '[def say [fn [] "Eins"]]]
+          [def zwei [eval-in eins '[environment*]]]
+          [eval-in zwei '[def say [fn [] "Polizei"]]]
+          [eval-in zwei '[say]]]
+[test/add "Eins"
+          [def eins [environment*]]
+          [eval-in eins '[def say [fn [] "Eins"]]]
+          [eval-in eins '[say]]]
 [test/add 11 [def counter [let [[a 0]] [fn [b] [set! a [+ a [or b 1]]]]]] [counter 10] [counter]]
 ;[test/add 11 [def count [let [[a 0]] [fn [b] [set! a [+ a [if [numeric? b] b 1]]]]]] [count 10] [count]]
 [test/add '[0 1 2 3 4] [range 5]]
@@ -628,7 +638,6 @@
 ;[test/add 5 [def a 4] [for [i 0 10] [once [++ a]]] a]
 ;[test/add 102334155 [def fib-iter [fn [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [fn [n] [fib-iter 1 0 n]]] [fib 40]]
 
-;[test/add 1000 [byterun '[do [def i 0] [while [< i 100] [set! i [+ 1 i]]] i]]]
 ;[test/add #t [for [i 5 4]] #t]
 
 ; Having test defined somehow breaks the whole testing system, how come?

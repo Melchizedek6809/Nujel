@@ -29,10 +29,7 @@
         [when [nil? line]
               [display "Bye!\r\n"]
               [exit 0]]
-        [def raw [read line]]
-        [def expr [cons 'do raw]]
-        [def cexpr [cons [compile expr]]]
-        [def result [apply ctx cexpr]]
+        [def result [eval-in ctx [cons do [read line]]]]
         [set! repl/history [cons line repl/history]]
         [println [cat [if [nil? result]
                           ""
@@ -57,13 +54,6 @@
        [println [cat "\nLong options - for working with/on Nujel code"]]
        [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]]
        [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]
-
-[defn repl/run-forked* [expr]
-       [def command [cat repl/executable-name " -x \"" [str/write expr] "\""]]
-       [popen command]]
-
-[defmacro repl/run-forked [expr]
-          `[repl/run-forked* ~[list 'quote expr]]]
 
 [tree/set! repl/option-map 'b
            [fn [option]

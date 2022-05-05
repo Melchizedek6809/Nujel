@@ -52,12 +52,8 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	lVal *ret;
 	if(lambda->vClosure->type == closureUnlinkedBytecode){
 		lBytecodeLink(lambda->vClosure);
-		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
-	}else if(lambda->vClosure->type == closureBytecoded){
-		ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
-	}else{
-		ret = lEval(tmpc,lambda->vClosure->text);
 	}
+	ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	lRootsRet(SP);
 	return ret;
 }
@@ -72,7 +68,8 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 			RCP(c);
 			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
 		}else{
-			return lnfDo(fun->vClosure,args);
+			lExceptionThrowValClo("no-more-walking", "Can't use the treewalker anymore", args, c);
+			return NULL;
 		}}
 	case ltLambda:
 		return lLambda(c,args,fun);
