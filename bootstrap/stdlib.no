@@ -4870,32 +4870,41 @@
 08i 2 v cons
 08i 1 v compile
 01
-}]] [def defobj ω] [def eval-in* [fn* eval-in* [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def defobj ω] [def eval-in [fn* eval-in [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
-18o 38
+18o 39
 10s expr
 10s closure
 08i 2 v compile
 08i 1 v bytecompile
 08i 1 v assemble*
+24
 10s closure
-08i 2 v bytecode-eval
+08i 3 v bytecode-eval
 09o 8
 1Ai 1
 09o 5
 27
 0D
 01
-}]] [def eval-in [fn* eval-in [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}]] [def eval-int [fn* eval-int [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
 10s display/error
-18o 38
+18o 63
 10s expr
 10s closure
 08i 2 v compile
 08i 1 v bytecompile
 08i 1 v assemble*
+0Es bc
+0D
+10s bc
+08i 1 v str/write
+08i 1 v println
+0D
+10s bc
+24
 10s closure
-08i 2 v bytecode-eval
+08i 3 v bytecode-eval
 09o 8
 1Ai 1
 09o 5

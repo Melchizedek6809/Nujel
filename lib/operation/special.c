@@ -9,28 +9,21 @@ lVal *lnfvDo;
 lVal *lnfvQuote;
 
 static lVal *lnfAnd(lClosure *c, lVal *v){
-	lVal *res = NULL;
-	for(lVal *t=v;t;t = t->vList.cdr){
-		res = lEval(c,lCar(t));
-		if(!castToBool(res)){break;}
-	}
-	return res;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [and] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfOr(lClosure *c, lVal *v){
-	if(v == NULL){return lValBool(false);}
-	lVal *t = lEval(c,lCar(v));
-	return castToBool(t) ? t : lnfOr(c,lCdr(v));
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [or] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfIf(lClosure *c, lVal *v){
-	if(v == NULL){return NULL;}
-	const bool pred = castToBool(lEval(c,lCar(v)));
-	return lEval(c,pred ? lCadr(v) : lCaddr(v));
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [if] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
-	(void)c;
 	if(v->type == ltPair){
 		return lCar(v);
 	}else {
@@ -50,29 +43,13 @@ lVal *lnfDo(lClosure *c, lVal *v){
 }
 
 static lVal *lnfWhile(lClosure *c, lVal *v){
-	lVal *cond = lCar(v);
-	lVal *body = lCdr(v);
-	lVal *ret  = NULL;
-	const int SP = lRootsGet();
-	while(castToBool(lEval(c,cond))){
-		lRootsRet(SP);
-		ret = RVP(lnfDo(c,body));
-                lCheckBreak();
-	}
-	lRootsRet(SP);
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [while] anymore", v, c);
+	return NULL;
 }
 
 lVal *lnfTry(lClosure *c, lVal *v){
-	const int SPOuter    = lRootsGet();
-	lVal *volatile catch = lRootsValPush(lEval(c,lCar(v)));
-	lVal *volatile body  = lCdr(v);
-
-	lVal *ret = lTry(c,catch,body);
-
-	lRootsRet(SPOuter);
-
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [try] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfThrow(lClosure *c, lVal *v){

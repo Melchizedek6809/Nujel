@@ -181,13 +181,8 @@ static lVal *lnfClosureSet(lClosure *c, lVal *v){
 }
 
 static lVal *lnfLetRaw(lClosure *c, lVal *v){
-	const int SP = lRootsGet();
-	lClosure *nc = lRootsClosurePush(lClosureNew(c, c->type));
-	nc->name     = c->name;
-	nc->caller   = c->caller;
-	lVal *ret    = lnfDo(nc,v);
-	lRootsRet(SP);
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [let] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfResolve(lClosure *c, lVal *v){
@@ -222,11 +217,11 @@ static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* Handler for [ω* ...body] */
+/* Handler for [ω*] */
 static lVal *lnfObjectAst(lClosure *c, lVal *v){
+	(void)v;
 	lVal *ret = lRootsValPush(lValAlloc(ltObject));
 	ret->vClosure = lClosureNew(c, closureObject);
-	lnfDo(ret->vClosure,v);
 	return ret;
 }
 
@@ -279,5 +274,5 @@ void lOperationsClosure(lClosure *c){
 
 	lAddSpecialForm(c,"macro*",       "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
 	lAddSpecialForm(c,"fn*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
-	lAddSpecialForm(c,"ω* environment*", "[body]",                  "Create a new object",       lnfObjectAst);
+	lAddSpecialForm(c,"ω* environment*", "[]",                  "Create a new object",       lnfObjectAst);
 }

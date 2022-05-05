@@ -146,7 +146,7 @@ lVal *lEval(lClosure *c, lVal *v){
                 case ltMacro:
 			lExceptionThrowValClo("runtime-macro", "Macros can't be used as functions", v, c);
 		case ltObject:
-			return lnfDo(car->vClosure,lCdr(v));
+			lExceptionThrowValClo("object-car", "Can't apply to objects in that way, use apply or eval-in instead", v, c);
 		case ltLambda:
 			return RVP(lLambda(c,lMap(c,lCdr(v),lEval),car));
 		case ltSpecialForm:
@@ -261,41 +261,6 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsTree(c);
 	lOperationsTypeSystem(c);
 	lOperationsVector(c);
-}
-
-/* Evaluate BODYRAW IN C while using CATCHRAW as an exception handler */
-lVal *lTry(lClosure *c, lVal *catchRaw, lVal *bodyRaw){
-	lVal *volatile catch = catchRaw;
-	lVal *volatile body  = bodyRaw;
-
-	const int SP = lRootsGet();
-	jmp_buf oldExceptionTarget;
-	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
-
-	lVal *doRet;
-	int ret;
-	exceptionTargetDepth++;
-	ret = setjmp(exceptionTarget);
-	if(ret){
-		lRootsRet(SP);
-		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
-		exceptionTargetDepth--;
-
-		lVal *args = lRootsValPush(exceptionValue);
-		args = lRootsValPush(lCons(args,NULL));
-
-		readClosure = NULL;
-		doRet = lApply(c,args,catch, NULL);
-
-		return doRet;
-	}else{
-		doRet = lnfDo(c,body);
-
-		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
-		exceptionTargetDepth--;
-
-		return doRet;
-	}
 }
 
 /* Quote V, enabling it to be used verbatim, without being evaluated. */
