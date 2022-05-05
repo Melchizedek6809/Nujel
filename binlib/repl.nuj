@@ -21,8 +21,7 @@
        "Evaluate LINE in the wasm context"
        [try repl/exception-handler
             [def raw [read line]]
-            [def cexpr [list [compile [cons 'do raw]]]]
-            [apply root-closure cexpr]]]
+            [eval-in root-closure [cons 'do raw]]]]
 
 [defn repl/readline [ctx]
         [def line [readline [repl/prompt]]]

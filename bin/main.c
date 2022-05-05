@@ -27,12 +27,13 @@ static void *evalRaw(void *cl, void *body){
 
 /* To be used for the WASM REPL, since we don't run continuously there */
 const char *run(const char *line){
+	static char buf[1<<16];
 	const int SP = lRootsGet();
 	lVal *exp = RVP(lList(2,RVP(lValSym("repl/wasm")),RVP(lValString(line))));
 	lVal *v = lExceptionTryExit(evalRaw,mainClosure,exp);
-	const char *ret = v ? lReturnDisplayVal(v) : "";
+	spf(buf, &buf[sizeof(buf)], "%v", v);
 	lRootsRet(SP);
-	return ret;
+	return buf;
 }
 #endif
 

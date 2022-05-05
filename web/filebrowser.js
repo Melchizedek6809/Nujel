@@ -173,8 +173,9 @@ const NujelFilebrowser = (ele, opts) => {
 	};
 	const evalDir = name => {
 		const pred = (c) => c.name.startsWith(name);
-		evalBufferQueue(Object.values(buffers).filter(pred).reverse());
-
+		const bufs = Object.values(buffers).filter(pred).sort((a,b) => a.name < b.name ? -1 : 1).reverse();
+		bufs.forEach(console.log);
+		evalBufferQueue(bufs);
 	};
 	const save = name => {
 		if(buffers[name].remote){return;}
