@@ -190,21 +190,16 @@
 01
 }]] [def repl/wasm [fn* repl/wasm [line] "Evaluate LINE in the wasm context" #{
 10s repl/exception-handler
-18o 61
+18o 42
 10s line
 08i 1 v read
 0Es raw
 0D
+10s root-closure
 23s do
 10s raw
 08i 2 v cons
-08i 1 v compile
-08i 1 v list
-0Es cexpr
-0D
-10s root-closure
-10s cexpr
-08i 2 v apply
+08i 2 v eval-in
 09o 8
 1Ai 1
 09o 5
@@ -286,23 +281,9 @@
 08i 1 v println
 0D
 05v "  "
-05v "n"
-08i 1 v ansi-yellow
-05v " - do not load the standard library"
-08i 3 v cat
-08i 1 v println
-0D
-05v "  "
 05v "v"
 08i 1 v ansi-yellow
 05v " - be verbose"
-08i 3 v cat
-08i 1 v println
-0D
-05v "  "
-05v "r"
-08i 1 v ansi-yellow
-05v " - eval following file without compilation/expansion"
 08i 3 v cat
 08i 1 v println
 0D
