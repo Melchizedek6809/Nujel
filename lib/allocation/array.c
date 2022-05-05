@@ -4,6 +4,7 @@
 #include "../display.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 lArray   lArrayList[ARR_MAX];
 uint     lArrayActive = 0;
@@ -37,6 +38,7 @@ lArray *lArrayAlloc(){
 		lArrayFFree = ret->nextFree;
 	}
 	lArrayActive++;
+	memset(ret, 0, sizeof(lArray));
 	return ret;
 }
 

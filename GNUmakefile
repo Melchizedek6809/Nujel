@@ -187,8 +187,8 @@ test.bootstrap: $(NUJEL_BOOTSTRAP)
 test.slow: $(NUJEL)
 	@./$(NUJEL) --slow-test tools/tests.nuj
 
-.PHONY: test.fast.debug
-test.fast.debug: $(NUJEL)
+.PHONY: test.debug
+test.debug: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r tools/tests.nuj"
 
 .PHONY: test.slow.debug
