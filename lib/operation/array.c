@@ -100,6 +100,7 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	}
 	int key = 0;
 	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
+		if(key >= length){break;}
 		r->vArray->data[key++] = n->vList.car;
 	}
 	return r;
