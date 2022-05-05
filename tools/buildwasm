@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-EMSDK_TESTED_VERSION="3.1.8"
+EMSDK_TESTED_VERSION="3.1.10"
 EMSDK_REPO_URL="https://github.com/emscripten-core/emsdk.git"
 
 cd `git rev-parse --show-toplevel`
