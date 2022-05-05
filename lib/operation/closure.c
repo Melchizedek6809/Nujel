@@ -237,14 +237,6 @@ static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfSymbolSearch(lClosure *c, lVal *v){
-	(void)c;
-	const lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltString)){return NULL;}
-	const int len = castToInt(lCadr(v), car->vString->bufEnd - car->vString->data);
-	return lSymbolSearch(car->vString->data, len);
-}
-
 void lOperationsClosure(lClosure *c){
 	symType          = RSYMP(lSymS("type"));
 	symDocumentation = RSYMP(lSymS("documentation"));
@@ -262,7 +254,6 @@ void lOperationsClosure(lClosure *c){
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
 
-	lAddNativeFunc(c,"symbol-search",  "[str len]",     "Return a list of all symbols starting with STR",lnfSymbolSearch);
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 

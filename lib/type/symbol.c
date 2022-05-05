@@ -34,20 +34,3 @@ lVal *lValKeywordS(const lSymbol *s){
 lVal *lValKeyword(const char *s){
 	return lValKeywordS(RSYMP(lSymS(s)));
 }
-
-/* Search the global symbol table for STR */
-lVal *lSymbolSearch(const char *str, uint len){
-	lVal *ret,*l;
-	ret = l = NULL;
-	if(str == NULL){return NULL;}
-	for(uint i=0;i<lSymbolMax;i++){
-		if(strncmp(lSymbolList[i].c,str,len)){continue;}
-		if(l == NULL){
-			ret = l = lRootsValPush(lCons(NULL,NULL));
-		}else{
-			l = l->vList.cdr = lCons(NULL,NULL);
-		}
-		l->vList.car = lValSymS(&lSymbolList[i]);
-	}
-	return ret;
-}

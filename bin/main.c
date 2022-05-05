@@ -15,7 +15,6 @@
 
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
-bool loadStdLib = true;
 
 /* Evaluate an expression without expanding/compiling it, probably
  * not what you want, run does expansion/compilation before invoking
@@ -37,86 +36,25 @@ const char *run(const char *line){
 }
 #endif
 
-/* Read and Eval str directly
- * DOES NOT EXPAND MACROS */
-static void *readEvalStringRaw(void *cl, void *str){
-	lClosure *c = (lClosure *)cl;
-	const char *expr = str;
-	lVal *v = lnfDo(c,lRead(expr));
-	return v;
-}
-
-/* Read a line from stdin and return a heap allocated string,
- * you have to free the pointer returned from this function at
- * some point in time. */
-static char *getLine(){
-	char *buf = NULL;
-	size_t bufsize = 0;
-
-	fputs("RAW> ", stdout);
-	const ssize_t ret = getline(&buf,&bufsize,stdin);
-
-	if(ret >= 0){
-		buf[MIN(bufsize-1,(size_t)ret)] = 0;
-		return buf;
-	}else{
-		return NULL;
-	}
-}
-
-/* REPL that is not controlled by Nujel, only really useful when
- * running without the standard library */
-static void replRaw(lClosure *c){
-	char *line = NULL;
-	while(true){
-		line = getLine();
-		if(line == NULL){break;}
-		lVal *v = readEvalStringRaw(c, line);
-		pf("  %V\n", v);
-	}
-	pf("\n");
-	exit(0);
-}
-
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(){
 	lClosure *c;
-	if(loadStdLib){
-		c = lNewRoot();
-		lOperationsIO(c);
-		lOperationsReadline(c);
-		lnfDo(c,lRead((const char *)binlib_no_data));
-		lGarbageCollect();
-	}else{
-		c = lNewRootNoStdLib();
-		lOperationsIO(c);
-		lOperationsReadline(c);
-	}
+	c = lNewRoot();
+	lOperationsIO(c);
+	lOperationsReadline(c);
+	lnfDo(c,lRead((const char *)binlib_no_data));
+	lGarbageCollect();
 	return c;
 }
 
 /* Parse options that might radically alter runtime behaviour, like running
  * without the stdlib (probably for using an alternative build of the stdlib ) */
 static lClosure *parsePreOptions(int argc, char *argv[]){
-	bool readNext   = false;
 	lClosure *c     = NULL;
 	for(int i=1;i<argc;i++){
-		if(readNext){
-			if(c == NULL){c = createRootClosure();}
-			size_t len = 0;
-			char *str = loadFile(argv[i],&len);
-			lExceptionTryExit(readEvalStringRaw,c,str);
-			free(str);
-			readNext = false;
-		}else if(argv[i][0] == '-'){
+		if(argv[i][0] == '-'){
 			for(const char *opts = &argv[i][1];*opts && (*opts != '-');opts++){
 				switch(*opts){
-				case 'r':
-					readNext = true;
-					break;
-				case 'n':
-					loadStdLib = false;
-					break;
 				case 'v':
 					lVerbose = true;
 					break;
@@ -153,11 +91,7 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	}
 	lRootsRet(SP);
 	RVP(ret);
-	if(loadStdLib){
-		ret = lCons(lValSym("repl/init"), ret);
-	}else{
-		replRaw(c);
-	}
+	ret = lCons(lValSym("repl/init"), ret);
 	lRootsRet(SP);
 	RVP(ret);
 	lExceptionTryExit(evalRaw,c,ret);

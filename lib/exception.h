@@ -12,7 +12,6 @@ extern bool breakQueued;
 
 void  lExceptionThrowRaw    (lVal *v) NORETURN;
 void  lExceptionThrow       (const char *symbol, const char *error) NORETURN;
-void  lExceptionThrowVal    (const char *symbol, const char *error, lVal *v) NORETURN;
 void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
 void *lExceptionTryExit     (void *(*body)(void *,void *), void *a, void *b);
 void *lExceptionTryCatch    (void *(*body)(void *,void *), void *a, void *b, void (*handler)(lVal *exceptionValue));

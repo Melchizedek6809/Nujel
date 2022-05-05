@@ -33,8 +33,8 @@ static lVal *lnfQuote(lClosure *c, lVal *v){
 lVal *lnfDo(lClosure *c, lVal *v){
 	lVal *ret = NULL;
 	const int SP = lRootsGet();
-	forEach(n,v){
-		ret = lEval(c,lCar(n));
+	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
+		ret = lEval(c, n->vList.car);
 		lRootsRet(SP);
 	}
 	return ret;

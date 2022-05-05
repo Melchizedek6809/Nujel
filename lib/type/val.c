@@ -66,8 +66,6 @@ lVal *lValLambda(lClosure *v){
 	return ret;
 }
 
-
-
 /* Checks if A is greater than B, returns 0 if the two values can't be compared
  | or if they are equal.
  */

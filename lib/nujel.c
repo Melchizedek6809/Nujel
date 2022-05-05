@@ -220,7 +220,7 @@ static void lAddCoreFuncs(lClosure *c){
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
-lClosure *lNewRootNoStdLib(){
+static lClosure *lNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
 	c->type = closureLet;

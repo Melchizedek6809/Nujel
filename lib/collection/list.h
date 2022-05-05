@@ -33,6 +33,4 @@ static inline lVal *lCaddr (lVal *v){return lCar(lCdr(lCdr(v)));}
 static inline lVal *lCdddr (lVal *v){return lCdr(lCdr(lCdr(v)));}
 static inline lVal *lCadddr(lVal *v){return lCar(lCdr(lCdr(lCdr(v))));}
 
-#define forEach(n,v) for(lVal *n = v;(n != NULL) && (n->type == ltPair) && (n->vList.car != NULL); n = n->vList.cdr)
-
 #endif

@@ -35,12 +35,6 @@ NORETURN void lExceptionThrow(const char *symbol, const char *error){
 }
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
-NORETURN void lExceptionThrowVal(const char *symbol, const char *error, lVal *v){
-	lVal *l = lList(3, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v));
-	lExceptionThrowRaw(l);
-}
-
-/* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
 	lVal *l = lList(4, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v),RVP(lValLambda(c)));
 	lExceptionThrowRaw(l);

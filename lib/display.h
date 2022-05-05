@@ -3,13 +3,10 @@
 
 #include "common.h"
 
-extern char dispWriteBuf[1<<18];
+extern char dispWriteBuf[1<<16];
 
 void        lPrintError       (const char *format, ...);
-void        lDisplayVal       (lVal *v);
-const char *lReturnDisplayVal (lVal *v);
 void        lDisplayErrorVal  (lVal *v);
 void        lWriteVal         (lVal *v);
-void        lWriteTree        (lTree *t);
 
 #endif

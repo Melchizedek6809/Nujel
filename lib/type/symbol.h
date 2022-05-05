@@ -15,6 +15,4 @@ lVal     *lValSym       (const char    *s);
 lVal     *lValKeywordS  (const lSymbol *s);
 lVal     *lValKeyword   (const char    *s);
 
-lVal     *lSymbolSearch (const char    *s, uint len);
-
 #endif

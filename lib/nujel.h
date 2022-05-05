@@ -13,10 +13,7 @@ extern bool lVerbose;
 extern lVal *lnfvQuote;
 
 void      lInit             ();
-
 lClosure *lNewRoot          ();
-lClosure *lNewRootNoStdLib  ();
-
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lLambda           (lClosure *c, lVal *args, lVal *lambda);

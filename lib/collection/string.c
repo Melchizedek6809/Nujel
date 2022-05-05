@@ -35,15 +35,6 @@ lString *lStringNewNoCopy(const char *str, uint len){
 	return s;
 }
 
-/* Create a new string containing a direct reference to STR, STR will be
- * freed by the GC if it ever goes out of scope */
-lString *lStringNewConst(const char *str, uint len){
-	lString *s = lStringAlloc();
-	s->buf    = s->data = str;
-	s->bufEnd = &s->buf[len];
-	return s;
-}
-
 /* Return a duplicate of OS */
 lString *lStringDup(lString *os){
 	uint len = os->bufEnd - os->buf;
@@ -83,15 +74,6 @@ lVal *lValStringNoCopy(const char *c,int len){
 	if(c == NULL){return NULL;}
 	lVal *t = lRootsValPush(lValAlloc(ltString));
 	t->vString = lStringNewNoCopy(c,len);
-	return t;
-}
-
-/* Create a new string value out of S, using C directly, which will be
- * freed once the value leaves scope  */
-lVal *lValStringConst(const char *c,int len){
-	if(c == NULL){return NULL;}
-	lVal *t = lRootsValPush(lValAlloc(ltString));
-	t->vString = lStringNewConst(c,len);
 	return t;
 }
 

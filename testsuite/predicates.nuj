@@ -99,7 +99,6 @@
 [test/add #t [resolves? 'π]]
 [test/add #f [resolves? :asd]]
 [test/add #f [resolves? 'asdqwe]]
-[test/add #t [> [length [symbol-search "abs"]] 0]]
 [test/add #t [tree? @[:asd 123]]]
 [test/add #f [tree? #[123]]]
 [test/add #f [tree? '[:asd 123]]]

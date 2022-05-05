@@ -99,8 +99,8 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 		return NULL;
 	}
 	int key = 0;
-	forEach(cur, v){
-		r->vArray->data[key++] = lCar(cur);
+	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
+		r->vArray->data[key++] = n->vList.car;
 	}
 	return r;
 }

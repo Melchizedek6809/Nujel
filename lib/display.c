@@ -3,7 +3,7 @@
 #include "display.h"
 #include "misc/pf.h"
 
-char dispWriteBuf[1<<18];
+char dispWriteBuf[1<<16];
 
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
@@ -16,21 +16,6 @@ char dispWriteBuf[1<<18];
 		console.error(UTF8ToString(str));
 	});
 #endif
-
-/* Display v on the default channel, most likely stdout */
-void lDisplayVal(lVal *v){
-	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%v",v);
-	#ifdef __EMSCRIPTEN__
-	wasmConsoleLog(dispWriteBuf);
-	#endif
-	fwrite(dispWriteBuf, end - dispWriteBuf, 1, stdout);
-}
-
-/* Display v on the default channel, most likely stdout */
-const char *lReturnDisplayVal(lVal *v){
-	spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%v",v);
-	return dispWriteBuf;
-}
 
 /* Display v on the error channel, most likely stderr */
 void lDisplayErrorVal(lVal *v){
