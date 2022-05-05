@@ -30,8 +30,11 @@
        ret]
 
 [defn array/dup [a]
-       "Duplicate Array A"
-       [array/append a #[]]]
+  "Duplicate Array A"
+  [def ret [array/allocate [array/length a]]]
+  [for [i 0 [array/length a]]
+       [array/set! ret i [array/ref a i]]]
+  ret]
 
 [defn array/reduce [arr fun α]
        "Reduce an array, [reduce] should be preferred"
