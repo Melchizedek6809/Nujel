@@ -50,23 +50,22 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-mismatch","[array/set!] expects an array as its first argument", v, c);
 		return NULL;
 	}
-	v = lCdr(v);
-	lVal *t = lCar(v);
+	lVal *t = lCadr(v);
 	if((t == NULL) || (t->type != ltInt)){
 		lExceptionThrowValClo("type-mismatch","[array/set!] expects its second argument to be an integer", v, c);
 		return NULL;
 	}
 	const int key = t->vInt;
 	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", lCons(lCons(t,lValInt(arr->vArray->length)),v), c);
+		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", lCons(lCons(t,lCons(lValInt(arr->vArray->length),arr)),v), c);
 		return NULL;
 	}
-	const lVal *vt = lCdr(v);
+	const lVal *vt = lCddr(v);
 	if((vt == NULL) || (vt->type != ltPair)){
 		lExceptionThrowValClo("type-mismatch","[array/set!] expects a third argument", v, c);
 		return NULL;
 	}
-	arr->vArray->data[key] = lCadr(v);
+	arr->vArray->data[key] = vt->vList.car;
 	return arr;
 }
 
