@@ -10,12 +10,12 @@
 
 [defn yield-run []
        "Executes pending coroutines if their predicate evaluates to #t"
-       [def new #nil]
-       [for-in [cur yield-queue]
+       [def old yield-queue]
+       [set! yield-queue #nil]
+       [for-in [cur old]
                [if [[car cur]]
                    [[cdr cur]]
-                   [set! new [cons cur new]]]]
-       [set! yield-queue new]]
+                   [set! yield-queue [cons cur yield-queue]]]]]
 
 [defn timeout [milliseconds]
        "Returns a function that evaluates to true once MILLISECONDS have passed"

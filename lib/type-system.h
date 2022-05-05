@@ -4,6 +4,10 @@
 #include "nujel.h"
 #include "misc/vec.h"
 
+vec         requireVec  (lClosure *c, lVal *v);
+i64         requireInt  (lClosure *c, lVal *v);
+double      requireFloat(lClosure *c, lVal *v);
+
 lVal *lCast             (lClosure *c, lVal *v, lType t);
 lVal *lCastAuto         (lClosure *c, lVal *v);
 lType lTypecast         (const lType a, const lType b);
