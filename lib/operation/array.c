@@ -58,7 +58,7 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 	}
 	const int key = t->vInt;
 	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", v, c);
+		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", lCons(t,v), c);
 		return NULL;
 	}
 	const lVal *vt = lCdr(v);
