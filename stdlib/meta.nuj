@@ -1,62 +1,62 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
-
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Introspection and procedures returning info about the runtime
 
 [defn display/error/wrap [i text]
-      [case i
-            [0 [ansi-red text]]
-            [1 [string text]]
-            [2 [ansi-yellow [str/write text]]]
-            [3 [describe/closure text]]
-            [otherwise text]]]
+  [case i
+    [0 [ansi-red text]]
+    [1 [string text]]
+    [2 [ansi-yellow [str/write text]]]
+    [3 [describe/closure text]]
+    [otherwise text]]]
 
 [defn display/error/iter [error i]
-       [if error
-           [cons [display/error/wrap i [car error]]
-                 [display/error/iter [cdr error] [+ 1 i]]]
-           [cons "" #nil]]]
+  [if error
+      [cons [display/error/wrap i [car error]]
+            [display/error/iter [cdr error] [+ 1 i]]]
+      [cons "" #nil]]]
 
 [defn display/error [error]
-                "Display ERROR in a nice, human readable way"
-                [display [join [display/error/iter error 0] "\r\n"]]]
+  "Display ERROR in a nice, human readable way"
+  [display [join [display/error/iter error 0] "\r\n"]]]
 
 [defn describe/thing [o]
-       "Describe a specific value O"
-       [def doc [closure o]]
-       [cat [str/write [ref doc :arguments]] " - " [ref doc :documentation]]]
+  "Describe a specific value O"
+  [def doc [closure o]]
+  [cat [str/write [ref doc :arguments]] " - " [ref doc :documentation]]]
 
 [defn describe/string [a]
-       "Descibe whatever value string A resolves to"
-       [describe/thing [resolve [str->sym a]]]]
+  "Descibe whatever value string A resolves to"
+  [describe/thing [resolve [str->sym a]]]]
 
 [defn describe [fun] "Describe FUN, if there is documentation available"
-       [if [string? fun]
-           [describe/string fun]
-           [describe/thing fun]]]
+  [if [string? fun]
+      [describe/string fun]
+      [describe/thing fun]]]
 
 [defn mem []
-       "Return some pretty printed memory usage information" ;
-       [def info [memory-info]]
-       [cat [ansi-white  "Memory Info"] "\n"
-            [ansi-green  "Values:   "] [getf info :value]   "\n"
-            [ansi-blue   "Closures: "] [getf info :closure] "\n"
-            [ansi-red    "Arrays:   "] [getf info :array]   "\n"
-            [ansi-yellow "STrings:  "] [getf info :string]  "\n"
-            [ansi-pink   "Symbols:  "] [getf info :symbol]  "\n"
-            ansi-reset]]
+  "Return some pretty printed memory usage information" ;
+  [def info [memory-info]]
+  [cat [ansi-white  "Memory Info"] "\n"
+       [ansi-green  "Values:   "] [getf info :value]   "\n"
+       [ansi-blue   "Closures: "] [getf info :closure] "\n"
+       [ansi-red    "Arrays:   "] [getf info :array]   "\n"
+       [ansi-yellow "STrings:  "] [getf info :string]  "\n"
+       [ansi-pink   "Symbols:  "] [getf info :symbol]  "\n"
+       ansi-reset]]
 
 [defn symbol-table [off len environment]
-      "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
-      [when-not environment [set! environment root-closure]]
-      [when-not off [set! off 0]]
-      [when-not len [set! len 9999999]]
-      [sublist [eval-in environment '[symbol-table*]] off [+ off len] #nil]]
+  "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
+  [when-not environment [set! environment root-closure]]
+  [when-not off [set! off 0]]
+  [when-not len [set! len 9999999]]
+  [sublist [eval-in environment '[symbol-table*]] off [+ off len] #nil]]
 
 [def gensym/counter 0]
 [defn gensym [prefix]
-       [++ gensym/counter]
-       [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
+  [++ gensym/counter]
+  [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
 
 [def root-closure [current-closure]]
 

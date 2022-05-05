@@ -20,8 +20,7 @@
 [defn repl/wasm [line]
        "Evaluate LINE in the wasm context"
        [try repl/exception-handler
-            [def raw [read line]]
-            [eval-in root-closure [cons 'do raw]]]]
+            [eval-in root-closure [cons do [read line]]]]]
 
 [defn repl/readline [ctx]
         [def line [readline [repl/prompt]]]
@@ -88,8 +87,8 @@
                                                       [file/eval/bytecode arg]]
                                                  [set! repl/parse-args/bytecode-eval-next #f]]
              [repl/parse-args/eval-next [try display/error
-                                             [apply root-closure [cons [compile [cons 'do [read arg]]]]]]
-                                        [set! repl/parse-args/eval-next #f]]
+                                             [eval-in root-closure [cons do [read arg]]]
+                                             [set! repl/parse-args/eval-next #f]]]
              [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
              [#t [try display/error
                       [file/eval arg]]

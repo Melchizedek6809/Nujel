@@ -1,50 +1,50 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
 
 ;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
 [defn sum [c]
-       "Return the sum of every value in collection C"
-       [reduce c + 0]]
+  "Return the sum of every value in collection C"
+  [reduce c + 0]]
 
 [defn join [l glue]
-       "Join every element of α together into a string with GLUE inbetween"
-       [when-not glue [set! glue ""]]
-       [if-not l "" [reduce l [fn [a b] [if a [cat a glue b] b]] #nil]]]
+  "Join every element of α together into a string with GLUE inbetween"
+  [when-not glue [set! glue ""]]
+  [if-not l "" [reduce l [fn [a b] [if a [cat a glue b] b]] #nil]]]
 
 [defn for-each [l f]
-       "Runs F over every item in collection L"
-       [reduce l [fn [a b] [f b]] #nil]]
+  "Runs F over every item in collection L"
+  [reduce l [fn [a b] [f b]] #nil]]
 
 [defn count [l p]
-       "Count the number of items in L where P is true"
-       [if p
-           [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]
-           [reduce l [fn [a b] [+ a 1]] 0]]]
+  "Count the number of items in L where P is true"
+  [if p
+      [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]
+      [reduce l [fn [a b] [+ a 1]] 0]]]
 
 
 [defn min l
-       "Returns the minimum value of its arguments, or collection"
-       [reduce [if [cdr l] l [car l]]
-               [fn [a b] [if [< a b] a b]]]]
+  "Returns the minimum value of its arguments, or collection"
+  [reduce [if [cdr l] l [car l]]
+          [fn [a b] [if [< a b] a b]]]]
 
 [defn max l
-      "Returns the minimum value of its arguments, or collection"
-      [reduce [if [cdr l] l [car l]]
-              [fn [a b] [if [> a b] a b]]]]
+  "Returns the minimum value of its arguments, or collection"
+  [reduce [if [cdr l] l [car l]]
+          [fn [a b] [if [> a b] a b]]]]
 
 [defn delete [l e]
-       "Returns a filtered list l with all elements equal to e omitted"
-       [filter l [fn [a] [not [== a e]]]]]
+  "Returns a filtered list l with all elements equal to e omitted"
+  [filter l [fn [a] [not [== a e]]]]]
 
 [defn remove [l p]
-       "Returns a filtered list l with all elements where P equal true removed"
-       [filter l [fn [a] [not [p a]]]]]
+  "Returns a filtered list l with all elements where P equal true removed"
+  [filter l [fn [a] [not [p a]]]]]
 
 [defn flatten/λ [a b]
-       [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
-             [#t [cons b a]]]]
+  [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
+        [#t [cons b a]]]]
 [defn flatten [l]
-       "Flatten a collection of collections into a simple list"
-       [if-not [collection? l] l
-               [nreverse [reduce l flatten/λ #nil]]]]
+  "Flatten a collection of collections into a simple list"
+  [if-not [collection? l] l
+          [nreverse [reduce l flatten/λ #nil]]]]

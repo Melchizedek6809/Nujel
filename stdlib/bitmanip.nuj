@@ -1,18 +1,20 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
-
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Some functions manipulating binary date
 
 [defn lognand l
-      "Returns the Nand of its arguments"
-      [lognot [apply logand l]]]
+  "Returns the Nand of its arguments"
+  [lognot [apply logand l]]]
 
 [defn bit-set?! [i]
-      [def mask [ash 1 i]]
-      [fn [α]
-          [not [zero? [logand α mask]]]]]
+  "Returns a function that checks if bit I is set in the provided number"
+  [def mask [ash 1 i]]
+  [fn [α]
+      [not [zero? [logand α mask]]]]]
 
 [defn bit-clear?! [i]
-      [def mask [ash 1 i]]
-      [fn [α]
-          [zero? [logand α mask]]]]
+  "Returns a function that checks if bit I is clear in the provided number"
+  [def mask [ash 1 i]]
+  [fn [α]
+      [zero? [logand α mask]]]]

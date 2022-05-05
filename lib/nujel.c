@@ -18,6 +18,7 @@
 extern u8 stdlib_no_data[];
 bool lVerbose = false;
 
+
 /* Initialize the allocator and symbol table, needs to be called before as
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
@@ -206,20 +207,16 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsArray(c);
 	lOperationsBinary(c);
 	lOperationsBytecode(c);
-	lOperationsClosure(c);
-	lOperationsEval(c);
-	lOperationsList(c);
-	lOperationsPredicate(c);
+	lOperationsCore(c);
 	lOperationsReader(c);
 	lOperationsSpecial(c);
 	lOperationsString(c);
-	lOperationsTime(c);
 	lOperationsTree(c);
 	lOperationsTypeSystem(c);
 	lOperationsVector(c);
 }
 
-/* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
+/* Create a new root closure WITHOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
 static lClosure *lNewRootNoStdLib(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
@@ -233,11 +230,7 @@ static lClosure *lNewRootNoStdLib(){
 /* Create a new root closure with the default included stdlib */
 static void *lNewRootReal(void *a, void *b){
 	(void)a; (void)b;
-	lClosure *c = lNewRootNoStdLib();
-	c->text = lRead((const char *)stdlib_no_data);
-	lnfDo(c,c->text);
-	c->text = NULL;
-	return c;
+	return lLoad(lNewRootNoStdLib(), (const char *)stdlib_no_data);
 }
 
 /* Create a new root closure with the default stdlib using the
@@ -250,4 +243,27 @@ lClosure *lNewRoot(){
  * likely abort the current computation and return to the top-level */
 void lBreak(){
 	breakQueued = true;
+}
+
+/* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
+ * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
+ * files. */
+lClosure *lLoad(lClosure *c, const char *expr){
+	const int RSP = lRootsGet();
+	lVal *v = RVP(lRead(expr));
+	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
+		lVal *car = n->vList.car;
+		if((car == NULL) || (car->type != ltBytecodeArr)){
+			if(car->type == ltPair){
+				lEval(c, car);
+			}else{
+				lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
+			}
+		}else{
+			lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
+		}
+	}
+
+	lRootsRet(RSP);
+	return c;
 }

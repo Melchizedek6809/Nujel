@@ -1,86 +1,86 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
-
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Contains native nujel implementations of some
 ;; core language constructs and essential macros
 
 [def otherwise #t]
 
 [defmacro comment body
-          "Does nothing"
-          #nil]
+  "Does nothing"
+  #nil]
 
 [defmacro += [val inc]
-          `[set! ~val [+ ~val ~inc]]]
+  `[set! ~val [+ ~val ~inc]]]
 
 [defmacro cdr! [l]
-          "[set! l [cdr l]]"
-          `[set! ~l [cdr ~l]]]
+  "[set! l [cdr l]]"
+  `[set! ~l [cdr ~l]]]
 
 [defn not [v]
-       "Return true if V is false"
-       [if v #f #t]]
+  "Return true if V is false"
+  [if v #f #t]]
 
 [defn identity [α]
-       "Returns its argument"
-       α]
+  "Returns its argument"
+  α]
 
 [defn list arguments
-       "Return ARGUMENTS as a list"
-       arguments]
+  "Return ARGUMENTS as a list"
+  arguments]
 
 [defn default [arg default-value]
-       "Returns ARG or DEFAULT-VALUE if ARG is #nil"
-       [if arg arg default-value]]
+  "Returns ARG or DEFAULT-VALUE if ARG is #nil"
+  [if arg arg default-value]]
 
 [defn caar [p]
-       "[car [car p]]"
-       [car [car p]]]
+  "[car [car p]]"
+  [car [car p]]]
 
 [defn cadr [p]
-       "[car [cdr p]]"
-       [car [cdr p]]]
+  "[car [cdr p]]"
+  [car [cdr p]]]
 
 [defn cdar [p]
-       "[cdr [car p]]"
-       [cdr [car p]]]
+  "[cdr [car p]]"
+  [cdr [car p]]]
 
 [defn cddr [p]
-       "[cdr [cdr p]]"
-       [cdr [cdr p]]]
+  "[cdr [cdr p]]"
+  [cdr [cdr p]]]
 
 [defn cadar [p]
-       "[cdr [car p]]"
-       [car [cdr [car p]]]]
+  "[cdr [car p]]"
+  [car [cdr [car p]]]]
 
 [defn caddr [p]
-       "[car [cdr [cdr p]]]"
-       [car [cdr [cdr p]]]]
+  "[car [cdr [cdr p]]]"
+  [car [cdr [cdr p]]]]
 
 [defn cdddr [p]
-       "[cdr [cdr [cdr p]]]"
-       [cdr [cdr [cdr p]]]]
+  "[cdr [cdr [cdr p]]]"
+  [cdr [cdr [cdr p]]]]
 
 [defn cadddr [p]
-       "[car [cdr [cdr [cdr p]]]]"
-       [car [cdr [cdr [cdr p]]]]]
+  "[car [cdr [cdr [cdr p]]]]"
+  [car [cdr [cdr [cdr p]]]]]
 
 [defn cddddr [p]
-       "[car [cdr [cdr [cdr p]]]]"
-       [cdr [cdr [cdr [cdr p]]]]]
+  "[car [cdr [cdr [cdr p]]]]"
+  [cdr [cdr [cdr [cdr p]]]]]
 
 [defn caddddr [p]
-       "[car [cdr [cdr [cdr p]]]]"
-       [car [cdr [cdr [cdr [cdr p]]]]]]
+  "[car [cdr [cdr [cdr p]]]]"
+  [car [cdr [cdr [cdr [cdr p]]]]]]
 
 [defn cdddddr [p]
-       "[cdr [cdr [cdr [cdr p]]]]"
-       [cdr [cdr [cdr [cdr [cdr p]]]]]]
+  "[cdr [cdr [cdr [cdr p]]]]"
+  [cdr [cdr [cdr [cdr [cdr p]]]]]]
 
 [defn keyword->string [α]
-       [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]
-       [sym->str [keyword->symbol α]]]
+  [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]
+  [sym->str [keyword->symbol α]]]
 
 [defn string->keyword [α]
-       [when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]]
-       [symbol->keyword [str->sym α]]]
+  [when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]]
+  [symbol->keyword [str->sym α]]]

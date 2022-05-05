@@ -39,37 +39,6 @@
 08i 4 v cat
 08i 1 v println
 01
-}]] [def file/compile [fn* file/compile [path no-write environment] "Compile a Nujel source file into optimized object code" #{
-23s do
-10s path
-08i 1 v file/read
-08i 1 v read
-08i 2 v cons
-0Es source
-0D
-10s source
-10s environment
-08i 2 v compile/forms
-0Es object-code
-0D
-10s no-write
-0Bo 7
-24
-09o 49
-10s object-code
-0Bo 15
-10s object-code
-08i 1 v str/write
-09o 7
-05v ""
-10s path
-08i 1 v path/without-extension
-05v ".no"
-08i 2 v cat
-08i 2 v file/write
-0D
-10s object-code
-01
 }]] [def file/eval [fn* file/eval [path environment] "Evaluate a Nujel source file in the current context" #{
 10s environment
 0Bo 7
@@ -89,57 +58,21 @@
 10s environment
 08i 2 v compile/forms
 01
-}]] [def file/eval/bytecode [fn* file/eval/bytecode [path] "Evaluate a Nujel source file in the current context" #{
+}]] [def file/eval/bytecode [fn* file/eval/bytecode [path environment] "Evaluate a Nujel source file in the current context" #{
+10s environment
+0Bo 7
+24
+09o 11
+10s root-closure
+0Fs environment
+0D
+10s environment
 23s do
 10s path
 08i 1 v file/read
 08i 1 v read
 08i 2 v cons
-0Es source
-0D
-10s source
-08i 1 v compile
-08i 1 v bytecompile
-08i 1 v assemble
-0Es bc
-0D
-10s disassemble/raw
-10s bc
-1Ai 1
-0D
-10s bc
-08i 1 v bytecode-eval
-01
-}]] [def eval/forked [fn* eval/forked [nujel-binary raw-expr] "Evaluate @EXPR in a separate process running NUJEL-BINARY" #{
-05v "[print [str/write "
-10s raw-expr
-08i 1 v str/write
-05v "]] "
-08i 3 v cat
-0Es expr
-0D
-10s expr
-08i 1 v file/temp
-0Es tmp-path
-0D
-10s nujel-binary
-05v " "
-10s tmp-path
-08i 3 v cat
-0Es command
-0D
-10s command
-08i 1 v popen
-0Es res
-0D
-10s tmp-path
-08i 1 v file/remove
-0D
-10s res
-08i 1 v car
-10s res
-08i 1 v cdr
-08i 2 v cons
+08i 2 v eval-in
 01
 }]] [def file/file? [fn* file/file? [filename] "" #{
 10s filename
@@ -190,14 +123,11 @@
 01
 }]] [def repl/wasm [fn* repl/wasm [line] "Evaluate LINE in the wasm context" #{
 10s repl/exception-handler
-18o 42
+18o 33
+10s root-closure
+10s do
 10s line
 08i 1 v read
-0Es raw
-0D
-10s root-closure
-23s do
-10s raw
 08i 2 v cons
 08i 2 v eval-in
 09o 8
@@ -417,27 +347,25 @@
 0D
 05v #f
 0Fs repl/parse-args/bytecode-eval-n
-09o 158
+09o 148
 10s repl/parse-args/eval-next
-0Bo 69
+0Bo 59
 10s display/error
-18o 43
+18o 42
 10s root-closure
-23s do
+10s do
 10s arg
 08i 1 v read
 08i 2 v cons
-08i 1 v compile
-08i 1 v cons
-08i 2 v apply
+08i 2 v eval-in
+0D
+05v #f
+0Fs repl/parse-args/eval-next
 09o 8
 1Ai 1
 09o 5
 27
 0D
-0D
-05v #f
-0Fs repl/parse-args/eval-next
 09o 85
 10s arg
 02i 0

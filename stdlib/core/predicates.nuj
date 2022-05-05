@@ -1,124 +1,124 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
-
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Some predicates that were simpler to do in nujel
 
 [defn numeric? [a]
-        "Return #t if a is a number"
-        [or [int? a] [float? a] [vec? a]]]
+  "Return #t if a is a number"
+  [or [int? a] [float? a] [vec? a]]]
 
 [defn last? [a]
-        "Return #t if a is the last pair in a list"
-        [nil? [cdr a]]]
+  "Return #t if a is the last pair in a list"
+  [nil? [cdr a]]]
 
 [defn pos? [a]
-        "Return #t if a is positive"
-        [and [numeric? a] [>= [float a] 0.0]]]
+  "Return #t if a is positive"
+  [and [numeric? a] [>= [float a] 0.0]]]
 
 [defn zero-neg? [a]
-        "Return #t if a is zero or negative"
-        [and [numeric? a] [<= [float a] 0.0]]]
+  "Return #t if a is zero or negative"
+  [and [numeric? a] [<= [float a] 0.0]]]
 
 [defn neg? [a]
-        "Returns #t if a is negative"
-        [and [numeric? a] [< [float a] 0.0]]]
+  "Returns #t if a is negative"
+  [and [numeric? a] [< [float a] 0.0]]]
 
 [defn odd? [a]
-        "Predicate that returns #t if a is odd"
-        [== [% [int a] 2] 1]]
+  "Predicate that returns #t if a is odd"
+  [== [% [int a] 2] 1]]
 
 [defn even? [a]
-        "Predicate that returns #t if a is even"
-        [== [mod/int [int a] 2] 0]]
+  "Predicate that returns #t if a is even"
+  [== [mod/int [int a] 2] 0]]
 
 [defn zero? [val]
-        "#t if VAL is zero"
-        [== 0 val]]
+  "#t if VAL is zero"
+  [== 0 val]]
 
 [defn not-zero? [val]
-        "#t if VAL is not zero"
-        [!= 0 val]]
+  "#t if VAL is not zero"
+  [!= 0 val]]
 
 [defn equal? [a b]
-       "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow."
-       [def cur-type [type-of a]]
-       [if [!= cur-type [type-of b]]
-           #f
-           [case cur-type
-                 [:array [array/equal? a b]]
-                 [:tree [tree/equal? a b]]
-                 [:pair [list/equal? a b]]
-                 [otherwise [== a b]]]]]
+  "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow."
+  [def cur-type [type-of a]]
+  [if [!= cur-type [type-of b]]
+      #f
+      [case cur-type
+        [:array [array/equal? a b]]
+        [:tree [tree/equal? a b]]
+        [:pair [list/equal? a b]]
+        [otherwise [== a b]]]]]
 
 [defn inequal? [a b]
-       "High level inequality comparator"
-       [not [equal? a b]]]
+  "High level inequality comparator"
+  [not [equal? a b]]]
 
 [defn int? [val]
-        "#t if VAL is a integer"
-        [== :int [type-of val]]]
+  "#t if VAL is a integer"
+  [== :int [type-of val]]]
 
 [defn float? [val]
-        "#t if VAL is a floating-point number"
-        [== :float [type-of val]]]
+  "#t if VAL is a floating-point number"
+  [== :float [type-of val]]]
 
 [defn vec? [val]
-        "#t if VAL is a vector"
-        [== :vec [type-of val]]]
+  "#t if VAL is a vector"
+  [== :vec [type-of val]]]
 
 [defn bool? [val]
-        "#t if VAL is a boolean"
-        [== :bool [type-of val]]]
+  "#t if VAL is a boolean"
+  [== :bool [type-of val]]]
 
 [defn pair? [val]
-        "#t if VAL is a pair"
-        [== :pair [type-of val]]]
+  "#t if VAL is a pair"
+  [== :pair [type-of val]]]
 
 [defn array? [val]
-	"#t if VAL is an array"
-	[== :array [type-of val]]]
+  "#t if VAL is an array"
+  [== :array [type-of val]]]
 
 [defn string? [val]
-        "#t if VAL is a string"
-        [== :string [type-of val]]]
+  "#t if VAL is a string"
+  [== :string [type-of val]]]
 
 [defn symbol? [val]
-        "#t if VAL is a symbol"
-        [== :symbol [type-of val]]]
+  "#t if VAL is a symbol"
+  [== :symbol [type-of val]]]
 
 [defn object? [val]
-        "#t if VAL is an object"
-        [== :object [type-of val]]]
+  "#t if VAL is an object"
+  [== :object [type-of val]]]
 
 [defn tree? [val]
-        "#t if VAL is an object"
-        [== :tree [type-of val]]]
+  "#t if VAL is an object"
+  [== :tree [type-of val]]]
 
 [defn macro? [val]
-        "#t if VAL is an object"
-        [== :macro [type-of val]]]
+  "#t if VAL is an object"
+  [== :macro [type-of val]]]
 
 [defn lambda? [val]
-        "#t if VAL is a lambda"
-        [or [== :lambda [type-of val]]]]
+  "#t if VAL is a lambda"
+  [or [== :lambda [type-of val]]]]
 
 [defn native? [val]
-        "#t if VAL is a native function"
-        [== :native-function [type-of val]]]
+  "#t if VAL is a native function"
+  [== :native-function [type-of val]]]
 
 [defn special-form? [val]
-        "#t if VAL is a native function"
-        [== :special-form [type-of val]]]
+  "#t if VAL is a native function"
+  [== :special-form [type-of val]]]
 
 [defn procedure? [val]
-        "#t if VAL is a native or lisp function"
-        [or [lambda? val] [native? val] [special-form? val]]]
+  "#t if VAL is a native or lisp function"
+  [or [lambda? val] [native? val] [special-form? val]]]
 
 [defn bytecode-array? [v]
-       [== :bytecode-array [type-of v]]]
+  [== :bytecode-array [type-of v]]]
 
 [defn bytecode-op? [v]
-       [== :bytecode-op [type-of v]]]
+  [== :bytecode-op [type-of v]]]
 
 [defn in-range? [v min max]
-       [and [>= v min] [<= v max]]]
+  [and [>= v min] [<= v max]]]

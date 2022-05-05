@@ -6003,11 +6003,14 @@
 05v #t
 01
 }]] [def yield-run [fn* yield-run [] "Executes pending coroutines if their predicate evaluates to #t" #{
+10s yield-queue
+0Es old
+0D
 24
-0Es new
+0Fs yield-queue
 0D
 15
-10s yield-queue
+10s old
 0Es ΓεnΣym-104
 0D
 10s ΓεnΣym-104
@@ -6031,9 +6034,9 @@
 1Ai 0
 09o 20
 10s cur
-10s new
+10s yield-queue
 08i 2 v cons
-0Fs new
+0Fs yield-queue
 0D
 10s ΓεnΣym-104
 08i 1 v cdr
@@ -6042,9 +6045,6 @@
 09o 4
 24
 16
-0D
-10s new
-0Fs yield-queue
 01
 }]] [def timeout [fn* timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed" #{
 08i 0 v time/milliseconds

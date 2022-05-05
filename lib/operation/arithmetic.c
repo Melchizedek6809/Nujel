@@ -62,7 +62,6 @@ static lVal *lnfAdd(lClosure *c, lVal *v){
 }
 
 static lVal *lnfAddAst(lClosure *c, lVal *v){
-	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return lValInt(0);}
@@ -77,7 +76,6 @@ static lVal *lnfAddAst(lClosure *c, lVal *v){
 }
 
 static lVal *lnfSubAst(lClosure *c, lVal *v){
-	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return b;}
@@ -92,7 +90,6 @@ static lVal *lnfSubAst(lClosure *c, lVal *v){
 }
 
 static lVal *lnfMulAst(lClosure *c, lVal *v){
-	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return lValInt(1);}
@@ -107,7 +104,6 @@ static lVal *lnfMulAst(lClosure *c, lVal *v){
 }
 
 static lVal *lnfDivAst(lClosure *c, lVal *v){
-	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return b;}
@@ -126,7 +122,6 @@ static lVal *lnfDivAst(lClosure *c, lVal *v){
 }
 
 static lVal *lnfModAst(lClosure *c, lVal *v){
-	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return b;}

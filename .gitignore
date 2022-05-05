@@ -29,6 +29,7 @@ gmon.out
 *.err
 /stdlib/**/*.no
 /binlib/**/*.no
+/tests/**/*.no
 *.wd
 *.wa
 *.wo

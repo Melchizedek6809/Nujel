@@ -1,10 +1,34 @@
 #!/usr/bin/env nujel
-; In here we use our bootstrap runtime to load, eval and finally precompile
-; the Nujel standard library, the eval is necessary so we can make use of macros
-; that are not within our bootstrap runtime (which is just using an old
-; precompiled stdlib).
+#| In here we use our bootstrap runtime to load, eval and finally precompile
+ | the Nujel standard library, the eval is necessary so we can make use of macros
+ | that are not within our bootstrap runtime (which is just using an old
+ | precompiled stdlib).
+ |#
 
-[def environment [ω]]
+[defn file/compile/new [path no-write environment]
+  "Compile a Nujel source file into optimized object code"
+  [def source [cons 'do [read [file/read path]]]]
+  [def object-code [-> [compile/forms source environment]
+                       compile
+                       bytecompile
+                       assemble*]]
+  [when-not no-write
+            [file/write [if object-code [str/write object-code] ""]
+                        [cat [path/without-extension path] ".no"]]]
+  object-code]
+
+[defn file/compile/old [path no-write environment]
+        "Compile a Nujel source file into optimized object code"
+        [def source [cons 'do [read [file/read path]]]]
+        [def object-code [compile/forms source environment]]
+        [when-not no-write [file/write [if object-code [str/write object-code] ""]
+                                       [cat [path/without-extension path] ".no"]]]
+        object-code]
+
+[defn file/compile [path no-write environment]
+  [file/compile/old path no-write environment]]
+
+[def environment [environment*]]
 [def ext-nuj? [path/ext?! "nuj"]]
 [def stdlib-files [-> [directory/read-recursive "stdlib"]
                       [append [directory/read-recursive "binlib"]]
@@ -12,8 +36,9 @@
                       [filter ext-nuj?]
                       [sort]]]
 
-; If something happens, we just print the responsible error and exit immediately,
-; since we can't really fix things, we could only make things worse.
+#| If something happens, we just print the responsible error and exit immediately,
+ | since we can't really fix things, we could only make things worse.
+ |#
 [try [fn [err]
          [println "Exception during stdlib compilation"]
          [display/error err]

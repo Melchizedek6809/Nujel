@@ -1,11 +1,11 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
 
 [defn describe/closure [c i]
   [when c
     [if [== c root-closure]
         [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]]
-                   "\r\n"]
+             "\r\n"]
         [do [def info [closure c]]
             [when info
               [def data [ref info :data]]

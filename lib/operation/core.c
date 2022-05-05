@@ -9,6 +9,9 @@
 #include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
+#include "../misc/getmsecs.h"
+
+#include <time.h>
 
 const lSymbol *symType;
 const lSymbol *symDocumentation;
@@ -17,26 +20,14 @@ const lSymbol *symCode;
 const lSymbol *symData;
 
 static lVal *lnfDef(lClosure *c, lVal *v){
-	lVal *sym = lCar(v);
-	if((sym == NULL) || (sym->type != ltSymbol)){
-		lExceptionThrowValClo("type-error","def needs a symbol as its first argument", v, c);
-		/* Never Returns */
-	}
-	const lSymbol *s = sym->vSymbol;
-
+	const lSymbol *s = requireSymbol(c, lCar(v));
 	lVal *ret = lEval(c,lCadr(v));
 	lDefineClosureSym(c,s,ret);
 	return ret;
 }
 
 static lVal *lnfSet(lClosure *c, lVal *v){
-	lVal *sym = lCar(v);
-	if((sym == NULL) || (sym->type != ltSymbol)){
-		lExceptionThrowValClo("type-error","def needs a symbol as its first argument", v, c);
-		/* Never Returns */
-	}
-	const lSymbol *s = sym->vSymbol;
-
+	const lSymbol *s = requireSymbol(c, lCar(v));
 	lVal *ret = lEval(c,lCadr(v));
 	if(!lSetClosureSym(c,s,ret)){
 		lExceptionThrowValClo("unbound-variable","set! only works with symbols that already have an associated value", lCar(v), c);
@@ -165,16 +156,13 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 static lVal *lnfClosureSet(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
-	lTree *data = castToTree(lCadr(v),NULL);
-	if(data == NULL){
-		lExceptionThrowValClo("type-error","expected a tree", lCadr(v), c);
-	}
 	if((car == NULL)
 		|| !((car->type == ltLambda)
 		||   (car->type == ltObject)
 		||   (car->type == ltMacro))){
 		return NULL;
 	}
+	lTree *data = requireTree(c, lCadr(v));
 	lClosure *clo = car->vClosure;
 	lClosureSetRec(clo,data);
 	return NULL;
@@ -237,7 +225,115 @@ static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 	return ret;
 }
 
-void lOperationsClosure(lClosure *c){
+static lVal *lnfApply(lClosure *c, lVal *v){
+	lVal *fun = lCar(v);
+	switch(fun ? fun->type : ltNoAlloc){
+	default:
+		lExceptionThrowValClo("type-error", "Can't apply to that", v, c);
+		return NULL;
+	case ltObject:
+	case ltLambda:
+	case ltNativeFunc:
+	case ltSpecialForm:
+		return lApply(c, lCadr(v), fun, fun);
+	}
+}
+
+static lVal *lnfMacroApply(lClosure *c, lVal *v){
+	lVal *fun = lCar(v);
+	if((fun == NULL) || (fun->type != ltMacro)){
+		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
+		return NULL;
+	}
+	return lLambda(c, lCadr(v), fun);
+}
+
+static lVal *lnfCar(lClosure *c, lVal *v){
+	(void)c;
+	return lCaar(v);
+}
+
+static lVal *lnfCdr(lClosure *c, lVal *v){
+	(void)c;
+	return lCdar(v);
+}
+
+static lVal *lnfCons(lClosure *c, lVal *v){
+	(void)c;
+	if(lCddr(v) != NULL){
+		lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c);
+	}
+	return lCons(lCar(v),lCadr(v));
+}
+
+static lVal *lnfNReverse(lClosure *c, lVal *v){
+	(void)c;
+	lVal *t = NULL, *l = lCar(v);
+	while((l != NULL) && (l->type == ltPair)){
+		lVal *next = l->vList.cdr;
+		l->vList.cdr = t;
+		t = l;
+		l = next;
+	}
+	return t;
+}
+
+static lVal *lnfTime(lClosure *c, lVal *v){
+	(void)c;(void)v;
+	return lValInt(time(NULL));
+}
+
+static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
+	(void)c; (void)v;
+	return lValInt(getMSecs());
+}
+
+static lVal *lnfLess(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(lValGreater(lCar(v), lCadr(v)) < 0);
+}
+
+static lVal *lnfUnequal(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(!lValEqual(lCar(v), lCadr(v)));
+}
+
+static lVal *lnfEqual(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(lValEqual(lCar(v), lCadr(v)));
+}
+
+static lVal *lnfLessEqual(lClosure *c, lVal *v){
+	(void)c;
+	lVal *a = lCar(v);
+	lVal *b = lCadr(v);
+	return lValBool(lValEqual(a,b) || (lValGreater(a, b) < 0));
+}
+
+static lVal *lnfGreater(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(lValGreater(lCar(v), lCadr(v)) > 0);
+}
+
+static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
+	(void)c;
+	lVal *a = lCar(v);
+	lVal *b = lCadr(v);
+	return lValBool(lValEqual(a,b) || (lValGreater(a, b) > 0));
+}
+
+static lVal *lnfNilPred(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(lCar(v) == NULL);
+}
+
+static lVal *lnfKeywordPred(lClosure *c, lVal *v){
+	(void)c;
+	lVal *car = lCar(v);
+	return lValBool(car ? car->type == ltKeyword : false);
+}
+
+void lOperationsCore(lClosure *c){
 	symType          = RSYMP(lSymS("type"));
 	symDocumentation = RSYMP(lSymS("documentation"));
 	symArguments     = RSYMP(lSymS("arguments"));
@@ -264,4 +360,24 @@ void lOperationsClosure(lClosure *c){
 	lAddSpecialForm(c,"macro*",       "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
 	lAddSpecialForm(c,"fn*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
 	lAddSpecialForm(c,"ω* environment*", "[]",                  "Create a new object",       lnfObjectAst);
+
+	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
+	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
+
+	lAddNativeFunc(c,"car",  "[list]",     "Returs the head of LIST",          lnfCar);
+	lAddNativeFunc(c,"cdr",  "[list]",     "Return the rest of LIST",          lnfCdr);
+	lAddNativeFunc(c,"cons", "[car cdr]",  "Return a new pair of CAR and CDR", lnfCons);
+	lAddNativeFunc(c,"nreverse","[list]",  "Return LIST in reverse order, fast but mutates", lnfNReverse);
+
+	lAddNativeFunc(c,"time",   "          []", "Return the current unix time",lnfTime);
+	lAddNativeFunc(c,"time/milliseconds","[]", "Return monotonic msecs",lnfTimeMsecs);
+
+	lAddNativeFunc(c,"<",        "[α β]", "Return true if α is less than β",             lnfLess);
+	lAddNativeFunc(c,"<=",       "[α β]", "Return true if α is less or equal to β",      lnfLessEqual);
+	lAddNativeFunc(c,"==",       "[α β]", "Return true if α is equal to β",              lnfEqual);
+	lAddNativeFunc(c,"!=",       "[α β]", "Return true if α is not equal to  β",         lnfUnequal);
+	lAddNativeFunc(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
+	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
+	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
+	lAddNativeFunc(c,"keyword?", "[α]",   "Return true if α is a keyword symbol",        lnfKeywordPred);
 }

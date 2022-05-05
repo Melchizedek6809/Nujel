@@ -7,7 +7,6 @@
 #include "../type/symbol.h"
 #include "../type/val.h"
 
-/* [tree/new ...plist] - Return a new tree, initialized with PLIST */
 lVal *lnfTreeNew(lClosure *c, lVal *v){
 	(void)c; (void) v;
 
@@ -34,108 +33,39 @@ lVal *lnfTreeNew(lClosure *c, lVal *v){
 	return ret;
 }
 
-/* [tree/list tree] - return a TREE as a plist */
 static lVal *lnfTreeGetList(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
-		/* Never Returns */
-	}
-	return lTreeToList(car->vTree);
+	return lTreeToList(requireTree(c, lCar(v)));
 }
 
-/* [tree/keys tree] - Return each key of TREE in a list */
 static lVal *lnfTreeGetKeys(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
-		/* Never Returns */
-	}
-	return lTreeKeysToList(car->vTree);
+	return lTreeKeysToList(requireTree(c, lCar(v)));
 }
 
-/* [tree/values tree] - Return each value of TREE in a list */
 static lVal *lnfTreeGetValues(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", car, c);
-		/* Never Returns */
-	}
-	return lTreeValuesToList(car->vTree);
+	return lTreeValuesToList(requireTree(c, lCar(v)));
 }
 
-/* [tree/get tree sym] - Return the value of SYM in TREE, or #nil */
-lVal *lnfTreeGet(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","[tree/ref] - expected argument to be of type :tree", car, c);
-		/* Never Returns */
-	}
-	lTree *tre = car->vTree;
-	const lSymbol *key = castToSymbol(lCadr(v), NULL);
-	if(key == NULL){
-		lExceptionThrowValClo("type-error","[tree/ref] - should be a :symbol", lCadr(v), c);
-		/* Never Returns */
-	}
-	return key ? lTreeGet(tre, key, NULL) : car;
+static lVal *lnfTreeGet(lClosure *c, lVal *v){
+	return lTreeGet(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL);
 }
 
-/* [tree/has? tree sym] - Return #t if TREE contains a value for SYM */
 static lVal *lnfTreeHas(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","[tree/has?] - needs a :tree", car, c);
-		/* Never Returns */
-	}
-	lTree *tre = car->vTree;
-	const lSymbol *key = castToSymbol(lCadr(v), NULL);
-	if(key == NULL){
-		lExceptionThrowValClo("type-error","[tree/has?] - needs a :symbol", lCadr(v), c);
-		/* Never Returns */
-	}
-	return lValBool(key ? lTreeHas(tre, key, NULL) : false);
+	return lValBool(lTreeHas(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL));
 }
 
-/* [tree/set! tree sym val] - Set SYM to VAL in TREE */
 static lVal *lnfTreeSet(lClosure *c, lVal *v){
-	(void)c;
 	lVal *car = lCar(v);
-	if(car == NULL){
-		car = lValTree(NULL);
-	}else if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","[tree/set!] - needs a :tree", car, c);
-		/* Never Returns */
-	}else if(car->vTree->flags & TREE_IMMUTABLE){
-		lExceptionThrowValClo("type-error","[tree/set!] - needs a MUTABLE :tree", car, c);
-		/* Never Returns */
-	}
-	lTree *tre = car->vTree;
-	const lSymbol *key = castToSymbol(lCadr(v), NULL);
-	if(key == NULL){
-		lExceptionThrowValClo("type-error","[tree/set!] - needs a :symbol", lCadr(v), c);
-		/* Never Returns */
-	}
+	if(car == NULL){car = lValTree(NULL);}
+	lTree *tre = requireMutableTree(c, car);
+	const lSymbol *key = requireSymbolic(c, lCadr(v));
 	car->vTree = lTreeInsert(tre, key, lCaddr(v));
 	return car;
 }
 
-/* [tree/size tree] - Return the amount of entries in TREE */
 static lVal *lnfTreeSize(lClosure *c, lVal *v){
-	(void)c;
-	lTree *tree = castToTree(lCar(v),NULL);
-	if(tree == NULL){
-		lExceptionThrowValClo("type-error","expected argument to be of type :tree", v, c);
-		/* Never Returns */
-	}
-	return lValInt(tree == 0 ? 0 : lTreeSize(tree));
+	return lValInt(lTreeSize(requireTree(c, lCar(v))));
 }
 
-/* [tree/dup tree] - Return a duplicate of TREE */
 static lVal *lnfTreeDup(lClosure *c, lVal *v){
 	(void)c;
 	if((v == NULL)
@@ -143,62 +73,32 @@ static lVal *lnfTreeDup(lClosure *c, lVal *v){
 		|| (v->vList.car == NULL)
 		|| (v->vList.car->type != ltTree)){
 		lExceptionThrowValClo("type-error","tree/dup can only be called with a tree as an argument", v, c);
-		/* Never Returns */
 	}
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltTree)){
-		lExceptionThrowValClo("type-error","expected an argument of type :tree", car, c);
-		/* Never Returns */
-	}
-	lTree *tree = castToTree(car,NULL);
+	lTree *tree = requireTree(c, lCar(v));
 	const int SP = lRootsGet();
 	tree = lTreeDup(tree);
 	lRootsRet(SP);
 	return lValTree(tree);
 }
 
-/* [tree/key* tree] - return the key of a tree */
 static lVal *lnfTreeKeyAst(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","tree/key* can only be called with a tree", v, c);
-		/* Never Returns */
-	}
-	return car->vTree ? lValKeywordS(car->vTree->key) : NULL;
+	lTree *tree = requireTree(c, lCar(v));
+	return tree ? lValKeywordS(tree->key) : NULL;
 }
 
-/* [tree/value* tree] - return the value of a tree */
 static lVal *lnfTreeValueAst(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
-		/* Never Returns */
-	}
-	return car->vTree ? car->vTree->value : NULL;
+	lTree *tree = requireTree(c, lCar(v));
+	return tree ? tree->value : NULL;
 }
 
-/* [tree/left* tree] - return the right branch of a tree */
 static lVal *lnfTreeLeftAst(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
-		/* Never Returns */
-	}
-	return (car->vTree && car->vTree->left) ? lValTree(car->vTree->left) : NULL;
+	lTree *tree = requireTree(c, lCar(v));
+	return (tree && tree->left) ? lValTree(tree->left) : NULL;
 }
 
-/* [tree/right* tree] - return the left branch of a tree */
 static lVal *lnfTreeRightAst(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if(car->type != ltTree){
-		lExceptionThrowValClo("type-error","tree/value* can only be called with a tree", v, c);
-		/* Never Returns */
-	}
-	return (car->vTree && car->vTree->right) ? lValTree(car->vTree->right) : NULL;
+	lTree *tree = requireTree(c, lCar(v));
+	return (tree && tree->right) ? lValTree(tree->right) : NULL;
 }
 
 void lOperationsTree(lClosure *c){

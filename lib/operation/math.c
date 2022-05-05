@@ -21,7 +21,7 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 }
 
 lVal *lnfAbs(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValInt(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"absolute");
@@ -32,7 +32,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 }
 
 lVal *lnfCbrt(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValInt(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"squareroot");
@@ -43,7 +43,7 @@ lVal *lnfCbrt(lClosure *c, lVal *v){
 }
 
 lVal *lnfSqrt(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValInt(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"squareroot");
@@ -54,7 +54,7 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 }
 
 lVal *lnfCeil(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"ceil");
@@ -64,7 +64,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 }
 
 lVal *lnfFloor(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"floor");
@@ -74,7 +74,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 }
 
 lVal *lnfRound(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrow(c, v,"round");
@@ -84,7 +84,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 }
 
 lVal *lnfSin(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrowFloat(c, v,"sin");
@@ -93,7 +93,7 @@ lVal *lnfSin(lClosure *c, lVal *v){
 }
 
 lVal *lnfCos(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrowFloat(c, v,"cos");
@@ -102,7 +102,7 @@ lVal *lnfCos(lClosure *c, lVal *v){
 }
 
 lVal *lnfTan(lClosure *c, lVal *v){
-	lVal *t = lCar(lCastAuto(c,v));
+	lVal *t = lCar(v);
 	if(t == NULL){return lValFloat(0);}
 	switch(t->type){
 		default:      return exceptionThrowFloat(c, v,"tan");
@@ -111,21 +111,9 @@ lVal *lnfTan(lClosure *c, lVal *v){
 }
 
 lVal *lnfAtanTwo(lClosure *c, lVal *v){
-	lVal *y =  lCar(v);
-	lVal *x = lCadr(v);
-	if((y == NULL) || (x == NULL)){
-		lExceptionThrowValClo("arity-error", "[atan2] expects 2 arguments", v, c);
-	}
-	if((y->type != ltFloat) || (x->type != ltFloat)){
-		lExceptionThrowValClo("type-error", "[atan2] only works on floats", v, c);
-	}
-	return lValFloat(atan2(y->vFloat,x->vFloat));
-}
-
-lVal *lnfVMag(lClosure *c, lVal *v){
-	lVal *t = lCar(lCast(c,v,ltVec));
-	if((t == NULL) || (t->type != ltVec)){return lValFloat(0);}
-	return lValFloat(vecMag(t->vVec));
+	const double y = requireFloat(c,  lCar(v));
+	const double x = requireFloat(c, lCadr(v));
+	return lValFloat(atan2(y, x));
 }
 
 void lOperationsMath(lClosure *c){
@@ -139,6 +127,4 @@ void lOperationsMath(lClosure *c){
 	lAddNativeFunc(c,"cos",  "[a]", "Cos A",                          lnfCos);
 	lAddNativeFunc(c,"tan",  "[a]", "Tan A",                          lnfTan);
 	lAddNativeFunc(c,"atan2","[y x]", "Arc tangent of y/x",           lnfAtanTwo);
-
-	lAddNativeFunc(c,"vec/magnitude","[vec]","Return the magnitude of VEC", lnfVMag);
 }

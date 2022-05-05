@@ -27,10 +27,6 @@
 	#include <sys/wait.h>
 #endif
 
-#ifndef __WATCOMC__
-
-#endif
-
 
 lSymbol *lsMode;
 lSymbol *lsSize;
@@ -86,57 +82,43 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 
 static lVal *lnfPrint(lClosure *c, lVal *v){
 	(void)c;
-	if(v == NULL){return v;}
 	lWriteVal(lCar(v));
 	return NULL;
 }
 
 static lVal *lnfError(lClosure *c, lVal *v){
 	(void)c;
-	if(v == NULL){return v;}
 	lDisplayErrorVal(lCar(v));
 	return NULL;
 }
 
 static lVal *lnfFileRead(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString(lCar(v),NULL);
-	if(filename == NULL){return NULL;}
-	size_t len = 0;
-	const char *data = loadFile(filename,&len);
-	lVal *ret = lValString(data);
-	free((void *)data);
-	return ret;
-
+	size_t len       = 0;
+	lString *str     = requireString(c, lCar(v));
+	const char *data = loadFile(str->data,&len);
+	return lValStringNoCopy(data, len);
 }
 
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString(lCadr(v),NULL);
-	lVal *contentV = lCar(v);
-	if((filename == NULL) || (contentV == NULL) || (contentV->type != ltString)){
-		lExceptionThrowValClo("type-error", "[file/write] expects two strings as arguments", v, c);
-	}
-	lString *content = contentV->vString;
-	const i64 len = content->bufEnd - content->buf;
-	saveFile(filename,content->data, len);
+	lVal *contentV    = lCar(v);
+	lString *content  = requireString(c, contentV);
+	lString *filename = requireString(c, lCadr(v));
+
+	saveFile(filename->data, content->data, lStringLength(content));
 	return contentV;
 }
 
 static lVal *lnfFileRemove(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString( lCar(v),NULL);
-	if(filename == NULL){return NULL;}
-	unlink(filename);
-	return NULL;
+	lVal *car = lCar(v);
+	lString *filename = requireString(c, car);
+	unlink(filename->data);
+	return car;
 }
 
 static lVal *lnfFileStat(lClosure *c, lVal *v){
-	(void)c;
-	const char *filename = castToString(lCar(v),NULL);
-	if(filename == NULL){return NULL;}
+	lString *filename = requireString(c, lCar(v));
 	struct stat statbuf;
-	int err = stat(filename,&statbuf);
+	int err = stat(filename->data, &statbuf);
 	lVal *ret = RVP(lValTree(NULL));
 	ret->vTree = lTreeInsert(ret->vTree, lsError, RVP(lValBool(err)));
 	if(err){
@@ -161,25 +143,22 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 
 
 static lVal *lnfFileTemp(lClosure *c, lVal *v){
-	(void)c; (void)v;
-	const char *content  = castToString(lCar(v),NULL);
+	lString *content = requireString(c, lCar(v));
 
 	const char *ret = tempFilename();
 	FILE *fd = fopen(ret,"w");
 
-	if(content){
-		const int len = lStringLength(lCar(v)->vString);
-		int written = 0;
-		while(written < len){
-			int r = fwrite(&content[written],1,len - written,fd);
-			if(r <= 0){
-				if(ferror(fd)){
-					lPrintError("Error while writing to temporary file: %s\n",ret);
-					break;
-				}
-			}else{
-				written += r;
+	const int len = lStringLength(content);
+	int written = 0;
+	while(written < len){
+		int r = fwrite(&content->data[written], 1, len - written, fd);
+		if(r <= 0){
+			if(ferror(fd)){
+				lPrintError("Error while writing to temporary file: %s\n", ret);
+				break;
 			}
+		}else{
+			written += r;
 		}
 	}
 
@@ -189,16 +168,14 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 
 #ifdef ENABLE_POPEN
 static lVal *lnfPopen(lClosure *c, lVal *v){
-	(void)c; (void)v;
-	const char *command = castToString(lCar(v),NULL);
-	if(command == NULL){return NULL;}
+	lString *command = requireString(c, lCar(v));
 
 	const int readSize = 1<<12;
 	int len   = 0;
 	int bufSize = readSize;
 	char *buf = malloc(readSize);
 
-	FILE *child = popen(command,"r");
+	FILE *child = popen(command->data, "r");
 	if(child == NULL){
 		fpf(stderr,"Error openeing %s\n",command);
 		return NULL;
@@ -245,17 +222,10 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 #endif
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
-	(void) c;
-	char pathBuf[512];
-
-	const char *path = castToString(lCar(v),NULL);
+	lString *path = requireString(c, lCar(v));
 	const bool showHidden = castToBool(lCadr(v));
-	if(path == NULL){
-		path = getcwd(pathBuf,512);
-		if(path == NULL){return NULL;}
-	}
 
-	DIR *dp = opendir(path);
+	DIR *dp = opendir(path->data);
 	if(dp == NULL){return NULL;}
 	lVal *ret = NULL;
 	lVal *cur = NULL;
@@ -278,49 +248,32 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 }
 
 static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
-	(void) c;
-
-	const char *path = castToString(lCar(v),NULL);
-	if(path == NULL){return NULL;}
-	int err = makeDir(path);
-
-	return lValBool(err == 0);
+	lString *path = requireString(c, lCar(v));
+	return lValBool(makeDir(path->data) == 0);
 }
 
 static lVal *lnfDirectoryRemove(lClosure *c, lVal *v){
-	(void) c;
-
-	const char *path = castToString(lCar(v),NULL);
-	if(path == NULL){return NULL;}
-	int err = rmdir(path);
-
-	return lValBool(err == 0);
+	lString *path = requireString(c, lCar(v));
+	return lValBool(rmdir(path->data) == 0);
 }
 
 static lVal *lnfChangeDirectory(lClosure *c, lVal *v){
-	(void) c;
-
-	const char *path = castToString(lCar(v),NULL);
-	if(path == NULL){return NULL;}
-	int err = chdir(path);
-
-	return lValBool(err == 0);
+	lString *path = requireString(c, lCar(v));
+	return lValBool(chdir(path->data) == 0);
 }
 
 static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
-	(void) c; (void) v;
-
+	(void)c;(void)v;
 	char path[512];
-	if(getcwd(path,sizeof(path)) == NULL){
+	if(getcwd(path, sizeof(path)) == NULL){
 		return NULL;
 	}
-
 	return lValString(path);
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"error",            "[...args]",      "Prints ...args to stderr",                          lnfError);
-	lAddNativeFunc(c,"print",            "[...args]",      "Displays ...args",                                  lnfPrint);
+	lAddNativeFunc(c,"error",            "[v]",      "Prints v to stderr",                          lnfError);
+	lAddNativeFunc(c,"print",            "[v]",      "Displays v",                                  lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
@@ -332,7 +285,7 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
 	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
 
-	lAddNativeFunc(c,"directory/read",   "[&path &show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
+	lAddNativeFunc(c,"directory/read",   "[path show-hidden]",   "Return all files within $PATH",               lnfDirectoryRead);
 	lAddNativeFunc(c,"directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
 	lAddNativeFunc(c,"directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
 

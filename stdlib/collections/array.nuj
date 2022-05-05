@@ -1,134 +1,134 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
 
 ;; Some functions dealing with arrays
 
 [defn array/+= [a i v]
-       "Add V to the value in A at position I and store the result in A returning A"
-       [array/set! a i [+ v [array/ref a i]]]]
+  "Add V to the value in A at position I and store the result in A returning A"
+  [array/set! a i [+ v [array/ref a i]]]]
 
 [defn array/++ [a i]
-       "Increment position I in A and return A"
-       [array/+= a i 1]]
+  "Increment position I in A and return A"
+  [array/+= a i 1]]
 
 [defn array/fill! [a v]
-       "Fills array a with value v"
-       [def len [array/length a]]
-       [for [i 0 len]
-            [array/set! a i v]]
-       a]
+  "Fills array a with value v"
+  [def len [array/length a]]
+  [for [i 0 len]
+    [array/set! a i v]]
+  a]
 
 [defn array/append [a b]
-       "Append array A to array B"
-       [when-not [and [array? a] [array? b]]
-                 [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
-       [def ret [array/allocate [+ [array/length a] [array/length b]]]]
-       [for [i 0 [array/length a]]
-            [array/set! ret i [array/ref a i]]]
-       [for [i [array/length a] [array/length ret]]
-            [array/set! ret i [array/ref b [- i [array/length a]]]]]
-       ret]
+  "Append array A to array B"
+  [when-not [and [array? a] [array? b]]
+            [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]]
+  [def ret [array/allocate [+ [array/length a] [array/length b]]]]
+  [for [i 0 [array/length a]]
+    [array/set! ret i [array/ref a i]]]
+  [for [i [array/length a] [array/length ret]]
+    [array/set! ret i [array/ref b [- i [array/length a]]]]]
+  ret]
 
 [defn array/dup [a]
   "Duplicate Array A"
   [def ret [array/allocate [array/length a]]]
   [for [i 0 [array/length a]]
-       [array/set! ret i [array/ref a i]]]
+    [array/set! ret i [array/ref a i]]]
   ret]
 
 [defn array/reduce [arr fun α]
-       "Reduce an array, [reduce] should be preferred"
-       [def len [array/length arr]]
-       [for [i 0 len]
-              [set! α [fun α [array/ref arr i]]]]
-       α]
+  "Reduce an array, [reduce] should be preferred"
+  [def len [array/length arr]]
+  [for [i 0 len]
+    [set! α [fun α [array/ref arr i]]]]
+  α]
 
 [defn array/map [arr fun]
-       "Map an array, [map] should be preferred"
-       [def len [array/length arr]]
-       [for [i 0 len]
-            [array/set! arr i [fun [array/ref arr i]]]]
-       arr]
+  "Map an array, [map] should be preferred"
+  [def len [array/length arr]]
+  [for [i 0 len]
+    [array/set! arr i [fun [array/ref arr i]]]]
+  arr]
 
 [defn array/filter [arr pred]
-       "Filter an array, [filter] should be preferred"
-       [def ri 0]
-       [def len [array/length arr]]
-       [def ret [array/allocate len]]
-       [for [ai 0 len]
-              [when [pred [array/ref arr ai]]
-                    [array/set! ret ri [array/ref arr ai]]
-                    [++ ri]]]
-       [array/length! ret ri]]
+  "Filter an array, [filter] should be preferred"
+  [def ri 0]
+  [def len [array/length arr]]
+  [def ret [array/allocate len]]
+  [for [ai 0 len]
+    [when [pred [array/ref arr ai]]
+      [array/set! ret ri [array/ref arr ai]]
+      [++ ri]]]
+  [array/length! ret ri]]
 
 [defn array/equal? [a b]
-       [if [or [not [array? a]]
-               [not [array? b]]
-               [!= [array/length a]
-                   [array/length b]]]
-           #f
-           [let [[ret #t]]
-                [for [i 0 [array/length a]]
-                     [when-not [equal? [array/ref a i]
-                                       [array/ref b i]]
-                               [set! ret #f]
-                               [set! i [array/length a]]]]
-                ret]]]
+  [if [or [not [array? a]]
+          [not [array? b]]
+          [!= [array/length a]
+              [array/length b]]]
+      #f
+      [let [[ret #t]]
+        [for [i 0 [array/length a]]
+          [when-not [equal? [array/ref a i]
+                            [array/ref b i]]
+                    [set! ret #f]
+                    [set! i [array/length a]]]]
+        ret]]]
 
 [defn array/push [arr val]
-      "Append VAL to ARR"
-      [-> arr
-          [array/length! [+ 1 [array/length arr]]]
-          [array/set! [- [array/length arr] 1] val]]]
+  "Append VAL to ARR"
+  [-> arr
+      [array/length! [+ 1 [array/length arr]]]
+      [array/set! [- [array/length arr] 1] val]]]
 
 [defn array/swap [arr i j]
-      "Swap values at I and J in ARR"
-      [def tmp [array/ref arr i]]
-      [-> arr
-          [array/set! i [array/ref arr j]]
-          [array/set! j tmp]]]
+  "Swap values at I and J in ARR"
+  [def tmp [array/ref arr i]]
+  [-> arr
+      [array/set! i [array/ref arr j]]
+      [array/set! j tmp]]]
 
 [defn array/heapify [arr n at]
-       "bubble up the element from index AT to until the max-heap property is satisfied"
-       [def top at]
-       [def looping #t]
-       [while looping
-              [def l [+ [ash at 1] 1]]
-              [def r [+ [ash at 1] 2]]
-              [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]]
-                    [set! top l]]
-              [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]
-                    [set! top r]]
-              [if [== top at]
-                  [set! looping #f]
-                  [do [array/swap arr at top]
-                      [set! at top]]]]
-        arr]
+  "bubble up the element from index AT to until the max-heap property is satisfied"
+  [def top at]
+  [def looping #t]
+  [while looping
+    [def l [+ [ash at 1] 1]]
+    [def r [+ [ash at 1] 2]]
+    [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]]
+      [set! top l]]
+    [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]
+      [set! top r]]
+    [if [== top at]
+        [set! looping #f]
+        [do [array/swap arr at top]
+            [set! at top]]]]
+  arr]
 
 [defn array/make-heap [arr]
-       [def l [array/length arr]]
-       [def l2 [/ l 2]]
-       [while [>= l2 0]
-              [array/heapify arr l l2]
-              [-- l2]]
-       arr]
+  [def l [array/length arr]]
+  [def l2 [/ l 2]]
+  [while [>= l2 0]
+    [array/heapify arr l l2]
+    [-- l2]]
+  arr]
 
 [defn array/heap-sort [arr]
-       [array/make-heap arr]
-       [def l [array/length arr]]
-       [while [> l 0]
-              [-- l]
-              [array/swap arr 0 l]
-              [array/heapify arr l 0]]
-       arr]
+  [array/make-heap arr]
+  [def l [array/length arr]]
+  [while [> l 0]
+    [-- l]
+    [array/swap arr 0 l]
+    [array/heapify arr l 0]]
+  arr]
 
 [def array/sort array/heap-sort]
 
 [defn array/cut [arr start end]
-       "Return a newly allocated array with the values of ARR from START to END"
-       [set! start [max 0 start]]
-       [set! end [min [array/length arr] end]]
-       [def ret [array/allocate [max 0 [- end start]]]]
-       [for [i start end]
-            [array/set! ret [- i start] [array/ref arr i]]]
-       ret]
+  "Return a newly allocated array with the values of ARR from START to END"
+  [set! start [max 0 start]]
+  [set! end [min [array/length arr] end]]
+  [def ret [array/allocate [max 0 [- end start]]]]
+  [for [i start end]
+    [array/set! ret [- i start] [array/ref arr i]]]
+  ret]

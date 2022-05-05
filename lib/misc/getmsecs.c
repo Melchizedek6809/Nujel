@@ -1,9 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../collection/string.h"
-#include "../type/native-function.h"
-#include "../type/val.h"
+#include "getmsecs.h"
 
 #include <time.h>
 #ifdef __WATCOMC__
@@ -32,21 +29,4 @@ u64 getMSecs(){
 	struct timespec tv;
 	clock_gettime(CLOCK_MONOTONIC,&tv);
 	return (tv.tv_nsec / 1000000) + (tv.tv_sec * 1000);
-}
-
-/* [time] - Return the current unix time */
-static lVal *lnfTime(lClosure *c, lVal *v){
-	(void)c;(void)v;
-	return lValInt(time(NULL));
-}
-
-/* [time/milliseconds] - Return monotonic msecs */
-static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
-	(void)c; (void)v;
-	return lValInt(getMSecs());
-}
-
-void lOperationsTime(lClosure *c){
-	lAddNativeFunc(c,"time",   "          []", "Return the current unix time",lnfTime);
-	lAddNativeFunc(c,"time/milliseconds","[]", "Return monotonic msecs",lnfTimeMsecs);
 }

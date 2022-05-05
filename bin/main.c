@@ -43,7 +43,7 @@ static lClosure *createRootClosure(){
 	c = lNewRoot();
 	lOperationsIO(c);
 	lOperationsReadline(c);
-	lnfDo(c,lRead((const char *)binlib_no_data));
+	c = lLoad(c, (const char *)binlib_no_data);
 	lGarbageCollect();
 	return c;
 }

@@ -13,36 +13,16 @@
        [def sc [/ [symbol-count] 10]]
        [pfmtln "Help page {i} of {sc}"]]
 
-[defn file/compile [path no-write environment]
-        "Compile a Nujel source file into optimized object code"
-        [def source [cons 'do [read [file/read path]]]]
-        [def object-code [compile/forms source environment]]
-        [when-not no-write [file/write [if object-code [str/write object-code] ""]
-                                       [cat [path/without-extension path] ".no"]]]
-        object-code]
-
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
        [def source [cons 'do [read [file/read path]]]]
        [compile/forms source environment]]
 
-[defn file/eval/bytecode [path]
-       "Evaluate a Nujel source file in the current context"
-       [def source [cons 'do [read [file/read path]]]]
-       [def bc [assemble [bytecompile [compile source]]]]
-       [disassemble/raw bc]
-       [bytecode-eval bc]]
-
-[defn eval/forked [nujel-binary raw-expr]
-        "Evaluate @EXPR in a separate process running NUJEL-BINARY"
-        [def expr [cat "[print [str/write " [str/write raw-expr] "]] "]]
-        [def tmp-path [file/temp expr]]
-
-        [def command [cat nujel-binary " " tmp-path]]
-        [def res [popen command]]
-        [file/remove tmp-path]
-        [cons [car res] [cdr res]]]
+[defn file/eval/bytecode [path environment]
+  "Evaluate a Nujel source file in the current context"
+  [when-not environment [set! environment root-closure]]
+  [eval-in environment [cons 'do [read [file/read path]]]]]
 
 [defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]

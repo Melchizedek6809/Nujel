@@ -20,6 +20,78 @@
 
 #include <stdlib.h>
 
+/* Cast v to be an int without memory allocations, or return fallback */
+i64 castToInt(const lVal *v, i64 fallback){
+	switch(v ? v->type : ltNoAlloc){
+	case ltVec:
+		return v->vVec.x;
+	case ltFloat:
+		return v->vFloat;
+	case ltInt:
+		return v->vInt;
+	default:
+		return fallback;
+	}
+}
+
+
+/* Cast v to be a float without memory allocations, or return fallback */
+double castToFloat(const lVal *v, double fallback){
+	switch(v ? v->type : ltNoAlloc){
+	case ltVec:
+		return v->vVec.x;
+	case ltFloat:
+		return v->vFloat;
+	case ltInt:
+		return v->vInt;
+	default:
+		return fallback;
+	}
+}
+
+/* Cast v to be a vec without memory allocations, or return fallback */
+vec castToVec(const lVal *v, vec fallback){
+	switch(v ? v->type : ltNoAlloc){
+	case ltVec:
+		return v->vVec;
+	case ltFloat:
+		return vecNew(v->vFloat,v->vFloat,v->vFloat);
+	case ltInt:
+		return vecNew(v->vInt,v->vInt,v->vInt);
+	default:
+		return fallback;
+	}
+}
+
+/* Cast v to be a bool without memory allocations, or return false */
+bool castToBool(const lVal *v){
+	if(v == NULL){
+		return false;
+	}else if(v->type == ltBool){
+		return v->vBool;
+	}else{
+		return true;
+	}
+}
+
+/* Cast v to be a string without memory allocations, or return fallback */
+const char *castToString(const lVal *v, const char *fallback){
+	if((v == NULL) || (v->type != ltString)){return fallback;}
+	return v->vString->data;
+}
+
+/* Return the tree in V if possible, otherwise fallback. */
+lTree *castToTree(const lVal *v, lTree *fallback){
+	if((v == NULL) || (v->type != ltTree)){return fallback;}
+	return v->vTree;
+}
+
+/* Return the tree in V if possible, otherwise fallback. */
+const lSymbol *castToSymbol(const lVal *v, const lSymbol *fallback){
+	if((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword))){return fallback;}
+	return v->vSymbol;
+}
+
 /* [bool v] - Convert v into a boolean value, true or false */
 lVal *lnfBool(lClosure *c, lVal *v){
 	(void)c;
@@ -169,14 +241,37 @@ i64 requireInt(lClosure *c, lVal *v){
 	return v->vInt;
 }
 
+i64 requireNaturalInt(lClosure *c, lVal *v){
+	i64 ret = requireInt(c,v);
+	if(ret < 0){
+		lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c);
+	}
+	return ret;
+}
+
+lBytecodeOp requireBytecodeOp(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltBytecodeOp)){
+		lExceptionThrowValClo("type-error", "Expected a bytecode operation, not: ", v, c);
+	}
+	return v->vBytecodeOp;
+}
+
+lBytecodeArray requireBytecodeArray(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltBytecodeArr)){
+		lExceptionThrowValClo("type-error", "Expected a bytecode array, not: ", v, c);
+	}
+	return v->vBytecodeArr;
+}
+
 double requireFloat(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
+	default:
+		lExceptionThrowValClo("type-error", "Expected a float, not: ", v, c);
 	case ltFloat:
 		return v->vFloat;
 	case ltInt:
 		return v->vInt;
 	}
-	lExceptionThrowValClo("type-error", "Expected a float, not: ", v, c);
 }
 
 vec requireVec(lClosure *c, lVal *v){
@@ -184,6 +279,49 @@ vec requireVec(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error", "Expected a vector, not: ", v, c);
 	}
 	return v->vVec;
+}
+
+lArray *requireArray(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltArray)){
+		lExceptionThrowValClo("type-error", "Expected an array, not: ", v, c);
+	}
+	return v->vArray;
+}
+
+lString *requireString(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltString)){
+		lExceptionThrowValClo("type-error", "Expected an array, not: ", v, c);
+	}
+	return v->vString;
+}
+
+lTree *requireTree(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltTree)){
+		lExceptionThrowValClo("type-error", "Expected a tree, not: ", v, c);
+	}
+	return v->vTree;
+}
+
+lTree *requireMutableTree(lClosure *c, lVal *v){
+	lTree *ret = requireTree(c,v);
+	if(ret->flags & TREE_IMMUTABLE){
+		lExceptionThrowValClo("type-error", "Tree is immutable", v, c);
+	}
+	return ret;
+}
+
+const lSymbol *requireSymbol(lClosure *c, lVal *v){
+	if((v == NULL) || (v->type != ltSymbol)){
+		lExceptionThrowValClo("type-error", "Expected a symbol, not: ", v, c);
+	}
+	return v->vSymbol;
+}
+
+const lSymbol *requireSymbolic(lClosure *c, lVal *v){
+	if((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword))){
+		lExceptionThrowValClo("type-error", "Expected a symbol or keyword, not: ", v, c);
+	}
+	return v->vSymbol;
 }
 
 /* [vec v] - Convert v into a vector value consisting of 3 floats x,y and z */

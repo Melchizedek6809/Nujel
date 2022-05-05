@@ -18,67 +18,49 @@ static lVal *lValBytecodeOp(lBytecodeOp v){
 static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
 	const i64 val = castToInt(lCar(v), -1);
 	if((val < -128) || (val > 255)){
-		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range 0-255", lCar(v), c);
+		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range -128 - 255", lCar(v), c);
 		return NULL;
 	}
 	return lValBytecodeOp(val);
 }
 
 static lVal *lnfBytecodeOpInt(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltBytecodeOp)){
-		lExceptionThrowValClo("type-error", "Expected 1 argument of type :bytecode-op", v, c);
-		return NULL;
-	}
-	return lValInt(car->vBytecodeOp);
+	return lValInt(requireBytecodeOp(c, lCar(v)));
 }
 
 static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo("type-error", "Expected 1 argument of type :array", v, c);
-		return NULL;
-	}
-	const int len = arr->vArray->length;
+	lArray *arr = requireArray(c, lCar(v));
+	const int len = arr->length;
+
 	lVal *ret = lValAlloc(ltBytecodeArr);
 	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
 	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
 
 	for(int i=0;i<len;i++){
-		const lVal *item = arr->vArray->data[i];
-		if((item == NULL) || (item->type != ltBytecodeOp)){
-			lExceptionThrowValClo("type-error", "Expected array to only contain values of type :bytecode-op", v, c);
-			return NULL;
-		}
-		ret->vBytecodeArr.data[i] = item->vBytecodeOp;
+		ret->vBytecodeArr.data[i] = requireBytecodeOp(c, arr->data[i]);
 	}
+
 	return ret;
 }
 
 static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltBytecodeArr)){
-		lExceptionThrowValClo("type-error", "Expected 1 argument of type :array", v, c);
-		return NULL;
-	}
-	const int len = arr->vBytecodeArr.dataEnd - arr->vBytecodeArr.data;
+	lBytecodeArray arr = requireBytecodeArray(c, lCar(v));
+	const int len = arr.dataEnd - arr.data;
+
 	lVal *ret = RVP(lValAlloc(ltArray));
 	ret->vArray = lArrayAlloc();
 	ret->vArray->length = len;
 	ret->vArray->data = malloc(len * sizeof(*ret->vArray->data));
 
 	for(int i=0;i<len;i++){
-		ret->vArray->data[i] = lValBytecodeOp(arr->vBytecodeArr.data[i]);
+		ret->vArray->data[i] = lValBytecodeOp(arr.data[i]);
 	}
+
 	return ret;
 }
 
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
-	lVal *opsArr = lCar(v);
-	if((opsArr == NULL) || (opsArr->type != ltBytecodeArr)){
-		lExceptionThrowValClo("type-error", "Expected first argument to be of type :bytecode-array", v, c);
-		return NULL;
-	}
+	lBytecodeArray arr = requireBytecodeArray(c, lCar(v));
 	lVal *args = lCadr(v);
 	lVal *env = lCaddr(v);
 	lClosure *bcc = c;
@@ -89,7 +71,7 @@ static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 		}
 		bcc = env->vClosure;
 	}
-	return lBytecodeEval(bcc, args, &opsArr->vBytecodeArr, trace);
+	return lBytecodeEval(bcc, args, &arr, trace);
 }
 
 void lOperationsBytecode(lClosure *c){

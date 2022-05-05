@@ -13,69 +13,43 @@
 #include <stdlib.h>
 #include <string.h>
 
-lVal *lnfvArrRef;
-
 static lVal *lnfArrLength(lClosure *c, lVal *v){
-	(void)c;
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo("type-mismatch","[array/length] expects an array as its first and only argument", v, c);
-		return NULL;
-	}
-	return lValInt(arr->vArray->length);
+	return lValInt(requireArray(c, lCar(v))->length);
 }
 
 static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
-	(void)c;
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo("type-mismatch","[array/length!] expects an array as its first argument", v, c);
-		return NULL;
+	lVal *car = lCar(v);
+	lArray *arr = requireArray(c, car);
+	const int length = requireNaturalInt(c, lCadr(v));
+	arr->data = realloc(arr->data,length * sizeof(lVal *));
+	if(length > arr->length){
+		memset(&arr->data[arr->length], 0, (length - arr->length) * sizeof(lVal *));
 	}
-	const int length =castToInt(lCadr(v),-1);
-	if(length >= 0){
-		arr->vArray->data = realloc(arr->vArray->data,length * sizeof(lVal *));
-		if(length > arr->vArray->length){
-			memset(&arr->vArray->data[arr->vArray->length], 0, (length - arr->vArray->length) * sizeof(lVal *));
-		}
-		arr->vArray->length = length;
-	}
-	return arr;
+	arr->length = length;
+	return car;
 }
 
 static lVal *lnfArrSet(lClosure *c, lVal *v){
 	(void)c;
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo("type-mismatch","[array/set!] expects an array as its first argument", v, c);
-		return NULL;
-	}
-	lVal *t = lCadr(v);
-	if((t == NULL) || (t->type != ltInt)){
-		lExceptionThrowValClo("type-mismatch","[array/set!] expects its second argument to be an integer", v, c);
-		return NULL;
-	}
-	const int key = t->vInt;
-	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", lCons(lCons(t,lCons(lValInt(arr->vArray->length),arr)),v), c);
+	lVal *car = lCar(v);
+	lArray *arr = requireArray(c, car);
+	const int key = requireInt(c, lCadr(v));
+	if((key < 0) || (key >= arr->length)){
+		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", v, c);
 		return NULL;
 	}
 	const lVal *vt = lCddr(v);
 	if((vt == NULL) || (vt->type != ltPair)){
-		lExceptionThrowValClo("type-mismatch","[array/set!] expects a third argument", v, c);
+		lExceptionThrowValClo("type-mismatch","[array/set!] needs a third argument", v, c);
 		return NULL;
 	}
-	arr->vArray->data[key] = vt->vList.car;
-	return arr;
+	arr->data[key] = vt->vList.car;
+	return car;
 }
 
 static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	(void)c;
-	const int len = castToInt(lCar(v),-1);
-	if(len < 0){
-		lExceptionThrowValClo("invalid-argument","[array/allocate] expects an integer indicating the size which has to be at least 0 or more", v, c);
-		return NULL;
-	}
+	const int len = requireNaturalInt(c, lCar(v));
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
 	r->vArray->length = len;
@@ -85,6 +59,16 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 		return NULL;
 	}
 	return r;
+}
+
+static lVal *lnfArrRef(lClosure *c, lVal *v){
+	lArray *arr = requireArray(c,  lCar(v));
+	const int key = requireInt(c, lCadr(v));
+	if((key < 0) || (key >= arr->length)){
+		lExceptionThrowValClo("out-of-bounds","[array/ref] index provided is out of bounds", v, c);
+		return NULL;
+	}
+	return arr->data[key];
 }
 
 lVal *lnfArrNew(lClosure *c, lVal *v){
@@ -106,31 +90,11 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	return r;
 }
 
-lVal *lnfArrRef(lClosure *c, lVal *v){
-	(void)c;
-	lVal *arr = lCar(v);
-	if((arr == NULL) || (arr->type != ltArray)){
-		lExceptionThrowValClo("type-mismatch","[array/ref] expects an array as its first argument", v, c);
-		return NULL;
-	}
-	lVal *t = lCadr(v);
-	if((t == NULL) || (t->type != ltInt)){
-		lExceptionThrowValClo("type-mismatch","[array/ref] expects its second argument to be an integer", v, c);
-		return NULL;
-	}
-	const int key = t->vInt;
-	if((key < 0) || (key >= arr->vArray->length)){
-		lExceptionThrowValClo("out-of-bounds","[array/ref] index provided is out of bounds", v, c);
-		return NULL;
-	}
-	return arr->vArray->data[key];
-}
-
 void lOperationsArray(lClosure *c){
-	             lAddNativeFunc(c,"array/new",      "args",                "Create a new array from ...ARGS",                lnfArrNew);
-	lnfvArrRef = lAddNativeFunc(c,"array/ref",      "[array index]",       "Return value of ARRAY at position INDEX",     lnfArrRef);
-	             lAddNativeFunc(c,"array/length",   "[array]",             "Return length of ARRAY",                      lnfArrLength);
-	             lAddNativeFunc(c,"array/length!",  "[array size]",        "Set a new LENGTH for ARRAY",                  lnfArrLengthSet);
-	             lAddNativeFunc(c,"array/set!",     "[array index value]", "Set ARRAY at INDEX to &...VALUES",  lnfArrSet);
-	             lAddNativeFunc(c,"array/allocate", "[size]",              "Allocate a new array of SIZE",                   lnfArrAllocate);
+	lAddNativeFunc(c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew);
+	lAddNativeFunc(c,"array/ref",      "[array index]",       "Return value of ARRAY at position INDEX",  lnfArrRef);
+	lAddNativeFunc(c,"array/length",   "[array]",             "Return length of ARRAY",                   lnfArrLength);
+	lAddNativeFunc(c,"array/length!",  "[array size]",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet);
+	lAddNativeFunc(c,"array/set!",     "[array index value]", "Set ARRAY at INDEX to &...VALUES",         lnfArrSet);
+	lAddNativeFunc(c,"array/allocate", "[size]",              "Allocate a new array of SIZE",             lnfArrAllocate);
 }

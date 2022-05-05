@@ -14,93 +14,76 @@
 #include <string.h>
 
 static lVal *lnfStrlen(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){
-		lExceptionThrowValClo("type-error","[string/length] expects a string as its first and only argument", v, c);
-		return NULL;
-	}
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){
-		lExceptionThrowValClo("type-error","[string/length] expects a string as its first and only argument", v, c);
-		return NULL;
-	}
-	return lValInt(lStringLength(t->vString));
+	return lValInt(lStringLength(requireString(c, lCar(v))));
 }
 
 static lVal *lnfTrim(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return NULL;}
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	const char *s;
-	for(s = t->vString->data;*s != 0 && isspace((u8)*s);s++){}
-	int len = lStringLength(t->vString) - (s -  t->vString->data);
-	for(;len > 0 && isspace((u8)s[len-1]);len--){}
-	char *buf = malloc(len+1);
-	memcpy(buf,s,len);
-	buf[len] = 0;
-	lVal *ret = lValStringLen(buf, len);
-	free(buf);
+	lString *str = requireString(c, lCar(v));
+
+	const char *firstNonWhitespace = str->data;
+	while(*firstNonWhitespace &&(firstNonWhitespace < (str->bufEnd-1)) && isspace((u8)*firstNonWhitespace)){
+		firstNonWhitespace++;
+	}
+
+	const char *lastNonWhitespace = str->bufEnd;
+	while(lastNonWhitespace[-1] && (lastNonWhitespace > (firstNonWhitespace+1)) && isspace((u8)lastNonWhitespace[-1])){
+		lastNonWhitespace--;
+	}
+	lastNonWhitespace = MAX(firstNonWhitespace, MIN(str->bufEnd, lastNonWhitespace));
+
+	int len = lastNonWhitespace - firstNonWhitespace;
+	lVal *ret = lValStringLen(firstNonWhitespace, len);
 	return ret;
 }
 
 static lVal *lnfStrDown(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return NULL;}
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	const int len = lStringLength(t->vString);
+	lString *str = requireString(c, lCar(v));
+	const int len = lStringLength(str);
+
 	char *buf = malloc(len+1);
 	for(int i=0;i<len;i++){
-		buf[i] = tolower((u8)t->vString->data[i]);
+		buf[i] = tolower((u8)str->data[i]);
 	}
+
 	buf[len] = 0;
-	lVal *ret = lValStringLen(buf, len);
-	free(buf);
-	return ret;
+	return lValStringNoCopy(buf, len);
 }
 
 static lVal *lnfStrUp(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return NULL;}
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	const int len = lStringLength(t->vString);
+	lString *str = requireString(c, lCar(v));
+	const int len = lStringLength(str);
+
 	char *buf = malloc(len+1);
 	for(int i=0;i<len;i++){
-		buf[i] = toupper((u8)t->vString->data[i]);
+		buf[i] = toupper((u8)str->data[i]);
 	}
+
 	buf[len] = 0;
-	lVal *ret = lValStringLen(buf, len);
-	free(buf);
-	return ret;
+	return lValStringNoCopy(buf, len);
 }
 
 static lVal *lnfStrCap(lClosure *c, lVal *v){
-	(void)c;
-	if(v == NULL){return NULL;}
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	const int len = lStringLength(t->vString);
+	lString *str = requireString(c, lCar(v));
+	const int len = lStringLength(str);
+
 	char *buf = malloc(len+1);
 	int cap = 1;
 	for(int i=0;i<len;i++){
-		if(isspace((u8)t->vString->data[i])){
+		if(isspace((u8)str->data[i])){
 			cap = 1;
-			buf[i] = t->vString->data[i];
+			buf[i] = str->data[i];
 		}else{
 			if(cap){
-				buf[i] = toupper((u8)t->vString->data[i]);
+				buf[i] = toupper((u8)str->data[i]);
 				cap = 0;
 			}else{
-				buf[i] = tolower((u8)t->vString->data[i]);
+				buf[i] = tolower((u8)str->data[i]);
 			}
 		}
 	}
+
 	buf[len] = 0;
-	lVal *ret = lValStringLen(buf, len);
-	free(buf);
-	return ret;
+	return lValStringNoCopy(buf, len);
 }
 
 static lVal *lnfStringCut(lClosure *c, lVal *v){
@@ -201,23 +184,11 @@ static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 }
 
 static lVal *lnfStrSym(lClosure *c, lVal *v){
-	(void)c;
-	v = lCar(v);
-	if((v == NULL) || (v->type != ltString)){
-		lExceptionThrowValClo("type-error","[str->sym] expects a string as its first and only argument", v, c);
-		return NULL;
-	}
-	return lValSym(v->vString->data);
+	return lValSym(requireString(c, lCar(v))->data);
 }
 
 static lVal *lnfSymStr(lClosure *c, lVal *v){
-	(void)c;
-	v = lCar(v);
-	if((v == NULL) || (v->type != ltSymbol)){
-		lExceptionThrowValClo("type-error","[sym->str] expects a string as its first and only argument", v, c);
-		return NULL;
-	}
-	return lValString(v->vSymbol->c);
+	return lValString(requireSymbol(c, lCar(v))->c);
 }
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
@@ -227,23 +198,16 @@ static lVal *lnfWriteStr(lClosure *c, lVal *v){
 }
 
 static lVal *lnfCharAt(lClosure *c,lVal *v){
-	(void)c;
-	const char *str = castToString(lCar(v),NULL);
-	if(str == NULL){
-		lExceptionThrowValClo("type-error","[char-at] expects a string as its first argument", v, c);
-		return NULL;
-	}
-	const int pos = castToInt(lCadr(v),-1);
-	if(pos < 0){
-		lExceptionThrowValClo("bounds-error","[char-at] does not support negative indices", v, c);
-		return NULL;
-	}
-	const int len = strlen(str);
-	if(pos >= len){
+	const lString *str = requireString(c, lCar(v));
+	const int pos = requireInt(c, lCadr(v));
+	const int len = lStringLength(str);
+
+	if((pos < 0) || (pos >= len)){
 		lExceptionThrowValClo("bounds-error","[char-at] index bigger that string", v, c);
 		return NULL;
 	}
-	return lValInt(str[pos]);
+
+	return lValInt(str->data[pos]);
 }
 
 static lVal *lnfFromCharCode(lClosure *c,lVal *v){
@@ -258,22 +222,22 @@ static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 		if(i >= len){break;}
 	}
 	buf[i] = 0;
-	v = lValStringNoCopy(buf, len);
-	return v;
+
+	return lValStringNoCopy(buf, len);
 }
 
 void lOperationsString(lClosure *c){
-	lAddNativeFunc(c,"cat",           "args",                "ConCATenates ARGS into a single string",                     lnfCat);
+	lAddNativeFunc(c,"cat",           "args",                     "ConCATenates ARGS into a single string",                     lnfCat);
 	lAddNativeFunc(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
 	lAddNativeFunc(c,"string/length", "[str]",                    "Return length of STR",                                       lnfStrlen);
 	lAddNativeFunc(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
 	lAddNativeFunc(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
 	lAddNativeFunc(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
-	lAddNativeFunc(c,"string/cut",    "[str &start &stop]",       "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
+	lAddNativeFunc(c,"string/cut",    "[str start &stop]",        "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
 	lAddNativeFunc(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
 	lAddNativeFunc(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 	lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
-	lAddNativeFunc(c,"from-char-code","codes",               "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
+	lAddNativeFunc(c,"from-char-code","codes",                    "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
 
 	lAddNativeFunc(c,"str->sym",      "[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
 	lAddNativeFunc(c,"sym->str",      "[sym]",                    "Convert SYM to a string",                                    lnfSymStr);

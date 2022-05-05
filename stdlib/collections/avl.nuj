@@ -42,8 +42,8 @@
 
 [defn avl/update-height [n]
   [array/set! [array/dup n] 0
-    [+ 1 [max [avl/height [avl/left n]]
-              [avl/height [avl/right n]]]]]]
+              [+ 1 [max [avl/height [avl/left n]]
+                        [avl/height [avl/right n]]]]]]
 
 ;;        y               x
 ;;       / \             / \
@@ -72,25 +72,25 @@
 [defn avl/insert-rebalance [n cmp v]
   [let [[b [avl/balance n]]]
     [cond
-      [[> b 1]
-        [case [cmp v [avl/key [avl/left n]]]
-          [-1 [avl/rotate-right n]]
-          [1  [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]]
-          [0  n]]]
-      [[< b -1]
-        [case [cmp v [avl/key [avl/right n]]]
-          [1  [avl/rotate-left n]]
-          [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]]
-          [0  n]]]
-      [#t n]]]]
+     [[> b 1]
+      [case [cmp v [avl/key [avl/left n]]]
+        [-1 [avl/rotate-right n]]
+        [1  [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]]
+        [0  n]]]
+     [[< b -1]
+      [case [cmp v [avl/key [avl/right n]]]
+        [1  [avl/rotate-left n]]
+        [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]]
+        [0  n]]]
+     [#t n]]]]
 
 [defn avl/node-insert [n cmp v]
   [if [avl/empty? n]
-        #[1 v avl/empty avl/empty]
-        [case [cmp v [avl/key n]]
-          [-1 [avl/insert-rebalance [avl/update-height [avl/update-left  n [avl/node-insert [avl/left  n] cmp v]]] cmp v]]
-          [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
-          [0  [avl/update-key n v]]]]]
+      #[1 v avl/empty avl/empty]
+      [case [cmp v [avl/key n]]
+        [-1 [avl/insert-rebalance [avl/update-height [avl/update-left  n [avl/node-insert [avl/left  n] cmp v]]] cmp v]]
+        [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
+        [0  [avl/update-key n v]]]]]
 
 [defn avl/insert [t v]
   "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
@@ -118,33 +118,33 @@
 
 [defn avl/remove-rebalance [n]
   [if [avl/empty? n]
-    n
-    [let [[b [avl/balance n]]
-          [l [avl/left n]]
-          [r [avl/right n]]]
-      [cond
-        [[> b 1]
+      n
+      [let [[b [avl/balance n]]
+            [l [avl/left n]]
+            [r [avl/right n]]]
+        [cond
+         [[> b 1]
           [if [>= [avl/balance l] 0]
               [avl/rotate-right n]
               [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]]
-        [[< b -1]
+         [[< b -1]
           [if [<= [avl/balance r] 0]
               [avl/rotate-left n]
               [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]]
-        [#t n]]]]]
+         [#t n]]]]]
 
 [defn avl/node-remove [n cmp v]
   [if [avl/empty? n]
       n
       [let [[root
-              [case [cmp v [avl/key n]]
-                [-1 [avl/update-left  n [avl/node-remove [avl/left  n] cmp v]]]
-                [1  [avl/update-right n [avl/node-remove [avl/right n] cmp v]]]
-                [0  [cond
-                    [[avl/empty? [avl/left  n]] [avl/right n]]
-                    [[avl/empty? [avl/right n]] [avl/left  n]]
-                    [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]]
-                         [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]]
+                [case [cmp v [avl/key n]]
+                  [-1 [avl/update-left  n [avl/node-remove [avl/left  n] cmp v]]]
+                  [1  [avl/update-right n [avl/node-remove [avl/right n] cmp v]]]
+                  [0  [cond
+                       [[avl/empty? [avl/left  n]] [avl/right n]]
+                       [[avl/empty? [avl/right n]] [avl/left  n]]
+                       [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]]
+                             [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]]
         [set! root [avl/update-height root]]
         [avl/remove-rebalance root]]]]
 
@@ -165,10 +165,10 @@
 
 [defn avl/reduce-node [node o s]
   [if [avl/empty? node]
-    s
-    [o [avl/key node]
-       [avl/reduce-node [avl/right node] o
-                        [avl/reduce-node [avl/left node] o s]]]]]
+      s
+      [o [avl/key node]
+         [avl/reduce-node [avl/right node] o
+                          [avl/reduce-node [avl/left node] o s]]]]]
 
 [defn avl/reduce [t o s]
   "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
@@ -176,10 +176,10 @@
 
 [defn avl/reduce-node-bin [n o s]
   [if [avl/empty? n]
-    s
-    [o [avl/key n]
-       [avl/reduce-node-bin [avl/left n] o s]
-       [avl/reduce-node-bin [avl/right n] o s]]]]
+      s
+      [o [avl/key n]
+         [avl/reduce-node-bin [avl/left n] o s]
+         [avl/reduce-node-bin [avl/right n] o s]]]]
 
 [defn avl/reduce-bin [t o s]
   "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"

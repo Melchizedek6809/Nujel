@@ -1,4 +1,7 @@
-; Contains various implementations for various hashing functions
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
+;; Contains various implementations for various hashing functions
 
 [defn hash/adler32 [data]
        [def a 1]

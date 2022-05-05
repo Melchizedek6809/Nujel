@@ -28,14 +28,12 @@ static char *bestline(const char *prompt){
 }
 
 static lVal *lnfReadline(lClosure *c, lVal *v){
-	(void) c;
-	const char *prompt = castToString(lCar(v),"> ");
-	char *line = bestline(prompt);
+	lString *prompt = requireString(c, lCar(v));
+	char *line = bestline(prompt->data);
 	lVal *ret = lValString(line);
 	free(line);
 	return ret;
 }
-
 
 void lOperationsReadline(lClosure *c){
 	lAddNativeFunc(c,"readline", "[prompt]", "Read a line of input in a user friendly way after writing PROMPT", lnfReadline);

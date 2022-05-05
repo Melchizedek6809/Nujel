@@ -90,11 +90,11 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	for(lineEnd = errEnd; (lineEnd < bufEnd) && (*lineEnd != '\n'); lineEnd++){}
 
 	const char *msgStart = MAX(lineStart, (errStart - 30));
-	const char *msgEnd = MIN(lineEnd, (errEnd + 30));
+	const char *msgEnd   = MIN(lineEnd, (errEnd + 30));
 	const size_t bufSize = (msgEnd - msgStart) + 3 + 3 + 1;
-	char *outbuf = malloc(bufSize);
+	char *outbuf    = malloc(bufSize);
 	char *outbufEnd = &outbuf[bufSize];
-	char *data = outbuf;
+	char *data      = outbuf;
 
 	if(msgStart != lineStart){data = spf(data, outbufEnd, "...");}
 	memcpy(data, msgStart, msgEnd - msgStart);

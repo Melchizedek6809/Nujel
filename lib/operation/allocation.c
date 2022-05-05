@@ -29,22 +29,15 @@ static lVal *lnfValIndex(lClosure *c, lVal *v){
 }
 
 static lVal *lnfIndexVal(lClosure *c, lVal *v){
-	(void)c;
-	const int i = castToInt(lCar(v), -1);
-	return lIndexVal(i);
+	return lIndexVal(requireInt(c, lCar(v)));
 }
 
 static lVal *lnfSymIndex(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL) || (car->type != ltSymbol)){return NULL;}
-	return lValInt(lSymIndex(car->vSymbol));
+	return lValInt(lSymIndex(requireSymbolic(c, lCar(v))));
 }
 
 static lVal *lnfIndexSym(lClosure *c, lVal *v){
-	(void)c;
-	const int i = castToInt(lCar(v), -1);
-	return lValSymS(lIndexSym(i));
+	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
 }
 
 void lOperationsAllocation(lClosure *c){

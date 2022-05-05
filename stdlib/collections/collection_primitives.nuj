@@ -1,77 +1,77 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
 
 ;; A bunch of procedurs working on procedures, using type specialized λs
 
 [defn ref [l i]
-       "Return whatver is at position I in L"
-       [case [type-of l]
-             [:nil               #nil]
-             [:tree   [tree/ref  l i]]
-             [:string [char-at   l i]]
-             [:array  [array/ref l i]]
-             [:pair   [list/ref  l i]]
-             [otherwise [throw [list :type-error "You can only use ref with a collection" l [current-lambda]]]]]]
+  "Return whatver is at position I in L"
+  [case [type-of l]
+    [:nil               #nil]
+    [:tree   [tree/ref  l i]]
+    [:string [char-at   l i]]
+    [:array  [array/ref l i]]
+    [:pair   [list/ref  l i]]
+    [otherwise [throw [list :type-error "You can only use ref with a collection" l [current-lambda]]]]]]
 
 [defn filter [l p]
-       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
-       [case [type-of l]
-             [:nil #nil]
-             [:tree   [tree/filter  l p]]
-             [:pair   [list/filter  l p]]
-             [:array  [array/filter l p]]
-             [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
+  "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
+  [case [type-of l]
+    [:nil #nil]
+    [:tree   [tree/filter  l p]]
+    [:pair   [list/filter  l p]]
+    [:array  [array/filter l p]]
+    [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
 
 [defn reduce [l f α]
-       "Combine all elements in collection l using operation F and starting value α"
-       [case [type-of l]
-             [:nil    α]
-             [:tree   [tree/reduce  l f α]]
-             [:pair   [list/reduce  l f α]]
-             [:array  [array/reduce l f α]]
-             [otherwise [f α l]]]]
+  "Combine all elements in collection l using operation F and starting value α"
+  [case [type-of l]
+    [:nil    α]
+    [:tree   [tree/reduce  l f α]]
+    [:pair   [list/reduce  l f α]]
+    [:array  [array/reduce l f α]]
+    [otherwise [f α l]]]]
 
 [defn length [α]
-       "Returns the length of collection α"
-       [case [type-of α]
-             [:nil                    0]
-             [:array  [array/length  α]]
-             [:pair   [list/length   α]]
-             [:string [string/length α]]
-             [:tree   [tree/size     α]]
-             [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]
+  "Returns the length of collection α"
+  [case [type-of α]
+    [:nil                    0]
+    [:array  [array/length  α]]
+    [:pair   [list/length   α]]
+    [:string [string/length α]]
+    [:tree   [tree/size     α]]
+    [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]
 
 [defn map [l f]
-       "Runs f over every item in collection l and returns the resulting list"
-       [case [type-of l]
-             [:nil    #nil]
-             [:pair   [list/map  l f]]
-             [:array  [array/map l f]]
-             [otherwise [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]
+  "Runs f over every item in collection l and returns the resulting list"
+  [case [type-of l]
+    [:nil    #nil]
+    [:pair   [list/map  l f]]
+    [:array  [array/map l f]]
+    [otherwise [throw [list :type-error "You can only use map with a collection" l [current-lambda]]]]]]
 
 [defn sort [l]
-       "Sorts the collection L"
-       [case [type-of l]
-             [:nil      #nil]
-             [:pair     [list/sort  l]]
-             [:array    [array/sort l]]
-             [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
+  "Sorts the collection L"
+  [case [type-of l]
+    [:nil      #nil]
+    [:pair     [list/sort  l]]
+    [:array    [array/sort l]]
+    [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
 
 [defn member [l m]
-      "Returns the first pair/item of collection l whose car is equal to m"
-       [case [type-of l]
-             [:pair     [list/member l m]]
-             [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
+  "Returns the first pair/item of collection l whose car is equal to m"
+  [case [type-of l]
+    [:pair     [list/member l m]]
+    [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
 
 [defn cut [l start end]
-       "Return a subcollection of L from START to END"
-       [case [type-of l]
-             [:array    [array/cut  l start end]]
-             [:pair     [list/cut   l start end]]
-             [:string   [string/cut l start end]]
-             [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
+  "Return a subcollection of L from START to END"
+  [case [type-of l]
+    [:array    [array/cut  l start end]]
+    [:pair     [list/cut   l start end]]
+    [:string   [string/cut l start end]]
+    [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
 
 [defn collection? [l]
-       [case [type-of l]
-             [[:pair :array :tree] #t]
-             [otherwise #f]]]
+  [case [type-of l]
+    [[:pair :array :tree] #t]
+    [otherwise #f]]]

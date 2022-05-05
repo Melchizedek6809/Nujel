@@ -1,95 +1,95 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
-
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Mostly macros implementing different control flow constructs
 
 [defmacro if-not [pred then else]
-          `[if ~pred ~else ~then]]
+  `[if ~pred ~else ~then]]
 
 [defmacro when-not [pred . body]
-          "Evalutes to BODY if PRED is false"
-          `[if ~pred #nil [do ~@body]]]
+  "Evalutes to BODY if PRED is false"
+  `[if ~pred #nil [do ~@body]]]
 
 [defmacro when [pred . body]
-          "Evalutes to BODY if PRED is true"
-          `[if ~pred [do ~@body] #nil]]
+  "Evalutes to BODY if PRED is true"
+  `[if ~pred [do ~@body] #nil]]
 
 [defn case/clauses/multiple [key-sym cases]
-       [when cases
-             [cons [list '== key-sym [car cases]]
-                   [case/clauses/multiple key-sym [cdr cases]]]]]
+  [when cases
+    [cons [list '== key-sym [car cases]]
+          [case/clauses/multiple key-sym [cdr cases]]]]]
 [defn case/clauses [key-sym clauses]
-       [when clauses
-             [if [== [caar clauses] 'otherwise]
-                 [cons 'do [cdar clauses]]
-                 [list 'if
-                       [if [pair? [caar clauses]]
-                           [if [and [== [car [caar clauses]] 'quote]
-                                    [last? [cdr [caar clauses]]]
-                                    [symbol? [cadr [caar clauses]]]]
-                               [list '== key-sym [caar clauses]]
-                               [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
-                           [list '== key-sym [caar clauses]]]
-                       [cons 'do [cdar clauses]]
-                       [case/clauses key-sym [cdr clauses]]]]]]
+  [when clauses
+    [if [== [caar clauses] 'otherwise]
+        [cons 'do [cdar clauses]]
+        [list 'if
+              [if [pair? [caar clauses]]
+                  [if [and [== [car [caar clauses]] 'quote]
+                           [last? [cdr [caar clauses]]]
+                           [symbol? [cadr [caar clauses]]]]
+                      [list '== key-sym [caar clauses]]
+                      [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
+                  [list '== key-sym [caar clauses]]]
+              [cons 'do [cdar clauses]]
+              [case/clauses key-sym [cdr clauses]]]]]]
 [defmacro case [key-form . clauses]
-          [def key-sym [gensym]]
-          [list 'let*
-                [list 'def key-sym key-form]
-                [case/clauses key-sym clauses]]]
+  [def key-sym [gensym]]
+  [list 'let*
+        [list 'def key-sym key-form]
+        [case/clauses key-sym clauses]]]
 
 [defmacro cond body
-          "Contains multiple cond clauses"
-          [when [and body [caar body]]
-                [list 'if
-                      [caar body]
-                      [cons 'do [cdar body]]
-                      [macro-apply cond [cdr body]]]]]
+  "Contains multiple cond clauses"
+  [when [and body [caar body]]
+    [list 'if
+          [caar body]
+          [cons 'do [cdar body]]
+          [macro-apply cond [cdr body]]]]]
 
 [defmacro for [for-loop . body]
-          "For loops, [for [name start stop] body]"
-          [def symbol-name [car for-loop]]
-          [def loop-start [cadr for-loop]]
-          [def loop-stop  [caddr for-loop]]
-          [def stop-var [gensym]]
-          [def dir 1]
-          [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
-          [when-not [symbol? symbol-name]
-                    [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]]
-          [when-not loop-start
-                    [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
-          [when-not loop-stop
-                    [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
-          [def pred [if [> dir 0] < >]]
-          `[let [[~symbol-name ~loop-start]
-                 [~stop-var ~loop-stop]]
-                [while [~pred ~symbol-name ~stop-var]
-                       ~@body
-                       [set! ~symbol-name [add/int ~dir ~symbol-name]]]]]
+  "For loops, [for [name start stop] body]"
+  [def symbol-name [car for-loop]]
+  [def loop-start [cadr for-loop]]
+  [def loop-stop  [caddr for-loop]]
+  [def stop-var [gensym]]
+  [def dir 1]
+  [when [cadddr for-loop] [set! dir [cadddr for-loop]]]
+  [when-not [symbol? symbol-name]
+            [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]]
+  [when-not loop-start
+            [throw [list :invalid-for "Expected a start value at the second position" for-loop]]]
+  [when-not loop-stop
+            [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]]
+  [def pred [if [> dir 0] < >]]
+  `[let [[~symbol-name ~loop-start]
+         [~stop-var ~loop-stop]]
+     [while [~pred ~symbol-name ~stop-var]
+       ~@body
+       [set! ~symbol-name [add/int ~dir ~symbol-name]]]]]
 
 [defmacro for-in [for-loop . body]
-          "[for-in [l [list 1 2 3 4]] [println l]]"
-          [def symbol-name [gensym]]
-          `[let [[~symbol-name ~[cadr for-loop]]]
-                [when ~symbol-name
-                      [while ~symbol-name
-                             [def ~[car for-loop] [car ~symbol-name]]
-                             ~@body
-                             [cdr! ~symbol-name]]]]]
+  "[for-in [l [list 1 2 3 4]] [println l]]"
+  [def symbol-name [gensym]]
+  `[let [[~symbol-name ~[cadr for-loop]]]
+     [when ~symbol-name
+       [while ~symbol-name
+         [def ~[car for-loop] [car ~symbol-name]]
+         ~@body
+         [cdr! ~symbol-name]]]]]
 
 [defn thread/-> [init fun]
-       [if-not fun init
-               [if [pair? [car fun]]
-                   `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
-                   [list [car fun] [thread/-> init [cdr fun]]]]]]
+  [if-not fun init
+          [if [pair? [car fun]]
+              `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
+              [list [car fun] [thread/-> init [cdr fun]]]]]]
 
 [defmacro -> [init . fun]
-          "Thread init as the first argument through every function in fun"
-          [thread/-> init [reverse fun]]]
+  "Thread init as the first argument through every function in fun"
+  [thread/-> init [reverse fun]]]
 
 [defn thread/->> [init fun]
-       [if-not fun init
-           [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
+  [if-not fun init
+          [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
 [defmacro ->> [init . fun]
-          "Thread init as the last argument through every function in fun"
-          [thread/->> init [reverse fun]]]
+  "Thread init as the last argument through every function in fun"
+  [thread/->> init [reverse fun]]]

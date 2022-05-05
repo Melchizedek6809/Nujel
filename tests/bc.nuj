@@ -1,8 +1,6 @@
 #!/usr/bin/env nujel
 
-[def expr '[do [bytecode-eval [assemble [$get 'test-var] [$push/int 1] [$add/int] [$ret]] #nil [ω [def test-var 9]]]]]
-[-> [compile expr] bytecompile assemble* disassemble]
-[-> [compile expr] bytecompile assemble* [bytecode-eval #nil [current-closure] #t]]
+[def path "tests/compile-test.nuj"]
 
-
-;[def c [-> [compile '[do [def t [let [[a 0]] [fn [b] [set! a [+ a [or b 1]]]]]] [t] t]] bytecompile assemble* bytecode-eval]]
+[file/compile/new path #f [environment*]]
+[println [file/read [cat [path/without-extension path] ".no"]]]

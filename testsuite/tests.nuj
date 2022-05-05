@@ -544,7 +544,7 @@
 [test/add :type-error [try car [char-at]]]
 [test/add :bounds-error [try car [char-at "" -1]]]
 [test/add :bounds-error [try car [char-at "" 1]]]
-[test/add :bounds-error [try car [char-at "" :asd]]]
+[test/add :type-error [try car [char-at "" :asd]]]
 [test/add #t [case 3 [otherwise #t] [2 #f]]]
 [test/add 0 [+]]
 [test/add 1 [*]]

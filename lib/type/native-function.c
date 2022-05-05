@@ -32,4 +32,3 @@ lVal *lAddSpecialForm(lClosure *c, const char *sym, const char *args, const char
 	lNF->type = ltSpecialForm;
 	return lDefineAliased(c,lNF,sym);
 }
-
