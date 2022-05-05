@@ -24,12 +24,10 @@ static lVal *lnfIf(lClosure *c, lVal *v){
 }
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
-	if(v->type == ltPair){
-		return lCar(v);
-	}else {
+	if(v->type != ltPair){
 		lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c);
-		return NULL;
 	}
+	return lCar(v);
 }
 
 lVal *lnfDo(lClosure *c, lVal *v){

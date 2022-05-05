@@ -82,50 +82,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	}
 }
 
-/* Run an expression after expanding/compiling it */
-lVal *lRun(lClosure *c, lVal *v){
-	const int SP = lRootsGet();
-
-	lVal *expr = RVP(lList(3,RVP(lValSym("eval-compile")),
-	                         RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))),
-	                         RVP(lValObject(c))));
-	lVal *ret = lEval(c,expr);
-
-	lRootsRet(SP);
-	return ret;
-}
-
-/* Read and run an expression after expanding/compiling it */
-lVal *lRunS(lClosure *c, const char *s, int sLen){
-	const int SP = lRootsGet();
-
-	lVal *expr = RVP(lList(3,RVP(lValSym("read-eval-compile")),
-	                         RVP(lValStringConst(s, sLen)),
-	                         RVP(lValObject(c))));
-	lVal *ret = lEval(c,expr);
-
-	lRootsRet(SP);
-	return ret;
-}
-
-/* Load an expression expanding/compiling/evaluating it, multiple times if necessary */
-void lLoad(lClosure *c, lVal *v){
-	const int SP = lRootsGet();
-	lEval(c,RVP(lList(3,RVP(lValSym("eval-load")),
-	                    RVP(lCons(lnfvQuote,RVP(lCons(v,NULL)))),
-	                    RVP(lValObject(c)))));
-	lRootsRet(SP);
-}
-
-/* Load and compile a string, evaluating parts of it multiple times to enable circular references */
-void lLoadS(lClosure *c, const char *s, int sLen){
-	const int SP = lRootsGet();
-	lEval(c,RVP(lList(3,RVP(lValSym("read-eval-load")),
-	                    RVP(lValStringConst(s, sLen)),
-	                    RVP(lValObject(c)))));
-	lRootsRet(SP);
-}
-
 static inline bool lArgsEval(const lVal *v){
 	return v && ((v->type == ltLambda) || (v->type == ltNativeFunc));
 }
@@ -261,14 +217,6 @@ static void lAddCoreFuncs(lClosure *c){
 	lOperationsTree(c);
 	lOperationsTypeSystem(c);
 	lOperationsVector(c);
-}
-
-/* Quote V, enabling it to be used verbatim, without being evaluated. */
-lVal *lQuote(lVal *v){
-	lVal *ret = RVP(lCons(NULL,NULL));
-	ret->vList.car = lValSymS(symQuote);
-	ret->vList.cdr = lCons(v,NULL);
-	return ret;
 }
 
 /* Create a new root closure WITHTOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */

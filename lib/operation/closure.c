@@ -219,10 +219,8 @@ static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
 
 /* Handler for [ω*] */
 static lVal *lnfObjectAst(lClosure *c, lVal *v){
-	(void)v;
-	lVal *ret = lRootsValPush(lValAlloc(ltObject));
-	ret->vClosure = lClosureNew(c, closureObject);
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [ω*] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfCurrentClosure(lClosure *c, lVal *v){

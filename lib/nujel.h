@@ -17,15 +17,10 @@ void      lInit             ();
 lClosure *lNewRoot          ();
 lClosure *lNewRootNoStdLib  ();
 
-lVal     *lRun              (lClosure *c, lVal *v);
-lVal     *lRunS             (lClosure *c, const char *s, int sLen);
-void      lLoad             (lClosure *c, lVal *v);
-void      lLoadS            (lClosure *c, const char *s, int sLen);
 lVal     *lMap              (lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *));
 lVal     *lEval             (lClosure *c, lVal *v);
 lVal     *lLambda           (lClosure *c, lVal *args, lVal *lambda);
 lVal     *lApply            (lClosure *c, lVal *args, lVal *fun, lVal *funSym);
-lVal     *lQuote            (lVal *v);
 void      lBreak            ();
 
 #endif
