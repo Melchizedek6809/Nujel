@@ -46,7 +46,7 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 }
 
 /* Read a value referenced at IP and store it in RET, retuns the new IP */
-static const lBytecodeOp *lBytecodeReadOPVal(const lBytecodeOp *ip, lVal **ret){
+static lBytecodeOp *lBytecodeReadOPVal(lBytecodeOp *ip, lVal **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
 	i = (i << 8) | *ip++;
@@ -55,7 +55,7 @@ static const lBytecodeOp *lBytecodeReadOPVal(const lBytecodeOp *ip, lVal **ret){
 }
 
 /* Read a symbol referenced at IP and store it in RET, retuns the new IP */
-static const lBytecodeOp *lBytecodeReadOPSym(const lBytecodeOp *ip, lSymbol **ret){
+static lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret){
 	int i = *ip++;
 	i = (i << 8) | *ip++;
 	i = (i << 8) | *ip++;
@@ -69,10 +69,34 @@ static int lBytecodeGetOffset16(const lBytecodeOp *ip){
 	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
 
+static void lBytecodeLinkApply(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
+	if(&c[4] >= v->dataEnd){return;}
+	lVal *raw = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
+	if((!raw) || (raw->type != ltSymbol)){return;}
+	lVal *n = lGetClosureSym(clo, raw->vSymbol);
+	if(n == raw){return;}
+	int i = lValIndex(n);
+	c[2] = (i >> 16) & 0xFF;
+	c[3] = (i >>  8) & 0xFF;
+	c[4] = (i      ) & 0xFF;
+}
+
+static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
+	if(&c[3] >= v->dataEnd){return;}
+	lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
+	if(!raw || (raw->type != ltSymbol)){return;}
+	lVal *n = lGetClosureSym(clo, raw->vSymbol);
+	if(n == raw){return;}
+	int i = lValIndex(n);
+	c[1] = (i >> 16) & 0xFF;
+	c[2] = (i >>  8) & 0xFF;
+	c[3] = (i      ) & 0xFF;
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
-lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *ops, bool trace){
+lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, bool trace){
 	jmp_buf oldExceptionTarget;
-	const lBytecodeOp *ip;
+	lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
 	ctx.closureStackSize = 8;
@@ -209,9 +233,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ctx.valueStack[ctx.sp++] = NULL;
 		ip++;
 		break;
-	case lopPushLVal:
-		ip = lBytecodeReadOPVal(ip+1, &ctx.valueStack[ctx.sp++]);
-		break;
+	case lopPushLVal: {
+		lVal *val = lIndexVal((ip[1] << 16) | (ip[2] << 8) | ip[3]);
+		if(val && (val->type == ltSymbol)){
+			lBytecodeLinkPush(c, ops, ip);
+			val = lIndexVal((ip[1] << 16) | (ip[2] << 8) | ip[3]);
+		}
+		ctx.valueStack[ctx.sp++] = val;
+		ip += 4;
+		break; }
 	case lopPushSymbol: {
 		lSymbol *sym;
 		ip = lBytecodeReadOPSym(ip+1, &sym);
@@ -223,6 +253,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, const lBytecodeArray *
 		ctx.sp = ctx.sp - len + 1;
 		ctx.valueStack[ctx.sp-1] = cargs;
 		lVal *fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+		if(fun && (fun->type == ltSymbol)){
+			lBytecodeLinkApply(c, ops, ip);
+			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+		}
 		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun, fun);
 		ip += 5;
 		break; }

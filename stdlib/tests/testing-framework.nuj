@@ -82,5 +82,5 @@
   [set! print-passes  [bool output-passes]]
   [test-run-real test-default]]
 
-[apply test/reset]
+[test/reset]
 ;; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

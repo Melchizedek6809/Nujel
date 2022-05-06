@@ -194,7 +194,7 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 /* Handler for [λδ name [..args] docstring body] */
 static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
 	lVal *ret = lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
-	ret->vClosure->type = closureUnlinkedBytecode;
+	ret->vClosure->type = closureBytecoded;
 	return ret;
 }
 

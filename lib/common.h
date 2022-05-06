@@ -132,8 +132,7 @@ typedef enum closureType {
 	closureLet = 4,
 	closureTry = 5,
 	closureRet = 6,
-	closureBytecoded = 7,
-	closureUnlinkedBytecode = 8
+	closureBytecoded = 7
 } closureType;
 
 struct lClosure {
@@ -143,7 +142,7 @@ struct lClosure {
 	};
 	lTree *data;
 	lVal *text;
-	const lBytecodeOp *ip;
+	lBytecodeOp *ip;
 	lVal *args;
 	lVal *doc;
 	const lSymbol *name;

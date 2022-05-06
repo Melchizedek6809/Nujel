@@ -51,11 +51,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
 	}
-	lVal *ret;
-	if(lambda->vClosure->type == closureUnlinkedBytecode){
-		lBytecodeLink(lambda->vClosure, &lambda->vClosure->text->vBytecodeArr);
-	}
-	ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
+	lVal *ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	lRootsRet(SP);
 	return ret;
 }
@@ -256,13 +252,8 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		const int RSSP = lRootsGet();
 		lVal *car = n->vList.car;
 		if((car == NULL) || (car->type != ltBytecodeArr)){
-			if(car->type == ltPair){
-				lEval(c, car);
-			}else{
-				lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
-			}
+			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}else{
-			lBytecodeLink(c, &car->vBytecodeArr);
 			lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
 		}
 		lRootsRet(RSSP);

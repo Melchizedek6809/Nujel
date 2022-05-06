@@ -27,7 +27,7 @@
 [test/add "asd" [index->val [val->index "asd"]]]
 [test/add '[123 asd] [index->val [val->index '[123 asd]]]]
 [test/add '[123 asd] [asmrun [$push/lval '[123 asd]] [$ret]]]
-[test/add 'test [asmrun [$push/lval 'test] [$ret]]]
+[test/add 'test [asmrun [$push/symbol 'test] [$ret]]]
 [test/add 2 [[asmrun [$push/lval [fn [a] [+ 1 a]]] [$ret]] 1]]
 [test/add '[test list] [let [[code [assemble [$push/lval [list 'test 'list]] [$ret]]]]                   [bytecode-eval code]]]
 [test/add '[test list] [let [[code [assemble [$push/lval [list 'test 'list]] [$ret]]]] [garbage-collect] [bytecode-eval code]]]

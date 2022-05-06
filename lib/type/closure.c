@@ -119,7 +119,7 @@ lVal *lLambdaBytecodeNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, l
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
 	lVal *ret = RVP(lValAlloc(ltLambda));
-	ret->vClosure       = lClosureNew(parent, closureUnlinkedBytecode);
+	ret->vClosure       = lClosureNew(parent, closureBytecoded);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->doc  = docs;

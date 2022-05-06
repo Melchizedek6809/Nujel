@@ -50,7 +50,7 @@ typedef enum lOpcode {
 	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
 
-lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops, bool trace);
+lVal *lBytecodeEval(lClosure *c, lVal *args, lBytecodeArray *ops, bool trace);
 void lBytecodeArrayMark(const lBytecodeArray *v);
 void lBytecodeLink(lClosure *c, lBytecodeArray *v);
 
