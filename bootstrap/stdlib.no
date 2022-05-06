@@ -8738,8 +8738,7 @@
 }
 0Es random
 0D
-10s random/seed-initialize!
-08i 1 v apply
+08i 0 v random/seed-initialize!
 01
 }#{
 25v tree->json v [v] v "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" v #{
@@ -11672,7 +11671,6 @@
 }
 0Es test-run
 0D
-10s test/reset
-08i 1 v apply
+08i 0 v test/reset
 01
 }

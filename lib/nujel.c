@@ -64,7 +64,8 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 	case ltObject: {
 		if(args && args->type == ltBytecodeArr){
 			RCP(c);
-			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
+			lVal *ret = lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
+			return ret;
 		}else{
 			lExceptionThrowValClo("no-more-walking", "Can't use the treewalker anymore", args, c);
 			return NULL;
@@ -78,50 +79,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
 		lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
 		return NULL;
 	}
-}
-
-static inline bool lArgsEval(const lVal *v){
-	return v && ((v->type == ltLambda) || (v->type == ltNativeFunc));
-}
-
-/* Directly Evaluate a single value, v, and return the result.
- * DOES NOT COMPILE THE EXPRESSION. */
-lVal *lEval(lClosure *c, lVal *v){
-	switch(v ? v->type : ltNoAlloc){
-	default:
-		return v;
-	case ltSymbol:
-		return lGetClosureSym(c,v->vSymbol);
-	case ltPair: {
-		lVal *car = lCar(v);
-		switch(car ? car->type : ltNoAlloc){
-		default:
-			lExceptionThrowValClo("type-error", "Can't use the following type as a function", lValSymS(getTypeSymbol(car)), c);
-                case ltMacro:
-			lExceptionThrowValClo("runtime-macro", "Macros can't be used as functions", v, c);
-		case ltObject:
-			lExceptionThrowValClo("object-car", "Can't apply to objects in that way, use apply or eval-in instead", v, c);
-		case ltLambda:
-			return RVP(lLambda(c,lMap(c,lCdr(v),lEval),car));
-		case ltSpecialForm:
-			return RVP(car->vNFunc->fp(c,lCdr(v)));
-		case ltNativeFunc:
-			return RVP(car->vNFunc->fp(c,lMap(c,lCdr(v),lEval)));
-                case ltPair:
-			return lApply(c,lMap(c,lCdr(v),lEval),lRootsValPush(lEval(c,car)),car);
-		case ltKeyword:
-			return v; // ToDo: can probably be removed
-		case ltSymbol: {
-			lVal *resolved;
-			if(lHasClosureSym(c,car->vSymbol,&resolved)){
-				lVal *args = lArgsEval(resolved) ? lMap(c,lCdr(v),lEval) : lCdr(v);
-				return lApply(c, args, resolved, car);
-			}else{
-				lExceptionThrowValClo("unresolved-procedure", "Can't resolve the following symbol into a procedure", car, c);
-			}}
-		}
-	}}
-	return NULL;
 }
 
 /* Evaluate func for every entry in list v and return a list containing the results */

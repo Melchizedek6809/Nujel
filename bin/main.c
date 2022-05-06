@@ -16,12 +16,6 @@
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
 
-/* Evaluate an expression without expanding/compiling it, probably
- * not what you want, run does expansion/compilation before invoking
- * the VM. */
-static void *evalRaw(void *cl, void *body){
-	return lEval((lClosure *)cl,(lVal *)body);
-}
 
 #ifdef __EMSCRIPTEN__
 
@@ -29,8 +23,9 @@ static void *evalRaw(void *cl, void *body){
 const char *run(const char *line){
 	static char buf[1<<16];
 	const int SP = lRootsGet();
-	lVal *exp = RVP(lList(2,RVP(lValSym("repl/wasm")),RVP(lValString(line))));
-	lVal *v = lExceptionTryExit(evalRaw,mainClosure,exp);
+	lVal *funSym = lValSym("repl/wasm");
+	lVal *fun = RVP(lGetClosureSym(mainClosure, funSym->vSymbol));
+	lVal *v = lApply(mainClosure, RVP(lCons(RVP(lValString(line)),NULL)), fun, funSym);
 	spf(buf, &buf[sizeof(buf)], "%v", v);
 	lRootsRet(SP);
 	return buf;
@@ -88,15 +83,14 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	const int SP = lRootsGet();
 	initEnvironmentMap(c);
 	for(int i = argc-1; i >= 0; i--){
-		ret = lCons(lValString(argv[i]), ret);
+		ret = RVP(lCons(RVP(lValString(argv[i])), ret));
 	}
 	lRootsRet(SP);
 	RVP(ret);
-	ret = lCons(lValSym("repl/init"), ret);
-	lRootsRet(SP);
-	RVP(ret);
-	lExceptionTryExit(evalRaw,c,ret);
+	lVal *funSym = RVP(lValSym("repl/init"));
+	lVal *fun = RVP(lGetClosureSym(c, funSym->vSymbol));
 	mainClosure = c;
+	lApply(c, ret, fun, funSym);
 }
 
 

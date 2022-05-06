@@ -18,8 +18,10 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Maps (using binary Trees)
 - [X] Garbage Collection (Mark-and-Sweep)
 - [X] Macros (expander written in Nujel itself)
+- [X] Bytecoded
 - [ ] Continuations
-- [ ] Bytecoded (already included but not used by default)
+- [ ] Fibers
+- [ ] Serializable Fibers
 
 ## Try it out
 You can try out a current [WASM Build over here](https://wolkenwelten.net/nujel/).

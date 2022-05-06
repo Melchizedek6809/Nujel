@@ -20,19 +20,13 @@ const lSymbol *symCode;
 const lSymbol *symData;
 
 static lVal *lnfDef(lClosure *c, lVal *v){
-	const lSymbol *s = requireSymbol(c, lCar(v));
-	lVal *ret = lEval(c,lCadr(v));
-	lDefineClosureSym(c,s,ret);
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [def] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfSet(lClosure *c, lVal *v){
-	const lSymbol *s = requireSymbol(c, lCar(v));
-	lVal *ret = lEval(c,lCadr(v));
-	if(!lSetClosureSym(c,s,ret)){
-		lExceptionThrowValClo("unbound-variable","set! only works with symbols that already have an associated value", lCar(v), c);
-	}
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [set!] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lSymTable(lClosure *c, lVal *v){
@@ -191,18 +185,15 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
 }
 
-/* Handler for [λδ name [..args] docstring body] */
 static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
-	lVal *ret = lLambdaNew(c, lCar(v), lCadr(v), lCaddr(v), lCadddr(v));
-	ret->vClosure->type = closureBytecoded;
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [fn*] anymore", v, c);
+	return NULL;
 }
 
 /* Handler for [macro* [...args] ...body] */
 static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
-	lVal *ret = lnfLambdaBytecodeAst(c,v);
-	if(ret){ ret->type = ltMacro; }
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [macro*] anymore", v, c);
+	return NULL;
 }
 
 /* Handler for [ω*] */

@@ -38,13 +38,8 @@ static lVal *lnfQuote(lClosure *c, lVal *v){
 }
 
 static lVal *lnfDo(lClosure *c, lVal *v){
-	lVal *ret = NULL;
-	const int SP = lRootsGet();
-	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
-		ret = lEval(c, n->vList.car);
-		lRootsRet(SP);
-	}
-	return ret;
+	lExceptionThrowValClo("no-more-walking", "Can't use the old style [do] anymore", v, c);
+	return NULL;
 }
 
 static lVal *lnfThrow(lClosure *c, lVal *v){
