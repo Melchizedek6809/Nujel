@@ -25,4 +25,4 @@
       [mod [abs [random/rng!]] max]
       [random/rng!]]]
 
-[random/seed-initialize!]
+[apply random/seed-initialize!]

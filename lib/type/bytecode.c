@@ -437,8 +437,7 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 
 /* Links a bytecode array, mostly used after serializing and deserializing
  * a function */
-void lBytecodeLink(lClosure *clo){
-	lBytecodeArray *v = &clo->text->vBytecodeArr;
+void lBytecodeLink(lClosure *clo, lBytecodeArray *v){
 	for(lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){
 		default: break;

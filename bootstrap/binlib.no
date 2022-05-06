@@ -1,4 +1,8 @@
-[do [def test-context "Nujel Bootstrap"] [def help [fn* help [i] "Describe 10 functions at offset 1" #{
+#{
+05v "Nujel Standalone"
+0Es test-context
+0D
+25v help v [i] v "Describe 10 functions at offset 1" v #{
 10s i
 08i 1 v int?
 0Bo 7
@@ -39,7 +43,10 @@
 08i 4 v cat
 08i 1 v println
 01
-}]] [def file/eval [fn* file/eval [path environment] "Evaluate a Nujel source file in the current context" #{
+}
+0Es help
+0D
+25v file/eval v [path environment] v "Evaluate a Nujel source file in the current context" v #{
 10s environment
 0Bo 7
 24
@@ -58,7 +65,10 @@
 10s environment
 08i 2 v compile/forms
 01
-}]] [def file/eval/bytecode [fn* file/eval/bytecode [path environment] "Evaluate a Nujel source file in the current context" #{
+}
+0Es file/eval
+0D
+25v file/eval/bytecode v [path environment] v "Evaluate a Nujel source file in the current context" v #{
 10s environment
 0Bo 7
 24
@@ -74,19 +84,28 @@
 08i 2 v cons
 08i 2 v eval-in
 01
-}]] [def file/file? [fn* file/file? [filename] "" #{
+}
+0Es file/eval/bytecode
+0D
+25v file/file? v [filename] v "" v #{
 10s filename
 08i 1 v file/stat
 05v :regular-file?
 08i 2 v ref
 01
-}]] [def file/dir? [fn* file/dir? [filename] "" #{
+}
+0Es file/file?
+0D
+25v file/dir? v [filename] v "" v #{
 10s filename
 08i 1 v file/stat
 05v :directory?
 08i 2 v ref
 01
-}]] [def directory/read-relative [fn* directory/read-relative [path] "" #{
+}
+0Es file/dir?
+0D
+25v directory/read-relative v [path] v "" v #{
 10s path
 08i 1 v directory/read
 25v anonymous v [a] v "" v #{
@@ -98,7 +117,10 @@
 }
 08i 2 v map
 01
-}]] [def directory/read-recursive [fn* directory/read-recursive [path] "" #{
+}
+0Es directory/read-relative
+0D
+25v directory/read-recursive v [path] v "" v #{
 10s path
 08i 1 v directory/read-relative
 25v anonymous v [A] v "" v #{
@@ -114,14 +136,47 @@
 08i 2 v map
 08i 1 v flatten
 01
-}]]][do [def repl/executable-name "nujel"] [def repl/parse-args/bytecode-eval-n #f] [def repl/parse-args/eval-next #f] [def repl/parse-args/run-repl #t] [def repl/options [tree/new #nil]] [def repl/option-map [tree/new #nil]] [def repl/exception-handler [fn* repl/exception-handler [error] "" #{
+}
+0Es directory/read-recursive
+01
+}#{
+05v "nujel"
+0Es repl/executable-name
+0D
+05v #f
+0Es repl/parse-args/bytecode-eval-n
+0D
+05v #f
+0Es repl/parse-args/eval-next
+0D
+05v #t
+0Es repl/parse-args/run-repl
+0D
+24
+08i 1 v tree/new
+0Es repl/options
+0D
+24
+08i 1 v tree/new
+0Es repl/option-map
+0D
+25v repl/exception-handler v [error] v "" v #{
 10s error
 08i 1 v display/error
 01
-}]] [def repl/history #nil] [def repl/prompt [fn* repl/prompt [] "> " #{
+}
+0Es repl/exception-handler
+0D
+24
+0Es repl/history
+0D
+25v repl/prompt v [] v "> " v #{
 05v "> "
 01
-}]] [def repl/wasm [fn* repl/wasm [line] "Evaluate LINE in the wasm context" #{
+}
+0Es repl/prompt
+0D
+25v repl/wasm v [line] v "Evaluate LINE in the wasm context" v #{
 10s repl/exception-handler
 18o 33
 10s root-closure
@@ -136,7 +191,10 @@
 27
 0D
 01
-}]] [def repl/readline [fn* repl/readline [ctx] "" #{
+}
+0Es repl/wasm
+0D
+25v repl/readline v [ctx] v "" v #{
 08i 0 v repl/prompt
 08i 1 v readline
 0Es line
@@ -175,7 +233,10 @@
 08i 1 v cat
 08i 1 v println
 01
-}]] [def repl [fn* repl [] "" #{
+}
+0Es repl/readline
+0D
+25v repl v [] v "" v #{
 02i 0
 1B
 1C
@@ -193,7 +254,10 @@
 0D
 09o -35
 01
-}]] [def repl/print-help [fn* repl/print-help [] "" #{
+}
+0Es repl
+0D
+25v repl/print-help v [] v "" v #{
 05v "Nujel"
 08i 1 v ansi-rainbow
 05v " - A Lisp dialect for games.\n"
@@ -260,41 +324,74 @@
 08i 3 v cat
 08i 1 v println
 01
-}]] [tree/set! repl/option-map 'b [fn* anonymous [option] "" #{
+}
+0Es repl/print-help
+0D
+10s repl/option-map
+23s b
+25v anonymous v [option] v "" v #{
 05v #t
 0Fs repl/parse-args/bytecode-eval-n
 0D
 05v #f
 0Fs repl/parse-args/run-repl
 01
-}]] [tree/set! repl/option-map 'h [fn* anonymous [option] "" #{
+}
+08i 3 v tree/set!
+0D
+10s repl/option-map
+23s h
+25v anonymous v [option] v "" v #{
 08i 0 v repl/print-help
 0D
 05v #f
 0Fs repl/parse-args/run-repl
 01
-}]] [tree/set! repl/option-map 'no-color [fn* anonymous [option] "" #{
+}
+08i 3 v tree/set!
+0D
+10s repl/option-map
+23s no-color
+25v anonymous v [option] v "" v #{
 05v ""
 0Fs ansi/disabled
 01
-}]] [tree/set! repl/option-map 'color [fn* anonymous [option] "" #{
+}
+08i 3 v tree/set!
+0D
+10s repl/option-map
+23s color
+25v anonymous v [option] v "" v #{
 05v #f
 0Fs ansi/disabled
 01
-}]] [tree/set! repl/option-map 'x [fn* anonymous [option] "" #{
+}
+08i 3 v tree/set!
+0D
+10s repl/option-map
+23s x
+25v anonymous v [option] v "" v #{
 05v #t
 0Fs repl/parse-args/eval-next
 0D
 05v #f
 0Fs repl/parse-args/run-repl
 01
-}]] [tree/set! repl/option-map :default [fn* anonymous [option] "" #{
+}
+08i 3 v tree/set!
+0D
+10s repl/option-map
+05v :default
+25v anonymous v [option] v "" v #{
 10s repl/options
 10s option
 05v #t
 08i 3 v tree/set!
 01
-}]] [def repl/parse-option [fn* repl/parse-option [option] "" #{
+}
+08i 3 v tree/set!
+0D
+25v repl/parse-option v [option] v "" v #{
 10s repl/option-map
 10s option
 08i 2 v ref
@@ -311,7 +408,10 @@
 10s option
 1Ai 1
 01
-}]] [def repl/parse-options [fn* repl/parse-options [options] "" #{
+}
+0Es repl/parse-option
+0D
+25v repl/parse-options v [options] v "" v #{
 10s options
 02i 0
 08i 2 v char-at
@@ -332,7 +432,10 @@
 10s repl/parse-option
 08i 2 v for-each
 01
-}]] [def repl/parse-arg [fn* repl/parse-arg [arg] "" #{
+}
+0Es repl/parse-options
+0D
+25v repl/parse-arg v [arg] v "" v #{
 10s repl/parse-args/bytecode-eval-n
 0Bo 41
 10s display/error
@@ -395,7 +498,10 @@
 09o 4
 24
 01
-}]] [def repl/parse-args [fn* repl/parse-args [args] "" #{
+}
+0Es repl/parse-arg
+0D
+25v repl/parse-args v [args] v "" v #{
 10s args
 0Bo 35
 10s args
@@ -408,14 +514,20 @@
 09o 7
 10s repl/parse-args/run-repl
 01
-}]] [def repl/init/wasm [fn* repl/init/wasm [args] "" #{
+}
+0Es repl/parse-args
+0D
+25v repl/init/wasm v [args] v "" v #{
 05v "Nujel"
 08i 1 v ansi-rainbow
 05v " heißt euch willkommen!"
 08i 2 v cat
 08i 1 v println
 01
-}]] [def repl/init/bin [fn* repl/init/bin [args] "" #{
+}
+0Es repl/init/wasm
+0D
+25v repl/init/bin v [args] v "" v #{
 10s repl/exception-handler
 18o 46
 10s args
@@ -435,7 +547,10 @@
 27
 0D
 01
-}]] [def repl/init [fn* repl/init args "" #{
+}
+0Es repl/init/bin
+0D
+25v repl/init v args v "" v #{
 10s System/Architecture
 23s wasm
 20
@@ -446,4 +561,7 @@
 10s args
 08i 1 v repl/init/bin
 01
-}]]]
+}
+0Es repl/init
+01
+}

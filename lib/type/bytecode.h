@@ -52,6 +52,6 @@ typedef enum lOpcode {
 
 lVal *lBytecodeEval(lClosure *c, lVal *args, const lBytecodeArray *ops, bool trace);
 void lBytecodeArrayMark(const lBytecodeArray *v);
-void lBytecodeLink(lClosure *c);
+void lBytecodeLink(lClosure *c, lBytecodeArray *v);
 
 #endif

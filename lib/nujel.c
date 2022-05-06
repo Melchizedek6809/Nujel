@@ -2,6 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "nujel.h"
 
+#include "misc/pf.h"
 #include "exception.h"
 #include "allocation/native-function.h"
 #include "allocation/tree.h"
@@ -52,7 +53,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	}
 	lVal *ret;
 	if(lambda->vClosure->type == closureUnlinkedBytecode){
-		lBytecodeLink(lambda->vClosure);
+		lBytecodeLink(lambda->vClosure, &lambda->vClosure->text->vBytecodeArr);
 	}
 	ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	lRootsRet(SP);
@@ -252,6 +253,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	const int RSP = lRootsGet();
 	lVal *v = RVP(lRead(expr));
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
+		const int RSSP = lRootsGet();
 		lVal *car = n->vList.car;
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			if(car->type == ltPair){
@@ -260,10 +262,11 @@ lClosure *lLoad(lClosure *c, const char *expr){
 				lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 			}
 		}else{
+			lBytecodeLink(c, &car->vBytecodeArr);
 			lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
 		}
+		lRootsRet(RSSP);
 	}
-
 	lRootsRet(RSP);
 	return c;
 }

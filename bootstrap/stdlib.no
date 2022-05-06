@@ -1,10 +1,14 @@
-[do [def lognand [fn* lognand l "Returns the Nand of its arguments" #{
+#{
+25v lognand v l v "Returns the Nand of its arguments" v #{
 10s logand
 10s l
 08i 2 v apply
 08i 1 v lognot
 01
-}]] [def bit-set?! [fn* bit-set?! [i] "" #{
+}
+0Es lognand
+0D
+25v bit-set?! v [i] v "Returns a function that checks if bit I is set in the provided number" v #{
 02i 1
 10s i
 08i 2 v ash
@@ -19,7 +23,10 @@
 01
 }
 01
-}]] [def bit-clear?! [fn* bit-clear?! [i] "" #{
+}
+0Es bit-set?!
+0D
+25v bit-clear?! v [i] v "Returns a function that checks if bit I is clear in the provided number" v #{
 02i 1
 10s i
 08i 2 v ash
@@ -33,7 +40,11 @@
 01
 }
 01
-}]]][do [def array/2d/allocate [fn* array/2d/allocate [width height] "" #{
+}
+0Es bit-clear?!
+01
+}#{
+25v array/2d/allocate v [width height] v "" v #{
 05v :data
 10s width
 10s height
@@ -47,7 +58,10 @@
 10s height
 08i 6 v tree/new
 01
-}]] [def array/2d/fill! [fn* array/2d/fill! [data v] "" #{
+}
+0Es array/2d/allocate
+0D
+25v array/2d/fill! v [data v] v "" v #{
 10s data
 05v :data
 08i 2 v tree/ref
@@ -56,7 +70,10 @@
 0D
 10s data
 01
-}]] [def array/2d/ref [fn* array/2d/ref [data x y oob-val] "" #{
+}
+0Es array/2d/fill!
+0D
+25v array/2d/ref v [data x y oob-val] v "" v #{
 10s x
 10s data
 05v :width
@@ -101,7 +118,10 @@
 08i 2 v add
 08i 2 v array/ref
 01
-}]] [def array/2d/set! [fn* array/2d/set! [data x y val] "" #{
+}
+0Es array/2d/ref
+0D
+25v array/2d/set! v [data x y val] v "" v #{
 10s x
 10s data
 05v :width
@@ -154,7 +174,10 @@
 0D
 10s data
 01
-}]] [def array/2d/print [fn* array/2d/print [data] "" #{
+}
+0Es array/2d/set!
+0D
+25v array/2d/print v [data] v "" v #{
 15
 02i 0
 0Es y
@@ -215,7 +238,11 @@
 0D
 10s data
 01
-}]]][do [def array/+= [fn* array/+= [a i v] "Add V to the value in A at position I and store the result in A returning A" #{
+}
+0Es array/2d/print
+01
+}#{
+25v array/+= v [a i v] v "Add V to the value in A at position I and store the result in A returning A" v #{
 10s a
 10s i
 10s v
@@ -225,13 +252,19 @@
 08i 2 v +
 08i 3 v array/set!
 01
-}]] [def array/++ [fn* array/++ [a i] "Increment position I in A and return A" #{
+}
+0Es array/+=
+0D
+25v array/++ v [a i] v "Increment position I in A and return A" v #{
 10s a
 10s i
 02i 1
 08i 3 v array/+=
 01
-}]] [def array/fill! [fn* array/fill! [a v] "Fills array a with value v" #{
+}
+0Es array/++
+0D
+25v array/fill! v [a v] v "Fills array a with value v" v #{
 10s a
 08i 1 v array/length
 0Es len
@@ -265,7 +298,10 @@
 0D
 10s a
 01
-}]] [def array/append [fn* array/append [a b] "Append array A to array B" #{
+}
+0Es array/fill!
+0D
+25v array/append v [a b] v "Append array A to array B" v #{
 10s a
 08i 1 v array?
 0C
@@ -357,7 +393,10 @@
 0D
 10s ret
 01
-}]] [def array/dup [fn* array/dup [a] "Duplicate Array A" #{
+}
+0Es array/append
+0D
+25v array/dup v [a] v "Duplicate Array A" v #{
 10s a
 08i 1 v array/length
 08i 1 v array/allocate
@@ -395,7 +434,10 @@
 0D
 10s ret
 01
-}]] [def array/reduce [fn* array/reduce [arr fun α] "Reduce an array, [reduce] should be preferred" #{
+}
+0Es array/dup
+0D
+25v array/reduce v [arr fun α] v "Reduce an array, [reduce] should be preferred" v #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -432,7 +474,10 @@
 0D
 10s α
 01
-}]] [def array/map [fn* array/map [arr fun] "Map an array, [map] should be preferred" #{
+}
+0Es array/reduce
+0D
+25v array/map v [arr fun] v "Map an array, [map] should be preferred" v #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -470,7 +515,10 @@
 0D
 10s arr
 01
-}]] [def array/filter [fn* array/filter [arr pred] "Filter an array, [filter] should be preferred" #{
+}
+0Es array/map
+0D
+25v array/filter v [arr pred] v "Filter an array, [filter] should be preferred" v #{
 02i 0
 0Es ri
 0D
@@ -528,7 +576,10 @@
 10s ri
 08i 2 v array/length!
 01
-}]] [def array/equal? [fn* array/equal? [a b] "" #{
+}
+0Es array/filter
+0D
+25v array/equal? v [a b] v "" v #{
 10s a
 08i 1 v array?
 08i 1 v not
@@ -600,7 +651,10 @@
 10s ret
 16
 01
-}]] [def array/push [fn* array/push [arr val] "Append VAL to ARR" #{
+}
+0Es array/equal?
+0D
+25v array/push v [arr val] v "Append VAL to ARR" v #{
 10s arr
 02i 1
 10s arr
@@ -614,7 +668,10 @@
 10s val
 08i 3 v array/set!
 01
-}]] [def array/swap [fn* array/swap [arr i j] "Swap values at I and J in ARR" #{
+}
+0Es array/push
+0D
+25v array/swap v [arr i j] v "Swap values at I and J in ARR" v #{
 10s arr
 10s i
 08i 2 v array/ref
@@ -630,7 +687,10 @@
 10s tmp
 08i 3 v array/set!
 01
-}]] [def array/heapify [fn* array/heapify [arr n at] "bubble up the element from index AT to until the max-heap property is satisfied" #{
+}
+0Es array/swap
+0D
+25v array/heapify v [arr n at] v "bubble up the element from index AT to until the max-heap property is satisfied" v #{
 10s at
 0Es top
 0D
@@ -713,7 +773,10 @@
 0D
 10s arr
 01
-}]] [def array/make-heap [fn* array/make-heap [arr] "" #{
+}
+0Es array/heapify
+0D
+25v array/make-heap v [arr] v "" v #{
 10s arr
 08i 1 v array/length
 0Es l
@@ -744,7 +807,10 @@
 0D
 10s arr
 01
-}]] [def array/heap-sort [fn* array/heap-sort [arr] "" #{
+}
+0Es array/make-heap
+0D
+25v array/heap-sort v [arr] v "" v #{
 10s arr
 08i 1 v array/make-heap
 0D
@@ -778,7 +844,13 @@
 0D
 10s arr
 01
-}]] [def array/sort array/heap-sort] [def array/cut [fn* array/cut [arr start end] "Return a newly allocated array with the values of ARR from START to END" #{
+}
+0Es array/heap-sort
+0D
+10s array/heap-sort
+0Es array/sort
+0D
+25v array/cut v [arr start end] v "Return a newly allocated array with the values of ARR from START to END" v #{
 02i 0
 10s start
 08i 2 v max
@@ -831,12 +903,22 @@
 0D
 10s ret
 01
-}]]][do [def avl/empty :e] [def avl/empty? [fn* avl/empty? [n] "" #{
+}
+0Es array/cut
+01
+}#{
+05v :e
+0Es avl/empty
+0D
+25v avl/empty? v [n] v "" v #{
 05v :e
 10s n
 20
 01
-}]] [def avl/default-cmp [fn* avl/default-cmp [x y] "" #{
+}
+0Es avl/empty?
+0D
+25v avl/default-cmp v [x y] v "" v #{
 10s x
 10s y
 1E
@@ -851,7 +933,10 @@
 09o 5
 02i 0
 01
-}]] [def avl/typecheck [fn* avl/typecheck [r k] "" #{
+}
+0Es avl/default-cmp
+0D
+25v avl/typecheck v [r k] v "" v #{
 10s r
 08i 1 v avl/root
 08i 1 v avl/empty?
@@ -879,7 +964,10 @@
 0D
 05v #f
 01
-}]] [def avl/tree [fn* avl/tree [cmp] "" #{
+}
+0Es avl/typecheck
+0D
+25v avl/tree v [cmp] v "" v #{
 10s avl/empty
 10s cmp
 0C
@@ -892,7 +980,10 @@
 05v #f
 08i 2 v array/new
 01
-}]] [def avl/height [fn* avl/height [n] "" #{
+}
+0Es avl/tree
+0D
+25v avl/height v [n] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 8
@@ -902,32 +993,50 @@
 02i 0
 08i 2 v array/ref
 01
-}]] [def avl/key [fn* avl/key [n] "" #{
+}
+0Es avl/height
+0D
+25v avl/key v [n] v "" v #{
 10s n
 02i 1
 08i 2 v array/ref
 01
-}]] [def avl/left [fn* avl/left [n] "" #{
+}
+0Es avl/key
+0D
+25v avl/left v [n] v "" v #{
 10s n
 02i 2
 08i 2 v array/ref
 01
-}]] [def avl/right [fn* avl/right [n] "" #{
+}
+0Es avl/left
+0D
+25v avl/right v [n] v "" v #{
 10s n
 02i 3
 08i 2 v array/ref
 01
-}]] [def avl/root [fn* avl/root [r] "" #{
+}
+0Es avl/right
+0D
+25v avl/root v [r] v "" v #{
 10s r
 02i 0
 08i 2 v array/ref
 01
-}]] [def avl/cmp [fn* avl/cmp [r] "" #{
+}
+0Es avl/root
+0D
+25v avl/cmp v [r] v "" v #{
 10s r
 02i 1
 08i 2 v array/ref
 01
-}]] [def avl/min-node [fn* avl/min-node [n] "" #{
+}
+0Es avl/cmp
+0D
+25v avl/min-node v [n] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -948,35 +1057,50 @@
 1Ai 1
 16
 01
-}]] [def avl/update-left [fn* avl/update-left [n l] "" #{
+}
+0Es avl/min-node
+0D
+25v avl/update-left v [n l] v "" v #{
 10s n
 08i 1 v array/dup
 02i 2
 10s l
 08i 3 v array/set!
 01
-}]] [def avl/update-right [fn* avl/update-right [n r] "" #{
+}
+0Es avl/update-left
+0D
+25v avl/update-right v [n r] v "" v #{
 10s n
 08i 1 v array/dup
 02i 3
 10s r
 08i 3 v array/set!
 01
-}]] [def avl/update-key [fn* avl/update-key [n k] "" #{
+}
+0Es avl/update-right
+0D
+25v avl/update-key v [n k] v "" v #{
 10s n
 08i 1 v array/dup
 02i 1
 10s k
 08i 3 v array/set!
 01
-}]] [def avl/update-root [fn* avl/update-root [t r] "" #{
+}
+0Es avl/update-key
+0D
+25v avl/update-root v [t r] v "" v #{
 10s t
 08i 1 v array/dup
 02i 0
 10s r
 08i 3 v array/set!
 01
-}]] [def avl/update-height [fn* avl/update-height [n] "" #{
+}
+0Es avl/update-root
+0D
+25v avl/update-height v [n] v "" v #{
 10s n
 08i 1 v array/dup
 02i 0
@@ -991,7 +1115,10 @@
 08i 2 v +
 08i 3 v array/set!
 01
-}]] [def avl/rotate-right [fn* avl/rotate-right [y] "" #{
+}
+0Es avl/update-height
+0D
+25v avl/rotate-right v [y] v "" v #{
 15
 10s y
 08i 1 v avl/left
@@ -1007,7 +1134,10 @@
 08i 1 v avl/update-height
 16
 01
-}]] [def avl/rotate-left [fn* avl/rotate-left [x] "" #{
+}
+0Es avl/rotate-right
+0D
+25v avl/rotate-left v [x] v "" v #{
 15
 10s x
 08i 1 v avl/right
@@ -1023,7 +1153,10 @@
 08i 1 v avl/update-height
 16
 01
-}]] [def avl/balance [fn* avl/balance [n] "" #{
+}
+0Es avl/rotate-left
+0D
+25v avl/balance v [n] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 8
@@ -1037,7 +1170,10 @@
 08i 1 v avl/height
 08i 2 v -
 01
-}]] [def avl/insert-rebalance [fn* avl/insert-rebalance [n cmp v] "" #{
+}
+0Es avl/balance
+0D
+25v avl/insert-rebalance v [n cmp v] v "" v #{
 15
 10s n
 08i 1 v avl/balance
@@ -1130,7 +1266,10 @@
 24
 16
 01
-}]] [def avl/node-insert [fn* avl/node-insert [n cmp v] "" #{
+}
+0Es avl/insert-rebalance
+0D
+25v avl/node-insert v [n cmp v] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 25
@@ -1191,7 +1330,10 @@
 24
 16
 01
-}]] [def avl/insert [fn* avl/insert [t v] "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" #{
+}
+0Es avl/node-insert
+0D
+25v avl/insert v [t v] v "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" v #{
 10s t
 10s v
 08i 2 v avl/typecheck
@@ -1205,7 +1347,10 @@
 08i 3 v avl/node-insert
 08i 2 v avl/update-root
 01
-}]] [def avl/node-get [fn* avl/node-get [n cmp v] "" #{
+}
+0Es avl/insert
+0D
+25v avl/node-get v [n cmp v] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 7
@@ -1249,7 +1394,10 @@
 24
 16
 01
-}]] [def avl/get [fn* avl/get [t v] "Retrieve the key V from tree T, or #nil if V is not in it" #{
+}
+0Es avl/node-get
+0D
+25v avl/get v [t v] v "Retrieve the key V from tree T, or #nil if V is not in it" v #{
 10s t
 08i 1 v avl/root
 08i 1 v avl/empty?
@@ -1277,14 +1425,20 @@
 10s v
 08i 3 v avl/node-get
 01
-}]] [def avl/from-list [fn* avl/from-list [l cmp] "Create a new avl tree using the keys in L and the comparison function CMP" #{
+}
+0Es avl/get
+0D
+25v avl/from-list v [l cmp] v "Create a new avl tree using the keys in L and the comparison function CMP" v #{
 10s l
 10s avl/insert
 10s cmp
 08i 1 v avl/tree
 08i 3 v list/reduce
 01
-}]] [def avl/remove-rebalance [fn* avl/remove-rebalance [n] "" #{
+}
+0Es avl/from-list
+0D
+25v avl/remove-rebalance v [n] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -1346,7 +1500,10 @@
 24
 16
 01
-}]] [def avl/node-remove [fn* avl/node-remove [n cmp v] "" #{
+}
+0Es avl/remove-rebalance
+0D
+25v avl/node-remove v [n cmp v] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -1438,7 +1595,10 @@
 08i 1 v avl/remove-rebalance
 16
 01
-}]] [def avl/remove [fn* avl/remove [t v] "Remove the key V from tree T if it is contained within it" #{
+}
+0Es avl/node-remove
+0D
+25v avl/remove v [t v] v "Remove the key V from tree T if it is contained within it" v #{
 10s t
 10s t
 08i 1 v avl/root
@@ -1448,7 +1608,10 @@
 08i 3 v avl/node-remove
 08i 2 v avl/update-root
 01
-}]] [def avl/equal-node? [fn* avl/equal-node? [a b] "" #{
+}
+0Es avl/remove
+0D
+25v avl/equal-node? v [a b] v "" v #{
 10s a
 08i 1 v avl/empty?
 0Bo 15
@@ -1477,14 +1640,20 @@
 08i 1 v avl/right
 08i 2 v avl/equal-node?
 01
-}]] [def avl/equal? [fn* avl/equal? [a b] "Test if two avl trees are equal" #{
+}
+0Es avl/equal-node?
+0D
+25v avl/equal? v [a b] v "Test if two avl trees are equal" v #{
 10s a
 08i 1 v avl/root
 10s b
 08i 1 v avl/root
 08i 2 v avl/equal-node?
 01
-}]] [def avl/reduce-node [fn* avl/reduce-node [node o s] "" #{
+}
+0Es avl/equal?
+0D
+25v avl/reduce-node v [node o s] v "" v #{
 10s node
 08i 1 v avl/empty?
 0Bo 10
@@ -1504,14 +1673,20 @@
 08i 3 v avl/reduce-node
 1Ai 2
 01
-}]] [def avl/reduce [fn* avl/reduce [t o s] "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" #{
+}
+0Es avl/reduce-node
+0D
+25v avl/reduce v [t o s] v "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" v #{
 10s t
 08i 1 v avl/root
 10s o
 10s s
 08i 3 v avl/reduce-node
 01
-}]] [def avl/reduce-node-bin [fn* avl/reduce-node-bin [n o s] "" #{
+}
+0Es avl/reduce
+0D
+25v avl/reduce-node-bin v [n o s] v "" v #{
 10s n
 08i 1 v avl/empty?
 0Bo 10
@@ -1532,14 +1707,20 @@
 08i 3 v avl/reduce-node-bin
 1Ai 3
 01
-}]] [def avl/reduce-bin [fn* avl/reduce-bin [t o s] "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" #{
+}
+0Es avl/reduce-node-bin
+0D
+25v avl/reduce-bin v [t o s] v "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" v #{
 10s t
 08i 1 v avl/root
 10s o
 10s s
 08i 3 v avl/reduce-node-bin
 01
-}]] [def avl/map [fn* avl/map [t f] "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" #{
+}
+0Es avl/reduce-bin
+0D
+25v avl/map v [t f] v "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" v #{
 10s t
 25v anonymous v [x acc] v "" v #{
 10s acc
@@ -1554,7 +1735,10 @@
 08i 1 v avl/tree
 08i 3 v avl/reduce
 01
-}]] [def avl/map-to [fn* avl/map-to [t f cmp] "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" #{
+}
+0Es avl/map
+0D
+25v avl/map-to v [t f cmp] v "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" v #{
 10s t
 25v anonymous v [x acc] v "" v #{
 10s acc
@@ -1568,19 +1752,29 @@
 08i 1 v avl/tree
 08i 3 v avl/reduce
 01
-}]] [def avl/to-list [fn* avl/to-list [t] "" #{
+}
+0Es avl/map-to
+0D
+25v avl/to-list v [t] v "" v #{
 10s t
 10s cons
 24
 08i 3 v avl/reduce
 01
-}]]][do [def sum [fn* sum [c] "Return the sum of every value in collection C" #{
+}
+0Es avl/to-list
+01
+}#{
+25v sum v [c] v "Return the sum of every value in collection C" v #{
 10s c
 10s +
 02i 0
 08i 3 v reduce
 01
-}]] [def join [fn* join [l glue] "Join every element of α together into a string with GLUE inbetween" #{
+}
+0Es sum
+0D
+25v join v [l glue] v "Join every element of α together into a string with GLUE inbetween" v #{
 10s glue
 0Bo 7
 24
@@ -1607,7 +1801,10 @@
 09o 7
 05v ""
 01
-}]] [def for-each [fn* for-each [l f] "Runs F over every item in collection L" #{
+}
+0Es join
+0D
+25v for-each v [l f] v "Runs F over every item in collection L" v #{
 10s l
 25v anonymous v [a b] v "" v #{
 10s f
@@ -1618,7 +1815,10 @@
 24
 08i 3 v reduce
 01
-}]] [def count [fn* count [l p] "Count the number of items in L where P is true" #{
+}
+0Es for-each
+0D
+25v count v [l p] v "Count the number of items in L where P is true" v #{
 10s p
 0Bo 30
 10s l
@@ -1647,7 +1847,10 @@
 02i 0
 08i 3 v reduce
 01
-}]] [def min [fn* min l "Returns the minimum value of its arguments, or collection" #{
+}
+0Es count
+0D
+25v min v l v "Returns the minimum value of its arguments, or collection" v #{
 10s l
 08i 1 v cdr
 0Bo 10
@@ -1667,7 +1870,10 @@
 }
 08i 2 v reduce
 01
-}]] [def max [fn* max l "Returns the minimum value of its arguments, or collection" #{
+}
+0Es min
+0D
+25v max v l v "Returns the minimum value of its arguments, or collection" v #{
 10s l
 08i 1 v cdr
 0Bo 10
@@ -1687,7 +1893,10 @@
 }
 08i 2 v reduce
 01
-}]] [def delete [fn* delete [l e] "Returns a filtered list l with all elements equal to e omitted" #{
+}
+0Es max
+0D
+25v delete v [l e] v "Returns a filtered list l with all elements equal to e omitted" v #{
 10s l
 25v anonymous v [a] v "" v #{
 10s a
@@ -1698,7 +1907,10 @@
 }
 08i 2 v filter
 01
-}]] [def remove [fn* remove [l p] "Returns a filtered list l with all elements where P equal true removed" #{
+}
+0Es delete
+0D
+25v remove v [l p] v "Returns a filtered list l with all elements where P equal true removed" v #{
 10s l
 25v anonymous v [a] v "" v #{
 10s p
@@ -1709,7 +1921,10 @@
 }
 08i 2 v filter
 01
-}]] [def flatten/λ [fn* flatten/λ [a b] "" #{
+}
+0Es remove
+0D
+25v flatten/λ v [a b] v "" v #{
 10s b
 08i 1 v collection?
 0Bo 29
@@ -1728,7 +1943,10 @@
 09o 4
 24
 01
-}]] [def flatten [fn* flatten [l] "Flatten a collection of collections into a simple list" #{
+}
+0Es flatten/λ
+0D
+25v flatten v [l] v "Flatten a collection of collections into a simple list" v #{
 10s l
 08i 1 v collection?
 0Bo 25
@@ -1740,7 +1958,11 @@
 09o 7
 10s l
 01
-}]]][do [def ref [fn* ref [l i] "Return whatver is at position I in L" #{
+}
+0Es flatten
+01
+}#{
+25v ref v [l i] v "Return whatver is at position I in L" v #{
 15
 10s l
 08i 1 v type-of
@@ -1792,7 +2014,10 @@
 08i 1 v throw
 16
 01
-}]] [def filter [fn* filter [l p] "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" #{
+}
+0Es ref
+0D
+25v filter v [l p] v "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" v #{
 15
 10s l
 08i 1 v type-of
@@ -1836,7 +2061,10 @@
 08i 1 v throw
 16
 01
-}]] [def reduce [fn* reduce [l f α] "Combine all elements in collection l using operation F and starting value α" #{
+}
+0Es filter
+0D
+25v reduce v [l f α] v "Combine all elements in collection l using operation F and starting value α" v #{
 15
 10s l
 08i 1 v type-of
@@ -1881,7 +2109,10 @@
 1Ai 2
 16
 01
-}]] [def length [fn* length [α] "Returns the length of collection α" #{
+}
+0Es reduce
+0D
+25v length v [α] v "Returns the length of collection α" v #{
 15
 10s α
 08i 1 v type-of
@@ -1929,7 +2160,10 @@
 08i 1 v throw
 16
 01
-}]] [def map [fn* map [l f] "Runs f over every item in collection l and returns the resulting list" #{
+}
+0Es length
+0D
+25v map v [l f] v "Runs f over every item in collection l and returns the resulting list" v #{
 15
 10s l
 08i 1 v type-of
@@ -1965,7 +2199,10 @@
 08i 1 v throw
 16
 01
-}]] [def sort [fn* sort [l] "Sorts the collection L" #{
+}
+0Es map
+0D
+25v sort v [l] v "Sorts the collection L" v #{
 15
 10s l
 08i 1 v type-of
@@ -1999,7 +2236,10 @@
 08i 1 v throw
 16
 01
-}]] [def member [fn* member [l m] "Returns the first pair/item of collection l whose car is equal to m" #{
+}
+0Es sort
+0D
+25v member v [l m] v "Returns the first pair/item of collection l whose car is equal to m" v #{
 15
 10s l
 08i 1 v type-of
@@ -2021,7 +2261,10 @@
 08i 1 v throw
 16
 01
-}]] [def cut [fn* cut [l start end] "Return a subcollection of L from START to END" #{
+}
+0Es member
+0D
+25v cut v [l start end] v "Return a subcollection of L from START to END" v #{
 15
 10s l
 08i 1 v type-of
@@ -2062,7 +2305,10 @@
 08i 1 v throw
 16
 01
-}]] [def collection? [fn* collection? [l] "" #{
+}
+0Es cut
+0D
+25v collection? v [l] v "" v #{
 15
 10s l
 08i 1 v type-of
@@ -2093,7 +2339,11 @@
 05v #f
 16
 01
-}]]][do [def array->list [fn* array->list [arr] "" #{
+}
+0Es collection?
+01
+}#{
+25v array->list v [arr] v "" v #{
 10s arr
 08i 1 v array/length
 02i 1
@@ -2127,7 +2377,10 @@
 10s ret
 01
 01
-}]] [def except-last-pair/iter [fn* except-last-pair/iter [list rest] "Iterator for except-last-pair" #{
+}
+0Es array->list
+0D
+25v except-last-pair/iter v [list rest] v "Iterator for except-last-pair" v #{
 10s list
 08i 1 v cdr
 08i 1 v nil?
@@ -2143,12 +2396,18 @@
 08i 2 v cons
 08i 2 v except-last-pair/iter
 01
-}]] [def except-last-pair [fn* except-last-pair [list] "Return a copy of LIST without the last pair" #{
+}
+0Es except-last-pair/iter
+0D
+25v except-last-pair v [list] v "Return a copy of LIST without the last pair" v #{
 10s list
 24
 08i 2 v except-last-pair/iter
 01
-}]] [def last-pair [fn* last-pair [list] "Return the last pair of LIST" #{
+}
+0Es except-last-pair
+0D
+25v last-pair v [list] v "Return the last pair of LIST" v #{
 02i 0
 1B
 1C
@@ -2163,7 +2422,10 @@
 0D
 10s list
 01
-}]] [def make-list [fn* make-list [number value] "Return a list of NUMBER elements containing VALUE in every car" #{
+}
+0Es last-pair
+0D
+25v make-list v [number value] v "Return a list of NUMBER elements containing VALUE in every car" v #{
 24
 0Es list
 0D
@@ -2186,7 +2448,10 @@
 0D
 10s list
 01
-}]] [def range [fn* range [end start step] "Return a list containing values from START (inclusive) to END (exclusive) by STEP" #{
+}
+0Es make-list
+0D
+25v range v [end start step] v "Return a list containing values from START (inclusive) to END (exclusive) by STEP" v #{
 10s end
 0Bo 7
 24
@@ -2244,7 +2509,10 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def list/reduce [fn* list/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
+}
+0Es range
+0D
+25v list/reduce v [l o s] v "Combine all elements in l using operation o and starting value s" v #{
 15
 10s l
 0Es ΓεnΣym-58
@@ -2277,7 +2545,10 @@
 0D
 10s s
 01
-}]] [def list/ref [fn* list/ref [l i] "Returns the the element of list l at location i" #{
+}
+0Es list/reduce
+0D
+25v list/ref v [l i] v "Returns the the element of list l at location i" v #{
 02i 0
 1B
 1C
@@ -2303,7 +2574,10 @@
 10s l
 08i 1 v car
 01
-}]] [def reverse [fn* reverse [l] "Return the list l in reverse order" #{
+}
+0Es list/ref
+0D
+25v reverse v [l] v "Return the list l in reverse order" v #{
 24
 0Es ret
 0D
@@ -2338,7 +2612,10 @@
 0D
 10s ret
 01
-}]] [def list/length [fn* list/length [l] "Returns the length of list l" #{
+}
+0Es reverse
+0D
+25v list/length v [l] v "Returns the length of list l" v #{
 02i 0
 0Es ret
 0D
@@ -2373,7 +2650,10 @@
 0D
 10s ret
 01
-}]] [def list/filter [fn* list/filter [l p] "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" #{
+}
+0Es list/length
+0D
+25v list/filter v [l p] v "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" v #{
 24
 0Es ret
 0D
@@ -2415,7 +2695,10 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def list/map [fn* list/map [l f] "Runs f over every item in list l and returns the resulting list" #{
+}
+0Es list/filter
+0D
+25v list/map v [l f] v "Runs f over every item in list l and returns the resulting list" v #{
 24
 0Es ret
 0D
@@ -2453,7 +2736,10 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def append [fn* append [a b] "Appends two lists A and B together" #{
+}
+0Es list/map
+0D
+25v append v [a b] v "Appends two lists A and B together" v #{
 10s b
 0Es ret
 0D
@@ -2492,7 +2778,10 @@
 0D
 10s ret
 01
-}]] [def sublist [fn* sublist [l start end ret] "Returns a new list containing all elements of l from start to end" #{
+}
+0Es append
+0D
+25v sublist v [l start end ret] v "Returns a new list containing all elements of l from start to end" v #{
 10s l
 08i 1 v nil?
 0Bo 15
@@ -2549,20 +2838,29 @@
 09o 4
 24
 01
-}]] [def list-head [fn* list-head [l k] "Returns the first k elements of list l" #{
+}
+0Es sublist
+0D
+25v list-head v [l k] v "Returns the first k elements of list l" v #{
 10s l
 02i 0
 10s k
 08i 3 v sublist
 01
-}]] [def list-tail [fn* list-tail [l k] "Returns the sublist of l obtained by omitting the first l elements" #{
+}
+0Es list-head
+0D
+25v list-tail v [l k] v "Returns the sublist of l obtained by omitting the first l elements" v #{
 10s l
 10s k
 10s l
 08i 1 v length
 08i 3 v sublist
 01
-}]] [def list/member [fn* list/member [l m] "Returns the first pair of list l whose car is equal to m" #{
+}
+0Es list-tail
+0D
+25v list/member v [l m] v "Returns the first pair of list l whose car is equal to m" v #{
 10s l
 08i 1 v nil?
 0Bo 10
@@ -2584,7 +2882,10 @@
 09o 4
 24
 01
-}]] [def getf [fn* getf [l key] "Return the value in LIST following KEY" #{
+}
+0Es list/member
+0D
+25v getf v [l key] v "Return the value in LIST following KEY" v #{
 10s l
 08i 1 v nil?
 0Bo 7
@@ -2607,7 +2908,10 @@
 09o 4
 24
 01
-}]] [def list/sort/bubble [fn* list/sort/bubble [l] "Terribly slow way to sort a list, though it was simple to write" #{
+}
+0Es getf
+0D
+25v list/sort/bubble v [l] v "Terribly slow way to sort a list, though it was simple to write" v #{
 10s l
 0Bo 161
 10s l
@@ -2659,7 +2963,10 @@
 09o 4
 24
 01
-}]] [def list/merge-sorted-lists [fn* list/merge-sorted-lists [l1 l2] "" #{
+}
+0Es list/sort/bubble
+0D
+25v list/merge-sorted-lists v [l1 l2] v "" v #{
 10s l1
 08i 1 v nil?
 0Bo 10
@@ -2696,7 +3003,10 @@
 09o 4
 24
 01
-}]] [def list/split-half-rec [fn* list/split-half-rec [l acc1 acc2] "" #{
+}
+0Es list/merge-sorted-lists
+0D
+25v list/split-half-rec v [l acc1 acc2] v "" v #{
 10s l
 08i 1 v nil?
 0Bo 19
@@ -2731,13 +3041,19 @@
 09o 4
 24
 01
-}]] [def list/split-half [fn* list/split-half [l] "" #{
+}
+0Es list/split-half-rec
+0D
+25v list/split-half v [l] v "" v #{
 10s l
 24
 24
 08i 3 v list/split-half-rec
 01
-}]] [def list/sort/merge [fn* list/sort/merge [l] "Sorts a list" #{
+}
+0Es list/split-half
+0D
+25v list/sort/merge v [l] v "Sorts a list" v #{
 10s l
 08i 1 v cdr
 08i 1 v nil?
@@ -2756,7 +3072,13 @@
 08i 1 v list/sort/merge
 08i 2 v list/merge-sorted-lists
 01
-}]] [def list/sort list/sort/merge] [def list/equal? [fn* list/equal? [a b] "#t if A and B are equal" #{
+}
+0Es list/sort/merge
+0D
+10s list/sort/merge
+0Es list/sort
+0D
+25v list/equal? v [a b] v "#t if A and B are equal" v #{
 10s a
 08i 1 v pair?
 0Bo 57
@@ -2778,7 +3100,10 @@
 10s b
 08i 2 v equal?
 01
-}]] [def list/take [fn* list/take [l count] "Take the first COUNT elements from list L" #{
+}
+0Es list/equal?
+0D
+25v list/take v [l count] v "Take the first COUNT elements from list L" v #{
 10s count
 02i 0
 1F
@@ -2795,7 +3120,10 @@
 08i 2 v list/take
 08i 2 v cons
 01
-}]] [def list/drop [fn* list/drop [l count] "Drop the final COUNT elements from list L" #{
+}
+0Es list/take
+0D
+25v list/drop v [l count] v "Drop the final COUNT elements from list L" v #{
 10s count
 02i 0
 1F
@@ -2809,7 +3137,10 @@
 08i 2 v -
 08i 2 v list/drop
 01
-}]] [def list/cut [fn* list/cut [l start end] "Return a subsequence of L from START to END" #{
+}
+0Es list/drop
+0D
+25v list/cut v [l start end] v "Return a subsequence of L from START to END" v #{
 10s l
 02i 0
 10s start
@@ -2822,7 +3153,11 @@
 08i 2 v -
 08i 2 v list/take
 01
-}]]][do [def tree/zip [fn* tree/zip [keys values] "Return a tree where KEYS point to VALUES" #{
+}
+0Es list/cut
+01
+}#{
+25v tree/zip v [keys values] v "Return a tree where KEYS point to VALUES" v #{
 24
 08i 1 v tree/new
 0Es ret
@@ -2863,7 +3198,10 @@
 0D
 10s ret
 01
-}]] [def tree/+= [fn* tree/+= [t k v] "Increment value at K in T by V" #{
+}
+0Es tree/zip
+0D
+25v tree/+= v [t k v] v "Increment value at K in T by V" v #{
 10s t
 10s k
 10s v
@@ -2882,7 +3220,10 @@
 08i 2 v +
 08i 3 v tree/set!
 01
-}]] [def tree/-= [macro* tree/-= [t k v] "Decrement value at K in T by V" #{
+}
+0Es tree/+=
+0D
+26v tree/-= v [t k v] v "Decrement value at K in T by V" v #{
 23s tree/+=
 10s t
 10s k
@@ -2897,7 +3238,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def tree/++ [macro* tree/++ [t k] "Increment value at K in T by 1" #{
+}
+0Es tree/-=
+0D
+26v tree/++ v [t k] v "Increment value at K in T by 1" v #{
 23s tree/+=
 10s t
 10s k
@@ -2908,7 +3252,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def tree/-- [macro* tree/-- [t k] "Increment value at K in T by 1" #{
+}
+0Es tree/++
+0D
+26v tree/-- v [t k] v "Increment value at K in T by 1" v #{
 23s tree/-=
 10s t
 10s k
@@ -2919,7 +3266,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def tree/equal? [fn* tree/equal? [a b] "Compares two trees for equality" #{
+}
+0Es tree/--
+0D
+25v tree/equal? v [a b] v "Compares two trees for equality" v #{
 10s a
 08i 1 v tree?
 0C
@@ -2962,14 +3312,20 @@
 10s b
 08i 2 v equal?
 01
-}]] [def tree/reduce [fn* tree/reduce [l o s] "Combine all elements in l using operation o and starting value s" #{
+}
+0Es tree/equal?
+0D
+25v tree/reduce v [l o s] v "Combine all elements in l using operation o and starting value s" v #{
 10s l
 08i 1 v tree/values
 10s o
 10s s
 08i 3 v list/reduce
 01
-}]] [def tree/filter [fn* tree/filter [l f] "Return a new tree with all elements from L where F retunrs true" #{
+}
+0Es tree/reduce
+0D
+25v tree/filter v [l f] v "Return a new tree with all elements from L where F retunrs true" v #{
 24
 08i 1 v tree/new
 0Es ret
@@ -3017,7 +3373,11 @@
 0D
 10s ret
 01
-}]]][do [def val->bytecode-op [fn* val->bytecode-op [v] "" #{
+}
+0Es tree/filter
+01
+}#{
+25v val->bytecode-op v [v] v "" v #{
 10s v
 08i 1 v val->index
 0Es i
@@ -3040,7 +3400,10 @@
 08i 1 v int->bytecode-op
 08i 3 v list
 01
-}]] [def sym->bytecode-op [fn* sym->bytecode-op [v] "" #{
+}
+0Es val->bytecode-op
+0D
+25v sym->bytecode-op v [v] v "" v #{
 10s v
 08i 1 v sym->index
 0Es i
@@ -3063,7 +3426,10 @@
 08i 1 v int->bytecode-op
 08i 3 v list
 01
-}]] [def int-fit-in-byte? [fn* int-fit-in-byte? [a] "" #{
+}
+0Es sym->bytecode-op
+0D
+25v int-fit-in-byte? v [a] v "" v #{
 10s a
 02i 127
 1F
@@ -3074,13 +3440,22 @@
 02i -128
 21
 01
-}]] [def $nop [fn* $nop [] "- | Do nothing" #{
+}
+0Es int-fit-in-byte?
+0D
+25v $nop v [] v "- | Do nothing" v #{
 05v [#$0]
 01
-}]] [def $ret [fn* $ret [] "a - | Return top of value stack" #{
+}
+0Es $nop
+0D
+25v $ret v [] v "a - | Return top of value stack" v #{
 05v [#$1]
 01
-}]] [def $push/int/byte [fn* $push/int/byte [a] "- a | Return top of value stack" #{
+}
+0Es $ret
+0D
+25v $push/int/byte v [a] v "- a | Return top of value stack" v #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 7
@@ -3098,7 +3473,10 @@
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $push/int [fn* $push/int [a] "- a | Return top of value stack" #{
+}
+0Es $push/int/byte
+0D
+25v $push/int v [a] v "- a | Return top of value stack" v #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 15
@@ -3108,13 +3486,22 @@
 10s a
 08i 1 v $push/lval
 01
-}]] [def $add/int [fn* $add/int [] "a b - c | Adds the two topmost values and pushes the result" #{
+}
+0Es $push/int
+0D
+25v $add/int v [] v "a b - c | Adds the two topmost values and pushes the result" v #{
 05v [#$3]
 01
-}]] [def $debug/print-stack [fn* $debug/print-stack [] "- | Print out the stack for the current closure" #{
+}
+0Es $add/int
+0D
+25v $debug/print-stack v [] v "- | Print out the stack for the current closure" v #{
 05v [#$4]
 01
-}]] [def $push/lval [fn* $push/lval [v] "- v | Pushes v onto the stack" #{
+}
+0Es $debug/print-stack
+0D
+25v $push/lval v [v] v "- v | Pushes v onto the stack" v #{
 10s v
 08i 1 v nil?
 0Bo 33
@@ -3132,13 +3519,19 @@
 08i 1 v val->bytecode-op
 08i 2 v list
 01
-}]] [def $push/symbol [fn* $push/symbol [v] "- v | Pushes v onto the stack" #{
+}
+0Es $push/lval
+0D
+25v $push/symbol v [v] v "- v | Pushes v onto the stack" v #{
 05v #$23
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $apply [fn* $apply [arg-count fun] "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" #{
+}
+0Es $push/symbol
+0D
+25v $apply v [arg-count fun] v "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" v #{
 15
 10s arg-count
 0Es ΓεnΣym-73
@@ -3209,13 +3602,19 @@
 08i 3 v list
 16
 01
-}]] [def $apply/dynamic [fn* $apply/dynamic [arg-count fun] "" #{
+}
+0Es $apply
+0D
+25v $apply/dynamic v [arg-count fun] v "" v #{
 05v #$1A
 10s arg-count
 08i 1 v int->bytecode-op
 08i 2 v list
 01
-}]] [def $try [fn* $try [target] " - | Try something, jumping to target if an exception occurs" #{
+}
+0Es $apply/dynamic
+0D
+25v $try v [target] v " - | Try something, jumping to target if an exception occurs" v #{
 05v #$18
 05v :relocate
 10s target
@@ -3233,7 +3632,10 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $jmp [fn* $jmp [target] "" #{
+}
+0Es $try
+0D
+25v $jmp v [target] v "" v #{
 05v #$9
 05v :relocate
 10s target
@@ -3251,7 +3653,10 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $jt [fn* $jt [target] "" #{
+}
+0Es $jmp
+0D
+25v $jt v [target] v "" v #{
 05v #$A
 05v :relocate
 10s target
@@ -3269,7 +3674,10 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $jf [fn* $jf [target] "" #{
+}
+0Es $jt
+0D
+25v $jf v [target] v "" v #{
 05v #$B
 05v :relocate
 10s target
@@ -3287,31 +3695,49 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def $dup [fn* $dup [] "" #{
+}
+0Es $jf
+0D
+25v $dup v [] v "" v #{
 05v [#$C]
 01
-}]] [def $drop [fn* $drop [] "" #{
+}
+0Es $dup
+0D
+25v $drop v [] v "" v #{
 05v [#$D]
 01
-}]] [def $def [fn* $def [v] "" #{
+}
+0Es $drop
+0D
+25v $def v [v] v "" v #{
 05v #$E
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $set [fn* $set [v] "" #{
+}
+0Es $def
+0D
+25v $set v [v] v "" v #{
 05v #$F
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $get [fn* $get [v] "" #{
+}
+0Es $set
+0D
+25v $get v [v] v "" v #{
 05v #$10
 10s v
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
-}]] [def $fn [fn* $fn [name args docs body] "" #{
+}
+0Es $get
+0D
+25v $fn v [name args docs body] v "" v #{
 05v #$25
 10s name
 08i 1 v val->bytecode-op
@@ -3323,7 +3749,10 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $macro* [fn* $macro* [name args docs body] "" #{
+}
+0Es $fn
+0D
+25v $macro* v [name args docs body] v "" v #{
 05v #$26
 10s name
 08i 1 v val->bytecode-op
@@ -3335,43 +3764,82 @@
 08i 1 v val->bytecode-op
 08i 5 v list
 01
-}]] [def $closure/push [fn* $closure/push [] "" #{
+}
+0Es $macro*
+0D
+25v $closure/push v [] v "" v #{
 05v [#$13]
 01
-}]] [def $let [fn* $let [] "" #{
+}
+0Es $closure/push
+0D
+25v $let v [] v "" v #{
 05v [#$15]
 01
-}]] [def $closure/pop [fn* $closure/pop [] "" #{
+}
+0Es $let
+0D
+25v $closure/pop v [] v "" v #{
 05v [#$16]
 01
-}]] [def $roots/save [fn* $roots/save [] "" #{
+}
+0Es $closure/pop
+0D
+25v $roots/save v [] v "" v #{
 05v [#$1B]
 01
-}]] [def $roots/restore [fn* $roots/restore [] "" #{
+}
+0Es $roots/save
+0D
+25v $roots/restore v [] v "" v #{
 05v [#$1C]
 01
-}]] [def $< [fn* $< [] "" #{
+}
+0Es $roots/restore
+0D
+25v $< v [] v "" v #{
 05v [#$1E]
 01
-}]] [def $<= [fn* $<= [] "" #{
+}
+0Es $<
+0D
+25v $<= v [] v "" v #{
 05v [#$1F]
 01
-}]] [def $== [fn* $== [] "" #{
+}
+0Es $<=
+0D
+25v $== v [] v "" v #{
 05v [#$20]
 01
-}]] [def $>= [fn* $>= [] "" #{
+}
+0Es $==
+0D
+25v $>= v [] v "" v #{
 05v [#$21]
 01
-}]] [def $> [fn* $> [] "" #{
+}
+0Es $>=
+0D
+25v $> v [] v "" v #{
 05v [#$22]
 01
-}]] [def $push/nil [fn* $push/nil [] "" #{
+}
+0Es $>
+0D
+25v $push/nil v [] v "" v #{
 05v [#$24]
 01
-}]] [def $swap [fn* $swap [] "" #{
+}
+0Es $push/nil
+0D
+25v $swap v [] v "" v #{
 05v [#$27]
 01
-}]] [def assemble/build-sym-map [fn* assemble/build-sym-map [code sym-map pos] "" #{
+}
+0Es $swap
+0D
+25v assemble/build-sym-map v [code sym-map pos] v "" v #{
 02i 0
 1B
 1C
@@ -3444,7 +3912,10 @@
 0D
 10s pos
 01
-}]] [def assemble/relocate-op [fn* assemble/relocate-op [code sym-map pos out] "" #{
+}
+0Es assemble/build-sym-map
+0D
+25v assemble/relocate-op v [code sym-map pos out] v "" v #{
 10s sym-map
 10s code
 08i 1 v cadr
@@ -3475,7 +3946,10 @@
 0D
 10s pos
 01
-}]] [def assemble/emit-relocated-ops [fn* assemble/emit-relocated-ops [code sym-map pos out] "" #{
+}
+0Es assemble/relocate-op
+0D
+25v assemble/emit-relocated-ops v [code sym-map pos out] v "" v #{
 10s code
 08i 1 v car
 05v :relocate
@@ -3545,7 +4019,13 @@
 0D
 10s pos
 01
-}]] [def assemble/verbose #f] [def assemble* [fn* assemble* [code] "Assemble all arguments into a single :bytecode-array" #{
+}
+0Es assemble/emit-relocated-ops
+0D
+05v #f
+0Es assemble/verbose
+0D
+25v assemble* v [code] v "Assemble all arguments into a single :bytecode-array" v #{
 24
 08i 1 v tree/new
 0Es sym-map
@@ -3603,11 +4083,17 @@
 10s out
 08i 1 v arr->bytecode-arr
 01
-}]] [def assemble [fn* assemble l "Assemble all arguments into a single :bytecode-array" #{
+}
+0Es assemble*
+0D
+25v assemble v l v "Assemble all arguments into a single :bytecode-array" v #{
 10s l
 08i 1 v assemble*
 01
-}]] [def asmrun [macro* asmrun ops "Assemble and evaluate all bytecode arguments" #{
+}
+0Es assemble
+0D
+26v asmrun v ops v "Assemble and evaluate all bytecode arguments" v #{
 23s bytecode-eval
 23s assemble
 10s ops
@@ -3618,7 +4104,14 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]]][do [def bytecompile/gen-label/counter 0] [def bytecompile/gen-label [fn* bytecompile/gen-label [prefix] "" #{
+}
+0Es asmrun
+01
+}#{
+02i 0
+0Es bytecompile/gen-label/counter
+0D
+25v bytecompile/gen-label v [prefix] v "" v #{
 02i 1
 10s bytecompile/gen-label/counter
 08i 2 v +
@@ -3630,7 +4123,10 @@
 08i 3 v cat
 08i 1 v str->sym
 01
-}]] [def bytecompile/literal [fn* bytecompile/literal [source] "" #{
+}
+0Es bytecompile/gen-label
+0D
+25v bytecompile/literal v [source] v "" v #{
 15
 10s source
 08i 1 v type-of
@@ -3676,7 +4172,10 @@
 08i 1 v $push/lval
 16
 01
-}]] [def bytecompile/quote [fn* bytecompile/quote [source] "" #{
+}
+0Es bytecompile/literal
+0D
+25v bytecompile/quote v [source] v "" v #{
 15
 10s source
 08i 1 v type-of
@@ -3700,7 +4199,10 @@
 08i 1 v $push/lval
 16
 01
-}]] [def bytecompile/do/form [fn* bytecompile/do/form [source env] "" #{
+}
+0Es bytecompile/quote
+0D
+25v bytecompile/do/form v [source env] v "" v #{
 10s source
 0Bo 79
 10s source
@@ -3724,14 +4226,20 @@
 09o 4
 24
 01
-}]] [def bytecompile/do [fn* bytecompile/do [source env] "" #{
+}
+0Es bytecompile/do/form
+0D
+25v bytecompile/do v [source env] v "" v #{
 10s source
 08i 1 v cdr
 10s env
 08i 2 v bytecompile/do/form
 08i 1 v list
 01
-}]] [def bytecompile/procedure [fn* bytecompile/procedure [op source env] "" #{
+}
+0Es bytecompile/do
+0D
+25v bytecompile/procedure v [op source env] v "" v #{
 10s source
 08i 1 v cdr
 10s bytecompile*
@@ -3745,7 +4253,10 @@
 08i 2 v $apply
 08i 2 v list
 01
-}]] [def bytecompile/def [fn* bytecompile/def [source env] "" #{
+}
+0Es bytecompile/procedure
+0D
+25v bytecompile/def v [source env] v "" v #{
 10s source
 08i 1 v cadr
 08i 1 v symbol?
@@ -3779,7 +4290,10 @@
 08i 1 v $def
 08i 2 v list
 01
-}]] [def bytecompile/set! [fn* bytecompile/set! [source env] "" #{
+}
+0Es bytecompile/def
+0D
+25v bytecompile/set! v [source env] v "" v #{
 10s source
 08i 1 v cadr
 08i 1 v symbol?
@@ -3813,7 +4327,10 @@
 08i 1 v $set
 08i 2 v list
 01
-}]] [def bytecompile/if [fn* bytecompile/if [source env] "" #{
+}
+0Es bytecompile/set!
+0D
+25v bytecompile/if v [source env] v "" v #{
 15
 08i 0 v bytecompile/gen-label
 0Es sym-else
@@ -3846,7 +4363,10 @@
 08i 7 v list
 16
 01
-}]] [def bytecompile/while [fn* bytecompile/while [source env] "" #{
+}
+0Es bytecompile/if
+0D
+25v bytecompile/while v [source env] v "" v #{
 08i 0 v bytecompile/gen-label
 0Es sym-start
 0D
@@ -3878,7 +4398,10 @@
 08i 2 v list
 08i 10 v list
 01
-}]] [def bytecompile/procedure/arg [fn* bytecompile/procedure/arg [source env] "" #{
+}
+0Es bytecompile/while
+0D
+25v bytecompile/procedure/arg v [source env] v "" v #{
 10s source
 08i 1 v last?
 0Bo 24
@@ -3897,7 +4420,10 @@
 08i 2 v bytecompile/procedure/arg
 08i 2 v cons
 01
-}]] [def bytecompile/procedure [fn* bytecompile/procedure [op args env] "" #{
+}
+0Es bytecompile/procedure/arg
+0D
+25v bytecompile/procedure v [op args env] v "" v #{
 10s args
 08i 1 v length
 0Es arg-count
@@ -3915,7 +4441,10 @@
 10s op
 08i 2 v $apply
 01
-}]] [def bytecompile/procedure/dynamic [fn* bytecompile/procedure/dynamic [op args env] "" #{
+}
+0Es bytecompile/procedure
+0D
+25v bytecompile/procedure/dynamic v [op args env] v "" v #{
 10s args
 08i 1 v length
 0Es arg-count
@@ -3933,7 +4462,10 @@
 08i 1 v $apply/dynamic
 08i 3 v list
 01
-}]] [def bytecompile/and/rec [fn* bytecompile/and/rec [source env label-end] "" #{
+}
+0Es bytecompile/procedure/dynamic
+0D
+25v bytecompile/and/rec v [source env label-end] v "" v #{
 10s source
 08i 1 v car
 10s env
@@ -3955,7 +4487,10 @@
 24
 08i 2 v list
 01
-}]] [def bytecompile/and [fn* bytecompile/and [source env] "" #{
+}
+0Es bytecompile/and/rec
+0D
+25v bytecompile/and v [source env] v "" v #{
 08i 0 v bytecompile/gen-label
 0Es label-end
 0D
@@ -3969,7 +4504,10 @@
 08i 2 v list
 08i 2 v list
 01
-}]] [def bytecompile/or/rec [fn* bytecompile/or/rec [source env label-end] "" #{
+}
+0Es bytecompile/and
+0D
+25v bytecompile/or/rec v [source env label-end] v "" v #{
 10s source
 0Bo 70
 10s source
@@ -3989,7 +4527,10 @@
 09o 4
 24
 01
-}]] [def bytecompile/or [fn* bytecompile/or [source env] "" #{
+}
+0Es bytecompile/or/rec
+0D
+25v bytecompile/or v [source env] v "" v #{
 08i 0 v bytecompile/gen-label
 0Es label-end
 0D
@@ -4005,37 +4546,55 @@
 08i 2 v list
 08i 3 v list
 01
-}]] [def bytecompile/string [fn* bytecompile/string [source env] "" #{
+}
+0Es bytecompile/or
+0D
+25v bytecompile/string v [source env] v "" v #{
 10s cat
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/array [fn* bytecompile/array [source env] "" #{
+}
+0Es bytecompile/string
+0D
+25v bytecompile/array v [source env] v "" v #{
 10s array/ref
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/tree [fn* bytecompile/tree [source env] "" #{
+}
+0Es bytecompile/array
+0D
+25v bytecompile/tree v [source env] v "" v #{
 10s tree/ref
 10s source
 10s env
 08i 3 v bytecompile/procedure
 01
-}]] [def bytecompile/fn* [fn* bytecompile/fn* [source env] "" #{
+}
+0Es bytecompile/tree
+0D
+25v bytecompile/fn* v [source env] v "" v #{
 10s $fn
 10s source
 08i 1 v cdr
 08i 2 v apply
 01
-}]] [def bytecompile/macro* [fn* bytecompile/macro* [source env] "" #{
+}
+0Es bytecompile/fn*
+0D
+25v bytecompile/macro* v [source env] v "" v #{
 10s $macro*
 10s source
 08i 1 v cdr
 08i 2 v apply
 01
-}]] [def bytecompile/ω* [fn* bytecompile/ω* [source env] "" #{
+}
+0Es bytecompile/macro*
+0D
+25v bytecompile/ω* v [source env] v "" v #{
 08i 0 v $let
 10s source
 08i 1 v cdr
@@ -4046,7 +4605,10 @@
 08i 0 v $closure/pop
 08i 5 v list
 01
-}]] [def bytecompile/let* [fn* bytecompile/let* [source env] "" #{
+}
+0Es bytecompile/ω*
+0D
+25v bytecompile/let* v [source env] v "" v #{
 08i 0 v $let
 10s source
 08i 1 v cadr
@@ -4055,7 +4617,10 @@
 08i 0 v $closure/pop
 08i 3 v list
 01
-}]] [def bytecompile/return [fn* bytecompile/return [source env] "" #{
+}
+0Es bytecompile/let*
+0D
+25v bytecompile/return v [source env] v "" v #{
 10s source
 08i 1 v cadr
 10s env
@@ -4063,7 +4628,10 @@
 08i 0 v $ret
 08i 2 v list
 01
-}]] [def bytecompile/try [fn* bytecompile/try [source env] "" #{
+}
+0Es bytecompile/return
+0D
+25v bytecompile/try v [source env] v "" v #{
 08i 0 v bytecompile/gen-label
 0Es handler-sym
 0D
@@ -4102,7 +4670,10 @@
 08i 2 v list
 08i 11 v list
 01
-}]] [def bytecompile* [fn* bytecompile* [source env] "Compile the forms in source" #{
+}
+0Es bytecompile/try
+0D
+25v bytecompile* v [source env] v "Compile the forms in source" v #{
 10s source
 08i 1 v car
 10s env
@@ -4319,14 +4890,27 @@
 08i 1 v bytecompile/literal
 16
 01
-}]] [def bytecompile [fn* bytecompile [form environment] "" #{
+}
+0Es bytecompile*
+0D
+25v bytecompile v [form environment] v "" v #{
 10s form
 10s environment
 08i 2 v bytecompile*
 08i 0 v $ret
 08i 2 v list
 01
-}]]][do [def compile/environment [current-closure]] [def compile/verbose #f] [def compile/do/args [fn* compile/do/args [args] "" #{
+}
+0Es bytecompile
+01
+}#{
+08i 0 v current-closure
+0Es compile/environment
+0D
+05v #f
+0Es compile/verbose
+0D
+25v compile/do/args v [args] v "" v #{
 10s args
 08i 1 v last?
 0Bo 26
@@ -4364,7 +4948,10 @@
 08i 1 v cdr
 08i 1 v compile/do/args
 01
-}]] [def compile/do [fn* compile/do [source] "" #{
+}
+0Es compile/do/args
+0D
+25v compile/do v [source] v "" v #{
 10s source
 08i 1 v compile/do/args
 0Es args
@@ -4379,7 +4966,10 @@
 10s args
 08i 2 v cons
 01
-}]] [def compile/def [fn* compile/def [source] "" #{
+}
+0Es compile/do
+0D
+25v compile/def v [source] v "" v #{
 10s source
 08i 1 v cdddr
 0Bo 33
@@ -4400,7 +4990,10 @@
 08i 1 v compile*
 08i 3 v list
 01
-}]] [def compile/set! [fn* compile/set! [source] "" #{
+}
+0Es compile/def
+0D
+25v compile/set! v [source] v "" v #{
 10s source
 08i 1 v cdddr
 0Bo 33
@@ -4421,7 +5014,10 @@
 08i 1 v compile*
 08i 3 v list
 01
-}]] [def compile/fn* [fn* compile/fn* [source] "" #{
+}
+0Es compile/set!
+0D
+25v compile/fn* v [source] v "" v #{
 10s source
 08i 1 v cdddddr
 0Bo 33
@@ -4446,7 +5042,10 @@
 08i 1 v compile
 08i 5 v list
 01
-}]] [def compile/macro* [fn* compile/macro* [source] "" #{
+}
+0Es compile/fn*
+0D
+25v compile/macro* v [source] v "" v #{
 10s source
 08i 1 v cdddddr
 0Bo 33
@@ -4471,14 +5070,20 @@
 08i 1 v compile
 08i 5 v list
 01
-}]] [def compile/ω* [fn* compile/ω* [source] "" #{
+}
+0Es compile/macro*
+0D
+25v compile/ω* v [source] v "" v #{
 23s ω*
 10s source
 08i 1 v cdr
 08i 1 v compile/do
 08i 2 v list
 01
-}]] [def compile/try [fn* compile/try [source] "" #{
+}
+0Es compile/ω*
+0D
+25v compile/try v [source] v "" v #{
 23s try
 10s source
 08i 1 v cadr
@@ -4488,7 +5093,10 @@
 08i 1 v compile/do
 08i 3 v list
 01
-}]] [def compile/return [fn* compile/return [source] "" #{
+}
+0Es compile/try
+0D
+25v compile/return v [source] v "" v #{
 10s source
 08i 1 v cddr
 0Bo 33
@@ -4507,7 +5115,10 @@
 08i 1 v compile*
 08i 2 v list
 01
-}]] [def compile/if [fn* compile/if [source] "" #{
+}
+0Es compile/return
+0D
+25v compile/if v [source] v "" v #{
 10s source
 08i 1 v cddddr
 0Bo 33
@@ -4532,19 +5143,28 @@
 08i 1 v compile*
 08i 4 v list
 01
-}]] [def compile/let* [fn* compile/let* [source] "" #{
+}
+0Es compile/if
+0D
+25v compile/let* v [source] v "" v #{
 23s let*
 10s source
 08i 1 v cdr
 08i 1 v compile/do
 08i 2 v list
 01
-}]] [def compile/map [fn* compile/map [source] "" #{
+}
+0Es compile/let*
+0D
+25v compile/map v [source] v "" v #{
 10s source
 10s compile*
 08i 2 v map
 01
-}]] [def compile/while [fn* compile/while [source] "" #{
+}
+0Es compile/map
+0D
+25v compile/while v [source] v "" v #{
 23s while
 10s source
 08i 1 v cadr
@@ -4554,14 +5174,20 @@
 08i 1 v compile/do
 08i 3 v list
 01
-}]] [def compile/macro [fn* compile/macro [macro source] "" #{
+}
+0Es compile/while
+0D
+25v compile/macro v [macro source] v "" v #{
 10s macro
 10s source
 08i 1 v cdr
 08i 2 v macro-apply
 08i 1 v compile*
 01
-}]] [def compile* [fn* compile* [source] "Expand all macros within source" #{
+}
+0Es compile/macro
+0D
+25v compile* v [source] v "Expand all macros within source" v #{
 10s source
 08i 1 v car
 10s compile/environment
@@ -4716,7 +5342,10 @@
 08i 2 v map
 16
 01
-}]] [def compile [fn* compile [source new-environment new-verbose] "Compile the forms in source" #{
+}
+0Es compile*
+0D
+25v compile v [source new-environment new-verbose] v "Compile the forms in source" v #{
 10s new-environment
 0Bo 7
 24
@@ -4740,7 +5369,10 @@
 10s source
 08i 1 v compile*
 01
-}]] [def load/forms [fn* load/forms [source environment] "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" #{
+}
+0Es compile
+0D
+25v load/forms v [source environment] v "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" v #{
 15
 10s source
 0Es ΓεnΣym-91
@@ -4774,7 +5406,10 @@
 24
 16
 01
-}]] [def compile/forms [fn* compile/forms [source-raw environment] "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined" #{
+}
+0Es load/forms
+0D
+25v compile/forms v [source-raw environment] v "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined" v #{
 10s environment
 0Bo 7
 24
@@ -4794,7 +5429,10 @@
 10s environment
 08i 2 v compile
 01
-}]] [def defmacro [macro* defmacro [name args . body] "Define a new bytecoded macro" #{
+}
+0Es compile/forms
+0D
+26v defmacro v [name args . body] v "Define a new bytecoded macro" v #{
 10s body
 08i 1 v car
 08i 1 v string?
@@ -4821,7 +5459,10 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def macro [macro* macro [args . body] "Return a new bytecoded macro" #{
+}
+0Es defmacro
+0D
+26v macro v [args . body] v "Return a new bytecoded macro" v #{
 10s body
 08i 1 v car
 08i 1 v string?
@@ -4845,7 +5486,10 @@
 08i 1 v assemble*
 08i 5 v list
 01
-}]] [def fn [macro* fn [args . body] "Define a λδ with the self-hosting Nujel compiler" #{
+}
+0Es macro
+0D
+26v fn v [args . body] v "Define a λδ with the self-hosting Nujel compiler" v #{
 10s body
 08i 1 v car
 08i 1 v string?
@@ -4869,7 +5513,10 @@
 08i 1 v assemble*
 08i 5 v list
 01
-}]] [def defn [macro* defn [name args . body] "Define a new bytecoded function" #{
+}
+0Es fn
+0D
+26v defn v [name args . body] v "Define a new bytecoded function" v #{
 10s body
 08i 1 v car
 08i 1 v string?
@@ -4896,13 +5543,22 @@
 08i 5 v list
 08i 3 v list
 01
-}]] [def ω [macro* ω body "Defines and returns new object after evaluating body within" #{
+}
+0Es defn
+0D
+26v ω v body v "Defines and returns new object after evaluating body within" v #{
 23s ω*
 10s body
 08i 2 v cons
 08i 1 v compile
 01
-}]] [def defobj ω] [def eval-in [fn* eval-in [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}
+0Es ω
+0D
+10s ω
+0Es defobj
+0D
+25v eval-in v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
 18o 39
 10s expr
@@ -4919,7 +5575,10 @@
 27
 0D
 01
-}]] [def eval-int [fn* eval-int [closure expr] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}
+0Es eval-in
+0D
+25v eval-int v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
 18o 63
 10s expr
@@ -4943,7 +5602,10 @@
 27
 0D
 01
-}]] [def eval [macro* eval [expr] "Compile, Evaluate and then return the result of EXPR" #{
+}
+0Es eval-int
+0D
+26v eval v [expr] v "Compile, Evaluate and then return the result of EXPR" v #{
 23s eval-in
 23s current-closure
 24
@@ -4954,13 +5616,19 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def read-eval-compile [fn* read-eval-compile [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}
+0Es eval
+0D
+25v read-eval-compile v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s closure
 10s expr
 08i 1 v read
 08i 2 v eval-in
 01
-}]] [def eval-load [fn* eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}
+0Es read-eval-compile
+0D
+25v eval-load v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
 18o 19
 10s expr
@@ -4972,13 +5640,19 @@
 27
 0D
 01
-}]] [def read-eval-load [fn* read-eval-load [expr closure] "Compile and the immediatly evaluate the result, mostly used by lRun()" #{
+}
+0Es eval-load
+0D
+25v read-eval-load v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s expr
 08i 1 v read
 10s closure
 08i 2 v eval-load
 01
-}]] [def typecheck/only [macro* typecheck/only [v t] "" #{
+}
+0Es read-eval-load
+0D
+26v typecheck/only v [v t] v "" v #{
 23s when-not
 23s ==
 23s type-of
@@ -5015,7 +5689,11 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]]][do [def disassemble/length [fn* disassemble/length [op] "Return the length in bytes of a bytecode operation and all its arguments" #{
+}
+0Es typecheck/only
+01
+}#{
+25v disassemble/length v [op] v "Return the length in bytes of a bytecode operation and all its arguments" v #{
 15
 10s op
 0Es ΓεnΣym-97
@@ -5244,7 +5922,10 @@
 08i 1 v throw
 16
 01
-}]] [def bytecode/nil-catcher [fn* bytecode/nil-catcher [error] "" #{
+}
+0Es disassemble/length
+0D
+25v bytecode/nil-catcher v [error] v "" v #{
 10s error
 08i 1 v car
 05v :type-error
@@ -5255,7 +5936,10 @@
 10s error
 08i 1 v throw
 01
-}]] [def bytecode-op->val [fn* bytecode-op->val [a b c] "Turn three bytecode ops representing an encoded value into an actual value" #{
+}
+0Es bytecode/nil-catcher
+0D
+25v bytecode-op->val v [a b c] v "Turn three bytecode ops representing an encoded value into an actual value" v #{
 10s a
 08i 1 v bytecode-op->int
 02i 16
@@ -5269,7 +5953,10 @@
 08i 3 v logior
 08i 1 v index->val
 01
-}]] [def bytecode-arr->val [fn* bytecode-arr->val [a i] "Read a bytecode encoded value in A at I and return it" #{
+}
+0Es bytecode-op->val
+0D
+25v bytecode-arr->val v [a i] v "Read a bytecode encoded value in A at I and return it" v #{
 10s bytecode/nil-catcher
 18o 64
 10s a
@@ -5292,7 +5979,10 @@
 27
 0D
 01
-}]] [def bytecode-op->sym [fn* bytecode-op->sym [a b c] "Turn three bytecode ops representing an encoded symbol into an actual symbol" #{
+}
+0Es bytecode-arr->val
+0D
+25v bytecode-op->sym v [a b c] v "Turn three bytecode ops representing an encoded symbol into an actual symbol" v #{
 10s a
 08i 1 v bytecode-op->int
 02i 16
@@ -5306,7 +5996,10 @@
 08i 3 v logior
 08i 1 v index->sym
 01
-}]] [def bytecode-arr->sym [fn* bytecode-arr->sym [a i] "Read a bytecode encoded symbol in A at I and return it" #{
+}
+0Es bytecode-op->sym
+0D
+25v bytecode-arr->sym v [a i] v "Read a bytecode encoded symbol in A at I and return it" v #{
 10s bytecode/nil-catcher
 18o 64
 10s a
@@ -5329,7 +6022,10 @@
 27
 0D
 01
-}]] [def bytecode-op->offset [fn* bytecode-op->offset [a b] "Turn two bytecode ops encoding an offset into the integer representation" #{
+}
+0Es bytecode-arr->sym
+0D
+25v bytecode-op->offset v [a b] v "Turn two bytecode ops encoding an offset into the integer representation" v #{
 10s a
 08i 1 v bytecode-op->int
 02i 8
@@ -5350,7 +6046,10 @@
 09o 7
 10s t
 01
-}]] [def bytecode-arr->offset [fn* bytecode-arr->offset [a i] "Read a bytecode encoded offset in A at I and return it as a signed integer" #{
+}
+0Es bytecode-op->offset
+0D
+25v bytecode-arr->offset v [a i] v "Read a bytecode encoded offset in A at I and return it as a signed integer" v #{
 10s a
 10s i
 08i 2 v ref
@@ -5361,7 +6060,10 @@
 08i 2 v ref
 08i 2 v bytecode-op->offset
 01
-}]] [def disassemble/op [fn* disassemble/op [a i] "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" #{
+}
+0Es bytecode-arr->offset
+0D
+25v disassemble/op v [a i] v "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" v #{
 15
 10s a
 10s i
@@ -5793,7 +6495,10 @@
 05v :unknown-op
 16
 01
-}]] [def disassemble/array [fn* disassemble/array [a i] "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" #{
+}
+0Es disassemble/op
+0D
+25v disassemble/array v [a i] v "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" v #{
 24
 0Es ret
 0D
@@ -5827,13 +6532,19 @@
 10s ret
 08i 1 v nreverse
 01
-}]] [def disassemble/bytecode-array [fn* disassemble/bytecode-array [code] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
+}
+0Es disassemble/array
+0D
+25v disassemble/bytecode-array v [code] v "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," v #{
 10s code
 08i 1 v bytecode-arr->arr
 02i 0
 08i 2 v disassemble/array
 01
-}]] [def disassemble/print [fn* disassemble/print [bc] "" #{
+}
+0Es disassemble/bytecode-array
+0D
+25v disassemble/print v [bc] v "" v #{
 15
 10s bc
 08i 1 v disassemble/bytecode-array
@@ -5871,7 +6582,10 @@
 24
 16
 01
-}]] [def disassemble [fn* disassemble [bc] "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," #{
+}
+0Es disassemble/print
+0D
+25v disassemble v [bc] v "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," v #{
 15
 10s bc
 08i 1 v type-of
@@ -5912,7 +6626,10 @@
 08i 1 v throw
 16
 01
-}]] [def disassemble/test [fn* disassemble/test [asm] "Verbose way of testing the disassembler" #{
+}
+0Es disassemble
+0D
+25v disassemble/test v [asm] v "Verbose way of testing the disassembler" v #{
 05v "--------- Assembly -----------"
 08i 1 v ansi-blue
 08i 1 v println
@@ -5992,7 +6709,14 @@
 27
 0D
 01
-}]]][do [def yield-queue #nil] [def yield [fn* yield [pred fun] "Evaluates FUN once PRED is true" #{
+}
+0Es disassemble/test
+01
+}#{
+24
+0Es yield-queue
+0D
+25v yield v [pred fun] v "Evaluates FUN once PRED is true" v #{
 10s pred
 10s fun
 08i 2 v cons
@@ -6002,7 +6726,10 @@
 0D
 05v #t
 01
-}]] [def yield-run [fn* yield-run [] "Executes pending coroutines if their predicate evaluates to #t" #{
+}
+0Es yield
+0D
+25v yield-run v [] v "Executes pending coroutines if their predicate evaluates to #t" v #{
 10s yield-queue
 0Es old
 0D
@@ -6046,7 +6773,10 @@
 24
 16
 01
-}]] [def timeout [fn* timeout [milliseconds] "Returns a function that evaluates to true once MILLISECONDS have passed" #{
+}
+0Es yield-run
+0D
+25v timeout v [milliseconds] v "Returns a function that evaluates to true once MILLISECONDS have passed" v #{
 08i 0 v time/milliseconds
 10s milliseconds
 08i 2 v +
@@ -6059,13 +6789,19 @@
 01
 }
 01
-}]] [def event-bind [fn* event-bind [event id handler] "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." #{
+}
+0Es timeout
+0D
+25v event-bind v [event id handler] v "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." v #{
 10s event
 10s id
 10s handler
 08i 3 v tree/set!
 01
-}]] [def event-clear [macro* event-clear [event] "Clears all event handlers for event-name" #{
+}
+0Es event-bind
+0D
+26v event-clear v [event] v "Clears all event handlers for event-name" v #{
 23s set!
 10s event
 23s tree/new
@@ -6078,7 +6814,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def event-fire [fn* event-fire [event val] "Applies ...val to all event handlers associated with event-name" #{
+}
+0Es event-clear
+0D
+25v event-fire v [event val] v "Applies ...val to all event handlers associated with event-name" v #{
 15
 10s event
 08i 1 v tree/values
@@ -6108,7 +6847,11 @@
 24
 16
 01
-}]]][do [def let/arg [fn* let/arg [arg] "" #{
+}
+0Es event-fire
+01
+}#{
+25v let/arg v [arg] v "" v #{
 10s arg
 0Bo 121
 10s arg
@@ -6146,7 +6889,10 @@
 09o 4
 24
 01
-}]] [def let/args [fn* let/args [args] "" #{
+}
+0Es let/arg
+0D
+25v let/args v [args] v "" v #{
 10s args
 0Bo 39
 10s args
@@ -6159,7 +6905,10 @@
 09o 4
 24
 01
-}]] [def let [macro* let [bindings . body] "Evalutes to BODY if PRED is true" #{
+}
+0Es let/args
+0D
+26v let v [bindings . body] v "Evalutes to BODY if PRED is true" v #{
 23s let*
 23s do
 10s bindings
@@ -6173,7 +6922,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def if-let [macro* if-let [binding then else] "" #{
+}
+0Es let
+0D
+26v if-let v [binding then else] v "" v #{
 23s let*
 23s def
 10s binding
@@ -6199,7 +6951,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def when-let [macro* when-let [binding . body] "" #{
+}
+0Es if-let
+0D
+26v when-let v [binding . body] v "" v #{
 23s if-let
 10s binding
 23s do
@@ -6212,10 +6967,20 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]]][do [def otherwise #t] [def comment [macro* comment body "Does nothing" #{
+}
+0Es when-let
+01
+}#{
+05v #t
+0Es otherwise
+0D
+26v comment v body v "Does nothing" v #{
 24
 01
-}]] [def += [macro* += [val inc] "" #{
+}
+0Es comment
+0D
+26v += v [val inc] v "" v #{
 23s set!
 10s val
 23s +
@@ -6230,7 +6995,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def cdr! [macro* cdr! [l] "[set! l [cdr l]]" #{
+}
+0Es +=
+0D
+26v cdr! v [l] v "[set! l [cdr l]]" v #{
 23s set!
 10s l
 23s cdr
@@ -6243,79 +7011,121 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def not [fn* not [v] "Return true if V is false" #{
+}
+0Es cdr!
+0D
+25v not v [v] v "Return true if V is false" v #{
 10s v
 0Bo 10
 05v #f
 09o 7
 05v #t
 01
-}]] [def identity [fn* identity [α] "Returns its argument" #{
+}
+0Es not
+0D
+25v identity v [α] v "Returns its argument" v #{
 10s α
 01
-}]] [def list [fn* list arguments "Return ARGUMENTS as a list" #{
+}
+0Es identity
+0D
+25v list v arguments v "Return ARGUMENTS as a list" v #{
 10s arguments
 01
-}]] [def default [fn* default [arg default-value] "Returns ARG or DEFAULT-VALUE if ARG is #nil" #{
+}
+0Es list
+0D
+25v default v [arg default-value] v "Returns ARG or DEFAULT-VALUE if ARG is #nil" v #{
 10s arg
 0Bo 10
 10s arg
 09o 7
 10s default-value
 01
-}]] [def caar [fn* caar [p] "[car [car p]]" #{
+}
+0Es default
+0D
+25v caar v [p] v "[car [car p]]" v #{
 10s p
 08i 1 v car
 08i 1 v car
 01
-}]] [def cadr [fn* cadr [p] "[car [cdr p]]" #{
+}
+0Es caar
+0D
+25v cadr v [p] v "[car [cdr p]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cdar [fn* cdar [p] "[cdr [car p]]" #{
+}
+0Es cadr
+0D
+25v cdar v [p] v "[cdr [car p]]" v #{
 10s p
 08i 1 v car
 08i 1 v cdr
 01
-}]] [def cddr [fn* cddr [p] "[cdr [cdr p]]" #{
+}
+0Es cdar
+0D
+25v cddr v [p] v "[cdr [cdr p]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def cadar [fn* cadar [p] "[cdr [car p]]" #{
+}
+0Es cddr
+0D
+25v cadar v [p] v "[cdr [car p]]" v #{
 10s p
 08i 1 v car
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def caddr [fn* caddr [p] "[car [cdr [cdr p]]]" #{
+}
+0Es cadar
+0D
+25v caddr v [p] v "[car [cdr [cdr p]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cdddr [fn* cdddr [p] "[cdr [cdr [cdr p]]]" #{
+}
+0Es caddr
+0D
+25v cdddr v [p] v "[cdr [cdr [cdr p]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def cadddr [fn* cadddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+}
+0Es cdddr
+0D
+25v cadddr v [p] v "[car [cdr [cdr [cdr p]]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cddddr [fn* cddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+}
+0Es cadddr
+0D
+25v cddddr v [p] v "[car [cdr [cdr [cdr p]]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def caddddr [fn* caddddr [p] "[car [cdr [cdr [cdr p]]]]" #{
+}
+0Es cddddr
+0D
+25v caddddr v [p] v "[car [cdr [cdr [cdr p]]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
@@ -6323,7 +7133,10 @@
 08i 1 v cdr
 08i 1 v car
 01
-}]] [def cdddddr [fn* cdddddr [p] "[cdr [cdr [cdr [cdr p]]]]" #{
+}
+0Es caddddr
+0D
+25v cdddddr v [p] v "[cdr [cdr [cdr [cdr p]]]]" v #{
 10s p
 08i 1 v cdr
 08i 1 v cdr
@@ -6331,7 +7144,10 @@
 08i 1 v cdr
 08i 1 v cdr
 01
-}]] [def keyword->string [fn* keyword->string [α] "" #{
+}
+0Es cdddddr
+0D
+25v keyword->string v [α] v "" v #{
 10s α
 08i 1 v keyword?
 0Bo 7
@@ -6348,7 +7164,10 @@
 08i 1 v keyword->symbol
 08i 1 v sym->str
 01
-}]] [def string->keyword [fn* string->keyword [α] "" #{
+}
+0Es keyword->string
+0D
+25v string->keyword v [α] v "" v #{
 10s α
 08i 1 v string?
 0Bo 7
@@ -6365,7 +7184,11 @@
 08i 1 v str->sym
 08i 1 v symbol->keyword
 01
-}]]][do [def if-not [macro* if-not [pred then else] "" #{
+}
+0Es string->keyword
+01
+}#{
+26v if-not v [pred then else] v "" v #{
 23s if
 10s pred
 10s else
@@ -6376,7 +7199,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def when-not [macro* when-not [pred . body] "Evalutes to BODY if PRED is false" #{
+}
+0Es if-not
+0D
+26v when-not v [pred . body] v "Evalutes to BODY if PRED is false" v #{
 23s if
 10s pred
 24
@@ -6391,7 +7217,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def when [macro* when [pred . body] "Evalutes to BODY if PRED is true" #{
+}
+0Es when-not
+0D
+26v when v [pred . body] v "Evalutes to BODY if PRED is true" v #{
 23s if
 10s pred
 23s do
@@ -6406,7 +7235,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def case/clauses/multiple [fn* case/clauses/multiple [key-sym cases] "" #{
+}
+0Es when
+0D
+25v case/clauses/multiple v [key-sym cases] v "" v #{
 10s cases
 0Bo 51
 23s ==
@@ -6422,7 +7254,10 @@
 09o 4
 24
 01
-}]] [def case/clauses [fn* case/clauses [key-sym clauses] "" #{
+}
+0Es case/clauses/multiple
+0D
+25v case/clauses v [key-sym clauses] v "" v #{
 10s clauses
 0Bo 253
 10s clauses
@@ -6490,7 +7325,10 @@
 09o 4
 24
 01
-}]] [def case [macro* case [key-form . clauses] "" #{
+}
+0Es case/clauses
+0D
+26v case v [key-form . clauses] v "" v #{
 08i 0 v gensym
 0Es key-sym
 0D
@@ -6504,7 +7342,10 @@
 08i 2 v case/clauses
 08i 3 v list
 01
-}]] [def cond [macro* cond body "Contains multiple cond clauses" #{
+}
+0Es case
+0D
+26v cond v body v "Contains multiple cond clauses" v #{
 10s body
 0C
 0Bo 13
@@ -6527,7 +7368,10 @@
 09o 4
 24
 01
-}]] [def for [macro* for [for-loop . body] "For loops, [for [name start stop] body]" #{
+}
+0Es cond
+0D
+26v for v [for-loop . body] v "For loops, [for [name start stop] body]" v #{
 10s for-loop
 08i 1 v car
 0Es symbol-name
@@ -6641,7 +7485,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def for-in [macro* for-in [for-loop . body] "[for-in [l [list 1 2 3 4]] [println l]]" #{
+}
+0Es for
+0D
+26v for-in v [for-loop . body] v "[for-in [l [list 1 2 3 4]] [println l]]" v #{
 08i 0 v gensym
 0Es symbol-name
 0D
@@ -6691,7 +7538,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def thread/-> [fn* thread/-> [init fun] "" #{
+}
+0Es for-in
+0D
+25v thread/-> v [init fun] v "" v #{
 10s fun
 0Bo 110
 10s fun
@@ -6721,13 +7571,19 @@
 09o 7
 10s init
 01
-}]] [def -> [macro* -> [init . fun] "Thread init as the first argument through every function in fun" #{
+}
+0Es thread/->
+0D
+26v -> v [init . fun] v "Thread init as the first argument through every function in fun" v #{
 10s init
 10s fun
 08i 1 v reverse
 08i 2 v thread/->
 01
-}]] [def thread/->> [fn* thread/->> [init fun] "" #{
+}
+0Es ->
+0D
+25v thread/->> v [init fun] v "" v #{
 10s fun
 0Bo 44
 10s fun
@@ -6742,13 +7598,20 @@
 09o 7
 10s init
 01
-}]] [def ->> [macro* ->> [init . fun] "Thread init as the last argument through every function in fun" #{
+}
+0Es thread/->>
+0D
+26v ->> v [init . fun] v "Thread init as the last argument through every function in fun" v #{
 10s init
 10s fun
 08i 1 v reverse
 08i 2 v thread/->>
 01
-}]]][do [def numeric? [fn* numeric? [a] "Return #t if a is a number" #{
+}
+0Es ->>
+01
+}#{
+25v numeric? v [a] v "Return #t if a is a number" v #{
 10s a
 08i 1 v int?
 0C
@@ -6766,12 +7629,18 @@
 0D
 05v #f
 01
-}]] [def last? [fn* last? [a] "Return #t if a is the last pair in a list" #{
+}
+0Es numeric?
+0D
+25v last? v [a] v "Return #t if a is the last pair in a list" v #{
 10s a
 08i 1 v cdr
 08i 1 v nil?
 01
-}]] [def pos? [fn* pos? [a] "Return #t if a is positive" #{
+}
+0Es last?
+0D
+25v pos? v [a] v "Return #t if a is positive" v #{
 10s a
 08i 1 v numeric?
 0C
@@ -6782,7 +7651,10 @@
 05v 0.0
 21
 01
-}]] [def zero-neg? [fn* zero-neg? [a] "Return #t if a is zero or negative" #{
+}
+0Es pos?
+0D
+25v zero-neg? v [a] v "Return #t if a is zero or negative" v #{
 10s a
 08i 1 v numeric?
 0C
@@ -6793,7 +7665,10 @@
 05v 0.0
 1F
 01
-}]] [def neg? [fn* neg? [a] "Returns #t if a is negative" #{
+}
+0Es zero-neg?
+0D
+25v neg? v [a] v "Returns #t if a is negative" v #{
 10s a
 08i 1 v numeric?
 0C
@@ -6804,7 +7679,10 @@
 05v 0.0
 1E
 01
-}]] [def odd? [fn* odd? [a] "Predicate that returns #t if a is odd" #{
+}
+0Es neg?
+0D
+25v odd? v [a] v "Predicate that returns #t if a is odd" v #{
 10s a
 08i 1 v int
 02i 2
@@ -6812,7 +7690,10 @@
 02i 1
 20
 01
-}]] [def even? [fn* even? [a] "Predicate that returns #t if a is even" #{
+}
+0Es odd?
+0D
+25v even? v [a] v "Predicate that returns #t if a is even" v #{
 10s a
 08i 1 v int
 02i 2
@@ -6820,17 +7701,26 @@
 02i 0
 20
 01
-}]] [def zero? [fn* zero? [val] "#t if VAL is zero" #{
+}
+0Es even?
+0D
+25v zero? v [val] v "#t if VAL is zero" v #{
 02i 0
 10s val
 20
 01
-}]] [def not-zero? [fn* not-zero? [val] "#t if VAL is not zero" #{
+}
+0Es zero?
+0D
+25v not-zero? v [val] v "#t if VAL is not zero" v #{
 02i 0
 10s val
 08i 2 v !=
 01
-}]] [def equal? [fn* equal? [a b] "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." #{
+}
+0Es not-zero?
+0D
+25v equal? v [a b] v "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." v #{
 10s a
 08i 1 v type-of
 0Es cur-type
@@ -6875,79 +7765,118 @@
 20
 16
 01
-}]] [def inequal? [fn* inequal? [a b] "High level inequality comparator" #{
+}
+0Es equal?
+0D
+25v inequal? v [a b] v "High level inequality comparator" v #{
 10s a
 10s b
 08i 2 v equal?
 08i 1 v not
 01
-}]] [def int? [fn* int? [val] "#t if VAL is a integer" #{
+}
+0Es inequal?
+0D
+25v int? v [val] v "#t if VAL is a integer" v #{
 05v :int
 10s val
 08i 1 v type-of
 20
 01
-}]] [def float? [fn* float? [val] "#t if VAL is a floating-point number" #{
+}
+0Es int?
+0D
+25v float? v [val] v "#t if VAL is a floating-point number" v #{
 05v :float
 10s val
 08i 1 v type-of
 20
 01
-}]] [def vec? [fn* vec? [val] "#t if VAL is a vector" #{
+}
+0Es float?
+0D
+25v vec? v [val] v "#t if VAL is a vector" v #{
 05v :vec
 10s val
 08i 1 v type-of
 20
 01
-}]] [def bool? [fn* bool? [val] "#t if VAL is a boolean" #{
+}
+0Es vec?
+0D
+25v bool? v [val] v "#t if VAL is a boolean" v #{
 05v :bool
 10s val
 08i 1 v type-of
 20
 01
-}]] [def pair? [fn* pair? [val] "#t if VAL is a pair" #{
+}
+0Es bool?
+0D
+25v pair? v [val] v "#t if VAL is a pair" v #{
 05v :pair
 10s val
 08i 1 v type-of
 20
 01
-}]] [def array? [fn* array? [val] "#t if VAL is an array" #{
+}
+0Es pair?
+0D
+25v array? v [val] v "#t if VAL is an array" v #{
 05v :array
 10s val
 08i 1 v type-of
 20
 01
-}]] [def string? [fn* string? [val] "#t if VAL is a string" #{
+}
+0Es array?
+0D
+25v string? v [val] v "#t if VAL is a string" v #{
 05v :string
 10s val
 08i 1 v type-of
 20
 01
-}]] [def symbol? [fn* symbol? [val] "#t if VAL is a symbol" #{
+}
+0Es string?
+0D
+25v symbol? v [val] v "#t if VAL is a symbol" v #{
 05v :symbol
 10s val
 08i 1 v type-of
 20
 01
-}]] [def object? [fn* object? [val] "#t if VAL is an object" #{
+}
+0Es symbol?
+0D
+25v object? v [val] v "#t if VAL is an object" v #{
 05v :object
 10s val
 08i 1 v type-of
 20
 01
-}]] [def tree? [fn* tree? [val] "#t if VAL is an object" #{
+}
+0Es object?
+0D
+25v tree? v [val] v "#t if VAL is an object" v #{
 05v :tree
 10s val
 08i 1 v type-of
 20
 01
-}]] [def macro? [fn* macro? [val] "#t if VAL is an object" #{
+}
+0Es tree?
+0D
+25v macro? v [val] v "#t if VAL is an object" v #{
 05v :macro
 10s val
 08i 1 v type-of
 20
 01
-}]] [def lambda? [fn* lambda? [val] "#t if VAL is a lambda" #{
+}
+0Es macro?
+0D
+25v lambda? v [val] v "#t if VAL is a lambda" v #{
 05v :lambda
 10s val
 08i 1 v type-of
@@ -6957,19 +7886,28 @@
 0D
 05v #f
 01
-}]] [def native? [fn* native? [val] "#t if VAL is a native function" #{
+}
+0Es lambda?
+0D
+25v native? v [val] v "#t if VAL is a native function" v #{
 05v :native-function
 10s val
 08i 1 v type-of
 20
 01
-}]] [def special-form? [fn* special-form? [val] "#t if VAL is a native function" #{
+}
+0Es native?
+0D
+25v special-form? v [val] v "#t if VAL is a native function" v #{
 05v :special-form
 10s val
 08i 1 v type-of
 20
 01
-}]] [def procedure? [fn* procedure? [val] "#t if VAL is a native or lisp function" #{
+}
+0Es special-form?
+0D
+25v procedure? v [val] v "#t if VAL is a native or lisp function" v #{
 10s val
 08i 1 v lambda?
 0C
@@ -6987,19 +7925,28 @@
 0D
 05v #f
 01
-}]] [def bytecode-array? [fn* bytecode-array? [v] "" #{
+}
+0Es procedure?
+0D
+25v bytecode-array? v [v] v "" v #{
 05v :bytecode-array
 10s v
 08i 1 v type-of
 20
 01
-}]] [def bytecode-op? [fn* bytecode-op? [v] "" #{
+}
+0Es bytecode-array?
+0D
+25v bytecode-op? v [v] v "" v #{
 05v :bytecode-op
 10s v
 08i 1 v type-of
 20
 01
-}]] [def in-range? [fn* in-range? [v min max] "" #{
+}
+0Es bytecode-op?
+0D
+25v in-range? v [v min max] v "" v #{
 10s v
 10s min
 21
@@ -7010,7 +7957,11 @@
 10s max
 1F
 01
-}]]][do [def quasiquote-real [fn* quasiquote-real [l depth] "" #{
+}
+0Es in-range?
+01
+}#{
+25v quasiquote-real v [l depth] v "" v #{
 10s l
 08i 1 v nil?
 0Bo 7
@@ -7119,24 +8070,37 @@
 09o 7
 10s l
 01
-}]] [def quasiquote [macro* quasiquote [l] "" #{
+}
+0Es quasiquote-real
+0D
+26v quasiquote v [l] v "" v #{
 10s l
 02i 0
 08i 2 v quasiquote-real
 01
-}]] [def unquote [fn* unquote [expr] "" #{
+}
+0Es quasiquote
+0D
+25v unquote v [expr] v "" v #{
 05v :unquote-without-quasiquote
 05v "unquote should only occur inside a quasiquote, never evaluated directly"
 08i 2 v list
 08i 1 v throw
 01
-}]] [def unquote-splicing [fn* unquote-splicing [expr] "" #{
+}
+0Es unquote
+0D
+25v unquote-splicing v [expr] v "" v #{
 05v :unquote-splicing-without-quasiq
 05v "unquote-splicing should only occur inside a quasiquote, never evaluated directly"
 08i 2 v list
 08i 1 v throw
 01
-}]]][do [def describe/closure [fn* describe/closure [c i] "" #{
+}
+0Es unquote-splicing
+01
+}#{
+25v describe/closure v [c i] v "" v #{
 10s c
 0Bo 259
 10s c
@@ -7220,20 +8184,30 @@
 09o 4
 24
 01
-}]] [def stacktrace [fn* stacktrace [] "" #{
+}
+0Es describe/closure
+0D
+25v stacktrace v [] v "" v #{
 08i 0 v current-lambda
 08i 1 v closure/caller
 08i 1 v describe/closure
 08i 1 v display
 01
-}]]][do [def time/seconds [fn* time/seconds [timestamp] "Return the seconds part of TIMESTAMP, defaults to current time" #{
+}
+0Es stacktrace
+01
+}#{
+25v time/seconds v [timestamp] v "Return the seconds part of TIMESTAMP, defaults to current time" v #{
 10s timestamp
 08i 0 v time
 08i 2 v default
 02i 60
 08i 2 v %
 01
-}]] [def time/minutes [fn* time/minutes [timestamp] "Return the minutes part of TIMESTAMP, defaults to current time" #{
+}
+0Es time/seconds
+0D
+25v time/minutes v [timestamp] v "Return the minutes part of TIMESTAMP, defaults to current time" v #{
 10s timestamp
 08i 0 v time
 08i 2 v default
@@ -7242,7 +8216,10 @@
 02i 60
 08i 2 v %
 01
-}]] [def time/hours [fn* time/hours [timestamp] "Return the hours part of TIMESTAMP, defaults to current time" #{
+}
+0Es time/minutes
+0D
+25v time/hours v [timestamp] v "Return the hours part of TIMESTAMP, defaults to current time" v #{
 10s timestamp
 08i 0 v time
 08i 2 v default
@@ -7251,7 +8228,10 @@
 02i 24
 08i 2 v %
 01
-}]] [def profile-form [fn* profile-form [raw] "" #{
+}
+0Es time/hours
+0D
+25v profile-form v [raw] v "" v #{
 08i 0 v time/milliseconds
 0Es start-time
 0D
@@ -7282,7 +8262,10 @@
 08i 6 v cat
 08i 1 v display
 01
-}]] [def profile [macro* profile body "Measure and display how much time and ressources it takes for BODY to be evaluated" #{
+}
+0Es profile-form
+0D
+26v profile v body v "Measure and display how much time and ressources it takes for BODY to be evaluated" v #{
 23s profile-form
 23s quote
 10s body
@@ -7301,7 +8284,11 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]]][def hash/adler32 [fn* hash/adler32 [data] "" #{
+}
+0Es profile
+01
+}#{
+25v hash/adler32 v [data] v "" v #{
 02i 1
 0Es a
 0D
@@ -7353,7 +8340,17 @@
 08i 2 v ash
 08i 2 v logior
 01
-}]][do [def PI 3.14159] [def π 3.14159] [def ++ [macro* ++ [i] "Increment I by 1 and store the result in I" #{
+}
+0Es hash/adler32
+01
+}#{
+05v 3.14159
+0Es PI
+0D
+05v 3.14159
+0Es π
+0D
+26v ++ v [i] v "Increment I by 1 and store the result in I" v #{
 23s set!
 10s i
 23s +
@@ -7368,7 +8365,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def -- [macro* -- [i] "Decrement I by 1 and store the result in I" #{
+}
+0Es ++
+0D
+26v -- v [i] v "Decrement I by 1 and store the result in I" v #{
 23s set!
 10s i
 23s +
@@ -7383,7 +8383,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def +x [fn* +x [α] "Return a function that adds α to it's argument, useful for mapping" #{
+}
+0Es --
+0D
+25v +x v [α] v "Return a function that adds α to it's argument, useful for mapping" v #{
 25v anonymous v [β] v "" v #{
 10s α
 10s β
@@ -7391,13 +8394,19 @@
 01
 }
 01
-}]] [def >> [fn* >> [val amount] "Shifts VAL by AMOUNT bits to the right" #{
+}
+0Es +x
+0D
+25v >> v [val amount] v "Shifts VAL by AMOUNT bits to the right" v #{
 10s val
 10s amount
 08i 1 v -
 08i 2 v ash
 01
-}]] [def fib [fn* fib [i] "Terribly inefficient, but, useful for testing the GC" #{
+}
+0Es >>
+0D
+25v fib v [i] v "Terribly inefficient, but, useful for testing the GC" v #{
 10s i
 02i 2
 1E
@@ -7414,7 +8423,10 @@
 08i 1 v fib
 08i 2 v +
 01
-}]] [def wrap-value [fn* wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around" #{
+}
+0Es fib
+0D
+25v wrap-value v [val min max] v "Constrains VAL to be within MIN and MAX, wrapping it around" v #{
 10s min
 10s val
 10s min
@@ -7425,7 +8437,10 @@
 08i 2 v %
 08i 2 v +
 01
-}]] [def +1 [macro* +1 [v] "" #{
+}
+0Es wrap-value
+0D
+26v +1 v [v] v "" v #{
 23s +
 02i 1
 10s v
@@ -7434,14 +8449,21 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def radians [fn* radians [degrees] "Convert a quantity in degrees to radians" #{
+}
+0Es +1
+0D
+25v radians v [degrees] v "Convert a quantity in degrees to radians" v #{
 10s π
 10s degrees
 08i 2 v *
 05v 180.0
 08i 2 v /
 01
-}]]][do [def display/error/wrap [fn* display/error/wrap [i text] "" #{
+}
+0Es radians
+01
+}#{
+25v display/error/wrap v [i text] v "" v #{
 15
 10s i
 0Es ΓεnΣym-111
@@ -7478,7 +8500,10 @@
 10s text
 16
 01
-}]] [def display/error/iter [fn* display/error/iter [error i] "" #{
+}
+0Es display/error/wrap
+0D
+25v display/error/iter v [error i] v "" v #{
 10s error
 0Bo 54
 10s i
@@ -7497,7 +8522,10 @@
 24
 08i 2 v cons
 01
-}]] [def display/error [fn* display/error [error] "Display ERROR in a nice, human readable way" #{
+}
+0Es display/error/iter
+0D
+25v display/error v [error] v "Display ERROR in a nice, human readable way" v #{
 10s error
 02i 0
 08i 2 v display/error/iter
@@ -7505,7 +8533,10 @@
 08i 2 v join
 08i 1 v display
 01
-}]] [def describe/thing [fn* describe/thing [o] "Describe a specific value O" #{
+}
+0Es display/error
+0D
+25v describe/thing v [o] v "Describe a specific value O" v #{
 10s o
 08i 1 v closure
 0Es doc
@@ -7520,13 +8551,19 @@
 08i 2 v ref
 08i 3 v cat
 01
-}]] [def describe/string [fn* describe/string [a] "Descibe whatever value string A resolves to" #{
+}
+0Es describe/thing
+0D
+25v describe/string v [a] v "Descibe whatever value string A resolves to" v #{
 10s a
 08i 1 v str->sym
 08i 1 v resolve
 08i 1 v describe/thing
 01
-}]] [def describe [fn* describe [fun] "Describe FUN, if there is documentation available" #{
+}
+0Es describe/string
+0D
+25v describe v [fun] v "Describe FUN, if there is documentation available" v #{
 10s fun
 08i 1 v string?
 0Bo 15
@@ -7536,7 +8573,10 @@
 10s fun
 08i 1 v describe/thing
 01
-}]] [def mem [fn* mem [] "Return some pretty printed memory usage information" #{
+}
+0Es describe
+0D
+25v mem v [] v "Return some pretty printed memory usage information" v #{
 08i 0 v memory-info
 0Es info
 0D
@@ -7576,7 +8616,10 @@
 10s ansi-reset
 08i 18 v cat
 01
-}]] [def symbol-table [fn* symbol-table [off len environment] "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF" #{
+}
+0Es mem
+0D
+25v symbol-table v [off len environment] v "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF" v #{
 10s environment
 0Bo 7
 24
@@ -7608,7 +8651,13 @@
 24
 08i 4 v sublist
 01
-}]] [def gensym/counter 0] [def gensym [fn* gensym [prefix] "" #{
+}
+0Es symbol-table
+0D
+02i 0
+0Es gensym/counter
+0D
+25v gensym v [prefix] v "" v #{
 02i 1
 10s gensym/counter
 08i 2 v +
@@ -7620,22 +8669,26 @@
 08i 3 v cat
 08i 1 v str->sym
 01
-}]] [def root-closure [current-closure]] [def test-des-stack-traces [fn* test-des-stack-traces [] "" #{
-24
-08i 1 v array/new
-02i -1
-08i 2 v array/set!
+}
+0Es gensym
+0D
+08i 0 v current-closure
+0Es root-closure
 01
-}]] [def t [fn* t [] "" #{
-08i 0 v test-des-stack-traces
-01
-}]]][do [def random/seed 0] [def random/seed-initialize! [fn* random/seed-initialize! [] "" #{
+}#{
+02i 0
+0Es random/seed
+0D
+25v random/seed-initialize! v [] v "" v #{
 08i 0 v time
 08i 0 v time/milliseconds
 08i 2 v logxor
 0Fs random/seed
 01
-}]] [def random/rng! [fn* random/rng! [] "" #{
+}
+0Es random/seed-initialize!
+0D
+25v random/rng! v [] v "" v #{
 05v 12345
 10s random/seed
 05v 1103515245
@@ -7655,14 +8708,23 @@
 08i 2 v logand
 08i 2 v logior
 01
-}]] [def random/seed! [fn* random/seed! [new-seed] "Set a new seed value for the RNG" #{
+}
+0Es random/rng!
+0D
+25v random/seed! v [new-seed] v "Set a new seed value for the RNG" v #{
 10s new-seed
 0Fs seed
 01
-}]] [def random/seed [fn* random/seed [] "Return the current RNG seed value" #{
+}
+0Es random/seed!
+0D
+25v random/seed v [] v "Return the current RNG seed value" v #{
 10s seed
 01
-}]] [def random [fn* random [max] "Return a value from 0 to MAX, or, if left out, a random int" #{
+}
+0Es random/seed
+0D
+25v random v [max] v "Return a value from 0 to MAX, or, if left out, a random int" v #{
 10s max
 08i 1 v numeric?
 0Bo 25
@@ -7673,7 +8735,14 @@
 09o 8
 08i 0 v random/rng!
 01
-}]] [random/seed-initialize!]][do [def tree->json [fn* tree->json [v] "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" #{
+}
+0Es random
+0D
+10s random/seed-initialize!
+08i 1 v apply
+01
+}#{
+25v tree->json v [v] v "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" v #{
 05v "{"
 10s v
 08i 1 v tree/keys
@@ -7695,7 +8764,10 @@
 05v "}"
 08i 3 v cat
 01
-}]] [def val->json [fn* val->json [v] "Return V as a JSON encoded string" #{
+}
+0Es tree->json
+0D
+25v val->json v [v] v "Return V as a JSON encoded string" v #{
 15
 10s v
 08i 1 v type-of
@@ -7799,7 +8871,56 @@
 08i 1 v throw
 16
 01
-}]]][do [def ansi/disabled #f] [def ansi-reset "\e[0m"] [def ansi-fg-reset "\e[0;39m"] [def ansi-bg-reset "\e[49m"] [def ansi-fg [array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]] [def ansi-reset "\e[0m"] [def ansi-bg [array/new "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]] [def ansi-wrap [fn* ansi-wrap [code string] "Wrap STRING in the ansi color CODE" #{
+}
+0Es val->json
+01
+}#{
+05v #f
+0Es ansi/disabled
+0D
+05v "\e[0m"
+0Es ansi-reset
+0D
+05v "\e[0;39m"
+0Es ansi-fg-reset
+0D
+05v "\e[49m"
+0Es ansi-bg-reset
+0D
+05v "\e[0;30m"
+05v "\e[0;31m"
+05v "\e[0;32m"
+05v "\e[0;33m"
+05v "\e[0;34m"
+05v "\e[0;35m"
+05v "\e[0;36m"
+05v "\e[0;37m"
+05v "\e[1;30m"
+05v "\e[1;31m"
+05v "\e[1;32m"
+05v "\e[1;33m"
+05v "\e[1;34m"
+05v "\e[1;35m"
+05v "\e[1;36m"
+05v "\e[1;37m"
+08i 16 v array/new
+0Es ansi-fg
+0D
+05v "\e[0m"
+0Es ansi-reset
+0D
+05v "\e[40m"
+05v "\e[41m"
+05v "\e[42m"
+05v "\e[43m"
+05v "\e[44m"
+05v "\e[45m"
+05v "\e[46m"
+05v "\e[47m"
+08i 8 v array/new
+0Es ansi-bg
+0D
+25v ansi-wrap v [code string] v "Wrap STRING in the ansi color CODE" v #{
 10s ansi/disabled
 0C
 0Ao 26
@@ -7823,119 +8944,170 @@
 05v #f
 08i 3 v cat
 01
-}]] [def ansi-black [fn* ansi-black args "Wrap ARGS in black" #{
+}
+0Es ansi-wrap
+0D
+25v ansi-black v args v "Wrap ARGS in black" v #{
 02i 0
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-red [fn* ansi-dark-red args "Wrap ARGS in dark red" #{
+}
+0Es ansi-black
+0D
+25v ansi-dark-red v args v "Wrap ARGS in dark red" v #{
 02i 1
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-green [fn* ansi-dark-green args "Wrap ARGS in dark green" #{
+}
+0Es ansi-dark-red
+0D
+25v ansi-dark-green v args v "Wrap ARGS in dark green" v #{
 02i 2
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-brown [fn* ansi-brown args "Wrap ARGS in brown" #{
+}
+0Es ansi-dark-green
+0D
+25v ansi-brown v args v "Wrap ARGS in brown" v #{
 02i 3
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-blue [fn* ansi-dark-blue args "Wrap ARGS in dark blue" #{
+}
+0Es ansi-brown
+0D
+25v ansi-dark-blue v args v "Wrap ARGS in dark blue" v #{
 02i 4
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-purple [fn* ansi-purple args "Wrap ARGS in purple" #{
+}
+0Es ansi-dark-blue
+0D
+25v ansi-purple v args v "Wrap ARGS in purple" v #{
 02i 5
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-teal [fn* ansi-teal args "Wrap ARGS in teal" #{
+}
+0Es ansi-purple
+0D
+25v ansi-teal v args v "Wrap ARGS in teal" v #{
 02i 6
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-dark-gray [fn* ansi-dark-gray args "Wrap ARGS in dark gray" #{
+}
+0Es ansi-teal
+0D
+25v ansi-dark-gray v args v "Wrap ARGS in dark gray" v #{
 02i 7
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-gray [fn* ansi-gray args "Wrap ARGS in gray" #{
+}
+0Es ansi-dark-gray
+0D
+25v ansi-gray v args v "Wrap ARGS in gray" v #{
 02i 8
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-red [fn* ansi-red args "Wrap ARGS in red" #{
+}
+0Es ansi-gray
+0D
+25v ansi-red v args v "Wrap ARGS in red" v #{
 02i 9
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-green [fn* ansi-green args "Wrap ARGS in green" #{
+}
+0Es ansi-red
+0D
+25v ansi-green v args v "Wrap ARGS in green" v #{
 02i 10
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-yellow [fn* ansi-yellow args "Wrap ARGS in yellow" #{
+}
+0Es ansi-green
+0D
+25v ansi-yellow v args v "Wrap ARGS in yellow" v #{
 02i 11
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-blue [fn* ansi-blue args "Wrap ARGS in blue" #{
+}
+0Es ansi-yellow
+0D
+25v ansi-blue v args v "Wrap ARGS in blue" v #{
 02i 12
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-pink [fn* ansi-pink args "Wrap ARGS in pink" #{
+}
+0Es ansi-blue
+0D
+25v ansi-pink v args v "Wrap ARGS in pink" v #{
 02i 13
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-cyan [fn* ansi-cyan args "Wrap ARGS in cyan" #{
+}
+0Es ansi-pink
+0D
+25v ansi-cyan v args v "Wrap ARGS in cyan" v #{
 02i 14
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-white [fn* ansi-white args "Wrap ARGS in white" #{
+}
+0Es ansi-cyan
+0D
+25v ansi-white v args v "Wrap ARGS in white" v #{
 02i 15
 10s cat
 10s args
 08i 2 v apply
 08i 2 v ansi-wrap
 01
-}]] [def ansi-rainbow [fn* ansi-rainbow args "Wrap ARGS in the colors of the rainbow!" #{
+}
+0Es ansi-white
+0D
+25v ansi-rainbow v args v "Wrap ARGS in the colors of the rainbow!" v #{
 15
 02i 0
 0Es count
@@ -7990,7 +9162,10 @@
 08i 2 v cat
 16
 01
-}]] [def ansi-rainbow-bg [fn* ansi-rainbow-bg args "Wrap ARGS in the colors of the rainbow!" #{
+}
+0Es ansi-rainbow
+0D
+25v ansi-rainbow-bg v args v "Wrap ARGS in the colors of the rainbow!" v #{
 02i 0
 0Es count
 0D
@@ -8052,7 +9227,10 @@
 05v #f
 08i 2 v cat
 01
-}]] [def reprint-line [fn* reprint-line [text width] "" #{
+}
+0Es ansi-rainbow-bg
+0D
+25v reprint-line v [text width] v "" v #{
 10s width
 0Bo 7
 24
@@ -8094,7 +9272,24 @@
 10s text
 08i 1 v print
 01
-}]]][do [def fmt/format-arg/default [tree/new :align :right :debug #f :base #f :width #nil :padding-char " "]] [def fmt/find-non-digit-from-right [fn* fmt/find-non-digit-from-right [s i] "" #{
+}
+0Es reprint-line
+01
+}#{
+05v :align
+05v :right
+05v :debug
+05v #f
+05v :base
+05v #f
+05v :width
+24
+05v :padding-char
+05v " "
+08i 10 v tree/new
+0Es fmt/format-arg/default
+0D
+25v fmt/find-non-digit-from-right v [s i] v "" v #{
 10s i
 02i 0
 1E
@@ -8124,7 +9319,10 @@
 09o 7
 10s i
 01
-}]] [def fmt/parse-spec [fn* fmt/parse-spec [opts spec] "" #{
+}
+0Es fmt/find-non-digit-from-right
+0D
+25v fmt/parse-spec v [opts spec] v "" v #{
 10s spec
 08i 1 v string/length
 08i 1 v zero?
@@ -8427,7 +9625,10 @@
 08i 1 v throw
 16
 01
-}]] [def fmt/debug [fn* fmt/debug [opts] "" #{
+}
+0Es fmt/parse-spec
+0D
+25v fmt/debug v [opts] v "" v #{
 10s opts
 05v :debug
 08i 2 v tree/ref
@@ -8443,7 +9644,10 @@
 09o 7
 10s opts
 01
-}]] [def fmt/number-format [fn* fmt/number-format [opts] "" #{
+}
+0Es fmt/debug
+0D
+25v fmt/number-format v [opts] v "" v #{
 15
 10s opts
 05v :base
@@ -8518,7 +9722,23 @@
 10s opts
 16
 01
-}]] [def fmt/number-format-prefixex [tree/new :binary "#b" :octal "#o" :decimal "#d" :hexadecimal "#x" :HEXADECIMAL "#x"]] [def fmt/number-format-prefix [fn* fmt/number-format-prefix [opts] "" #{
+}
+0Es fmt/number-format
+0D
+05v :binary
+05v "#b"
+05v :octal
+05v "#o"
+05v :decimal
+05v "#d"
+05v :hexadecimal
+05v "#x"
+05v :HEXADECIMAL
+05v "#x"
+08i 10 v tree/new
+0Es fmt/number-format-prefixex
+0D
+25v fmt/number-format-prefix v [opts] v "" v #{
 10s opts
 05v :debug
 08i 2 v tree/ref
@@ -8562,7 +9782,10 @@
 05v #f
 08i 3 v tree/set!
 01
-}]] [def fmt/add-padding [fn* fmt/add-padding [opts] "" #{
+}
+0Es fmt/number-format-prefix
+0D
+25v fmt/add-padding v [opts] v "" v #{
 10s opts
 05v :width
 08i 2 v tree/ref
@@ -8625,7 +9848,10 @@
 09o 7
 10s opts
 01
-}]] [def fmt/precision [fn* fmt/precision [opts] "" #{
+}
+0Es fmt/add-padding
+0D
+25v fmt/precision v [opts] v "" v #{
 10s opts
 05v :precision
 08i 2 v tree/ref
@@ -8644,7 +9870,10 @@
 09o 7
 10s opts
 01
-}]] [def fmt/truncate [fn* fmt/truncate [opts] "" #{
+}
+0Es fmt/precision
+0D
+25v fmt/truncate v [opts] v "" v #{
 10s opts
 05v :width
 08i 2 v tree/ref
@@ -8666,12 +9895,18 @@
 09o 7
 10s opts
 01
-}]] [def fmt/output [fn* fmt/output [opts] "" #{
+}
+0Es fmt/truncate
+0D
+25v fmt/output v [opts] v "" v #{
 10s opts
 05v :argument
 08i 2 v tree/ref
 01
-}]] [def fmt/format-arg [fn* fmt/format-arg [spec argument] "" #{
+}
+0Es fmt/output
+0D
+25v fmt/format-arg v [spec argument] v "" v #{
 10s fmt/format-arg/default
 08i 1 v tree/dup
 10s spec
@@ -8687,7 +9922,10 @@
 08i 1 v fmt/debug
 08i 1 v fmt/output
 01
-}]] [def fmt/valid-argument? [fn* fmt/valid-argument? [argument] "" #{
+}
+0Es fmt/format-arg
+0D
+25v fmt/valid-argument? v [argument] v "" v #{
 10s argument
 08i 1 v int?
 0C
@@ -8700,7 +9938,10 @@
 0D
 05v #f
 01
-}]] [def fmt/arg-sym [fn* fmt/arg-sym [v] "" #{
+}
+0Es fmt/valid-argument?
+0D
+25v fmt/arg-sym v [v] v "" v #{
 15
 10s v
 08i 1 v type-of
@@ -8737,7 +9978,10 @@
 08i 1 v throw
 16
 01
-}]] [def fmt/expr [fn* fmt/expr [expr arguments-used opts] "" #{
+}
+0Es fmt/arg-sym
+0D
+25v fmt/expr v [expr arguments-used opts] v "" v #{
 10s expr
 08i 1 v string?
 0Bo 7
@@ -8870,7 +10114,10 @@
 08i 2 v fmt/format-arg
 16
 01
-}]] [def fmt [macro* fmt [format-string . args] "Return a formatted string" #{
+}
+0Es fmt/expr
+0D
+26v fmt v [format-string . args] v "Return a formatted string" v #{
 10s format-string
 08i 1 v string?
 0Bo 7
@@ -9179,7 +10426,10 @@
 09o 7
 10s expr
 01
-}]] [def pfmt [macro* pfmt [format-string . args] "Print a formatted string" #{
+}
+0Es fmt
+0D
+26v pfmt v [format-string . args] v "Print a formatted string" v #{
 23s print
 23s fmt
 10s format-string
@@ -9192,7 +10442,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def efmt [macro* efmt [format-string . args] "Print a formatted string" #{
+}
+0Es pfmt
+0D
+26v efmt v [format-string . args] v "Print a formatted string" v #{
 23s error
 23s fmt
 10s format-string
@@ -9205,7 +10458,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def pfmtln [macro* pfmtln [format-string . args] "Print a formatted string" #{
+}
+0Es efmt
+0D
+26v pfmtln v [format-string . args] v "Print a formatted string" v #{
 23s println
 23s fmt
 10s format-string
@@ -9218,7 +10474,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def efmtln [macro* efmtln [format-string . args] "Print a formatted string" #{
+}
+0Es pfmtln
+0D
+26v efmtln v [format-string . args] v "Print a formatted string" v #{
 23s errorln
 23s fmt
 10s format-string
@@ -9231,12 +10490,19 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]]][do [def string->keyword [fn* string->keyword [α] "Return string α as a keyword" #{
+}
+0Es efmtln
+01
+}#{
+25v string->keyword v [α] v "Return string α as a keyword" v #{
 10s α
 08i 1 v str->sym
 08i 1 v symbol->keyword
 01
-}]] [def string->byte-array [fn* string->byte-array [a] "Turn a string into an UTF-8 encoded byte array" #{
+}
+0Es string->keyword
+0D
+25v string->byte-array v [a] v "Turn a string into an UTF-8 encoded byte array" v #{
 10s a
 08i 1 v string/length
 08i 1 v array/allocate
@@ -9274,27 +10540,42 @@
 0D
 10s ret
 01
-}]] [def println [fn* println [str] "Print STR on a single line" #{
+}
+0Es string->byte-array
+0D
+25v println v [str] v "Print STR on a single line" v #{
 10s str
 05v "\r\n"
 08i 2 v cat
 08i 1 v print
 01
-}]] [def errorln [fn* errorln [str] "Print to stderr STR on a single line" #{
+}
+0Es println
+0D
+25v errorln v [str] v "Print to stderr STR on a single line" v #{
 10s str
 05v "\r\n"
 08i 2 v cat
 08i 1 v error
 01
-}]] [def display [fn* display [value] "Display VALUE" #{
+}
+0Es errorln
+0D
+25v display v [value] v "Display VALUE" v #{
 10s value
 08i 1 v print
 01
-}]] [def newline [fn* newline [] "Print a single line feed character" #{
+}
+0Es display
+0D
+25v newline v [] v "Print a single line feed character" v #{
 05v "\r\n"
 08i 1 v display
 01
-}]] [def br [fn* br [num] "Return NUM=1 linebreaks" #{
+}
+0Es newline
+0D
+25v br v [num] v "Return NUM=1 linebreaks" v #{
 10s num
 08i 1 v nil?
 0C
@@ -9318,7 +10599,10 @@
 08i 1 v br
 08i 2 v cat
 01
-}]] [def path/ext?! [fn* path/ext?! [ext] "Return a predicate that checks if a path ends on EXT" #{
+}
+0Es br
+0D
+25v path/ext?! v [ext] v "Return a predicate that checks if a path ends on EXT" v #{
 15
 10s ext
 08i 1 v type-of
@@ -9373,7 +10657,10 @@
 08i 1 v throw
 16
 01
-}]] [def path/extension [fn* path/extension [path] "Return the extension of PATH" #{
+}
+0Es path/ext?!
+0D
+25v path/extension v [path] v "Return the extension of PATH" v #{
 10s path
 05v "."
 08i 2 v last-index-of
@@ -9393,7 +10680,10 @@
 09o 7
 10s path
 01
-}]] [def path/without-extension [fn* path/without-extension [path] "Return PATH, but without the extension part" #{
+}
+0Es path/extension
+0D
+25v path/without-extension v [path] v "Return PATH, but without the extension part" v #{
 10s path
 05v "."
 08i 2 v last-index-of
@@ -9410,7 +10700,10 @@
 09o 7
 10s path
 01
-}]] [def int->string/binary [fn* int->string/binary [α] "Turn α into a its **binary** string representation" #{
+}
+0Es path/without-extension
+0D
+25v int->string/binary v [α] v "Turn α into a its **binary** string representation" v #{
 05v ""
 0Es ret
 0D
@@ -9454,7 +10747,10 @@
 0D
 10s ret
 01
-}]] [def int->string/octal [fn* int->string/octal [α] "Turn α into a its **octal** string representation" #{
+}
+0Es int->string/binary
+0D
+25v int->string/octal v [α] v "Turn α into a its **octal** string representation" v #{
 05v ""
 0Es ret
 0D
@@ -9498,7 +10794,29 @@
 0D
 10s ret
 01
-}]] [def int->string/hex/conversion-arr [array/new "0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]] [def int->string/HEX [fn* int->string/HEX [α] "Turn α into a its **hexadecimal** string representation" #{
+}
+0Es int->string/octal
+0D
+05v "0"
+05v "1"
+05v "2"
+05v "3"
+05v "4"
+05v "5"
+05v "6"
+05v "7"
+05v "8"
+05v "9"
+05v "A"
+05v "B"
+05v "C"
+05v "D"
+05v "E"
+05v "F"
+08i 16 v array/new
+0Es int->string/hex/conversion-arr
+0D
+25v int->string/HEX v [α] v "Turn α into a its **hexadecimal** string representation" v #{
 05v ""
 0Es ret
 0D
@@ -9554,16 +10872,28 @@
 0D
 10s ret
 01
-}]] [def int->string/hex [fn* int->string/hex [α] "Turn α into a its **hexadecimal** string representation" #{
+}
+0Es int->string/HEX
+0D
+25v int->string/hex v [α] v "Turn α into a its **hexadecimal** string representation" v #{
 10s α
 08i 1 v int->string/HEX
 08i 1 v lowercase
 01
-}]] [def int->string/decimal [fn* int->string/decimal [α] "Turn α into a its **decimal** string representation" #{
+}
+0Es int->string/hex
+0D
+25v int->string/decimal v [α] v "Turn α into a its **decimal** string representation" v #{
 10s α
 08i 1 v string
 01
-}]] [def int->string int->string/decimal] [def string/pad-start [fn* string/pad-start [text goal-length char] "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string" #{
+}
+0Es int->string/decimal
+0D
+10s int->string/decimal
+0Es int->string
+0D
+25v string/pad-start v [text goal-length char] v "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string" v #{
 10s char
 0Bo 7
 24
@@ -9623,7 +10953,10 @@
 09o 7
 10s text
 01
-}]] [def string/pad-end [fn* string/pad-end [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" #{
+}
+0Es string/pad-start
+0D
+25v string/pad-end v [text goal-length char] v "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" v #{
 10s char
 0Bo 7
 24
@@ -9679,7 +11012,10 @@
 09o 7
 10s text
 01
-}]] [def string/pad-middle [fn* string/pad-middle [text goal-length char] "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" #{
+}
+0Es string/pad-end
+0D
+25v string/pad-middle v [text goal-length char] v "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string" v #{
 10s char
 0Bo 7
 24
@@ -9756,7 +11092,10 @@
 09o 7
 10s text
 01
-}]] [def string/round [fn* string/round [text decimal-digits] "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period" #{
+}
+0Es string/pad-middle
+0D
+25v string/round v [text decimal-digits] v "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period" v #{
 10s text
 05v "."
 08i 2 v last-index-of
@@ -9776,7 +11115,10 @@
 09o 7
 10s text
 01
-}]] [def split/empty [fn* split/empty [str separator] "" #{
+}
+0Es string/round
+0D
+25v split/empty v [str separator] v "" v #{
 10s str
 08i 1 v string/length
 0Es slen
@@ -9814,7 +11156,10 @@
 10s ret
 08i 1 v reverse
 01
-}]] [def split/string [fn* split/string [str separator start] "" #{
+}
+0Es split/empty
+0D
+25v split/string v [str separator start] v "" v #{
 10s start
 0Bo 7
 24
@@ -9853,7 +11198,10 @@
 24
 08i 2 v cons
 01
-}]] [def split [fn* split [str separator] "Splits STR into a list at every occurunse of SEPARATOR" #{
+}
+0Es split/string
+0D
+25v split v [str separator] v "Splits STR into a list at every occurunse of SEPARATOR" v #{
 10s str
 08i 1 v type-of
 05v :string
@@ -9900,7 +11248,10 @@
 08i 3 v split/string
 16
 01
-}]] [def read/single [fn* read/single [text] "Uses the reader and returns the first single value read from string TEXT" #{
+}
+0Es split
+0D
+25v read/single v [text] v "Uses the reader and returns the first single value read from string TEXT" v #{
 10s text
 08i 1 v type-of
 05v :string
@@ -9919,17 +11270,26 @@
 08i 1 v read
 08i 1 v car
 01
-}]] [def read/int [fn* read/int [text] "Reads the first string from TEXT" #{
+}
+0Es read/single
+0D
+25v read/int v [text] v "Reads the first string from TEXT" v #{
 10s text
 08i 1 v read/single
 08i 1 v int
 01
-}]] [def read/float [fn* read/float [text] "Reads the first float from TEXT" #{
+}
+0Es read/int
+0D
+25v read/float v [text] v "Reads the first float from TEXT" v #{
 10s text
 08i 1 v read/single
 08i 1 v float
 01
-}]] [def string/length?! [fn* string/length?! [chars] "" #{
+}
+0Es read/float
+0D
+25v string/length?! v [chars] v "" v #{
 25v anonymous v [a] v "" v #{
 10s chars
 10s a
@@ -9938,7 +11298,10 @@
 01
 }
 01
-}]] [def contains-any? [fn* contains-any? [str chars] "" #{
+}
+0Es string/length?!
+0D
+25v contains-any? v [str chars] v "" v #{
 10s or
 10s chars
 05v ""
@@ -9954,7 +11317,10 @@
 08i 2 v map
 08i 2 v apply
 01
-}]] [def contains-all? [fn* contains-all? [str chars] "" #{
+}
+0Es contains-any?
+0D
+25v contains-all? v [str chars] v "" v #{
 10s and
 10s chars
 05v ""
@@ -9970,7 +11336,14 @@
 08i 2 v map
 08i 2 v apply
 01
-}]]][do [def test-context "Nujel"] [def test/reset [fn* test/reset [] "" #{
+}
+0Es contains-all?
+01
+}#{
+05v "Nujel"
+0Es test-context
+0D
+25v test/reset v [] v "" v #{
 24
 0Fs test-list
 0D
@@ -9981,7 +11354,31 @@
 05v [do [+ 3 1]]
 08i 2 v test/add*
 01
-}]] [def test-list #nil] [def test-count 0] [def nujel-start 0] [def success-count 0] [def error-count 0] [def print-errors #t] [def print-passes #f] [def test/add* [fn* test/add* [result expr] "" #{
+}
+0Es test/reset
+0D
+24
+0Es test-list
+0D
+02i 0
+0Es test-count
+0D
+02i 0
+0Es nujel-start
+0D
+02i 0
+0Es success-count
+0D
+02i 0
+0Es error-count
+0D
+05v #t
+0Es print-errors
+0D
+05v #f
+0Es print-passes
+0D
+25v test/add* v [result expr] v "" v #{
 10s result
 10s expr
 08i 2 v cons
@@ -9994,7 +11391,10 @@
 08i 2 v +
 0Fs test-count
 01
-}]] [def test/add [macro* test/add [result . expr] "Add a test where EXPR must eval to RESULT" #{
+}
+0Es test/add*
+0D
+26v test/add v [result . expr] v "Add a test where EXPR must eval to RESULT" v #{
 23s test/add*
 10s result
 23s quote
@@ -10007,7 +11407,10 @@
 08i 2 v cons
 08i 2 v cons
 01
-}]] [def display-results [fn* display-results [] "Prints the result Message" #{
+}
+0Es test/add
+0D
+25v display-results v [] v "Prints the result Message" v #{
 08i 0 v random/seed-initialize!
 0D
 15
@@ -10073,7 +11476,10 @@
 16
 08i 1 v errorln
 01
-}]] [def test-success [fn* test-success [res-should res-is expr i] "Should be called after a test has finished successfully" #{
+}
+0Es display-results
+0D
+25v test-success v [res-should res-is expr i] v "Should be called after a test has finished successfully" v #{
 10s print-passes
 0Bo 94
 15
@@ -10108,7 +11514,10 @@
 08i 2 v +
 0Fs success-count
 01
-}]] [def test-failure [fn* test-failure [res-should res-is expr i] "Should be called if EXPR does not equal RES" #{
+}
+0Es test-success
+0D
+25v test-failure v [res-should res-is expr i] v "Should be called if EXPR does not equal RES" v #{
 10s print-errors
 0Bo 94
 15
@@ -10143,7 +11552,10 @@
 08i 2 v +
 0Fs error-count
 01
-}]] [def test-default [fn* test-default [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" #{
+}
+0Es test-failure
+0D
+25v test-default v [result rawexpr i] v "Tests that RAWEXPR evaluates to RESULT" v #{
 25v anonymous v [err] v "" v #{
 10s err
 08i 1 v display/error
@@ -10184,7 +11596,10 @@
 27
 0D
 01
-}]] [def test-run-real [fn* test-run-real [test] "" #{
+}
+0Es test-default
+0D
+25v test-run-real v [test] v "" v #{
 08i 0 v time/milliseconds
 0Fs nujel-start
 0D
@@ -10238,7 +11653,10 @@
 0D
 10s error-count
 01
-}]] [def test-run [fn* test-run [output-passes hide-errors] "Run through all automated Tests" #{
+}
+0Es test-run-real
+0D
+25v test-run v [output-passes hide-errors] v "Run through all automated Tests" v #{
 10s hide-errors
 08i 1 v bool
 08i 1 v not
@@ -10251,4 +11669,10 @@
 10s test-default
 08i 1 v test-run-real
 01
-}]] [test/reset]]
+}
+0Es test-run
+0D
+10s test/reset
+08i 1 v apply
+01
+}

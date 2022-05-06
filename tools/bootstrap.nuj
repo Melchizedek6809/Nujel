@@ -5,28 +5,16 @@
  | precompiled stdlib).
  |#
 
-[defn file/compile/new [path no-write environment]
+[defn file/compile [path environment]
   "Compile a Nujel source file into optimized object code"
   [def source [cons 'do [read [file/read path]]]]
   [def object-code [-> [compile/forms source environment]
                        compile
                        bytecompile
                        assemble*]]
-  [when-not no-write
-            [file/write [if object-code [str/write object-code] ""]
-                        [cat [path/without-extension path] ".no"]]]
+  [file/write [if object-code [str/write object-code] ""]
+              [cat [path/without-extension path] ".no"]]
   object-code]
-
-[defn file/compile/old [path no-write environment]
-        "Compile a Nujel source file into optimized object code"
-        [def source [cons 'do [read [file/read path]]]]
-        [def object-code [compile/forms source environment]]
-        [when-not no-write [file/write [if object-code [str/write object-code] ""]
-                                       [cat [path/without-extension path] ".no"]]]
-        object-code]
-
-[defn file/compile [path no-write environment]
-  [file/compile/old path no-write environment]]
 
 [def environment [environment*]]
 [def ext-nuj? [path/ext?! "nuj"]]
@@ -45,4 +33,4 @@
          [exit 2]]
      [for-in [cur-path stdlib-files]
              [println [cat [ansi-green " [NUJ]  "] cur-path]]
-             [file/compile cur-path #f environment]]]
+             [file/compile cur-path environment]]]
