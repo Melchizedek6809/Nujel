@@ -630,6 +630,7 @@
 [test/add #f [[path/ext?! "asd"] "qwe.as"]]
 [test/add #t [[path/ext?! '["as" "asd"]] "qwe.as"]]
 [test/add #t [[path/ext?! '["as" "asd"]] "qwe.asd"]]
+[test/add :a [let [[list '[:a :b :c]]] [car list]]]
 
 ;[test/add "#{02i 1 02i 2 08i 2 v + 01}" [str/write [assemble* [bytecompile '[+ 1 2]]]]]
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]

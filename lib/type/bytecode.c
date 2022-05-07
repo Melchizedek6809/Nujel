@@ -342,26 +342,40 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		lRootsRet(c->rsp);
 		ip++;
 		break;
-	case lopClosurePush:
+	case lopCar:
+		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during car", NULL, c);}
+		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
 		ip++;
+		break;
+	case lopCdr:
+		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during cdr", NULL, c);}
+		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
+		ip++;
+		break;
+	case lopCons:
+		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during cons", NULL, c);}
+		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopClosurePush:
 		ctx.valueStack[ctx.sp++] = lValObject(c);
+		ip++;
 		break;
 	case lopLet:
-		ip++;
-		//ctx.closureStack[ctx.csp] = c;
 		c = lClosureNew(c, closureLet);
 		c->type = closureLet;
 		ctx.closureStack[++ctx.csp] = c;
+		ip++;
 		break;
 	case lopClosurePop: {
-		ip++;
 		lClosure *nclo = ctx.closureStack[--ctx.csp];
 		c = nclo;
 		lRootsRet(c->rsp);
 		if(ctx.csp < 0){lExceptionThrowValClo("stack-underflow", "Underflowed during lopClosurePop", NULL, c);}
+		ip++;
 		break; }
 	case lopTry:
-		//ctx.closureStack[ctx.csp] = c;
 		c = lClosureNew(c, closureTry);
 		c->ip = ip + lBytecodeGetOffset16(ip+1);
 		c->sp = ctx.sp;
@@ -397,6 +411,9 @@ static int lBytecodeOpLength(lBytecodeOp op){
 		epf("Unknown bytecodeOp length: %x\n",op);
 		exit(3);
 	case lopNOP:
+	case lopCar:
+	case lopCdr:
+	case lopCons:
 	case lopRet:
 	case lopIntAdd:
 	case lopDebugPrintStack:

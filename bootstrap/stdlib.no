@@ -44,204 +44,6 @@
 0Es bit-clear?!
 01
 }#{
-25v array/2d/allocate v [width height] v "" v #{
-05v :data
-10s width
-10s height
-08i 2 v *
-08i 1 v array/allocate
-02i 0
-08i 2 v array/fill!
-05v :width
-10s width
-05v :height
-10s height
-08i 6 v tree/new
-01
-}
-0Es array/2d/allocate
-0D
-25v array/2d/fill! v [data v] v "" v #{
-10s data
-05v :data
-08i 2 v tree/ref
-10s v
-08i 2 v array/fill!
-0D
-10s data
-01
-}
-0Es array/2d/fill!
-0D
-25v array/2d/ref v [data x y oob-val] v "" v #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 52
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-08i 2 v array/ref
-01
-}
-0Es array/2d/ref
-0D
-25v array/2d/set! v [data x y val] v "" v #{
-10s x
-10s data
-05v :width
-08i 2 v tree/ref
-21
-0C
-0Ao 55
-0D
-10s y
-10s data
-05v :height
-08i 2 v tree/ref
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 33
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 56
-10s data
-05v :data
-08i 2 v tree/ref
-10s x
-10s y
-10s data
-05v :width
-08i 2 v tree/ref
-08i 2 v mul
-08i 2 v add
-10s val
-08i 3 v array/set!
-0D
-10s data
-01
-}
-0Es array/2d/set!
-0D
-25v array/2d/print v [data] v "" v #{
-15
-02i 0
-0Es y
-0D
-10s data
-05v :height
-08i 2 v tree/ref
-0Es ΓεnΣym-22
-0D
-02i 0
-1B
-1C
-10s y
-10s ΓεnΣym-22
-1E
-0Bo 115
-0D
-15
-02i 0
-0Es x
-0D
-10s data
-05v :width
-08i 2 v tree/ref
-0Es ΓεnΣym-23
-0D
-02i 0
-1B
-1C
-10s x
-10s ΓεnΣym-23
-1E
-0Bo 50
-0D
-10s data
-10s x
-10s y
-08i 3 v array/2d/ref
-05v " "
-08i 2 v cat
-08i 1 v display
-0D
-02i 1
-10s x
-03
-0Fs x
-09o -57
-16
-0D
-08i 0 v newline
-0D
-02i 1
-10s y
-03
-0Fs y
-09o -122
-16
-0D
-10s data
-01
-}
-0Es array/2d/print
-01
-}#{
 25v array/+= v [a i v] v "Add V to the value in A at position I and store the result in A returning A" v #{
 10s a
 10s i
@@ -905,6 +707,204 @@
 01
 }
 0Es array/cut
+01
+}#{
+25v array/2d/allocate v [width height] v "" v #{
+05v :data
+10s width
+10s height
+08i 2 v *
+08i 1 v array/allocate
+02i 0
+08i 2 v array/fill!
+05v :width
+10s width
+05v :height
+10s height
+08i 6 v tree/new
+01
+}
+0Es array/2d/allocate
+0D
+25v array/2d/fill! v [data v] v "" v #{
+10s data
+05v :data
+08i 2 v tree/ref
+10s v
+08i 2 v array/fill!
+0D
+10s data
+01
+}
+0Es array/2d/fill!
+0D
+25v array/2d/ref v [data x y oob-val] v "" v #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 52
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+08i 2 v array/ref
+01
+}
+0Es array/2d/ref
+0D
+25v array/2d/set! v [data x y val] v "" v #{
+10s x
+10s data
+05v :width
+08i 2 v tree/ref
+21
+0C
+0Ao 55
+0D
+10s y
+10s data
+05v :height
+08i 2 v tree/ref
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 33
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+09o 56
+10s data
+05v :data
+08i 2 v tree/ref
+10s x
+10s y
+10s data
+05v :width
+08i 2 v tree/ref
+08i 2 v mul
+08i 2 v add
+10s val
+08i 3 v array/set!
+0D
+10s data
+01
+}
+0Es array/2d/set!
+0D
+25v array/2d/print v [data] v "" v #{
+15
+02i 0
+0Es y
+0D
+10s data
+05v :height
+08i 2 v tree/ref
+0Es ΓεnΣym-22
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-22
+1E
+0Bo 115
+0D
+15
+02i 0
+0Es x
+0D
+10s data
+05v :width
+08i 2 v tree/ref
+0Es ΓεnΣym-23
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-23
+1E
+0Bo 50
+0D
+10s data
+10s x
+10s y
+08i 3 v array/2d/ref
+05v " "
+08i 2 v cat
+08i 1 v display
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -57
+16
+0D
+08i 0 v newline
+0D
+02i 1
+10s y
+03
+0Fs y
+09o -122
+16
+0D
+10s data
+01
+}
+0Es array/2d/print
 01
 }#{
 05v :e
@@ -3534,53 +3534,84 @@
 25v $apply v [arg-count fun] v "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" v #{
 15
 10s arg-count
-0Es ΓεnΣym-73
-0D
-10s ΓεnΣym-73
-24
-20
-0Bo 10
-10s do
-09o 201
-10s ΓεnΣym-73
-02i 2
-20
-0Bo 164
-15
-10s fun
 0Es ΓεnΣym-74
 0D
 10s ΓεnΣym-74
+02i 1
+20
+0Bo 86
+15
+10s fun
+0Es ΓεnΣym-75
+0D
+10s ΓεnΣym-75
+10s car
+20
+0Bo 12
+10s $car
+1Ai 0
+09o 51
+10s ΓεnΣym-75
+10s cdr
+20
+0Bo 12
+10s $cdr
+1Ai 0
+09o 30
+05v #$8
+10s arg-count
+08i 1 v int->bytecode-op
+10s fun
+08i 1 v val->bytecode-op
+08i 3 v list
+16
+09o 222
+10s ΓεnΣym-74
+02i 2
+20
+0Bo 185
+15
+10s fun
+0Es ΓεnΣym-76
+0D
+10s ΓεnΣym-76
 10s add/int
 20
 0Bo 11
 08i 0 v $add/int
+09o 151
+10s ΓεnΣym-76
+10s cons
+20
+0Bo 12
+10s $cons
+1Ai 0
 09o 130
-10s ΓεnΣym-74
+10s ΓεnΣym-76
 10s <
 20
 0Bo 11
 08i 0 v $<
 09o 110
-10s ΓεnΣym-74
+10s ΓεnΣym-76
 10s <=
 20
 0Bo 11
 08i 0 v $<=
 09o 90
-10s ΓεnΣym-74
+10s ΓεnΣym-76
 10s ==
 20
 0Bo 11
 08i 0 v $==
 09o 70
-10s ΓεnΣym-74
+10s ΓεnΣym-76
 10s >=
 20
 0Bo 11
 08i 0 v $>=
 09o 50
-10s ΓεnΣym-74
+10s ΓεnΣym-76
 10s >
 20
 0Bo 11
@@ -3839,6 +3870,24 @@
 }
 0Es $swap
 0D
+25v $car v [] v "" v #{
+05v [#$11]
+01
+}
+0Es $car
+0D
+25v $cdr v [] v "" v #{
+05v [#$12]
+01
+}
+0Es $cdr
+0D
+25v $cons v [] v "" v #{
+05v [#$14]
+01
+}
+0Es $cons
+0D
 25v assemble/build-sym-map v [code sym-map pos] v "" v #{
 02i 0
 1B
@@ -3850,9 +3899,9 @@
 10s code
 08i 1 v car
 08i 1 v type-of
-0Es ΓεnΣym-75
+0Es ΓεnΣym-77
 0D
-10s ΓεnΣym-75
+10s ΓεnΣym-77
 05v :bytecode-op
 20
 0Bo 34
@@ -3864,13 +3913,13 @@
 0Fs pos
 08i 3 v tree/set!
 09o 124
-10s ΓεnΣym-75
+10s ΓεnΣym-77
 05v :symbol
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-75
+10s ΓεnΣym-77
 05v :keyword
 20
 0C
@@ -3891,7 +3940,7 @@
 10s pos
 08i 3 v tree/set!
 09o 45
-10s ΓεnΣym-75
+10s ΓεnΣym-77
 05v :pair
 20
 0Bo 32
@@ -3964,26 +4013,26 @@
 09o 168
 15
 10s code
-0Es ΓεnΣym-76
+0Es ΓεnΣym-78
 0D
-10s ΓεnΣym-76
+10s ΓεnΣym-78
 0Bo 149
 02i 0
 1B
 1C
-10s ΓεnΣym-76
+10s ΓεnΣym-78
 0Bo 135
 0D
-10s ΓεnΣym-76
+10s ΓεnΣym-78
 08i 1 v car
 0Es op
 0D
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-77
+0Es ΓεnΣym-79
 0D
-10s ΓεnΣym-77
+10s ΓεnΣym-79
 05v :bytecode-op
 20
 0Bo 34
@@ -3995,7 +4044,7 @@
 10s op
 08i 3 v array/set!
 09o 44
-10s ΓεnΣym-77
+10s ΓεnΣym-79
 05v :pair
 20
 0Bo 31
@@ -4009,9 +4058,9 @@
 24
 16
 0D
-10s ΓεnΣym-76
+10s ΓεnΣym-78
 08i 1 v cdr
-0Fs ΓεnΣym-76
+0Fs ΓεnΣym-78
 09o -137
 09o 4
 24
@@ -4130,15 +4179,15 @@
 15
 10s source
 08i 1 v type-of
-0Es ΓεnΣym-82
+0Es ΓεnΣym-84
 0D
-10s ΓεnΣym-82
+10s ΓεnΣym-84
 05v :symbol
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-82
+10s ΓεnΣym-84
 05v :keyword
 20
 0C
@@ -4155,14 +4204,14 @@
 10s source
 08i 1 v $get
 09o 56
-10s ΓεnΣym-82
+10s ΓεnΣym-84
 05v :int
 20
 0Bo 15
 10s source
 08i 1 v $push/int
 09o 32
-10s ΓεnΣym-82
+10s ΓεnΣym-84
 05v :nil
 20
 0Bo 11
@@ -4179,16 +4228,16 @@
 15
 10s source
 08i 1 v type-of
-0Es ΓεnΣym-83
+0Es ΓεnΣym-85
 0D
-10s ΓεnΣym-83
+10s ΓεnΣym-85
 05v :int
 20
 0Bo 15
 10s source
 08i 1 v $push/int
 09o 36
-10s ΓεnΣym-83
+10s ΓεnΣym-85
 05v :symbol
 20
 0Bo 15
@@ -4691,17 +4740,17 @@
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-84
+0Es ΓεnΣym-86
 0D
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :special-form
 20
 0Bo 442
 15
 10s op
-0Es ΓεnΣym-85
+0Es ΓεnΣym-87
 0D
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s do
 20
 0Bo 19
@@ -4709,7 +4758,7 @@
 10s env
 08i 2 v bytecompile/do
 09o 400
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s let*
 20
 0Bo 19
@@ -4717,7 +4766,7 @@
 10s env
 08i 2 v bytecompile/let*
 09o 372
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s def
 20
 0Bo 19
@@ -4725,7 +4774,7 @@
 10s env
 08i 2 v bytecompile/def
 09o 344
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s set!
 20
 0Bo 19
@@ -4733,7 +4782,7 @@
 10s env
 08i 2 v bytecompile/set!
 09o 316
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s if
 20
 0Bo 19
@@ -4741,7 +4790,7 @@
 10s env
 08i 2 v bytecompile/if
 09o 288
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s while
 20
 0Bo 19
@@ -4749,7 +4798,7 @@
 10s env
 08i 2 v bytecompile/while
 09o 260
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s and
 20
 0Bo 19
@@ -4757,7 +4806,7 @@
 10s env
 08i 2 v bytecompile/and
 09o 232
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s or
 20
 0Bo 19
@@ -4765,7 +4814,7 @@
 10s env
 08i 2 v bytecompile/or
 09o 204
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s fn*
 20
 0Bo 19
@@ -4773,7 +4822,7 @@
 10s env
 08i 2 v bytecompile/fn*
 09o 176
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s macro*
 20
 0Bo 19
@@ -4781,7 +4830,7 @@
 10s env
 08i 2 v bytecompile/macro*
 09o 148
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s ω*
 20
 0Bo 19
@@ -4789,7 +4838,7 @@
 10s env
 08i 2 v bytecompile/ω*
 09o 120
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s try
 20
 0Bo 19
@@ -4797,7 +4846,7 @@
 10s env
 08i 2 v bytecompile/try
 09o 92
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s return
 20
 0Bo 19
@@ -4805,7 +4854,7 @@
 10s env
 08i 2 v bytecompile/return
 09o 64
-10s ΓεnΣym-85
+10s ΓεnΣym-87
 10s quote
 20
 0Bo 20
@@ -4822,13 +4871,13 @@
 08i 1 v throw
 16
 09o 216
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :lambda
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :native-function
 20
 0C
@@ -4842,13 +4891,13 @@
 10s env
 08i 3 v bytecompile/procedure
 09o 156
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :pair
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :symbol
 20
 0C
@@ -4862,7 +4911,7 @@
 10s env
 08i 3 v bytecompile/procedure/dynamic
 09o 96
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :string
 20
 0Bo 19
@@ -4870,7 +4919,7 @@
 10s env
 08i 2 v bytecompile/string
 09o 68
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :array
 20
 0Bo 19
@@ -4878,7 +4927,7 @@
 10s env
 08i 2 v bytecompile/array
 09o 40
-10s ΓεnΣym-84
+10s ΓεnΣym-86
 05v :tree
 20
 0Bo 19
@@ -5205,92 +5254,92 @@
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-89
+0Es ΓεnΣym-91
 0D
-10s ΓεnΣym-89
+10s ΓεnΣym-91
 05v :nil
 20
 0Bo 10
 10s source
 09o 426
-10s ΓεnΣym-89
+10s ΓεnΣym-91
 05v :special-form
 20
 0Bo 373
 15
 10s op
-0Es ΓεnΣym-90
+0Es ΓεnΣym-92
 0D
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s do
 20
 0Bo 15
 10s source
 08i 1 v compile/do
 09o 335
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s def
 20
 0Bo 15
 10s source
 08i 1 v compile/def
 09o 311
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s set!
 20
 0Bo 15
 10s source
 08i 1 v compile/set!
 09o 287
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s let*
 20
 0Bo 15
 10s source
 08i 1 v compile/let*
 09o 263
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s fn*
 20
 0Bo 15
 10s source
 08i 1 v compile/fn*
 09o 239
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s macro*
 20
 0Bo 15
 10s source
 08i 1 v compile/macro*
 09o 215
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s ω*
 20
 0Bo 15
 10s source
 08i 1 v compile/ω*
 09o 191
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s if
 20
 0Bo 15
 10s source
 08i 1 v compile/if
 09o 167
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s try
 20
 0Bo 15
 10s source
 08i 1 v compile/try
 09o 143
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s and
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s or
 20
 0C
@@ -5302,21 +5351,21 @@
 10s compile*
 08i 2 v map
 09o 92
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s while
 20
 0Bo 15
 10s source
 08i 1 v compile/while
 09o 68
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s return
 20
 0Bo 15
 10s source
 08i 1 v compile/return
 09o 44
-10s ΓεnΣym-90
+10s ΓεnΣym-92
 10s quote
 20
 0Bo 10
@@ -5329,7 +5378,7 @@
 08i 1 v throw
 16
 09o 44
-10s ΓεnΣym-89
+10s ΓεnΣym-91
 05v :macro
 20
 0Bo 19
@@ -5375,17 +5424,17 @@
 25v load/forms v [source environment] v "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" v #{
 15
 10s source
-0Es ΓεnΣym-91
+0Es ΓεnΣym-93
 0D
-10s ΓεnΣym-91
+10s ΓεnΣym-93
 0Bo 82
 02i 0
 1B
 1C
-10s ΓεnΣym-91
+10s ΓεnΣym-93
 0Bo 68
 0D
-10s ΓεnΣym-91
+10s ΓεnΣym-93
 08i 1 v car
 0Es form
 0D
@@ -5398,9 +5447,9 @@
 10s environment
 08i 3 v bytecode-eval
 0D
-10s ΓεnΣym-91
+10s ΓεnΣym-93
 08i 1 v cdr
-0Fs ΓεnΣym-91
+0Fs ΓεnΣym-93
 09o -70
 09o 4
 24
@@ -5696,111 +5745,129 @@
 25v disassemble/length v [op] v "Return the length in bytes of a bytecode operation and all its arguments" v #{
 15
 10s op
-0Es ΓεnΣym-97
+0Es ΓεnΣym-99
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$0
+20
+0C
+0Ao 288
+0D
+10s ΓεnΣym-99
+05v #$1
+20
+0C
+0Ao 274
+0D
+10s ΓεnΣym-99
+05v #$3
+20
+0C
+0Ao 260
+0D
+10s ΓεnΣym-99
+05v #$4
 20
 0C
 0Ao 246
 0D
-10s ΓεnΣym-97
-05v #$1
+10s ΓεnΣym-99
+05v #$C
 20
 0C
 0Ao 232
 0D
-10s ΓεnΣym-97
-05v #$3
+10s ΓεnΣym-99
+05v #$D
 20
 0C
 0Ao 218
 0D
-10s ΓεnΣym-97
-05v #$4
+10s ΓεnΣym-99
+05v #$11
 20
 0C
 0Ao 204
 0D
-10s ΓεnΣym-97
-05v #$C
+10s ΓεnΣym-99
+05v #$12
 20
 0C
 0Ao 190
 0D
-10s ΓεnΣym-97
-05v #$D
+10s ΓεnΣym-99
+05v #$13
 20
 0C
 0Ao 176
 0D
-10s ΓεnΣym-97
-05v #$13
+10s ΓεnΣym-99
+05v #$14
 20
 0C
 0Ao 162
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$15
 20
 0C
 0Ao 148
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$16
 20
 0C
 0Ao 134
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$1B
 20
 0C
 0Ao 120
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$1C
 20
 0C
 0Ao 106
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$1E
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$1F
 20
 0C
 0Ao 78
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$20
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$21
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$22
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$24
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$27
 20
 0C
@@ -5810,13 +5877,13 @@
 0Bo 8
 02i 1
 09o 286
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$2
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$1A
 20
 0C
@@ -5826,25 +5893,25 @@
 0Bo 8
 02i 2
 09o 246
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$9
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$A
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$B
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$18
 20
 0C
@@ -5854,31 +5921,31 @@
 0Bo 8
 02i 3
 09o 178
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$5
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$E
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$F
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$10
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$23
 20
 0C
@@ -5888,7 +5955,7 @@
 0Bo 8
 02i 4
 09o 96
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$8
 20
 0C
@@ -5898,13 +5965,13 @@
 0Bo 8
 02i 5
 09o 70
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$25
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-97
+10s ΓεnΣym-99
 05v #$26
 20
 0C
@@ -6068,21 +6135,21 @@
 10s a
 10s i
 08i 2 v ref
-0Es ΓεnΣym-98
+0Es ΓεnΣym-100
 0D
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$0
 20
 0Bo 10
 05v [$nop]
 09o 1461
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1
 20
 0Bo 10
 05v [$ret]
 09o 1442
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$2
 20
 0Bo 46
@@ -6097,19 +6164,19 @@
 08i 2 v cons
 08i 2 v cons
 09o 1387
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$3
 20
 0Bo 10
 05v [$add/int]
 09o 1368
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$4
 20
 0Bo 10
 05v [$debug/print-stack]
 09o 1349
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$5
 20
 0Bo 41
@@ -6123,7 +6190,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 1299
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$6
 20
 0Bo 46
@@ -6138,13 +6205,13 @@
 08i 2 v cons
 08i 2 v cons
 09o 1244
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$7
 20
 0Bo 10
 05v [$eval]
 09o 1225
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$8
 20
 0Bo 71
@@ -6165,7 +6232,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 1145
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$9
 20
 0Bo 41
@@ -6179,7 +6246,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 1095
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$A
 20
 0Bo 41
@@ -6193,7 +6260,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 1045
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$B
 20
 0Bo 41
@@ -6207,19 +6274,19 @@
 08i 2 v cons
 08i 2 v cons
 09o 995
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$C
 20
 0Bo 10
 05v [$dup]
 09o 976
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$D
 20
 0Bo 10
 05v [$drop]
 09o 957
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$E
 20
 0Bo 41
@@ -6233,7 +6300,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 907
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$F
 20
 0Bo 41
@@ -6247,7 +6314,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 857
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$10
 20
 0Bo 41
@@ -6261,31 +6328,31 @@
 08i 2 v cons
 08i 2 v cons
 09o 807
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$13
 20
 0Bo 10
 05v [$closure/push]
 09o 788
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$14
 20
 0Bo 10
 05v [$closure/enter]
 09o 769
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$15
 20
 0Bo 10
 05v [$let]
 09o 750
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$16
 20
 0Bo 10
 05v [$closure/pop]
 09o 731
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$17
 20
 0Bo 41
@@ -6299,7 +6366,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 681
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$18
 20
 0Bo 41
@@ -6313,13 +6380,13 @@
 08i 2 v cons
 08i 2 v cons
 09o 631
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$19
 20
 0Bo 10
 05v [$throw]
 09o 612
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1A
 20
 0Bo 46
@@ -6334,7 +6401,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 557
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1B
 20
 0Bo 16
@@ -6342,7 +6409,7 @@
 24
 08i 2 v cons
 09o 532
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1C
 20
 0Bo 16
@@ -6350,7 +6417,7 @@
 24
 08i 2 v cons
 09o 507
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1D
 20
 0Bo 16
@@ -6358,7 +6425,7 @@
 24
 08i 2 v cons
 09o 482
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1E
 20
 0Bo 16
@@ -6366,7 +6433,7 @@
 24
 08i 2 v cons
 09o 457
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$1F
 20
 0Bo 16
@@ -6374,7 +6441,7 @@
 24
 08i 2 v cons
 09o 432
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$20
 20
 0Bo 16
@@ -6382,7 +6449,7 @@
 24
 08i 2 v cons
 09o 407
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$21
 20
 0Bo 16
@@ -6390,7 +6457,7 @@
 24
 08i 2 v cons
 09o 382
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$22
 20
 0Bo 16
@@ -6398,7 +6465,7 @@
 24
 08i 2 v cons
 09o 357
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$23
 20
 0Bo 41
@@ -6412,7 +6479,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 307
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$24
 20
 0Bo 16
@@ -6420,7 +6487,7 @@
 24
 08i 2 v cons
 09o 282
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$25
 20
 0Bo 116
@@ -6452,7 +6519,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 157
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$26
 20
 0Bo 116
@@ -6484,7 +6551,7 @@
 08i 2 v cons
 08i 2 v cons
 09o 32
-10s ΓεnΣym-98
+10s ΓεnΣym-100
 05v #$27
 20
 0Bo 16
@@ -6548,17 +6615,17 @@
 15
 10s bc
 08i 1 v disassemble/bytecode-array
-0Es ΓεnΣym-99
+0Es ΓεnΣym-101
 0D
-10s ΓεnΣym-99
+10s ΓεnΣym-101
 0Bo 98
 02i 0
 1B
 1C
-10s ΓεnΣym-99
+10s ΓεnΣym-101
 0Bo 84
 0D
-10s ΓεnΣym-99
+10s ΓεnΣym-101
 08i 1 v car
 0Es a
 0D
@@ -6574,9 +6641,9 @@
 08i 3 v cat
 08i 1 v println
 0D
-10s ΓεnΣym-99
+10s ΓεnΣym-101
 08i 1 v cdr
-0Fs ΓεnΣym-99
+0Fs ΓεnΣym-101
 09o -86
 09o 4
 24
@@ -6589,15 +6656,15 @@
 15
 10s bc
 08i 1 v type-of
-0Es ΓεnΣym-100
+0Es ΓεnΣym-102
 0D
-10s ΓεnΣym-100
+10s ΓεnΣym-102
 05v :lambda
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-100
+10s ΓεnΣym-102
 05v :macro
 20
 0C
@@ -6611,7 +6678,7 @@
 08i 2 v ref
 08i 1 v disassemble/print
 09o 54
-10s ΓεnΣym-100
+10s ΓεnΣym-102
 05v :bytecode-array
 20
 0Bo 15
@@ -6639,17 +6706,17 @@
 0D
 15
 10s asm
-0Es ΓεnΣym-101
+0Es ΓεnΣym-103
 0D
-10s ΓεnΣym-101
+10s ΓεnΣym-103
 0Bo 94
 02i 0
 1B
 1C
-10s ΓεnΣym-101
+10s ΓεnΣym-103
 0Bo 80
 0D
-10s ΓεnΣym-101
+10s ΓεnΣym-103
 08i 1 v car
 0Es a
 0D
@@ -6665,9 +6732,9 @@
 08i 3 v cat
 08i 1 v println
 0D
-10s ΓεnΣym-101
+10s ΓεnΣym-103
 08i 1 v cdr
-0Fs ΓεnΣym-101
+0Fs ΓεnΣym-103
 09o -82
 09o 4
 24
@@ -6738,17 +6805,17 @@
 0D
 15
 10s old
-0Es ΓεnΣym-104
+0Es ΓεnΣym-106
 0D
-10s ΓεnΣym-104
+10s ΓεnΣym-106
 0Bo 94
 02i 0
 1B
 1C
-10s ΓεnΣym-104
+10s ΓεnΣym-106
 0Bo 80
 0D
-10s ΓεnΣym-104
+10s ΓεnΣym-106
 08i 1 v car
 0Es cur
 0D
@@ -6765,9 +6832,9 @@
 08i 2 v cons
 0Fs yield-queue
 0D
-10s ΓεnΣym-104
+10s ΓεnΣym-106
 08i 1 v cdr
-0Fs ΓεnΣym-104
+0Fs ΓεnΣym-106
 09o -82
 09o 4
 24
@@ -6821,17 +6888,17 @@
 15
 10s event
 08i 1 v tree/values
-0Es ΓεnΣym-105
+0Es ΓεnΣym-107
 0D
-10s ΓεnΣym-105
+10s ΓεnΣym-107
 0Bo 59
 02i 0
 1B
 1C
-10s ΓεnΣym-105
+10s ΓεnΣym-107
 0Bo 45
 0D
-10s ΓεnΣym-105
+10s ΓεnΣym-107
 08i 1 v car
 0Es h
 0D
@@ -6839,9 +6906,9 @@
 10s val
 1Ai 1
 0D
-10s ΓεnΣym-105
+10s ΓεnΣym-107
 08i 1 v cdr
-0Fs ΓεnΣym-105
+0Fs ΓεnΣym-107
 09o -47
 09o 4
 24
@@ -7734,9 +7801,9 @@
 09o 107
 15
 10s cur-type
-0Es ΓεnΣym-107
+0Es ΓεnΣym-109
 0D
-10s ΓεnΣym-107
+10s ΓεnΣym-109
 05v :array
 20
 0Bo 19
@@ -7744,7 +7811,7 @@
 10s b
 08i 2 v array/equal?
 09o 68
-10s ΓεnΣym-107
+10s ΓεnΣym-109
 05v :tree
 20
 0Bo 19
@@ -7752,7 +7819,7 @@
 10s b
 08i 2 v tree/equal?
 09o 40
-10s ΓεnΣym-107
+10s ΓεnΣym-109
 05v :pair
 20
 0Bo 19
@@ -8301,13 +8368,13 @@
 0D
 10s data
 08i 1 v string/length
-0Es ΓεnΣym-109
+0Es ΓεnΣym-111
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-109
+10s ΓεnΣym-111
 1E
 0Bo 73
 0D
@@ -8466,23 +8533,23 @@
 25v display/error/wrap v [i text] v "" v #{
 15
 10s i
-0Es ΓεnΣym-111
+0Es ΓεnΣym-113
 0D
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 02i 0
 20
 0Bo 15
 10s text
 08i 1 v ansi-red
 09o 78
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 02i 1
 20
 0Bo 15
 10s text
 08i 1 v string
 09o 56
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 02i 2
 20
 0Bo 20
@@ -8490,7 +8557,7 @@
 08i 1 v str/write
 08i 1 v ansi-yellow
 09o 29
-10s ΓεnΣym-111
+10s ΓεnΣym-113
 02i 3
 20
 0Bo 15
@@ -8770,21 +8837,21 @@
 15
 10s v
 08i 1 v type-of
-0Es ΓεnΣym-113
+0Es ΓεnΣym-115
 0D
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :nil
 20
 0Bo 10
 05v "null"
 09o 305
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :int
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :float
 20
 0C
@@ -8795,7 +8862,7 @@
 10s v
 08i 1 v string
 09o 258
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :bool
 20
 0Bo 24
@@ -8805,13 +8872,13 @@
 09o 7
 05v "false"
 09o 225
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :pair
 20
 0C
@@ -8828,14 +8895,14 @@
 05v "]"
 08i 3 v cat
 09o 152
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :string
 20
 0Bo 15
 10s v
 08i 1 v str/write
 09o 128
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :symbol
 20
 0Bo 28
@@ -8845,7 +8912,7 @@
 05v "\""
 08i 3 v cat
 09o 91
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :keyword
 20
 0Bo 28
@@ -8855,7 +8922,7 @@
 05v "\""
 08i 3 v cat
 09o 54
-10s ΓεnΣym-113
+10s ΓεnΣym-115
 05v :tree
 20
 0Bo 15
@@ -9245,13 +9312,13 @@
 0Es i
 0D
 10s width
-0Es ΓεnΣym-115
+0Es ΓεnΣym-117
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 1E
 0Bo 28
 0D
@@ -9335,63 +9402,63 @@
 02i 1
 08i 2 v -
 08i 2 v char-at
-0Es ΓεnΣym-124
+0Es ΓεnΣym-126
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 57
 20
 0C
@@ -9444,7 +9511,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 659
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 63
 20
 0Bo 55
@@ -9461,7 +9528,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 597
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 88
 20
 0Bo 55
@@ -9478,7 +9545,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 535
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 120
 20
 0Bo 55
@@ -9495,7 +9562,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 473
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 100
 20
 0Bo 55
@@ -9512,7 +9579,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 411
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 111
 20
 0Bo 55
@@ -9529,7 +9596,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 349
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 98
 20
 0Bo 55
@@ -9546,7 +9613,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 287
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 60
 20
 0Bo 55
@@ -9563,7 +9630,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 225
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 94
 20
 0Bo 55
@@ -9580,7 +9647,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 163
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 62
 20
 0Bo 55
@@ -9597,7 +9664,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 101
-10s ΓεnΣym-124
+10s ΓεnΣym-126
 02i 46
 20
 0Bo 64
@@ -9651,9 +9718,9 @@
 10s opts
 05v :base
 08i 2 v tree/ref
-0Es ΓεnΣym-125
+0Es ΓεnΣym-127
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 05v :binary
 20
 0Bo 41
@@ -9666,7 +9733,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 207
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 05v :octal
 20
 0Bo 41
@@ -9679,7 +9746,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 157
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 05v :decimal
 20
 0Bo 41
@@ -9692,7 +9759,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 107
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 05v :hexadecimal
 20
 0Bo 41
@@ -9705,7 +9772,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 57
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 05v :HEXADECIMAL
 20
 0Bo 41
@@ -9795,21 +9862,21 @@
 10s opts
 05v :align
 08i 2 v tree/ref
-0Es ΓεnΣym-126
+0Es ΓεnΣym-128
 0D
-10s ΓεnΣym-126
+10s ΓεnΣym-128
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-126
+10s ΓεnΣym-128
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-126
+10s ΓεnΣym-128
 05v :left
 20
 0Bo 10
@@ -9944,9 +10011,9 @@
 15
 10s v
 08i 1 v type-of
-0Es ΓεnΣym-127
+0Es ΓεnΣym-129
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :int
 20
 0Bo 29
@@ -9956,13 +10023,13 @@
 08i 2 v cat
 08i 1 v fmt/arg-sym
 09o 73
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :symbol
 20
 0Bo 10
 10s v
 09o 54
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :string
 20
 0Bo 15
@@ -10138,13 +10205,13 @@
 0D
 10s format-string
 08i 1 v string/length
-0Es ΓεnΣym-128
+0Es ΓεnΣym-130
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-128
+10s ΓεnΣym-130
 1E
 0Bo 217
 0D
@@ -10152,9 +10219,9 @@
 10s format-string
 10s i
 08i 2 v char-at
-0Es ΓεnΣym-129
+0Es ΓεnΣym-131
 0D
-10s ΓεnΣym-129
+10s ΓεnΣym-131
 02i 123
 20
 0Bo 72
@@ -10176,7 +10243,7 @@
 08i 2 v cons
 0Fs cuts
 09o 102
-10s ΓεnΣym-129
+10s ΓεnΣym-131
 02i 125
 20
 0Bo 91
@@ -10247,17 +10314,17 @@
 0D
 15
 10s cuts
-0Es ΓεnΣym-130
+0Es ΓεnΣym-132
 0D
-10s ΓεnΣym-130
+10s ΓεnΣym-132
 0Bo 200
 02i 0
 1B
 1C
-10s ΓεnΣym-130
+10s ΓεnΣym-132
 0Bo 186
 0D
-10s ΓεnΣym-130
+10s ΓεnΣym-132
 08i 1 v car
 0Es c
 0D
@@ -10303,9 +10370,9 @@
 08i 1 v car
 0Fs last-pos
 0D
-10s ΓεnΣym-130
+10s ΓεnΣym-132
 08i 1 v cdr
-0Fs ΓεnΣym-130
+0Fs ΓεnΣym-132
 09o -188
 09o 4
 24
@@ -10334,13 +10401,13 @@
 0D
 10s arguments-used
 08i 1 v array/length
-0Es ΓεnΣym-131
+0Es ΓεnΣym-133
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-131
+10s ΓεnΣym-133
 1E
 0Bo 84
 0D
@@ -10513,13 +10580,13 @@
 0D
 10s a
 08i 1 v string/length
-0Es ΓεnΣym-135
+0Es ΓεnΣym-137
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-135
+10s ΓεnΣym-137
 1E
 0Bo 45
 0D
@@ -10605,9 +10672,9 @@
 15
 10s ext
 08i 1 v type-of
-0Es ΓεnΣym-136
+0Es ΓεnΣym-138
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-138
 05v :string
 20
 0Bo 19
@@ -10620,7 +10687,7 @@
 01
 }
 09o 53
-10s ΓεnΣym-136
+10s ΓεnΣym-138
 05v :pair
 20
 0Bo 19
@@ -11232,9 +11299,9 @@
 15
 10s separator
 08i 1 v string/length
-0Es ΓεnΣym-137
+0Es ΓεnΣym-139
 0D
-10s ΓεnΣym-137
+10s ΓεnΣym-139
 02i 0
 20
 0Bo 15
@@ -11615,17 +11682,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-139
+0Es ΓεnΣym-141
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 0Bo 88
 02i 0
 1B
 1C
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 0Bo 74
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 08i 1 v car
 0Es cur-test
 0D
@@ -11640,9 +11707,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 08i 1 v cdr
-0Fs ΓεnΣym-139
+0Fs ΓεnΣym-141
 09o -76
 09o 4
 24

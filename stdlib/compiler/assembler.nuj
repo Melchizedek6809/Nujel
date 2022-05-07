@@ -58,20 +58,27 @@
 
 [defn $apply [arg-count fun]
   "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-  [case arg-count 2
-        [2 [case fun
-             [add/int [$add/int]]
-             [< [$<]]
-             [<= [$<=]]
-             [== [$==]]
-             [>= [$>=]]
-             [> [$>]]
-             [otherwise [list #$8
-                              [int->bytecode-op arg-count]
-                              [val->bytecode-op fun]]]]]
-        [otherwise [list #$8
-                         [int->bytecode-op arg-count]
-                         [val->bytecode-op fun]]]]]
+  [case arg-count
+    [1 [case fun
+         [car [$car]]
+         [cdr [$cdr]]
+         [otherwise [list #$8
+                          [int->bytecode-op arg-count]
+                          [val->bytecode-op fun]]]]]
+    [2 [case fun
+         [add/int [$add/int]]
+         [cons [$cons]]
+         [< [$<]]
+         [<= [$<=]]
+         [== [$==]]
+         [>= [$>=]]
+         [> [$>]]
+         [otherwise [list #$8
+                          [int->bytecode-op arg-count]
+                          [val->bytecode-op fun]]]]]
+    [otherwise [list #$8
+                     [int->bytecode-op arg-count]
+                     [val->bytecode-op fun]]]]]
 
 [defn $apply/dynamic [arg-count fun]
   [list #$1A [int->bytecode-op arg-count]]]
@@ -157,6 +164,15 @@
 
 [defn $swap []
   '[#$27]]
+
+[defn $car []
+  '[#$11]]
+
+[defn $cdr []
+  '[#$12]]
+
+[defn $cons []
+  '[#$14]]
 
 [defn assemble/build-sym-map [code sym-map pos]
   [while code
