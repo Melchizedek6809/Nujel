@@ -14,11 +14,14 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Lexical scoping
 - [X] Exceptions
 - [X] WASM support
-- [X] Formated output (inspired by python3/rust/zig)
-- [X] Maps (using binary Trees)
-- [X] Garbage Collection (Mark-and-Sweep)
+- [X] Formatted output (inspired by Python/Rust/Zig)
+- [X] Maps (using binary trees)
+- [X] Garbage Collection (Mark-and-Sweep for now)
 - [X] Macros (expander written in Nujel itself)
 - [X] Bytecoded
+- [ ] Tail-call elimination
+- [ ] NaN Boxing
+- [ ] Modules
 - [ ] Continuations
 - [ ] Fibers
 - [ ] Serializable Fibers
