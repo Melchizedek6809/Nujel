@@ -22,7 +22,7 @@
 [defn random [max]
   "Return a value from 0 to MAX, or, if left out, a random int"
   [if [numeric? max]
-      [mod [abs [random/rng!]] max]
+      [% [abs [random/rng!]] max]
       [random/rng!]]]
 
 [random/seed-initialize!]

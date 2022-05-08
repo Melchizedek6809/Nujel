@@ -28,47 +28,8 @@ NORETURN void lExceptionThrowRaw(lVal *v){
 	while(1){}
 }
 
-/* Cause an exception, passing a list of SYMBOL and ERROR to the exception handler */
-NORETURN void lExceptionThrow(const char *symbol, const char *error){
-	lVal *l = lList(2, RVP(lValKeyword(symbol)), RVP(lValString(error)));
-	lExceptionThrowRaw(l);
-}
-
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
 	lVal *l = lList(4, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v),RVP(lValLambda(c)));
 	lExceptionThrowRaw(l);
-}
-
-/* Last resort exception Handler */
-static void exceptionCatchExit(lVal *exc){
-	epf("Root Exception:\n%V\n",exc);
-	exit(200);
-}
-
-/* Execute BODY(A,B) with a fallback exception handler set that writes everything to stdout before exiting. */
-void *lExceptionTryExit(void *(*body)(void *,void *), void *a, void *b){
-	return lExceptionTryCatch(body, a, b, exceptionCatchExit);
-}
-
-/* Return the result of running body with a and b after installing the exception handler
- * a should be the lClosure
- * b should be the lVal
- */
-void *lExceptionTryCatch(void *(*body)(void *,void *), void *a, void *b, void (*handler)(lVal *exceptionValue)){
-	jmp_buf oldExceptionTarget;
-	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
-
-	exceptionTargetDepth++;
-	int ret = setjmp(exceptionTarget);
-	if(ret){
-		handler(exceptionValue);
-		exceptionTargetDepth--;
-		return NULL;
-	}else{
-		void *doRet = body(a, b);
-		memcpy(exceptionTarget,oldExceptionTarget,sizeof(jmp_buf));
-		exceptionTargetDepth--;
-		return doRet;
-	}
 }

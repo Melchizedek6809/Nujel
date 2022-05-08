@@ -1,12 +1,12 @@
-/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
 #include "../misc/pf.h"
 #include "../allocation/symbol.h"
 #include "../exception.h"
 #include "../collection/tree.h"
+#include "../reader.h"
 #include "../type/closure.h"
-#include "../type/native-function.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 #include "../misc/getmsecs.h"
@@ -19,26 +19,9 @@ const lSymbol *symArguments;
 const lSymbol *symCode;
 const lSymbol *symData;
 
-static lVal *lnfDef(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [def] anymore", v, c);
-	return NULL;
-}
-
-static lVal *lnfSet(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [set!] anymore", v, c);
-	return NULL;
-}
-
-static lVal *lSymTable(lClosure *c, lVal *v){
-	if(c == NULL){return v;}
-	lRootsValPush(v);
-	lVal *l = lTreeAddKeysToList(c->data,v);
-	return lSymTable(c->parent,l);
-}
-
 static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	(void)v;
-	lVal *l = lSymTable(c,NULL);
+	lVal *l = lTreeAddKeysToList(c->data, NULL);
 	for(lVal *n = l;n;n = n->vList.cdr){
 		if(n->vList.car == NULL){break;}
 		n->vList.car->type = ltSymbol;
@@ -60,8 +43,7 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
 	if((car == NULL)
-		|| !((car->type == ltSpecialForm)
-		||   (car->type == ltNativeFunc)
+		|| !((car->type == ltNativeFunc)
 		||   (car->type == ltLambda)
 		||   (car->type == ltObject)
 		||   (car->type == ltMacro))){
@@ -69,7 +51,7 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 	}
 	lVal *ret = lRootsValPush(lValTree(NULL));
 	ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("type")),lRootsValPush(lValSymS(getTypeSymbol(car))));
-	if((car->type == ltSpecialForm) || (car->type == ltNativeFunc)){
+	if(car->type == ltNativeFunc){
 		lNFunc *nf = car->vNFunc;
 		if(nf == NULL){return ret;}
 		ret->vTree = lTreeInsert(ret->vTree, symDocumentation,nf->doc);
@@ -134,12 +116,8 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 	}else if(data->key == symCode){
 		clo->text = data->value;
 	}else if(data->key == symData){
-		lTree *newData = castToTree(data->value,NULL);
-		if(newData && (newData->flags & TREE_IMMUTABLE)){
-			lExceptionThrowValClo("type-error","Closures need a mutable data tree", data->value, clo);
-		}else{
-			clo->data = newData;
-		}
+		lTree *newData = requireTree(clo, data->value);
+		clo->data = newData;
 	}else {
 		lExceptionThrowValClo("invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
 	}
@@ -162,44 +140,24 @@ static lVal *lnfClosureSet(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfLetRaw(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [let] anymore", v, c);
-	return NULL;
-}
-
 static lVal *lnfResolve(lClosure *c, lVal *v){
-	const lSymbol *sym = castToSymbol(lCar(v),NULL);
+	const lSymbol *sym = requireSymbol(c, lCar(v));
 	lVal *env = lCadr(v);
 	if(env && (env->type != ltLambda) && (env->type != ltObject)){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
-	return sym ? lGetClosureSym(env ? env->vClosure : c, sym) : NULL;
+	return lGetClosureSym(env ? env->vClosure : c, sym);
 }
 
 static lVal *lnfResolvesPred(lClosure *c, lVal *v){
-	const lSymbol *sym = castToSymbol(lCar(v),NULL);
+	lVal *car = lCar(v);
+	if(!car || (car->type != ltSymbol)){return lValBool(false);}
+	const lSymbol *sym = car->vSymbol;
 	lVal *env = lCadr(v);
 	if(env && (env->type != ltLambda) && (env->type != ltObject)){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
-	return lValBool(sym ? lHasClosureSym(env ? env->vClosure : c, sym,NULL) : false);
-}
-
-static lVal *lnfLambdaBytecodeAst(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [fn*] anymore", v, c);
-	return NULL;
-}
-
-/* Handler for [macro* [...args] ...body] */
-static lVal *lnfMacroBytecodeAst(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [macro*] anymore", v, c);
-	return NULL;
-}
-
-/* Handler for [ω*] */
-static lVal *lnfObjectAst(lClosure *c, lVal *v){
-	lExceptionThrowValClo("no-more-walking", "Can't use the old style [ω*] anymore", v, c);
-	return NULL;
+	return lValBool(lHasClosureSym(env ? env->vClosure : c, sym,NULL));
 }
 
 static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
@@ -218,23 +176,13 @@ static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 
 static lVal *lnfApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
-	switch(fun ? fun->type : ltNoAlloc){
-	default:
-		lExceptionThrowValClo("type-error", "Can't apply to that", v, c);
-		return NULL;
-	case ltObject:
-	case ltLambda:
-	case ltNativeFunc:
-	case ltSpecialForm:
-		return lApply(c, lCadr(v), fun, fun);
-	}
+	return lApply(c, lCadr(v), fun);
 }
 
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
 	if((fun == NULL) || (fun->type != ltMacro)){
 		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
-		return NULL;
 	}
 	return lLambda(c, lCadr(v), fun);
 }
@@ -324,6 +272,59 @@ static lVal *lnfKeywordPred(lClosure *c, lVal *v){
 	return lValBool(car ? car->type == ltKeyword : false);
 }
 
+static lVal *lnfQuote(lClosure *c, lVal *v){
+	if(v->type != ltPair){
+		lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c);
+	}
+	return lCar(v);
+}
+
+static lVal *lnfThrow(lClosure *c, lVal *v){
+	(void)c;
+	lExceptionThrowRaw(lCar(v));
+	return NULL;
+}
+
+static lVal *lnfRead(lClosure *c, lVal *v){
+	(void)c;
+	lVal *t = lCar(v);
+	if((t == NULL) || (t->type != ltString)){return NULL;}
+	lString *dup = lRootsStringPush(lStringDup(t->vString));
+	readClosure = c;
+	t = lReadList(dup,true);
+	readClosure = NULL;
+	return t;
+}
+
+static lVal *lnfTypeOf(lClosure *c, lVal *v){
+	(void)c;
+	return lValKeywordS(getTypeSymbol(lCar(v)));
+}
+
+static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
+	(void)c; (void)v;
+	lGarbageCollect();
+	return NULL;
+}
+
+static lVal *lnfValIndex(lClosure *c, lVal *v){
+	(void)c;
+	return lValInt(lValIndex(lCar(v)));
+}
+
+static lVal *lnfIndexVal(lClosure *c, lVal *v){
+	return lIndexVal(requireInt(c, lCar(v)));
+}
+
+static lVal *lnfSymIndex(lClosure *c, lVal *v){
+	return lValInt(lSymIndex(requireSymbolic(c, lCar(v))));
+}
+
+static lVal *lnfIndexSym(lClosure *c, lVal *v){
+	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
+}
+
+
 void lOperationsCore(lClosure *c){
 	symType          = RSYMP(lSymS("type"));
 	symDocumentation = RSYMP(lSymS("documentation"));
@@ -331,26 +332,23 @@ void lOperationsCore(lClosure *c){
 	symCode          = RSYMP(lSymS("code"));
 	symData          = RSYMP(lSymS("data"));
 
+	lAddNativeFunc(c,"quote",   "[v]",   "Return v as is without evaluating", lnfQuote);
+	lAddNativeFunc(c,"throw",   "[v]",   "Throw V to the closest exception handler", lnfThrow);
+	lAddNativeFunc(c,"read",    "[str]", "Read and Parses STR as an S-Expression", lnfRead);
+	lAddNativeFunc(c,"type-of", "[α]",   "Return a symbol describing the type of α", lnfTypeOf);
+
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
+	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
 	lAddNativeFunc(c,"closure/parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
 	lAddNativeFunc(c,"closure/caller", "[clo]",         "Return the caller of CLO",                   lnfClosureCaller);
-	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
 
 	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
-
-	lAddSpecialForm(c,"def",           "[sym val]",     "Define a new symbol SYM and link it to value VAL", lnfDef);
-	lAddSpecialForm(c,"set!",          "[s v]",         "Bind a new value v to already defined symbol s",   lnfSet);
-	lAddSpecialForm(c,"let*",          "body",          "Run BODY wihtin a new closure",  lnfLetRaw);
-
-	lAddSpecialForm(c,"macro*",       "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
-	lAddSpecialForm(c,"fn*",          "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
-	lAddSpecialForm(c,"ω* environment*", "[]",                  "Create a new object",       lnfObjectAst);
 
 	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
 	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
@@ -371,4 +369,10 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
 	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
 	lAddNativeFunc(c,"keyword?", "[α]",   "Return true if α is a keyword symbol",        lnfKeywordPred);
+
+	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
+	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
+	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
+	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
+	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
 }

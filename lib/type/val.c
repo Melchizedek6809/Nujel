@@ -4,9 +4,9 @@
 
 #include "../exception.h"
 #include "../allocation/garbage-collection.h"
-#include "../allocation/val.h"
-#include "../collection/string.h"
+#include "../allocation/allocator.h"
 #include "../collection/tree.h"
+#include "../collection/string.h"
 #include "../type/closure.h"
 
 #include <math.h>
@@ -22,9 +22,9 @@ lVal *lValInt(i64 v){
 /* Return a newly allocated Nujel float of value V */
 lVal *lValFloat(double v){
 	if(isnan(v)){
-		lExceptionThrow("float-nan","NaN is disallowed in Nujel, please check you calculations");
+		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel, please check you calculations", NULL, NULL);
 	}else if(isinf(v)){
-		lExceptionThrow("float-inf","INF is disallowed in Nujel, please check you calculations");
+		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel, please check you calculations", NULL, NULL);
 	}
 	lVal *ret   = lValAlloc(ltFloat);
 	ret->vFloat = v;
@@ -135,7 +135,6 @@ bool lValEqual(const lVal *a, const lVal *b){
 	case ltLambda:
 		return b->vClosure == a->vClosure;
 	case ltNativeFunc:
-	case ltSpecialForm:
 		return b->vNFunc == a->vNFunc;
 	case ltBytecodeOp:
 		return a->vBytecodeOp == b->vBytecodeOp;

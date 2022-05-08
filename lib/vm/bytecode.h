@@ -1,17 +1,12 @@
-#ifndef NUJEL_LIB_TYPE_BYTECODE
-#define NUJEL_LIB_TYPE_BYTECODE
-#include "../nujel.h"
-
-#define VALUE_STACK_SIZE  512
-#define CALL_STACK_SIZE   128
-#define ROOT_STACK_SIZE    32
+#ifndef NUJEL_LIB_VM_BYTECODE
+#define NUJEL_LIB_VM_BYTECODE
 
 typedef enum lOpcode {
 	lopNOP             =  0x0,
 	lopRet             =  0x1,
 	lopIntByte         =  0x2,
 	lopIntAdd          =  0x3,
-	lopDebugPrintStack =  0x4,
+	lopApplyNew        =  0x4,
 	lopPushLVal        =  0x5,
 	lopUNUSED6         =  0x6,
 	lopUNUSED7         =  0x7,
@@ -49,9 +44,5 @@ typedef enum lOpcode {
 	lopSwap            = 0x27
 	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
-
-lVal *lBytecodeEval(lClosure *c, lVal *args, lBytecodeArray *ops, bool trace);
-void lBytecodeArrayMark(const lBytecodeArray *v);
-void lBytecodeLink(lClosure *c, lBytecodeArray *v);
 
 #endif

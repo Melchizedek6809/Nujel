@@ -14,12 +14,6 @@ extern lSymbol *symQuasiquote;
 extern lSymbol *symUnquote;
 extern lSymbol *symUnquoteSplicing;
 extern lSymbol *symArr;
-extern lSymbol *symIf;
-extern lSymbol *symCond;
-extern lSymbol *symDo;
-extern lSymbol *symMinus;
-extern lSymbol *symLambda;
-extern lSymbol *symLambdAst;
 extern lSymbol *symTreeNew;
 
 void      lSymbolInit  ();

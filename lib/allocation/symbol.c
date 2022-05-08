@@ -34,12 +34,6 @@ lSymbol *symQuasiquote;
 lSymbol *symUnquote;
 lSymbol *symUnquoteSplicing;
 lSymbol *symArr;
-lSymbol *symIf;
-lSymbol *symCond;
-lSymbol *symDo;
-lSymbol *symMinus;
-lSymbol *symLambda;
-lSymbol *symLambdAst;
 lSymbol *symTreeNew;
 
 lSymbol *lSymLTNil;
@@ -54,7 +48,6 @@ lSymbol *lSymLTString;
 lSymbol *lSymLTSymbol;
 lSymbol *lSymLTKeyword;
 lSymbol *lSymLTNativeFunction;
-lSymbol *lSymLTSpecialForm;
 lSymbol *lSymLTObject;
 lSymbol *lSymLTMacro;
 lSymbol *lSymLTArray;
@@ -77,17 +70,11 @@ void lSymbolInit(){
 
 	symNull              = RSYMP(lSymS(""));
 	symQuote             = RSYMP(lSymS("quote"));
-	symArr               = RSYMP(lSymS("array/new"));
-	symIf                = RSYMP(lSymS("if"));
-	symCond              = RSYMP(lSymS("cond"));
-	symDo                = RSYMP(lSymS("do"));
-	symMinus             = RSYMP(lSymS("-"));
-	symLambda            = RSYMP(lSymS("λ"));
-	symLambdAst          = RSYMP(lSymS("λ*"));
-	symTreeNew           = RSYMP(lSymS("tree/new"));
 	symQuasiquote        = RSYMP(lSymS("quasiquote"));
 	symUnquote           = RSYMP(lSymS("unquote"));
 	symUnquoteSplicing   = RSYMP(lSymS("unquote-splicing"));
+	symArr               = RSYMP(lSymS("array/new"));
+	symTreeNew           = RSYMP(lSymS("tree/new"));
 
 
 	lSymLTNil            = RSYMP(lSymS("nil"));
@@ -103,7 +90,6 @@ void lSymbolInit(){
 	lSymLTSymbol         = RSYMP(lSymS("symbol"));
 	lSymLTKeyword        = RSYMP(lSymS("keyword"));
 	lSymLTNativeFunction = RSYMP(lSymS("native-function"));
-	lSymLTSpecialForm    = RSYMP(lSymS("special-form"));
 	lSymLTArray          = RSYMP(lSymS("array"));
 	lSymLTGUIWidget      = RSYMP(lSymS("gui-widget"));
 	lSymLTMacro          = RSYMP(lSymS("macro"));
@@ -239,7 +225,6 @@ lSymbol *getTypeSymbol(const lVal* v){
 		case ltSymbol:      return lSymLTSymbol;
 		case ltKeyword:     return lSymLTKeyword;
 		case ltNativeFunc:  return lSymLTNativeFunction;
-		case ltSpecialForm: return lSymLTSpecialForm;
 		case ltArray:       return lSymLTArray;
 		case ltGUIWidget:   return lSymLTGUIWidget;
 		case ltMacro:       return lSymLTMacro;

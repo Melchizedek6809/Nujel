@@ -42,10 +42,6 @@
   "a b - c | Adds the two topmost values and pushes the result"
   '[#$3]]
 
-[defn $debug/print-stack []
-  "- | Print out the stack for the current closure"
-  '[#$4]]
-
 [defn $push/lval [v]
   "- v | Pushes v onto the stack"
   [when [nil? v]
@@ -55,6 +51,30 @@
 [defn $push/symbol [v]
   "- v | Pushes v onto the stack"
   [list #$23 [sym->bytecode-op v]]]
+
+[defn $apply/new [arg-count fun]
+  "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+  [case arg-count
+    [1 [case fun
+         [car [$car]]
+         [cdr [$cdr]]
+         [otherwise [list #$4
+                          [int->bytecode-op arg-count]
+                          [val->bytecode-op fun]]]]]
+    [2 [case fun
+         [add/int [$add/int]]
+         [cons [$cons]]
+         [< [$<]]
+         [<= [$<=]]
+         [== [$==]]
+         [>= [$>=]]
+         [> [$>]]
+         [otherwise [list #$4
+                          [int->bytecode-op arg-count]
+                          [val->bytecode-op fun]]]]]
+    [otherwise [list #$4
+                     [int->bytecode-op arg-count]
+                     [val->bytecode-op fun]]]]]
 
 [defn $apply [arg-count fun]
   "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"

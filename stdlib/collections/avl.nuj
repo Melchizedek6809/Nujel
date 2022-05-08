@@ -177,8 +177,8 @@
 [defn avl/reduce-node-bin [n o s]
   [if [avl/empty? n]
       s
-      [o [avl/key n]
-         [avl/reduce-node-bin [avl/left n] o s]
+      [o [o [avl/key n]
+            [avl/reduce-node-bin [avl/left n] o s]]
          [avl/reduce-node-bin [avl/right n] o s]]]]
 
 [defn avl/reduce-bin [t o s]

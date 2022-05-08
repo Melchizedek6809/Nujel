@@ -38,7 +38,7 @@
 [test/add "##[0 0 0]" [str/write [-> [array/allocate 3] [array/fill! 0]]]]
 [test/add "##[3 9 0]" [str/write [-> [array/allocate 3] [array/fill! 0] [array/set! 1 9] [array/set! 0 3]]]]
 [test/add 10 [def arr #[1 2 3]] [array/length! arr 4] [array/set! arr 3 4] [reduce arr + 0]]
-[test/add 10 [-> #[1 2 3] [array/length! 4] [array/set! 3 4] [reduce add 0]]]
+[test/add 10 [-> #[1 2 3] [array/length! 4] [array/set! 3 4] [reduce + 0]]]
 [test/add 10 [sum #[1 2 3 4]]]
 [test/add "##[#nil]" [str/write [array/set! #[1] 0 #nil]]]
 [test/add "##[2]" [str/write [array/set! #[1] 0 2]]]

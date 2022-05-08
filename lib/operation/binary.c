@@ -2,7 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../operation.h"
 #include "../exception.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/val.h"
 #include "../misc/popcount.h"
 

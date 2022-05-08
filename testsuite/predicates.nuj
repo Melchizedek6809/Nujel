@@ -114,8 +114,6 @@
 [test/add #f [native? min]]
 [test/add #f [lambda? +]]
 [test/add #t [lambda? min]]
-[test/add #t [special-form? if]]
-[test/add #f [special-form? when]]
 [test/add #f [> #nil 1.0]]
 [test/add #f [> #nil 1]]
 [test/add #f [> #nil 0]]

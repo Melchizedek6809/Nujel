@@ -16,7 +16,7 @@
           [< x 0]
           [< y 0]]
       oob-val
-      [array/ref [tree/ref data :data] [add x [mul y [tree/ref data :width]]]]]]
+      [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]
 
 [defn array/2d/set! [data x y val]
   [if [or [>= x [tree/ref data :width]]
@@ -24,7 +24,7 @@
           [< x 0]
           [< y 0]]
       [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]]
-      [array/set! [tree/ref data :data] [add x [mul y [tree/ref data :width]]] val]]
+      [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]]
   data]
 
 [defn array/2d/print [data]

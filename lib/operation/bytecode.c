@@ -3,9 +3,9 @@
 #include "../operation.h"
 #include "../exception.h"
 #include "../collection/list.h"
-#include "../type/bytecode.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type-system.h"
+#include "../vm/eval.h"
 
 #include <stdlib.h>
 

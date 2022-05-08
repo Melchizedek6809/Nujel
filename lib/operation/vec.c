@@ -6,7 +6,7 @@
 #include "../collection/list.h"
 #include "../misc/vec.h"
 #include "../type-system.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/val.h"
 
 static lVal *lnfVX(lClosure *c, lVal *v){

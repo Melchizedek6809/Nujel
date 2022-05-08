@@ -3,33 +3,20 @@
 #include "../operation.h"
 #include "../exception.h"
 #include "../collection/tree.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 
 lVal *lnfTreeNew(lClosure *c, lVal *v){
-	(void)c; (void) v;
-
 	lVal *ret = lRootsValPush(lValAlloc(ltTree));
-	ret->vTree = NULL;
+	ret->vTree = lTreeNew(NULL, NULL);
 
-	while(v != NULL){
-		lVal *car = lCar(v);
-		const lSymbol *sym = castToSymbol(lCar(v), NULL);
-		if(sym == NULL){
-			if(car == NULL){
-				break;
-			}else{
-				lExceptionThrowValClo("type-error","Expected a :symbol or :keyword, got:", car, c);
-			}
-		}
-		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(v));
-		v = lCddr(v);
+	for(lVal *n = v; n; n = lCddr(n)){
+		lVal *car = lCar(n);
+		if(car == NULL){break;}
+		const lSymbol *sym = requireSymbolic(c, car);
+		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(n));
 	}
-	if(ret->vTree == NULL){
-		ret->vTree = lTreeNew(NULL, NULL);
-	}
-
 	return ret;
 }
 

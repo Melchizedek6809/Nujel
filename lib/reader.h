@@ -1,7 +1,7 @@
 #ifndef NUJEL_LIB_SEXPR_READER
 #define NUJEL_LIB_SEXPR_READER
-#include "../nujel.h"
-#include "../collection/string.h"
+#include "nujel.h"
+#include "collection/string.h"
 
 extern lClosure *readClosure;
 

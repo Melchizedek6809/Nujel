@@ -7,13 +7,10 @@
 
 #include "nujel.h"
 
-#include "allocation/array.h"
-#include "allocation/closure.h"
+#include "allocation/allocator.h"
 #include "allocation/garbage-collection.h"
 #include "allocation/roots.h"
-#include "allocation/string.h"
 #include "allocation/symbol.h"
-#include "allocation/val.h"
 
 #include "collection/list.h"
 #include "collection/string.h"
@@ -22,14 +19,13 @@
 #include "misc/pf.h"
 #include "operation.h"
 
-#include "s-expression/reader.h"
+#include "reader.h"
 
 #include "display.h"
 #include "exception.h"
 #include "type-system.h"
 
 #include "type/closure.h"
-#include "type/native-function.h"
 #include "type/symbol.h"
 #include "type/val.h"
 

@@ -58,7 +58,7 @@
 10s path
 08i 1 v file/read
 08i 1 v read
-08i 2 v cons
+14
 0Es source
 0D
 10s source
@@ -81,7 +81,7 @@
 10s path
 08i 1 v file/read
 08i 1 v read
-08i 2 v cons
+14
 08i 2 v eval-in
 01
 }
@@ -178,12 +178,12 @@
 0D
 25v repl/wasm v [line] v "Evaluate LINE in the wasm context" v #{
 10s repl/exception-handler
-18o 33
+18o 29
 10s root-closure
 10s do
 10s line
 08i 1 v read
-08i 2 v cons
+14
 08i 2 v eval-in
 09o 8
 1Ai 1
@@ -214,13 +214,13 @@
 10s do
 10s line
 08i 1 v read
-08i 2 v cons
+14
 08i 2 v eval-in
 0Es result
 0D
 10s line
 10s repl/history
-08i 2 v cons
+14
 0Fs repl/history
 0D
 10s result
@@ -450,16 +450,16 @@
 0D
 05v #f
 0Fs repl/parse-args/bytecode-eval-n
-09o 148
+09o 144
 10s repl/parse-args/eval-next
-0Bo 59
+0Bo 55
 10s display/error
-18o 42
+18o 38
 10s root-closure
 10s do
 10s arg
 08i 1 v read
-08i 2 v cons
+14
 08i 2 v eval-in
 0D
 05v #f
@@ -503,13 +503,13 @@
 0D
 25v repl/parse-args v [args] v "" v #{
 10s args
-0Bo 35
+0Bo 27
 10s args
-08i 1 v car
+11
 08i 1 v repl/parse-arg
 0D
 10s args
-08i 1 v cdr
+12
 08i 1 v repl/parse-args
 09o 7
 10s repl/parse-args/run-repl
@@ -529,13 +529,13 @@
 0D
 25v repl/init/bin v [args] v "" v #{
 10s repl/exception-handler
-18o 46
+18o 38
 10s args
-08i 1 v car
+11
 0Fs repl/executable-name
 0D
 10s args
-08i 1 v cdr
+12
 08i 1 v repl/parse-args
 0Bo 11
 08i 0 v repl

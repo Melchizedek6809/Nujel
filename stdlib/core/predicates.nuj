@@ -106,13 +106,9 @@
   "#t if VAL is a native function"
   [== :native-function [type-of val]]]
 
-[defn special-form? [val]
-  "#t if VAL is a native function"
-  [== :special-form [type-of val]]]
-
 [defn procedure? [val]
   "#t if VAL is a native or lisp function"
-  [or [lambda? val] [native? val] [special-form? val]]]
+  [or [lambda? val] [native? val]]]
 
 [defn bytecode-array? [v]
   [== :bytecode-array [type-of v]]]

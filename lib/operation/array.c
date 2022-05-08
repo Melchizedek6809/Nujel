@@ -4,7 +4,7 @@
 #include "../exception.h"
 #include "../misc/pf.h"
 #include "../collection/list.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 
 #ifdef __WATCOMC__
 #include <malloc.h>
@@ -30,7 +30,6 @@ static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
 }
 
 static lVal *lnfArrSet(lClosure *c, lVal *v){
-	(void)c;
 	lVal *car = lCar(v);
 	lArray *arr = requireArray(c, car);
 	const int key = requireInt(c, lCadr(v));
@@ -48,7 +47,6 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 }
 
 static lVal *lnfArrAllocate(lClosure *c, lVal *v){
-	(void)c;
 	const int len = requireNaturalInt(c, lCar(v));
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();
@@ -72,7 +70,6 @@ static lVal *lnfArrRef(lClosure *c, lVal *v){
 }
 
 lVal *lnfArrNew(lClosure *c, lVal *v){
-	(void)c;
 	int length = v ? lListLength(v) : 0;
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
 	r->vArray = lArrayAlloc();

@@ -5,7 +5,7 @@
 #include "../type-system.h"
 #include "../misc/pf.h"
 #include "../misc/vec.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/val.h"
 
 #include <math.h>
@@ -25,319 +25,173 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 	return NULL;
 }
 
-static vec lnfAddV(const lVal *v){
-	vec acc = v->vList.car->vVec;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc = vecAdd(acc,v->vList.car->vVec);
-	}
-	return acc;
-}
-static double lnfAddF(const lVal *v){
-	double acc = v->vList.car->vFloat;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc += v->vList.car->vFloat;
-	}
-	return acc;
-}
-static i64 lnfAddI(const lVal *v){
-	i64 acc = v->vList.car->vInt;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc += v->vList.car->vInt;
-	}
-	return acc;
-}
 static lVal *lnfAdd(lClosure *c, lVal *v){
-	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){return lValInt(0);}
-	lRootsValPush(t);
-	switch(t->vList.car->type){
-		default:      return exceptionThrow(c, v,"addition");
-		case ltInt:   return lValInt(lnfAddI(t));
-		case ltFloat: return lValFloat(lnfAddF(t));
-		case ltVec:   return lValVec(lnfAddV(t));
-	}
-}
-
-static lVal *lnfAddAst(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
+	if(lCddr(v)){
+		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+	}
 	if(a == NULL){return lValInt(0);}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, v,"addition");
-		case ltInt:   return lValInt(castToInt(a,0) + castToInt(b,0));
-		case ltFloat: return lValFloat(castToFloat(a,0.f) + castToFloat(b,0.f));
-		case ltVec:   return lValVec(vecAdd(castToVec(a,vecZero()), castToVec(b,vecZero())));
+		case ltInt:   return lValInt(requireInt(c,a) + requireInt(c,b));
+		case ltFloat: return lValFloat(requireFloat(c,a) + requireFloat(c,b));
+		case ltVec:   return lValVec(vecAdd(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static lVal *lnfSubAst(lClosure *c, lVal *v){
+static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
-	if(b == NULL){return a;}
+	if(a == NULL){
+		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce" , a, c);
+	}
+	if(b == NULL){
+		switch(a->type){
+		default: lExceptionThrowValClo("type-error","Can't negate the following value", a, c);
+		case ltInt:   return lValInt(-a->vInt);
+		case ltFloat: return lValFloat(-a->vFloat);
+		case ltVec:   return lValVec(vecInvert(a->vVec));
+		}
+	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, v,"subtraction");
-		case ltInt:   return lValInt(castToInt(a,0) - castToInt(b,0));
-		case ltFloat: return lValFloat(castToFloat(a,0.f) - castToFloat(b,0.f));
-		case ltVec:   return lValVec(vecSub(castToVec(a,vecZero()), castToVec(b,vecZero())));
+		case ltInt:   return lValInt(requireInt(c,a) - requireInt(c,b));
+		case ltFloat: return lValFloat(requireFloat(c,a) - requireFloat(c,b));
+		case ltVec:   return lValVec(vecSub(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static lVal *lnfMulAst(lClosure *c, lVal *v){
+static lVal *lnfMul(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return lValInt(1);}
-	if(b == NULL){return a;}
+	if((b == NULL) || (lCddr(v))){
+		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, v,"multiplication");
-		case ltInt:   return lValInt(castToInt(a,1) * castToInt(b,1));
-		case ltFloat: return lValFloat(castToFloat(a,1.f) * castToFloat(b,1.f));
-		case ltVec:   return lValVec(vecMul(castToVec(a,vecZero()), castToVec(b,vecZero())));
+		case ltInt:   return lValInt(requireInt(c,a) * requireInt(c,b));
+		case ltFloat: return lValFloat(requireFloat(c,a) * requireFloat(c,b));
+		case ltVec:   return lValVec(vecMul(requireVecCompatible(c,a), requireVecCompatible(c,b)));\
 	}
 }
 
-static lVal *lnfDivAst(lClosure *c, lVal *v){
+static lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
-	if(b == NULL){return a;}
+	if((a == NULL) || (b == NULL) || lCddr(v)){
+		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default: return exceptionThrow(c, v,"division");
 		case ltInt: {
-			const int av = castToInt(a,1);
-			const int bv = castToInt(b,1);
+			const int av = requireInt(c,a);
+			const int bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
-		case ltFloat: return lValFloat(castToFloat(a,1.f) / castToFloat(b,1.f));
-		case ltVec:   return lValVec(vecDiv(castToVec(a,vecZero()), castToVec(b,vecZero())));
+		case ltFloat: return lValFloat(requireFloat(c,a) / requireFloat(c,b));
+		case ltVec:   return lValVec(vecDiv(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static lVal *lnfModAst(lClosure *c, lVal *v){
+static lVal *lnfMod(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(a == NULL){return b;}
 	if(b == NULL){return a;}
+	if(lCddr(v)){
+		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, v,"module");
 		case ltInt: {
-			const int av = castToInt(a,1);
-			const int bv = castToInt(b,1);
+			const int av = requireInt(c,a);
+			const int bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av % bv);}
-		case ltFloat: return lValFloat(fmod(castToFloat(a,0.f),castToFloat(b,0.f)));
-		case ltVec:   return lValVec(vecMod(castToVec(a,vecZero()), castToVec(b,vecZero())));
+		case ltFloat: return lValFloat(fmod(requireFloat(c,a), requireFloat(c,b)));
+		case ltVec:   return lValVec(vecMod(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static vec lnfSubV(lVal *v){
-	vec acc = v->vList.car->vVec;
-	v = v->vList.cdr;
-	if(!v){return vecSub(vecZero(),acc);}
-	for(; v ; v = v->vList.cdr){
-		acc = vecSub(acc,v->vList.car->vVec);
-	}
-	return acc;
-}
-static double lnfSubF(lVal *v){
-	double acc = v->vList.car->vFloat;
-	v = v->vList.cdr;
-	if(!v){return -acc;}
-	for(; v ; v = v->vList.cdr){
-		acc -= v->vList.car->vFloat;
-	}
-	return acc;
-}
-static i64 lnfSubI(lVal *v){
-	i64 acc = v->vList.car->vInt;
-	v = v->vList.cdr;
-	if(!v){return -acc;}
-	for(; v ; v = v->vList.cdr){
-		acc -= v->vList.car->vInt;
-	}
-	return acc;
-}
-static lVal *lnfSub(lClosure *c, lVal *v){
-	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){
-		lExceptionThrowValClo("arity-error","- expects at least 1 argument", NULL, c);
-	}
-	lRootsValPush(t);
-	switch(t->vList.car->type){
-		default:      return exceptionThrow(c, v,"substraction");
-		case ltInt:   return lValInt(lnfSubI(t));
-		case ltFloat: return lValFloat(lnfSubF(t));
-		case ltVec:   return lValVec(lnfSubV(t));
-	}
-}
-
-static vec lnfMulV(lVal *v){
-	vec acc;
-	for(acc = vecOne(); v ; v = v->vList.cdr){
-		acc = vecMul(acc,v->vList.car->vVec);
-	}
-	return acc;
-}
-static double lnfMulF(lVal *v){
-	double acc;
-	for(acc = 1.f; v ; v = v->vList.cdr){
-		acc *= v->vList.car->vFloat;
-	}
-	return acc;
-}
-static i64 lnfMulI(lVal *v){
-	i64 acc;
-	for(acc = 1; v ; v = v->vList.cdr){
-		acc *= v->vList.car->vInt;
-	}
-	return acc;
-}
-lVal *lnfMul(lClosure *c, lVal *v){
-	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){return lValInt(1);}
-	lRootsValPush(t);
-	switch(t->vList.car->type){
-		default:      return exceptionThrow(c, v,"multiplication");
-		case ltInt:   return lValInt(lnfMulI(t));
-		case ltFloat: return lValFloat(lnfMulF(t));
-		case ltVec:   return lValVec(lnfMulV(t));
-	}
-}
-
-
-static vec lnfDivV(lVal *v){
-	vec acc = v->vList.car->vVec;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc = vecDiv(acc,v->vList.car->vVec);
-	}
-	return acc;
-}
-static double lnfDivF(lVal *v){
-	double acc = v->vList.car->vFloat;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc /= v->vList.car->vFloat;
-	}
-	return acc;
-}
-
-static i64 lnfDivI(lClosure *c, lVal *v){
-	i64 acc = v->vList.car->vInt;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		if(v->vList.car->vInt == 0){
-			lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);
-			return 0;
-		}
-		acc /= v->vList.car->vInt;
-	}
-	return acc;
-}
-lVal *lnfDiv(lClosure *c, lVal *v){
-	lVal *t = lCastAuto(c,v);
-	if((t == NULL) || (t->vList.car == NULL)){
-		lExceptionThrowValClo("arity-error","/ expects at least 1 argument", NULL, c);
-	}
-	if(t->vList.cdr == NULL){
-		switch(t->vList.car->type){
-		default: return exceptionThrow(c, v,"division");
-		case ltInt:
-			if(t->vInt == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
-			return lValFloat(1.0 / ((double)t->vList.car->vInt));
-		case ltFloat: return lValFloat(1.0 / t->vList.car->vFloat);
-		case ltVec:   return lValVec(vecDiv(vecOne(),t->vList.car->vVec));
-		}
-	}
-	lRootsValPush(t);
-	switch(t->vList.car->type){
-		default:      return exceptionThrow(c, v,"division");
-		case ltInt:   return lValInt(lnfDivI(c,t));
-		case ltFloat: return lValFloat(lnfDivF(t));
-		case ltVec:   return lValVec(lnfDivV(t));
-	}
-}
-
-
-static vec lnfModV(lClosure *c, lVal *v){
-	(void)c;
-	vec acc = v->vList.car->vVec;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc = vecMod(acc,v->vList.car->vVec);
-	}
-	return acc;
-}
-static double lnfModF(lClosure *c, lVal *v){
-	(void)c;
-	double acc = v->vList.car->vFloat;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		acc = fmodf(acc,v->vList.car->vFloat);
-	}
-	return acc;
-}
-static i64 lnfModI(lClosure *c, lVal *v){
-	i64 acc = v->vList.car->vInt;
-	v = v->vList.cdr;
-	for(; v ; v = v->vList.cdr){
-		if(v->vList.car->vInt == 0){
-			lExceptionThrowValClo("division-by-zero","Modulo/Dividing by zero is probably not what you wanted", NULL, c);
-			return 0;
-		}
-		acc = acc % v->vList.car->vInt;
-	}
-	return acc;
-}
-lVal *lnfMod(lClosure *c, lVal *v){
-	lVal *t = lCastAuto(c,v);
-	if(t == NULL){return lValInt(0);}
-	lRootsValPush(t);
-	switch(t->vList.car->type){
-		default:      return exceptionThrow(c, v,"modulo");
-		case ltInt:   return lValInt(lnfModI(c,t));
-		case ltFloat: return lValFloat(lnfModF(c,t));
-		case ltVec:   return lValVec(lnfModV(c,t));
-	}
-}
-
-lVal *lnfPow(lClosure *c, lVal *v){
+static lVal *lnfPow(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
 	if(b == NULL){return a;}
+	if(a == NULL){
+		lExceptionThrowValClo("arity-error","- expects at least 1 argument", NULL, c);
+	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrowFloat(c, v,"power");
-		case ltInt:   return lValInt(pow(castToInt(a,0),castToInt(b,0)));
-		case ltFloat: return lValFloat(pow(castToFloat(a,0.f),castToFloat(b,0.f)));
-		case ltVec:   return lValVec(vecPow(castToVec(a,vecZero()),castToVec(b,vecZero())));
+		case ltInt:   return lValInt(pow(requireInt(c,a),  requireInt(c,b)));
+		case ltFloat: return lValFloat(pow(requireFloat(c,a), requireFloat(c,b)));
+		case ltVec:   return lValVec(vecPow(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-void lOperationsArithmeticInteger(lClosure *c);
+
+static lVal *lnfAddAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(a + b);
+}
+
+static lVal *lnfSubAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(a - b);
+}
+
+static lVal *lnfMulAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(a * b);
+}
+
+static lVal *lnfDivAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(a / b);
+}
+
+static lVal *lnfModAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(a % b);
+}
+
+static lVal *lnfPowAstI(lClosure *c, lVal *v){
+	(void)c;
+	const int a = v->vList.car->vInt;
+	const int b = v->vList.cdr->vList.car->vInt;
+	return lValInt(pow(a,b));
+}
+
 void lOperationsArithmetic(lClosure *c){
-	lAddNativeFunc(c,"%",   "args",  "Modulo",        lnfMod);
-	lAddNativeFunc(c,"/",   "args",  "Division",      lnfDiv);
-	lAddNativeFunc(c,"*",   "args",  "Multiplication",lnfMul);
-	lAddNativeFunc(c,"-",   "args",  "Substraction",  lnfSub);
-	lAddNativeFunc(c,"+",   "args",  "Addition",      lnfAdd);
+	lAddNativeFunc(c,"+",   "[a b]", "Addition",      lnfAdd);
+	lAddNativeFunc(c,"-",   "[a b]", "Substraction",  lnfSub);
+	lAddNativeFunc(c,"*",   "[a b]", "Multiplication",lnfMul);
+	lAddNativeFunc(c,"/",   "[a b]", "Division",      lnfDiv);
+	lAddNativeFunc(c,"%",   "[a b]", "Modulo",        lnfMod);
 	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
-	lAddNativeFunc(c,"add", "[a b]", "Return a + b",  lnfAddAst);
-	lAddNativeFunc(c,"sub", "[a b]", "Return a - b",  lnfSubAst);
-	lAddNativeFunc(c,"mul", "[a b]", "Return a * b",  lnfMulAst);
-	lAddNativeFunc(c,"div", "[a b]", "Return a / b",  lnfDivAst);
-	lAddNativeFunc(c,"mod", "[a b]", "Return a % b",  lnfModAst);
-
-	lOperationsArithmeticInteger(c);
+	lAddNativeFunc(c,"add/int", "[a b]", "Return a:int + b:int",  lnfAddAstI);
+	lAddNativeFunc(c,"sub/int", "[a b]", "Return a:int - b:int",  lnfSubAstI);
+	lAddNativeFunc(c,"mul/int", "[a b]", "Return a:int * b:int",  lnfMulAstI);
+	lAddNativeFunc(c,"div/int", "[a b]", "Return a:int / b:int",  lnfDivAstI);
+	lAddNativeFunc(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
+	lAddNativeFunc(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
 }

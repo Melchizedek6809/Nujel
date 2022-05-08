@@ -3,7 +3,7 @@
 #include "../operation.h"
 #include "../exception.h"
 #include "../misc/vec.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/val.h"
 
 #include <math.h>

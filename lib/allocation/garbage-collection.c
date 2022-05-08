@@ -6,16 +6,14 @@
  * is good enough for now.
  */
 #include "garbage-collection.h"
-#include "array.h"
-#include "closure.h"
+
+#include "bytecode.h"
+#include "allocator.h"
 #include "roots.h"
-#include "string.h"
 #include "symbol.h"
-#include "tree.h"
 #include "../exception.h"
 #include "../operation.h"
 #include "../misc/pf.h"
-#include "../type/bytecode.h"
 
 #include <stdlib.h>
 
@@ -90,7 +88,6 @@ void lValGCMark(lVal *v){
 	case ltArray:
 		lArrayGCMark(v->vArray);
 		break;
-	case ltSpecialForm:
 	case ltNativeFunc:
 		lValGCMark(v->vNFunc->doc);
 		lValGCMark(v->vNFunc->args);
@@ -226,5 +223,4 @@ void lGarbageCollect(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
-        lCheckBreak();
 }

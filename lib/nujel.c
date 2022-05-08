@@ -4,93 +4,49 @@
 
 #include "misc/pf.h"
 #include "exception.h"
-#include "allocation/native-function.h"
-#include "allocation/tree.h"
+#include "allocation/allocator.h"
 #include "allocation/symbol.h"
 #include "collection/list.h"
 #include "operation.h"
-#include "s-expression/reader.h"
-#include "type/bytecode.h"
+#include "reader.h"
 #include "type/closure.h"
 #include "type/symbol.h"
-
-#include <string.h>
+#include "vm/eval.h"
 
 extern u8 stdlib_no_data[];
 bool lVerbose = false;
 
-
 /* Initialize the allocator and symbol table, needs to be called before as
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
-	lArrayInit();
-	lClosureInit();
-	lNativeFunctionsInit();
-	lStringInit();
-	lValInit();
 	lSymbolInit();
-	lTreeInit();
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
-	lVal *vn = args;
-	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure, closureCall));
-	tmpc->text = lambda->vClosure->text;
-	tmpc->name = lambda->vClosure->name;
-	tmpc->caller = c;
-	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
-		if(n->type == ltPair){
-			lVal *car = lCar(n);
-			if(car){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(vn));}
-			vn = lCdr(vn);
-		}else if(n->type == ltSymbol){
-			if(n){lDefineClosureSym(tmpc, lGetSymbol(n), vn);}
-		}else{
-			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, c);
-		}
-	}
+	lClosure *tmpc = lClosureNewFunCall(c, args, lambda);
 	lVal *ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
 	lRootsRet(SP);
 	return ret;
 }
 
 /* Run fun with args, evaluating args if necessary  */
-lVal *lApply(lClosure *c, lVal *args, lVal *fun, lVal *funSym){
+lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
-	case ltMacro:
-		lExceptionThrowValClo("runtime-macro","Can't use macros as functions",lCons(funSym,args),c);
-	case ltObject: {
-		if(args && args->type == ltBytecodeArr){
-			RCP(c);
-			lVal *ret = lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
-			return ret;
-		}else{
-			lExceptionThrowValClo("no-more-walking", "Can't use the treewalker anymore", args, c);
-			return NULL;
-		}}
 	case ltLambda:
 		return lLambda(c,args,fun);
-	case ltSpecialForm:
 	case ltNativeFunc:
 		return fun->vNFunc->fp(c,args);
+	case ltObject:
+		if(args && args->type == ltBytecodeArr){
+			RCP(c);
+			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
+		} /* fall-through */
 	default:
 		lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
 		return NULL;
 	}
-}
-
-/* Evaluate func for every entry in list v and return a list containing the results */
-lVal *lMap(lClosure *c, lVal *v, lVal *(*func)(lClosure *,lVal *)){
-	lVal *ret, *cc;
-	ret = cc = RVP(lCons(NULL,NULL));
-	ret->vList.car = func(c,lCar(v));
-	for(lVal *t = lCdr(v); t ; t = lCdr(t)){
-		cc = cc->vList.cdr = lCons(NULL,NULL);
-		cc->vList.car = func(c,lCar(t));
-	}
-	return ret;
 }
 
 /* Add all the platform specific constants to C */
@@ -153,50 +109,15 @@ static void lAddPlatformVars(lClosure *c){
 	lDefineVal(c, "System/Architecture", valArch);
 }
 
-/* Add all the core native functions to c, without IO or stdlib */
-static void lAddCoreFuncs(lClosure *c){
-	lOperationsAllocation(c);
-	lOperationsArithmetic(c);
-	lOperationsMath(c);
-	lOperationsArray(c);
-	lOperationsBinary(c);
-	lOperationsBytecode(c);
-	lOperationsCore(c);
-	lOperationsReader(c);
-	lOperationsSpecial(c);
-	lOperationsString(c);
-	lOperationsTree(c);
-	lOperationsTypeSystem(c);
-	lOperationsVector(c);
-}
-
-/* Create a new root closure WITHOUT loading the nujel stdlib, mostly of interest when testing a different stdlib than the one included */
-static lClosure *lNewRootNoStdLib(){
+/* Create a new root closure with the stdlib */
+lClosure *lNewRoot(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
 	c->type = closureLet;
 	lRootsClosurePush(c);
 	lAddCoreFuncs(c);
 	lAddPlatformVars(c);
-	return c;
-}
-
-/* Create a new root closure with the default included stdlib */
-static void *lNewRootReal(void *a, void *b){
-	(void)a; (void)b;
-	return lLoad(lNewRootNoStdLib(), (const char *)stdlib_no_data);
-}
-
-/* Create a new root closure with the default stdlib using the
- * fallback exception handler */
-lClosure *lNewRoot(){
-	return lExceptionTryExit(lNewRootReal,NULL,NULL);
-}
-
-/* Trigger a break exception as soon as possible, which will most
- * likely abort the current computation and return to the top-level */
-void lBreak(){
-	breakQueued = true;
+	return lLoad(c, (const char *)stdlib_no_data);
 }
 
 /* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
@@ -210,9 +131,8 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		lVal *car = n->vList.car;
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
-		}else{
-			lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
 		}
+		lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
 		lRootsRet(RSSP);
 	}
 	lRootsRet(RSP);

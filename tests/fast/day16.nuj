@@ -6,13 +6,16 @@
 [defn bits/read-value [s offset len]
        [read/single [cat "#b" [string/cut s offset [+ offset len]]]]]
 
+[defn bits/mul vals
+  [reduce vals * 1]]
+
 [defn bits/> [a b] [if [> a b] 1 0]]
 [defn bits/< [a b] [if [< a b] 1 0]]
 [defn bits/= [a b] [if [== a b] 1 0]]
 [defn bits/type->op [t]
        [case y
              [0 +]
-	     [1 *]
+	     [1 bits/mul]
 	     [2 min]
 	     [3 max]
 	     [5 bits/>]
@@ -21,7 +24,7 @@
 [defn bits/type->op [t]
        [case t
              [0 +]
-	     [1 *]
+	     [1 bits/mul]
 	     [2 min]
 	     [3 max]
 	     [5 bits/>]

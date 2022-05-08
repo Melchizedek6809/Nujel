@@ -35,17 +35,6 @@
       [describe/string fun]
       [describe/thing fun]]]
 
-[defn mem []
-  "Return some pretty printed memory usage information" ;
-  [def info [memory-info]]
-  [cat [ansi-white  "Memory Info"] "\n"
-       [ansi-green  "Values:   "] [getf info :value]   "\n"
-       [ansi-blue   "Closures: "] [getf info :closure] "\n"
-       [ansi-red    "Arrays:   "] [getf info :array]   "\n"
-       [ansi-yellow "STrings:  "] [getf info :string]  "\n"
-       [ansi-pink   "Symbols:  "] [getf info :symbol]  "\n"
-       ansi-reset]]
-
 [defn symbol-table [off len environment]
   "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
   [when-not environment [set! environment root-closure]]

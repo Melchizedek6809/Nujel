@@ -5,7 +5,7 @@
 #include "../exception.h"
 #include "../collection/string.h"
 #include "../misc/pf.h"
-#include "../type/native-function.h"
+#include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
 

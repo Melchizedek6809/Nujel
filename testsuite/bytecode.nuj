@@ -48,7 +48,7 @@
 [test/add "#$F" [str/write #$F]]
 [test/add "#$10" [str/write #$10]]
 [test/add "#$FF" [str/write #$FF]]
-[test/add :invalid-literal [try car [read/single "#$1FF"]]]
+[test/add :read-error [try car [read/single "#$1FF"]]]
 [test/add #t [int? [sym->index 'asd]]]
 [test/add 'asd [index->sym [sym->index 'asd]]]
 [test/add 55 [+ 1 [+ 2 [+ 3 [+ 4 [+ 5 [+ 6 [+ 7 [+ 8 [+ 9 10]]]]]]]]]]

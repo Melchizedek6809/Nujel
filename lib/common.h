@@ -73,7 +73,6 @@ typedef enum lType {
 	ltMacro,
 	ltThread,
 	ltNativeFunc,
-	ltSpecialForm,
 	ltBytecodeOp,
 	ltBytecodeArr,
 
@@ -127,12 +126,9 @@ struct lArray {
 typedef enum closureType {
 	closureDefault = 0,
 	closureObject = 1,
-	closureConstant = 2,
-	closureCall = 3,
-	closureLet = 4,
-	closureTry = 5,
-	closureRet = 6,
-	closureBytecoded = 7
+	closureCall = 2,
+	closureLet = 3,
+	closureTry = 4
 } closureType;
 
 struct lClosure {
@@ -183,10 +179,7 @@ struct lTree {
 #define TREE_IMMUTABLE 1
 
 struct lNFunc {
-	union {
-		lVal *(*fp)(lClosure *, lVal *);
-		lNFunc *nextFree;
-	};
+	lVal *(*fp)(lClosure *, lVal *);
 	lVal *doc;
 	lVal *args;
 	lSymbol *name;

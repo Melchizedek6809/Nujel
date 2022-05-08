@@ -1,7 +1,8 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "bytecode.h"
+#include "eval.h"
 
+#include "bytecode.h"
 #include "../exception.h"
 #include "../allocation/symbol.h"
 #include "../type/closure.h"
@@ -13,20 +14,11 @@
 #include <stdlib.h>
 
 /* Push the list args onto the stack, return the new SP */
-int pushList(lVal **stack, int sp, lVal *args){
+static int pushList(lVal **stack, int sp, lVal *args){
 	if(!args){return sp;}
 	sp = pushList(stack, sp, lCdr(args));
 	stack[sp] = lCar(args);
 	return sp + 1;
-}
-
-/* Print the contents of the stack, mostly used for debuggin */
-void printStack(lVal **stack, int sp, lClosure **cloStack, int csp){
-	(void)cloStack;
-	pf("-- Debug Output [SP:%u CSP:%u] -- %v\n", sp, csp);
-	while(sp > 0){
-		pf("%v\n",stack[--sp]);
-	}
 }
 
 /* Build a list of length len in stack starting at sp */
@@ -93,13 +85,32 @@ static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
 	c[3] = (i      ) & 0xFF;
 }
 
+static void lBytecodeTrace(const lThread *ctx, const lBytecodeOp *ip, const lBytecodeArray *ops){
+	pf("[OP: %u]\n [IP: %x, CSP:%i SP:%i]\n", (ip - ops->data), (i64)*ip, (i64)ctx->csp, (i64)ctx->sp);
+	for(int i=ctx->csp;i>=0;i--){
+		pf("C %u: %i\n", i, (i64)(ctx->closureStack[i] ? ctx->closureStack[i]->type : 0));
+	}
+	for(int i=ctx->sp-1;i>=0;i--){
+		pf("V %u: %V\n", i, ctx->valueStack[i]);
+	}
+	pf("\n");
+	if(ctx->csp < 0){
+		epf("CSP Error!");
+		exit(1);
+	}
+	if(ctx->sp < 0){
+		epf("SP Error!");
+		exit(1);
+	}
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, bool trace){
 	jmp_buf oldExceptionTarget;
 	lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
-	ctx.closureStackSize = 8;
+	ctx.closureStackSize = 4;
 	ctx.valueStackSize = 8;
 	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
 	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
@@ -138,15 +149,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
-		if(trace){
-			pf("[%u]: %x [csp:%i | sp:%i]\n", (ip - ops->data), (i64)*ip, (i64)ctx.csp, (i64)ctx.sp);
-			for(int i=ctx.csp;i>=0;i--){
-				pf("#%u: %i\n", i, (i64)(ctx.closureStack[i] ? ctx.closureStack[i]->type : 0));
-			}
-			for(int i=ctx.sp-1;i>=0;i--){
-				pf("!%u: %V\n", i, ctx.valueStack[i]);
-			}
-		}
 		if(ctx.csp == ctx.closureStackSize-1){
 			ctx.closureStackSize *= 2;
 			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
@@ -155,14 +157,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 			ctx.valueStackSize *= 2;
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
 		}
-		if(ctx.csp < 0){
-			epf("CSP Error!");
-			exit(1);
-		}
-		if(ctx.sp < 0){
-			epf("SP Error!");
-			exit(1);
-		}
+		if(trace){lBytecodeTrace(&ctx, ip, ops);}
 	switch(*ip){
 	default:
 		lExceptionThrowValClo("unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
@@ -224,11 +219,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ctx.sp--;
 		ip++;
 		break; }
-	case lopDebugPrintStack:
-		pf("Bytecode Debug stack:\n");
-		printStack(ctx.valueStack, ctx.sp, ctx.closureStack, ctx.csp);
-		ip++;
-		break;
 	case lopPushNil:
 		ctx.valueStack[ctx.sp++] = NULL;
 		ip++;
@@ -247,29 +237,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ip = lBytecodeReadOPSym(ip+1, &sym);
 		ctx.valueStack[ctx.sp++] = lValSymS(sym);
 		break;}
-	case lopApply: {
-		const int len = ip[1];
-		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp = ctx.sp - len + 1;
-		ctx.valueStack[ctx.sp-1] = cargs;
-		lVal *fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-		if(fun && (fun->type == ltSymbol)){
-			lBytecodeLinkApply(c, ops, ip);
-			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-		}
-		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun, fun);
-		ip += 5;
-		break; }
-	case lopApplyDynamic: {
-		const int len = ip[1];
-		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp = ctx.sp - len + 1;
-		ctx.valueStack[ctx.sp-1] = cargs;
-		lVal *fun = ctx.valueStack[ctx.sp-2];
-		ip+=2;
-		ctx.valueStack[ctx.sp-2] = lApply(c, cargs, fun, fun);
-		ctx.sp--;
-		break; }
 	case lopDup:
 		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDup", NULL, c);}
 		ctx.valueStack[ctx.sp] = ctx.valueStack[ctx.sp-1];
@@ -312,28 +279,18 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ip = lBytecodeReadOPSym(ip+1, &sym);
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
+	case lopMacroAst:
 	case lopFn: {
+		const lBytecodeOp curOp = *ip;
 		lVal *cName, *cArgs, *cDocs, *cBody;
-		ip++;
-		ip = lBytecodeReadOPVal(ip, &cName);
-		ip = lBytecodeReadOPVal(ip, &cArgs);
-		ip = lBytecodeReadOPVal(ip, &cDocs);
-		ip = lBytecodeReadOPVal(ip, &cBody);
-		ctx.valueStack[ctx.sp++] = lLambdaBytecodeNew(c, cName, cArgs, cDocs, cBody);
-		break;}
-	case lopMacroAst: {
-		lVal *cName, *cArgs, *cDocs, *cBody;
-		ip++;
-		ip = lBytecodeReadOPVal(ip, &cName);
-		ip = lBytecodeReadOPVal(ip, &cArgs);
-		ip = lBytecodeReadOPVal(ip, &cDocs);
-		ip = lBytecodeReadOPVal(ip, &cBody);
-		ctx.valueStack[ctx.sp] = lLambdaBytecodeNew(c, cName, cArgs, cDocs, cBody);
-		if(ctx.valueStack[ctx.sp]){
-			ctx.valueStack[ctx.sp]->type = ltMacro;
-		}
+		ip = lBytecodeReadOPVal(ip+1, &cName);
+		ip = lBytecodeReadOPVal(ip,   &cArgs);
+		ip = lBytecodeReadOPVal(ip,   &cDocs);
+		ip = lBytecodeReadOPVal(ip,   &cBody);
+		ctx.valueStack[ctx.sp] = lLambdaNew(c, cName, cArgs, cDocs, cBody);
+		if(curOp == lopMacroAst){ctx.valueStack[ctx.sp]->type = ltMacro;}
 		ctx.sp++;
-		break; }
+		break;}
 	case lopRootsSave:
 		c->rsp = lRootsGet();
 		ip++;
@@ -382,6 +339,41 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=3;
 		break;
+	case lopApplyDynamic:
+	case lopApply: {
+		const lBytecodeOp curOp = *ip;
+		const int len = ip[1];
+		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
+		ctx.sp = ctx.sp - len + 1;
+		ctx.valueStack[ctx.sp-1] = cargs;
+		lVal *fun;
+		if(curOp == lopApply){
+			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+			if(fun && (fun->type == ltSymbol)){
+				lBytecodeLinkApply(c, ops, ip);
+				fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+			}
+			ip += 5;
+		}else{
+			fun = ctx.valueStack[ctx.sp-2];
+			ip+=2;
+			ctx.sp--;
+		}
+		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun);
+		break; }
+	case lopApplyNew: {
+		const int len = ip[1];
+		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
+		ctx.sp = ctx.sp - len + 1;
+		ctx.valueStack[ctx.sp-1] = cargs;
+		lVal *fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+		if(fun && (fun->type == ltSymbol)){
+			lBytecodeLinkApply(c, ops, ip);
+			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
+		}
+		ip += 5;
+		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun);
+		break; }
 	case lopRet:
 		if(ctx.sp < 1){
 			lExceptionThrowValClo("stack-underflow", "Underflow during lopRet", NULL, c);
@@ -402,118 +394,4 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 	free(ctx.valueStack);
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	return NULL;
-}
-
-/* Return the overall length of opcode op */
-static int lBytecodeOpLength(lBytecodeOp op){
-	switch(op){
-	default:
-		epf("Unknown bytecodeOp length: %x\n",op);
-		exit(3);
-	case lopNOP:
-	case lopCar:
-	case lopCdr:
-	case lopCons:
-	case lopRet:
-	case lopIntAdd:
-	case lopDebugPrintStack:
-	case lopDup:
-	case lopDrop:
-	case lopClosurePush:
-	case lopLet:
-	case lopClosurePop:
-	case lopRootsSave:
-	case lopRootsRestore:
-	case lopLessPred:
-	case lopLessEqPred:
-	case lopEqualPred:
-	case lopGreaterEqPred:
-	case lopGreaterPred:
-	case lopPushNil:
-	case lopSwap:
-		return 1;
-	case lopApplyDynamic:
-	case lopIntByte:
-		return 2;
-	case lopTry:
-	case lopJmp:
-	case lopJf:
-	case lopJt:
-		return 3;
-	case lopPushSymbol:
-	case lopDef:
-	case lopSet:
-	case lopGet:
-	case lopPushLVal:
-		return 4;
-	case lopApply:
-		return 5;
-	case lopMacroAst:
-	case lopFn:
-		return 4*3+1;
-	}
-}
-
-/* Mark all objects references within v, should only be called from the GC */
-void lBytecodeArrayMark(const lBytecodeArray *v){
-	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
-		switch(*c){
-		default: break;
-		case lopPushSymbol:
-		case lopDef:
-		case lopGet:
-		case lopSet:
-			if(&c[3] >= v->dataEnd){break;}
-			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
-			break;
-		case lopApply:
-			if(&c[4] >= v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[ 2] << 16) | (c[ 3] << 8) | c[ 4]));
-			break;
-		case lopMacroAst:
-		case lopFn:
-			if(&c[12] >= v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[ 1] << 16) | (c[ 2] << 8) | c[ 3]));
-			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));
-			lValGCMark(lIndexVal((c[ 7] << 16) | (c[ 8] << 8) | c[ 9]));
-			lValGCMark(lIndexVal((c[10] << 16) | (c[11] << 8) | c[12]));
-			break;
-		case lopPushLVal:
-			if(&c[3] >= v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
-			break;
-		}
-	}
-}
-
-/* Links a bytecode array, mostly used after serializing and deserializing
- * a function */
-void lBytecodeLink(lClosure *clo, lBytecodeArray *v){
-	for(lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
-		switch(*c){
-		default: break;
-		case lopApply: {
-			if(&c[4] >= v->dataEnd){break;}
-			lVal *raw = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
-			if((!raw) || (raw->type != ltSymbol)){break;}
-			lVal *n = lGetClosureSym(clo, raw->vSymbol);
-			if(n == raw){break;}
-			int i = lValIndex(n);
-			c[2] = (i >> 16) & 0xFF;
-			c[3] = (i >>  8) & 0xFF;
-			c[4] = (i      ) & 0xFF;
-			break; }
-		case lopPushLVal:
-			if(&c[3] >= v->dataEnd){break;}
-			lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-			if(!raw || (raw->type != ltSymbol)){break;}
-			lVal *n = lGetClosureSym(clo, raw->vSymbol);
-			if(n == raw){break;}
-			int i = lValIndex(n);
-			c[1] = (i >> 16) & 0xFF;
-			c[2] = (i >>  8) & 0xFF;
-			c[3] = (i      ) & 0xFF;
-			break;
-		}
-	}
 }

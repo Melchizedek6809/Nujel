@@ -3,11 +3,13 @@
 #include "../display.h"
 #include "../exception.h"
 #include "../nujel.h"
-#include "../allocation/closure.h"
+#include "../allocation/allocator.h"
 #include "../allocation/garbage-collection.h"
 #include "../allocation/symbol.h"
 #include "../collection/list.h"
 #include "../collection/tree.h"
+#include "../collection/string.h"
+#include "../reader.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -28,10 +30,29 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 	return c;
 }
 
+lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
+	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure, closureCall));
+	tmpc->text = lambda->vClosure->text;
+	tmpc->name = lambda->vClosure->name;
+	tmpc->caller = parent;
+	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
+		if(n->type == ltPair){
+			lVal *car = lCar(n);
+			if(car){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));}
+			args = lCdr(args);
+		}else if(n->type == ltSymbol){
+			if(n){lDefineClosureSym(tmpc, lGetSymbol(n), args);}
+		}else{
+			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, parent);
+		}
+	}
+	return tmpc;
+}
+
 /* Define the NFunc LNF in C with all the space separated symbols in SYM */
 lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	const char *cur = sym;
-	if((lNF->type != ltNativeFunc) && (lNF->type != ltSpecialForm)){
+	if(lNF->type != ltNativeFunc){
 		lExceptionThrowValClo(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF, c);
 	}
 
@@ -100,26 +121,23 @@ void lDefineVal(lClosure *c, const char *str, lVal *val){
 	lDefineClosureSym(c,lSymS(str),val);
 }
 
+/* Add a NFunc to closure C, should only be used during root closure creation */
+lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
+	lVal *v = lRootsValPush(lValAlloc(ltNativeFunc));
+	v->vNFunc = lNFuncAlloc();
+	v->vNFunc->fp   = func;
+	v->vNFunc->doc  = lValString(doc);
+	v->vNFunc->args = lCar(lRead(args));
+	return lDefineAliased(c,v,sym);
+}
+
+
 /* Create a new Lambda Value */
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
 	lVal *ret = RVP(lValAlloc(ltLambda));
 	ret->vClosure       = lClosureNew(parent, closureDefault);
-	ret->vClosure->name = sym;
-	ret->vClosure->args = args;
-	ret->vClosure->doc  = docs;
-	ret->vClosure->text = body;
-
-	return ret;
-}
-
-/* Create a new Lambda Value */
-lVal *lLambdaBytecodeNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
-	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
-
-	lVal *ret = RVP(lValAlloc(ltLambda));
-	ret->vClosure       = lClosureNew(parent, closureBytecoded);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->doc  = docs;

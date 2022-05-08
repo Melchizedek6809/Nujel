@@ -5,7 +5,7 @@
 #include "../display.h"
 #include "../nujel.h"
 #include "../allocation/symbol.h"
-#include "../allocation/val.h"
+#include "../allocation/allocator.h"
 
 #include <string.h>
 

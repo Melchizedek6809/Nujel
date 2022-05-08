@@ -25,7 +25,7 @@ const char *run(const char *line){
 	const int SP = lRootsGet();
 	lVal *funSym = lValSym("repl/wasm");
 	lVal *fun = RVP(lGetClosureSym(mainClosure, funSym->vSymbol));
-	lVal *v = lApply(mainClosure, RVP(lCons(RVP(lValString(line)),NULL)), fun, funSym);
+	lVal *v = lApply(mainClosure, RVP(lCons(RVP(lValString(line)),NULL)), fun);
 	spf(buf, &buf[sizeof(buf)], "%v", v);
 	lRootsRet(SP);
 	return buf;
@@ -90,21 +90,14 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	lVal *funSym = RVP(lValSym("repl/init"));
 	lVal *fun = RVP(lGetClosureSym(c, funSym->vSymbol));
 	mainClosure = c;
-	lApply(c, ret, fun, funSym);
+	lApply(c, ret, fun);
 }
 
 
 #ifndef __WATCOMC__
-/* Signal handler that enabled using C-c to break out of
- * an infinite loop */
-static void breakSignalHandler(int sig){
-	(void)sig;
-	breakQueued = true;
-}
-
 /* Set up a bunch of signal handlers */
 static void initSignalHandlers(){
-	signal(SIGINT, breakSignalHandler);
+	//signal(SIGINT, breakSignalHandler);
 }
 #endif
 

@@ -77,6 +77,17 @@
 [defn compile/macro [macro source]
   [compile* [macro-apply macro [cdr source]]]]
 
+[defn compile/fold [op source]
+  [if [cdr source]
+      [if [cddr source]
+          [list op
+                [compile/fold op [except-last-pair source]]
+                [compile* [car [last-pair source]]]]
+          [list op
+                [compile* [car source]]
+                [compile* [cadr source]]]]
+      [list op [compile* [car source]]]]]
+
 [defn compile* [source]
   "Expand all macros within source"
 
@@ -86,21 +97,22 @@
 
   [case [type-of op]
     [:nil source]
-    [:special-form [case op
-                     [do     [compile/do     source]]
-                     [def    [compile/def    source]]
-                     [set!   [compile/set!   source]]
-                     [let*   [compile/let*   source]]
-                     [fn*    [compile/fn*    source]]
-                     [macro* [compile/macro* source]]
-                     [ω*     [compile/ω*     source]]
-                     [if     [compile/if     source]]
-                     [try    [compile/try    source]]
-                     [[and or] [map source compile*]]
-                     [while  [compile/while  source]]
-                     [return [compile/return source]]
-                     [quote                  source ]
-                     [otherwise [throw [list :panic "Unknown special form, please fix the compiler!" source]]]]]
+    [:native-function
+     [case op
+       [[+ - * / %] [compile/fold [car source] [cdr source]]]
+       [do     [compile/do     source]]
+       [def    [compile/def    source]]
+       [set!   [compile/set!   source]]
+       [let*   [compile/let*   source]]
+       [fn*    [compile/fn*    source]]
+       [macro* [compile/macro* source]]
+       [environment* [compile/ω* source]]
+       [if     [compile/if     source]]
+       [try    [compile/try    source]]
+       [while  [compile/while  source]]
+       [return [compile/return source]]
+       [quote                  source ]
+       [otherwise [map source compile*]]]]
     [:macro                      [compile/macro      op  source]]
     [otherwise                   [map source compile*]]]]
 

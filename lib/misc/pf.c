@@ -2,11 +2,10 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "pf.h"
 
-#include "../allocation/closure.h"
-#include "../allocation/native-function.h"
+#include "../allocation/allocator.h"
 #include "../allocation/symbol.h"
 #include "../collection/list.h"
-#include "../type/bytecode.h"
+#include "../vm/bytecode.h"
 
 #include <float.h>
 #include <limits.h>
@@ -258,7 +257,6 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 	case ltKeyword:
 		ret = spf(cur, bufEnd, ":%s",v->vSymbol->c);
 		break;
-	case ltSpecialForm:
 	case ltNativeFunc:
 		if(v->vNFunc->name){
 			ret = spf(cur, bufEnd, "%s",v->vNFunc->name->c);

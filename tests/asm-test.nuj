@@ -1,41 +1,9 @@
 #!/usr/bin/env nujel
 
-;[disassemble/test '[[$nop] [$push/int 5] [$push/int 2] [$add/int] [$ret]]]
-;[disassemble/test '[[$nop] [$push/int 26] [$push/lval #t] [$jt :asd] [$push/int 99] [:label :asd] [$ret]]]
-;[disassemble/test '[[$jmp :start] [:label :func] [$push/int 2] [$add/int] [$ret] [:label :start] [$push/int 3] [$call :func] [$ret]]]
-;[disassemble/test '[[$jmp :start] [:label :ret] [$push/int 3] [$ret] [:label :start] [$push/int 2] [$jmp :ret] [$ret]]]
+[let* [defn min [a b]
+        [if [< a b] a b]]
 
-;[println [str/write [compile ''[1 . 2]]]]
+  [def bc [assemble [$push/int 42] [$push/int 23] [$apply 2 min] [$ret]]]
+  [println [bytecode-eval bc #nil root-closure #t]]
 
-
-[def expr '[for [i 1 5] [println [cat "Hello for the " [str/write i]]]]]
-
-[println [ansi-rainbow "Start!"]]
-[println [str/write [bytecompile [compile expr]]]]
-
-[println [ansi-rainbow "Bytecompilation"]]
-[def a [assemble [bytecompile [compile expr]]]]
-[println [ansi-rainbow "Assembled!"]]
-[println [str/write [closure disassemble/raw]]]
-[disassemble/raw a]
-[println [ansi-rainbow "Done!!!! => " [bytecode-eval a]]]
-;[disassemble/test '[bytecompile [compile '[- 7 1]]]]
-
-[exit]
-
-[println [str/write [compile '[cond [[odd? 2] #f] [even? 2] #t]]]]
-[println [ansi-blue "--------------------"]]
-[println [str/write [bytecompile [compile '[cond [[odd? 2] #f] [even? 2] #t]]]]]
-[println [ansi-blue "--------------------"]]
-[println [str/write [eval [cond [[odd? 2] #f] [even? 2] #t]]]]
-
-#;[println [str/write [asmrun
-         [$jmp :start]
-         [:label :handle]
-         [$ret]
-         [:label :start]
-         [$try :handle]
-         [$let]
-         [$push/lval '[:asd "Test"]]
-         [$throw]
-]]]
+]
