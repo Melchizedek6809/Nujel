@@ -173,6 +173,10 @@ test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj
 
 .PHONY: test.verbose
+test.v: $(NUJEL)
+	@./$(NUJEL) -v tools/tests.nuj
+
+.PHONY: test.verbose
 test.verbose: $(NUJEL)
 	@./$(NUJEL) --verbose --only-test-suite tools/tests.nuj
 

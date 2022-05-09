@@ -3,6 +3,7 @@
 #include "symbol.h"
 #include "../display.h"
 #include "../misc/pf.h"
+#include "../misc/popcount.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -129,14 +130,30 @@ lSymbol *lSymSL(const char *str, uint len){
 	return lSymS(buf);
 }
 
-uint lHashSymStr(const char *str){
-	uint res = 0x12345678;
+const u32 hashLookupTable[8] = {
+	0x2e003dc5,
+	0x8b27c03c,
+	0x4d9b3063,
+	0xbd3e8d7e,
+	0x52568b75,
+	0x1d528623,
+	0xf0a5bd1d,
+	0x76c15bf8
+};
+
+static u32 lHashSymStr(const char *str){
+	u32 res = 0xf3b06b3b;
 	while (*str) {
-		res = (res << 4) | ((res & 0xf0000000) >> 28);
-		res += *str++;
+		res = (res << 4) | ((res & 0xF0000000) >> 28);
+		res ^= *str++;
+		res ^= hashLookupTable[__builtin_popcount(res)&0x7];
 	}
 	return res;
 }
+
+
+uint symbolLookups = 0;
+uint tombLookups = 0;
 
 // Probes the symbol index and returns the slot where STR is stored.  If STR is
 // not in the map, returns a slot where it could be inserted, which could be
@@ -146,7 +163,9 @@ uint lSymbolIndexSlot(const char *str){
 	uint firstTomb = 0xffffffff;
 	uint h = lHashSymStr(str) % SYM_MAX;
 	uint hInitial = h;
+	symbolLookups++;
 	do {
+		tombLookups++;
 		int idx = lSymbolIndex[h];
 		if(SYMBOL_SLOT_IS_EMPTY(idx)){
 			return firstTomb == 0xffffffff ? h : firstTomb;

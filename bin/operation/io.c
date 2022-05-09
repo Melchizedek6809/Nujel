@@ -61,8 +61,14 @@ void setIOSymbols(){
 	lsNamedPipe        = RSYMP(lSymS("named-pipe?"));
 }
 
+extern uint symbolLookups;
+extern uint tombLookups;
+
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	(void)c;
+	if(lVerbose){
+		pf("\nLookups %u/%u == %f\n", (i64)symbolLookups, (i64)tombLookups, (double)tombLookups / (double)symbolLookups);
+	}
 	exit(castToInt(lCar(v),0));
 	return NULL;
 }
