@@ -234,7 +234,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		ret = writeArray(cur, bufEnd, v->vArray);
 		break;
 	case ltBytecodeArr:
-		ret = writeBytecodeArray(cur, bufEnd, &v->vBytecodeArr);
+		ret = writeBytecodeArray(cur, bufEnd, v->vBytecodeArr);
 		break;
 	case ltBytecodeOp:
 		ret = spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));

@@ -33,34 +33,32 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	const int len = arr->length;
 
 	lVal *ret = lValAlloc(ltBytecodeArr);
-	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
-	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
+	lBytecodeArray *bca = lBytecodeArrayAlloc(len);
+	ret->vBytecodeArr = bca;
 
 	for(int i=0;i<len;i++){
-		ret->vBytecodeArr.data[i] = requireBytecodeOp(c, arr->data[i]);
+		bca->data[i] = requireBytecodeOp(c, arr->data[i]);
 	}
 
 	return ret;
 }
 
 static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
-	lBytecodeArray arr = requireBytecodeArray(c, lCar(v));
-	const int len = arr.dataEnd - arr.data;
+	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
+	const int len = arr->dataEnd - arr->data;
 
 	lVal *ret = RVP(lValAlloc(ltArray));
-	ret->vArray = lArrayAlloc();
-	ret->vArray->length = len;
-	ret->vArray->data = malloc(len * sizeof(*ret->vArray->data));
+	ret->vArray = lArrayAlloc(len);
 
 	for(int i=0;i<len;i++){
-		ret->vArray->data[i] = lValBytecodeOp(arr.data[i]);
+		ret->vArray->data[i] = lValBytecodeOp(arr->data[i]);
 	}
 
 	return ret;
 }
 
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
-	lBytecodeArray arr = requireBytecodeArray(c, lCar(v));
+	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	lVal *args = lCadr(v);
 	lVal *env = lCaddr(v);
 	lClosure *bcc = c;
@@ -71,7 +69,7 @@ static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 		}
 		bcc = env->vClosure;
 	}
-	return lBytecodeEval(bcc, args, &arr, trace);
+	return lBytecodeEval(bcc, args, arr, trace);
 }
 
 void lOperationsBytecode(lClosure *c){

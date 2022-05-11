@@ -141,7 +141,7 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *bod
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->doc  = docs;
-	ret->vClosure->text = body;
+	ret->vClosure->text = requireBytecodeArray(parent, body);
 
 	return ret;
 }

@@ -80,7 +80,7 @@ lBytecodeOp requireBytecodeOp(lClosure *c, lVal *v){
 	return v->vBytecodeOp;
 }
 
-lBytecodeArray requireBytecodeArray(lClosure *c, lVal *v){
+lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v){
 	if((v == NULL) || (v->type != ltBytecodeArr)){
 		lExceptionThrowValClo("type-error", "Expected a bytecode array, not: ", v, c);
 	}

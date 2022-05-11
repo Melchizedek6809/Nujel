@@ -19,12 +19,13 @@
 
 int lGCRuns = 0;
 
-u8 lValMarkMap    [VAL_MAX];
-u8 lTreeMarkMap   [TRE_MAX];
-u8 lClosureMarkMap[CLO_MAX];
-u8 lArrayMarkMap  [ARR_MAX];
-u8 lStringMarkMap [STR_MAX];
-u8 lSymbolMarkMap [SYM_MAX];
+u8 lValMarkMap           [VAL_MAX];
+u8 lTreeMarkMap          [TRE_MAX];
+u8 lClosureMarkMap       [CLO_MAX];
+u8 lArrayMarkMap         [ARR_MAX];
+u8 lStringMarkMap        [STR_MAX];
+u8 lSymbolMarkMap        [SYM_MAX];
+u8 lBytecodeArrayMarkMap [BCA_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
@@ -107,7 +108,7 @@ void lValGCMark(lVal *v){
 		lWidgetMarkI(v->vInt);
 		break;
 	case ltBytecodeArr:
-		lBytecodeArrayMark(&v->vBytecodeArr);
+		lBytecodeArrayMark(v->vBytecodeArr);
 	default:
 		break;
 	}
@@ -143,7 +144,7 @@ void lClosureGCMark(const lClosure *c){
 
 	lClosureGCMark(c->parent);
 	lTreeGCMark(c->data);
-	lValGCMark(c->text);
+	lBytecodeArrayMark(c->text);
 	lValGCMark(c->doc);
 	lValGCMark(c->args);
 	lClosureGCMark(c->caller);
@@ -163,6 +164,19 @@ void lArrayGCMark(const lArray *v){
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);
 	}
+}
+
+/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
+void lBytecodeArrayMark(const lBytecodeArray *v){
+	if(v == NULL){return;}
+	const uint ci = v - lBytecodeArrayList;
+	if(ci > lBytecodeArrayMax){
+		epf("Tried to mark invalid lBytecodeArray\n");
+		exit(1);
+	}
+	if(lBytecodeArrayMarkMap[ci]){return;}
+	lBytecodeArrayMarkMap[ci] = 1;
+	lBytecodeArrayMarkRefs(v);
 }
 
 /* There should be a way to avoid having this procedure alltogether, but for
@@ -194,6 +208,10 @@ static void lMarkFree(){
 		const uint ci = t - lTreeList;
 		lTreeMarkMap[ci] = 1;
 	}
+	for(lBytecodeArray *t = lBytecodeArrayFFree;t != NULL;t = t->nextFree){
+		const uint ci = t - lBytecodeArrayList;
+		lBytecodeArrayMarkMap[ci] = 1;
+	}
 }
 
 /* Mark the roots so they will be skipped by the GC,  */
@@ -203,16 +221,17 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
-#define ALLOC_MAX MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax)))))
+#define ALLOC_MAX MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax))))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	for(uint i=0;i<ALLOC_MAX;i++){
-		if(i < lValMax)    {lValMarkMap[i]     ? lValMarkMap[i]     = 0 : lValFree(&lValList[i]);}
-		if(i < lClosureMax){lClosureMarkMap[i] ? lClosureMarkMap[i] = 0 : lClosureFree(&lClosureList[i]);}
-		if(i < lStringMax) {lStringMarkMap[i]  ? lStringMarkMap[i]  = 0 : lStringFree(&lStringList[i]);}
-		if(i < lSymbolMax) {lSymbolMarkMap[i]  ? lSymbolMarkMap[i]  = 0 : lSymbolFree(&lSymbolList[i]);}
-		if(i < lArrayMax)  {lArrayMarkMap[i]   ? lArrayMarkMap[i]   = 0 : lArrayFree(&lArrayList[i]);}
-		if(i < lTreeMax)   {lTreeMarkMap[i]    ? lTreeMarkMap[i]    = 0 : lTreeFree(&lTreeList[i]);}
+		if(i < lValMax)           {lValMarkMap[i]           ? lValMarkMap[i]           = 0 : lValFree(&lValList[i]);}
+		if(i < lClosureMax)       {lClosureMarkMap[i]       ? lClosureMarkMap[i]       = 0 : lClosureFree(&lClosureList[i]);}
+		if(i < lStringMax)        {lStringMarkMap[i]        ? lStringMarkMap[i]        = 0 : lStringFree(&lStringList[i]);}
+		if(i < lSymbolMax)        {lSymbolMarkMap[i]        ? lSymbolMarkMap[i]        = 0 : lSymbolFree(&lSymbolList[i]);}
+		if(i < lArrayMax)         {lArrayMarkMap[i]         ? lArrayMarkMap[i]         = 0 : lArrayFree(&lArrayList[i]);}
+		if(i < lTreeMax)          {lTreeMarkMap[i]          ? lTreeMarkMap[i]          = 0 : lTreeFree(&lTreeList[i]);}
+		if(i < lBytecodeArrayMax) {lBytecodeArrayMarkMap[i] ? lBytecodeArrayMarkMap[i] = 0 : lBytecodeArrayFree(&lBytecodeArrayList[i]);}
 	}
 	if(sweeperChain != NULL){sweeperChain();}
 }

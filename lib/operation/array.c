@@ -49,9 +49,7 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	const int len = requireNaturalInt(c, lCar(v));
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
-	r->vArray = lArrayAlloc();
-	r->vArray->length = len;
-	r->vArray->data = calloc(len, sizeof(*r->vArray->data));
+	r->vArray = lArrayAlloc(len);
 	if(len && (r->vArray->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","[array/allocate] couldn't allocate its array", v, c);
 		return NULL;
@@ -70,15 +68,10 @@ static lVal *lnfArrRef(lClosure *c, lVal *v){
 }
 
 lVal *lnfArrNew(lClosure *c, lVal *v){
+	(void)c;
 	int length = v ? lListLength(v) : 0;
 	lVal *r = lRootsValPush(lValAlloc(ltArray));
-	r->vArray = lArrayAlloc();
-	r->vArray->length = length;
-	r->vArray->data = calloc(length, sizeof(*r->vArray->data));
-	if(length && (r->vArray->data == NULL)){
-		lExceptionThrowValClo("out-of-memory","[array/new] couldn't allocate its array", lValInt(length), c);
-		return NULL;
-	}
+	r->vArray = lArrayAlloc(length);
 	int key = 0;
 	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
 		if(key >= length){break;}

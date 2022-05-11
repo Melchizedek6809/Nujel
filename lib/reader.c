@@ -366,9 +366,8 @@ static lVal *lParseBytecodeArray(lString *s){
 		d[len++] = (u8)t;
 	}
 	lVal *ret = RVP(lValAlloc(ltBytecodeArr));
-	ret->vBytecodeArr.data = malloc(len * sizeof(lBytecodeOp));
-	ret->vBytecodeArr.dataEnd = &ret->vBytecodeArr.data[len];
-	memcpy(ret->vBytecodeArr.data, d, len);
+	ret->vBytecodeArr = lBytecodeArrayAlloc(len);
+	memcpy(ret->vBytecodeArr->data, d, len);
 	free(d);
 	return ret;
 }

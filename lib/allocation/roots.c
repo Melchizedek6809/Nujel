@@ -27,7 +27,8 @@ rootEntry *rootStack = NULL;
 int rootSP  = 0;
 int rootMax = 0;
 
-/* Push a new pointer onto the root stack */
+void (*rootsMarkerChain)() = NULL;
+
 static void lRootsPush(const lType t, void *ptr){
 	if(rootSP >= rootMax){
 		rootMax = MAX(rootMax * 2, 256);
@@ -72,11 +73,11 @@ lSymbol *lRootsSymbolPush(lSymbol *s){
 	return s;
 }
 
+/* Push an lThread onto the root stack, protecting it from being freed by the GC */
 void lRootsThreadPush(lThread *c){
 	lRootsPush(ltThread, c);
 }
 
-void (*rootsMarkerChain)() = NULL;
 /* Mark every single root and everything they point to */
 void lRootsMark(){
 	for(int i=0;i<rootSP;i++){

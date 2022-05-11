@@ -2,6 +2,6 @@
 #define NUJEL_LIB_ALLOCATION_BYTECODE
 #include "../common.h"
 
-void lBytecodeArrayMark(const lBytecodeArray *v);
+void lBytecodeArrayMarkRefs(const lBytecodeArray *v);
 
 #endif

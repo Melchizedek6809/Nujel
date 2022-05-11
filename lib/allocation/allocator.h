@@ -8,6 +8,7 @@
 #define NFN_MAX (1<<10)
 #define STR_MAX (1<<14)
 #define VAL_MAX (1<<21)
+#define BCA_MAX (1<<14)
 
 
 extern lArray  lArrayList[ARR_MAX];
@@ -34,8 +35,12 @@ extern lVal     lValList[VAL_MAX];
 extern uint     lValMax;
 extern lVal    *lValFFree;
 
+extern lBytecodeArray  lBytecodeArrayList[BCA_MAX];
+extern uint            lBytecodeArrayMax;
+extern lBytecodeArray *lBytecodeArrayFFree;
 
-lArray   *lArrayAlloc  ();
+
+lArray *  lArrayAlloc  (size_t len);
 void      lArrayFree   (lArray *v);
 
 lClosure *lClosureAlloc();
@@ -51,6 +56,9 @@ static inline int lNFuncID(const lNFunc *n){
 
 lString  *lStringAlloc ();
 void      lStringFree  (lString *s);
+
+lBytecodeArray *lBytecodeArrayAlloc(size_t len);
+void            lBytecodeArrayFree(lBytecodeArray *a);
 
 lTree    *lTreeAlloc   ();
 void      lTreeFree    (lTree *t);

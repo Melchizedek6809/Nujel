@@ -59,7 +59,7 @@ static int lBytecodeOpLength(lBytecodeOp op){
 }
 
 /* Mark all objects references within v, should only be called from the GC */
-void lBytecodeArrayMark(const lBytecodeArray *v){
+void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){
 		default: break;

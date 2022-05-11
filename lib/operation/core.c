@@ -63,7 +63,9 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree, symDocumentation, clo->doc);
 		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")), RVP(lValSymS(clo->name)));
-		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("code")), clo->text);
+		lVal *text = lValAlloc(ltBytecodeArr);
+		text->vBytecodeArr = clo->text;
+		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("code")), text);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("data")), RVP(lValTree(clo->data)));
 		if(clo->type == closureCall){
 			ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("call")), lRootsValPush(lValBool(true)));
@@ -114,7 +116,7 @@ static void lClosureSetRec(lClosure *clo, lTree *data){
 	}else if(data->key == symArguments){
 		clo->args = data->value;
 	}else if(data->key == symCode){
-		clo->text = data->value;
+		clo->text = requireBytecodeArray(clo, data->value);
 	}else if(data->key == symData){
 		lTree *newData = requireTree(clo, data->value);
 		clo->data = newData;

@@ -47,9 +47,13 @@ typedef struct vec vec;
 
 typedef uint8_t lBytecodeOp;
 
-typedef struct lBytecodeArray{
-	lBytecodeOp *data,*dataEnd;
-} lBytecodeArray;
+struct lBytecodeArray{
+	lBytecodeOp *data;
+	union {
+		lBytecodeOp *dataEnd;
+		struct lBytecodeArray *nextFree;
+	};
+};
 
 
 typedef enum lType {
@@ -88,6 +92,7 @@ typedef struct lString  lString;
 typedef struct lTree    lTree;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
+typedef struct lBytecodeArray lBytecodeArray;
 
 typedef struct {
 	lVal *car,*cdr;
@@ -96,30 +101,33 @@ typedef struct {
 struct lVal {
 	u8 type;
 	union {
-		bool           vBool;
-		lPair          vList;
-		i64            vInt;
-		double         vFloat;
-		vec            vVec;
-		lBytecodeOp    vBytecodeOp;
-		lBytecodeArray vBytecodeArr;
-		lArray        *vArray;
-		lTree         *vTree;
-		lString       *vString;
-		const lSymbol *vSymbol;
-		lClosure      *vClosure;
-		lNFunc        *vNFunc;
-		void          *vPointer;
-
-		lVal          *nextFree;
+		bool            vBool;
+		lPair           vList;
+		i64             vInt;
+		double          vFloat;
+		vec             vVec;
+		lBytecodeOp     vBytecodeOp;
+		lBytecodeArray *vBytecodeArr;
+		lArray         *vArray;
+		lTree          *vTree;
+		lString        *vString;
+		const lSymbol  *vSymbol;
+		lClosure       *vClosure;
+		lNFunc         *vNFunc;
+		void           *vPointer;
+		lVal           *nextFree;
 	};
 };
 
 struct lArray {
 	lVal **data;
-	lArray *nextFree;
-	i32 length;
-	u8 flags;
+	union {
+		lArray *nextFree;
+		struct {
+			i32 length;
+			u8 flags;
+		};
+	};
 };
 #define ARRAY_IMMUTABLE 1
 
@@ -137,15 +145,15 @@ struct lClosure {
 		lClosure *nextFree;
 	};
 	lTree *data;
-	lVal *text;
+	lBytecodeArray *text;
 	lBytecodeOp *ip;
 	lVal *args;
 	lVal *doc;
 	const lSymbol *name;
 	lClosure *caller;
 	int sp;
+	u16 rsp;
 	u8 type;
-	u32 rsp;
 };
 
 struct lThread {
@@ -170,9 +178,11 @@ struct lString{
 struct lTree {
 	lTree *left;
 	lTree *right;
-	const lSymbol *key;
+	union {
+		const lSymbol *key;
+		lTree *nextFree;
+	};
 	lVal *value;
-	lTree *nextFree;
 	i16 height;
 	u8 flags;
 };

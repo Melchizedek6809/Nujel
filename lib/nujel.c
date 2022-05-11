@@ -26,7 +26,7 @@ void lInit(){
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lClosure *tmpc = lClosureNewFunCall(c, args, lambda);
-	lVal *ret = lBytecodeEval(tmpc, NULL, &lambda->vClosure->text->vBytecodeArr, false);
+	lVal *ret = lBytecodeEval(tmpc, NULL, lambda->vClosure->text, false);
 	lRootsRet(SP);
 	return ret;
 }
@@ -41,7 +41,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	case ltObject:
 		if(args && args->type == ltBytecodeArr){
 			RCP(c);
-			return lBytecodeEval(fun->vClosure, NULL, &args->vBytecodeArr, false);
+			return lBytecodeEval(fun->vClosure, NULL, args->vBytecodeArr, false);
 		} /* fall-through */
 	default:
 		lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
@@ -132,7 +132,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}
-		lBytecodeEval(c, NULL, &car->vBytecodeArr, false);
+		lBytecodeEval(c, NULL, car->vBytecodeArr, false);
 		lRootsRet(RSSP);
 	}
 	lRootsRet(RSP);

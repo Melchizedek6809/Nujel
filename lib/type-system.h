@@ -4,23 +4,23 @@
 #include "nujel.h"
 #include "misc/vec.h"
 
-i64            castToInt   (const lVal *v, i64 fallback);
-bool           castToBool  (const lVal *v);
-const char *   castToString(const lVal *v, const char *fallback);
+i64             castToInt   (const lVal *v, i64 fallback);
+bool            castToBool  (const lVal *v);
+const char *    castToString(const lVal *v, const char *fallback);
 
-vec            requireVec          (lClosure *c, lVal *v);
-vec            requireVecCompatible(lClosure *c, lVal *v);
-i64            requireInt          (lClosure *c, lVal *v);
-i64            requireNaturalInt   (lClosure *c, lVal *v);
-double         requireFloat        (lClosure *c, lVal *v);
-lArray *       requireArray        (lClosure *c, lVal *v);
-const lSymbol *requireSymbol       (lClosure *c, lVal *v);
-const lSymbol *requireSymbolic     (lClosure *c, lVal *v);
-lString *      requireString       (lClosure *c, lVal *v);
-lTree *        requireTree         (lClosure *c, lVal *v);
-lTree *        requireMutableTree  (lClosure *c, lVal *v);
-lBytecodeOp    requireBytecodeOp   (lClosure *c, lVal *v);
-lBytecodeArray requireBytecodeArray(lClosure *c, lVal *v);
+vec             requireVec          (lClosure *c, lVal *v);
+vec             requireVecCompatible(lClosure *c, lVal *v);
+i64             requireInt          (lClosure *c, lVal *v);
+i64             requireNaturalInt   (lClosure *c, lVal *v);
+double          requireFloat        (lClosure *c, lVal *v);
+lArray *        requireArray        (lClosure *c, lVal *v);
+const lSymbol * requireSymbol       (lClosure *c, lVal *v);
+const lSymbol * requireSymbolic     (lClosure *c, lVal *v);
+lString *       requireString       (lClosure *c, lVal *v);
+lTree *         requireTree         (lClosure *c, lVal *v);
+lTree *         requireMutableTree  (lClosure *c, lVal *v);
+lBytecodeOp     requireBytecodeOp   (lClosure *c, lVal *v);
+lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v);
 
 lType lTypecast         (const lType a, const lType b);
 
