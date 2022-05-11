@@ -67,7 +67,7 @@ defineAllocator(lVal, lValAllocRaw, lValList, lValMax, VAL_MAX, lValFFree, "lVal
 defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
 
 lBytecodeArray *lBytecodeArrayAlloc(size_t len){
-	lBytecodeArray *ret = lBytecodeArrayAllocRaw(len);
+	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
 	ret->data = calloc(len, sizeof(lBytecodeOp));
 	if(ret->data == NULL){
 		lExceptionThrowValClo("out-of-memory","Couldn't allocate a new BC array", lValInt(len), NULL);
