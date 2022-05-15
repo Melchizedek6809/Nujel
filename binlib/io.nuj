@@ -40,3 +40,7 @@
                      [fn [A] [if [file/dir? A]
                                  [directory/read-recursive A]
                                  A]]]]]
+
+[defn popen/trim [cmd]
+  "Run CMD using popen and return the trimmed stdout"
+  [trim [cdr [popen cmd]]]]

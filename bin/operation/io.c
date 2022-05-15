@@ -183,7 +183,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 	FILE *child = popen(command->data, "r");
 	if(child == NULL){
-		fpf(stderr,"Error openeing %s\n",command);
+		fpf(stderr,"Error opening %s\n",command);
 		return NULL;
 	}
 	while(1){
@@ -283,7 +283,6 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
-
 
 	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
 	lAddNativeFunc(c,"file/write",       "[content path]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
