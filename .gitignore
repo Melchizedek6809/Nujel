@@ -60,3 +60,5 @@ gmon.out
 /.vs
 
 /web/filesystem.json
+/web/benchmark-results/
+/web/report-data.js

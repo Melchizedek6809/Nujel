@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<title>Nujel Benchmarking Report</title>
+		<link rel="stylesheet" href="report.css"/>
+	</head>
+	<body>
+		<div id="report-options">
+			<label><input type="checkbox" id="log-scale" checked/> logarithmic scale</label>
+			<div id="report-views">
+			</div>
+			<br>
+			<button id="add-view">Add view</button>
+		</div>
+		<div id="report-wrapper">
+			<div id="report-cpu"></div>
+			<div id="report-memory"></div>
+		</div>
+		<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+		<script src="report-data.js"></script>
+		<script src="report.js"></script>
+	</body>
+</html>
