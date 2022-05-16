@@ -183,7 +183,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopLessPred", NULL, c);}
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) < 0);
+		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) < 0) && !lValEqual(a, b));
 		ctx.sp--;
 		ip++;
 		break; }
@@ -215,7 +215,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflow during lopGreaterPred", NULL, c);}
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) > 0);
+		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) > 0) && !lValEqual(a, b));
 		ctx.sp--;
 		ip++;
 		break; }
