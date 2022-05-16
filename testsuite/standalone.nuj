@@ -20,5 +20,5 @@
   [test/add #t [bool? [ref [file/stat "GNUmakefile"] :block-device?]]]
   [test/add #t [bool? [ref [file/stat "GNUmakefile"] :named-pipe?]]]]
 
-[test/add #t [tree? environment/variables]]
-[test/add #t [string? [ref environment/variables 'PATH]]]
+[test/add #t [tree? System/Environment]]
+[test/add #t [string? [ref System/Environment 'PATH]]]

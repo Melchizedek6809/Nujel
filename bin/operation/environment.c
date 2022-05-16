@@ -29,7 +29,7 @@ void initEnvironmentMap(lClosure *c){
 		while(*env++){}
 	}
 	lVal *et = RVP(lValTree(t));
-	lDefineClosureSym(c,lSymS("environment/variables"),et);
+	lDefineClosureSym(c,lSymS("System/Environment"),et);
 	lRootsRet(SP);
 }
 
@@ -44,7 +44,7 @@ void initEnvironmentMap(lClosure *c){
 		t = RTP(addVar(environ[i],t));
 	}
 	lVal *env = RVP(lValTree(t));
-	lDefineClosureSym(c,lSymS("environment/variables"),env);
+	lDefineClosureSym(c,lSymS("System/Environment"),env);
 	lRootsRet(SP);
 }
 #endif

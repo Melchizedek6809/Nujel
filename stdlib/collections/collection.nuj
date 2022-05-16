@@ -22,7 +22,6 @@
       [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]
       [reduce l [fn [a b] [+ a 1]] 0]]]
 
-
 [defn min l
   "Returns the minimum value of its arguments, or collection"
   [reduce [if [cdr l] l [car l]]

@@ -238,6 +238,17 @@ web:
 	./tools/buildwasm
 	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/home/nujel/nujel/
 
+benchmark: release
+	cp -f $(NUJEL) ~/bin/
+	./$(NUJEL)./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
+
+benchmark-nujel: release
+	cp -f $(NUJEL) ~/bin/
+	./$(NUJEL) --no-overwrite --only-nujel ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
+
+benchmark-trigger-remote:
+	ssh wolkenwelten.net "nohup ./benchmark.sh &"
+
 update-bootstrap: tmp/stdlib.no tmp/binlib.no
 	cp -f tmp/stdlib.no bootstrap/stdlib.no
 	cp -f tmp/binlib.no bootstrap/binlib.no

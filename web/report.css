@@ -1,0 +1,11 @@
+.two-col > * {
+	float:left;
+	width:49%;
+}
+.two-col > *:nth-child(even) {
+	float:right;
+}
+.two-col:after {
+	content:'';
+	clear:both;
+}

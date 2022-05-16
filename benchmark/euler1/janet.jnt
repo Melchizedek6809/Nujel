@@ -1,0 +1,11 @@
+(defn test-run []
+  (var ret 0)
+  (var i 0)
+  (while (< i 10000000)
+         (when (or (zero? (% i 3))
+                   (zero? (% i 5)))
+               (+= ret i))
+         (++ i))
+  ret)
+
+(print "The sum is: " (test-run))

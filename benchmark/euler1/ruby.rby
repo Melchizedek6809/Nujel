@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+ret = 0
+for i in 0..(10000000-1) do
+  if ((i % 3) == 0) || ((i % 5) == 0) then
+    ret = ret + i
+  end
+end
+puts "The sum is: #{ret}"

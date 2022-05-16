@@ -1,0 +1,10 @@
+(defun test ()
+  (let ((ret 0))
+    (dotimes (i 10000000)
+      (when (or (zerop (mod i 3))
+                (zerop (mod i 5)))
+        (incf ret i)))
+    ret))
+
+(compile 'test)
+(format T "THE SUM IS ~a~%" (test))
