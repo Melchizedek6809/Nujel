@@ -4,9 +4,11 @@
 *.c linguist-language=C
 *.h linguist-language=C
 *.s linguist-language=Assembly
-*.nuj linguist-language=Lisp
 
-vendor/ linguist-vendored
-tools/ linguist-vendored
-web/ linguist-vendored
-benchmark/ linguist-vendored
+*.nuj linguist-language=Scheme
+*.no linguist-generated
+
+vendor/** linguist-vendored=true
+tools/** linguist-vendored=true
+web/** linguist-vendored=true
+benchmark/** linguist-vendored=true
