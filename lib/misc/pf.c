@@ -450,6 +450,7 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			case 'T': {
 				const lVal *val = va_arg(va, const lVal *);
 				cur = writeVal(cur, bufEnd, val, true);
+				if(cur < bufEnd-1){*cur++ = ':';}
 				const lSymbol *typeSym = getTypeSymbol(val);
 				if(typeSym){
 					cur = writeString(cur, bufEnd, typeSym->c);
