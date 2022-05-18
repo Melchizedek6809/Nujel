@@ -8,8 +8,7 @@
 [defn file/compile [path environment]
   "Compile a Nujel source file into optimized object code"
   [def source [cons 'do [read [file/read path]]]]
-  [def object-code [-> [compile/forms source environment]
-                       compile
+  [def object-code [-> [macroexpand/forms source environment]
                        bytecompile
                        assemble*]]
   [file/write [if object-code [str/write object-code] ""]

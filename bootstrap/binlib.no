@@ -63,29 +63,10 @@
 0D
 10s source
 10s environment
-08i 2 v compile/forms
+08i 2 v macroexpand/forms
 01
 }
 0Es file/eval
-0D
-25v file/eval/bytecode v [path environment] v "Evaluate a Nujel source file in the current context" v #{
-10s environment
-0Bo 7
-24
-09o 11
-10s root-closure
-0Fs environment
-0D
-10s environment
-23s do
-10s path
-08i 1 v file/read
-08i 1 v read
-14
-08i 2 v eval-in
-01
-}
-0Es file/eval/bytecode
 0D
 25v file/file? v [filename] v "" v #{
 10s filename

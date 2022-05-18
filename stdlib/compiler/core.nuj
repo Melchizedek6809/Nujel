@@ -1,0 +1,84 @@
+[defn load/forms [source environment]
+  "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
+  [for-in [form source]
+          [-> [macroexpand form environment]
+              bytecompile
+              assemble*
+              [bytecode-eval #nil environment]]]]
+
+[defn macroexpand/forms [source-raw environment]
+  "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+  [when-not environment [set! environment [ω]]]
+  [load/forms source-raw environment]
+  [macroexpand source-raw environment]]
+
+[defn compile/debug [expr]
+  [-> [macroexpand expr]
+      bytecompile
+      assemble*
+      disassemble]]
+
+[defn compile* [source environment]
+  "Compile SOURCE so it can be evaluated/applied"
+  [-> [macroexpand source environment]
+      bytecompile
+      assemble*]]
+
+[defn compile/do* [source environment]
+  [compile* [cons do source] environment]]
+
+[defmacro compile [source]
+  "Compile SOURCE so it can be evaluated/applied"
+  `[compile* ~source [current-closure]]]
+
+[defmacro compile/do [source]
+  "Compile SOURCE so it can be evaluated/applied"
+  `[compile* [cons do ~source] [current-closure]]]
+
+[defmacro defmacro [name args . body]
+  "Define a new bytecoded macro"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  `[def ~name [macro* ~name ~args ~doc-string ~[compile/do* body [current-closure]]]]]
+
+[defmacro macro [args . body]
+  "Return a new macro"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  `[macro* #nil ~args ~doc-string ~[compile/do* body [current-closure]]]]
+
+[defmacro fn [args . body]
+  "Define an anonymous function"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  `[fn* 'anonymous ~args ~doc-string ~[compile/do* body [current-closure]]]]
+
+[defmacro defn [name args . body]
+  "Define a new function"
+  [def doc-string [if-not [string? [car body]] ""
+                          [car body]]]
+  `[def ~name [fn* ~name ~args ~doc-string ~[compile/do* body [current-closure]]]]]
+
+[defmacro ω body
+  "Defines and returns new object after evaluating body within"
+  [macroexpand [cons 'ω* body]]]
+[def defobj ω]
+
+[defn eval-in [closure expr]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [try display/error [-> [compile* expr closure]
+                         [bytecode-eval #nil closure]]]]
+
+[defn eval-in/trace [closure expr]
+  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  [try display/error
+       [def bc [compile* expr closure]]
+       [println [str/write bc]]
+       [bytecode-eval bc #nil closure]]]
+
+[defmacro eval [expr]
+  "Compile, Evaluate and then return the result of EXPR"
+  `[eval-in [current-closure] ~expr]]
+
+[defmacro typecheck/only [v t]
+  `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]

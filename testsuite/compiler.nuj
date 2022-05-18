@@ -1,4 +1,4 @@
-[test/add :arity-error [try car [compile '[return 1 2 3]]]]
-[test/add :arity-error [try car [compile '[if 1 2 3 4]]]]
-[test/add :arity-error [try car [compile '[def 1 2 3]]]]
-[test/add :arity-error [try car [compile '[set! 1 2 3]]]]
+[test/add :arity-error [try car [macroexpand '[return 1 2 3]]]]
+[test/add :arity-error [try car [macroexpand '[if 1 2 3 4]]]]
+[test/add :arity-error [try car [macroexpand '[def 1 2 3]]]]
+[test/add :arity-error [try car [macroexpand '[set! 1 2 3]]]]

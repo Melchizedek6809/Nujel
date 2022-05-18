@@ -17,12 +17,7 @@
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
        [def source [cons 'do [read [file/read path]]]]
-       [compile/forms source environment]]
-
-[defn file/eval/bytecode [path environment]
-  "Evaluate a Nujel source file in the current context"
-  [when-not environment [set! environment root-closure]]
-  [eval-in environment [cons 'do [read [file/read path]]]]]
+       [macroexpand/forms source environment]]
 
 [defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]

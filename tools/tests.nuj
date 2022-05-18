@@ -12,7 +12,7 @@
 [when [not [tree/has? repl/options :only-test-suite]]
   [println [ansi-purple "First we test the basic functions of the runtime."]]]
 [for-each [sort [directory/read-relative "testsuite"]]
-          file/eval/bytecode]
+          file/eval]
 
 [def output-passes #f]
 [when [tree/has? repl/options :verbose]
