@@ -5756,7 +5756,7 @@
 }
 0Es eval-in
 0D
-25v eval-int v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
+25v eval-in/trace v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
 19o 61
 10s expr
@@ -5777,7 +5777,7 @@
 16
 01
 }
-0Es eval-int
+0Es eval-in/trace
 0D
 26v eval v [expr] v "Compile, Evaluate and then return the result of EXPR" v #{
 23s eval-in
@@ -5792,35 +5792,6 @@
 01
 }
 0Es eval
-0D
-25v read-eval-compile v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
-10s closure
-10s expr
-08i 1 v read
-08i 2 v eval-in
-01
-}
-0Es read-eval-compile
-0D
-25v eval-load v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
-10s display/error
-19o 17
-10s expr
-10s closure
-08i 2 v load/forms
-16
-01
-}
-0Es eval-load
-0D
-25v read-eval-load v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
-10s expr
-08i 1 v read
-10s closure
-08i 2 v eval-load
-01
-}
-0Es read-eval-load
 0D
 26v typecheck/only v [v t] v "" v #{
 23s when-not

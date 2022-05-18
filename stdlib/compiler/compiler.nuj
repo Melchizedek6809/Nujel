@@ -186,7 +186,7 @@
                          assemble*
                          [bytecode-eval #nil closure]]]]
 
-[defn eval-int [closure expr]
+[defn eval-in/trace [closure expr]
   "Compile and the immediatly evaluate the result, mostly used by lRun()"
   [try display/error [def bc [-> [compile expr closure]
                                  bytecompile
@@ -197,19 +197,6 @@
 [defmacro eval [expr]
   "Compile, Evaluate and then return the result of EXPR"
   `[eval-in [current-closure] ~expr]]
-
-[defn read-eval-compile [expr closure]
-  "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [eval-in closure [read expr]]]
-
-;; TODO REMOVE!!!
-[defn eval-load [expr closure]
-  "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [try display/error [load/forms expr closure]]]
-
-[defn read-eval-load [expr closure]
-  "Compile and the immediatly evaluate the result, mostly used by lRun()"
-  [eval-load [read expr] closure]]
 
 [defmacro typecheck/only [v t]
   `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
