@@ -18,6 +18,7 @@
 [defn bench/get-language [filename]
   [case [lowercase [path/extension filename]]
     ["lisp" :common-lisp]
+    ["lsp" :franz-lisp]
     ["c" :c]
     ["dart" :dart]
     ["erl" :erlang]
@@ -39,6 +40,7 @@
   [case language
     [:c '["tcc -run"]]
     [:common-lisp '["ecl --shell" "clisp" "sbcl --script"]]
+    [:franz-lisp '["pc-lisp"]]
     [:dart '["dart"]]
     [:erlang '["escript"]]
     [:janet '["janet"]]

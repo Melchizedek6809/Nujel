@@ -240,7 +240,7 @@ web:
 
 benchmark: release
 	cp -f $(NUJEL) ~/bin/
-	./$(NUJEL)./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
+	./$(NUJEL) ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
 
 benchmark-nujel: release
 	cp -f $(NUJEL) ~/bin/
