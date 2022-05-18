@@ -15,7 +15,7 @@ bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 void      lDefineVal         (lClosure *c, const char *str,  lVal *v);
 lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda);
 
-void      lClosureSetDocumentation(lClosure *c, lVal *doc);
+void      lClosureSetMeta    (lClosure *c, lVal *doc);
 
 lVal     *lLambdaNew         (lClosure *parent, lVal *name, lVal *args, lVal *body);
 lVal     *lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));

@@ -17,7 +17,7 @@
 08i 2 v symbol-table
 10s string
 08i 2 v map
-25v anonymous v [l] v "" v #{
+25v 'anonymous v [l] v "" v #{
 10s l
 08i 1 v describe
 0Es desc
@@ -89,7 +89,7 @@
 25v directory/read-relative v [path] v "" v #{
 10s path
 08i 1 v directory/read
-25v anonymous v [a] v "" v #{
+25v 'anonymous v [a] v "" v #{
 10s path
 05v "/"
 10s a
@@ -104,7 +104,7 @@
 25v directory/read-recursive v [path] v "" v #{
 10s path
 08i 1 v directory/read-relative
-25v anonymous v [A] v "" v #{
+25v 'anonymous v [A] v "" v #{
 10s A
 08i 1 v file/dir?
 0Bo 15
@@ -301,7 +301,7 @@
 0D
 10s repl/option-map
 23s h
-25v anonymous v [option] v "" v #{
+25v 'anonymous v [option] v "" v #{
 08i 0 v repl/print-help
 0D
 05v #f
@@ -312,7 +312,7 @@
 0D
 10s repl/option-map
 23s no-color
-25v anonymous v [option] v "" v #{
+25v 'anonymous v [option] v "" v #{
 05v ""
 0Fs ansi/disabled
 01
@@ -321,7 +321,7 @@
 0D
 10s repl/option-map
 23s color
-25v anonymous v [option] v "" v #{
+25v 'anonymous v [option] v "" v #{
 05v #f
 0Fs ansi/disabled
 01
@@ -330,7 +330,7 @@
 0D
 10s repl/option-map
 23s x
-25v anonymous v [option] v "" v #{
+25v 'anonymous v [option] v "" v #{
 05v #t
 0Fs repl/parse-args/eval-next
 0D
@@ -342,7 +342,7 @@
 0D
 10s repl/option-map
 05v :default
-25v anonymous v [option] v "" v #{
+25v 'anonymous v [option] v "" v #{
 10s repl/options
 10s option
 05v #t

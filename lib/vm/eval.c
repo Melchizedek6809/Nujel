@@ -282,7 +282,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ip = lBytecodeReadOPVal(ip,   &cDocs);
 		ip = lBytecodeReadOPVal(ip,   &cBody);
 		ctx.valueStack[ctx.sp] = lLambdaNew(c, cName, cArgs, cBody);
-		lClosureSetDocumentation(ctx.valueStack[ctx.sp]->vClosure, cDocs);
+		lClosureSetMeta(ctx.valueStack[ctx.sp]->vClosure, cDocs);
 		if(curOp == lopMacroAst){ctx.valueStack[ctx.sp]->type = ltMacro;}
 		ctx.sp++;
 		break;}

@@ -145,6 +145,11 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	return ret;
 }
 
-void lClosureSetDocumentation(lClosure *c, lVal *doc){
-	c->meta = lTreeInsert(c->meta, symDocumentation, doc);
+void lClosureSetMeta(lClosure *c, lVal *doc){
+	if(doc == NULL){return;}
+	if(doc->type == ltTree){
+		c->meta = lTreeDup(doc->vTree);
+	}else{
+		c->meta = lTreeInsert(c->meta, symDocumentation, doc);
+	}
 }

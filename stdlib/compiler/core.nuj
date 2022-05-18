@@ -35,29 +35,28 @@
   "Compile SOURCE so it can be evaluated/applied"
   `[compile* [cons do ~source] [current-closure]]]
 
-[defmacro defmacro [name args . body]
-  "Define a new bytecoded macro"
-  [def doc-string [if-not [string? [car body]] ""
-                          [car body]]]
-  `[def ~name [macro* ~name ~args ~doc-string ~[compile/do* body [current-closure]]]]]
+[defn meta/parse/body [body]
+  [def meta @[]]
+  [for-in [v body]
+          [case [type-of v]
+            [:pair [return meta]]
+            [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
+                                                               "\n"
+                                                               v]]]]
+            [:keyword [tree/set! meta v #t]]]]
+  [return meta]]
 
-[defmacro macro [args . body]
-  "Return a new macro"
-  [def doc-string [if-not [string? [car body]] ""
-                          [car body]]]
-  `[macro* #nil ~args ~doc-string ~[compile/do* body [current-closure]]]]
+[defmacro defmacro [name args . body]
+  "Define a new macro"
+  `[def ~name [macro* ~name ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]]
 
 [defmacro fn [args . body]
   "Define an anonymous function"
-  [def doc-string [if-not [string? [car body]] ""
-                          [car body]]]
-  `[fn* 'anonymous ~args ~doc-string ~[compile/do* body [current-closure]]]]
+  `[fn* 'anonymous ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
   "Define a new function"
-  [def doc-string [if-not [string? [car body]] ""
-                          [car body]]]
-  `[def ~name [fn* ~name ~args ~doc-string ~[compile/do* body [current-closure]]]]]
+  `[def ~name [fn* ~name ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]]
 
 [defmacro ω body
   "Defines and returns new object after evaluating body within"
