@@ -138,13 +138,19 @@
 01
 }
 0Es directory/read-recursive
+0D
+25v popen/trim v [cmd] v "Run CMD using popen and return the trimmed stdout" v #{
+10s cmd
+08i 1 v popen
+12
+08i 1 v trim
+01
+}
+0Es popen/trim
 01
 }#{
 05v "nujel"
 0Es repl/executable-name
-0D
-05v #f
-0Es repl/parse-args/bytecode-eval-n
 0D
 05v #f
 0Es repl/parse-args/eval-next
@@ -286,13 +292,6 @@
 08i 1 v println
 0D
 05v "  "
-05v "b"
-08i 1 v ansi-blue
-05v " - eval following file using the bytecode interpreter"
-08i 3 v cat
-08i 1 v println
-0D
-05v "  "
 05v "x"
 08i 1 v ansi-blue
 05v " - Run the expression following this argument directly"
@@ -326,18 +325,6 @@
 01
 }
 0Es repl/print-help
-0D
-10s repl/option-map
-23s b
-25v anonymous v [option] v "" v #{
-05v #t
-0Fs repl/parse-args/bytecode-eval-n
-0D
-05v #f
-0Fs repl/parse-args/run-repl
-01
-}
-08i 3 v tree/set!
 0D
 10s repl/option-map
 23s h
@@ -436,21 +423,6 @@
 0Es repl/parse-options
 0D
 25v repl/parse-arg v [arg] v "" v #{
-10s repl/parse-args/bytecode-eval-n
-0Bo 41
-10s display/error
-18o 15
-10s arg
-08i 1 v file/eval/bytecode
-09o 8
-1Ai 1
-09o 5
-27
-0D
-0D
-05v #f
-0Fs repl/parse-args/bytecode-eval-n
-09o 144
 10s repl/parse-args/eval-next
 0Bo 55
 10s display/error

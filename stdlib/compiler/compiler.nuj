@@ -213,3 +213,9 @@
 
 [defmacro typecheck/only [v t]
   `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
+
+[defn compile/debug [expr]
+  [-> [compile expr]
+      bytecompile
+      assemble*
+      disassemble]]

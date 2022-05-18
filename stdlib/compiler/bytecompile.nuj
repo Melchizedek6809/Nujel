@@ -166,6 +166,7 @@
         [$apply/dynamic 1]
         [$jmp final-sym]
         [list :label end-sym]
+        [$closure/pop]
         [$swap]
         [$drop]
         [list :label final-sym]]]

@@ -1,0 +1,5 @@
+[test/add :division-by-zero [try car [/ 3 0]]]
+[test/add :test [try [fn [e] :test] [/ 3 0]]]
+[test/add :test [try car [try [fn [e] :test] [/ 3 0]]]]
+[test/add :inner [try [fn [e] :outer] [try [fn [e] :inner] [throw :asd]]]]
+[test/add :outer [try [fn [e] :outer] [try [fn [e] :inner] 1] [throw :asd]]]
