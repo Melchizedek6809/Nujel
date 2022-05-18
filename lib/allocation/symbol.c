@@ -35,6 +35,7 @@ lSymbol *symUnquote;
 lSymbol *symUnquoteSplicing;
 lSymbol *symArr;
 lSymbol *symTreeNew;
+lSymbol *symDocumentation;
 
 lSymbol *lSymLTNil;
 lSymbol *lSymLTNoAlloc;
@@ -75,7 +76,7 @@ void lSymbolInit(){
 	symUnquoteSplicing   = RSYMP(lSymS("unquote-splicing"));
 	symArr               = RSYMP(lSymS("array/new"));
 	symTreeNew           = RSYMP(lSymS("tree/new"));
-
+	symDocumentation     = RSYMP(lSymS("documentation"));
 
 	lSymLTNil            = RSYMP(lSymS("nil"));
 	lSymLTNoAlloc        = RSYMP(lSymS("no-alloc"));

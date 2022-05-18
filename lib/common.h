@@ -144,12 +144,11 @@ struct lClosure {
 		lClosure *parent;
 		lClosure *nextFree;
 	};
-	lTree *data;
+	lTree *data, *meta;
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
-	lVal *args;
 	union {
-		lVal *doc;
+		lVal *args;
 		lVal *exceptionHandler;
 	};
 	const lSymbol *name;

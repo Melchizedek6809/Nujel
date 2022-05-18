@@ -21,10 +21,17 @@
   "Display ERROR in a nice, human readable way"
   [display [join [display/error/iter error 0] "\r\n"]]]
 
+[defn closure/arguments [o]
+  [ref [closure o] :arguments]]
+
+[defn closure/documentation [o]
+  [closure/meta o :documentation]]
+
 [defn describe/thing [o]
   "Describe a specific value O"
-  [def doc [closure o]]
-  [cat [str/write [ref doc :arguments]] " - " [ref doc :documentation]]]
+  [def documentation [closure/documentation o]]
+  [def arguments [closure/arguments o]]
+  [fmt "{arguments:?} - {documentation}"]]
 
 [defn describe/string [a]
   "Descibe whatever value string A resolves to"

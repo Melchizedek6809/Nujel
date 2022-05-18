@@ -21,6 +21,7 @@ lTree *         requireTree         (lClosure *c, lVal *v);
 lTree *         requireMutableTree  (lClosure *c, lVal *v);
 lBytecodeOp     requireBytecodeOp   (lClosure *c, lVal *v);
 lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v);
+lClosure       *requireClosure      (lClosure *c, lVal *v);
 
 lType lTypecast         (const lType a, const lType b);
 

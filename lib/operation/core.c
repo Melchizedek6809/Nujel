@@ -14,7 +14,6 @@
 #include <time.h>
 
 const lSymbol *symType;
-const lSymbol *symDocumentation;
 const lSymbol *symArguments;
 const lSymbol *symCode;
 const lSymbol *symData;
@@ -54,13 +53,11 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 	if(car->type == ltNativeFunc){
 		lNFunc *nf = car->vNFunc;
 		if(nf == NULL){return ret;}
-		ret->vTree = lTreeInsert(ret->vTree, symDocumentation,nf->doc);
 		ret->vTree = lTreeInsert(ret->vTree, symArguments,nf->args);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
 		if(clo == NULL){return ret;}
-		ret->vTree = lTreeInsert(ret->vTree, symDocumentation, clo->doc);
 		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
 		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")), RVP(lValSymS(clo->name)));
 		lVal *text = lValAlloc(ltBytecodeArr);
@@ -111,9 +108,7 @@ static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 static void lClosureSetRec(lClosure *clo, lTree *data){
 	if(data == NULL){return;}
 	const lSymbol *sym = data->key;
-	if(data->key == symDocumentation){
-		clo->doc = data->value;
-	}else if(data->key == symArguments){
+	if(data->key == symArguments){
 		clo->args = data->value;
 	}else if(data->key == symCode){
 		clo->text = requireBytecodeArray(clo, data->value);
@@ -326,10 +321,22 @@ static lVal *lnfIndexSym(lClosure *c, lVal *v){
 	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
 }
 
+static lVal *lnfClosureMetaGet(lClosure *c, lVal *v){
+	lClosure *clo = requireClosure(c, lCar(v));
+	const lSymbol *key = requireSymbolic(c, lCadr(v));
+	return lTreeGet(clo->meta, key, NULL);
+}
+
+static lVal *lnfClosureMetaSet(lClosure *c, lVal *v){
+	lVal *car = lCar(v);
+	lClosure *clo = requireClosure(c, car);
+	const lSymbol *key = requireSymbolic(c, lCadr(v));
+	clo->meta = lTreeInsert(clo->meta, key, lCaddr(v));
+	return car;
+}
 
 void lOperationsCore(lClosure *c){
 	symType          = RSYMP(lSymS("type"));
-	symDocumentation = RSYMP(lSymS("documentation"));
 	symArguments     = RSYMP(lSymS("arguments"));
 	symCode          = RSYMP(lSymS("code"));
 	symData          = RSYMP(lSymS("data"));
@@ -341,6 +348,9 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
+
+	lAddNativeFunc(c,"closure/meta",  "[clo key]",      "Retrieve KEY from CLO's metadata", lnfClosureMetaGet);
+	lAddNativeFunc(c,"closure/meta!", "[clo key value]", "Set KEY to VALUE in CLO's metadata", lnfClosureMetaSet);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
 	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);

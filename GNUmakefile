@@ -28,8 +28,8 @@ BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
 ifeq ($(OS),Windows_NT)
-	NUJEL   := ./nujel.exe
-	ASSET   := ./tools/assets.exe
+	NUJEL   := nujel.exe
+	ASSET   := tools/assets.exe
 	LIBS    += -lpthread
 	STATIC_LIBS := -static -lpthread
 	LDFLAGS := -Wl,--stack,16777216

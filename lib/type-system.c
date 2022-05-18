@@ -161,3 +161,14 @@ const lSymbol *requireSymbolic(lClosure *c, lVal *v){
 	}
 	return v->vSymbol;
 }
+
+lClosure *requireClosure(lClosure *c, lVal *v){
+	if((v == NULL)
+		|| !((v->type == ltLambda)
+		||   (v->type == ltObject)
+		||   (v->type == ltMacro))){
+			lExceptionThrowValClo("type-error", "Can't get metadata from that value: ", v, c);
+			return NULL;
+	}
+	return v->vClosure;
+}

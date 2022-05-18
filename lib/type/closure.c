@@ -133,15 +133,18 @@ lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char 
 
 
 /* Create a new Lambda Value */
-lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *docs, lVal *body){
+lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
 	lVal *ret = RVP(lValAlloc(ltLambda));
 	ret->vClosure       = lClosureNew(parent, closureDefault);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
-	ret->vClosure->doc  = docs;
 	ret->vClosure->text = requireBytecodeArray(parent, body);
 
 	return ret;
+}
+
+void lClosureSetDocumentation(lClosure *c, lVal *doc){
+	c->meta = lTreeInsert(c->meta, symDocumentation, doc);
 }

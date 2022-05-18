@@ -136,7 +136,6 @@ void lClosureGCMark(const lClosure *c){
 	const uint ci = c - lClosureList;
 	if(ci >= lClosureMax){
 		epf("Tried to mark out of bounds lClosure: %i\n", (i64)ci);
-		//return;
 		exit(1);
 	}
 	if(lClosureMarkMap[ci]){return;}
@@ -144,8 +143,8 @@ void lClosureGCMark(const lClosure *c){
 
 	lClosureGCMark(c->parent);
 	lTreeGCMark(c->data);
+	lTreeGCMark(c->meta);
 	lBytecodeArrayMark(c->text);
-	lValGCMark(c->doc);
 	lValGCMark(c->args);
 	lClosureGCMark(c->caller);
 	lSymbolGCMark(c->name);
