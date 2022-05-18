@@ -81,12 +81,24 @@ const initConfig = () => {
 };
 
 const getData = (key, filterP, name) => {
+	let newestDate = {};
 	const data = {};
 	for(const run of reportData){
 		for(const entry of run){
 			if(!entry){continue;}
 			if(!filterP(entry)){continue;}
 			const runtime = entry.runtime == "./nujel" ? "nujel" : entry.runtime;
+			if(!newestDate[runtime] || (entry.date > newestDate[runtime])){
+				newestDate[runtime] = entry.date;
+			}
+		}
+	}
+	for(const run of reportData){
+		for(const entry of run){
+			if(!entry){continue;}
+			if(!filterP(entry)){continue;}
+			const runtime = entry.runtime == "./nujel" ? "nujel" : entry.runtime;
+			if(entry.date != newestDate[runtime]){continue;}
 			if(!data[runtime]){
 				data[runtime] = {
 					"language": entry.language,

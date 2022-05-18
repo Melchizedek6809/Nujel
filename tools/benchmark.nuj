@@ -6,8 +6,8 @@
  | use the benchmark-aggregate.nuj script to generate the single aggregate JSON
  | file for the viewer.
  |#
-[def single-runs 4]
-[def nujel-runs  8]
+[def single-runs 1]
+[def nujel-runs  4]
 [def git-head [popen/trim "git rev-parse HEAD"]]
 [def git-branch [popen/trim "git rev-parse --abbrev-ref HEAD"]]
 [def uname-a [popen/trim "uname -a"]]
@@ -134,6 +134,7 @@
       [tree/set! :hostname hostname]
       [tree/set! :os System/OS]
       [tree/set! :time [time]]
+      [tree/set! :triplet [fmt "{testcase}-{hostname}-{System/Architecture}"]]
       [tree/set! :testcase testcase]
       [tree/set! :total [+ [ref measurements :user] [ref measurements :system]]]
       [tree/set! :date date]
@@ -164,8 +165,8 @@
 
 [and [tree/has? repl/options :no-overwrite]
      [file/file? out-name]
-     [pfmtln "{out-name} exists already, exiting."]
-     [exit 0]]
+     [do [pfmtln "{out-name} exists already, exiting."]
+         [exit 0]]]
 
 [-> [directory/read-recursive "benchmark"]
     [sort]
