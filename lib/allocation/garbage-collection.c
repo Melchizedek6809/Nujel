@@ -142,11 +142,11 @@ void lClosureGCMark(const lClosure *c){
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);
+	lClosureGCMark(c->caller);
 	lTreeGCMark(c->data);
 	lTreeGCMark(c->meta);
-	lBytecodeArrayMark(c->text);
 	lValGCMark(c->args);
-	lClosureGCMark(c->caller);
+	lBytecodeArrayMark(c->text);
 	lSymbolGCMark(c->name);
 }
 
