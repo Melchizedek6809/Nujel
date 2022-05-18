@@ -125,15 +125,16 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(setjmpRet){
-		while((ctx.csp > 0) && (c->type != closureTry)){
+		while((ctx.csp > 0) && (c->type != closureTry) && (c->type != closureTry)){
 			ctx.csp--;
 			c = ctx.closureStack[ctx.csp];
 		}
 		if((ctx.csp > 0) && (++exceptionCount < 1000) && (c->type == closureTry)){
 			ip = c->ip;
 			ctx.sp = c->sp;
-			ctx.valueStack[ctx.sp++] = exceptionValue;
+			lVal *handler = RVP(c->exceptionHandler);
 			c = ctx.closureStack[--ctx.csp];
+			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NULL), handler);
 		}else{
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
@@ -248,13 +249,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ctx.sp--;
 		ip++;
 		break;
-	case lopSwap: {
-		if(ctx.sp < 2){lExceptionThrowValClo("stack-underflow", "Underflowed during lopDup", NULL, c);}
-		lVal *t = ctx.valueStack[ctx.sp-2];
-		ctx.valueStack[ctx.sp-2] = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-1] = t;
-		ip++;
-		break; }
 	case lopJmp:
 		ip += lBytecodeGetOffset16(ip+1);
 		break;
@@ -333,7 +327,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		ip++;
 		break; }
 	case lopTry:
+		if(ctx.sp < 1){lExceptionThrowValClo("stack-underflow", "Underflowed during try", NULL, c);}
 		c = lClosureNew(c, closureTry);
+		c->exceptionHandler = ctx.valueStack[--ctx.sp];
 		c->ip = ip + lBytecodeGetOffset16(ip+1);
 		c->sp = ctx.sp;
 		ctx.closureStack[++ctx.csp] = c;

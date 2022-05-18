@@ -148,7 +148,10 @@ struct lClosure {
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
 	lVal *args;
-	lVal *doc;
+	union {
+		lVal *doc;
+		lVal *exceptionHandler;
+	};
 	const lSymbol *name;
 	lClosure *caller;
 	int sp;

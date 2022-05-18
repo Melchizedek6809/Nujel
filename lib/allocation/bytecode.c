@@ -33,7 +33,6 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopGreaterEqPred:
 	case lopGreaterPred:
 	case lopPushNil:
-	case lopSwap:
 		return 1;
 	case lopApplyDynamic:
 	case lopIntByte:

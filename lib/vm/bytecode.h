@@ -26,8 +26,8 @@ typedef enum lOpcode {
 	lopLet             = 0x15,
 	lopClosurePop      = 0x16,
 	lopUNUSED4         = 0x17,
-	lopTry             = 0x18,
-	lopUNUSED8         = 0x19,
+	lopUNUSED5         = 0x18,
+	lopTry             = 0x19,
 	lopApplyDynamic    = 0x1A,
 	lopRootsSave       = 0x1B,
 	lopRootsRestore    = 0x1C,
@@ -40,8 +40,7 @@ typedef enum lOpcode {
 	lopPushSymbol      = 0x23,
 	lopPushNil         = 0x24,
 	lopFn              = 0x25,
-	lopMacroAst        = 0x26,
-	lopSwap            = 0x27
+	lopMacroAst        = 0x26
 	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
 

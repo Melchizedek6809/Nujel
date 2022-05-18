@@ -3740,8 +3740,29 @@
 }
 0Es $apply/dynamic
 0D
-25v $try v [target] v " - | Try something, jumping to target if an exception occurs" v #{
+25v $try/old v [target] v " - | Try something, jumping to target if an exception occurs" v #{
 05v #$18
+05v :relocate
+10s target
+02i 8
+02i 0
+02i 0
+08i 1 v int->bytecode-op
+08i 5 v list
+05v :relocate
+10s target
+02i 0
+02i 1
+02i 0
+08i 1 v int->bytecode-op
+08i 5 v list
+08i 3 v list
+01
+}
+0Es $try/old
+0D
+25v $try v [target] v " - | Try something, jumping to target if an exception occurs" v #{
+05v #$19
 05v :relocate
 10s target
 02i 8
@@ -3958,12 +3979,6 @@
 01
 }
 0Es $push/nil
-0D
-25v $swap v [] v "" v #{
-05v [#$27]
-01
-}
-0Es $swap
 0D
 25v $car v [] v "" v #{
 05v [#$11]
@@ -4777,43 +4792,23 @@
 0D
 25v bytecompile/try v [source env] v "" v #{
 08i 0 v bytecompile/gen-label
-0Es handler-sym
-0D
-08i 0 v bytecompile/gen-label
 0Es end-sym
-0D
-08i 0 v bytecompile/gen-label
-0Es final-sym
 0D
 10s source
 08i 1 v cadr
 10s env
 08i 2 v bytecompile*
-10s handler-sym
+10s end-sym
 08i 1 v $try
 10s source
 08i 1 v cddr
 10s env
 08i 2 v bytecompile/do/form
-10s end-sym
-08i 1 v $jmp
-05v :label
-10s handler-sym
-08i 2 v list
-02i 1
-08i 1 v $apply/dynamic
-10s final-sym
-08i 1 v $jmp
-05v :label
-10s end-sym
-08i 2 v list
 08i 0 v $closure/pop
-08i 0 v $swap
-08i 0 v $drop
 05v :label
-10s final-sym
+10s end-sym
 08i 2 v list
-08i 12 v list
+08i 5 v list
 01
 }
 0Es bytecompile/try
@@ -5747,7 +5742,7 @@
 0D
 25v eval-in v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
-18o 39
+19o 37
 10s expr
 10s closure
 08i 2 v compile
@@ -5756,18 +5751,14 @@
 24
 10s closure
 08i 3 v bytecode-eval
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es eval-in
 0D
 25v eval-int v [closure expr] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
-18o 63
+19o 61
 10s expr
 10s closure
 08i 2 v compile
@@ -5783,11 +5774,7 @@
 24
 10s closure
 08i 3 v bytecode-eval
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es eval-int
@@ -5817,15 +5804,11 @@
 0D
 25v eval-load v [expr closure] v "Compile and the immediatly evaluate the result, mostly used by lRun()" v #{
 10s display/error
-18o 19
+19o 17
 10s expr
 10s closure
 08i 2 v load/forms
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es eval-load
@@ -5899,118 +5882,112 @@
 05v #$0
 20
 0C
-0Ao 274
+0Ao 260
 0D
 10s ΓεnΣym-105
 05v #$1
 20
 0C
-0Ao 260
+0Ao 246
 0D
 10s ΓεnΣym-105
 05v #$3
 20
 0C
-0Ao 246
+0Ao 232
 0D
 10s ΓεnΣym-105
 05v #$C
 20
 0C
-0Ao 232
+0Ao 218
 0D
 10s ΓεnΣym-105
 05v #$D
 20
 0C
-0Ao 218
+0Ao 204
 0D
 10s ΓεnΣym-105
 05v #$11
 20
 0C
-0Ao 204
+0Ao 190
 0D
 10s ΓεnΣym-105
 05v #$12
 20
 0C
-0Ao 190
+0Ao 176
 0D
 10s ΓεnΣym-105
 05v #$13
 20
 0C
-0Ao 176
+0Ao 162
 0D
 10s ΓεnΣym-105
 05v #$14
 20
 0C
-0Ao 162
+0Ao 148
 0D
 10s ΓεnΣym-105
 05v #$15
 20
 0C
-0Ao 148
+0Ao 134
 0D
 10s ΓεnΣym-105
 05v #$16
 20
 0C
-0Ao 134
+0Ao 120
 0D
 10s ΓεnΣym-105
 05v #$1B
 20
 0C
-0Ao 120
+0Ao 106
 0D
 10s ΓεnΣym-105
 05v #$1C
 20
 0C
-0Ao 106
+0Ao 92
 0D
 10s ΓεnΣym-105
 05v #$1E
 20
 0C
-0Ao 92
+0Ao 78
 0D
 10s ΓεnΣym-105
 05v #$1F
 20
 0C
-0Ao 78
+0Ao 64
 0D
 10s ΓεnΣym-105
 05v #$20
 20
 0C
-0Ao 64
+0Ao 50
 0D
 10s ΓεnΣym-105
 05v #$21
 20
 0C
-0Ao 50
+0Ao 36
 0D
 10s ΓεnΣym-105
 05v #$22
 20
 0C
-0Ao 36
-0D
-10s ΓεnΣym-105
-05v #$24
-20
-0C
 0Ao 22
 0D
 10s ΓεnΣym-105
-05v #$27
+05v #$24
 20
 0C
 0Ao 8
@@ -6018,7 +5995,7 @@
 05v #f
 0Bo 8
 02i 1
-09o 300
+09o 314
 10s ΓεnΣym-105
 05v #$2
 20
@@ -6034,27 +6011,33 @@
 05v #f
 0Bo 8
 02i 2
-09o 260
+09o 274
 10s ΓεnΣym-105
 05v #$9
 20
 0C
-0Ao 50
+0Ao 64
 0D
 10s ΓεnΣym-105
 05v #$A
 20
 0C
-0Ao 36
+0Ao 50
 0D
 10s ΓεnΣym-105
 05v #$B
 20
 0C
-0Ao 22
+0Ao 36
 0D
 10s ΓεnΣym-105
 05v #$18
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-105
+05v #$19
 20
 0C
 0Ao 8
@@ -6173,7 +6156,7 @@
 0D
 25v bytecode-arr->val v [a i] v "Read a bytecode encoded value in A at I and return it" v #{
 10s bytecode/nil-catcher
-18o 64
+19o 62
 10s a
 10s i
 08i 2 v ref
@@ -6188,11 +6171,7 @@
 08i 2 v +
 08i 2 v ref
 08i 3 v bytecode-op->val
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es bytecode-arr->val
@@ -6216,7 +6195,7 @@
 0D
 25v bytecode-arr->sym v [a i] v "Read a bytecode encoded symbol in A at I and return it" v #{
 10s bytecode/nil-catcher
-18o 64
+19o 62
 10s a
 10s i
 08i 2 v ref
@@ -6231,11 +6210,7 @@
 08i 2 v +
 08i 2 v ref
 08i 3 v bytecode-op->sym
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es bytecode-arr->sym
@@ -6290,13 +6265,13 @@
 20
 0Bo 10
 05v [$nop]
-09o 1155
+09o 1176
 10s ΓεnΣym-106
 05v #$1
 20
 0Bo 10
 05v [$ret]
-09o 1136
+09o 1157
 10s ΓεnΣym-106
 05v #$2
 20
@@ -6311,19 +6286,19 @@
 24
 14
 14
-09o 1089
+09o 1110
 10s ΓεnΣym-106
 05v #$3
 20
 0Bo 10
 05v [$add/int]
-09o 1070
+09o 1091
 10s ΓεnΣym-106
 05v #$4
 20
 0Bo 10
 05v [$debug/print-stack]
-09o 1051
+09o 1072
 10s ΓεnΣym-106
 05v #$5
 20
@@ -6337,7 +6312,7 @@
 24
 14
 14
-09o 1009
+09o 1030
 10s ΓεnΣym-106
 05v #$8
 20
@@ -6358,7 +6333,7 @@
 14
 14
 14
-09o 941
+09o 962
 10s ΓεnΣym-106
 05v #$9
 20
@@ -6372,7 +6347,7 @@
 24
 14
 14
-09o 899
+09o 920
 10s ΓεnΣym-106
 05v #$A
 20
@@ -6386,7 +6361,7 @@
 24
 14
 14
-09o 857
+09o 878
 10s ΓεnΣym-106
 05v #$B
 20
@@ -6400,19 +6375,19 @@
 24
 14
 14
-09o 815
+09o 836
 10s ΓεnΣym-106
 05v #$C
 20
 0Bo 10
 05v [$dup]
-09o 796
+09o 817
 10s ΓεnΣym-106
 05v #$D
 20
 0Bo 10
 05v [$drop]
-09o 777
+09o 798
 10s ΓεnΣym-106
 05v #$E
 20
@@ -6426,7 +6401,7 @@
 24
 14
 14
-09o 735
+09o 756
 10s ΓεnΣym-106
 05v #$F
 20
@@ -6440,7 +6415,7 @@
 24
 14
 14
-09o 693
+09o 714
 10s ΓεnΣym-106
 05v #$10
 20
@@ -6454,45 +6429,59 @@
 24
 14
 14
-09o 651
+09o 672
 10s ΓεnΣym-106
 05v #$11
 20
 0Bo 10
 05v [$car]
-09o 632
+09o 653
 10s ΓεnΣym-106
 05v #$12
 20
 0Bo 10
 05v [$cdr]
-09o 613
+09o 634
 10s ΓεnΣym-106
 05v #$13
 20
 0Bo 10
 05v [$closure/push]
-09o 594
+09o 615
 10s ΓεnΣym-106
 05v #$14
 20
 0Bo 10
 05v [$cons]
-09o 575
+09o 596
 10s ΓεnΣym-106
 05v #$15
 20
 0Bo 10
 05v [$let]
-09o 556
+09o 577
 10s ΓεnΣym-106
 05v #$16
 20
 0Bo 10
 05v [$closure/pop]
-09o 537
+09o 558
 10s ΓεnΣym-106
 05v #$18
+20
+0Bo 33
+23s $try/old
+10s a
+10s i
+02i 1
+08i 2 v +
+08i 2 v bytecode-arr->offset
+24
+14
+14
+09o 516
+10s ΓεnΣym-106
+05v #$19
 20
 0Bo 33
 23s $try
@@ -6504,7 +6493,7 @@
 24
 14
 14
-09o 495
+09o 474
 10s ΓεnΣym-106
 05v #$1A
 20
@@ -6519,7 +6508,7 @@
 24
 14
 14
-09o 448
+09o 427
 10s ΓεnΣym-106
 05v #$1B
 20
@@ -6527,7 +6516,7 @@
 23s $roots/push
 24
 14
-09o 427
+09o 406
 10s ΓεnΣym-106
 05v #$1C
 20
@@ -6535,7 +6524,7 @@
 23s $roots/pop
 24
 14
-09o 406
+09o 385
 10s ΓεnΣym-106
 05v #$1E
 20
@@ -6543,7 +6532,7 @@
 23s $<
 24
 14
-09o 385
+09o 364
 10s ΓεnΣym-106
 05v #$1F
 20
@@ -6551,7 +6540,7 @@
 23s $<=
 24
 14
-09o 364
+09o 343
 10s ΓεnΣym-106
 05v #$20
 20
@@ -6559,7 +6548,7 @@
 23s $==
 24
 14
-09o 343
+09o 322
 10s ΓεnΣym-106
 05v #$21
 20
@@ -6567,7 +6556,7 @@
 23s $>=
 24
 14
-09o 322
+09o 301
 10s ΓεnΣym-106
 05v #$22
 20
@@ -6575,7 +6564,7 @@
 23s $>
 24
 14
-09o 301
+09o 280
 10s ΓεnΣym-106
 05v #$23
 20
@@ -6589,7 +6578,7 @@
 24
 14
 14
-09o 259
+09o 238
 10s ΓεnΣym-106
 05v #$24
 20
@@ -6597,7 +6586,7 @@
 23s $push/nil
 24
 14
-09o 238
+09o 217
 10s ΓεnΣym-106
 05v #$25
 20
@@ -6629,7 +6618,7 @@
 14
 14
 14
-09o 133
+09o 112
 10s ΓεnΣym-106
 05v #$26
 20
@@ -6660,14 +6649,6 @@
 14
 14
 14
-14
-09o 28
-10s ΓεnΣym-106
-05v #$27
-20
-0Bo 12
-23s $swap
-24
 14
 09o 7
 05v :unknown-op
@@ -6876,16 +6857,12 @@
 08i 1 v println
 0D
 10s display/error
-18o 25
+19o 23
 10s bc
 08i 1 v bytecode-eval
 08i 1 v str/write
 08i 1 v println
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es disassemble/test
@@ -11712,7 +11689,7 @@
 08i 4 v test-failure
 01
 }
-18o 86
+19o 84
 08i 0 v current-closure
 10s rawexpr
 08i 2 v eval-in
@@ -11733,11 +11710,7 @@
 10s rawexpr
 10s i
 08i 4 v test-failure
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es test-default

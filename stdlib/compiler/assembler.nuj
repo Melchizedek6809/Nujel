@@ -103,9 +103,14 @@
 [defn $apply/dynamic [arg-count fun]
   [list #$1A [int->bytecode-op arg-count]]]
 
-[defn $try [target]
+[defn $try/old [target]
   " - | Try something, jumping to target if an exception occurs"
   [list #$18 [list :relocate target 8 0 [int->bytecode-op 0]]
+        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+
+[defn $try [target]
+  " - | Try something, jumping to target if an exception occurs"
+  [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]]
         [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jmp [target]
@@ -181,9 +186,6 @@
 
 [defn $push/nil []
   '[#$24]]
-
-[defn $swap []
-  '[#$27]]
 
 [defn $car []
   '[#$11]]

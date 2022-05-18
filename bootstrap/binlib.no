@@ -184,18 +184,14 @@
 0D
 25v repl/wasm v [line] v "Evaluate LINE in the wasm context" v #{
 10s repl/exception-handler
-18o 29
+19o 27
 10s root-closure
 10s do
 10s line
 08i 1 v read
 14
 08i 2 v eval-in
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es repl/wasm
@@ -247,18 +243,14 @@
 1B
 1C
 05v #t
-0Bo 33
+0Bo 24
 0D
 10s repl/exception-handler
-18o 15
+19o 13
 10s root-closure
 08i 1 v repl/readline
-09o 8
-1Ai 1
-09o 5
-27
-0D
-09o -35
+16
+09o -26
 01
 }
 0Es repl
@@ -424,9 +416,9 @@
 0D
 25v repl/parse-arg v [arg] v "" v #{
 10s repl/parse-args/eval-next
-0Bo 55
+0Bo 46
 10s display/error
-18o 38
+19o 36
 10s root-closure
 10s do
 10s arg
@@ -436,12 +428,8 @@
 0D
 05v #f
 0Fs repl/parse-args/eval-next
-09o 8
-1Ai 1
-09o 5
-27
-0D
-09o 85
+16
+09o 76
 10s arg
 02i 0
 08i 2 v char-at
@@ -452,18 +440,14 @@
 02i 1
 08i 2 v string/cut
 08i 1 v repl/parse-options
-09o 49
+09o 40
 05v #t
-0Bo 41
+0Bo 32
 10s display/error
-18o 15
+19o 13
 10s arg
 08i 1 v file/eval
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 0D
 05v #f
 0Fs repl/parse-args/run-repl
@@ -501,7 +485,7 @@
 0D
 25v repl/init/bin v [args] v "" v #{
 10s repl/exception-handler
-18o 38
+19o 36
 10s args
 11
 0Fs repl/executable-name
@@ -513,11 +497,7 @@
 08i 0 v repl
 09o 4
 24
-09o 8
-1Ai 1
-09o 5
-27
-0D
+16
 01
 }
 0Es repl/init/bin
