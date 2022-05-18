@@ -7,7 +7,7 @@
               [bytecode-eval #nil environment]]]]
 
 [defn macroexpand/forms [source-raw environment]
-  "Compile multiple forms, evaluation the results in a temporary environment, so we can make use of macros we just defined"
+  "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
   [when-not environment [set! environment [ω]]]
   [load/forms source-raw environment]
   [macroexpand source-raw environment]]
@@ -35,7 +35,7 @@
   "Compile SOURCE so it can be evaluated/applied"
   `[compile* [cons do ~source] [current-closure]]]
 
-[defn meta/parse/body [body]
+[defn meta/parse/body [type args body]
   [def meta @[]]
   [for-in [v body]
           [case [type-of v]
@@ -48,15 +48,15 @@
 
 [defmacro defmacro [name args . body]
   "Define a new macro"
-  `[def ~name [macro* ~name ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]]
+  `[def ~name [macro* ~name ~args ~[tree/set! [meta/parse/body :macro args body] :source body] ~[compile/do* body [current-closure]]]]]
 
 [defmacro fn [args . body]
   "Define an anonymous function"
-  `[fn* 'anonymous ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]
+  `[fn* 'anonymous ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
   "Define a new function"
-  `[def ~name [fn* ~name ~args ~[meta/parse/body body] ~[compile/do* body [current-closure]]]]]
+  `[def ~name [fn* ~name ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]]
 
 [defmacro ω body
   "Defines and returns new object after evaluating body within"
@@ -64,12 +64,16 @@
 [def defobj ω]
 
 [defn eval-in [closure expr]
-  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  "Compile and the immediatly evaluate the result"
+  ""
+  "Mostly used by lRun()"
   [try display/error [-> [compile* expr closure]
                          [bytecode-eval #nil closure]]]]
 
 [defn eval-in/trace [closure expr]
-  "Compile and the immediatly evaluate the result, mostly used by lRun()"
+  "Compile and the immediatly evaluate the result"
+  ""
+  "mostly used by lRun()"
   [try display/error
        [def bc [compile* expr closure]]
        [println [str/write bc]]

@@ -2,7 +2,7 @@
 05v "Nujel Standalone"
 0Es test-context
 0D
-25v help v [i] v "Describe 10 functions at offset 1" v #{
+25v help v [i] v #@[documentation: "Describe 10 functions at offset 1" source: ["Describe 10 functions at offset 1" [when-not [int? i] [set! i [int i]]] [for-each [map [symbol-table off 10] string] [fn [l] [def desc [describe l]] [pfmtln "{l} {desc}"]]] [def sc [/ [symbol-count] 10]] [pfmtln "Help page {i} of {sc}"]]] v #{
 10s i
 08i 1 v int?
 0Bo 7
@@ -17,7 +17,7 @@
 08i 2 v symbol-table
 10s string
 08i 2 v map
-25v 'anonymous v [l] v "" v #{
+25v 'anonymous v [l] v #@[source: [[def desc [describe l]] [pfmtln "{l} {desc}"]]] v #{
 10s l
 08i 1 v describe
 0Es desc
@@ -46,7 +46,7 @@
 }
 0Es help
 0D
-25v file/eval v [path environment] v "Evaluate a Nujel source file in the current context" v #{
+25v file/eval v [path environment] v #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [def source [cons 'do [read [file/read path]]]] [macroexpand/forms source environment]]] v #{
 10s environment
 0Bo 7
 24
@@ -68,7 +68,7 @@
 }
 0Es file/eval
 0D
-25v file/file? v [filename] v "" v #{
+25v file/file? v [filename] v #@[source: [[ref [file/stat filename] :regular-file?]]] v #{
 10s filename
 08i 1 v file/stat
 05v :regular-file?
@@ -77,7 +77,7 @@
 }
 0Es file/file?
 0D
-25v file/dir? v [filename] v "" v #{
+25v file/dir? v [filename] v #@[source: [[ref [file/stat filename] :directory?]]] v #{
 10s filename
 08i 1 v file/stat
 05v :directory?
@@ -86,10 +86,10 @@
 }
 0Es file/dir?
 0D
-25v directory/read-relative v [path] v "" v #{
+25v directory/read-relative v [path] v #@[source: [[map [directory/read path] [fn [a] [cat path "/" a]]]]] v #{
 10s path
 08i 1 v directory/read
-25v 'anonymous v [a] v "" v #{
+25v 'anonymous v [a] v #@[source: [[cat path "/" a]]] v #{
 10s path
 05v "/"
 10s a
@@ -101,10 +101,10 @@
 }
 0Es directory/read-relative
 0D
-25v directory/read-recursive v [path] v "" v #{
+25v directory/read-recursive v [path] v #@[source: [[flatten [map [directory/read-relative path] [fn [A] [if [file/dir? A] [directory/read-recursive A] A]]]]]] v #{
 10s path
 08i 1 v directory/read-relative
-25v 'anonymous v [A] v "" v #{
+25v 'anonymous v [A] v #@[source: [[if [file/dir? A] [directory/read-recursive A] A]]] v #{
 10s A
 08i 1 v file/dir?
 0Bo 15
@@ -120,7 +120,7 @@
 }
 0Es directory/read-recursive
 0D
-25v popen/trim v [cmd] v "Run CMD using popen and return the trimmed stdout" v #{
+25v popen/trim v [cmd] v #@[documentation: "Run CMD using popen and return the trimmed stdout" source: ["Run CMD using popen and return the trimmed stdout" [trim [cdr [popen cmd]]]]] v #{
 10s cmd
 08i 1 v popen
 12
@@ -147,7 +147,7 @@
 08i 1 v tree/new
 0Es repl/option-map
 0D
-25v repl/exception-handler v [error] v "" v #{
+25v repl/exception-handler v [error] v #@[source: [[display/error error]]] v #{
 10s error
 08i 1 v display/error
 01
@@ -157,13 +157,13 @@
 24
 0Es repl/history
 0D
-25v repl/prompt v [] v "> " v #{
+25v repl/prompt v [] v #@[documentation: ">" source: ["> "]] v #{
 05v "> "
 01
 }
 0Es repl/prompt
 0D
-25v repl/wasm v [line] v "Evaluate LINE in the wasm context" v #{
+25v repl/wasm v [line] v #@[documentation: "Evaluate LINE in the wasm context" source: ["Evaluate LINE in the wasm context" [try repl/exception-handler [eval-in root-closure [cons do [read line]]]]]] v #{
 10s repl/exception-handler
 19o 27
 10s root-closure
@@ -177,7 +177,7 @@
 }
 0Es repl/wasm
 0D
-25v repl/readline v [ctx] v "" v #{
+25v repl/readline v [ctx] v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Bye!\r\n"] [exit 0]] [def result [eval-in ctx [cons do [read line]]]] [set! repl/history [cons line repl/history]] [println [cat [if [nil? result] "" [str/write result]]]]]] v #{
 08i 0 v repl/prompt
 08i 1 v readline
 0Es line
@@ -219,7 +219,7 @@
 }
 0Es repl/readline
 0D
-25v repl v [] v "" v #{
+25v repl v [] v #@[source: [[while #t [try repl/exception-handler [repl/readline root-closure]]]]] v #{
 02i 0
 1B
 1C
@@ -236,7 +236,7 @@
 }
 0Es repl
 0D
-25v repl/print-help v [] v "" v #{
+25v repl/print-help v [] v #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] v #{
 05v "Nujel"
 08i 1 v ansi-rainbow
 05v " - A Lisp dialect for games.\n"
@@ -301,7 +301,7 @@
 0D
 10s repl/option-map
 23s h
-25v 'anonymous v [option] v "" v #{
+25v 'anonymous v [option] v #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] v #{
 08i 0 v repl/print-help
 0D
 05v #f
@@ -312,7 +312,7 @@
 0D
 10s repl/option-map
 23s no-color
-25v 'anonymous v [option] v "" v #{
+25v 'anonymous v [option] v #@[source: [[set! ansi/disabled ""]]] v #{
 05v ""
 0Fs ansi/disabled
 01
@@ -321,7 +321,7 @@
 0D
 10s repl/option-map
 23s color
-25v 'anonymous v [option] v "" v #{
+25v 'anonymous v [option] v #@[source: [[set! ansi/disabled #f]]] v #{
 05v #f
 0Fs ansi/disabled
 01
@@ -330,7 +330,7 @@
 0D
 10s repl/option-map
 23s x
-25v 'anonymous v [option] v "" v #{
+25v 'anonymous v [option] v #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] v #{
 05v #t
 0Fs repl/parse-args/eval-next
 0D
@@ -342,7 +342,7 @@
 0D
 10s repl/option-map
 05v :default
-25v 'anonymous v [option] v "" v #{
+25v 'anonymous v [option] v #@[source: [[tree/set! repl/options option #t]]] v #{
 10s repl/options
 10s option
 05v #t
@@ -351,7 +351,7 @@
 }
 08i 3 v tree/set!
 0D
-25v repl/parse-option v [option] v "" v #{
+25v repl/parse-option v [option] v #@[source: [[[or [ref repl/option-map option] [ref repl/option-map :default]] option]]] v #{
 10s repl/option-map
 10s option
 08i 2 v ref
@@ -371,7 +371,7 @@
 }
 0Es repl/parse-option
 0D
-25v repl/parse-options v [options] v "" v #{
+25v repl/parse-options v [options] v #@[source: [[if [== [char-at options 0] 45] [repl/parse-option [string->keyword [cut options 1]]] [for-each [map [split options ""] str->sym] repl/parse-option]]]] v #{
 10s options
 02i 0
 08i 2 v char-at
@@ -395,7 +395,7 @@
 }
 0Es repl/parse-options
 0D
-25v repl/parse-arg v [arg] v "" v #{
+25v repl/parse-arg v [arg] v #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[== [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]] v #{
 10s repl/parse-args/eval-next
 0Bo 46
 10s display/error
@@ -438,7 +438,7 @@
 }
 0Es repl/parse-arg
 0D
-25v repl/parse-args v [args] v "" v #{
+25v repl/parse-args v [args] v #@[source: [[if args [do [repl/parse-arg [car args]] [repl/parse-args [cdr args]]] repl/parse-args/run-repl]]] v #{
 10s args
 0Bo 27
 10s args
@@ -454,7 +454,7 @@
 }
 0Es repl/parse-args
 0D
-25v repl/init/wasm v [args] v "" v #{
+25v repl/init/wasm v [args] v #@[source: [[println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]] v #{
 05v "Nujel"
 08i 1 v ansi-rainbow
 05v " heißt euch willkommen!"
@@ -464,7 +464,7 @@
 }
 0Es repl/init/wasm
 0D
-25v repl/init/bin v [args] v "" v #{
+25v repl/init/bin v [args] v #@[source: [[try repl/exception-handler [set! repl/executable-name [car args]] [when [repl/parse-args [cdr args]] [repl]]]]] v #{
 10s repl/exception-handler
 19o 36
 10s args
@@ -483,7 +483,7 @@
 }
 0Es repl/init/bin
 0D
-25v repl/init v args v "" v #{
+25v repl/init v args v #@[source: [[if [== System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]] v #{
 10s System/Architecture
 23s wasm
 20

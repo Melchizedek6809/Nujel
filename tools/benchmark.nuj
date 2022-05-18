@@ -122,11 +122,11 @@
        [when-not [>= [index-of [cdr ret] [get-result testcase]] 0]
                  [exception :benchmark-error "Benchmark returned wrong result" [cons filename ret]]]
        [set! measurements [tree/dup [read/single [file/read result-file]]]]
+       [tree/set! measurements :stdout [cdr ret]]
        [file/remove result-file]]
   [when-not measurements [return #nil]]
   [-> measurements
       [tree/set! :language [bench/get-language filename]]
-      [tree/set! :stdout [cdr ret]]
       [tree/set! :git-head git-head]
       [tree/set! :git-branch git-branch]
       [tree/set! :uname uname-a]

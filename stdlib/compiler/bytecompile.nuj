@@ -84,12 +84,32 @@
       [cons [bytecompile* [car source] env]
             [bytecompile/procedure/arg [cdr source] env]]]]
 
-[defn bytecompile/procedure [op args env]
+[defn bytecompile/procedure/default [op args env]
   [def arg-count [length args]]
   [if args
       [list [bytecompile/procedure/arg args]
             [$apply arg-count op]]
       [$apply 0 op]]]
+
+[defn bytecompile/procedure/inline? [op]
+  [case [type-of op]
+    [:lambda [closure/meta op :inline]]
+    [#t #f]]]
+
+[defn bytecompile/procedure/inline [op args env]
+  [def arg-count [length args]]
+  [when [> arg-count 1]
+    [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-closure]]]]
+  [def form [macroexpand/do [closure/meta op :source] env]]
+  [def arg-name [car [tree/ref [closure op] :arguments]]]
+  [if args
+      [bytecompile* [list/replace form arg-name [car args]] env]
+      [bytecompile* form env]]]
+
+[defn bytecompile/procedure [op args env]
+  [if [bytecompile/procedure/inline? op]
+      [bytecompile/procedure/inline op args env]
+      [bytecompile/procedure/default op args env]]]
 
 [defn bytecompile/procedure/dynamic [op args env]
   [def arg-count [length args]]

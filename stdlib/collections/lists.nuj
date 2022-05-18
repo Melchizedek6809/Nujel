@@ -186,3 +186,14 @@
 [defn list/cut [l start end]
   "Return a subsequence of L from START to END"
   [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]
+
+[defn list/replace [l search-for replace-with]
+  "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
+  ""
+  "Uses [equal?] so we can search/replace lists/trees and other complex data structures"
+  [cond [[not l] #nil]
+        [[equal? [car l] search-for]
+         [cons replace-with
+               [list/replace [cdr l] search-for replace-with]]]
+        [#t [cons [car l]
+                  [list/replace [cdr l] search-for replace-with]]]]]
