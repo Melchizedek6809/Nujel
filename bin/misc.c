@@ -22,12 +22,6 @@
 #endif
 
 void lWidgetMarkI(uint i){(void)i;}
-void lPrintError(const char *format, ...){
-	va_list ap;
-	va_start(ap,format);
-	vfpf(stderr,format,ap);
-	va_end(ap);
-}
 
 /* Load filename into a fresly allocated buffer which is always zero terminated.
  * The length is returned in len if len is not NULL */
@@ -79,9 +73,7 @@ void saveFile(const char *filename,const void *buf, size_t len){
 	size_t written,wlen = 0;
 	const char *cbuf = buf;
 	#if defined (__EMSCRIPTEN__)
-	(void)filename;
-	(void)buf;
-	(void)len;
+	(void)filename; (void)buf; (void)len;
 	return;
 	#endif
 
@@ -98,10 +90,6 @@ void saveFile(const char *filename,const void *buf, size_t len){
 
 /* Return true if name is a directory */
 int isDir(const char *name){
-	#if defined (__EMSCRIPTEN__)
-	(void)name;
-	return 0;
-	#endif
 	DIR *dp = opendir(name);
 	if(dp == NULL){return 0;}
 	closedir(dp);
@@ -119,43 +107,6 @@ int makeDir(const char *name){
 	#else
 	return mkdir(name,0755);
 	#endif
-}
-
-/* Create a directory and all needed parent directories in a portable manner */
-int makeDirR(const char *name){
-	char buf[256];
-	strncpy(buf,name,sizeof(buf));
-	buf[sizeof(buf)-1] = 0;
-	for(int i=0;i<256;i++){
-		if(buf[i] != '/'){continue;}
-		buf[i] = 0;
-		makeDir(buf);
-		buf[i] = '/';
-	}
-	return makeDir(buf);
-}
-
-/* Remove a directory and all subdirectories and files in a portable manner */
-void rmDirR(const char *name){
-	#if defined (__EMSCRIPTEN__)
-	return;
-	#endif
-	DIR *dp = opendir(name);
-	if(dp == NULL){return;}
-	struct dirent *de = NULL;
-	while((de = readdir(dp)) != NULL){
-		char buf[520];
-		if(de->d_name[0] == '.'){continue;}
-		spf(buf,&buf[sizeof(buf)],"%s/%s",name,de->d_name);
-		if(isDir(buf)){
-			rmDirR(buf);
-			rmdir(buf);
-		}else{
-			unlink(buf);
-		}
-	}
-	closedir(dp);
-	rmdir(name);
 }
 
 /* Generate a temporary filename in a portable manner */

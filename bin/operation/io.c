@@ -2,7 +2,6 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "io.h"
 #include "../misc.h"
-#include "../../lib/exception.h"
 
 #ifdef __WATCOMC__
 	#include <direct.h>
@@ -27,16 +26,16 @@
 	#include <sys/wait.h>
 #endif
 
-
+lSymbol *lsError;
+lSymbol *lsErrorNumber;
+lSymbol *lsErrorText;
 lSymbol *lsMode;
 lSymbol *lsSize;
 lSymbol *lsUserID;
 lSymbol *lsGroupID;
 lSymbol *lsAccessTime;
 lSymbol *lsModificationTime;
-lSymbol *lsError;
-lSymbol *lsErrorNumber;
-lSymbol *lsErrorText;
+
 lSymbol *lsRegularFile;
 lSymbol *lsDirectory;
 lSymbol *lsCharacterDevice;
@@ -69,7 +68,8 @@ static lVal *lnfQuit(lClosure *c, lVal *v){
 	if(lVerbose){
 		pf("\nLookups %u/%u == %f\n", (i64)symbolLookups, (i64)tombLookups, (double)tombLookups / (double)symbolLookups);
 	}
-	exit(castToInt(lCar(v),0));
+	lVal *car = lCar(v);
+	exit((car && (car->type == ltInt)) ? car->vInt : 0);
 	return NULL;
 }
 
@@ -86,15 +86,39 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 	return lValString(buf);
 }
 
-static lVal *lnfPrint(lClosure *c, lVal *v){
-	(void)c;
-	lWriteVal(lCar(v));
-	return NULL;
+#ifdef __EMSCRIPTEN__
+	#include <emscripten.h>
+	EM_JS(void, wasmConsoleLog, (const char *str), {
+		console.log(UTF8ToString(str));
+	});
+
+	EM_JS(void, wasmConsoleError, (const char *str), {
+		console.error(UTF8ToString(str));
+	});
+#endif
+
+static void lWriteVal(lVal *v, FILE *fp){
+	char dispWriteBuf[1<<16];
+	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%V",v);
+	#ifdef __EMSCRIPTEN__
+	if(fp == stderr){
+		wasmConsoleError(dispWriteBuf);
+	}else{
+		wasmConsoleLog(dispWriteBuf);
+	}
+	#endif
+	fwrite(dispWriteBuf, end - dispWriteBuf, 1, fp);
 }
 
 static lVal *lnfError(lClosure *c, lVal *v){
 	(void)c;
-	lDisplayErrorVal(lCar(v));
+	lWriteVal(lCar(v), stderr);
+	return NULL;
+}
+
+static lVal *lnfPrint(lClosure *c, lVal *v){
+	(void)c;
+	lWriteVal(lCar(v), stdout);
 	return NULL;
 }
 
@@ -160,7 +184,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 		int r = fwrite(&content->data[written], 1, len - written, fd);
 		if(r <= 0){
 			if(ferror(fd)){
-				lPrintError("Error while writing to temporary file: %s\n", ret);
+				fpf(stderr, "Error while writing to temporary file: %s\n", ret);
 				break;
 			}
 		}else{

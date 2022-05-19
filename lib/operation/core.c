@@ -1,10 +1,7 @@
  /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../misc/pf.h"
-#include "../allocation/symbol.h"
-#include "../exception.h"
 #include "../collection/tree.h"
+#include "../allocation/symbol.h"
 #include "../reader.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
@@ -29,8 +26,7 @@ static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 }
 
 static int lSymCount(lClosure *c, int ret){
-	if(c == NULL){return ret;}
-	return lSymCount(c->parent,lTreeSize(c->data) + ret);
+	return c ? lSymCount(c->parent,lTreeSize(c->data) + ret) : ret;
 }
 
 static lVal *lnfSymCount(lClosure *c, lVal *v){
@@ -72,35 +68,23 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 }
 
 static lVal *lnfClosureParent(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL)
-		|| !((car->type == ltLambda)
-		||   (car->type == ltObject)
-		||   (car->type == ltMacro))){
-		return NULL;
-	}else if(car->vClosure->parent == NULL){
+	lClosure *cc = requireClosure(c, lCar(v));
+	if(cc->parent == NULL){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc(car->vClosure->parent->type == closureObject ? ltObject : ltLambda);
-		ret->vClosure = car->vClosure->parent;
+		lVal *ret = lValAlloc(cc->parent->type == closureObject ? ltObject : ltLambda);
+		ret->vClosure = cc->parent;
 		return ret;
 	}
 }
 
 static lVal *lnfClosureCaller(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL)
-		|| !((car->type == ltLambda)
-		||   (car->type == ltObject)
-		||   (car->type == ltMacro))){
-		return NULL;
-	}else if(car->vClosure->caller == NULL){
+	lClosure *cc = requireClosure(c, lCar(v));
+	if(cc->caller == NULL){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc(car->vClosure->caller->type == closureObject ? ltObject : ltLambda);
-		ret->vClosure = car->vClosure->caller;
+		lVal *ret = lValAlloc(cc->caller->type == closureObject ? ltObject : ltLambda);
+		ret->vClosure = cc->caller;
 		return ret;
 	}
 }
@@ -178,9 +162,7 @@ static lVal *lnfApply(lClosure *c, lVal *v){
 
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
 	lVal *fun = lCar(v);
-	if((fun == NULL) || (fun->type != ltMacro)){
-		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
-	}
+	if((fun == NULL) || (fun->type != ltMacro)){ lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c); }
 	return lLambda(c, lCadr(v), fun);
 }
 
@@ -195,10 +177,7 @@ static lVal *lnfCdr(lClosure *c, lVal *v){
 }
 
 static lVal *lnfCons(lClosure *c, lVal *v){
-	(void)c;
-	if(lCddr(v) != NULL){
-		lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c);
-	}
+	if(lCddr(v) != NULL){ lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c); }
 	return lCons(lCar(v),lCadr(v));
 }
 
@@ -255,7 +234,7 @@ static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 	(void)c;
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	return lValBool(lValEqual(a,b) || (lValGreater(a, b) > 0));
+	return lValBool(lValEqual(a, b) || (lValGreater(a, b) > 0));
 }
 
 static lVal *lnfNilPred(lClosure *c, lVal *v){
@@ -270,9 +249,7 @@ static lVal *lnfKeywordPred(lClosure *c, lVal *v){
 }
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
-	if(v->type != ltPair){
-		lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c);
-	}
+	if(v->type != ltPair){ lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c); }
 	return lCar(v);
 }
 
@@ -283,7 +260,6 @@ static lVal *lnfThrow(lClosure *c, lVal *v){
 }
 
 static lVal *lnfRead(lClosure *c, lVal *v){
-	(void)c;
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
 	lString *dup = lRootsStringPush(lStringDup(t->vString));
@@ -304,23 +280,6 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfValIndex(lClosure *c, lVal *v){
-	(void)c;
-	return lValInt(lValIndex(lCar(v)));
-}
-
-static lVal *lnfIndexVal(lClosure *c, lVal *v){
-	return lIndexVal(requireInt(c, lCar(v)));
-}
-
-static lVal *lnfSymIndex(lClosure *c, lVal *v){
-	return lValInt(lSymIndex(requireSymbolic(c, lCar(v))));
-}
-
-static lVal *lnfIndexSym(lClosure *c, lVal *v){
-	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
-}
-
 static lVal *lnfClosureMetaGet(lClosure *c, lVal *v){
 	lClosure *clo = requireClosure(c, lCar(v));
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
@@ -335,6 +294,79 @@ static lVal *lnfClosureMetaSet(lClosure *c, lVal *v){
 	return car;
 }
 
+static lVal *lCastFloat(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	default:      throwTypeError(c, v, ltFloat);
+	case ltFloat: return v;
+	case ltInt:   return lValFloat(v->vInt);
+	}
+}
+static lVal *lnfFloat(lClosure *c, lVal *v){
+	return lCastFloat(c,lCar(v));
+}
+
+static lVal *lCastInt(lClosure *c, lVal *v){
+	switch(v ? v->type : ltNoAlloc){
+	default:      throwTypeError(c, v, ltInt);
+	case ltInt:   return v;
+	case ltFloat: return lValInt(v->vFloat);
+	}
+}
+static lVal *lnfInt(lClosure *c, lVal *v){
+	return lCastInt(c, lCar(v));
+}
+
+static lVal *lnfBool(lClosure *c, lVal *v){
+	(void)c;
+	return lValBool(castToBool(lCar(v)));
+}
+
+static lVal *lnfSymbolToKeyword(lClosure *c, lVal *v){
+	return lValKeywordS(requireSymbol(c, lCar(v)));
+}
+
+static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
+	return lValSymS(requireKeyword(c, lCar(v)));
+}
+
+lVal *lnfVec(lClosure *c, lVal *v){
+	vec nv = vecNew(0,0,0);
+	if(v == NULL){return lValVec(nv);}
+	if(v->type != ltPair){
+		if(v->type == ltInt){
+			return lValVec(vecNew(v->vInt, v->vInt, v->vInt));
+		}else if(v->type == ltFloat){
+			return lValVec(vecNew(v->vFloat, v->vFloat, v->vFloat));
+		}else if(v->type == ltVec){
+			return v;
+		}
+	}
+	int i = 0;
+	for(lVal *cv = v; cv && cv->type == ltPair; cv = cv->vList.cdr){
+		lVal *t = lCar(cv);
+		if(t == NULL){break;}
+		switch(t->type){
+		case ltInt:
+			nv.v[i] = t->vInt;
+			break;
+		case ltFloat:
+			nv.v[i] = t->vFloat;
+			break;
+		case ltVec:
+			if(i == 0){return t;}
+			lExceptionThrowValClo("type-error", "vectors can't contain other vectors, only :float and :int values", t, c);
+		default:
+			lExceptionThrowValClo("type-error", "Unexpected value in [vec]", t, c);
+			break;
+		}
+		if(++i >= 3){break;}
+	}
+	for(int ii=MAX(1,i);ii<3;ii++){
+		nv.v[ii] = nv.v[ii-1];
+	}
+	return lValVec(nv);
+}
+
 void lOperationsCore(lClosure *c){
 	symType          = RSYMP(lSymS("type"));
 	symArguments     = RSYMP(lSymS("arguments"));
@@ -344,7 +376,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"quote",   "[v]",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFunc(c,"throw",   "[v]",   "Throw V to the closest exception handler", lnfThrow);
 	lAddNativeFunc(c,"read",    "[str]", "Read and Parses STR as an S-Expression", lnfRead);
-	lAddNativeFunc(c,"type-of", "[α]",   "Return a symbol describing the type of α", lnfTypeOf);
 
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
@@ -383,8 +414,13 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"keyword?", "[α]",   "Return true if α is a keyword symbol",        lnfKeywordPred);
 
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
-	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
-	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
-	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
-	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
+
+	lAddNativeFunc(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
+	lAddNativeFunc(c,"bool",            "[α]",     "Convert α into a boolean value, true or false", lnfBool);
+	lAddNativeFunc(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
+	lAddNativeFunc(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
+	lAddNativeFunc(c,"vec",             "[x y z]", "Convert α into a vector value consisting of 3 floats x,y and z", lnfVec);
+	lAddNativeFunc(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfCat);
+	lAddNativeFunc(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
+	lAddNativeFunc(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
 }

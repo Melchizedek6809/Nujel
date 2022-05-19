@@ -20,32 +20,16 @@
 #endif
 
 vec vecCbrt(const vec a){
-	vec ret;
-	ret.x = cbrtf(a.x);
-	ret.y = cbrtf(a.y);
-	ret.z = cbrtf(a.z);
-	return ret;
+	return (vec){cbrtf(a.x), cbrtf(a.y), cbrtf(a.z)};
 }
 vec vecSqrt(const vec a){
-	vec ret;
-	ret.x = sqrtf(a.x);
-	ret.y = sqrtf(a.y);
-	ret.z = sqrtf(a.z);
-	return ret;
+	return (vec){sqrtf(a.x), sqrtf(a.y), sqrtf(a.z)};
 }
 vec vecCeil(const vec a){
-	vec ret;
-	ret.x = ceilf(a.x);
-	ret.y = ceilf(a.y);
-	ret.z = ceilf(a.z);
-	return ret;
+	return (vec){ceilf(a.x), ceilf(a.y), ceilf(a.z)};
 }
 vec vecRound(const vec a){
-	vec ret;
-	ret.x = roundf(a.x);
-	ret.y = roundf(a.y);
-	ret.z = roundf(a.z);
-	return ret;
+	return (vec){roundf(a.x), roundf(a.y), roundf(a.z)};
 }
 
 vec vecNorm(const vec a){
@@ -87,67 +71,35 @@ vec vecVecToDeg(const vec a){
 
 vec vecDegToVec(const vec a){
 	vec ret;
-	ret.x = cosf((a.x-90.f)*PI180) * cosf((-a.y)*PI180);
-	ret.y = sinf((-a.y)*PI180);
-	ret.z = sinf((a.x-90.f)*PI180) * cosf((-a.y)*PI180);
+	ret.x = cosf((a.x-90.f)*PI/180) * cosf((-a.y)*PI/180);
+	ret.y = sinf((-a.y)*PI/180);
+	ret.z = sinf((a.x-90.f)*PI/180) * cosf((-a.y)*PI/180);
 	return ret;
 }
 
 vec vecNew (float x, float y, float z){
-	vec ret;
-	ret.x = x;
-	ret.y = y;
-	ret.z = z;
-	return ret;
+	return (vec){x,y,z};
 }
 vec vecNewP(const float *p){
-	vec ret;
-	ret.x = p[0];
-	ret.y = p[1];
-	ret.z = p[2];
-	return ret;
+	return (vec){p[0], p[1], p[2]};
 }
 vec vecNOne(){
-	vec ret;
-	ret.x = -1.f;
-	ret.y = -1.f;
-	ret.z = -1.f;
-	return ret;
+	return (vec){-1.f, -1.f, -1.f};
 }
 vec vecZero(){
-	vec ret;
-	ret.x = 0.f;
-	ret.y = 0.f;
-	ret.z = 0.f;
-	return ret;
+	return (vec){0.f, 0.f, 0.f};
 }
 vec vecOne(){
-	vec ret;
-	ret.x = 1.f;
-	ret.y = 1.f;
-	ret.z = 1.f;
-	return ret;
+	return (vec){1.f, 1.f, 1.f};
 }
 vec vecInvert(const vec a){
-	vec ret;
-	ret.x = -a.x;
-	ret.y = -a.y;
-	ret.z = -a.z;
-	return ret;
+	return (vec){-a.x,-a.y,-a.z};
 }
 vec vecAdd (const vec a, const vec b){
-	vec ret;
-	ret.x = a.x + b.x;
-	ret.y = a.y + b.y;
-	ret.z = a.z + b.z;
-	return ret;
+	return (vec){a.x+b.x, a.y+b.y, a.z+b.z};
 }
 vec vecAddS(const vec a, const float b){
-	vec ret;
-	ret.x = a.x + b;
-	ret.y = a.y + b;
-	ret.z = a.z + b;
-	return ret;
+	return (vec){a.x+b, a.y+b, a.z+b};
 }
 vec vecAddT(const vec a, const vec b, const vec c){
 	vec ret;
@@ -157,32 +109,16 @@ vec vecAddT(const vec a, const vec b, const vec c){
 	return ret;
 }
 vec vecSub (const vec a, const vec b){
-	vec ret;
-	ret.x = a.x - b.x;
-	ret.y = a.y - b.y;
-	ret.z = a.z - b.z;
-	return ret;
+	return (vec){a.x-b.x, a.y-b.y, a.z-b.z};
 }
 vec vecSubS(const vec a, const float b){
-	vec ret;
-	ret.x = a.x - b;
-	ret.y = a.y - b;
-	ret.z = a.z - b;
-	return ret;
+	return (vec){a.x-b, a.y-b, a.z-b};
 }
 vec vecMul (const vec a, const vec b){
-	vec ret;
-	ret.x = a.x * b.x;
-	ret.y = a.y * b.y;
-	ret.z = a.z * b.z;
-	return ret;
+	return (vec){a.x*b.x, a.y*b.y, a.z*b.z};
 }
 vec vecMulS(const vec a, const float b){
-	vec ret;
-	ret.x = a.x * b;
-	ret.y = a.y * b;
-	ret.z = a.z * b;
-	return ret;
+	return (vec){a.x*b, a.y*b, a.z*b};
 }
 vec vecMulT(const vec a, const vec b, const vec c){
 	vec ret;
@@ -192,46 +128,22 @@ vec vecMulT(const vec a, const vec b, const vec c){
 	return ret;
 }
 vec vecDiv (const vec a, const vec b){
-	vec ret;
-	ret.x = a.x / b.x;
-	ret.y = a.y / b.y;
-	ret.z = a.z / b.z;
-	return ret;
+	return (vec){a.x/b.x, a.y/b.y, a.z/b.z};
 }
 vec vecDivS(const vec a, const float b){
-	vec ret;
-	ret.x = a.x / b;
-	ret.y = a.y / b;
-	ret.z = a.z / b;
-	return ret;
+	return (vec){a.x/b, a.y/b, a.z/b};
 }
 vec vecMod (const vec a, const vec b){
-	vec ret;
-	ret.x = fmodf(a.x, b.x);
-	ret.y = fmodf(a.y, b.y);
-	ret.z = fmodf(a.z, b.z);
-	return ret;
+	return (vec){fmodf(a.x, b.x), fmodf(a.y, b.y), fmodf(a.z, b.z)};
 }
 vec vecAbs(const vec a){
-	vec ret;
-	ret.x = fabsf(a.x);
-	ret.y = fabsf(a.y);
-	ret.z = fabsf(a.z);
-	return ret;
+	return (vec){fabsf(a.x), fabsf(a.y), fabsf(a.z)};
 }
 vec vecFloor(const vec a){
-	vec ret;
-	ret.x = floorf(a.x);
-	ret.y = floorf(a.y);
-	ret.z = floorf(a.z);
-	return ret;
+	return (vec){floorf(a.x), floorf(a.y), floorf(a.z)};
 }
 vec vecPow(const vec a, const vec b){
-	vec ret;
-	ret.x = powf(a.x, b.x);
-	ret.y = powf(a.y, b.y);
-	ret.z = powf(a.z, b.z);
-	return ret;
+	return (vec){powf(a.x, b.x), powf(a.y, b.y), powf(a.z, b.z)};
 }
 float vecDot (const vec a, const vec b){
 	return (a.x*b.x)+(a.y*b.y)+(a.z*b.z);

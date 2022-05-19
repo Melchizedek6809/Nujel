@@ -186,7 +186,7 @@
 08i 1 v nil?
 0Bo 23
 05v "Bye!\r\n"
-08i 1 v display
+08i 1 v print
 0D
 02i 0
 08i 1 v exit
@@ -377,11 +377,12 @@
 08i 2 v char-at
 02i 45
 20
-0Bo 27
+0Bo 32
 10s options
 02i 1
 08i 2 v cut
-08i 1 v string->keyword
+08i 1 v str->sym
+08i 1 v symbol->keyword
 08i 1 v repl/parse-option
 09o 34
 10s options

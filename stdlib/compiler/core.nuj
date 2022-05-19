@@ -4,7 +4,7 @@
           [-> [macroexpand form environment]
               bytecompile
               assemble*
-              [bytecode-eval #nil environment]]]]
+              [bytecode-eval environment]]]]
 
 [defn macroexpand/forms [source-raw environment]
   "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
@@ -68,7 +68,7 @@
   ""
   "Mostly used by lRun()"
   [try display/error [-> [compile* expr closure]
-                         [bytecode-eval #nil closure]]]]
+                         [bytecode-eval closure]]]]
 
 [defn eval-in/trace [closure expr]
   "Compile and the immediatly evaluate the result"
@@ -77,7 +77,7 @@
   [try display/error
        [def bc [compile* expr closure]]
        [println [str/write bc]]
-       [bytecode-eval bc #nil closure]]]
+       [bytecode-eval bc closure]]]
 
 [defmacro eval [expr]
   "Compile, Evaluate and then return the result of EXPR"

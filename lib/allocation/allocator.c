@@ -1,8 +1,7 @@
  /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "allocator.h"
-#include "../display.h"
-#include "../exception.h"
+#include "../misc/pf.h"
 #include "../type/val.h"
 
 #include <stdlib.h>
@@ -42,7 +41,7 @@ T * funcName (){\
 		if(listMax >= typeMax-1){\
 			lGarbageCollect();\
 			if(listFree == NULL){\
-				lPrintError(errorMsg);\
+				fpf(stderr, "%S", errorMsg);\
 				exit(123);\
 			}else{\
 				goto allocateFromFreeList;\
@@ -96,7 +95,7 @@ lArray *lArrayAlloc(size_t len){
 
 lNFunc *lNFuncAlloc(){
 	if(lNFuncMax >= NFN_MAX-1){
-		lPrintError("lNFunc OOM ");
+		fpf(stderr, "lNFunc OOM ");
 		exit(123);
 	}
 	return &lNFuncList[lNFuncMax++];

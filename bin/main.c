@@ -58,6 +58,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 			}
 		}
 	}
+	if(c == NULL){c = createRootClosure();}
 	if(lVerbose){
 		pf("sizeof(vec): %u\n",     (i64)sizeof(vec));
 		pf("sizeof(lClosure): %u\n",(i64)sizeof(lClosure));
@@ -66,12 +67,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 		pf("sizeof(lString): %u\n", (i64)sizeof(lString));
 		pf("sizeof(lTree): %u\n",   (i64)sizeof(lTree));
 		pf("sizeof(jmp_buf): %u\n", (i64)sizeof(jmp_buf));
-	}
-
-	if(c == NULL){c = createRootClosure();}
-
-	if(lVerbose){
-		pf("\n\nRoot Closure Data Size: %u\n", (i64)lTreeSize(c->data));
+		pf("Root Size: %u\n",       (i64)lTreeSize(c->data));
 	}
 	return c;
 }
@@ -94,20 +90,11 @@ void initNujel(int argc, char *argv[], lClosure *c){
 }
 
 
-#ifndef __WATCOMC__
-/* Set up a bunch of signal handlers */
-static void initSignalHandlers(){
-	//signal(SIGINT, breakSignalHandler);
-}
-#endif
-
-
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
 	#ifndef __WATCOMC__
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
-	initSignalHandlers();
 	#endif
 	lInit();
 	setIOSymbols();

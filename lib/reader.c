@@ -1,16 +1,10 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "reader.h"
-#include "display.h"
-#include "exception.h"
-#include "allocation/roots.h"
-#include "allocation/allocator.h"
 #include "allocation/symbol.h"
 #include "collection/list.h"
-#include "type/closure.h"
+#include "misc/pf.h"
 #include "type/symbol.h"
-#include "type/val.h"
-#include "operation.h"
 
 #include <ctype.h>
 #include <math.h>
@@ -26,19 +20,19 @@
 
 lClosure *readClosure = NULL;
 
-static void lExceptionThrowReader(lString *s, const char *msg){
+static NORETURN void lExceptionThrowReader(lString *s, const char *msg){
 	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
 	lExceptionThrowValClo("read-error", msg, err, readClosure);
 }
 
-static void lExceptionThrowReaderStartEnd(lString *s, const char *msg){
+static NORETURN void lExceptionThrowReaderStartEnd(lString *s, const char *msg){
 	const char *start, *end;
 	for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 	for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
 	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
 }
 
-static void lExceptionThrowReaderEnd(lString *s, const char *start, const char *msg){
+static NORETURN void lExceptionThrowReaderEnd(lString *s, const char *start, const char *msg){
 	const char *end;
 	for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
 	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
@@ -84,7 +78,7 @@ static lVal *lParseString(lString *s){
 	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
 	if(buf == NULL){
-		lPrintError("Can't alloc parse buf\n");
+		fpf(stderr, "Can't alloc parse buf\n");
 		exit(20);
 	}
 	char *b = buf;
@@ -94,7 +88,7 @@ static lVal *lParseString(lString *s){
 			bufSize *= 2;
 			buf = realloc(buf,bufSize);
 			if(buf == NULL){
-				lPrintError("Can't grow parse buf\n");
+				fpf(stderr, "Can't grow parse buf\n");
 				exit(21);
 			}
 			b = &buf[i];
@@ -283,9 +277,9 @@ static lVal *lParseBytecodeOp(lString *s){
 }
 
 static lVal *lParseBytecodeArray(lString *s){
-	u8 *d = NULL;
+	u8 *d    = NULL;
 	int size = 0;
-	int len = 0;
+	int len  = 0;
 
 	while(s->data < s->bufEnd){
 		if((len+4) >= size){
@@ -375,9 +369,7 @@ static lVal *lParseBytecodeArray(lString *s){
 static lVal *lParseSpecial(lString *s){
 	if(s->data >= s->bufEnd){return NULL;}
 	switch(*s->data++){
-	default:
-		lExceptionThrowReaderStartEnd(s, "Wrong char in special lit.");
-		return NULL;
+	default: lExceptionThrowReaderStartEnd(s, "Wrong char in special lit.");
 	case '|': // SRFI-30
 		lStringAdvanceUntilEndOfBlockComment(s);
 		lStringAdvanceToNextCharacter(s);
@@ -394,12 +386,9 @@ static lVal *lParseSpecial(lString *s){
 	case 'n':
 		lStringAdvanceToNextSpaceOrSpecial(s);
 		return NULL;
-	case 't':
-		return lValBool(true);
-	case 'f':
-		return lValBool(false);
-	case '{':
-		return lParseBytecodeArray(s);
+	case 't': return lValBool(true);
+	case 'f': return lValBool(false);
+	case '{': return lParseBytecodeArray(s);
 	case '#':
 		s->data++;
 		return lnfArrNew(readClosure, lReadList(s, false));

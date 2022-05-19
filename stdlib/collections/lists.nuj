@@ -192,8 +192,12 @@
   ""
   "Uses [equal?] so we can search/replace lists/trees and other complex data structures"
   [cond [[not l] #nil]
+        [[equal? l search-for]
+         replace-with]
         [[equal? [car l] search-for]
          [cons replace-with
                [list/replace [cdr l] search-for replace-with]]]
-        [#t [cons [car l]
+        [#t [cons [if [pair? [car l]]
+                      [list/replace [car l] search-for replace-with]
+                      [car l]]
                   [list/replace [cdr l] search-for replace-with]]]]]

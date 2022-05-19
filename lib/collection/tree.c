@@ -2,10 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "tree.h"
 #include "list.h"
-#include "../allocation/allocator.h"
 #include "../type/symbol.h"
-
-#include <stdlib.h>
 
 /* Create a new Tree segment with S associated to V */
 lTree *lTreeNew(const lSymbol *s, lVal *v){

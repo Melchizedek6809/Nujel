@@ -1,7 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "symbol.h"
-#include "../display.h"
 #include "../misc/pf.h"
 #include "../misc/popcount.h"
 
@@ -172,7 +171,7 @@ uint lSymbolIndexSlot(const char *str){
 			h = 0;
 		}
 	} while (h != hInitial);
-	lPrintError("lSymbolIndexSlot Overflow\n");
+	fpf(stderr, "lSymbolIndexSlot Overflow\n");
 	exit(123);
 	return 0;
 }
@@ -194,7 +193,7 @@ lSymbol *lSymS(const char *str){
 			if(lSymbolFFree != NULL){
 				goto getFirstFree;
 			} else {
-				lPrintError("lSym Overflow\n");
+				fpf(stderr, "lSym Overflow\n");
 				exit(123);
 			}
 		}else{
@@ -210,9 +209,8 @@ lSymbol *lSymS(const char *str){
 	return ret;
 }
 
-lSymbol *getTypeSymbol(const lVal* v){
-	if(v == NULL){return lSymLTNil;}
-	switch(v->type){
+lSymbol *getTypeSymbolT(const lType T){
+	switch(T){
 		default:            return lSymLTNil;
 		case ltNoAlloc:     return lSymLTNoAlloc;
 		case ltBool:        return lSymLTBool;
@@ -233,4 +231,8 @@ lSymbol *getTypeSymbol(const lVal* v){
 		case ltBytecodeOp:  return lSymLTBytecodeOp;
 		case ltBytecodeArr: return lSymLTBytecodeArray;
 	}
+}
+
+lSymbol *getTypeSymbol(const lVal *v){
+	return v ? getTypeSymbolT(v->type) : lSymLTNil;
 }

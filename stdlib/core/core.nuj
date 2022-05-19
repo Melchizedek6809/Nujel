@@ -17,11 +17,11 @@
   "[set! l [cdr l]]"
   `[set! ~l [cdr ~l]]]
 
-[defn not [v]
+[defn not [v] :inline
   "Return true if V is false"
   [if v #f #t]]
 
-[defn identity [α]
+[defn identity [α] :inline
   "Returns its argument"
   α]
 
@@ -33,19 +33,19 @@
   "Returns ARG or DEFAULT-VALUE if ARG is #nil"
   [if arg arg default-value]]
 
-[defn caar [p]
+[defn caar [p] :inline
   "[car [car p]]"
   [car [car p]]]
 
-[defn cadr [p]
+[defn cadr [p] :inline
   "[car [cdr p]]"
   [car [cdr p]]]
 
-[defn cdar [p]
+[defn cdar [p] :inline
   "[cdr [car p]]"
   [cdr [car p]]]
 
-[defn cddr [p]
+[defn cddr [p] :inline
   "[cdr [cdr p]]"
   [cdr [cdr p]]]
 

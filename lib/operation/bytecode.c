@@ -1,13 +1,10 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../exception.h"
 #include "../collection/list.h"
+#include "../allocation/symbol.h"
 #include "../type/closure.h"
-#include "../type-system.h"
+#include "../type/symbol.h"
 #include "../vm/eval.h"
-
-#include <stdlib.h>
 
 static lVal *lValBytecodeOp(lBytecodeOp v){
 	lVal *ret = lValAlloc(ltBytecodeOp);
@@ -59,17 +56,31 @@ static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	lVal *args = lCadr(v);
-	lVal *env = lCaddr(v);
+	lVal *env = lCadr(v);
 	lClosure *bcc = c;
-	const bool trace = castToBool(lCadddr(v));
+	const bool trace = castToBool(lCaddr(v));
 	if(env){
-		if(env->type != ltObject){
-			lExceptionThrowValClo("type-error", "Environments have to be of type :object", lCaddr(v), c);
-		}
+		requireCertainType(c, env, ltObject);
 		bcc = env->vClosure;
 	}
-	return lBytecodeEval(bcc, args, arr, trace);
+	return lBytecodeEval(bcc, arr, trace);
+}
+
+static lVal *lnfValIndex(lClosure *c, lVal *v){
+	(void)c;
+	return lValInt(lValIndex(lCar(v)));
+}
+
+static lVal *lnfIndexVal(lClosure *c, lVal *v){
+	return lIndexVal(requireInt(c, lCar(v)));
+}
+
+static lVal *lnfSymIndex(lClosure *c, lVal *v){
+	return lValInt(lSymIndex(requireSymbolic(c, lCar(v))));
+}
+
+static lVal *lnfIndexSym(lClosure *c, lVal *v){
+	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
 }
 
 void lOperationsBytecode(lClosure *c){
@@ -77,5 +88,11 @@ void lOperationsBytecode(lClosure *c){
 	lAddNativeFunc(c,"bytecode-op->int",  "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
 	lAddNativeFunc(c,"arr->bytecode-arr", "[a]", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
 	lAddNativeFunc(c,"bytecode-arr->arr", "[a]", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
-	lAddNativeFunc(c,"bytecode-eval",     "[bc args environment trace]", "Evaluate a bytecode array and return the result", lnfBytecodeEval);
+
+	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
+	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
+	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
+	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
+
+	lAddNativeFunc(c,"bytecode-eval",    "[bc environment trace]", "Evaluate a bytecode array and return the result", lnfBytecodeEval);
 }

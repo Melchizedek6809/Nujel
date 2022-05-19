@@ -3,7 +3,6 @@
 #include "eval.h"
 
 #include "bytecode.h"
-#include "../exception.h"
 #include "../allocation/symbol.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
@@ -12,14 +11,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-
-/* Push the list args onto the stack, return the new SP */
-static int pushList(lVal **stack, int sp, lVal *args){
-	if(!args){return sp;}
-	sp = pushList(stack, sp, lCdr(args));
-	stack[sp] = lCar(args);
-	return sp + 1;
-}
 
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
@@ -105,7 +96,7 @@ static void lBytecodeTrace(const lThread *ctx, const lBytecodeOp *ip, const lByt
 }
 
 /* Evaluate ops within callingClosure after pushing args on the stack */
-lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, bool trace){
+lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *ops, bool trace){
 	jmp_buf oldExceptionTarget;
 	lBytecodeOp *ip;
 	lClosure * volatile c = callingClosure;
@@ -145,8 +136,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lVal *args, lBytecodeArray *ops, b
 		}
 	}else{
 		ip = ops->data;
-		(void)args;
-		ctx.sp = pushList(ctx.valueStack, 0, args);
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){

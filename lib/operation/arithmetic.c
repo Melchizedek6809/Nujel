@@ -1,12 +1,9 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../exception.h"
 #include "../type-system.h"
-#include "../misc/pf.h"
-#include "../misc/vec.h"
 #include "../type/closure.h"
 #include "../type/val.h"
+#include "../misc/popcount.h"
 
 #include <math.h>
 
@@ -28,9 +25,7 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 static lVal *lnfAdd(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
-	}
+	if(lCddr(v)){ throwArityError(c, v, 2); }
 	if(a == NULL){return lValInt(0);}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
@@ -45,12 +40,10 @@ static lVal *lnfAdd(lClosure *c, lVal *v){
 static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){
-		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce" , a, c);
-	}
+	if(a == NULL){ throwArityError(c, v, 2); }
 	if(b == NULL){
 		switch(a->type){
-		default: lExceptionThrowValClo("type-error","Can't negate the following value", a, c);
+		default:      return exceptionThrow(c, v,"subtraction");
 		case ltInt:   return lValInt(-a->vInt);
 		case ltFloat: return lValFloat(-a->vFloat);
 		case ltVec:   return lValVec(vecInvert(a->vVec));
@@ -70,7 +63,7 @@ static lVal *lnfMul(lClosure *c, lVal *v){
 	lVal *b = lCadr(v);
 	if(a == NULL){return lValInt(1);}
 	if((b == NULL) || (lCddr(v))){
-		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+		throwArityError(c, v, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
@@ -85,7 +78,7 @@ static lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if((a == NULL) || (b == NULL) || lCddr(v)){
-		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+		throwArityError(c, v, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
@@ -106,7 +99,7 @@ static lVal *lnfMod(lClosure *c, lVal *v){
 	if(a == NULL){return b;}
 	if(b == NULL){return a;}
 	if(lCddr(v)){
-		lExceptionThrowValClo("arity-error","Operation can only be done with up to two arguments at once, to add more use reduce",v, c);
+		throwArityError(c, v, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
@@ -126,7 +119,7 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 	lVal *b = lCadr(v);
 	if(b == NULL){return a;}
 	if(a == NULL){
-		lExceptionThrowValClo("arity-error","- expects at least 1 argument", NULL, c);
+		throwArityError(c, v, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
@@ -180,6 +173,32 @@ static lVal *lnfPowAstI(lClosure *c, lVal *v){
 	return lValInt(pow(a,b));
 }
 
+static lVal *lnfLogAnd(lClosure *c, lVal *v){
+	return lValInt(requireInt(c, lCar(v)) & requireInt(c, lCadr(v)));
+}
+
+static lVal *lnfLogIor(lClosure *c, lVal *v){
+	return lValInt(requireInt(c, lCar(v)) | requireInt(c, lCadr(v)));
+}
+
+static lVal *lnfLogXor(lClosure *c, lVal *v){
+        return lValInt(requireInt(c, lCar(v)) ^ requireInt(c, lCadr(v)));
+}
+
+static lVal *lnfLogNot(lClosure *c, lVal *v){
+	return lValInt(~requireInt(c, lCar(v)));
+}
+
+static lVal *lnfPopCount(lClosure *c, lVal *v){
+	return lValInt(__builtin_popcountll(requireInt(c, lCar(v))));
+}
+
+static lVal *lnfAsh(lClosure *c, lVal *v){
+	const i64 iv = requireInt(c, lCar(v));
+	const i64 sv = requireInt(c, lCadr(v));
+	return lValInt((sv > 0) ? (iv <<  sv) : (iv >> -sv));
+}
+
 void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"+",   "[a b]", "Addition",      lnfAdd);
 	lAddNativeFunc(c,"-",   "[a b]", "Substraction",  lnfSub);
@@ -194,4 +213,11 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"div/int", "[a b]", "Return a:int / b:int",  lnfDivAstI);
 	lAddNativeFunc(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
 	lAddNativeFunc(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
+
+	lAddNativeFunc(c,"logand",  "[a b]",       "And ARGS together",               lnfLogAnd);
+	lAddNativeFunc(c,"logior",  "args",        "Or ARGS",                         lnfLogIor);
+	lAddNativeFunc(c,"logxor",  "args",        "Xor ARGS",                        lnfLogXor);
+	lAddNativeFunc(c,"lognot",  "[val]",       "Binary not of VAL",               lnfLogNot);
+	lAddNativeFunc(c,"ash",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFunc(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
 }

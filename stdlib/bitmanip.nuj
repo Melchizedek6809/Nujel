@@ -7,14 +7,22 @@
   "Returns the Nand of its arguments"
   [lognot [apply logand l]]]
 
+[defn bit-set? [α i]
+  "Returns #t if bit I is set in Α"
+  [typecheck/only α :int]
+  [typecheck/only i :int]
+  [not [zero? [logand α [ash 1 i]]]]]
+
 [defn bit-set?! [i]
   "Returns a function that checks if bit I is set in the provided number"
+  [typecheck/only i :int]
   [def mask [ash 1 i]]
   [fn [α]
       [not [zero? [logand α mask]]]]]
 
 [defn bit-clear?! [i]
   "Returns a function that checks if bit I is clear in the provided number"
+  [typecheck/only i :int]
   [def mask [ash 1 i]]
   [fn [α]
       [zero? [logand α mask]]]]

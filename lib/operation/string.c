@@ -1,8 +1,5 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../display.h"
-#include "../exception.h"
 #include "../collection/string.h"
 #include "../misc/pf.h"
 #include "../type/closure.h"
@@ -97,8 +94,9 @@ static lVal *lnfStringCut(lClosure *c, lVal *v){
 
 	const char *buf = str->vString->data;
 	slen = len = lStringLength(str->vString);
-	start = MAX(0, castToInt(lCadr(v), 0));
-	len   = MIN(slen - start, castToInt(lCaddr(v), len) - start);
+	start = MAX(0, requireInt(c, lCadr(v)));
+	lVal *lenV = lCaddr(v);
+	len   = MIN(slen - start, ((lenV && (lenV->type == ltInt)) ? lenV->vInt : len) - start);
 
 	if(len <= 0){return lValString("");}
 	return lValStringLen(&buf[start], len);
@@ -110,7 +108,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	static int tmpStringBufSize = 1<<12; // Start with 4K
 	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
 	if(tmpStringBuf == NULL){
-		lPrintError("lnfCat OOM\n");
+		fpf(stderr,"lnfCat OOM\n");
 		return NULL;
 	}
 	char *new, *cur = tmpStringBuf;
@@ -128,7 +126,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 			tmpStringBuf = realloc(tmpStringBuf,tmpStringBufSize);
 			bufEnd = &tmpStringBuf[tmpStringBufSize];
 			if(tmpStringBuf == NULL){
-				lPrintError("lnfCat2 OOM\n");
+				fpf(stderr, "lnfCat2 OOM\n");
 				return NULL;
 			}
 			cur = &tmpStringBuf[i];
@@ -193,6 +191,7 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
+	char dispWriteBuf[1<<16];
 	spf(dispWriteBuf, &dispWriteBuf[sizeof(dispWriteBuf)], "%v", lCar(v));
 	return lValString(dispWriteBuf);
 }
@@ -217,7 +216,7 @@ static lVal *lnfFromCharCode(lClosure *c,lVal *v){
 	int i=0;
 
 	while(v != NULL){
-		buf[i++] = castToInt(lCar(v),0);
+		buf[i++] = requireInt(c,lCar(v));
 		v = lCdr(v);
 		if(i >= len){break;}
 	}

@@ -8,35 +8,112 @@
 }
 0Es lognand
 0D
-25v bit-set?! v [i] v #@[documentation: "Returns a function that checks if bit I is set in the provided number" source: ["Returns a function that checks if bit I is set in the provided number" [def mask [ash 1 i]] [fn [α] [not [zero? [logand α mask]]]]]] v #{
+25v bit-set? v [α i] v #@[documentation: "Returns #t if bit I is set in Α" source: ["Returns #t if bit I is set in Α" [typecheck/only α :int] [typecheck/only i :int] [not [zero? [logand α [ash 1 i]]]]]] v #{
+10s α
+08i 1 v type-of
+05v :int
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :int"
+10s α
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+10s i
+08i 1 v type-of
+05v :int
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :int"
+10s i
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
+02i 0
+10s α
+02i 1
+10s i
+08i 2 v ash
+08i 2 v logand
+20
+0Bo 10
+05v #f
+09o 7
+05v #t
+01
+}
+0Es bit-set?
+0D
+25v bit-set?! v [i] v #@[documentation: "Returns a function that checks if bit I is set in the provided number" source: ["Returns a function that checks if bit I is set in the provided number" [typecheck/only i :int] [def mask [ash 1 i]] [fn [α] [not [zero? [logand α mask]]]]]] v #{
+10s i
+08i 1 v type-of
+05v :int
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :int"
+10s i
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
 02i 1
 10s i
 08i 2 v ash
 0Es mask
 0D
 25v 'anonymous v [α] v #@[source: [[not [zero? [logand α mask]]]]] v #{
+02i 0
 10s α
 10s mask
 08i 2 v logand
-08i 1 v zero?
-08i 1 v not
+20
+0Bo 10
+05v #f
+09o 7
+05v #t
 01
 }
 01
 }
 0Es bit-set?!
 0D
-25v bit-clear?! v [i] v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [def mask [ash 1 i]] [fn [α] [zero? [logand α mask]]]]] v #{
+25v bit-clear?! v [i] v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [typecheck/only i :int] [def mask [ash 1 i]] [fn [α] [zero? [logand α mask]]]]] v #{
+10s i
+08i 1 v type-of
+05v :int
+20
+0Bo 7
+24
+09o 30
+05v :type-error
+05v "Expected a value of type :int"
+10s i
+08i 0 v current-lambda
+08i 4 v list
+08i 1 v throw
+0D
 02i 1
 10s i
 08i 2 v ash
 0Es mask
 0D
 25v 'anonymous v [α] v #@[source: [[zero? [logand α mask]]]] v #{
+02i 0
 10s α
 10s mask
 08i 2 v logand
-08i 1 v zero?
+20
 01
 }
 01
@@ -218,7 +295,7 @@
 08i 3 v array/2d/ref
 05v " "
 08i 2 v cat
-08i 1 v display
+08i 1 v print
 0D
 02i 1
 10s x
@@ -582,13 +659,19 @@
 25v array/equal? v [a b] v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] #f [let [[ret #t]] [for [i 0 [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] ret]]]] v #{
 10s a
 08i 1 v array?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
-0Ao 55
+0Ao 64
 0D
 10s b
 08i 1 v array?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
 0Ao 36
 0D
@@ -1904,7 +1987,10 @@
 10s a
 10s e
 20
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 01
 }
 08i 2 v filter
@@ -1918,7 +2004,10 @@
 10s p
 10s a
 1Ai 1
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 01
 }
 08i 2 v filter
@@ -2478,7 +2567,8 @@
 0Fs step
 0D
 10s step
-08i 1 v pos?
+05v 0.0
+21
 0Bo 10
 10s <
 09o 7
@@ -2789,9 +2879,10 @@
 0Bo 15
 10s ret
 08i 1 v reverse
-09o 166
+09o 164
 10s end
-08i 1 v neg?
+05v 0.0
+1E
 0Bo 37
 10s l
 10s start
@@ -2800,9 +2891,10 @@
 10s end
 08i 2 v +
 08i 3 v sublist
-09o 120
+09o 118
+02i 0
 10s end
-08i 1 v zero?
+20
 0Bo 15
 10s ret
 08i 1 v reverse
@@ -2892,14 +2984,15 @@
 08i 1 v nil?
 0Bo 7
 24
-09o 53
+09o 50
 10s key
 10s l
 11
 20
-0Bo 15
+0Bo 12
 10s l
-08i 1 v cadr
+12
+11
 09o 28
 05v #t
 0Bo 20
@@ -3015,7 +3108,7 @@
 10s acc1
 10s acc2
 14
-09o 83
+09o 77
 10s l
 12
 08i 1 v nil?
@@ -3026,17 +3119,19 @@
 14
 10s acc2
 14
-09o 52
+09o 46
 05v #t
-0Bo 44
+0Bo 38
 10s l
-08i 1 v cddr
+12
+12
 10s l
 11
 10s acc1
 14
 10s l
-08i 1 v cadr
+12
+11
 10s acc2
 14
 08i 3 v list/split-half-rec
@@ -3158,36 +3253,53 @@
 }
 0Es list/cut
 0D
-25v list/replace v [l search-for replace-with] v #@[documentation: "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH\nUses [equal?] so we can search/replace lists/trees and other complex data structures" source: ["Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH" "" "Uses [equal?] so we can search/replace lists/trees and other complex data structures" [cond [[not l] #nil] [[equal? [car l] search-for] [cons replace-with [list/replace [cdr l] search-for replace-with]]] [#t [cons [car l] [list/replace [cdr l] search-for replace-with]]]]]] v #{
+25v list/replace v [l search-for replace-with] v #@[documentation: "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH\nUses [equal?] so we can search/replace lists/trees and other complex data structures" source: ["Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH" "" "Uses [equal?] so we can search/replace lists/trees and other complex data structures" [cond [[not l] #nil] [[equal? l search-for] replace-with] [[equal? [car l] search-for] [cons replace-with [list/replace [cdr l] search-for replace-with]]] [#t [cons [if [pair? [car l]] [list/replace [car l] search-for replace-with] [car l]] [list/replace [cdr l] search-for replace-with]]]]]] v #{
 10s l
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0Bo 7
 24
-09o 83
+09o 138
+10s l
+10s search-for
+08i 2 v equal?
+0Bo 10
+10s replace-with
+09o 115
 10s l
 11
 10s search-for
 08i 2 v equal?
-0Bo 30
+0Bo 29
 10s replace-with
-10s list/replace
 10s l
 12
 10s search-for
 10s replace-with
-1Ai 3
+08i 3 v list/replace
 14
-09o 39
+09o 72
 05v #t
-0Bo 31
+0Bo 64
 10s l
 11
-10s list/replace
+08i 1 v pair?
+0Bo 24
+10s l
+11
+10s search-for
+10s replace-with
+08i 3 v list/replace
+09o 8
+10s l
+11
 10s l
 12
 10s search-for
 10s replace-with
-1Ai 3
+08i 3 v list/replace
 14
 09o 4
 24
@@ -4040,7 +4152,7 @@
 1B
 1C
 10s code
-0Bo 190
+0Bo 187
 0D
 15
 10s code
@@ -4059,7 +4171,7 @@
 08i 2 v +
 0Fs pos
 08i 3 v tree/set!
-09o 116
+09o 113
 10s ΓεnΣym-83
 05v :symbol
 20
@@ -4073,17 +4185,18 @@
 0Ao 8
 0D
 05v #f
-0Bo 43
+0Bo 40
 10s code
 11
 05v :label
 20
 0C
-0Bo 26
+0Bo 23
 0D
 10s sym-map
 10s code
-08i 1 v cadr
+12
+11
 10s pos
 08i 3 v tree/set!
 09o 41
@@ -4104,7 +4217,7 @@
 10s code
 12
 0Fs code
-09o -192
+09o -189
 0D
 10s pos
 01
@@ -4114,7 +4227,8 @@
 25v assemble/relocate-op v [code sym-map pos out] v #@[source: [[def target [tree/ref sym-map [cadr code]]] [def off [- [+ target [cadddr code]] pos]] [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] 255]]] pos]] v #{
 10s sym-map
 10s code
-08i 1 v cadr
+12
+11
 08i 2 v tree/ref
 0Es target
 0D
@@ -4400,13 +4514,14 @@
 0D
 25v bytecompile/do/form v [source env] v #@[source: [[when source [cons [cons [bytecompile* [car source] env] [if [last? source] #nil [cons [$drop] #nil]]] [bytecompile/do/form [cdr source] env]]]]] v #{
 10s source
-0Bo 59
+0Bo 60
 10s source
 11
 10s env
 08i 2 v bytecompile*
 10s source
-08i 1 v last?
+12
+08i 1 v nil?
 0Bo 7
 24
 09o 10
@@ -4454,15 +4569,23 @@
 0D
 25v bytecompile/def v [source env] v #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[def] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$def [cadr source]]]]] v #{
 10s source
-08i 1 v cadr
+12
+11
 08i 1 v symbol?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
-0Ao 27
+0Ao 33
 0D
 10s source
-08i 1 v cddr
-08i 1 v not
+12
+12
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
 0Ao 8
 0D
@@ -4482,7 +4605,8 @@
 10s env
 08i 2 v bytecompile*
 10s source
-08i 1 v cadr
+12
+11
 08i 1 v $def
 08i 2 v list
 01
@@ -4491,15 +4615,23 @@
 0D
 25v bytecompile/set! v [source env] v #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[set!] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$set [cadr source]]]]] v #{
 10s source
-08i 1 v cadr
+12
+11
 08i 1 v symbol?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
-0Ao 27
+0Ao 33
 0D
 10s source
-08i 1 v cddr
-08i 1 v not
+12
+12
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
 0Ao 8
 0D
@@ -4519,7 +4651,8 @@
 10s env
 08i 2 v bytecompile*
 10s source
-08i 1 v cadr
+12
+11
 08i 1 v $set
 08i 2 v list
 01
@@ -4535,7 +4668,8 @@
 0Es sym-after
 0D
 10s source
-08i 1 v cadr
+12
+11
 10s env
 08i 2 v bytecompile*
 10s sym-else
@@ -4577,14 +4711,16 @@
 08i 2 v list
 08i 0 v $roots/restore
 10s source
-08i 1 v cadr
+12
+11
 10s env
 08i 2 v bytecompile*
 10s sym-end
 08i 1 v $jf
 08i 0 v $drop
 10s source
-08i 1 v cddr
+12
+12
 10s env
 08i 2 v bytecompile/do/form
 10s sym-start
@@ -4599,7 +4735,8 @@
 0D
 25v bytecompile/procedure/arg v [source env] v #@[source: [[if [last? source] [bytecompile* [car source] env] [cons [bytecompile* [car source] env] [bytecompile/procedure/arg [cdr source] env]]]]] v #{
 10s source
-08i 1 v last?
+12
+08i 1 v nil?
 0Bo 20
 10s source
 11
@@ -4699,13 +4836,12 @@
 0Es arg-name
 0D
 10s args
-0Bo 34
-10s list/replace
+0Bo 33
 10s form
 10s arg-name
 10s args
 11
-1Ai 3
+08i 3 v list/replace
 10s env
 08i 2 v bytecompile*
 09o 16
@@ -4719,12 +4855,11 @@
 25v bytecompile/procedure v [op args env] v #@[source: [[if [bytecompile/procedure/inline? op] [bytecompile/procedure/inline op args env] [bytecompile/procedure/default op args env]]]] v #{
 10s op
 08i 1 v bytecompile/procedure/inline?
-0Bo 24
-10s bytecompile/procedure/inline
+0Bo 23
 10s op
 10s args
 10s env
-1Ai 3
+08i 3 v bytecompile/procedure/inline
 09o 20
 10s op
 10s args
@@ -4901,7 +5036,8 @@
 25v bytecompile/let* v [source env] v #@[source: [[list [$let] [bytecompile/do [cadr source] env] [$closure/pop]]]] v #{
 08i 0 v $let
 10s source
-08i 1 v cadr
+12
+11
 10s env
 08i 2 v bytecompile/do
 08i 0 v $closure/pop
@@ -4912,7 +5048,8 @@
 0D
 25v bytecompile/return v [source env] v #@[source: [[list [bytecompile* [cadr source] env] [$ret]]]] v #{
 10s source
-08i 1 v cadr
+12
+11
 10s env
 08i 2 v bytecompile*
 08i 0 v $ret
@@ -4926,13 +5063,15 @@
 0Es end-sym
 0D
 10s source
-08i 1 v cadr
+12
+11
 10s env
 08i 2 v bytecompile*
 10s end-sym
 08i 1 v $try
 10s source
-08i 1 v cddr
+12
+12
 10s env
 08i 2 v bytecompile/do/form
 08i 0 v $closure/pop
@@ -4977,7 +5116,7 @@
 0Ao 8
 0D
 05v #f
-0Bo 428
+0Bo 425
 15
 10s op
 0Es ΓεnΣym-95
@@ -4989,7 +5128,7 @@
 10s source
 10s env
 08i 2 v bytecompile/do
-09o 386
+09o 383
 10s ΓεnΣym-95
 10s let*
 20
@@ -4997,7 +5136,7 @@
 10s source
 10s env
 08i 2 v bytecompile/let*
-09o 358
+09o 355
 10s ΓεnΣym-95
 10s def
 20
@@ -5005,7 +5144,7 @@
 10s source
 10s env
 08i 2 v bytecompile/def
-09o 330
+09o 327
 10s ΓεnΣym-95
 10s set!
 20
@@ -5013,7 +5152,7 @@
 10s source
 10s env
 08i 2 v bytecompile/set!
-09o 302
+09o 299
 10s ΓεnΣym-95
 10s if
 20
@@ -5021,7 +5160,7 @@
 10s source
 10s env
 08i 2 v bytecompile/if
-09o 274
+09o 271
 10s ΓεnΣym-95
 10s while
 20
@@ -5029,7 +5168,7 @@
 10s source
 10s env
 08i 2 v bytecompile/while
-09o 246
+09o 243
 10s ΓεnΣym-95
 10s and
 20
@@ -5037,7 +5176,7 @@
 10s source
 10s env
 08i 2 v bytecompile/and
-09o 218
+09o 215
 10s ΓεnΣym-95
 10s or
 20
@@ -5045,7 +5184,7 @@
 10s source
 10s env
 08i 2 v bytecompile/or
-09o 190
+09o 187
 10s ΓεnΣym-95
 10s fn*
 20
@@ -5053,7 +5192,7 @@
 10s source
 10s env
 08i 2 v bytecompile/fn*
-09o 162
+09o 159
 10s ΓεnΣym-95
 10s macro*
 20
@@ -5061,7 +5200,7 @@
 10s source
 10s env
 08i 2 v bytecompile/macro*
-09o 134
+09o 131
 10s ΓεnΣym-95
 10s ω*
 20
@@ -5069,7 +5208,7 @@
 10s source
 10s env
 08i 2 v bytecompile/ω*
-09o 106
+09o 103
 10s ΓεnΣym-95
 10s try
 20
@@ -5077,7 +5216,7 @@
 10s source
 10s env
 08i 2 v bytecompile/try
-09o 78
+09o 75
 10s ΓεnΣym-95
 10s return
 20
@@ -5085,13 +5224,14 @@
 10s source
 10s env
 08i 2 v bytecompile/return
-09o 50
+09o 47
 10s ΓεnΣym-95
 10s quote
 20
-0Bo 20
+0Bo 17
 10s source
-08i 1 v cadr
+12
+11
 08i 1 v bytecompile/quote
 09o 21
 10s op
@@ -5163,18 +5303,18 @@
 0Es bytecompile
 01
 }#{
-25v load/forms v [source environment] v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [for-in [form source] [-> [macroexpand form environment] bytecompile assemble* [bytecode-eval #nil environment]]]]] v #{
+25v load/forms v [source environment] v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [for-in [form source] [-> [macroexpand form environment] bytecompile assemble* [bytecode-eval environment]]]]] v #{
 15
 10s source
 0Es ΓεnΣym-99
 0D
 10s ΓεnΣym-99
-0Bo 74
+0Bo 73
 02i 0
 1B
 1C
 10s ΓεnΣym-99
-0Bo 60
+0Bo 59
 0D
 10s ΓεnΣym-99
 11
@@ -5185,14 +5325,13 @@
 08i 2 v macroexpand
 08i 1 v bytecompile
 08i 1 v assemble*
-24
 10s environment
-08i 3 v bytecode-eval
+08i 2 v bytecode-eval
 0D
 10s ΓεnΣym-99
 12
 0Fs ΓεnΣym-99
-09o -62
+09o -61
 09o 4
 24
 16
@@ -5462,23 +5601,22 @@
 10s ω
 0Es defobj
 0D
-25v eval-in v [closure expr] v #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [try display/error [-> [compile* expr closure] [bytecode-eval #nil closure]]]]] v #{
+25v eval-in v [closure expr] v #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [try display/error [-> [compile* expr closure] [bytecode-eval closure]]]]] v #{
 10s display/error
-19o 27
+19o 26
 10s expr
 10s closure
 08i 2 v compile*
-24
 10s closure
-08i 3 v bytecode-eval
+08i 2 v bytecode-eval
 16
 01
 }
 0Es eval-in
 0D
-25v eval-in/trace v [closure expr] v #@[documentation: "Compile and the immediatly evaluate the result\nmostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "mostly used by lRun()" [try display/error [def bc [compile* expr closure]] [println [str/write bc]] [bytecode-eval bc #nil closure]]]] v #{
+25v eval-in/trace v [closure expr] v #@[documentation: "Compile and the immediatly evaluate the result\nmostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "mostly used by lRun()" [try display/error [def bc [compile* expr closure]] [println [str/write bc]] [bytecode-eval bc closure]]]] v #{
 10s display/error
-19o 51
+19o 50
 10s expr
 10s closure
 08i 2 v compile*
@@ -5489,9 +5627,8 @@
 08i 1 v println
 0D
 10s bc
-24
 10s closure
-08i 3 v bytecode-eval
+08i 2 v bytecode-eval
 16
 01
 }
@@ -6547,57 +6684,62 @@
 0Es disassemble/test
 01
 }#{
-08i 0 v current-closure
-0Es macroexpand/environment
-0D
-25v macroexpand/do/args v [args] v #@[source: [[if [last? args] [cons [macroexpand* [car args]] #nil] [if [pair? [car args]] [let* [def ocar [macroexpand* [car args]]] [if [pair? ocar] [cons ocar [macroexpand/do/args [cdr args]]] [macroexpand/do/args [cdr args]]]] [macroexpand/do/args [cdr args]]]]]] v #{
+25v macroexpand/do/args v [args env] v #@[source: [[if [last? args] [cons [macroexpand* [car args] env] #nil] [if [pair? [car args]] [let* [def ocar [macroexpand* [car args] env]] [if [pair? ocar] [cons ocar [macroexpand/do/args [cdr args] env]] [macroexpand/do/args [cdr args] env]]] [macroexpand/do/args [cdr args] env]]]]] v #{
 10s args
-08i 1 v last?
-0Bo 18
+12
+08i 1 v nil?
+0Bo 22
 10s args
 11
-08i 1 v macroexpand*
+10s env
+08i 2 v macroexpand*
 24
 14
-09o 86
+09o 102
 10s args
 11
 08i 1 v pair?
-0Bo 63
+0Bo 75
 15
 10s args
 11
-08i 1 v macroexpand*
+10s env
+08i 2 v macroexpand*
 0Es ocar
 0D
 10s ocar
 08i 1 v pair?
-0Bo 21
+0Bo 25
 10s ocar
 10s args
 12
-08i 1 v macroexpand/do/args
+10s env
+08i 2 v macroexpand/do/args
 14
-09o 13
+09o 17
 10s args
 12
-08i 1 v macroexpand/do/args
+10s env
+08i 2 v macroexpand/do/args
 16
-09o 13
+09o 17
 10s args
 12
-08i 1 v macroexpand/do/args
+10s env
+08i 2 v macroexpand/do/args
 01
 }
 0Es macroexpand/do/args
 0D
-25v macroexpand/do v [source] v #@[source: [[def args [macroexpand/do/args source]] [if [last? args] [car args] [cons 'do args]]]] v #{
+25v macroexpand/do v [source env] v #@[source: [[def args [macroexpand/do/args source env]] [if [last? args] [car args] [cons 'do args]]]] v #{
 10s source
-08i 1 v macroexpand/do/args
+10s env
+08i 2 v macroexpand/do/args
 0Es args
 0D
 10s args
-08i 1 v last?
+12
+08i 1 v nil?
 0Bo 11
 10s args
 11
@@ -6609,139 +6751,73 @@
 }
 0Es macroexpand/do
 0D
-25v macroexpand/def v [source] v #@[source: [[when [cdddr source] [throw [list :arity-error "[def] can only have 2 arguments" source [current-lambda]]]] [list 'def [cadr source] [macroexpand* [caddr source]]]]] v #{
-10s source
-08i 1 v cdddr
-0Bo 33
-05v :arity-error
-05v "[def] can only have 2 arguments"
-10s source
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 4
+25v macroexpand/form v [source env op arity implicit-do? no-expand-bitmap] v #@[source: [[def ret [cons op #nil]] [def l [cdr source]] [for [i 0 arity] [set! ret [cons [if [bit-set? no-expand-bitmap i] [car l] [macroexpand* [car l] env]] ret]] [cdr! l]] [if implicit-do? [set! ret [cons [macroexpand/do l env] ret]] [when l [throw [list :arity-error [cat "form contains more than " arity " arguments"] source [current-lambda]]]]] [return [nreverse ret]]]] v #{
+10s op
 24
+14
+0Es ret
 0D
-23s def
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-08i 1 v macroexpand*
-08i 3 v list
-01
-}
-0Es macroexpand/def
-0D
-25v macroexpand/set! v [source] v #@[source: [[when [cdddr source] [throw [list :arity-error "[set!] can only have 2 arguments" source [current-lambda]]]] [list 'set! [cadr source] [macroexpand* [caddr source]]]]] v #{
-10s source
-08i 1 v cdddr
-0Bo 33
-05v :arity-error
-05v "[set!] can only have 2 arguments"
-10s source
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 4
-24
-0D
-23s set!
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-08i 1 v macroexpand*
-08i 3 v list
-01
-}
-0Es macroexpand/set!
-0D
-25v macroexpand/fn* v [source] v #@[source: [[when [cdddddr source] [throw [list :arity-error "[fn*] can only have 4 arguments" source [current-lambda]]]] [list 'fn* [cadr source] [caddr source] [cadddr source] [macroexpand [caddddr source]]]]] v #{
-10s source
-08i 1 v cdddddr
-0Bo 33
-05v :arity-error
-05v "[fn*] can only have 4 arguments"
-10s source
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 4
-24
-0D
-23s fn*
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-10s source
-08i 1 v cadddr
-10s source
-08i 1 v caddddr
-08i 1 v macroexpand
-08i 5 v list
-01
-}
-0Es macroexpand/fn*
-0D
-25v macroexpand/macro* v [source] v #@[source: [[when [cdddddr source] [throw [list :arity-error "[macro*] can only have 4 arguments" source [current-lambda]]]] [list 'macro* [cadr source] [caddr source] [cadddr source] [macroexpand [caddddr source]]]]] v #{
-10s source
-08i 1 v cdddddr
-0Bo 33
-05v :arity-error
-05v "[macro*] can only have 4 arguments"
-10s source
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 4
-24
-0D
-23s macro*
-10s source
-08i 1 v cadr
-10s source
-08i 1 v caddr
-10s source
-08i 1 v cadddr
-10s source
-08i 1 v caddddr
-08i 1 v macroexpand
-08i 5 v list
-01
-}
-0Es macroexpand/macro*
-0D
-25v macroexpand/ω* v [source] v #@[source: [[list 'ω* [macroexpand/do [cdr source]]]]] v #{
-23s ω*
 10s source
 12
-08i 1 v macroexpand/do
-08i 2 v list
-01
-}
-0Es macroexpand/ω*
+0Es l
 0D
-25v macroexpand/try v [source] v #@[source: [[list 'try [macroexpand* [cadr source]] [macroexpand/do [cddr source]]]]] v #{
-23s try
-10s source
-08i 1 v cadr
-08i 1 v macroexpand*
-10s source
-08i 1 v cddr
-08i 1 v macroexpand/do
-08i 3 v list
-01
-}
-0Es macroexpand/try
+15
+02i 0
+0Es i
 0D
-25v macroexpand/return v [source] v #@[source: [[when [cddr source] [throw [list :arity-error "[return] can only return a single value" source [current-lambda]]]] [list 'return [macroexpand* [cadr source]]]]] v #{
-10s source
-08i 1 v cddr
-0Bo 33
+10s arity
+0Es ΓεnΣym-115
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-115
+1E
+0Bo 76
+0D
+10s no-expand-bitmap
+10s i
+08i 2 v bit-set?
+0Bo 11
+10s l
+11
+09o 17
+10s l
+11
+10s env
+08i 2 v macroexpand*
+10s ret
+14
+0Fs ret
+0D
+10s l
+12
+0Fs l
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -83
+16
+0D
+10s implicit-do?
+0Bo 28
+10s l
+10s env
+08i 2 v macroexpand/do
+10s ret
+14
+0Fs ret
+09o 54
+10s l
+0Bo 46
 05v :arity-error
-05v "[return] can only return a single value"
+05v "form contains more than "
+10s arity
+05v " arguments"
+08i 3 v cat
 10s source
 08i 0 v current-lambda
 08i 4 v list
@@ -6749,129 +6825,65 @@
 09o 4
 24
 0D
-23s return
-10s source
-08i 1 v cadr
-08i 1 v macroexpand*
-08i 2 v list
+10s ret
+08i 1 v nreverse
+01
 01
 }
-0Es macroexpand/return
+0Es macroexpand/form
 0D
-25v macroexpand/if v [source] v #@[source: [[when [cddddr source] [throw [list :arity-error "[if] can only have 3 arguments" source [current-lambda]]]] [list 'if [macroexpand* [cadr source]] [macroexpand* [caddr source]] [macroexpand* [cadddr source]]]]] v #{
-10s source
-08i 1 v cddddr
-0Bo 33
-05v :arity-error
-05v "[if] can only have 3 arguments"
-10s source
-08i 0 v current-lambda
-08i 4 v list
-08i 1 v throw
-09o 4
-24
-0D
-23s if
-10s source
-08i 1 v cadr
-08i 1 v macroexpand*
-10s source
-08i 1 v caddr
-08i 1 v macroexpand*
-10s source
-08i 1 v cadddr
-08i 1 v macroexpand*
-08i 4 v list
-01
-}
-0Es macroexpand/if
-0D
-25v macroexpand/let* v [source] v #@[source: [[list 'let* [macroexpand/do [cdr source]]]]] v #{
-23s let*
+25v macroexpand/fold v [op source env] v #@[source: [[if [cdr source] [if [cddr source] [list op [macroexpand/fold op [except-last-pair source] env] [macroexpand* [car [last-pair source]] env]] [list op [macroexpand* [car source] env] [macroexpand* [cadr source] env]]] [list op [macroexpand* [car source] env]]]]] v #{
 10s source
 12
-08i 1 v macroexpand/do
-08i 2 v list
-01
-}
-0Es macroexpand/let*
-0D
-25v macroexpand/map v [source] v #@[source: [[map source macroexpand*]]] v #{
-10s source
-10s macroexpand*
-08i 2 v map
-01
-}
-0Es macroexpand/map
-0D
-25v macroexpand/while v [source] v #@[source: [[list 'while [macroexpand* [cadr source]] [macroexpand/do [cddr source]]]]] v #{
-23s while
-10s source
-08i 1 v cadr
-08i 1 v macroexpand*
-10s source
-08i 1 v cddr
-08i 1 v macroexpand/do
-08i 3 v list
-01
-}
-0Es macroexpand/while
-0D
-25v macroexpand/macro v [macro source] v #@[source: [[macroexpand* [macro-apply macro [cdr source]]]]] v #{
-10s macro
+0Bo 106
 10s source
 12
-08i 2 v macro-apply
-08i 1 v macroexpand*
-01
-}
-0Es macroexpand/macro
-0D
-25v macroexpand/fold v [op source] v #@[source: [[if [cdr source] [if [cddr source] [list op [macroexpand/fold op [except-last-pair source]] [macroexpand* [car [last-pair source]]]] [list op [macroexpand* [car source]] [macroexpand* [cadr source]]]] [list op [macroexpand* [car source]]]]]] v #{
-10s source
 12
-0Bo 96
-10s source
-08i 1 v cddr
-0Bo 48
+0Bo 56
 10s op
 10s op
 10s source
 08i 1 v except-last-pair
-08i 2 v macroexpand/fold
+10s env
+08i 3 v macroexpand/fold
 10s source
 08i 1 v last-pair
 11
-08i 1 v macroexpand*
+10s env
+08i 2 v macroexpand*
 08i 3 v list
-09o 36
+09o 41
 10s op
 10s source
 11
-08i 1 v macroexpand*
+10s env
+08i 2 v macroexpand*
 10s source
-08i 1 v cadr
-08i 1 v macroexpand*
+12
+11
+10s env
+08i 2 v macroexpand*
 08i 3 v list
-09o 22
+09o 26
 10s op
 10s source
 11
-08i 1 v macroexpand*
+10s env
+08i 2 v macroexpand*
 08i 2 v list
 01
 }
 0Es macroexpand/fold
 0D
-25v macroexpand* v [source] v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] macroexpand/environment] [resolve [car source] macroexpand/environment] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / %] [macroexpand/fold [car source] [cdr source]]] [do [macroexpand/do source]] [def [macroexpand/def source]] [set! [macroexpand/set! source]] [let* [macroexpand/let* source]] [fn* [macroexpand/fn* source]] [macro* [macroexpand/macro* source]] [environment* [macroexpand/ω* source]] [if [macroexpand/if source]] [try [macroexpand/try source]] [while [macroexpand/while source]] [return [macroexpand/return source]] 'source [otherwise [map source macroexpand*]]]] [:macro [macroexpand/macro op source]] [otherwise [map source macroexpand*]]]]] v #{
+25v macroexpand* v [source env] v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / %] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]] v #{
 10s source
 11
-10s macroexpand/environment
+10s env
 08i 2 v resolves?
 0Bo 20
 10s source
 11
-10s macroexpand/environment
+10s env
 08i 2 v resolve
 09o 8
 10s source
@@ -6881,177 +6893,230 @@
 15
 10s op
 08i 1 v type-of
-0Es ΓεnΣym-114
+0Es ΓεnΣym-116
 0D
-10s ΓεnΣym-114
+10s ΓεnΣym-116
 05v :nil
 20
 0Bo 10
 10s source
-09o 461
-10s ΓεnΣym-114
+09o 582
+10s ΓεnΣym-116
 05v :native-function
 20
-0Bo 408
+0Bo 510
 15
 10s op
-0Es ΓεnΣym-115
+0Es ΓεnΣym-117
 0D
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 10s +
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 10s -
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 10s *
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 10s /
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-115
+10s ΓεnΣym-117
 10s %
 20
 0C
 0Ao 8
 0D
 05v #f
-0Bo 21
-10s source
-11
+0Bo 20
+10s op
 10s source
 12
 08i 2 v macroexpand/fold
-09o 299
-10s ΓεnΣym-115
+09o 402
+10s ΓεnΣym-117
 10s do
 20
-0Bo 15
+0Bo 19
 10s source
-08i 1 v macroexpand/do
-09o 275
-10s ΓεnΣym-115
-10s def
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/def
-09o 251
-10s ΓεnΣym-115
-10s set!
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/set!
-09o 227
-10s ΓεnΣym-115
-10s let*
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/let*
-09o 203
-10s ΓεnΣym-115
-10s fn*
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/fn*
-09o 179
-10s ΓεnΣym-115
-10s macro*
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/macro*
-09o 155
-10s ΓεnΣym-115
-10s environment*
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/ω*
-09o 131
-10s ΓεnΣym-115
-10s if
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/if
-09o 107
-10s ΓεnΣym-115
-10s try
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/try
-09o 83
-10s ΓεnΣym-115
-10s while
-20
-0Bo 15
-10s source
-08i 1 v macroexpand/while
-09o 59
-10s ΓεnΣym-115
+10s env
+08i 2 v macroexpand/do
+09o 374
+10s ΓεnΣym-117
 10s return
 20
-0Bo 15
+0Bo 31
 10s source
-08i 1 v macroexpand/return
-09o 35
-10s ΓεnΣym-115
+10s env
+10s op
+02i 1
+05v #f
+02i 0
+08i 6 v macroexpand/form
+09o 334
+10s ΓεnΣym-117
+10s try
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-117
+10s while
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 31
+10s source
+10s env
+10s op
+02i 1
+05v #t
+02i 0
+08i 6 v macroexpand/form
+09o 271
+10s ΓεnΣym-117
+10s def
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-117
+10s set!
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 31
+10s source
+10s env
+10s op
+02i 2
+05v #f
+02i 1
+08i 6 v macroexpand/form
+09o 208
+10s ΓεnΣym-117
+10s if
+20
+0Bo 31
+10s source
+10s env
+10s op
+02i 3
+05v #f
+02i 0
+08i 6 v macroexpand/form
+09o 168
+10s ΓεnΣym-117
+10s fn*
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-117
+10s macro*
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 31
+10s source
+10s env
+10s op
+02i 4
+05v #t
+02i 7
+08i 6 v macroexpand/form
+09o 105
+10s ΓεnΣym-117
+10s let*
+20
+0C
+0Ao 22
+0D
+10s ΓεnΣym-117
+10s environment*
+20
+0C
+0Ao 8
+0D
+05v #f
+0Bo 29
+10s op
+10s source
+12
+10s env
+08i 2 v macroexpand/do
+08i 2 v list
+09o 44
+10s ΓεnΣym-117
 10s quote
 20
 0Bo 10
 10s source
-09o 16
+09o 25
 10s source
-10s macroexpand*
+25v 'anonymous v [α] v #@[source: [[macroexpand* α env]]] v #{
+10s α
+10s env
+08i 2 v macroexpand*
+01
+}
 08i 2 v map
 16
-09o 44
-10s ΓεnΣym-114
+09o 63
+10s ΓεnΣym-116
 05v :macro
 20
-0Bo 19
+0Bo 29
 10s op
 10s source
-08i 2 v macroexpand/macro
-09o 16
+12
+08i 2 v macro-apply
+10s env
+08i 2 v macroexpand*
+09o 25
 10s source
-10s macroexpand*
+25v 'anonymous v [α] v #@[source: [[macroexpand* α env]]] v #{
+10s α
+10s env
+08i 2 v macroexpand*
+01
+}
 08i 2 v map
 16
 01
 }
 0Es macroexpand*
 0D
-25v macroexpand v [source new-environment] v #@[documentation: "Macroexpand the forms in source" source: ["Macroexpand the forms in source" [when-not new-environment [set! new-environment [current-closure]]] [set! macroexpand/environment new-environment] [macroexpand* source]]] v #{
-10s new-environment
-0Bo 7
-24
-09o 12
-08i 0 v current-closure
-0Fs new-environment
-0D
-10s new-environment
-0Fs macroexpand/environment
-0D
+25v macroexpand v [source env] v #@[documentation: "Macroexpand the forms in source" source: ["Macroexpand the forms in source" [macroexpand* source [or env [current-closure]]]]] v #{
 10s source
-08i 1 v macroexpand*
+10s env
+0C
+0Ao 18
+0D
+08i 0 v current-closure
+0C
+0Ao 8
+0D
+05v #f
+08i 2 v macroexpand*
 01
 }
 0Es macroexpand
@@ -7085,17 +7150,17 @@
 0D
 15
 10s old
-0Es ΓεnΣym-118
+0Es ΓεnΣym-120
 0D
-10s ΓεnΣym-118
+10s ΓεnΣym-120
 0Bo 74
 02i 0
 1B
 1C
-10s ΓεnΣym-118
+10s ΓεnΣym-120
 0Bo 60
 0D
-10s ΓεnΣym-118
+10s ΓεnΣym-120
 11
 0Es cur
 0D
@@ -7112,9 +7177,9 @@
 14
 0Fs yield-queue
 0D
-10s ΓεnΣym-118
+10s ΓεnΣym-120
 12
-0Fs ΓεnΣym-118
+0Fs ΓεnΣym-120
 09o -62
 09o 4
 24
@@ -7168,17 +7233,17 @@
 15
 10s event
 08i 1 v tree/values
-0Es ΓεnΣym-119
+0Es ΓεnΣym-121
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 0Bo 51
 02i 0
 1B
 1C
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 0Bo 37
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 11
 0Es h
 0D
@@ -7186,9 +7251,9 @@
 10s val
 1Ai 1
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 12
-0Fs ΓεnΣym-119
+0Fs ΓεnΣym-121
 09o -39
 09o 4
 24
@@ -7200,17 +7265,23 @@
 }#{
 25v let/arg v [arg] v #@[source: [[when arg [when [or [not [pair? arg]] [not [symbol? [car arg]]]] [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]] [quasiquote [def [unquote [car arg]] [unquote [cadr arg]]]]]]] v #{
 10s arg
-0Bo 101
+0Bo 116
 10s arg
 08i 1 v pair?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
-0Ao 28
+0Ao 37
 0D
 10s arg
 11
 08i 1 v symbol?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
 0Ao 8
 0D
@@ -7228,7 +7299,8 @@
 10s arg
 11
 10s arg
-08i 1 v cadr
+12
+11
 24
 14
 14
@@ -7278,7 +7350,8 @@
 10s binding
 11
 10s binding
-08i 1 v cadr
+12
+11
 24
 14
 14
@@ -7361,7 +7434,7 @@
 }
 0Es cdr!
 0D
-25v not v [v] v #@[documentation: "Return true if V is false" source: ["Return true if V is false" [if v #f #t]]] v #{
+25v not v [v] v #@[documentation: "Return true if V is false" source: [:inline "Return true if V is false" [if v #f #t]] inline: #t] v #{
 10s v
 0Bo 10
 05v #f
@@ -7371,7 +7444,7 @@
 }
 0Es not
 0D
-25v identity v [α] v #@[documentation: "Returns its argument" source: ["Returns its argument" α]] v #{
+25v identity v [α] v #@[documentation: "Returns its argument" source: [:inline "Returns its argument" α] inline: #t] v #{
 10s α
 01
 }
@@ -7393,7 +7466,7 @@
 }
 0Es default
 0D
-25v caar v [p] v #@[documentation: "[car [car p]]" source: ["[car [car p]]" [car [car p]]]] v #{
+25v caar v [p] v #@[documentation: "[car [car p]]" source: [:inline "[car [car p]]" [car [car p]]] inline: #t] v #{
 10s p
 11
 11
@@ -7401,7 +7474,7 @@
 }
 0Es caar
 0D
-25v cadr v [p] v #@[documentation: "[car [cdr p]]" source: ["[car [cdr p]]" [car [cdr p]]]] v #{
+25v cadr v [p] v #@[documentation: "[car [cdr p]]" source: [:inline "[car [cdr p]]" [car [cdr p]]] inline: #t] v #{
 10s p
 12
 11
@@ -7409,7 +7482,7 @@
 }
 0Es cadr
 0D
-25v cdar v [p] v #@[documentation: "[cdr [car p]]" source: ["[cdr [car p]]" [cdr [car p]]]] v #{
+25v cdar v [p] v #@[documentation: "[cdr [car p]]" source: [:inline "[cdr [car p]]" [cdr [car p]]] inline: #t] v #{
 10s p
 11
 12
@@ -7417,7 +7490,7 @@
 }
 0Es cdar
 0D
-25v cddr v [p] v #@[documentation: "[cdr [cdr p]]" source: ["[cdr [cdr p]]" [cdr [cdr p]]]] v #{
+25v cddr v [p] v #@[documentation: "[cdr [cdr p]]" source: [:inline "[cdr [cdr p]]" [cdr [cdr p]]] inline: #t] v #{
 10s p
 12
 12
@@ -7628,63 +7701,75 @@
 0D
 25v case/clauses v [key-sym clauses] v #@[source: [[when clauses [if [== [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [== [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '== key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '== key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]]]] v #{
 10s clauses
-0Bo 229
+0Bo 197
 10s clauses
-08i 1 v caar
+11
+11
 23s otherwise
 20
-0Bo 20
+0Bo 17
 23s do
 10s clauses
-08i 1 v cdar
+11
+12
 14
-09o 192
+09o 166
 23s if
 10s clauses
-08i 1 v caar
+11
+11
 08i 1 v pair?
-0Bo 116
+0Bo 99
 10s clauses
-08i 1 v caar
+11
+11
 11
 23s quote
 20
 0C
-0Bo 43
+0Bo 35
 0D
 10s clauses
-08i 1 v caar
+11
+11
 12
-08i 1 v last?
+12
+08i 1 v nil?
 0C
-0Bo 23
+0Bo 17
 0D
 10s clauses
-08i 1 v caar
-08i 1 v cadr
+11
+11
+12
+11
 08i 1 v symbol?
-0Bo 28
+0Bo 25
 23s ==
 10s key-sym
 10s clauses
-08i 1 v caar
+11
+11
 08i 3 v list
-09o 26
+09o 23
 23s or
 10s key-sym
 10s clauses
-08i 1 v caar
+11
+11
 08i 2 v case/clauses/multiple
 14
-09o 25
+09o 22
 23s ==
 10s key-sym
 10s clauses
-08i 1 v caar
+11
+11
 08i 3 v list
 23s do
 10s clauses
-08i 1 v cdar
+11
+12
 14
 10s key-sym
 10s clauses
@@ -7717,17 +7802,20 @@
 26v cond v body v #@[documentation: "Contains multiple cond clauses" source: ["Contains multiple cond clauses" [when [and body [caar body]] [list 'if [caar body] [cons 'do [cdar body]] [macro-apply cond [cdr body]]]]]] v #{
 10s body
 0C
-0Bo 13
+0Bo 10
 0D
 10s body
-08i 1 v caar
-0Bo 52
+11
+11
+0Bo 46
 23s if
 10s body
-08i 1 v caar
+11
+11
 23s do
 10s body
-08i 1 v cdar
+11
+12
 14
 10s cond
 10s body
@@ -7746,7 +7834,8 @@
 0Es symbol-name
 0D
 10s for-loop
-08i 1 v cadr
+12
+11
 0Es loop-start
 0D
 10s for-loop
@@ -7864,7 +7953,8 @@
 23s let
 10s symbol-name
 10s for-loop
-08i 1 v cadr
+12
+11
 24
 14
 14
@@ -7912,19 +8002,21 @@
 0D
 25v thread/-> v [init fun] v #@[source: [[if-not fun init [if [pair? [car fun]] [quasiquote [[unquote [caar fun]] [unquote [thread/-> init [cdr fun]]] [unquote-splicing [cdar fun]]]] [list [car fun] [thread/-> init [cdr fun]]]]]]] v #{
 10s fun
-0Bo 86
+0Bo 80
 10s fun
 11
 08i 1 v pair?
-0Bo 46
+0Bo 40
 10s fun
-08i 1 v caar
+11
+11
 10s init
 10s fun
 12
 08i 2 v thread/->
 10s fun
-08i 1 v cdar
+11
+12
 24
 08i 2 v append
 14
@@ -8001,7 +8093,7 @@
 }
 0Es numeric?
 0D
-25v last? v [a] v #@[documentation: "Return #t if a is the last pair in a list" source: ["Return #t if a is the last pair in a list" [nil? [cdr a]]]] v #{
+25v last? v [a] v #@[documentation: "Return #t if a is the last pair in a list" source: [:inline "Return #t if a is the last pair in a list" [nil? [cdr a]]] inline: #t] v #{
 10s a
 12
 08i 1 v nil?
@@ -8009,42 +8101,24 @@
 }
 0Es last?
 0D
-25v pos? v [a] v #@[documentation: "Return #t if a is positive" source: ["Return #t if a is positive" [and [numeric? a] [>= [float a] 0.0]]]] v #{
+25v pos? v [a] v #@[documentation: "Return #t if a is positive" source: [:inline "Return #t if a is positive" [>= a 0.0]] inline: #t] v #{
 10s a
-08i 1 v numeric?
-0C
-0Bo 18
-0D
-10s a
-08i 1 v float
 05v 0.0
 21
 01
 }
 0Es pos?
 0D
-25v zero-neg? v [a] v #@[documentation: "Return #t if a is zero or negative" source: ["Return #t if a is zero or negative" [and [numeric? a] [<= [float a] 0.0]]]] v #{
+25v zero-neg? v [a] v #@[documentation: "Return #t if a is zero or negative" source: [:inline "Return #t if a is zero or negative" [<= a 0.0]] inline: #t] v #{
 10s a
-08i 1 v numeric?
-0C
-0Bo 18
-0D
-10s a
-08i 1 v float
 05v 0.0
 1F
 01
 }
 0Es zero-neg?
 0D
-25v neg? v [a] v #@[documentation: "Returns #t if a is negative" source: ["Returns #t if a is negative" [and [numeric? a] [< [float a] 0.0]]]] v #{
+25v neg? v [a] v #@[documentation: "Returns #t if a is negative" source: [:inline "Returns #t if a is negative" [< a 0.0]] inline: #t] v #{
 10s a
-08i 1 v numeric?
-0C
-0Bo 18
-0D
-10s a
-08i 1 v float
 05v 0.0
 1E
 01
@@ -8081,7 +8155,7 @@
 }
 0Es zero?
 0D
-25v not-zero? v [val] v #@[documentation: "#t if VAL is not zero" source: ["#t if VAL is not zero" [!= 0 val]]] v #{
+25v not-zero? v [val] v #@[documentation: "#t if VAL is not zero" source: [:inline "#t if VAL is not zero" [!= 0 val]] inline: #t] v #{
 02i 0
 10s val
 08i 2 v !=
@@ -8103,9 +8177,9 @@
 09o 107
 15
 10s cur-type
-0Es ΓεnΣym-121
+0Es ΓεnΣym-123
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :array
 20
 0Bo 19
@@ -8113,7 +8187,7 @@
 10s b
 08i 2 v array/equal?
 09o 68
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :tree
 20
 0Bo 19
@@ -8121,7 +8195,7 @@
 10s b
 08i 2 v tree/equal?
 09o 40
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :pair
 20
 0Bo 19
@@ -8141,7 +8215,10 @@
 10s a
 10s b
 08i 2 v equal?
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 01
 }
 0Es inequal?
@@ -8321,73 +8398,82 @@
 08i 1 v nil?
 0Bo 7
 24
-09o 372
+09o 346
 10s l
 08i 1 v pair?
-0Bo 313
+0Bo 289
 10s l
-08i 1 v caar
+11
+11
 23s unquote-splicing
 20
-0Bo 88
+0Bo 80
+02i 0
 10s depth
-08i 1 v zero?
-0Bo 39
+20
+0Bo 36
 23s append
 10s l
 11
-08i 1 v cadr
+12
+11
 10s l
 12
 10s depth
 08i 2 v quasiquote-real
 08i 3 v list
-09o 37
+09o 34
 23s unquote-splicing
 10s l
-08i 1 v cadr
+12
+11
 02i -1
 10s depth
 08i 2 v +
 08i 2 v quasiquote-real
 08i 2 v list
-09o 208
+09o 195
 10s l
 11
 23s unquote
 20
-0Bo 64
+0Bo 56
+02i 0
 10s depth
-08i 1 v zero?
-0Bo 15
+20
+0Bo 12
 10s l
-08i 1 v cadr
-09o 37
+12
+11
+09o 34
 23s unquote
 10s l
-08i 1 v cadr
+12
+11
 02i -1
 10s depth
 08i 2 v +
 08i 2 v quasiquote-real
 08i 2 v list
-09o 134
+09o 129
 10s l
 11
 23s quasiquote
 20
-0Bo 40
+0Bo 37
 10s l
-08i 1 v cadr
+12
+11
 02i 1
 10s depth
 08i 2 v +
 08i 2 v quasiquote-real
 10s depth
 08i 2 v quasiquote-real
-09o 84
+09o 82
+02i 0
 10s depth
-08i 1 v zero?
+20
 0Bo 43
 23s cons
 10s l
@@ -8409,9 +8495,10 @@
 10s depth
 08i 2 v quasiquote-real
 14
-09o 50
+09o 48
+02i 0
 10s depth
-08i 1 v zero?
+20
 0C
 0Bo 13
 0D
@@ -8546,7 +8633,7 @@
 08i 0 v current-lambda
 08i 1 v closure/caller
 08i 1 v describe/closure
-08i 1 v display
+08i 1 v print
 01
 }
 0Es stacktrace
@@ -8615,7 +8702,7 @@
 05v "\n"
 08i 2 v ansi-red
 08i 6 v cat
-08i 1 v display
+08i 1 v print
 01
 }
 0Es profile-form
@@ -8624,7 +8711,8 @@
 23s profile-form
 23s quote
 10s body
-08i 1 v last?
+12
+08i 1 v nil?
 0Bo 11
 10s body
 11
@@ -8656,13 +8744,13 @@
 0D
 10s data
 08i 1 v string/length
-0Es ΓεnΣym-123
+0Es ΓεnΣym-125
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-123
+10s ΓεnΣym-125
 1E
 0Bo 73
 0D
@@ -8821,23 +8909,23 @@
 25v display/error/wrap v [i text] v #@[source: [[case i [0 [ansi-red text]] [1 [string text]] [2 [ansi-yellow [str/write text]]] [3 [describe/closure text]] [otherwise text]]]] v #{
 15
 10s i
-0Es ΓεnΣym-125
+0Es ΓεnΣym-127
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 0
 20
 0Bo 15
 10s text
 08i 1 v ansi-red
 09o 78
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 1
 20
 0Bo 15
 10s text
 08i 1 v string
 09o 56
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 2
 20
 0Bo 20
@@ -8845,7 +8933,7 @@
 08i 1 v str/write
 08i 1 v ansi-yellow
 09o 29
-10s ΓεnΣym-125
+10s ΓεnΣym-127
 02i 3
 20
 0Bo 15
@@ -8886,7 +8974,7 @@
 08i 2 v display/error/iter
 05v "\r\n"
 08i 2 v join
-08i 1 v display
+08i 1 v print
 01
 }
 0Es display/error
@@ -9099,21 +9187,21 @@
 15
 10s v
 08i 1 v type-of
-0Es ΓεnΣym-127
+0Es ΓεnΣym-129
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :nil
 20
 0Bo 10
 05v "null"
 09o 305
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :int
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :float
 20
 0C
@@ -9124,7 +9212,7 @@
 10s v
 08i 1 v string
 09o 258
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :bool
 20
 0Bo 24
@@ -9134,13 +9222,13 @@
 09o 7
 05v "false"
 09o 225
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :pair
 20
 0C
@@ -9157,14 +9245,14 @@
 05v "]"
 08i 3 v cat
 09o 152
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :string
 20
 0Bo 15
 10s v
 08i 1 v str/write
 09o 128
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :symbol
 20
 0Bo 28
@@ -9174,7 +9262,7 @@
 05v "\""
 08i 3 v cat
 09o 91
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :keyword
 20
 0Bo 28
@@ -9184,7 +9272,7 @@
 05v "\""
 08i 3 v cat
 09o 54
-10s ΓεnΣym-127
+10s ΓεnΣym-129
 05v :tree
 20
 0Bo 15
@@ -9455,11 +9543,12 @@
 0D
 10s ansi/disabled
 0C
-0Ao 50
+0Ao 48
 0D
 10s ansi-fg
+02i 0
 10s count
-08i 1 v zero?
+20
 0Bo 8
 02i 7
 09o 14
@@ -9574,13 +9663,13 @@
 0Es i
 0D
 10s width
-0Es ΓεnΣym-129
+0Es ΓεnΣym-131
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-129
+10s ΓεnΣym-131
 1E
 0Bo 28
 0D
@@ -9651,9 +9740,10 @@
 0Es fmt/find-non-digit-from-right
 0D
 25v fmt/parse-spec v [opts spec] v #@[source: [[if [zero? [string/length spec]] opts [case [char-at spec [- [string/length spec] 1]] [[48 49 50 51 52 53 54 55 56 57] [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]] [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]] [tree/set! opts :width [read/single number]] [when [== 48 [char-at number 0]] [tree/set! opts :padding-char "0"]] [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]] [63 [fmt/parse-spec [tree/set! opts :debug #t] [string/cut spec 0 [- [string/length spec] 1]]]] [88 [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL] [string/cut spec 0 [- [string/length spec] 1]]]] [120 [fmt/parse-spec [tree/set! opts :base :hexadecimal] [string/cut spec 0 [- [string/length spec] 1]]]] [100 [fmt/parse-spec [tree/set! opts :base :decimal] [string/cut spec 0 [- [string/length spec] 1]]]] [111 [fmt/parse-spec [tree/set! opts :base :octal] [string/cut spec 0 [- [string/length spec] 1]]]] [98 [fmt/parse-spec [tree/set! opts :base :binary] [string/cut spec 0 [- [string/length spec] 1]]]] [60 [fmt/parse-spec [tree/set! opts :align :left] [string/cut spec 0 [- [string/length spec] 1]]]] [94 [fmt/parse-spec [tree/set! opts :align :center] [string/cut spec 0 [- [string/length spec] 1]]]] [62 [fmt/parse-spec [tree/set! opts :align :right] [string/cut spec 0 [- [string/length spec] 1]]]] [46 [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]] [string/cut spec 0 [- [string/length spec] 1]]]] [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]] v #{
+02i 0
 10s spec
 08i 1 v string/length
-08i 1 v zero?
+20
 0Bo 10
 10s opts
 09o 978
@@ -9664,63 +9754,63 @@
 02i 1
 08i 2 v -
 08i 2 v char-at
-0Es ΓεnΣym-138
+0Es ΓεnΣym-140
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 57
 20
 0C
@@ -9773,7 +9863,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 659
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 63
 20
 0Bo 55
@@ -9790,7 +9880,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 597
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 88
 20
 0Bo 55
@@ -9807,7 +9897,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 535
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 120
 20
 0Bo 55
@@ -9824,7 +9914,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 473
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 100
 20
 0Bo 55
@@ -9841,7 +9931,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 411
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 111
 20
 0Bo 55
@@ -9858,7 +9948,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 349
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 98
 20
 0Bo 55
@@ -9875,7 +9965,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 287
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 60
 20
 0Bo 55
@@ -9892,7 +9982,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 225
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 94
 20
 0Bo 55
@@ -9909,7 +9999,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 163
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 62
 20
 0Bo 55
@@ -9926,7 +10016,7 @@
 08i 3 v string/cut
 08i 2 v fmt/parse-spec
 09o 101
-10s ΓεnΣym-138
+10s ΓεnΣym-140
 02i 46
 20
 0Bo 64
@@ -9980,9 +10070,9 @@
 10s opts
 05v :base
 08i 2 v tree/ref
-0Es ΓεnΣym-139
+0Es ΓεnΣym-141
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 05v :binary
 20
 0Bo 41
@@ -9995,7 +10085,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 207
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 05v :octal
 20
 0Bo 41
@@ -10008,7 +10098,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 157
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 05v :decimal
 20
 0Bo 41
@@ -10021,7 +10111,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 107
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 05v :hexadecimal
 20
 0Bo 41
@@ -10034,7 +10124,7 @@
 08i 2 v list
 08i 3 v tree/set!
 09o 57
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 05v :HEXADECIMAL
 20
 0Bo 41
@@ -10070,14 +10160,20 @@
 10s opts
 05v :debug
 08i 2 v tree/ref
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
-0Ao 31
+0Ao 40
 0D
 10s opts
 05v :base
 08i 2 v tree/ref
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0C
 0Ao 8
 0D
@@ -10124,21 +10220,21 @@
 10s opts
 05v :align
 08i 2 v tree/ref
-0Es ΓεnΣym-140
+0Es ΓεnΣym-142
 0D
-10s ΓεnΣym-140
+10s ΓεnΣym-142
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-140
+10s ΓεnΣym-142
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-140
+10s ΓεnΣym-142
 05v :left
 20
 0Bo 10
@@ -10273,9 +10369,9 @@
 15
 10s v
 08i 1 v type-of
-0Es ΓεnΣym-141
+0Es ΓεnΣym-143
 0D
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :int
 20
 0Bo 29
@@ -10285,13 +10381,13 @@
 08i 2 v cat
 08i 1 v fmt/arg-sym
 09o 73
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :symbol
 20
 0Bo 10
 10s v
 09o 54
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :string
 20
 0Bo 15
@@ -10332,7 +10428,8 @@
 0Es argument
 0D
 10s split-expr
-08i 1 v cadr
+12
+11
 0C
 0Ao 17
 0D
@@ -10467,13 +10564,13 @@
 0D
 10s format-string
 08i 1 v string/length
-0Es ΓεnΣym-142
+0Es ΓεnΣym-144
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-142
+10s ΓεnΣym-144
 1E
 0Bo 189
 0D
@@ -10481,9 +10578,9 @@
 10s format-string
 10s i
 08i 2 v char-at
-0Es ΓεnΣym-143
+0Es ΓεnΣym-145
 0D
-10s ΓεnΣym-143
+10s ΓεnΣym-145
 02i 123
 20
 0Bo 64
@@ -10505,7 +10602,7 @@
 14
 0Fs cuts
 09o 82
-10s ΓεnΣym-143
+10s ΓεnΣym-145
 02i 125
 20
 0Bo 71
@@ -10576,17 +10673,17 @@
 0D
 15
 10s cuts
-0Es ΓεnΣym-144
+0Es ΓεnΣym-146
 0D
-10s ΓεnΣym-144
+10s ΓεnΣym-146
 0Bo 168
 02i 0
 1B
 1C
-10s ΓεnΣym-144
+10s ΓεnΣym-146
 0Bo 154
 0D
-10s ΓεnΣym-144
+10s ΓεnΣym-146
 11
 0Es c
 0D
@@ -10632,9 +10729,9 @@
 11
 0Fs last-pos
 0D
-10s ΓεnΣym-144
+10s ΓεnΣym-146
 12
-0Fs ΓεnΣym-144
+0Fs ΓεnΣym-146
 09o -156
 09o 4
 24
@@ -10663,13 +10760,13 @@
 0D
 10s arguments-used
 08i 1 v array/length
-0Es ΓεnΣym-145
+0Es ΓεnΣym-147
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-145
+10s ΓεnΣym-147
 1E
 0Bo 84
 0D
@@ -10822,7 +10919,7 @@
 0Es efmtln
 01
 }#{
-25v string->keyword v [α] v #@[documentation: "Return string α as a keyword" source: ["Return string α as a keyword" [symbol->keyword [str->sym α]]]] v #{
+25v string->keyword v [α] v #@[documentation: "Return string α as a keyword" source: [:inline "Return string α as a keyword" [symbol->keyword [str->sym α]]] inline: #t] v #{
 10s α
 08i 1 v str->sym
 08i 1 v symbol->keyword
@@ -10842,13 +10939,13 @@
 0D
 10s a
 08i 1 v string/length
-0Es ΓεnΣym-149
+0Es ΓεnΣym-151
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-149
+10s ΓεnΣym-151
 1E
 0Bo 45
 0D
@@ -10889,7 +10986,7 @@
 }
 0Es errorln
 0D
-25v display v [value] v #@[documentation: "Display VALUE" source: ["Display VALUE" [print value]]] v #{
+25v display v [value] v #@[documentation: "Display VALUE" source: [:inline "Display VALUE" [print value]] inline: #t] v #{
 10s value
 08i 1 v print
 01
@@ -10898,7 +10995,7 @@
 0D
 25v newline v [] v #@[documentation: "Print a single line feed character" source: ["Print a single line feed character" [display "\r\n"]]] v #{
 05v "\r\n"
-08i 1 v display
+08i 1 v print
 01
 }
 0Es newline
@@ -10934,9 +11031,9 @@
 15
 10s ext
 08i 1 v type-of
-0Es ΓεnΣym-150
+0Es ΓεnΣym-152
 0D
-10s ΓεnΣym-150
+10s ΓεnΣym-152
 05v :string
 20
 0Bo 19
@@ -10949,7 +11046,7 @@
 01
 }
 09o 53
-10s ΓεnΣym-150
+10s ΓεnΣym-152
 05v :pair
 20
 0Bo 19
@@ -11042,8 +11139,9 @@
 02i 0
 0Es α
 0D
+02i 0
 10s α
-08i 1 v zero?
+20
 0Bo 14
 05v "0"
 0Fs ret
@@ -11053,8 +11151,9 @@
 02i 0
 1B
 1C
+02i 0
 10s α
-08i 1 v not-zero?
+08i 2 v !=
 0Bo 59
 0D
 02i 48
@@ -11071,7 +11170,7 @@
 02i -1
 08i 2 v ash
 0Fs α
-09o -66
+09o -68
 0D
 10s ret
 01
@@ -11089,8 +11188,9 @@
 02i 0
 0Es α
 0D
+02i 0
 10s α
-08i 1 v zero?
+20
 0Bo 14
 05v "0"
 0Fs ret
@@ -11100,8 +11200,9 @@
 02i 0
 1B
 1C
+02i 0
 10s α
-08i 1 v not-zero?
+08i 2 v !=
 0Bo 59
 0D
 02i 48
@@ -11118,7 +11219,7 @@
 02i -3
 08i 2 v ash
 0Fs α
-09o -66
+09o -68
 0D
 10s ret
 01
@@ -11155,8 +11256,9 @@
 02i 0
 0Es α
 0D
+02i 0
 10s α
-08i 1 v zero?
+20
 0Bo 14
 05v "0"
 0Fs ret
@@ -11179,8 +11281,9 @@
 02i 0
 1B
 1C
+02i 0
 10s α
-08i 1 v not-zero?
+08i 2 v !=
 0Bo 56
 0D
 10s int->string/hex/conversion-arr
@@ -11196,7 +11299,7 @@
 02i -4
 08i 2 v ash
 0Fs α
-09o -63
+09o -65
 0D
 10s ret
 01
@@ -11562,9 +11665,9 @@
 15
 10s separator
 08i 1 v string/length
-0Es ΓεnΣym-151
+0Es ΓεnΣym-153
 0D
-10s ΓεnΣym-151
+10s ΓεnΣym-153
 02i 0
 20
 0Bo 15
@@ -11743,8 +11846,9 @@
 08i 0 v random/seed-initialize!
 0D
 15
+02i 0
 10s error-count
-08i 1 v zero?
+20
 0C
 0Bo 11
 0D
@@ -11770,8 +11874,9 @@
 08i 2 v -
 0Es fmt-arg-3
 0D
+02i 0
 10s error-count
-08i 1 v zero?
+20
 0C
 0Bo 11
 0D
@@ -11941,17 +12046,17 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-153
+0Es ΓεnΣym-155
 0D
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 0Bo 72
 02i 0
 1B
 1C
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 0Bo 58
 0D
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 11
 0Es cur-test
 0D
@@ -11966,9 +12071,9 @@
 0Fs i
 1Ai 3
 0D
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 12
-0Fs ΓεnΣym-153
+0Fs ΓεnΣym-155
 09o -60
 09o 4
 24
@@ -11984,7 +12089,10 @@
 25v test-run v [output-passes hide-errors] v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [test-run-real test-default]]] v #{
 10s hide-errors
 08i 1 v bool
-08i 1 v not
+0Bo 10
+05v #f
+09o 7
+05v #t
 0Fs print-errors
 0D
 10s output-passes

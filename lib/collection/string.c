@@ -1,8 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "string.h"
-#include "list.h"
-#include "../display.h"
 #include "../misc/pf.h"
 
 #include <stdlib.h>
@@ -14,7 +12,7 @@ lString *lStringNew(const char *str, uint len){
 	lString *s = lStringAlloc();
 	char *nbuf = malloc(len+1);
 	if(nbuf == NULL){
-		lPrintError("lStringNew OOM");
+		fpf(stderr,"lStringNew OOM");
 	}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
@@ -26,7 +24,7 @@ lString *lStringNew(const char *str, uint len){
 
 /* Create a new string containing a direct reference to STR, STR will be
  * freed by the GC if it ever goes out of scope */
-lString *lStringNewNoCopy(const char *str, uint len){
+static lString *lStringNewNoCopy(const char *str, uint len){
 	if(str == NULL){return NULL;}
 	lString *s = lStringAlloc();
 	s->buf    = s->data = str;

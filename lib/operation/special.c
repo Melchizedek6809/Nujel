@@ -1,8 +1,5 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../exception.h"
-#include "../type/val.h"
 #include "../type/closure.h"
 
 char *errorSym = "vm-error";
@@ -26,7 +23,6 @@ lVMErrorPlaceholder(lnfLetRaw)
 lVMErrorPlaceholder(lnfLambdaBytecodeAst)
 lVMErrorPlaceholder(lnfMacroBytecodeAst)
 lVMErrorPlaceholder(lnfObjectAst)
-
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",               "body",                    "Evaluate body in order and returns the last result", lnfDo);

@@ -1,5 +1,5 @@
-include mk/common.mk
 include mk/ansi_colors.mk
+include mk/common.mk
 include mk/disable_implicit_rules.mk
 
 LIB_SRCS      := $(shell find lib -type f -name '*.c')
@@ -47,6 +47,8 @@ BIN_WASM_DEPS := $(BIN_SRCS:.c=.wd)
 
 all: $(NUJEL)
 .PHONY: all release release.musl
+.PHONY: rund runn install install.musl profile web
+.PHONY: test.bootstrap check test test.verbose test.debug test.slow test.slow.debug test.ridiculous
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(LIB_DEPS)
@@ -59,25 +61,8 @@ ifdef EMSDK
 all: nujel.wa
 endif
 
-.PHONY: clean
-clean:
-	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.o')
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.obj')
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wo')
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.d')
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.wd')
-	@rm -f -- $(shell find bin lib vendor bootstrap -type f -name '*.deps')
-	@rm -f -- $(shell find binlib stdlib -type f -name '*.no')
-	@rm -f ./callgrind.out.*
-	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
-	@rm -f ./bootstrap/*.h ./bootstrap/*.c
-	@rm -rf tmp
-	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
-
-.PHONY: distclean
-distclean:
-	@rm -rf tools/emsdk
+FILES_TO_CLEAN := $(shell find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
+NOBS_TO_CLEAN  := $(shell find binlib stdlib -type f -name '*.no')
 
 %.o: %.c
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
@@ -126,130 +111,8 @@ release.san: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
-	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
-
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
 	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@
 
-release.wasm: web/index.html
-
-bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
-	@./$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-
-bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
-	@./$(ASSET) bootstrap/binlib bootstrap/binlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-
-tmp/stdlib.no: $(STDLIB_NUJS) $(BINLIB_NUJS) $(NUJEL_BOOTSTRAP)
-	@mkdir -p tmp/
-	@./$(NUJEL_BOOTSTRAP) tools/bootstrap.nuj
-	@cat $(STDLIB_NOBS) > tmp/stdlib.no
-	@cat $(BINLIB_NOBS) > tmp/binlib.no
-	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
-	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
-
-tmp/binlib.no: tmp/stdlib.no
-	@true
-
-tmp/stdlib.c: tmp/stdlib.no $(ASSET)
-	@mkdir -p tmp/
-	@./$(ASSET) tmp/stdlib tmp/stdlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-tmp/stdlib.h: tmp/stdlib.c
-	@true
-
-tmp/binlib.c: tmp/binlib.no $(ASSET)
-	@mkdir -p tmp/
-	@./$(ASSET) tmp/binlib tmp/binlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-tmp/binlib.h: tmp/binlib.c
-	@true
-
-.PHONY: test
-test: $(NUJEL)
-	@./$(NUJEL) tools/tests.nuj
-
-.PHONY: test.verbose
-test.v: $(NUJEL)
-	@./$(NUJEL) -v tools/tests.nuj
-
-.PHONY: test.verbose
-test.verbose: $(NUJEL)
-	@./$(NUJEL) --verbose --only-test-suite tools/tests.nuj
-
-.PHONY: check
-check: test
-
-.PHONY: test.bootstrap
-test.bootstrap: $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
-
-.PHONY: test.slow
-test.slow: $(NUJEL)
-	@./$(NUJEL) --slow-test tools/tests.nuj
-
-.PHONY: test.debug
-test.debug: $(NUJEL)
-	@gdb ./$(NUJEL) -ex "r tools/tests.nuj"
-
-.PHONY: test.slow.debug
-test.slow.debug: $(NUJEL)
-	@gdb ./$(NUJEL) -ex "r --slow-test tools/tests.nuj"
-
-.PHONY: test.ridiculous
-test.ridiculous: $(NUJEL)
-	@./$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
-
-.PHONY: run
-run: $(NUJEL)
-	@./$(NUJEL) --only-test-suite tools/tests.nuj
-
-.PHONY: rund
-rund: $(NUJEL)
-	gdb ./$(NUJEL) -ex "r"
-
-.PHONY: runn
-runn: $(NUJEL)
-	rlwrap ./$(NUJEL)
-
-.PHONY: install
-install: release
-	mkdir -p $(bindir)
-	$(INSTALL) $(NUJEL) $(bindir)
-
-.PHONY: install.musl
-install.musl: release.musl
-	mkdir -p $(bindir)
-	$(INSTALL) $(NUJEL) $(bindir)
-
-.PHONY: profile
-profile: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) --only-test-suite tools/tests.nuj
-
-.PHONY: profile-while
-profile-while: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) -x "[display [let* [def v 0] [while [< v 2,000,000] [set! v [+ 1 v]]] v]]"
-
-.PHONY: web
-web:
-	./tools/buildwasm
-	rsync -avhe ssh --delete ./web/ wolkenwelten.net:/home/nujel/nujel/
-
-benchmark: release
-	cp -f $(NUJEL) ~/bin/
-	./$(NUJEL) ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
-
-benchmark-nujel: release
-	cp -f $(NUJEL) ~/bin/
-	./$(NUJEL) --no-overwrite --only-nujel ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
-
-benchmark-trigger-remote:
-	ssh wolkenwelten.net "nohup ./benchmark.sh &"
-
-update-bootstrap: tmp/stdlib.no tmp/binlib.no
-	cp -f tmp/stdlib.no bootstrap/stdlib.no
-	cp -f tmp/binlib.no bootstrap/binlib.no
-	sed -i 's/\[def test-context \"Nujel Standalone\"\]/\[def test-context \"Nujel Bootstrap\"\]/g' bootstrap/binlib.no
+include mk/targets.mk

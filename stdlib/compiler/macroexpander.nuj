@@ -3,119 +3,71 @@
 ;;
 ;; Contains the Nujel macroexpander
 
-[def macroexpand/environment [current-closure]]
-
 ;; Expands a do for, leaving out sub-expressions in the middle that are without
 ;; side effects, which is simplified to mean anything that is not a pair.
-[defn macroexpand/do/args [args]
+[defn macroexpand/do/args [args env]
   [if [last? args]
-      [cons [macroexpand* [car args]] #nil]
+      [cons [macroexpand* [car args] env] #nil]
       [if [pair? [car args]]
-          [let* [def ocar [macroexpand* [car args]]]
+          [let* [def ocar [macroexpand* [car args] env]]
             [if [pair? ocar]
-                [cons ocar [macroexpand/do/args [cdr args]]]
-                [macroexpand/do/args [cdr args]]]]
-          [macroexpand/do/args [cdr args]]]]]
+                [cons ocar [macroexpand/do/args [cdr args] env]]
+                [macroexpand/do/args [cdr args] env]]]
+          [macroexpand/do/args [cdr args] env]]]]
 
-[defn macroexpand/do [source]
-  [def args [macroexpand/do/args source]]
+[defn macroexpand/do [source env]
+  [def args [macroexpand/do/args source env]]
   [if [last? args]
       [car args]
       [cons 'do args]]]
 
-[defn macroexpand/def [source]
-  [when [cdddr source] [throw [list :arity-error "[def] can only have 2 arguments" source [current-lambda]]]]
-  [list 'def [cadr source] [macroexpand* [caddr source]]]]
+[defn macroexpand/form [source env op arity implicit-do? no-expand-bitmap]
+  [def ret [cons op #nil]]
+  [def l [cdr source]]
+  [for [i 0 arity]
+    [set! ret [cons [if [bit-set? no-expand-bitmap i]
+                        [car l]
+                        [macroexpand* [car l] env]]
+                    ret]]
+    [cdr! l]]
+  [if implicit-do?
+      [set! ret [cons [macroexpand/do l env] ret]]
+      [when l [throw [list :arity-error [cat "form contains more than " arity " arguments"] source [current-lambda]]]]]
+  [return [nreverse ret]]]
 
-[defn macroexpand/set! [source]
-  [when [cdddr source] [throw [list :arity-error "[set!] can only have 2 arguments" source [current-lambda]]]]
-  [list 'set! [cadr source] [macroexpand* [caddr source]]]]
-
-[defn macroexpand/fn* [source]
-  [when [cdddddr source] [throw [list :arity-error "[fn*] can only have 4 arguments" source [current-lambda]]]]
-  [list 'fn*
-        [cadr source]
-        [caddr source]
-        [cadddr source]
-        [macroexpand [caddddr source]]]]
-
-[defn macroexpand/macro* [source]
-  [when [cdddddr source] [throw [list :arity-error "[macro*] can only have 4 arguments" source [current-lambda]]]]
-  [list 'macro*
-        [cadr source]
-        [caddr source]
-        [cadddr source]
-        [macroexpand [caddddr source]]]]
-
-[defn macroexpand/ω* [source]
-  [list 'ω* [macroexpand/do [cdr source]]]]
-
-[defn macroexpand/try [source]
-  [list 'try [macroexpand* [cadr source]] [macroexpand/do [cddr source]]]]
-
-[defn macroexpand/return [source]
-  [when [cddr source] [throw [list :arity-error "[return] can only return a single value" source [current-lambda]]]]
-  [list 'return [macroexpand* [cadr source]]]]
-
-[defn macroexpand/if [source]
-  [when [cddddr source] [throw [list :arity-error "[if] can only have 3 arguments" source [current-lambda]]]]
-  [list 'if
-        [macroexpand* [cadr source]]
-        [macroexpand* [caddr source]]
-        [macroexpand* [cadddr source]]]]
-
-[defn macroexpand/let* [source]
-  [list 'let* [macroexpand/do [cdr source]]]]
-
-[defn macroexpand/map [source]
-  [map source macroexpand*]]
-
-[defn macroexpand/while [source]
-  [list 'while [macroexpand* [cadr source]] [macroexpand/do [cddr source]]]]
-
-[defn macroexpand/macro [macro source]
-  [macroexpand* [macro-apply macro [cdr source]]]]
-
-[defn macroexpand/fold [op source]
+[defn macroexpand/fold [op source env]
   [if [cdr source]
       [if [cddr source]
           [list op
-                [macroexpand/fold op [except-last-pair source]]
-                [macroexpand* [car [last-pair source]]]]
+                [macroexpand/fold op [except-last-pair source] env]
+                [macroexpand* [car [last-pair source]] env]]
           [list op
-                [macroexpand* [car source]]
-                [macroexpand* [cadr source]]]]
-      [list op [macroexpand* [car source]]]]]
+                [macroexpand* [car source] env]
+                [macroexpand* [cadr source] env]]]
+      [list op [macroexpand* [car source] env]]]]
 
-[defn macroexpand* [source]
+[defn macroexpand* [source env]
   "Expand all macros within source"
-  [def op [if [resolves? [car source] macroexpand/environment]
-              [resolve [car source] macroexpand/environment]
+  [def op [if [resolves? [car source] env]
+              [resolve   [car source] env]
               [car source]]]
-
   [case [type-of op]
     [:nil source]
     [:native-function
      [case op
-       [[+ - * / %] [macroexpand/fold [car source] [cdr source]]]
-       [do     [macroexpand/do     source]]
-       [def    [macroexpand/def    source]]
-       [set!   [macroexpand/set!   source]]
-       [let*   [macroexpand/let*   source]]
-       [fn*    [macroexpand/fn*    source]]
-       [macro* [macroexpand/macro* source]]
-       [environment* [macroexpand/ω* source]]
-       [if     [macroexpand/if     source]]
-       [try    [macroexpand/try    source]]
-       [while  [macroexpand/while  source]]
-       [return [macroexpand/return source]]
-       [quote                  source ]
-       [otherwise [map source macroexpand*]]]]
-    [:macro                      [macroexpand/macro      op  source]]
-    [otherwise                   [map source macroexpand*]]]]
+       [[+ - * / %]         [macroexpand/fold op [cdr source]]]
+       [do                  [macroexpand/do   source env]]
+       [return              [macroexpand/form source env op 1 #f #b0]]
+       [[try while]         [macroexpand/form source env op 1 #t #b0]]
+       [[def set!]          [macroexpand/form source env op 2 #f #b01]]
+       [if                  [macroexpand/form source env op 3 #f #b0]]
+       [[fn* macro*]        [macroexpand/form source env op 4 #t #b0111]]
+       [[let* environment*] [list op [macroexpand/do [cdr source] env]]]
+       [quote source]
+       [otherwise [map source [fn [α] [macroexpand* α env]]]]]]
+    [:macro    [macroexpand* [macro-apply op [cdr source]] env]]
+    [otherwise [map source [fn [α] [macroexpand* α env]]]]]]
 
-[defn macroexpand [source new-environment]
+[defn macroexpand [source env]
   "Macroexpand the forms in source"
-  [when-not new-environment [set! new-environment [current-closure]]]
-  [set! macroexpand/environment new-environment]
-  [macroexpand* source]]
+  [macroexpand* source [or env [current-closure]]]]

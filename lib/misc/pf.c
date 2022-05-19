@@ -4,50 +4,34 @@
 
 #include "../allocation/allocator.h"
 #include "../allocation/symbol.h"
-#include "../collection/list.h"
 #include "../vm/bytecode.h"
 
 #include <float.h>
 #include <limits.h>
 #include <math.h>
-#include <stdarg.h>
+
+#define BUF_SIZE 8192
 
 const lVal *writeValStack[256];
 int         writeValSP = 0;
 
-static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display);
-
 /* Write left part, current node and then the right part of a tree */
 static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	if((v == NULL) || (v->key == NULL)){return cur;}
-
 	cur = writeTreeRec(cur, bufEnd, v->left);
-	cur = spf(cur,bufEnd,"%s: %v ",v->key->c, v->value);
+	cur = spf(cur,bufEnd," %s: %v",v->key->c, v->value);
 	cur = writeTreeRec(cur, bufEnd, v->right);
-
 	return cur;
 }
 
 /* Write an entire Tree structure, including @[] wrapping */
 static char *writeTree(char *cur, char *bufEnd, const lTree *v){
-	cur = spf(cur,bufEnd,"#@[");
-	char *new = writeTreeRec(cur, bufEnd, v);
-	if(new != cur){
-		cur = new;
-		cur[-1] = ']';
-	}else if(cur < bufEnd){
-		*cur++ = ']';
-	}
+	char *openingBracket = spf(cur,bufEnd,"#@");
+	cur = writeTreeRec(openingBracket, bufEnd, v);
+	cur += (cur == openingBracket);
+	if(openingBracket < bufEnd){*openingBracket = '[';}
+	if(cur < bufEnd){*cur++ = ']';}
 	return cur;
-}
-
-/* Write a tree as a list of value definitions */
-static char *writeTreeDef(char *cur, char *bufEnd, const lTree *v){
-	if(v == NULL){return cur;}
-
-	cur = writeTreeDef(cur, bufEnd, v->left);
-	cur = spf(cur,bufEnd,"[def %s %v]\n",v->key->c, v->value);
-	return writeTreeDef(cur, bufEnd, v->right);
 }
 
 /* Write an entire array including #[] wrapper */
@@ -63,32 +47,29 @@ static char *writeArray(char *cur, char *bufEnd, const lArray *v){
 
 /* Return character of the lowest nibble of c */
 static char getHexChar(int c){
-	c &= 0xF;
-	return (c < 0xA) ? '0' + c : 'A' + (c - 10);
+	const char v = c & 0xF;
+	return (v < 0xA) ? '0' + v : 'A' + (v - 10);
 }
 
 static char *writeBytecodeArrayValue(char *cur, char *bufEnd, i64 index){
 	if((index < 0) || (index > lValMax)){
 		return spf(cur, bufEnd, "v :INVALID-VALUE ");
-	}else{
-		return spf(cur, bufEnd, "v %v ", lIndexVal(index));
 	}
+	return spf(cur, bufEnd, "v %v ", lIndexVal(index));
 }
 
 static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
 	if((index < 0) || (index >= lSymbolMax)){
 		return spf(cur, bufEnd, "s --INVALID-SYMBOL-- ");
-	}else{
-		return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
 	}
+	return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
 }
 
 static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
 		return spf(cur, bufEnd, "o --INVALID-OFFSET--", offset);
-	}else{
-		return spf(cur, bufEnd, "o %i ", offset);
 	}
+	return spf(cur, bufEnd, "o %i ", offset);
 }
 
 /* Write a bytecode array including #{} wrapper */
@@ -110,29 +91,29 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 			case lopPushSymbol:
 			case lopDef:
 			case lopGet:
-			case lopSet: {
+			case lopSet:
 				if(&c[3] < v->dataEnd){
 					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
 					cur = writeBytecodeArraySymbol(cur, bufEnd, i);
 				}
 				c+=3;
-				break; }
-			case lopApplyDynamic: {
+				break;
+			case lopApplyDynamic:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
 				}
 				c++;
-				break; }
-			case lopApply: {
+				break;
+			case lopApply:
 				if(&c[4] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
 					const i64 i = ((c[2] << 16) | (c[3] << 8) | c[4]);
 					cur = writeBytecodeArrayValue(cur, bufEnd, i);
 				}
 				c+=4;
-				break; }
+				break;
 			case lopFn:
-			case lopMacroAst: {
+			case lopMacroAst:
 				if(&c[12] >= v->dataEnd){
 					c+=12;
 					break;
@@ -142,45 +123,52 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 					cur = writeBytecodeArrayValue(cur, bufEnd, val);
 					c+=3;
 				}
-				break;}
-			case lopIntByte: {
+				break;
+			case lopIntByte:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)((i8)c[1]));
 				}
 				c++;
-				break;}
-			case lopPushLVal: {
+				break;
+			case lopPushLVal:
 				if(&c[3] < v->dataEnd){
 					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
 					cur = writeBytecodeArrayValue(cur, bufEnd, i);
 				}
 				c+=3;
-				break;}
+				break;
 			}
 		}
 	}
 	return spf(cur, bufEnd, "\n}");
 }
 
-/* Write pair/list V, including dotted pair notation */
 static char *writePair(char *cur, char *bufEnd, const lVal *v){
 	const lVal *carSym = v->vList.car;
-	if((carSym != NULL) && (carSym->type == ltSymbol) && (v->vList.cdr != NULL)){
-		if((carSym->vSymbol == symQuote) && (v->vList.cdr != NULL) && (v->vList.cdr->type == ltPair) && (v->vList.cdr->vList.cdr == NULL) && (v->vList.cdr->vList.car != NULL)){
+	if((carSym != NULL) && (carSym->type == ltSymbol))		{
+		if((carSym->vSymbol == symQuote)
+		   && (v->vList.cdr != NULL)
+		   && (v->vList.cdr->type == ltPair)
+		   && (v->vList.cdr->vList.cdr == NULL)
+		   && (v->vList.cdr->vList.car != NULL)){
 			return spf(cur, bufEnd, "\'%v",v->vList.cdr->vList.car);
 		}
 	}
-	cur = spf(cur, bufEnd, "[");
-	for(const lVal *n = v;n != NULL; n = n->vList.cdr){
-		if(n->type == ltPair){
-			const lVal *cv = n->vList.car;
-			if((n == v) && (cv == NULL) && (n->vList.cdr == NULL)){continue;}
-			cur = spf(cur, bufEnd, "%v%s", cv, n->vList.cdr != NULL ? " " : "");
-		}else{
-			cur = spf(cur, bufEnd, ". %v", n);
-			break;
+	char *openingBracket = cur;
+	if(v && (v->type == ltPair) && (v->vList.car == NULL) && (v->vList.cdr == NULL)){
+		cur++;
+	}else{
+		for(const lVal *n = v;n != NULL; n = n->vList.cdr){
+			if(n->type == ltPair){
+				const lVal *cv = n->vList.car;
+				cur = spf(cur, bufEnd, " %v", cv);
+			}else{
+				cur = spf(cur, bufEnd, " . %v", n);
+				break;
+			}
 		}
 	}
+	*openingBracket = '[';
 	return spf(cur, bufEnd, "]");
 }
 
@@ -209,7 +197,7 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 		if(v->vClosure->parent == NULL){
 			ret = spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
 		}else{
-			ret = spf(cur, bufEnd, "[ω %M]", v->vClosure->data);
+			ret = spf(cur, bufEnd, "[ω]", v->vClosure->data);
 		}
 		break;
 	case ltMacro:
@@ -275,12 +263,11 @@ static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
 
 /* Write the string S into the buffer */
 static char *writeString(char *buf, char *bufEnd, const char *s){
-	char *cur = buf;
 	if(s == NULL){return NULL;}
-	while((cur < bufEnd) && *s){
-		*cur++ = *s++;
+	while((buf < bufEnd) && *s){
+		*buf++ = *s++;
 	}
-	return cur;
+	return buf;
 }
 
 /* Write the string S into the buffer while escaping all characters and wrapping
@@ -289,33 +276,33 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
 	if((cur+1) >= bufEnd){return buf;}
 	*cur++ = '\"';
-	while(cur < bufEnd){
+	while(cur < (bufEnd-1)){
 		const u8 c = *s++;
 		switch(c){
 		case 0:
 			goto bufWriteStringExit;
-		case '\a': // Bell
+		case '\a':
 			*cur++ = '\\'; *cur++ = 'a';
 			break;
-		case '\b': // Backspace
+		case '\b':
 			*cur++ = '\\'; *cur++ = 'b';
 			break;
-		case '\t': // Horiz. Tab
+		case '\t':
 			*cur++ = '\\'; *cur++ = 't';
 			break;
-		case '\n': // Line Feed
+		case '\n':
 			*cur++ = '\\'; *cur++ = 'n';
 			break;
-		case '\v': // Vert. Tab
+		case '\v':
 			*cur++ = '\\'; *cur++ = 'v';
 			break;
-		case '\f': // Form Feed
+		case '\f':
 			*cur++ = '\\'; *cur++ = 'f';
 			break;
-		case '\r': // Carriage Return
+		case '\r':
 			*cur++ = '\\'; *cur++ = 'r';
 			break;
-		case 0x1B: // Escape
+		case 0x1B:
 			*cur++ = '\\'; *cur++ = 'e';
 			break;
 		case '"':
@@ -334,33 +321,25 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	return cur;
 }
 
-/* Write the integer V into BUF */
-static char *writeInt(char *buf, char *bufEnd, i64 v){
-	if(v < 0){
-		if(buf < bufEnd){ *buf++ = '-'; }
-		return writeInt(buf, bufEnd, -v);
-	}else if(v >= 10){
-		buf = writeInt(buf, bufEnd, v / 10);
-	}
-	if(buf < bufEnd){*buf++ = '0' + (v % 10);}
-	return buf;
-}
-
-/* Write the unsigned integer V into BUF */
 static char *writeUint(char *buf, char *bufEnd, u64 v){
 	if(v >= 10){ buf = writeUint(buf, bufEnd, v / 10); }
 	if(buf < bufEnd){ *buf++ = '0' + (v % 10);}
 	return buf;
 }
 
-/* Write the integer V into BUF in hexadecimal notation */
 static char *writeXint(char *buf, char *bufEnd, u64 v){
 	if(v >= 16){ buf = writeXint(buf, bufEnd, v >> 4); }
-	if(buf < bufEnd){
-		const uint mv = v & 0xF;
-		*buf++ = mv < 10 ? '0' + mv : ('A' - 10) + mv;
-	}
+	if(buf < bufEnd){ *buf++ = getHexChar(v); }
 	return buf;
+}
+
+/* Write the integer V into BUF */
+static char *writeInt(char *buf, char *bufEnd, i64 v){
+	if((v < 0) && (buf < bufEnd)){
+		*buf++ = '-';
+		v = -v;
+	}
+	return writeUint(buf, bufEnd, v);
 }
 
 /* Write out the floating point number V into BUF */
@@ -370,11 +349,7 @@ static char *writeFloat(char *buf, char *bufEnd, double v){
 	fract = round(fract * 100000.0) / 100000.0;
 	if(fract > (1.0-DBL_EPSILON)){
 		fract = 0;
-		if(integer > 0){
-			integer++;
-		}else{
-			integer--;
-		}
+		integer += integer > 0 ? 1 : -1;
 	}
 	char *cur = buf;
 	if((v < 0) && (cur < bufEnd)){*cur++ = '-';}
@@ -383,15 +358,18 @@ static char *writeFloat(char *buf, char *bufEnd, double v){
 	int digits = 0;
 	while((modf(fract, &integer) > DBL_EPSILON) && (++digits < 7)){
 		fract *= 10.;
-		if((i64)integer == 0){
- 			zeroes++;
-		}
+		zeroes += (integer == 0);
 	}
 	zeroes = MAX(0, zeroes - 1);
 	i64 ifract = round(fract);
-	while(!(ifract % 10)){ifract /= 10; if(--digits < 0){break;}}
+	while(!(ifract % 10)){
+		ifract /= 10;
+		if(--digits < 0){break;}
+	}
 	if(cur < bufEnd){*cur++ = '.';}
-	while((cur < bufEnd) && zeroes--){*cur++ = '0';}
+	while((cur < bufEnd) && zeroes--){
+		*cur++ = '0';
+	}
 	return writeInt(cur, bufEnd, ifract);
 }
 
@@ -403,6 +381,7 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			format++;
 			switch(*format){
 			default:
+				cur = writeString(cur, bufEnd, "UNKNOWN_SEQUENCE");
 				break;
 			case '%':
 				*cur++ = '%';
@@ -438,24 +417,6 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 			case 'm':
 				cur = writeTree(cur, bufEnd, va_arg(va, const lTree *));
 				break;
-			case 'M':
-				cur = writeTreeDef(cur, bufEnd, va_arg(va, const lTree *));
-				break;
-			case 't': {
-				const lSymbol *typeSym = getTypeSymbol(va_arg(va, const lVal *));
-				if(typeSym){
-					cur = writeString(cur, bufEnd, typeSym->c);
-				}
-				break; }
-			case 'T': {
-				const lVal *val = va_arg(va, const lVal *);
-				cur = writeVal(cur, bufEnd, val, true);
-				if(cur < bufEnd-1){*cur++ = ':';}
-				const lSymbol *typeSym = getTypeSymbol(val);
-				if(typeSym){
-					cur = writeString(cur, bufEnd, typeSym->c);
-				}
-				break; }
 			}
 			format++;
 		}else{
@@ -476,13 +437,13 @@ char *spf(char *cur, char *bufEnd, const char *format, ...){
 }
 
 void vfpf(FILE *fp, const char *format, va_list va){
-	char buf[8192];
+	char buf[BUF_SIZE];
 	char *ret = vspf(buf,buf + sizeof(buf), format, va);
 	fwrite(buf, ret - buf, 1, fp);
 }
 
 void fpf(FILE *fp, const char *format, ...){
-	char buf[8192];
+	char buf[BUF_SIZE];
 	va_list va;
 	va_start(va ,format);
 	char *ret = vspf(buf,buf + sizeof(buf), format, va);
@@ -490,20 +451,20 @@ void fpf(FILE *fp, const char *format, ...){
 	fwrite(buf, ret - buf, 1, fp);
 }
 
-void pf(const char *format, ...){
-	char buf[8192];
-	va_list va;
-	va_start(va ,format);
-	char *ret = vspf(buf,buf + sizeof(buf), format, va);
-	va_end(va);
-	fwrite(buf, ret - buf, 1, stdout);
-}
-
 void epf(const char *format, ...){
-	char buf[8192];
+	char buf[BUF_SIZE];
 	va_list va;
 	va_start(va,format);
 	char *ret = vspf(buf,buf + sizeof(buf), format, va);
 	va_end(va);
 	fwrite(buf, ret - buf, 1, stderr);
+}
+
+void pf(const char *format, ...){
+	char buf[BUF_SIZE];
+	va_list va;
+	va_start(va ,format);
+	char *ret = vspf(buf,buf + sizeof(buf), format, va);
+	va_end(va);
+	fwrite(buf, ret - buf, 1, stdout);
 }

@@ -3,18 +3,23 @@
 #include "nujel.h"
 
 #include "misc/pf.h"
-#include "exception.h"
-#include "allocation/allocator.h"
 #include "allocation/symbol.h"
 #include "collection/list.h"
-#include "operation.h"
 #include "reader.h"
 #include "type/closure.h"
 #include "type/symbol.h"
 #include "vm/eval.h"
 
+#include <setjmp.h>
+#include <stdlib.h>
+
 extern u8 stdlib_no_data[];
-bool lVerbose = false;
+
+jmp_buf exceptionTarget;
+lVal *exceptionValue;
+int exceptionTargetDepth = 0;
+
+bool lVerbose    = false;
 
 /* Initialize the allocator and symbol table, needs to be called before as
  * soon as possible, since most procedures depend on it.*/
@@ -22,11 +27,28 @@ void lInit(){
 	lSymbolInit();
 }
 
+/* Cause an exception, passing V directly to the closest exception handler */
+NORETURN void lExceptionThrowRaw(lVal *v){
+	if(exceptionTargetDepth <= 0){
+		fpf(stderr,"%V",v);
+		exit(201);
+	}
+	exceptionValue = v;
+	longjmp(exceptionTarget, 1);
+	while(1){}
+}
+
+/* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
+NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
+	lVal *l = lList(4, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v),RVP(lValLambda(c)));
+	lExceptionThrowRaw(l);
+}
+
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 	const int SP = lRootsGet();
 	lClosure *tmpc = lClosureNewFunCall(c, args, lambda);
-	lVal *ret = lBytecodeEval(tmpc, NULL, lambda->vClosure->text, false);
+	lVal *ret = lBytecodeEval(tmpc, lambda->vClosure->text, false);
 	lRootsRet(SP);
 	return ret;
 }
@@ -34,18 +56,14 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
-	case ltLambda:
-		return lLambda(c,args,fun);
-	case ltNativeFunc:
-		return fun->vNFunc->fp(c,args);
 	case ltObject:
 		if(args && args->type == ltBytecodeArr){
 			RCP(c);
-			return lBytecodeEval(fun->vClosure, NULL, args->vBytecodeArr, false);
+			return lBytecodeEval(fun->vClosure, args->vBytecodeArr, false);
 		} /* fall-through */
-	default:
-		lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
-		return NULL;
+	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
+	case ltLambda:     return lLambda(c,args,fun);
+	case ltNativeFunc: return fun->vNFunc->fp(c,args);
 	}
 }
 
@@ -109,17 +127,6 @@ static void lAddPlatformVars(lClosure *c){
 	lDefineVal(c, "System/Architecture", valArch);
 }
 
-/* Create a new root closure with the stdlib */
-lClosure *lNewRoot(){
-	lClosure *c = lClosureAlloc();
-	c->parent = NULL;
-	c->type = closureLet;
-	lRootsClosurePush(c);
-	lAddCoreFuncs(c);
-	lAddPlatformVars(c);
-	return lLoad(c, (const char *)stdlib_no_data);
-}
-
 /* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
@@ -132,9 +139,43 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}
-		lBytecodeEval(c, NULL, car->vBytecodeArr, false);
+		lBytecodeEval(c, car->vBytecodeArr, false);
 		lRootsRet(RSSP);
 	}
 	lRootsRet(RSP);
 	return c;
+}
+
+/* These add all the core NFuncs, since they are only ever used within
+ | lNewRoot() there is no need to export these declearations
+ */
+void lOperationsArithmetic (lClosure *c);
+void lOperationsArray      (lClosure *c);
+void lOperationsBytecode   (lClosure *c);
+void lOperationsCore       (lClosure *c);
+void lOperationsMath       (lClosure *c);
+void lOperationsSpecial    (lClosure *c);
+void lOperationsString     (lClosure *c);
+void lOperationsTree       (lClosure *c);
+void lOperationsVector     (lClosure *c);
+
+/* Create a new root closure with the stdlib */
+lClosure *lNewRoot(){
+	lClosure *c = lClosureAlloc();
+	c->parent = NULL;
+	c->type = closureLet;
+	lRootsClosurePush(c);
+
+	lOperationsArithmetic(c);
+	lOperationsMath(c);
+	lOperationsArray(c);
+	lOperationsBytecode(c);
+	lOperationsCore(c);
+	lOperationsSpecial(c);
+	lOperationsString(c);
+	lOperationsTree(c);
+	lOperationsVector(c);
+
+	lAddPlatformVars(c);
+	return lLoad(c, (const char *)stdlib_no_data);
 }

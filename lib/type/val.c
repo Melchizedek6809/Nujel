@@ -2,7 +2,6 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "val.h"
 
-#include "../exception.h"
 #include "../allocation/garbage-collection.h"
 #include "../allocation/allocator.h"
 #include "../collection/tree.h"

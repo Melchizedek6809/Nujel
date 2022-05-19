@@ -15,16 +15,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PI    (3.1415926535897932384626433832795)
-#define PI180 (3.1415926535897932384626433832795 / 180.0)
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define MINMAX(a, b, v) (MAX(a,MIN(b,v)))
 #define countof(x) (sizeof(x)/sizeof(*x))
 
 typedef unsigned int     uint;
-typedef unsigned short ushort;
-typedef unsigned char   uchar;
 
 typedef uint64_t          u64;
 typedef uint32_t          u32;

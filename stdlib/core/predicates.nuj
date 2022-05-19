@@ -7,21 +7,21 @@
   "Return #t if a is a number"
   [or [int? a] [float? a] [vec? a]]]
 
-[defn last? [a]
+[defn last? [a] :inline
   "Return #t if a is the last pair in a list"
   [nil? [cdr a]]]
 
-[defn pos? [a]
+[defn pos? [a] :inline
   "Return #t if a is positive"
-  [and [numeric? a] [>= [float a] 0.0]]]
+  [>= a 0.0]]
 
-[defn zero-neg? [a]
+[defn zero-neg? [a] :inline
   "Return #t if a is zero or negative"
-  [and [numeric? a] [<= [float a] 0.0]]]
+  [<= a 0.0]]
 
-[defn neg? [a]
+[defn neg? [a] :inline
   "Returns #t if a is negative"
-  [and [numeric? a] [< [float a] 0.0]]]
+  [< a 0.0]]
 
 [defn odd? [a]
   "Predicate that returns #t if a is odd"

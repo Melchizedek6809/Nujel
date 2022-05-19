@@ -11,8 +11,6 @@
 #include "allocator.h"
 #include "roots.h"
 #include "symbol.h"
-#include "../exception.h"
-#include "../operation.h"
 #include "../misc/pf.h"
 
 #include <stdlib.h>

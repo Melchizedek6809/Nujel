@@ -2,7 +2,6 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "symbol.h"
 #include "val.h"
-#include "../display.h"
 #include "../nujel.h"
 #include "../allocation/symbol.h"
 #include "../allocation/allocator.h"

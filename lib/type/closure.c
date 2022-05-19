@@ -1,7 +1,7 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../display.h"
-#include "../exception.h"
+#include "closure.h"
+
 #include "../nujel.h"
 #include "../allocation/allocator.h"
 #include "../allocation/garbage-collection.h"
@@ -9,6 +9,7 @@
 #include "../collection/list.h"
 #include "../collection/tree.h"
 #include "../collection/string.h"
+#include "../misc/pf.h"
 #include "../reader.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
@@ -72,7 +73,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 		}
 		cur += len;
 	}
-	lPrintError("Quite the amount of aliases we have there (%s)\n",sym);
+	fpf(stderr, "Quite the amount of aliases we have there (%s)\n",sym);
 	return NULL;
 }
 

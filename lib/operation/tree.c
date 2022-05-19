@@ -1,7 +1,5 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../operation.h"
-#include "../exception.h"
 #include "../collection/tree.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
@@ -14,8 +12,7 @@ lVal *lnfTreeNew(lClosure *c, lVal *v){
 	for(lVal *n = v; n; n = lCddr(n)){
 		lVal *car = lCar(n);
 		if(car == NULL){break;}
-		const lSymbol *sym = requireSymbolic(c, car);
-		ret->vTree = lTreeInsert(ret->vTree, sym, lCadr(n));
+		ret->vTree = lTreeInsert(ret->vTree, requireSymbolic(c, car), lCadr(n));
 	}
 	return ret;
 }
@@ -94,7 +91,6 @@ void lOperationsTree(lClosure *c){
 	lAddNativeFunc(c,"tree/list",    "[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c,"tree/keys",    "[tree]",         "Return each key of TREE in a list", lnfTreeGetKeys);
 	lAddNativeFunc(c,"tree/values",  "[tree]",         "Return each value of TREE in a list", lnfTreeGetValues);
-	lAddNativeFunc(c,"tree/get-list","[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c,"tree/size",    "[tree]",         "Return the amount of entries in TREE", lnfTreeSize);
 	lAddNativeFunc(c,"tree/has?",    "[tree sym]",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
 	lAddNativeFunc(c,"tree/set!",    "[tree sym val]", "Set SYM to VAL in TREE", lnfTreeSet);

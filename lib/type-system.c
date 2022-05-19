@@ -7,90 +7,78 @@
  */
 #include "type-system.h"
 #include "allocation/symbol.h"
-#include "collection/list.h"
-#include "collection/string.h"
-#include "display.h"
-#include "exception.h"
 #include "misc/pf.h"
-#include "misc/vec.h"
-#include "operation.h"
-#include "type/closure.h"
-#include "type/symbol.h"
 
-#include <stdlib.h>
+NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
+	char buf[128];
+	spf(buf, &buf[sizeof(buf)], "expected argument of type %s, not: ", getTypeSymbolT(T)->c);
+	lExceptionThrowValClo("type-error", buf, v, c);
+}
 
+NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
+	char buf[128];
+	spf(buf, &buf[sizeof(buf)], "This subroutine needs %i arguments", (i64)arity);
+	lExceptionThrowValClo("arity-error", buf, v, c);
+}
+
+void requireCertainType(lClosure *c, lVal *v, lType T){
+	if((v == NULL) || (v->type != T)){
+		throwTypeError(c, v, T);
+	}
+}
 
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal *v, i64 fallback){
 	switch(v ? v->type : ltNoAlloc){
-	case ltVec:
-		return v->vVec.x;
-	case ltFloat:
-		return v->vFloat;
-	case ltInt:
-		return v->vInt;
-	default:
-		return fallback;
+		case ltFloat: return v->vFloat;
+		case ltInt:   return v->vInt;
+		default:      return fallback;
 	}
 }
 
 /* Cast v to be a bool without memory allocations, or return false */
 bool castToBool(const lVal *v){
-	if(v == NULL){
-		return false;
-	}else{
-		return v->type == ltBool ? v->vBool : true;
-	}
+	return !v ? false : (v->type == ltBool ? v->vBool : true);
 }
 
 const char *castToString(const lVal *v, const char *fallback){
-	if((v == NULL) || (v->type != ltString)){return fallback;}
-	return v->vString->data;
+	return ((v == NULL) || (v->type != ltString)) ? fallback : v->vString->data;
 }
 
 /* Determine which type has the highest precedence between a and b */
-lType lTypecast(const lType a,const lType b){
+lType lTypecast(const lType a, const lType b){
+	if (a == b){ return a;}
 	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
 	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
 	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
-	if((a == ltBool)  || (b == ltBool)) {return ltBool;}
-	if (a == b){ return a;}
 	return ltNoAlloc;
 }
 
 i64 requireInt(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltInt)){
-		lExceptionThrowValClo("type-error", "Expected an int, not: ", v, c);
-	}
+	requireCertainType(c, v, ltInt);
 	return v->vInt;
 }
 
 i64 requireNaturalInt(lClosure *c, lVal *v){
 	i64 ret = requireInt(c,v);
-	if(ret < 0){
-		lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c);
-	}
+	if(ret < 0){ lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c); }
 	return ret;
 }
 
 lBytecodeOp requireBytecodeOp(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltBytecodeOp)){
-		lExceptionThrowValClo("type-error", "Expected a bytecode operation, not: ", v, c);
-	}
+	requireCertainType(c, v, ltBytecodeOp);
 	return v->vBytecodeOp;
 }
 
 lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltBytecodeArr)){
-		lExceptionThrowValClo("type-error", "Expected a bytecode array, not: ", v, c);
-	}
+	requireCertainType(c, v, ltBytecodeArr);
 	return v->vBytecodeArr;
 }
 
 double requireFloat(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
 	default:
-		lExceptionThrowValClo("type-error", "Expected a float, not: ", v, c);
+		throwTypeError(c, v, ltFloat);
 	case ltFloat:
 		return v->vFloat;
 	case ltInt:
@@ -99,65 +87,57 @@ double requireFloat(lClosure *c, lVal *v){
 }
 
 vec requireVec(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltVec)){
-		lExceptionThrowValClo("type-error", "Expected a vector, not: ", v, c);
-	}
+	requireCertainType(c, v, ltVec);
 	return v->vVec;
 }
 
 vec requireVecCompatible(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
+	default:
+		throwTypeError(c, v, ltVec);
 	case ltVec:
 		return v->vVec;
 	case ltFloat:
 		return vecNew(v->vFloat, v->vFloat, v->vFloat);
 	case ltInt:
 		return vecNew(v->vInt, v->vInt, v->vInt);
-	default:
-		lExceptionThrowValClo("type-error", "Expected a vector, not: ", v, c);
-		return v->vVec;
 	}
 }
 
 lArray *requireArray(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltArray)){
-		lExceptionThrowValClo("type-error", "Expected an array, not: ", v, c);
-	}
+	requireCertainType(c, v, ltArray);
 	return v->vArray;
 }
 
 lString *requireString(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltString)){
-		lExceptionThrowValClo("type-error", "Expected an array, not: ", v, c);
-	}
+	requireCertainType(c, v, ltString);
 	return v->vString;
 }
 
 lTree *requireTree(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltTree)){
-		lExceptionThrowValClo("type-error", "Expected a tree, not: ", v, c);
-	}
+	requireCertainType(c, v, ltTree);
 	return v->vTree;
 }
 
 lTree *requireMutableTree(lClosure *c, lVal *v){
 	lTree *ret = requireTree(c,v);
-	if(ret->flags & TREE_IMMUTABLE){
-		lExceptionThrowValClo("type-error", "Tree is immutable", v, c);
-	}
+	if(ret->flags & TREE_IMMUTABLE){ lExceptionThrowValClo("type-error", "Tree is immutable", v, c); }
 	return ret;
 }
 
 const lSymbol *requireSymbol(lClosure *c, lVal *v){
-	if((v == NULL) || (v->type != ltSymbol)){
-		lExceptionThrowValClo("type-error", "Expected a symbol, not: ", v, c);
-	}
+	requireCertainType(c, v, ltSymbol);
+	return v->vSymbol;
+}
+
+const lSymbol *requireKeyword(lClosure *c, lVal *v){
+	requireCertainType(c, v, ltKeyword);
 	return v->vSymbol;
 }
 
 const lSymbol *requireSymbolic(lClosure *c, lVal *v){
 	if((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword))){
-		lExceptionThrowValClo("type-error", "Expected a symbol or keyword, not: ", v, c);
+		throwTypeError(c, v, ltSymbol);
 	}
 	return v->vSymbol;
 }

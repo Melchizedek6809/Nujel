@@ -3,7 +3,7 @@
 ;;
 ;; Some nujel string λs
 
-[defn string->keyword [α]
+[defn string->keyword [α] :inline
   "Return string α as a keyword"
   [symbol->keyword [str->sym α]]]
 
@@ -22,7 +22,7 @@
   "Print to stderr STR on a single line"
   [error [cat str "\r\n"]]]
 
-[defn display [value]
+[defn display [value] :inline
   "Display VALUE"
   [print value]]
 
