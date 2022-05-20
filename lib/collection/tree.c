@@ -10,8 +10,6 @@ lTree *lTreeNew(const lSymbol *s, lVal *v){
 	ret->key    = s;
 	ret->height = 1;
 	ret->value  = v;
-	ret->left   = NULL;
-	ret->right  = NULL;
 	return ret;
 }
 
@@ -138,8 +136,8 @@ lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
  * in values, if found. */
 bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 	bool found = false;
-	lVal *v = lTreeGet(t,s,&found);
-	if((found) && value){*value = v;}
+	lVal *v = lTreeGet(t, s, &found);
+	if(found && value){*value = v;}
 	return found;
 }
 

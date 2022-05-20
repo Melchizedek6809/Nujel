@@ -56,6 +56,9 @@ lSymbol *lSymLTTree;
 lSymbol *lSymLTBytecodeOp;
 lSymbol *lSymLTBytecodeArray;
 
+uint symbolLookups = 0;
+uint tombLookups = 0;
+
 void lSymbolInit(){
 	lSymbolActive   = 0;
 	lSymbolMax      = 0;
@@ -136,10 +139,6 @@ static u32 lHashSymStr(const char *str){
 	}
 	return res;
 }
-
-
-uint symbolLookups = 0;
-uint tombLookups = 0;
 
 // Probes the symbol index and returns the slot where STR is stored.  If STR is
 // not in the map, returns a slot where it could be inserted, which could be

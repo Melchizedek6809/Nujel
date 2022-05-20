@@ -6,22 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Create a new string containing a copy of STR[0] - STR[LEN] */
-lString *lStringNew(const char *str, uint len){
-	if(str == NULL){return 0;}
-	lString *s = lStringAlloc();
-	char *nbuf = malloc(len+1);
-	if(nbuf == NULL){
-		fpf(stderr,"lStringNew OOM");
-	}
-	memcpy(nbuf,str,len);
-	nbuf[len] = 0;
-	s->buf    = s->data = nbuf;
-	s->flags  = HEAP_ALLOCATED;
-	s->bufEnd = &s->buf[len];
-	return s;
-}
-
 /* Create a new string containing a direct reference to STR, STR will be
  * freed by the GC if it ever goes out of scope */
 static lString *lStringNewNoCopy(const char *str, uint len){
@@ -33,19 +17,22 @@ static lString *lStringNewNoCopy(const char *str, uint len){
 	return s;
 }
 
-/* Return a duplicate of OS */
-lString *lStringDup(lString *os){
-	uint len = os->bufEnd - os->buf;
-	const char *str = os->data;
-	lString *s = lStringAlloc();
-	if(s == NULL){return 0;}
+/* Create a new string containing a copy of STR[0] - STR[LEN] */
+lString *lStringNew(const char *str, uint len){
+	if(str == NULL){return NULL;}
 	char *nbuf = malloc(len+1);
+	if(nbuf == NULL){
+		fpf(stderr,"lStringNew OOM");
+		exit(2);
+	}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
-	s->buf    = s->data = nbuf;
-	s->flags  = HEAP_ALLOCATED;
-	s->bufEnd = &s->buf[len];
-	return s;
+	return lStringNewNoCopy(nbuf, len);
+}
+
+/* Return a duplicate of OS */
+lString *lStringDup(lString *os){
+	return lStringNew(os->buf, os->bufEnd - os->buf);
 }
 
 /* Return the length of the String S */

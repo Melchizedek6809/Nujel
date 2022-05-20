@@ -122,10 +122,10 @@ void lTreeGCMark(const lTree *v){
 	}
 	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
-	lTreeGCMark(v->left);
-	lTreeGCMark(v->right);
 	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
+	lTreeGCMark(v->left);
+	lTreeGCMark(v->right);
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */

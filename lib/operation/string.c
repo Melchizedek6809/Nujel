@@ -165,8 +165,8 @@ static lVal *lnfIndexOf(lClosure *c, lVal *v){
 static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
-	const char *needle   = castToString(lCadr(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}
+	const char *needle   = castToString(lCadr(v),NULL);
 	if(needle   == NULL) {return lValInt(-2);}
 	const int haystackLength = strlen(haystack);
 	const int needleLength   = strlen(needle);

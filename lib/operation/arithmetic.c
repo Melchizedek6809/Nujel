@@ -16,6 +16,7 @@ static lVal *exceptionThrow(lClosure *c, lVal *v, const char *func){
 	lExceptionThrowValClo("type-error","Can't calculate with non numeric types, please explicitly convert into a numeric form using [int α],[float β],[vec γ].",v, c);
 	return NULL;
 }
+
 static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 	(void)func;
 	lExceptionThrowValClo("type-error","This function can only be used with floats, you can use [float α] to explicitly convert into a floating point value",v, c);

@@ -276,6 +276,12 @@ static lVal *lParseBytecodeOp(lString *s){
 	return ret;
 }
 
+static NORETURN void throwBCReadError(lClosure *c, lVal *v, lString *s, const char *msg){
+	char buf[128];
+	spf(buf, &buf[sizeof(buf)], "invalid %s in Bytecoded Array", msg);
+	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), c);
+}
+
 static lVal *lParseBytecodeArray(lString *s){
 	u8 *d    = NULL;
 	int size = 0;
@@ -296,13 +302,9 @@ static lVal *lParseBytecodeArray(lString *s){
 		if(c == 'o'){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){
-				lExceptionThrowValClo("read-error", "Invalid offset in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
-			}
+			if(!tv || (tv->type != ltInt)){ throwBCReadError(readClosure, tv, s, "offset"); }
 			const int v = tv->vInt;
-			if((v > SHRT_MAX) || (v < SHRT_MIN)){
-				lExceptionThrowValClo("read-error", "Invalid offset in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
-			}
+			if((v > SHRT_MAX) || (v < SHRT_MIN)){ throwBCReadError(readClosure, tv, s, "offset"); }
 			d[len++] = (v >> 8) & 0xFF;
 			d[len++] =  v       & 0xFF;
 			lStringAdvanceToNextCharacter(s);
@@ -311,13 +313,9 @@ static lVal *lParseBytecodeArray(lString *s){
 		if(c == 'i'){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){
-				lExceptionThrowValClo("read-error", "Invalid integer in BCArr", lCons(tv,lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), readClosure);
-			}
+			if(!tv || (tv->type != ltInt)){ throwBCReadError(readClosure, tv, s, "integer"); }
 			const int v = tv->vInt;
-			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){
-				lExceptionThrowValClo("read-error", "Invalid integer in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
-			}
+			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(readClosure, tv, s, "integer"); }
 			d[len++] = v;
 			lStringAdvanceToNextCharacter(s);
 			continue;
@@ -336,7 +334,7 @@ static lVal *lParseBytecodeArray(lString *s){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = RVP(lReadValue(s));
 			if(!tv || ((tv->type != ltSymbol) && (tv->type != ltKeyword))){
-				lExceptionThrowValClo("read-error", "Invalid symbol in in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+				throwBCReadError(readClosure, tv, s,"symbol");
 			}
 			const int i = lSymIndex(tv->vSymbol);
 			d[len++] = (i >> 16) & 0xFF;
@@ -348,7 +346,7 @@ static lVal *lParseBytecodeArray(lString *s){
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
-			lExceptionThrowValClo("read-error", "Sudden end of BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data), readClosure);
+			throwBCReadError(readClosure, NULL, s, "sudden end");
 		}
 		c = *s->data++;
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}

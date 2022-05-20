@@ -29,7 +29,7 @@ int rootMax = 0;
 
 void (*rootsMarkerChain)() = NULL;
 
-static void lRootsPush(const lType t, void *ptr){
+static void *lRootsPush(const lType t, void *ptr){
 	if(rootSP >= rootMax){
 		rootMax = MAX(rootMax * 2, 256);
 		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
@@ -41,36 +41,32 @@ static void lRootsPush(const lType t, void *ptr){
 	rootStack[rootSP].t = t;
 	rootStack[rootSP].vPointer = ptr;
 	rootSP++;
+	return ptr;
 }
 
 /* Push an lClosure onto the root stack, protecting it from being freed by the GC */
 lClosure *lRootsClosurePush(lClosure *c){
-	lRootsPush(ltLambda,c);
-	return c;
+	return lRootsPush(ltLambda,c);
 }
 
 /* Push an lClosure onto the root stack, protecting it from being freed by the GC */
 lTree *lRootsTreePush(lTree *c){
-	lRootsPush(ltTree,c);
-	return c;
+	return lRootsPush(ltTree,c);
 }
 
 /* Push an lVal onto the root stack, protecting it from being freed by the GC */
 lVal *lRootsValPush(lVal *v){
-	lRootsPush(ltPair,v);
-	return v;
+	return lRootsPush(ltPair,v);
 }
 
 /* Push an lString onto the root stack, protecting it from being freed by the GC */
 lString *lRootsStringPush(lString *s){
-	lRootsPush(ltString,s);
-	return s;
+	return lRootsPush(ltString,s);
 }
 
 /* Push an lString onto the root stack, protecting it from being freed by the GC */
 lSymbol *lRootsSymbolPush(lSymbol *s){
-	lRootsPush(ltSymbol,s);
-	return s;
+	return lRootsPush(ltSymbol,s);
 }
 
 /* Push an lThread onto the root stack, protecting it from being freed by the GC */
