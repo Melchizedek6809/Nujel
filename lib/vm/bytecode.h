@@ -11,7 +11,7 @@ typedef enum lOpcode {
 	lopApplyNew        =  0x4,
 	lopPushLVal        =  0x5,
 	lopUNUSED6         =  0x6,
-	lopUNUSED7         =  0x7,
+	lopApplyDynamicNew =  0x7,
 	lopApply           =  0x8,
 	lopJmp             =  0x9,
 	lopJt              =  0xA,

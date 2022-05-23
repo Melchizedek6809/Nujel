@@ -368,8 +368,7 @@
 [test/add #t [def i 1] [case [++ i] [[9] #f] [[4] #f] [[2] #t]]]
 [test/add :too-many-args [try [fn [err] [car err]] [cons 123 234 345]]]
 [test/add #t [== car [resolve [car '[car asd]]]]]
-;[test/add #t [pos? [index-of [describe/closure [[defn stackTraceTest [] [current-lambda]]]] "stackTraceTest"]]]
-; Should be reenabled as soon as stacktrace work again!
+[test/add #t [pos? [index-of [describe/closure [[defn stackTraceTest [] [current-lambda]]]] "stackTraceTest"]]]
 [test/add 2 [case 'asd [['qwe] 1] [['asd] 2] [otherwise 3]]]
 [test/add 10 [reduce #[1 2 3 4] add/int 0]]
 [test/add "1,2,3,4" [join #[1 2 3 4] ","]]
@@ -601,7 +600,6 @@
 [test/add 4 [identity 4]]
 [test/add "4" [identity "4"]]
 [test/add #[1 2 3] [identity #[1 2 3]]]
-;[test/add "Polizei" [def eins [ω [def say [fn [] "Eins"]]]] [def zwei [eins [ω]]] [zwei [def say [fn [] "Polizei"]]] [zwei [say]]]
 [test/add "Polizei"
           [def eins [environment*]]
           [eval-in eins '[def say [fn [] "Eins"]]]
@@ -613,7 +611,6 @@
           [eval-in eins '[def say [fn [] "Eins"]]]
           [eval-in eins '[say]]]
 [test/add 11 [def counter [let [[a 0]] [fn [b] [set! a [+ a [or b 1]]]]]] [counter 10] [counter]]
-;[test/add 11 [def count [let [[a 0]] [fn [b] [set! a [+ a [if [numeric? b] b 1]]]]]] [count 10] [count]]
 [test/add '[0 1 2 3 4] [range 5]]
 [test/add #nil [range 0]]
 [test/add #nil [range -1 1]]

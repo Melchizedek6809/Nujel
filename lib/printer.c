@@ -52,7 +52,7 @@ static char getHexChar(int c){
 }
 
 static char *writeBytecodeArrayValue(char *cur, char *bufEnd, i64 index){
-	if((index < 0) || (index > lValMax)){
+	if((index < 0) || (index >= lValMax)){
 		return spf(cur, bufEnd, "v :INVALID-VALUE ");
 	}
 	return spf(cur, bufEnd, "v %v ", lIndexVal(index));
@@ -74,6 +74,11 @@ static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
+	if((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax)){
+		epf("ERROR writing BCA\n");
+		//exit(2);
+		return cur = spf(cur, bufEnd, "#{ 01 }");
+	}
 	cur = spf(cur, bufEnd, "#{");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
@@ -98,12 +103,14 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c+=3;
 				break;
+			case lopApplyDynamicNew:
 			case lopApplyDynamic:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
 				}
 				c++;
 				break;
+			case lopApplyNew:
 			case lopApply:
 				if(&c[4] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);

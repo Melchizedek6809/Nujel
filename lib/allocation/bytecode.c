@@ -35,6 +35,7 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopPushNil:
 		return 1;
 	case lopApplyDynamic:
+	case lopApplyDynamicNew:
 	case lopIntByte:
 		return 2;
 	case lopTry:

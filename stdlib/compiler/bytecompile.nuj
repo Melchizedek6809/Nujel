@@ -1,7 +1,9 @@
 ;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ;; This project uses the MIT license, a copy should be included under /LICENSE
 ;;
-;; Contains the low level Nujel -> Bytecode compiler
+;; Contains the Bytecode compiler that takes macroexpanded Nujel code and emits
+;; Bytecode assembly
+[def *bytecompile-apply-new* #t]
 
 [def bytecompile/gen-label/counter 0]
 [defn bytecompile/gen-label [prefix]
@@ -35,7 +37,9 @@
 [defn bytecompile/procedure [op source env]
   [def args [map [cdr source] bytecompile*]]
   [list args
-        [$apply [length args] op]]]
+        [if *bytecompile-apply-new*
+            [$apply/new [length args] op]
+            [$apply [length args] op]]]]
 
 [defn bytecompile/def [source env]
   [when [or [not [symbol? [cadr source]]]
@@ -88,8 +92,12 @@
   [def arg-count [length args]]
   [if args
       [list [bytecompile/procedure/arg args]
-            [$apply arg-count op]]
-      [$apply 0 op]]]
+            [if *bytecompile-apply-new*
+                [$apply/new arg-count op]
+                [$apply arg-count op]]]
+      [if *bytecompile-apply-new*
+          [$apply/new 0 op]
+          [$apply 0 op]]]]
 
 [defn bytecompile/procedure/inline? [op]
   [case [type-of op]
@@ -99,7 +107,7 @@
 [defn bytecompile/procedure/inline [op args env]
   [def arg-count [length args]]
   [when [> arg-count 1]
-    [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-closure]]]]
+    [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]]
   [def form [macroexpand/do [closure/meta op :source] env]]
   [def arg-name [car [tree/ref [closure op] :arguments]]]
   [if args
@@ -115,7 +123,9 @@
   [def arg-count [length args]]
   [list [bytecompile* op env]
         [when args [bytecompile/procedure/arg args]]
-        [$apply/dynamic arg-count]]]
+        [if *bytecompile-apply-new*
+            [$apply/dynamic/new arg-count]
+            [$apply/dynamic arg-count]]]]
 
 [defn bytecompile/and/rec [source env label-end]
   [list [bytecompile* [car source] env]

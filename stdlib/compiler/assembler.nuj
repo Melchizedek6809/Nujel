@@ -18,29 +18,17 @@
 [defn int-fit-in-byte? [a]
   [and [<= a 127] [>= a -128]]]
 
-[defn $nop []
-  "- | Do nothing"
-  '[#$0]]
-
-[defn $ret []
-  "a - | Return top of value stack"
-  '[#$1]]
-
-[defn $push/int/byte [a]
-  "- a | Return top of value stack"
-  [when-not [int-fit-in-byte? a]
-            [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
-  [list #$2 [int->bytecode-op a]]]
-
 [defn $push/int [a]
   "- a | Return top of value stack"
   [if [int-fit-in-byte? a]
       [$push/int/byte a]
       [$push/lval a]]]
 
-[defn $add/int []
-  "a b - c | Adds the two topmost values and pushes the result"
-  '[#$3]]
+[defn $push/int/byte [a]
+  "- a | Return top of value stack"
+  [when-not [int-fit-in-byte? a]
+            [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+  [list #$2 [int->bytecode-op a]]]
 
 [defn $push/lval [v]
   "- v | Pushes v onto the stack"
@@ -52,13 +40,22 @@
   "- v | Pushes v onto the stack"
   [list #$23 [sym->bytecode-op v]]]
 
-[defn $apply/new [arg-count fun]
+[defn $def [v]
+  [list #$E [sym->bytecode-op v]]]
+
+[defn $set [v]
+  [list #$F [sym->bytecode-op v]]]
+
+[defn $get [v]
+  [list #$10 [sym->bytecode-op v]]]
+
+[defn $apply/generic [opcode arg-count fun]
   "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
   [case arg-count
     [1 [case fun
          [car [$car]]
          [cdr [$cdr]]
-         [otherwise [list #$4
+         [otherwise [list opcode
                           [int->bytecode-op arg-count]
                           [val->bytecode-op fun]]]]]
     [2 [case fun
@@ -69,44 +66,26 @@
          [== [$==]]
          [>= [$>=]]
          [> [$>]]
-         [otherwise [list #$4
+         [otherwise [list opcode
                           [int->bytecode-op arg-count]
                           [val->bytecode-op fun]]]]]
-    [otherwise [list #$4
+    [otherwise [list opcode
                      [int->bytecode-op arg-count]
                      [val->bytecode-op fun]]]]]
 
 [defn $apply [arg-count fun]
   "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-  [case arg-count
-    [1 [case fun
-         [car [$car]]
-         [cdr [$cdr]]
-         [otherwise [list #$8
-                          [int->bytecode-op arg-count]
-                          [val->bytecode-op fun]]]]]
-    [2 [case fun
-         [add/int [$add/int]]
-         [cons [$cons]]
-         [< [$<]]
-         [<= [$<=]]
-         [== [$==]]
-         [>= [$>=]]
-         [> [$>]]
-         [otherwise [list #$8
-                          [int->bytecode-op arg-count]
-                          [val->bytecode-op fun]]]]]
-    [otherwise [list #$8
-                     [int->bytecode-op arg-count]
-                     [val->bytecode-op fun]]]]]
+  [$apply/generic #$8 arg-count fun]]
+
+[defn $apply/new [arg-count fun]
+  "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+  [$apply/generic #$4 arg-count fun]]
 
 [defn $apply/dynamic [arg-count fun]
   [list #$1A [int->bytecode-op arg-count]]]
 
-[defn $try/old [target]
-  " - | Try something, jumping to target if an exception occurs"
-  [list #$18 [list :relocate target 8 0 [int->bytecode-op 0]]
-        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+[defn $apply/dynamic/new [arg-count fun]
+  [list #$7 [int->bytecode-op arg-count]]]
 
 [defn $try [target]
   " - | Try something, jumping to target if an exception occurs"
@@ -125,21 +104,6 @@
   [list #$B [list :relocate target 8 0 [int->bytecode-op 0]]
         [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
-[defn $dup []
-  '[#$C]]
-
-[defn $drop []
-  '[#$D]]
-
-[defn $def [v]
-  [list #$E [sym->bytecode-op v]]]
-
-[defn $set [v]
-  [list #$F [sym->bytecode-op v]]]
-
-[defn $get [v]
-  [list #$10 [sym->bytecode-op v]]]
-
 [defn $fn [name args docs body]
   [list #$25
         [val->bytecode-op name]
@@ -154,48 +118,6 @@
         [val->bytecode-op docs]
         [val->bytecode-op body]]]
 
-[defn $closure/push []
-  '[#$13]]
-
-[defn $let []
-  '[#$15]]
-
-[defn $closure/pop []
-  '[#$16]]
-
-[defn $roots/save []
-  '[#$1B]]
-
-[defn $roots/restore []
-  '[#$1C]]
-
-[defn $< []
-  '[#$1E]]
-
-[defn $<= []
-  '[#$1F]]
-
-[defn $== []
-  '[#$20]]
-
-[defn $>= []
-  '[#$21]]
-
-[defn $> []
-  '[#$22]]
-
-[defn $push/nil []
-  '[#$24]]
-
-[defn $car []
-  '[#$11]]
-
-[defn $cdr []
-  '[#$12]]
-
-[defn $cons []
-  '[#$14]]
-
 [defn assemble/build-sym-map [code sym-map pos]
   [while code
     [case [type-of [car code]]
@@ -204,13 +126,13 @@
                                [tree/set! sym-map [cadr code] pos]]]
       [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
     [cdr! code]]
-  pos]
+  [return pos]]
 
 [defn assemble/relocate-op [code sym-map pos out]
   [def target [tree/ref sym-map [cadr code]]]
   [def off [- [+ target [cadddr code]] pos]]
   [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
-  pos]
+  [return pos]]
 
 [defn assemble/emit-relocated-ops [code sym-map pos out]
   [if [== [car code] :relocate]
@@ -219,7 +141,7 @@
               [case [type-of op]
                 [:bytecode-op [array/set! out [++ pos] op]]
                 [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
-  pos]
+  [return pos]]
 
 [def assemble/verbose #f]
 [defn assemble* [code]

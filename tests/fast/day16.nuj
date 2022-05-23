@@ -13,15 +13,6 @@
 [defn bits/< [a b] [if [< a b] 1 0]]
 [defn bits/= [a b] [if [== a b] 1 0]]
 [defn bits/type->op [t]
-       [case y
-             [0 +]
-	     [1 bits/mul]
-	     [2 min]
-	     [3 max]
-	     [5 bits/>]
-	     [6 bits/<]
-	     [7 bits/=]]]
-[defn bits/type->op [t]
        [case t
              [0 +]
 	     [1 bits/mul]
@@ -33,9 +24,10 @@
 [defn bits/compile [p]
        [if [== 4 [ref p :type]]
 	   [ref p :value]
-	   [cons [bits/type->op [ref p :type]] [map [ref p :value] bits/compile]]]]
+	   [cons [bits/type->op [ref p :type]]
+                 [map [ref p :value] bits/compile]]]]
 
-[defn bits/parse/packet/operator/packets [p s offset packets]
+[defn packet/operator/packets [p s offset packets]
        [def off offset]
        [for [i 0 packets]
 	    [def child [bits/parse/packet s off]]
@@ -44,7 +36,7 @@
        [tree/set! p :value [nreverse [ref p :value]]]
        [cons off p]]
 
-[defn bits/parse/packet/operator/bits [p s offset bits]
+[defn packet/operator/bits [p s offset bits]
        [def off offset]
        [def goal-offset [+ offset bits]]
 
@@ -55,12 +47,12 @@
        [tree/set! p :value [nreverse [ref p :value]]]
        [cons off p]]
 
-[defn bits/parse/packet/operator [p s offset]
+[defn packet/operator [p s offset]
        [if [== [char-at s offset] #\1]
-           [bits/parse/packet/operator/packets p s [+ offset 12] [bits/read-value s [+ 1 offset] 11]]
-           [bits/parse/packet/operator/bits p s [+ offset 16] [bits/read-value s [+ 1 offset] 15]]]]
+           [packet/operator/packets p s [+ offset 12] [bits/read-value s [+ 1 offset] 11]]
+           [packet/operator/bits p s [+ offset 16] [bits/read-value s [+ 1 offset] 15]]]]
 
-[defn bits/parse/packet/literal [p s offset]
+[defn packet/literal [p s offset]
        [def parts #nil]
        [def off offset]
        [while [== [char-at s off] #\1]
@@ -74,8 +66,8 @@
 
 [defn bits/parse/packet-contents [p s offset]
        [case [ref p :type]
-	     [4 [bits/parse/packet/literal p s offset]]
-	     [otherwise [bits/parse/packet/operator p s offset]]]]
+	     [4 [packet/literal p s offset]]
+	     [otherwise [packet/operator p s offset]]]]
 
 [defn bits/parse/packet [s offset]
        [-> @[:version [bits/read-value s offset 3]
@@ -101,11 +93,11 @@
 				      " v:" [ansi-green [ref p :version]]]]
 			 [for-each [ref p :value] [fn [a] [bits/print a [+ 4 indent]]]]]]]
 
-[def parsed-prog [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]
-
-[def res-p1 [bits/version-sum parsed-prog]]
-[def res-p2 [eval [bits/compile parsed-prog]]]
-[when [!= res-p1 951]
-      [throw [list :wrong-result "Wrong result" res-p1]]]
-[when [!= res-p2 902198718880]
-      [throw [list :wrong-result "Wrong result" res-p2]]]
+[let []
+  [def res-p1 [bits/version-sum [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]]
+  [def res-p2 [eval [bits/compile [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]]]
+  [when [!= res-p1 951]
+    [throw [list :wrong-result "Wrong result" res-p1]]]
+  [when [!= res-p2 902198718880]
+    [throw [list :wrong-result "Wrong result" res-p2]]]
+]

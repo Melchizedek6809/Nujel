@@ -1,0 +1,28 @@
+[defn $nop []
+  "- | Do nothing"
+  '[#$00]]
+
+[defn $ret []
+  "a - | Return top of value stack"
+  '[#$01]]
+
+[defn $add/int []
+  "a b - c | Adds the two topmost values and pushes the result"
+  '[#$03]]
+
+[defn $dup           [] '[#$0C]]
+[defn $drop          [] '[#$0D]]
+[defn $closure/push  [] '[#$13]]
+[defn $let           [] '[#$15]]
+[defn $closure/pop   [] '[#$16]]
+[defn $roots/save    [] '[#$1B]]
+[defn $roots/restore [] '[#$1C]]
+[defn $<             [] '[#$1E]]
+[defn $<=            [] '[#$1F]]
+[defn $==            [] '[#$20]]
+[defn $>=            [] '[#$21]]
+[defn $>             [] '[#$22]]
+[defn $push/nil      [] '[#$24]]
+[defn $car           [] '[#$11]]
+[defn $cdr           [] '[#$12]]
+[defn $cons          [] '[#$14]]
