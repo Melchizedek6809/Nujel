@@ -1,9 +1,14 @@
 Nujel
 --------------------------------------------------------
-A Lisp inspired language for games and other latency sensitive applications.
-Development started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting runtime.
-While Nujel is still very early in development, and for the most part just a terrible Scheme, it is evolving
+A small, portable Lisp dialect for games and other latency sensitive applications.
+Development was started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting runtime.
+While Nujel is still very early in development, and for the most part just an incompatible Scheme, it is evolving
 rapidly.
+
+## Performance
+While Nujel is still quite slow, it is definitely not the slowest Lisp out there. To make sure that
+there are no performance regression benchmarks are regularly run which are also used to compare Nujel
+against other runtimes, if you are interested you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
 
 ## Future direction
 To get an idea about the design and future direction of Nujel have a look at the [FUTURE.md](/FUTURE.md).
@@ -18,13 +23,18 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Maps (using binary trees)
 - [X] Garbage Collection (Mark-and-Sweep for now)
 - [X] Macros (expander written in Nujel itself)
-- [X] Bytecoded
+- [X] Bytecoded (compiler/assembler/disassemble all written in Nujel)
 - [ ] Tail-call elimination
 - [ ] NaN Boxing
 - [ ] Modules
 - [ ] Continuations
 - [ ] Fibers
 - [ ] Serializable Fibers
+
+## Current Limitations
+These will be addressed in later versions
+- [ ] Static Heap (works far better than expected)
+- [ ] No file streams/sockets (can only read/write files in their entirety)
 
 ## Try it out
 You can try out a current [WASM Build over here](https://wolkenwelten.net/nujel/).

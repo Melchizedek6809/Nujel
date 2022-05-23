@@ -3,6 +3,7 @@
 #include "eval.h"
 
 #include "bytecode.h"
+#include "tracing.h"
 #include "../printer.h"
 #include "../allocation/symbol.h"
 #include "../type/closure.h"
@@ -74,25 +75,6 @@ static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
 	c[1] = (i >> 16) & 0xFF;
 	c[2] = (i >>  8) & 0xFF;
 	c[3] = (i      ) & 0xFF;
-}
-
-static void lBytecodeTrace(const lThread *ctx, const lBytecodeOp *ip, const lBytecodeArray *ops){
-	pf("[OP: %u]\n [IP: %x, CSP:%i SP:%i]\n", (ip - ops->data), (i64)*ip, (i64)ctx->csp, (i64)ctx->sp);
-	for(int i=ctx->csp;i>=0;i--){
-		pf("C %u: %i\n", i, (i64)(ctx->closureStack[i] ? ctx->closureStack[i]->type : 0));
-	}
-	for(int i=ctx->sp-1;i>=0;i--){
-		pf("V %u: %V\n", i, ctx->valueStack[i]);
-	}
-	pf("\n");
-	if(ctx->csp < 0){
-		epf("CSP Error!");
-		exit(1);
-	}
-	if(ctx->sp < 0){
-		epf("SP Error!");
-		exit(1);
-	}
 }
 
 NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
