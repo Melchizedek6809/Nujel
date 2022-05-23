@@ -1,8 +1,8 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "symbol.h"
-#include "../misc/pf.h"
-#include "../misc/popcount.h"
+#include "../printer.h"
+#include "../compatibility/popcount.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -6,7 +6,7 @@
  * objects on the heap are still reachable.
  */
 #include "roots.h"
-#include "../misc/pf.h"
+#include "../printer.h"
 
 #include <stdlib.h>
 

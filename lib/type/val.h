@@ -1,7 +1,6 @@
 #ifndef NUJEL_LIB_TYPE_VAL
 #define NUJEL_LIB_TYPE_VAL
 #include "../nujel.h"
-#include "../collection/list.h"
 #include "../type-system.h"
 
 int       lValCompare(const lVal *a, const lVal *b);

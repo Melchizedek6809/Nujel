@@ -1,10 +1,10 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "bytecode.h"
-#include "../vm/bytecode.h"
-#include "../misc/pf.h"
 #include "garbage-collection.h"
 #include "symbol.h"
+#include "../printer.h"
+#include "../vm/bytecode.h"
 
 #include <stdlib.h>
 

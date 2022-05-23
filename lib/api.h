@@ -7,14 +7,13 @@
 
 #include "nujel.h"
 #include "allocation/symbol.h"
-#include "collection/list.h"
-#include "collection/string.h"
-#include "collection/tree.h"
-#include "misc/pf.h"
+#include "printer.h"
 #include "reader.h"
 #include "type-system.h"
 #include "type/closure.h"
+#include "type/string.h"
 #include "type/symbol.h"
+#include "type/tree.h"
 #include "type/val.h"
 
 #endif

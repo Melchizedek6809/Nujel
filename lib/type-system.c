@@ -7,7 +7,7 @@
  */
 #include "type-system.h"
 #include "allocation/symbol.h"
-#include "misc/pf.h"
+#include "printer.h"
 
 NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
 	char buf[128];

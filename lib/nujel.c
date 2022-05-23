@@ -2,12 +2,12 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "nujel.h"
 
-#include "misc/pf.h"
+#include "printer.h"
 #include "allocation/symbol.h"
-#include "collection/list.h"
 #include "reader.h"
 #include "type/closure.h"
 #include "type/symbol.h"
+#include "type/val.h"
 #include "vm/eval.h"
 
 #include <setjmp.h>
@@ -40,7 +40,10 @@ NORETURN void lExceptionThrowRaw(lVal *v){
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
-	lVal *l = lList(4, RVP(lValKeyword(symbol)), RVP(lValString(error)),RVP(v),RVP(lValLambda(c)));
+	lVal *l = RVP(lCons(RVP(lValLambda(c)), NULL));
+	l = RVP(lCons(RVP(v), l));
+	l = RVP(lCons(RVP(lValString(error)), l));
+	l = RVP(lCons(RVP(lValKeyword(symbol)), l));
 	lExceptionThrowRaw(l);
 }
 
@@ -178,4 +181,18 @@ lClosure *lNewRoot(){
 
 	lAddPlatformVars(c);
 	return lLoad(c, (const char *)stdlib_no_data);
+}
+
+/* Return the length of the list V */
+int lListLength(lVal *v){
+	int i = 0;
+	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
+	return i;
+}
+
+lVal *lCons(lVal *car, lVal *cdr){
+	lVal *v = lValAlloc(ltPair);
+	v->vList.car = car;
+	v->vList.cdr = cdr;
+	return v;
 }

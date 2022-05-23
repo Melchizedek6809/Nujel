@@ -6,13 +6,12 @@
 #include "../allocation/allocator.h"
 #include "../allocation/garbage-collection.h"
 #include "../allocation/symbol.h"
-#include "../collection/list.h"
-#include "../collection/tree.h"
-#include "../collection/string.h"
-#include "../misc/pf.h"
+#include "../printer.h"
 #include "../reader.h"
 #include "../type/closure.h"
+#include "../type/string.h"
 #include "../type/symbol.h"
+#include "../type/tree.h"
 #include "../type/val.h"
 
 #include <ctype.h>

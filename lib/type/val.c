@@ -4,8 +4,8 @@
 
 #include "../allocation/garbage-collection.h"
 #include "../allocation/allocator.h"
-#include "../collection/tree.h"
-#include "../collection/string.h"
+#include "../type/tree.h"
+#include "../type/string.h"
 #include "../type/closure.h"
 
 #include <math.h>

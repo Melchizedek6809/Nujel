@@ -2,7 +2,7 @@
 #define NUJEL_LIB_TYPE_SYSTEM
 
 #include "nujel.h"
-#include "misc/vec.h"
+#include "type/vec.h"
 
 i64             castToInt   (const lVal *v, i64 fallback);
 bool            castToBool  (const lVal *v);

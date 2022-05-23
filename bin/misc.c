@@ -1,7 +1,7 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "misc.h"
-#include "../lib/misc/pf.h"
+#include "../lib/printer.h"
 
 #ifdef __WATCOMC__
 	#include <direct.h>

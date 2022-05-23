@@ -1,6 +1,6 @@
-#ifndef NUJEL_LIB_MISC_PF
-#define NUJEL_LIB_MISC_PF
-#include "../common.h"
+#ifndef NUJEL_LIB_PRINTER
+#define NUJEL_LIB_PRINTER
+#include "common.h"
 #include <stdio.h>
 #include <stdarg.h>
 

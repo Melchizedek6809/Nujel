@@ -1,12 +1,12 @@
  /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../collection/tree.h"
-#include "../allocation/symbol.h"
 #include "../reader.h"
+#include "../type/tree.h"
+#include "../allocation/symbol.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
-#include "../misc/getmsecs.h"
+#include "../compatibility/getmsecs.h"
 
 #include <time.h>
 

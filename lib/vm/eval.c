@@ -3,11 +3,11 @@
 #include "eval.h"
 
 #include "bytecode.h"
+#include "../printer.h"
 #include "../allocation/symbol.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
-#include "../collection/list.h"
-#include "../misc/pf.h"
+#include "../type/val.h"
 
 #include <string.h>
 #include <stdlib.h>

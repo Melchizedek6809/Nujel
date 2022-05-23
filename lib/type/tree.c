@@ -1,7 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "tree.h"
-#include "list.h"
 #include "../type/symbol.h"
 
 /* Create a new Tree segment with S associated to V */

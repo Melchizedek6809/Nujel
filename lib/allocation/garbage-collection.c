@@ -11,7 +11,7 @@
 #include "allocator.h"
 #include "roots.h"
 #include "symbol.h"
-#include "../misc/pf.h"
+#include "../printer.h"
 
 #include <stdlib.h>
 
