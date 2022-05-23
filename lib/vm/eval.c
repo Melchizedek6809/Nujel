@@ -5,7 +5,6 @@
 #include "bytecode.h"
 #include "tracing.h"
 #include "../printer.h"
-#include "../allocation/symbol.h"
 #include "../type/closure.h"
 #include "../type/symbol.h"
 #include "../type/val.h"
@@ -27,30 +26,6 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 		}
 	}
 	return ret;
-}
-
-/* Read a value referenced at IP and store it in RET, retuns the new IP */
-static lBytecodeOp *lBytecodeReadOPVal(lBytecodeOp *ip, lVal **ret){
-	int i = *ip++;
-	i = (i << 8) | *ip++;
-	i = (i << 8) | *ip++;
-	*ret = lIndexVal(i);
-	return ip;
-}
-
-/* Read a symbol referenced at IP and store it in RET, retuns the new IP */
-static lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret){
-	int i = *ip++;
-	i = (i << 8) | *ip++;
-	i = (i << 8) | *ip++;
-	*ret = lIndexSym(i);
-	return ip;
-}
-
-/* Read an encoded signed 16-bit offset at ip */
-static int lBytecodeGetOffset16(const lBytecodeOp *ip){
-	const int x = (ip[0] << 8) | ip[1];
-	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
 
 static void lBytecodeLinkApply(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){

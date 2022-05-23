@@ -1,6 +1,8 @@
 #ifndef NUJEL_LIB_VM_BYTECODE
 #define NUJEL_LIB_VM_BYTECODE
 
+#include "../common.h"
+
 typedef enum lOpcode {
 	lopNOP             =  0x0,
 	lopRet             =  0x1,
@@ -43,5 +45,10 @@ typedef enum lOpcode {
 	lopMacroAst        = 0x26
 	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
+
+const char *lBytecodeGetOpcodeName(const lBytecodeOp op);
+lBytecodeOp *lBytecodeReadOPVal(lBytecodeOp *ip, lVal **ret);
+lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret);
+int lBytecodeGetOffset16(const lBytecodeOp *ip);
 
 #endif

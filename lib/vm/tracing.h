@@ -2,6 +2,6 @@
 #define NUJEL_LIB_VM_TRACING
 #include "../nujel.h"
 
-void lBytecodeTrace(const lThread *ctx, const lBytecodeOp *ip, const lBytecodeArray *ops);
+void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *ops);
 
 #endif
