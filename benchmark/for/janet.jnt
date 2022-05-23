@@ -1,6 +1,9 @@
-(var ret 0)
-(var i 0)
-(while (< i 10000000)
+(defn testRun []
+  (var ret 0)
+  (var i 0)
+  (while (< i 10000000)
        (+= ret i)
        (++ i))
-(print ret)
+  ret)
+
+(print (testRun))

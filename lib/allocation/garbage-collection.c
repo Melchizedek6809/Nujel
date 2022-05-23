@@ -9,6 +9,7 @@
 
 #include "bytecode.h"
 #include "allocator.h"
+#include "marker.h"
 #include "roots.h"
 #include "symbol.h"
 #include "../printer.h"
@@ -28,8 +29,7 @@ u8 lBytecodeArrayMarkMap [BCA_MAX];
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
 	if((c->csp > 8192) || (c->csp < 0)){
-		epf("Unlikely csp: %u\n", (i64)c->csp);
-		exit(1);
+		return;
 	}
 	for(int i=0;i<=c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
@@ -44,8 +44,7 @@ void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
 	if(ci >= lStringMax){
-		epf("Tried to mark invalid lString\n");
-		exit(1);
+		return;
 	}
 	if(lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
@@ -56,11 +55,23 @@ void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
 	if(ci >= lSymbolMax){
-		epf("Tried to mark invalid lSymbol\n");
-		exit(1);
+		return;
 	}
 	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
+}
+
+void lNFuncGCMark(const lNFunc *v){
+	if(v == NULL){return;}
+	const uint ci = v - lNFuncList;
+	if(ci > lNFuncMax){
+		return;
+		epf("Tried to mark invalid lNFunc\n");
+		exit(1);
+	}
+	lValGCMark(v->doc);
+	lValGCMark(v->args);
+	lSymbolGCMark(v->name);
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
@@ -68,8 +79,7 @@ void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
 	if(ci >= lValMax){
-		epf("Tried to mark out of bounds lVal\n");
-		exit(1);
+		return;
 	}
 	if(lValMarkMap[ci]){return;}
 	lValMarkMap[ci] = 1;
@@ -88,9 +98,7 @@ void lValGCMark(lVal *v){
 		lArrayGCMark(v->vArray);
 		break;
 	case ltNativeFunc:
-		lValGCMark(v->vNFunc->doc);
-		lValGCMark(v->vNFunc->args);
-		lSymbolGCMark(v->vNFunc->name);
+		lNFuncGCMark(v->vNFunc);
 		break;
 	case ltString:
 		lStringGCMark(v->vString);
@@ -117,8 +125,7 @@ void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
 	if(ci >= lTreeMax){
-		epf("Tried to mark invalid lTree\n");
-		exit(1);
+		return;
 	}
 	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
@@ -133,8 +140,7 @@ void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
 	if(ci >= lClosureMax){
-		epf("Tried to mark out of bounds lClosure: %i\n", (i64)ci);
-		exit(1);
+		return;
 	}
 	if(lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
@@ -221,7 +227,8 @@ void (*sweeperChain)() = NULL;
 #define ALLOC_MAX MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax))))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
-	for(uint i=0;i<ALLOC_MAX;i++){
+	const uint max = ALLOC_MAX;
+	for(uint i=0;i<max;i++){
 		if(i < lValMax)           {lValMarkMap[i]           ? lValMarkMap[i]           = 0 : lValFree(&lValList[i]);}
 		if(i < lClosureMax)       {lClosureMarkMap[i]       ? lClosureMarkMap[i]       = 0 : lClosureFree(&lClosureList[i]);}
 		if(i < lStringMax)        {lStringMarkMap[i]        ? lStringMarkMap[i]        = 0 : lStringFree(&lStringList[i]);}
@@ -236,7 +243,9 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
+	void *currentStack = NULL;
 	lGCRuns++;
+	lGCMarkStack(&currentStack);
 	lGCMark();
 	lGCSweep();
 }

@@ -6,6 +6,7 @@
  */
 
 #include "nujel.h"
+#include "allocation/marker.h"
 #include "allocation/symbol.h"
 #include "printer.h"
 #include "reader.h"

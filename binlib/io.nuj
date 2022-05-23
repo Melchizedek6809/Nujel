@@ -3,21 +3,21 @@
 
 [def test-context "Nujel Standalone"]
 
-[defn help [i]
-       "Describe 10 functions at offset 1"
-       [when-not [int? i] [set! i [int i]]]
+[defn help [off]
+       "Describe 10 functions at OFFset"
+       [when-not [int? off] [set! off [int off]]]
 
        [for-each [map [symbol-table off 10] string]
                  [fn [l] [def desc [describe l]]
                          [pfmtln "{l} {desc}"]]]
        [def sc [/ [symbol-count] 10]]
-       [pfmtln "Help page {i} of {sc}"]]
+       [pfmtln "Help page {off} of {sc}"]]
 
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
-       [def source [cons 'do [read [file/read path]]]]
-       [macroexpand/forms source environment]]
+       [for-in [form [read [file/read path]]]
+               [eval-in environment form]]]
 
 [defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]

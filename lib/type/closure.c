@@ -35,6 +35,8 @@ lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->caller = parent;
+	tmpc->rsp  = lRootsGet();
+	tmpc->ip   = tmpc->text->data;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(n->type == ltPair){
 			lVal *car = lCar(n);
@@ -141,6 +143,7 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;
 	ret->vClosure->text = requireBytecodeArray(parent, body);
+	ret->vClosure->ip   = ret->vClosure->text->data;
 
 	return ret;
 }

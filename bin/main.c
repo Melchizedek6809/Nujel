@@ -34,8 +34,7 @@ const char *run(const char *line){
 
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(){
-	lClosure *c;
-	c = lNewRoot();
+	lClosure *c = lNewRoot();
 	lOperationsIO(c);
 	lOperationsReadline(c);
 	c = lLoad(c, (const char *)binlib_no_data);
@@ -74,7 +73,7 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 
 /* Initialize the Nujel context with an stdlib as well
  * as parsing arguments passed to the runtime */
-void initNujel(int argc, char *argv[], lClosure *c){
+int initNujel(int argc, char *argv[], lClosure *c){
 	lVal *ret = NULL;
 	const int SP = lRootsGet();
 	initEnvironmentMap(c);
@@ -87,11 +86,15 @@ void initNujel(int argc, char *argv[], lClosure *c){
 	lVal *fun = RVP(lGetClosureSym(c, funSym->vSymbol));
 	mainClosure = c;
 	lApply(c, ret, fun);
+	return 0;
 }
 
 
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
+	volatile void *lStartOfStackTestVal = NULL;
+	lSetStartOfStack(&lStartOfStackTestVal);
+
 	#ifndef __WATCOMC__
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
@@ -99,7 +102,5 @@ int main(int argc, char *argv[]){
 	lInit();
 	setIOSymbols();
 
-	initNujel(argc,argv,parsePreOptions(argc,argv));
-
-	return 0;
+	return initNujel(argc,argv,parsePreOptions(argc,argv));
 }

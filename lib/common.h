@@ -154,12 +154,14 @@ struct lClosure {
 };
 
 struct lThread {
+	u64 magicValue;
 	lVal **valueStack;
 	lClosure **closureStack;
 	int valueStackSize;
 	int sp;
 	int csp;
 	int closureStackSize;
+	lBytecodeArray *text;
 };
 
 struct lString{
