@@ -2,7 +2,7 @@
 #define NUJEL_LIB_ALLOC_ALLOCATOR
 #include "../nujel.h"
 
-#define ARR_MAX (1<<12)
+#define ARR_MAX (1<<14)
 #define TRE_MAX (1<<19)
 #define CLO_MAX (1<<16)
 #define NFN_MAX (1<<10)

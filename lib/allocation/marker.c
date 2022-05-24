@@ -30,81 +30,88 @@ void lSetStartOfStack(void *p){
 }
 
 static bool couldBeArray(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lArrayList){return false;}
 	if(p > (void *)&lArrayList[ARR_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeClosure(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lClosureList){return false;}
 	if(p > (void *)&lClosureList[CLO_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeNFunc(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lNFuncList){return false;}
 	if(p > (void *)&lNFuncList[NFN_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeString(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lStringList){return false;}
 	if(p > (void *)&lStringList[STR_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeTree(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lTreeList){return false;}
 	if(p > (void *)&lTreeList[TRE_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeVal(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lValList){return false;}
 	if(p > (void *)&lValList[VAL_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
 static bool couldBeBCA(void *p){
+	if((u64)p & (sizeof(void *) - 1)){return false;}
 	if(p < (void *)lBytecodeArrayList){return false;}
 	if(p > (void *)&lBytecodeArrayList[BCA_MAX]){return false;}
-	if((intptr_t)p & (sizeof(void *) - 1)){return false;}
 	return true;
 }
 
+extern bool verboseMarking;
+
 void lGCMarkStack(void *endOfStack){
 	const void *start = lStartOfStack;
+	//verboseMarking = true;
+	//pf("Marking the stack:\n%p\n%p\n%p\n\n", start, endOfStack, checkForVal);
 	for(void *p = endOfStack; p < start; p+= sizeof(void *)){
-		const u64 v = *((u64 *)p);
-		if(v == 0xbaddbeefcafebabe){
+		const u64 vv = *((u64 *)p);
+		if(vv == 0xbaddbeefcafebabe){
 			lThread *c = (lThread *)p;
-			if((c->closureStackSize & 3) || (c->valueStackSize & 7)){continue;}
-			if((c->closureStackSize > 0x10000) || (c->valueStackSize > 0x10000)){continue;}
-			if((c->valueStack == NULL) || (c->closureStack == NULL)){continue;}
+			if((c->callStackSize & 0xF) || (c->valueStackSize & 0xF)){continue;}
+			if((c->callStackSize > 0x10000) || (c->callStackSize < 16)){continue;}
+			if((c->valueStackSize > 0x10000) || (c->valueStackSize < 16)){continue;}
+			if((c->valueStack == NULL) || (c->callStack == NULL)){continue;}
 			lThreadGCMark(p);
 		}
-		if(p < lStartOfHeap){continue;}
-		if(p > lEndOfHeap){continue;}
-		if(couldBeArray(p)){
-
-		}else if(couldBeBCA(p)){
-			lBytecodeArrayMark(p);
-		}else if(couldBeClosure(p)){
-			lClosureGCMark(p);
-		}else if(couldBeNFunc(p)){
-			lNFuncGCMark(p);
-		}else if(couldBeString(p)){
-			lStringGCMark(p);
-		}else if(couldBeTree(p)){
-			lTreeGCMark(p);
-		}else if(couldBeVal(p)){
-			lValGCMark(p);
+		void *v = *((void **)p);
+		if(v < lStartOfHeap){continue;}
+		if(v > lEndOfHeap){continue;}
+		if(couldBeArray(v)){
+			lArrayGCMark(v);
+		}else if(couldBeBCA(v)){
+			lBytecodeArrayMark(v);
+		}else if(couldBeClosure(v)){
+			lClosureGCMark(v);
+		}else if(couldBeNFunc(v)){
+			lNFuncGCMark(v);
+		}else if(couldBeString(v)){
+			lStringGCMark(v);
+		}else if(couldBeTree(v)){
+			lTreeGCMark(v);
+		}else if(couldBeVal(v)){
+			lValGCMark(v);
 		}
 	}
+	verboseMarking = false;
 }

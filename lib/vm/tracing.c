@@ -39,7 +39,7 @@ void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *o
 		pf("%s[$%s]\n", getIndent(ctx->csp), lBytecodeGetOpcodeName(*ip));
 	}
 	pf("%s [IP:%i CSP:%i SP:%i] [Text: %p]\n", getIndent(ctx->csp), (ip - ops->data), (i64)ctx->csp, (i64)ctx->sp, ops->data);
-	pf("%s [Data: %m]\n", getIndent(ctx->csp), ctx->closureStack[ctx->csp]->data);
+	pf("%s [Data: %m]\n", getIndent(ctx->csp), ctx->callStack[ctx->csp].c->data);
 	for(int i=ctx->csp;i>=0;i--){
 		//pf("Clo[%u] = %i\n", i, (i64)(ctx->closureStack[i] ? ctx->closureStack[i]->type : 0));
 	}

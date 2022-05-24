@@ -141,27 +141,31 @@ struct lClosure {
 	};
 	lTree *data, *meta;
 	lBytecodeArray *text;
-	lBytecodeOp *ip;
 	union {
 		lVal *args;
 		lVal *exceptionHandler;
 	};
 	const lSymbol *name;
 	lClosure *caller;
-	int sp;
-	u16 rsp;
 	u8 type;
 };
 
+typedef struct {
+	lClosure *c;
+	lBytecodeArray *text;
+	lBytecodeOp *ip;
+	int sp;
+} lCallFrame;
+
 struct lThread {
 	u64 magicValue;
+	lBytecodeArray *text;
 	lVal **valueStack;
-	lClosure **closureStack;
+	lCallFrame *callStack;
 	int valueStackSize;
+	int callStackSize;
 	int sp;
 	int csp;
-	int closureStackSize;
-	lBytecodeArray *text;
 };
 
 struct lString{

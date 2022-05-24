@@ -3,7 +3,7 @@
 ;;
 ;; Contains the Bytecode compiler that takes macroexpanded Nujel code and emits
 ;; Bytecode assembly
-[def *bytecompile-apply-new* #t]
+[def *bytecompile-apply-new* #f]
 
 [def bytecompile/gen-label/counter 0]
 [defn bytecompile/gen-label [prefix]

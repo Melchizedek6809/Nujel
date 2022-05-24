@@ -142,9 +142,11 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}
+		c->text = car->vBytecodeArr;
 		lBytecodeEval(c, car->vBytecodeArr, false);
 		lRootsRet(RSSP);
 	}
+	c->text = NULL;
 	lRootsRet(RSP);
 	return c;
 }

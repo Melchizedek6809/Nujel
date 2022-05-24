@@ -2,6 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "eval.h"
 
+#include "../allocation/marker.h"
 #include "bytecode.h"
 #include "tracing.h"
 #include "../printer.h"
@@ -58,6 +59,8 @@ NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 	lExceptionThrowValClo("stack-underflow", buf, NULL, c);
 }
 
+
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	jmp_buf oldExceptionTarget;
@@ -66,40 +69,39 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
 	ctx.magicValue = 0xbaddbeefcafebabe;
-	ctx.closureStackSize = 4;
-	ctx.valueStackSize = 8;
-	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
+	ctx.callStackSize = 16;
+	ctx.valueStackSize = 16;
+	ctx.callStack = calloc(ctx.callStackSize, sizeof(lCallFrame));
 	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
 	ctx.csp = 0;
 	ctx.sp = 0;
-	ctx.closureStack[ctx.csp] = c;
-
-	int exceptionCount = 0;
+	ctx.callStack[ctx.csp].c = c;
+	ctx.callStack[ctx.csp].text = text;
 	lRootsThreadPush(&ctx);
+	const int RSP = lRootsGet();
 
+	lRootsThreadPush(&ctx);
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(setjmpRet){
 		while((ctx.csp > 0) && (c->type != closureTry)){
-			ctx.csp--;
-			c = ctx.closureStack[ctx.csp];
+			c = ctx.callStack[--ctx.csp].c;
 		}
-		if((ctx.csp > 0) && (++exceptionCount < 1000)){
+		if(ctx.csp > 0){
 			lVal *handler = RVP(c->exceptionHandler);
 
-			c = ctx.closureStack[--ctx.csp];
-			ops = c->text;
-			ip = c->ip;
-			ctx.sp = c->sp;
+			c = ctx.callStack[--ctx.csp].c;
+			ops = ctx.callStack[ctx.csp].text;
+			ip = ctx.callStack[ctx.csp].ip;
 			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NULL), handler);
-			lRootsRet(c->rsp);
 		} else {
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
-			free(ctx.closureStack);
+			free(ctx.callStack);
 			free(ctx.valueStack);
-			lRootsRet(callingClosure->rsp);
 			lExceptionThrowRaw(exceptionValue);
+			memset(&ctx, 0, sizeof(lThread));
+			lRootsRet(RSP);
 			return NULL;
 		}
 	} else {
@@ -107,13 +109,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
-		if(ctx.csp == ctx.closureStackSize-1){
-			ctx.closureStackSize *= 2;
-			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
+		if(ctx.csp == ctx.callStackSize-1){
+			ctx.callStackSize *= 2;
+			ctx.callStack = realloc(ctx.callStack, ctx.callStackSize * sizeof(lCallFrame));
 		}
 		if(ctx.sp == ctx.valueStackSize-1){
 			ctx.valueStackSize *= 2;
-			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
+			ctx.valueStack = realloc(ctx.valueStack, ctx.valueStackSize * sizeof(lVal *));
 		}
 		if(trace){lBytecodeTrace(&ctx, ip, ops);}
 	switch(*ip){
@@ -244,11 +246,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.sp++;
 		break;}
 	case lopRootsSave:
-		c->rsp = lRootsGet();
+		//c->rsp = lRootsGet();
 		ip++;
 		break;
 	case lopRootsRestore:
-		lRootsRet(c->rsp);
+		//lRootsRet(c->rsp);
 		ip++;
 		break;
 	case lopCar:
@@ -273,28 +275,26 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;
 	case lopLet:
 		c = lClosureNew(c, closureLet);
-		c->type = closureLet;
-		ctx.closureStack[++ctx.csp] = c;
+		ctx.callStack[++ctx.csp].c = c;
 		ip++;
 		break;
 	case lopClosurePop: {
-		lClosure *nclo = ctx.closureStack[--ctx.csp];
+		lClosure *nclo = ctx.callStack[--ctx.csp].c;
 		c = nclo;
-		lRootsRet(c->rsp);
 		if(ctx.csp < 0){throwStackUnderflowError(c, "ClosurePop");}
 		ip++;
 		break; }
 	case lopTry:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Try");}
-
-		c->ip = ip + lBytecodeGetOffset16(ip+1);
-		c->sp = ctx.sp;
-		c->rsp = lRootsGet();
-		c->text = ops;
+		ctx.callStack[ctx.csp].ip   = ip + lBytecodeGetOffset16(ip+1);
+		ctx.callStack[ctx.csp].sp   = ctx.sp;
+		ctx.callStack[ctx.csp].text = ops;
 
 		c = lClosureNew(c, closureTry);
 		c->exceptionHandler = ctx.valueStack[--ctx.sp];
-		ctx.closureStack[++ctx.csp] = c;
+		ctx.callStack[++ctx.csp].c  = c;
+		ctx.callStack[  ctx.csp].text = ops;
+		ctx.callStack[  ctx.csp].ip   = ip;
 		ip+=3;
 		break;
 	case lopApplyDynamic:
@@ -302,11 +302,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		const lBytecodeOp curOp = *ip;
 		const int len = ip[1];
 		if(ctx.sp < len){throwStackUnderflowError(c, "ApplyNew");}
-		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
+		lVal * cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len + 1;
 		ctx.valueStack[ctx.sp-1] = cargs;
 		lVal *fun;
-		if(curOp == lopApply){
+		if((curOp == lopApply) || (curOp == lopApplyNew)){
 			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
 			if(fun && (fun->type == ltSymbol)){
 				lBytecodeLinkApply(c, ops, ip);
@@ -318,15 +318,16 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ip+=2;
 			ctx.sp--;
 		}
+		const int RRSP = lRootsGet();
 		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun);
+		lRootsRet(RRSP);
 		break; }
 	case lopApplyDynamicNew:
 	case lopApplyNew: {
 		const lBytecodeOp curOp = *ip;
 		const int len = ip[1];
 		if(ctx.sp < len){throwStackUnderflowError(c, "ApplyNew");}
-		c->rsp = lRootsGet();
-		lVal *cargs = RVP(lStackBuildList(ctx.valueStack, ctx.sp, len));
+		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun;
 
@@ -343,46 +344,51 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		}
 
 		if(fun && (fun->type == ltLambda)){
-			c->ip = ip;
-			c->sp = ctx.sp;
-			c->text = ops;
-			ctx.closureStack[++ctx.csp] = c = lClosureNewFunCall(c, cargs, fun);
-			ip = c->ip;
-			ops = c->text;
+			ctx.callStack[ctx.csp].c    = c;
+			ctx.callStack[ctx.csp].ip   = ip;
+			ctx.callStack[ctx.csp].sp   = ctx.sp;
+			ctx.callStack[ctx.csp].text = ops;
+
+			ctx.csp++;
+			c   = ctx.callStack[ctx.csp].c    = lClosureNewFunCall(c, cargs, fun);
+			ops = ctx.callStack[ctx.csp].text = c->text;
+			ip  = ctx.callStack[ctx.csp].ip   = c->text->data;
 		}else{
+			const int RRSP = lRootsGet();
 			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
+			lRootsRet(RRSP);
 		}
 		break; }
 	case lopRet:
 		if(ctx.sp < 1){ throwStackUnderflowError(c, "Ret"); }
 		if(ctx.csp > 0){
-			while(ctx.closureStack[ctx.csp]->type != closureCall){
+			while(ctx.callStack[ctx.csp].c->type != closureCall){
 				if(--ctx.csp <= 0){goto topLevelReturn;}
 			}
 			lVal *ret = ctx.valueStack[ctx.sp-1];
-			c   = ctx.closureStack[--ctx.csp];
-			ip  = c->ip;
-			ops = c->text;
-			ctx.sp = c->sp;
+			c   = ctx.callStack[--ctx.csp].c;
+			ip  = ctx.callStack[ctx.csp].ip;
+			ops = ctx.callStack[ctx.csp].text;
+			ctx.sp = ctx.callStack[ctx.csp].sp;
 			ctx.valueStack[ctx.sp++] = ret;
-			lRootsRet(c->rsp);
 			break;
 		}
 		topLevelReturn:
 		memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 		exceptionTargetDepth--;
-		lRootsRet(callingClosure->rsp);
-		lVal *ret = RVP(ctx.valueStack[ctx.sp-1]);
-		free(ctx.closureStack);
+		lVal *ret = ctx.valueStack[ctx.sp-1];
+		free(ctx.callStack);
 		free(ctx.valueStack);
+		memset(&ctx, 0, sizeof(lThread));
+		lRootsRet(RSP);
 		return ret;
 	}}
 	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 	exceptionTargetDepth--;
-	lRootsRet(callingClosure->rsp);
-	free(ctx.closureStack);
+	free(ctx.callStack);
 	free(ctx.valueStack);
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	memset(&ctx, 0, sizeof(lThread));
+	lRootsRet(RSP);
 	return NULL;
 }

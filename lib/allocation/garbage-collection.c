@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 int lGCRuns = 0;
+bool verboseMarking = false;
 
 u8 lValMarkMap           [VAL_MAX];
 u8 lTreeMarkMap          [TRE_MAX];
@@ -27,12 +28,13 @@ u8 lSymbolMarkMap        [SYM_MAX];
 u8 lBytecodeArrayMarkMap [BCA_MAX];
 
 void lThreadGCMark(lThread *c){
-	if(c == NULL){return;}
-	if((c->csp > 8192) || (c->csp < 0)){
-		return;
+	if(c == NULL){ return; }
+	if(verboseMarking){
+		pf("Thread Mark\n");
 	}
 	for(int i=0;i<=c->csp;i++){
-		lClosureGCMark(c->closureStack[i]);
+		lClosureGCMark(c->callStack[i].c);
+		lBytecodeArrayMark(c->callStack[i].text);
 	}
 	for(int i=0;i<c->sp;i++){
 		lValGCMark(c->valueStack[i]);
@@ -43,10 +45,11 @@ void lThreadGCMark(lThread *c){
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
-	if(ci >= lStringMax){
-		return;
+	if(ci >= lStringMax)  { return; }
+	if(lStringMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("String Mark\n");
 	}
-	if(lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
 }
 
@@ -54,20 +57,20 @@ void lStringGCMark(const lString *v){
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
-	if(ci >= lSymbolMax){
-		return;
+	if(ci >= lSymbolMax)  {return;}
+	if(lSymbolMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("Symbol Mark\n");
 	}
-	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
 }
 
 void lNFuncGCMark(const lNFunc *v){
 	if(v == NULL){return;}
 	const uint ci = v - lNFuncList;
-	if(ci > lNFuncMax){
-		return;
-		epf("Tried to mark invalid lNFunc\n");
-		exit(1);
+	if(ci > lNFuncMax){ return; }
+	if(verboseMarking){
+		pf("NFunc Mark\n");
 	}
 	lValGCMark(v->doc);
 	lValGCMark(v->args);
@@ -78,10 +81,11 @@ void lNFuncGCMark(const lNFunc *v){
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
-	if(ci >= lValMax){
-		return;
+	if(ci >= lValMax)  { return; }
+	if(lValMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("Val Mark\n");
 	}
-	if(lValMarkMap[ci]){return;}
 	lValMarkMap[ci] = 1;
 
 	switch(v->type){
@@ -124,10 +128,11 @@ void lValGCMark(lVal *v){
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
-	if(ci >= lTreeMax){
-		return;
+	if(ci >= lTreeMax)  { return; }
+	if(lTreeMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("Tree Mark\n");
 	}
-	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
 	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
@@ -139,10 +144,11 @@ void lTreeGCMark(const lTree *v){
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
-	if(ci >= lClosureMax){
-		return;
+	if(ci >= lClosureMax)  { return; }
+	if(lClosureMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("Closure Mark\n");
 	}
-	if(lClosureMarkMap[ci]){return;}
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);
@@ -158,11 +164,11 @@ void lClosureGCMark(const lClosure *c){
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
-	if(ci >= lArrayMax){
-		epf("Tried to mark invalid lArray\n");
-		exit(1);
+	if(ci >= lArrayMax)  { return; }
+	if(lArrayMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("Array Mark\n");
 	}
-	if(lArrayMarkMap[ci]){return;}
 	lArrayMarkMap[ci] = 1;
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);
@@ -173,11 +179,11 @@ void lArrayGCMark(const lArray *v){
 void lBytecodeArrayMark(const lBytecodeArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lBytecodeArrayList;
-	if(ci >= lBytecodeArrayMax){
-		epf("Tried to mark invalid lBytecodeArray\n");
-		exit(1);
+	if(ci >= lBytecodeArrayMax)  { return; }
+	if(lBytecodeArrayMarkMap[ci]){ return; }
+	if(verboseMarking){
+		pf("BCArr Mark\n");
 	}
-	if(lBytecodeArrayMarkMap[ci]){return;}
 	lBytecodeArrayMarkMap[ci] = 1;
 	lBytecodeArrayMarkRefs(v);
 }
@@ -219,6 +225,8 @@ static void lMarkFree(){
 
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
+	void *currentStack = NULL;
+	lGCMarkStack(&currentStack);
 	lRootsMark();
 	lMarkFree();
 }
@@ -243,9 +251,7 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
-	void *currentStack = NULL;
 	lGCRuns++;
-	lGCMarkStack(&currentStack);
 	lGCMark();
 	lGCSweep();
 }
