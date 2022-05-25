@@ -4,6 +4,7 @@
 #include "../misc.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(__MINGW32__) || defined(__MSYS__)
 	#include <windows.h>
@@ -16,7 +17,9 @@ static char *bestline(const char *prompt){
 	char *buf = NULL;
 	size_t bufsize = 0;
 
-	fputs(prompt, stdout);
+	if(prompt){
+		fputs(prompt, stdout);
+	}
 	const int64_t ret = getline(&buf,&bufsize,stdin);
 
 	if(ret >= 0){
@@ -28,11 +31,14 @@ static char *bestline(const char *prompt){
 }
 
 static lVal *lnfReadline(lClosure *c, lVal *v){
-	lString *prompt = requireString(c, lCar(v));
-	char *line = bestline(prompt->data);
-	lVal *ret = lValString(line);
-	free(line);
-	return ret;
+	const char *prompt = NULL;
+	lVal *car = lCar(v);
+	if(car){
+		lString *promptS = requireString(c, lCar(v));
+		prompt = promptS->data;
+	}
+	char *line = bestline(prompt);
+	return lValStringNoCopy(line, strnlen(line, BUF_SIZE));
 }
 
 void lOperationsReadline(lClosure *c){

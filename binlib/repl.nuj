@@ -20,16 +20,34 @@
   [try repl/exception-handler
        [eval-in root-closure [cons do [read line]]]]]
 
-[defn repl/readline [ctx]
-  [def line [readline [repl/prompt]]]
+[defn repl/cmd/raw [ctx line]
   [when [nil? line]
     [display "Bye!\r\n"]
     [exit 0]]
-  [def result [eval-in ctx [cons do [read line]]]]
+  [def expr [read line]]
+  [when [equal? '[] expr]
+    [print "\r"]
+    [return]]
+  [def result [eval-in ctx [cons do expr]]]
   [set! repl/history [cons line repl/history]]
-  [println [cat [if [nil? result]
-                    ""
-                    [str/write result]]]]]
+  [println [if [nil? result] "" [str/write result]]]]
+
+[defn repl/cmd [ctx]
+  [def buf ""]
+  [def line ""]
+  [while [!= line "[/cmd]\n"]
+    [set! buf [cat buf line]]
+    [set! line [readline]]]
+  [def expr [cons do [read buf]]]
+  [set! repl/history [cons buf repl/history]]
+  [def result [eval-in ctx expr]]
+  [println [if [nil? result] "" [str/write result]]]]
+
+[defn repl/readline [ctx]
+  [def line [readline [repl/prompt]]]
+  [if [== line "[cmd]\n"]
+      [repl/cmd ctx]
+      [repl/cmd/raw ctx line]]]
 
 [defn repl []
   [while #t

@@ -48,7 +48,9 @@ tmp/binlib.c: tmp/binlib.no $(ASSET)
 tmp/binlib.h: tmp/binlib.c
 	@true
 
-run: test
+run: $(NUJEL)
+	@./$(NUJEL) --only-test-suite tools/tests.nuj
+
 test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj
 
