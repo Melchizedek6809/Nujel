@@ -13,6 +13,7 @@
 #include "roots.h"
 #include "symbol.h"
 #include "../printer.h"
+#include "../compatibility/builtins.h"
 
 #include <stdlib.h>
 
@@ -31,10 +32,10 @@ void lThreadGCMark(lThread *c){
 	if((c->csp > 8192) || (c->csp < 0)){
 		return;
 	}
-	for(int i=0;i<=c->csp;i++){
+	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
-	for(int i=0;i<c->sp;i++){
+	for(int i=0;i <= c->sp;i++){
 		lValGCMark(c->valueStack[i]);
 	}
 }

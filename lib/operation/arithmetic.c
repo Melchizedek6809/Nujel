@@ -3,7 +3,7 @@
 #include "../type-system.h"
 #include "../type/closure.h"
 #include "../type/val.h"
-#include "../compatibility/popcount.h"
+#include "../compatibility/builtins.h"
 
 #include <math.h>
 

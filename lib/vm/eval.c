@@ -13,19 +13,14 @@
 
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
-	lVal *ret = NULL;
-	lVal *t= NULL;
-	ret = RVP(lCons(NULL,NULL));
-	for(int i = len; i > 0; i--){
-		if(t == NULL){
-			ret->vList.car = stack[sp - i];
-			t = ret;
-		}else{
-			t->vList.cdr = lCons(stack[sp - i],NULL);
-			t = t->vList.cdr;
-		}
+	if(len == 0){return lCons(NULL, NULL);}
+	const int nsp = sp - len;
+	lVal *t = stack[nsp] = RVP(lCons(stack[nsp], NULL));
+	for(int i = len-1; i > 0; i--){
+		t->vList.cdr = lCons(stack[sp - i], NULL);
+		t = t->vList.cdr;
 	}
-	return ret;
+	return stack[nsp];
 }
 
 static void lBytecodeLinkApply(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
@@ -67,11 +62,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lThread ctx;
 	ctx.magicValue = 0xbaddbeefcafebabe;
 	ctx.closureStackSize = 4;
-	ctx.valueStackSize = 8;
-	ctx.closureStack = calloc(ctx.closureStackSize, sizeof(lClosure *));
-	ctx.valueStack = calloc(ctx.valueStackSize, sizeof(lVal *));
+	ctx.valueStackSize   = 8;
+	ctx.closureStack     = calloc(ctx.closureStackSize, sizeof(lClosure *));
+	ctx.valueStack       = calloc(ctx.valueStackSize,   sizeof(lVal *));
 	ctx.csp = 0;
-	ctx.sp = 0;
+	ctx.sp  = 0;
 	ctx.closureStack[ctx.csp] = c;
 
 	int exceptionCount = 0;
@@ -288,9 +283,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopTry:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Try");}
 
-		c->ip = ip + lBytecodeGetOffset16(ip+1);
-		c->sp = ctx.sp;
-		c->rsp = lRootsGet();
+		c->ip   = ip + lBytecodeGetOffset16(ip+1);
+		c->sp   = ctx.sp;
+		c->rsp  = lRootsGet();
 		c->text = ops;
 
 		c = lClosureNew(c, closureTry);
@@ -300,12 +295,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;
 	case lopApplyDynamic:
 	case lopApply: {
+		const int applyRSP = lRootsGet();
 		const lBytecodeOp curOp = *ip;
 		const int len = ip[1];
 		if(ctx.sp < len){throwStackUnderflowError(c, "ApplyNew");}
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len + 1;
-		ctx.valueStack[ctx.sp-1] = cargs;
 		lVal *fun;
 		if(curOp == lopApply){
 			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
@@ -317,9 +312,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		}else{
 			fun = ctx.valueStack[ctx.sp-2];
 			ip+=2;
-			ctx.sp--;
 		}
-		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun);
+		lVal *res = lApply(c, cargs, fun);
+		if(curOp == lopApplyDynamic){ ctx.sp--; }
+		ctx.valueStack[ctx.sp-1] = res;
+		(void)applyRSP;
+		//lRootsRet(applyRSP);
 		break; }
 	case lopRet:
 		if(ctx.sp < 1){ throwStackUnderflowError(c, "Ret"); }

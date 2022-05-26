@@ -2,7 +2,7 @@
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "symbol.h"
 #include "../printer.h"
-#include "../compatibility/popcount.h"
+#include "../compatibility/builtins.h"
 
 #include <stdlib.h>
 #include <string.h>

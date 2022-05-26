@@ -51,6 +51,7 @@ lVal *lRootsValPush(lVal *v){
 
 /* Mark every single root and everything they point to */
 void lRootsMark(){
+	//pf("rootSP: %i\n", (i64)rootSP);
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){
 		case ltPair:

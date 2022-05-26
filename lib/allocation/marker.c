@@ -104,6 +104,7 @@ bool isReferencedInStack(void *needle, void *endOfStack){
 	return false;
 }
 
+
 void lGCMarkStack(void *endOfStack){
 	const void *start = lStartOfStack;
 	for(void *p = endOfStack; p < start; p+= sizeof(void *)){

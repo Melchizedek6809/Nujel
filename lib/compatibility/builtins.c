@@ -19,4 +19,6 @@ uint64_t __builtin_popcountll(uint64_t x){
 uint32_t __builtin_popcount(uint32_t x){
 	return popcount_2(x);
 }
+
+void __sync_synchronize(){}
 #endif
