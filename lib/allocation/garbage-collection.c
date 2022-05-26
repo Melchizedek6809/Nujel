@@ -43,7 +43,7 @@ void lThreadGCMark(lThread *c){
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
-	if(ci > lStringMax){
+	if(ci >= lStringMax){
 		epf("Tried to mark invalid lString\n");
 		exit(1);
 	}
@@ -55,7 +55,7 @@ void lStringGCMark(const lString *v){
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
-	if(ci > lSymbolMax){
+	if(ci >= lSymbolMax){
 		epf("Tried to mark invalid lSymbol\n");
 		exit(1);
 	}
@@ -67,7 +67,7 @@ void lSymbolGCMark(const lSymbol *v){
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
-	if(ci > lValMax){
+	if(ci >= lValMax){
 		epf("Tried to mark out of bounds lVal\n");
 		exit(1);
 	}
@@ -116,7 +116,7 @@ void lValGCMark(lVal *v){
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
-	if(ci > lTreeMax){
+	if(ci >= lTreeMax){
 		epf("Tried to mark invalid lTree\n");
 		exit(1);
 	}
@@ -152,7 +152,7 @@ void lClosureGCMark(const lClosure *c){
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
-	if(ci > lArrayMax){
+	if(ci >= lArrayMax){
 		epf("Tried to mark invalid lArray\n");
 		exit(1);
 	}
@@ -167,7 +167,7 @@ void lArrayGCMark(const lArray *v){
 void lBytecodeArrayMark(const lBytecodeArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lBytecodeArrayList;
-	if(ci > lBytecodeArrayMax){
+	if(ci >= lBytecodeArrayMax){
 		epf("Tried to mark invalid lBytecodeArray\n");
 		exit(1);
 	}
