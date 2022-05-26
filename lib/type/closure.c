@@ -9,15 +9,12 @@
 #include "../printer.h"
 #include "../reader.h"
 #include "../type/closure.h"
-#include "../type/string.h"
-#include "../type/symbol.h"
 #include "../type/tree.h"
 #include "../type/val.h"
 
 #include <ctype.h>
 #include <string.h>
 
-/* Return a new closure, setting the parent field */
 lClosure *lClosureNew(lClosure *parent, closureType t){
 	lClosure *c = lClosureAlloc();
 	c->parent = parent;
@@ -31,11 +28,10 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 }
 
 lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
-	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure, closureCall));
+	lClosure *tmpc = lClosureNew(lambda->vClosure, closureCall);
 	tmpc->text = lambda->vClosure->text;
 	tmpc->name = lambda->vClosure->name;
 	tmpc->caller = parent;
-	tmpc->rsp  = lRootsGet();
 	tmpc->ip   = tmpc->text->data;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(n->type == ltPair){
@@ -94,7 +90,6 @@ bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal **v){
 	return false;
 }
 
-/* Return the value bound to S in C */
 lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
 	for(lClosure *cc = c; cc; cc = cc->parent){
 		lVal *ret;
@@ -125,7 +120,7 @@ void lDefineVal(lClosure *c, const char *str, lVal *val){
 
 /* Add a NFunc to closure C, should only be used during root closure creation */
 lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
-	lVal *v = lRootsValPush(lValAlloc(ltNativeFunc));
+	lVal *v = lValAlloc(ltNativeFunc);
 	v->vNFunc = lNFuncAlloc();
 	v->vNFunc->fp   = func;
 	v->vNFunc->doc  = lValString(doc);
@@ -138,7 +133,7 @@ lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char 
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
 
-	lVal *ret = RVP(lValAlloc(ltLambda));
+	lVal *ret = lValAlloc(ltLambda);
 	ret->vClosure       = lClosureNew(parent, closureDefault);
 	ret->vClosure->name = sym;
 	ret->vClosure->args = args;

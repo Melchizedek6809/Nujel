@@ -49,13 +49,13 @@
 [defn $get [v]
   [list #$10 [sym->bytecode-op v]]]
 
-[defn $apply/generic [opcode arg-count fun]
+[defn $apply [arg-count fun]
   "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
   [case arg-count
     [1 [case fun
          [car [$car]]
          [cdr [$cdr]]
-         [otherwise [list opcode
+         [otherwise [list #$8
                           [int->bytecode-op arg-count]
                           [val->bytecode-op fun]]]]]
     [2 [case fun
@@ -66,23 +66,15 @@
          [== [$==]]
          [>= [$>=]]
          [> [$>]]
-         [otherwise [list opcode
+         [otherwise [list #$8
                           [int->bytecode-op arg-count]
                           [val->bytecode-op fun]]]]]
-    [otherwise [list opcode
+    [otherwise [list #$8
                      [int->bytecode-op arg-count]
                      [val->bytecode-op fun]]]]]
 
-[defn $apply [arg-count fun]
-  "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-  [$apply/generic #$8 arg-count fun]]
-
-[defn $apply/new [arg-count fun]
-  "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-  [$apply/generic #$4 arg-count fun]]
-
 [defn $apply/dynamic [arg-count fun]
-  [list #$1A [int->bytecode-op arg-count]]]
+  [list #$7 [int->bytecode-op arg-count]]]
 
 [defn $apply/dynamic/new [arg-count fun]
   [list #$7 [int->bytecode-op arg-count]]]

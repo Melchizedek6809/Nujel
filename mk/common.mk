@@ -25,5 +25,5 @@ WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing
 
 LIBS                 := -lm
 
-RELEASE_OPTIMIZATION := -O3 -flto
+RELEASE_OPTIMIZATION := -O3 -flto=auto
 VERSION_ARCH         := $(shell uname -m)

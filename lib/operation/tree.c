@@ -1,12 +1,11 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "../type/closure.h"
-#include "../type/symbol.h"
 #include "../type/tree.h"
 #include "../type/val.h"
 
 lVal *lnfTreeNew(lClosure *c, lVal *v){
-	lVal *ret = lRootsValPush(lValAlloc(ltTree));
+	lVal *ret = lValAlloc(ltTree);
 	ret->vTree = lTreeNew(NULL, NULL);
 
 	for(lVal *n = v; n; n = lCddr(n)){
@@ -59,9 +58,7 @@ static lVal *lnfTreeDup(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error","tree/dup can only be called with a tree as an argument", v, c);
 	}
 	lTree *tree = requireTree(c, lCar(v));
-	const int SP = lRootsGet();
 	tree = lTreeDup(tree);
-	lRootsRet(SP);
 	return lValTree(tree);
 }
 

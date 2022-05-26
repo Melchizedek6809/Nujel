@@ -8,6 +8,11 @@ extern lSymbol *lSymbolFFree;
 extern uint     lSymbolActive;
 extern uint     lSymbolMax;
 
+extern lSymbol *symType;
+extern lSymbol *symArguments;
+extern lSymbol *symCode;
+extern lSymbol *symData;
+
 extern lSymbol *symNull;
 extern lSymbol *symQuote;
 extern lSymbol *symQuasiquote;

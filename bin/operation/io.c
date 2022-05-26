@@ -42,22 +42,44 @@ lSymbol *lsCharacterDevice;
 lSymbol *lsBlockDevice;
 lSymbol *lsNamedPipe;
 
-void setIOSymbols(){
-	lsError            = RSYMP(lSymS("error?"));
-	lsErrorNumber      = RSYMP(lSymS("error-number"));
-	lsErrorText        = RSYMP(lSymS("error-text"));
-	lsMode             = RSYMP(lSymS("mode"));
-	lsSize             = RSYMP(lSymS("size"));
-	lsUserID           = RSYMP(lSymS("user-id"));
-	lsGroupID          = RSYMP(lSymS("group-id"));
-	lsAccessTime       = RSYMP(lSymS("access-time"));
-	lsModificationTime = RSYMP(lSymS("modification-time"));
+void (*ioMarkerChain)() = NULL;
+void ioSymbolMarker(){
+	lSymbolGCMark(lsError);
+	lSymbolGCMark(lsErrorText);
+	lSymbolGCMark(lsMode);
+	lSymbolGCMark(lsSize);
+	lSymbolGCMark(lsUserID);
+	lSymbolGCMark(lsGroupID);
+	lSymbolGCMark(lsAccessTime);
+	lSymbolGCMark(lsModificationTime);
+	lSymbolGCMark(lsRegularFile);
+	lSymbolGCMark(lsDirectory);
+	lSymbolGCMark(lsCharacterDevice);
+	lSymbolGCMark(lsBlockDevice);
+	lSymbolGCMark(lsNamedPipe);
 
-	lsRegularFile      = RSYMP(lSymS("regular-file?"));
-	lsDirectory        = RSYMP(lSymS("directory?"));
-	lsCharacterDevice  = RSYMP(lSymS("character-device?"));
-	lsBlockDevice      = RSYMP(lSymS("block-device?"));
-	lsNamedPipe        = RSYMP(lSymS("named-pipe?"));
+	if(ioMarkerChain){ioMarkerChain();}
+}
+
+void setIOSymbols(){
+	lsError            = lSymS("error?");
+	lsErrorNumber      = lSymS("error-number");
+	lsErrorText        = lSymS("error-text");
+	lsMode             = lSymS("mode");
+	lsSize             = lSymS("size");
+	lsUserID           = lSymS("user-id");
+	lsGroupID          = lSymS("group-id");
+	lsAccessTime       = lSymS("access-time");
+	lsModificationTime = lSymS("modification-time");
+
+	lsRegularFile      = lSymS("regular-file?");
+	lsDirectory        = lSymS("directory?");
+	lsCharacterDevice  = lSymS("character-device?");
+	lsBlockDevice      = lSymS("block-device?");
+	lsNamedPipe        = lSymS("named-pipe?");
+
+	ioMarkerChain = rootsMarkerChain;
+	rootsMarkerChain = ioSymbolMarker;
 }
 
 extern uint symbolLookups;
@@ -149,24 +171,24 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 	lString *filename = requireString(c, lCar(v));
 	struct stat statbuf;
 	int err = stat(filename->data, &statbuf);
-	lVal *ret = RVP(lValTree(NULL));
-	ret->vTree = lTreeInsert(ret->vTree, lsError, RVP(lValBool(err)));
+	lVal *ret = lValTree(NULL);
+	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(err));
 	if(err){
-		ret->vTree = lTreeInsert(ret->vTree, lsErrorNumber,      RVP(lValInt(errno)));
-		ret->vTree = lTreeInsert(ret->vTree, lsErrorText,        RVP(lValString(strerror(errno))));
+		ret->vTree = lTreeInsert(ret->vTree, lsErrorNumber,      lValInt(errno));
+		ret->vTree = lTreeInsert(ret->vTree, lsErrorText,        lValString(strerror(errno)));
 	}else{
-		ret->vTree = lTreeInsert(ret->vTree, lsMode,             RVP(lValInt(statbuf.st_mode)));
-		ret->vTree = lTreeInsert(ret->vTree, lsUserID,           RVP(lValInt(statbuf.st_uid)));
-		ret->vTree = lTreeInsert(ret->vTree, lsGroupID,          RVP(lValInt(statbuf.st_gid)));
-		ret->vTree = lTreeInsert(ret->vTree, lsSize,             RVP(lValInt(statbuf.st_size)));
-		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime,       RVP(lValInt(statbuf.st_atime)));
-		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, RVP(lValInt(statbuf.st_mtime)));
+		ret->vTree = lTreeInsert(ret->vTree, lsMode,             lValInt(statbuf.st_mode));
+		ret->vTree = lTreeInsert(ret->vTree, lsUserID,           lValInt(statbuf.st_uid));
+		ret->vTree = lTreeInsert(ret->vTree, lsGroupID,          lValInt(statbuf.st_gid));
+		ret->vTree = lTreeInsert(ret->vTree, lsSize,             lValInt(statbuf.st_size));
+		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime,       lValInt(statbuf.st_atime));
+		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(statbuf.st_mtime));
 
-		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile,      RVP(lValBool(S_ISREG(statbuf.st_mode))));
-		ret->vTree = lTreeInsert(ret->vTree, lsDirectory,        RVP(lValBool(S_ISDIR(statbuf.st_mode))));
-		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice,  RVP(lValBool(S_ISCHR(statbuf.st_mode))));
-		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice,      RVP(lValBool(S_ISBLK(statbuf.st_mode))));
-		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        RVP(lValBool(S_ISFIFO(statbuf.st_mode))));
+		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
+		ret->vTree = lTreeInsert(ret->vTree, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
+		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
+		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
+		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
 	}
 	return ret;
 }
@@ -238,11 +260,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	buf = realloc(buf,len+1);
 	buf[len] = 0;
 
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	ret->vList.car = lValInt(exitCode);
-	ret->vList.cdr = lValStringNoCopy(buf,len);
-
-	return ret;
+	return lCons(lValInt(exitCode),lValStringNoCopy(buf,len));
 }
 #else
 static lVal *lnfPopen(lClosure *c, lVal *v){
@@ -266,7 +284,7 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 		if((de->d_name[0] == '.') && (de->d_name[1] == 0)){continue;}
 		if((de->d_name[0] == '.') && (de->d_name[1] == '.') && (de->d_name[2] == 0)){continue;}
 		if(cur == NULL){
-			ret = cur = lRootsValPush(lCons(NULL,NULL));
+			ret = cur = lCons(NULL,NULL);
 		}else{
 			cur = cur->vList.cdr = lCons(NULL,NULL);
 		}
@@ -302,8 +320,8 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"error",            "[v]",      "Prints v to stderr",                          lnfError);
-	lAddNativeFunc(c,"print",            "[v]",      "Displays v",                                  lnfPrint);
+	lAddNativeFunc(c,"error",            "[v]",            "Prints v to stderr",                                lnfError);
+	lAddNativeFunc(c,"print",            "[v]",            "Displays v",                                        lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);

@@ -103,14 +103,12 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c+=3;
 				break;
-			case lopApplyDynamicNew:
 			case lopApplyDynamic:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
 				}
 				c++;
 				break;
-			case lopApplyNew:
 			case lopApply:
 				if(&c[4] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);

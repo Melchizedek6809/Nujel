@@ -4,20 +4,14 @@
 #include "../type/tree.h"
 #include "../allocation/symbol.h"
 #include "../type/closure.h"
-#include "../type/symbol.h"
 #include "../type/val.h"
 #include "../compatibility/getmsecs.h"
 
 #include <time.h>
 
-const lSymbol *symType;
-const lSymbol *symArguments;
-const lSymbol *symCode;
-const lSymbol *symData;
-
 static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	(void)v;
-	lVal *l = lTreeAddKeysToList(c->data, NULL);
+	lVal *l = lTreeKeysToList(c->data);
 	for(lVal *n = l;n;n = n->vList.cdr){
 		if(n->vList.car == NULL){break;}
 		n->vList.car->type = ltSymbol;
@@ -44,24 +38,24 @@ static lVal *lnfClosure(lClosure *c, lVal *v){
 		||   (car->type == ltMacro))){
 		return NULL;
 	}
-	lVal *ret = lRootsValPush(lValTree(NULL));
-	ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("type")),lRootsValPush(lValSymS(getTypeSymbol(car))));
+	lVal *ret = lValTree(NULL);
+	ret->vTree = lTreeInsert(ret->vTree, lSymS("type"), lValSymS(getTypeSymbol(car)));
 	if(car->type == ltNativeFunc){
 		lNFunc *nf = car->vNFunc;
 		if(nf == NULL){return ret;}
 		ret->vTree = lTreeInsert(ret->vTree, symArguments,nf->args);
-		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")),lValSymS(nf->name));
+		ret->vTree = lTreeInsert(ret->vTree, lSymS("name"),lValSymS(nf->name));
 	}else{
 		lClosure *clo = car->vClosure;
 		if(clo == NULL){return ret;}
 		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
-		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("name")), RVP(lValSymS(clo->name)));
+		ret->vTree = lTreeInsert(ret->vTree, lSymS("name"), lValSymS(clo->name));
 		lVal *text = lValAlloc(ltBytecodeArr);
 		text->vBytecodeArr = clo->text;
-		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("code")), text);
-		ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("data")), RVP(lValTree(clo->data)));
+		ret->vTree = lTreeInsert(ret->vTree, lSymS("code"), text);
+		ret->vTree = lTreeInsert(ret->vTree, lSymS("data"), lValTree(clo->data));
 		if(clo->type == closureCall){
-			ret->vTree = lTreeInsert(ret->vTree, RSYMP(lSymS("call")), lRootsValPush(lValBool(true)));
+			ret->vTree = lTreeInsert(ret->vTree, lSymS("call"), lValBool(true));
 		}
 	}
 	return ret;
@@ -262,7 +256,7 @@ static lVal *lnfThrow(lClosure *c, lVal *v){
 static lVal *lnfRead(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	if((t == NULL) || (t->type != ltString)){return NULL;}
-	lString *dup = lRootsStringPush(lStringDup(t->vString));
+	lString *dup = lStringDup(t->vString);
 	readClosure = c;
 	t = lReadList(dup,true);
 	readClosure = NULL;
@@ -368,11 +362,6 @@ lVal *lnfVec(lClosure *c, lVal *v){
 }
 
 void lOperationsCore(lClosure *c){
-	symType          = RSYMP(lSymS("type"));
-	symArguments     = RSYMP(lSymS("arguments"));
-	symCode          = RSYMP(lSymS("code"));
-	symData          = RSYMP(lSymS("data"));
-
 	lAddNativeFunc(c,"quote",   "[v]",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFunc(c,"throw",   "[v]",   "Throw V to the closest exception handler", lnfThrow);
 	lAddNativeFunc(c,"read",    "[str]", "Read and Parses STR as an S-Expression", lnfRead);

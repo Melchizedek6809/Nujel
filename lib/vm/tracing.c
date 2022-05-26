@@ -23,7 +23,7 @@ const char *getIndent(int d){
 }
 
 void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *ops){
-	if((*ip == lopApplyNew) || (*ip == lopApply)){
+	if(*ip == lopApply){
 		lVal *fun = NULL;
 		lBytecodeReadOPVal(ip+2, &fun);
 		pf("%s[$%s %V]\n", getIndent(ctx->csp), lBytecodeGetOpcodeName(*ip), fun);

@@ -3,7 +3,6 @@
 #include "reader.h"
 #include "printer.h"
 #include "allocation/symbol.h"
-#include "type/symbol.h"
 #include "type/val.h"
 
 #include <ctype.h>
@@ -322,7 +321,7 @@ static lVal *lParseBytecodeArray(lString *s){
 		}
 		if(c == 'v'){
 			lStringAdvanceToNextCharacter(s);
-			lVal *tv = RVP(lReadValue(s));
+			lVal *tv = lReadValue(s);
 			const int i = lValIndex(tv);
 			d[len++] = (i >> 16) & 0xFF;
 			d[len++] = (i >>  8) & 0xFF;
@@ -332,7 +331,7 @@ static lVal *lParseBytecodeArray(lString *s){
 		}
 		if(c == 's'){
 			lStringAdvanceToNextCharacter(s);
-			lVal *tv = RVP(lReadValue(s));
+			lVal *tv = lReadValue(s);
 			if(!tv || ((tv->type != ltSymbol) && (tv->type != ltKeyword))){
 				throwBCReadError(readClosure, tv, s,"symbol");
 			}
@@ -357,7 +356,7 @@ static lVal *lParseBytecodeArray(lString *s){
 		storeOP:
 		d[len++] = (u8)t;
 	}
-	lVal *ret = RVP(lValAlloc(ltBytecodeArr));
+	lVal *ret = lValAlloc(ltBytecodeArr);
 	ret->vBytecodeArr = lBytecodeArrayAlloc(len);
 	memcpy(ret->vBytecodeArr->data, d, len);
 	free(d);
@@ -393,11 +392,8 @@ static lVal *lParseSpecial(lString *s){
 	case 'v':
 		s->data++;
 		return lnfVec(readClosure, lReadList(s, false));
-	case '[':{
-		lVal *ret = lRootsValPush(lCons(NULL,NULL));
-		ret->vList.car = lValSymS(symArr);
-		ret->vList.cdr = lReadList(s,false);
-		return ret; }
+	case '[':
+		return lCons(lValSymS(symArr), lReadList(s,false));
 	case '@':{
 		s->data++;
 		lVal *ret = lnfTreeNew(readClosure, lReadList(s,false));
@@ -448,9 +444,8 @@ lVal *lReadList(lString *s, bool rootForm){
 			}else{
 				lVal *nv = lReadValue(s);
 				if(isComment(nv)){continue;}
-				RVP(nv);
 				if(v == NULL){
-					v = ret = lRootsValPush(lCons(nv,NULL));
+					v = ret = lCons(nv,NULL);
 				}else{
 					v->vList.cdr = lCons(nv,NULL);
 					v = v->vList.cdr;
@@ -461,11 +456,7 @@ lVal *lReadList(lString *s, bool rootForm){
 }
 
 static lVal *lReadQuote(lString *s, lSymbol *carSym){
-	lVal *ret = lRootsValPush(lCons(NULL,NULL));
-	ret->vList.car = lValSymS(carSym);
-	ret->vList.cdr = lCons(NULL,NULL);
-	ret->vList.cdr->vList.car = lReadValue(s);
-	return ret;
+	return lCons(lValSymS(carSym), lCons(lReadValue(s),NULL));
 }
 
 lVal *lReadValue(lString *s){
@@ -522,10 +513,7 @@ lVal *lReadValue(lString *s){
 	case '@':
 		if(isopenparen(s->data[1])){
 			s->data+=2;
-			lVal *ret = lRootsValPush(lCons(NULL,NULL));
-			ret->vList.car = lValSymS(symTreeNew);
-			ret->vList.cdr = lReadList(s,false);
-			return ret;
+			return lCons(lValSymS(symTreeNew), lReadList(s,false));
 		}
 		// fall through
 	default: {
@@ -541,7 +529,7 @@ lVal *lReadValue(lString *s){
 
 lVal *lRead(const char *str){
 	const int SP = lRootsGet();
-	lString *s = lRootsStringPush(lStringAlloc());
+	lString *s = lStringAlloc();
 	s->buf     = s->data = str;
 	s->bufEnd  = &str[strlen(str)];
 	lVal *ret  = lReadList(s,true);

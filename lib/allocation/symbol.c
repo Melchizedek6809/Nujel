@@ -36,6 +36,11 @@ lSymbol *symArr;
 lSymbol *symTreeNew;
 lSymbol *symDocumentation;
 
+lSymbol *symType;
+lSymbol *symArguments;
+lSymbol *symCode;
+lSymbol *symData;
+
 lSymbol *lSymLTNil;
 lSymbol *lSymLTNoAlloc;
 lSymbol *lSymLTBool;
@@ -59,10 +64,42 @@ lSymbol *lSymLTBytecodeArray;
 uint symbolLookups = 0;
 uint tombLookups = 0;
 
+void (*symbolMarkerChain)() = NULL;
+void symbolMarker(){
+	lSymbolGCMark(symNull);
+	lSymbolGCMark(symQuote);
+	lSymbolGCMark(symQuasiquote);
+	lSymbolGCMark(symUnquote);
+	lSymbolGCMark(symUnquoteSplicing);
+	lSymbolGCMark(symArr);
+	lSymbolGCMark(symTreeNew);
+	lSymbolGCMark(symDocumentation);
+
+	lSymbolGCMark(lSymLTNil);
+	lSymbolGCMark(lSymLTNoAlloc);
+	lSymbolGCMark(lSymLTBool);
+	lSymbolGCMark(lSymLTPair);
+	lSymbolGCMark(lSymLTObject);
+	lSymbolGCMark(lSymLTLambda);
+	lSymbolGCMark(lSymLTInt);
+	lSymbolGCMark(lSymLTFloat);
+	lSymbolGCMark(lSymLTVec);
+	lSymbolGCMark(lSymLTString);
+	lSymbolGCMark(lSymLTSymbol);
+	lSymbolGCMark(lSymLTKeyword);
+	lSymbolGCMark(lSymLTNativeFunction);
+	lSymbolGCMark(lSymLTArray);
+	lSymbolGCMark(lSymLTGUIWidget);
+	lSymbolGCMark(lSymLTMacro);
+	lSymbolGCMark(lSymLTTree);
+	lSymbolGCMark(lSymLTBytecodeOp);
+	lSymbolGCMark(lSymLTBytecodeArray);
+}
+
 void lSymbolInit(){
-	lSymbolActive   = 0;
-	lSymbolMax      = 0;
-	lSymbolFFree    = NULL;
+	lSymbolActive = 0;
+	lSymbolMax    = 0;
+	lSymbolFFree  = NULL;
 
 	lSymbolList[0].nextFree = NULL;
 	lSymbolList[0].c[sizeof(lSymbolList[0].c) - 1] = 0xFF;
@@ -71,34 +108,39 @@ void lSymbolInit(){
 		exit(123);
 	}
 
-	symNull              = RSYMP(lSymS(""));
-	symQuote             = RSYMP(lSymS("quote"));
-	symQuasiquote        = RSYMP(lSymS("quasiquote"));
-	symUnquote           = RSYMP(lSymS("unquote"));
-	symUnquoteSplicing   = RSYMP(lSymS("unquote-splicing"));
-	symArr               = RSYMP(lSymS("array/new"));
-	symTreeNew           = RSYMP(lSymS("tree/new"));
-	symDocumentation     = RSYMP(lSymS("documentation"));
+	symNull              = lSymS("");
+	symQuote             = lSymS("quote");
+	symQuasiquote        = lSymS("quasiquote");
+	symUnquote           = lSymS("unquote");
+	symUnquoteSplicing   = lSymS("unquote-splicing");
+	symArr               = lSymS("array/new");
+	symTreeNew           = lSymS("tree/new");
+	symDocumentation     = lSymS("documentation");
 
-	lSymLTNil            = RSYMP(lSymS("nil"));
-	lSymLTNoAlloc        = RSYMP(lSymS("no-alloc"));
-	lSymLTBool           = RSYMP(lSymS("bool"));
-	lSymLTPair           = RSYMP(lSymS("pair"));
-	lSymLTObject         = RSYMP(lSymS("object"));
-	lSymLTLambda         = RSYMP(lSymS("lambda"));
-	lSymLTInt            = RSYMP(lSymS("int"));
-	lSymLTFloat          = RSYMP(lSymS("float"));
-	lSymLTVec            = RSYMP(lSymS("vec"));
-	lSymLTString         = RSYMP(lSymS("string"));
-	lSymLTSymbol         = RSYMP(lSymS("symbol"));
-	lSymLTKeyword        = RSYMP(lSymS("keyword"));
-	lSymLTNativeFunction = RSYMP(lSymS("native-function"));
-	lSymLTArray          = RSYMP(lSymS("array"));
-	lSymLTGUIWidget      = RSYMP(lSymS("gui-widget"));
-	lSymLTMacro          = RSYMP(lSymS("macro"));
-	lSymLTTree           = RSYMP(lSymS("tree"));
-	lSymLTBytecodeOp     = RSYMP(lSymS("bytecode-op"));
-	lSymLTBytecodeArray  = RSYMP(lSymS("bytecode-array"));
+	symType              = lSymS("type");
+	symArguments         = lSymS("arguments");
+	symCode              = lSymS("code");
+	symData              = lSymS("data");
+
+	lSymLTNil            = lSymS("nil");
+	lSymLTNoAlloc        = lSymS("no-alloc");
+	lSymLTBool           = lSymS("bool");
+	lSymLTPair           = lSymS("pair");
+	lSymLTObject         = lSymS("object");
+	lSymLTLambda         = lSymS("lambda");
+	lSymLTInt            = lSymS("int");
+	lSymLTFloat          = lSymS("float");
+	lSymLTVec            = lSymS("vec");
+	lSymLTString         = lSymS("string");
+	lSymLTSymbol         = lSymS("symbol");
+	lSymLTKeyword        = lSymS("keyword");
+	lSymLTNativeFunction = lSymS("native-function");
+	lSymLTArray          = lSymS("array");
+	lSymLTGUIWidget      = lSymS("gui-widget");
+	lSymLTMacro          = lSymS("macro");
+	lSymLTTree           = lSymS("tree");
+	lSymLTBytecodeOp     = lSymS("bytecode-op");
+	lSymLTBytecodeArray  = lSymS("bytecode-array");
 }
 
 void lSymbolFree(lSymbol *s){

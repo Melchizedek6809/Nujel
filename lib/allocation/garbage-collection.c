@@ -120,6 +120,14 @@ void lValGCMark(lVal *v){
 	}
 }
 
+bool lValIsMarked(lVal *v){
+	const uint ci = v - lValList;
+	if((ci < lValMax) && lValMarkMap[ci]){
+		return true;
+	}
+	return false;
+}
+
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
@@ -219,6 +227,9 @@ static void lMarkFree(){
 
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
+	void *currentStack = NULL;
+	__sync_synchronize();
+	lGCMarkStack(&currentStack);
 	lRootsMark();
 	lMarkFree();
 }
@@ -243,9 +254,7 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
-	void *currentStack = NULL;
 	lGCRuns++;
-	lGCMarkStack(&currentStack);
 	lGCMark();
 	lGCSweep();
 }

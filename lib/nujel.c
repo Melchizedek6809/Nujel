@@ -6,7 +6,6 @@
 #include "allocation/symbol.h"
 #include "reader.h"
 #include "type/closure.h"
-#include "type/symbol.h"
 #include "type/val.h"
 #include "vm/eval.h"
 
@@ -40,10 +39,10 @@ NORETURN void lExceptionThrowRaw(lVal *v){
 
 /* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
 NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal *v, lClosure *c){
-	lVal *l = RVP(lCons(RVP(lValLambda(c)), NULL));
-	l = RVP(lCons(RVP(v), l));
-	l = RVP(lCons(RVP(lValString(error)), l));
-	l = RVP(lCons(RVP(lValKeyword(symbol)), l));
+	lVal *l = lCons(lValLambda(c), NULL);
+	l = lCons(v,l);
+	l = lCons(lValString(error),l);
+	l = lCons(lValKeyword(symbol),l);
 	lExceptionThrowRaw(l);
 }
 
@@ -61,7 +60,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
 	case ltObject:
 		if(args && args->type == ltBytecodeArr){
-			RCP(c);
 			return lBytecodeEval(fun->vClosure, args->vBytecodeArr, false);
 		} /* fall-through */
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
@@ -134,18 +132,14 @@ static void lAddPlatformVars(lClosure *c){
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
-	const int RSP = lRootsGet();
-	lVal *v = RVP(lRead(expr));
+	lVal * volatile v = lRead(expr);
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
-		const int RSSP = lRootsGet();
 		lVal *car = n->vList.car;
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}
 		lBytecodeEval(c, car->vBytecodeArr, false);
-		lRootsRet(RSSP);
 	}
-	lRootsRet(RSP);
 	return c;
 }
 
@@ -167,7 +161,6 @@ lClosure *lNewRoot(){
 	lClosure *c = lClosureAlloc();
 	c->parent = NULL;
 	c->type = closureLet;
-	lRootsClosurePush(c);
 
 	lOperationsArithmetic(c);
 	lOperationsMath(c);

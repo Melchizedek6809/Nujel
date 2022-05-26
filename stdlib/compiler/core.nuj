@@ -52,7 +52,7 @@
 
 [defmacro fn [args . body]
   "Define an anonymous function"
-  `[fn* 'anonymous ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]
+  `[fn* anonymous ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
   "Define a new function"

@@ -6,7 +6,6 @@
 #include "tracing.h"
 #include "../printer.h"
 #include "../type/closure.h"
-#include "../type/symbol.h"
 #include "../type/val.h"
 
 #include <string.h>
@@ -14,7 +13,8 @@
 
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
-	lVal *ret, *t = NULL;
+	lVal *ret = NULL;
+	lVal *t= NULL;
 	ret = RVP(lCons(NULL,NULL));
 	for(int i = len; i > 0; i--){
 		if(t == NULL){
@@ -75,7 +75,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.closureStack[ctx.csp] = c;
 
 	int exceptionCount = 0;
-	lRootsThreadPush(&ctx);
+	const int RSP = lRootsGet();
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;
@@ -86,7 +86,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			c = ctx.closureStack[ctx.csp];
 		}
 		if((ctx.csp > 0) && (++exceptionCount < 1000)){
-			lVal *handler = RVP(c->exceptionHandler);
+			lVal *handler = c->exceptionHandler;
 
 			c = ctx.closureStack[--ctx.csp];
 			ops = c->text;
@@ -100,6 +100,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			free(ctx.valueStack);
 			lRootsRet(callingClosure->rsp);
 			lExceptionThrowRaw(exceptionValue);
+			lRootsRet(RSP);
 			return NULL;
 		}
 	} else {
@@ -320,39 +321,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		}
 		ctx.valueStack[ctx.sp-1] = lApply(c, cargs, fun);
 		break; }
-	case lopApplyDynamicNew:
-	case lopApplyNew: {
-		const lBytecodeOp curOp = *ip;
-		const int len = ip[1];
-		if(ctx.sp < len){throwStackUnderflowError(c, "ApplyNew");}
-		c->rsp = lRootsGet();
-		lVal *cargs = RVP(lStackBuildList(ctx.valueStack, ctx.sp, len));
-		ctx.sp = ctx.sp - len;
-		lVal *fun;
-
-		if((curOp == lopApplyNew) || (curOp == lopApply)){
-			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-			if(fun && (fun->type == ltSymbol)){
-				lBytecodeLinkApply(c, ops, ip);
-				fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-			}
-			ip += 5;
-		}else{
-			fun = ctx.valueStack[--ctx.sp];
-			ip+=2;
-		}
-
-		if(fun && (fun->type == ltLambda)){
-			c->ip = ip;
-			c->sp = ctx.sp;
-			c->text = ops;
-			ctx.closureStack[++ctx.csp] = c = lClosureNewFunCall(c, cargs, fun);
-			ip = c->ip;
-			ops = c->text;
-		}else{
-			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
-		}
-		break; }
 	case lopRet:
 		if(ctx.sp < 1){ throwStackUnderflowError(c, "Ret"); }
 		if(ctx.csp > 0){
@@ -372,9 +340,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 		exceptionTargetDepth--;
 		lRootsRet(callingClosure->rsp);
-		lVal *ret = RVP(ctx.valueStack[ctx.sp-1]);
+		lVal *ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);
+		lRootsRet(RSP);
 		return ret;
 	}}
 	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
@@ -384,5 +353,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	free(ctx.valueStack);
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
 	memset(&ctx, 0, sizeof(lThread));
+	lRootsRet(RSP);
 	return NULL;
 }

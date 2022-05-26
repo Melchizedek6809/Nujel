@@ -2,22 +2,22 @@
 05v "Nujel Standalone"
 0Es test-context
 0D
-25v help v [i] v #@[documentation: "Describe 10 functions at offset 1" source: ["Describe 10 functions at offset 1" [when-not [int? i] [set! i [int i]]] [for-each [map [symbol-table off 10] string] [fn [l] [def desc [describe l]] [pfmtln "{l} {desc}"]]] [def sc [/ [symbol-count] 10]] [pfmtln "Help page {i} of {sc}"]]] v #{
-10s i
+25v help v [off] v #@[documentation: "Describe 10 functions at OFFset" source: ["Describe 10 functions at OFFset" [when-not [int? off] [set! off [int off]]] [for-each [map [symbol-table off 10] string] [fn [l] [def desc [describe l]] [pfmtln "{l} {desc}"]]] [def sc [/ [symbol-count] 10]] [pfmtln "Help page {off} of {sc}"]]] v #{
+10s off
 08i 1 v int?
 0Bo 7
 24
 09o 16
-10s i
+10s off
 08i 1 v int
-0Fs i
+0Fs off
 0D
 10s off
 02i 10
 08i 2 v symbol-table
 10s string
 08i 2 v map
-25v 'anonymous v [l] v #@[source: [[def desc [describe l]] [pfmtln "{l} {desc}"]]] v #{
+25v anonymous v [l] v #@[source: [[def desc [describe l]] [pfmtln "{l} {desc}"]]] v #{
 10s l
 08i 1 v describe
 0Es desc
@@ -37,7 +37,7 @@
 0Es sc
 0D
 05v "Help page "
-10s i
+10s off
 05v " of "
 10s sc
 08i 4 v cat
@@ -46,7 +46,7 @@
 }
 0Es help
 0D
-25v file/eval v [path environment] v #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [def source [cons 'do [read [file/read path]]]] [macroexpand/forms source environment]]] v #{
+25v file/eval v [path environment] v #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [for-in [form [read [file/read path]]] [eval-in environment form]]]] v #{
 10s environment
 0Bo 7
 24
@@ -54,16 +54,35 @@
 10s root-closure
 0Fs environment
 0D
-23s do
+15
 10s path
 08i 1 v file/read
 08i 1 v read
-14
-0Es source
+0Es ΓεnΣym-3
 0D
-10s source
+10s ΓεnΣym-3
+0Bo 54
+02i 0
+1B
+1C
+10s ΓεnΣym-3
+0Bo 40
+0D
+10s ΓεnΣym-3
+11
+0Es form
+0D
 10s environment
-08i 2 v macroexpand/forms
+10s form
+08i 2 v eval-in
+0D
+10s ΓεnΣym-3
+12
+0Fs ΓεnΣym-3
+09o -42
+09o 4
+24
+16
 01
 }
 0Es file/eval
@@ -89,7 +108,7 @@
 25v directory/read-relative v [path] v #@[source: [[map [directory/read path] [fn [a] [cat path "/" a]]]]] v #{
 10s path
 08i 1 v directory/read
-25v 'anonymous v [a] v #@[source: [[cat path "/" a]]] v #{
+25v anonymous v [a] v #@[source: [[cat path "/" a]]] v #{
 10s path
 05v "/"
 10s a
@@ -104,7 +123,7 @@
 25v directory/read-recursive v [path] v #@[source: [[flatten [map [directory/read-relative path] [fn [A] [if [file/dir? A] [directory/read-recursive A] A]]]]]] v #{
 10s path
 08i 1 v directory/read-relative
-25v 'anonymous v [A] v #@[source: [[if [file/dir? A] [directory/read-recursive A] A]]] v #{
+25v anonymous v [A] v #@[source: [[if [file/dir? A] [directory/read-recursive A] A]]] v #{
 10s A
 08i 1 v file/dir?
 0Bo 15
@@ -177,11 +196,7 @@
 }
 0Es repl/wasm
 0D
-25v repl/readline v [ctx] v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Bye!\r\n"] [exit 0]] [def result [eval-in ctx [cons do [read line]]]] [set! repl/history [cons line repl/history]] [println [cat [if [nil? result] "" [str/write result]]]]]] v #{
-08i 0 v repl/prompt
-08i 1 v readline
-0Es line
-0D
+25v repl/cmd/raw v [ctx line] v #@[source: [[when [nil? line] [display "Bye!\r\n"] [exit 0]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [set! repl/history [cons line repl/history]] [println [if [nil? result] "" [str/write result]]]]] v #{
 10s line
 08i 1 v nil?
 0Bo 23
@@ -193,10 +208,25 @@
 09o 4
 24
 0D
-10s ctx
-10s do
 10s line
 08i 1 v read
+0Es expr
+0D
+05v []
+10s expr
+08i 2 v equal?
+0Bo 18
+05v "\r"
+08i 1 v print
+0D
+24
+01
+09o 4
+24
+0D
+10s ctx
+10s do
+10s expr
 14
 08i 2 v eval-in
 0Es result
@@ -213,8 +243,78 @@
 09o 12
 10s result
 08i 1 v str/write
-08i 1 v cat
 08i 1 v println
+01
+}
+0Es repl/cmd/raw
+0D
+25v repl/cmd v [ctx] v #@[source: [[def buf ""] [def line ""] [while [!= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [set! repl/history [cons buf repl/history]] [def result [eval-in ctx expr]] [println [if [nil? result] "" [str/write result]]]]] v #{
+05v ""
+0Es buf
+0D
+05v ""
+0Es line
+0D
+02i 0
+1B
+1C
+10s line
+05v "[/cmd]\n"
+08i 2 v !=
+0Bo 34
+0D
+10s buf
+10s line
+08i 2 v cat
+0Fs buf
+0D
+08i 0 v readline
+0Fs line
+09o -45
+0D
+10s do
+10s buf
+08i 1 v read
+14
+0Es expr
+0D
+10s buf
+10s repl/history
+14
+0Fs repl/history
+0D
+10s ctx
+10s expr
+08i 2 v eval-in
+0Es result
+0D
+10s result
+08i 1 v nil?
+0Bo 10
+05v ""
+09o 12
+10s result
+08i 1 v str/write
+08i 1 v println
+01
+}
+0Es repl/cmd
+0D
+25v repl/readline v [ctx] v #@[source: [[def line [readline [repl/prompt]]] [if [== line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] v #{
+08i 0 v repl/prompt
+08i 1 v readline
+0Es line
+0D
+10s line
+05v "[cmd]\n"
+20
+0Bo 15
+10s ctx
+08i 1 v repl/cmd
+09o 16
+10s ctx
+10s line
+08i 2 v repl/cmd/raw
 01
 }
 0Es repl/readline
@@ -301,7 +401,7 @@
 0D
 10s repl/option-map
 23s h
-25v 'anonymous v [option] v #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] v #{
+25v anonymous v [option] v #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] v #{
 08i 0 v repl/print-help
 0D
 05v #f
@@ -312,7 +412,7 @@
 0D
 10s repl/option-map
 23s no-color
-25v 'anonymous v [option] v #@[source: [[set! ansi/disabled ""]]] v #{
+25v anonymous v [option] v #@[source: [[set! ansi/disabled ""]]] v #{
 05v ""
 0Fs ansi/disabled
 01
@@ -321,7 +421,7 @@
 0D
 10s repl/option-map
 23s color
-25v 'anonymous v [option] v #@[source: [[set! ansi/disabled #f]]] v #{
+25v anonymous v [option] v #@[source: [[set! ansi/disabled #f]]] v #{
 05v #f
 0Fs ansi/disabled
 01
@@ -330,7 +430,7 @@
 0D
 10s repl/option-map
 23s x
-25v 'anonymous v [option] v #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] v #{
+25v anonymous v [option] v #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] v #{
 05v #t
 0Fs repl/parse-args/eval-next
 0D
@@ -342,7 +442,7 @@
 0D
 10s repl/option-map
 05v :default
-25v 'anonymous v [option] v #@[source: [[tree/set! repl/options option #t]]] v #{
+25v anonymous v [option] v #@[source: [[tree/set! repl/options option #t]]] v #{
 10s repl/options
 10s option
 05v #t
@@ -366,7 +466,7 @@
 0D
 05v #f
 10s option
-1Ai 1
+07i 1
 01
 }
 0Es repl/parse-option

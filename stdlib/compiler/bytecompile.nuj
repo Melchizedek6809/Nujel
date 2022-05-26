@@ -3,8 +3,6 @@
 ;;
 ;; Contains the Bytecode compiler that takes macroexpanded Nujel code and emits
 ;; Bytecode assembly
-[def *bytecompile-apply-new* #t]
-
 [def bytecompile/gen-label/counter 0]
 [defn bytecompile/gen-label [prefix]
   [++ bytecompile/gen-label/counter]
@@ -37,9 +35,7 @@
 [defn bytecompile/procedure [op source env]
   [def args [map [cdr source] bytecompile*]]
   [list args
-        [if *bytecompile-apply-new*
-            [$apply/new [length args] op]
-            [$apply [length args] op]]]]
+        [$apply [length args] op]]]
 
 [defn bytecompile/def [source env]
   [when [or [not [symbol? [cadr source]]]
@@ -92,12 +88,8 @@
   [def arg-count [length args]]
   [if args
       [list [bytecompile/procedure/arg args]
-            [if *bytecompile-apply-new*
-                [$apply/new arg-count op]
-                [$apply arg-count op]]]
-      [if *bytecompile-apply-new*
-          [$apply/new 0 op]
-          [$apply 0 op]]]]
+            [$apply arg-count op]]
+      [$apply 0 op]]]
 
 [defn bytecompile/procedure/inline? [op]
   [case [type-of op]
@@ -123,9 +115,7 @@
   [def arg-count [length args]]
   [list [bytecompile* op env]
         [when args [bytecompile/procedure/arg args]]
-        [if *bytecompile-apply-new*
-            [$apply/dynamic/new arg-count]
-            [$apply/dynamic arg-count]]]]
+        [$apply/dynamic arg-count]]]
 
 [defn bytecompile/and/rec [source env label-end]
   [list [bytecompile* [car source] env]

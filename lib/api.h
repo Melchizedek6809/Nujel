@@ -12,8 +12,6 @@
 #include "reader.h"
 #include "type-system.h"
 #include "type/closure.h"
-#include "type/string.h"
-#include "type/symbol.h"
 #include "type/tree.h"
 #include "type/val.h"
 

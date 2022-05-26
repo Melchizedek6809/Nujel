@@ -3,7 +3,6 @@
 #include "../allocation/symbol.h"
 #include "../type-system.h"
 #include "../type/closure.h"
-#include "../type/symbol.h"
 #include "../type/val.h"
 #include "../vm/eval.h"
 
@@ -45,7 +44,7 @@ static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	const int len = arr->dataEnd - arr->data;
 
-	lVal *ret = RVP(lValAlloc(ltArray));
+	lVal *ret = lValAlloc(ltArray);
 	ret->vArray = lArrayAlloc(len);
 
 	for(int i=0;i<len;i++){

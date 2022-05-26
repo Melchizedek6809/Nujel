@@ -1,9 +1,8 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "tree.h"
-#include "../type/symbol.h"
+#include "../type/val.h"
 
-/* Create a new Tree segment with S associated to V */
 lTree *lTreeNew(const lSymbol *s, lVal *v){
 	lTree *ret = lTreeAlloc();
 	ret->key    = s;
@@ -12,12 +11,10 @@ lTree *lTreeNew(const lSymbol *s, lVal *v){
 	return ret;
 }
 
-/* Return the stored height of the tree T */
 static uint lTreeHeight(const lTree *t){
 	return t == NULL ? 0 : t->height;
 }
 
-/* Calculate the true height of tree T */
 static uint lTreeCalcHeight(const lTree *t){
 	return 1 + MAX(lTreeHeight(t->left),lTreeHeight(t->right));
 }
@@ -141,10 +138,9 @@ bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 }
 
 /* Add every symbol/value pair within T onto list, making it a big a-list */
-lVal *lTreeAddToList(const lTree *t, lVal *list){
+static lVal *lTreeAddToList(const lTree *t, lVal *list){
 	if((t == NULL) || (t->key == NULL)){return list;}
-	lRootsValPush(list);
-	lVal *l = lRootsValPush(lCons(NULL,NULL));
+	lVal *l = lCons(NULL,NULL);
 	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
 	l->vList.cdr->vList.car = t->value;
 	l->vList.car = lValKeywordS(t->key);
@@ -152,26 +148,18 @@ lVal *lTreeAddToList(const lTree *t, lVal *list){
 }
 
 /* Add all the keys within T to the beginning LIST */
-lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
+static lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
 	if((t == NULL) || (t->key == NULL)){return list;}
-
-	lRootsValPush(list);
-	list = lTreeAddKeysToList(t->right,list);
-
-	lVal *sym = lRootsValPush(lValKeywordS(t->key));
-	list = lCons(sym,list);
-
-	return lTreeAddKeysToList(t->left,list);
+	list = lTreeAddKeysToList(t->right, list);
+	list = lCons(lValKeywordS(t->key), list);
+	return lTreeAddKeysToList(t->left, list);
 }
 /* Add all the values within T to the beginning LIST */
-lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
+static lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
 	if((t == NULL) || (t->key == NULL)){return list;}
-	list = lTreeAddValuesToList(t->right,list);
-
-	lRootsValPush(list);
-	lVal *l = lCons(t->value,list);
-
-	return lTreeAddValuesToList(t->left,l);
+	list = lTreeAddValuesToList(t->right, list);
+	list = lCons(t->value, list);
+	return lTreeAddValuesToList(t->left, list);
 }
 
 /* Create an a-list with all the key/value bindings from T */
@@ -197,7 +185,7 @@ uint lTreeSize(const lTree *t){
 /* Return a duplicate of t */
 lTree *lTreeDup(const lTree *t){
 	if(t == NULL){return NULL;}
-	lTree *ret  = RTP(lTreeAlloc());
+	lTree *ret  = lTreeAlloc();
 	ret->key    = t->key;
 	ret->value  = t->value;
         ret->height = t->height;

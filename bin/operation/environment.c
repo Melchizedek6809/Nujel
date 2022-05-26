@@ -10,8 +10,8 @@ static lTree *addVar(const char *e, lTree *t){
 	int endOfKey, endOfString;
 	for(endOfKey=0;e[endOfKey] != '=';endOfKey++){}
 	for(endOfString=endOfKey+1;e[endOfString];endOfString++){}
-	lSymbol *sym = RSYMP(lSymSL(e,endOfKey));
-	lVal *v = RVP(lValStringNoCopy(&e[endOfKey+1], endOfString));
+	lSymbol *sym = lSymSL(e,endOfKey);
+	lVal *v = lValStringNoCopy(&e[endOfKey+1], endOfString);
 	return lTreeInsert(t, sym, v);
 }
 
@@ -21,16 +21,14 @@ static lTree *addVar(const char *e, lTree *t){
 
 /* Windows specific - add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
-	const int SP = lRootsGet();
 	lTree *t = NULL;
 	LPCH env = GetEnvironmentStrings();
 	while(*env){
-		t = RTP(addVar(env,t));
+		t = addVar(env,t);
 		while(*env++){}
 	}
-	lVal *et = RVP(lValTree(t));
+	lVal *et = lValTree(t);
 	lDefineClosureSym(c,lSymS("System/Environment"),et);
-	lRootsRet(SP);
 }
 
 #else
@@ -38,13 +36,11 @@ extern char **environ;
 
 /* Add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
-	const int SP = lRootsGet();
 	lTree *t = NULL;
 	for(int i=0;environ[i];i++){
-		t = RTP(addVar(environ[i],t));
+		t = addVar(environ[i],t);
 	}
-	lVal *env = RVP(lValTree(t));
+	lVal *env = lValTree(t);
 	lDefineClosureSym(c,lSymS("System/Environment"),env);
-	lRootsRet(SP);
 }
 #endif
