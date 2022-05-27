@@ -15,7 +15,7 @@
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	if(len == 0){return lCons(NULL, NULL);}
 	const int nsp = sp - len;
-	lVal *t = stack[nsp] = RVP(lCons(stack[nsp], NULL));
+	lVal *t = stack[nsp] = lRootsValPush(lCons(stack[nsp], NULL));
 	for(int i = len-1; i > 0; i--){
 		t->vList.cdr = lCons(stack[sp - i], NULL);
 		t = t->vList.cdr;
@@ -71,6 +71,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 
 	int exceptionCount = 0;
 	const int RSP = lRootsGet();
+	lRootsThreadPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;
@@ -88,12 +89,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ip = c->ip;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NULL), handler);
-			lRootsRet(c->rsp);
 		} else {
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
 			free(ctx.valueStack);
-			lRootsRet(callingClosure->rsp);
 			lExceptionThrowRaw(exceptionValue);
 			lRootsRet(RSP);
 			return NULL;
@@ -103,6 +102,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	}
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
+		lGarbageCollectIfNecessary();
 		if(ctx.csp == ctx.closureStackSize-1){
 			ctx.closureStackSize *= 2;
 			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
@@ -234,10 +234,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = lBytecodeReadOPVal(ip,   &cArgs);
 		ip = lBytecodeReadOPVal(ip,   &cDocs);
 		ip = lBytecodeReadOPVal(ip,   &cBody);
-		ctx.valueStack[ctx.sp] = lLambdaNew(c, cName, cArgs, cBody);
-		lClosureSetMeta(ctx.valueStack[ctx.sp]->vClosure, cDocs);
-		if(curOp == lopMacroAst){ctx.valueStack[ctx.sp]->type = ltMacro;}
-		ctx.sp++;
+		ctx.valueStack[ctx.sp++] = lLambdaNew(c, cName, cArgs, cBody);
+		lClosureSetMeta(ctx.valueStack[ctx.sp-1]->vClosure, cDocs);
+		if(curOp == lopMacroAst){ctx.valueStack[ctx.sp-1]->type = ltMacro;}
 		break;}
 	case lopRootsSave:
 		c->rsp = lRootsGet();
@@ -276,7 +275,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopClosurePop: {
 		lClosure *nclo = ctx.closureStack[--ctx.csp];
 		c = nclo;
-		lRootsRet(c->rsp);
 		if(ctx.csp < 0){throwStackUnderflowError(c, "ClosurePop");}
 		ip++;
 		break; }
@@ -331,13 +329,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ops = c->text;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = ret;
-			lRootsRet(c->rsp);
 			break;
 		}
 		topLevelReturn:
 		memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 		exceptionTargetDepth--;
-		lRootsRet(callingClosure->rsp);
 		lVal *ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);
@@ -346,7 +342,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	}}
 	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 	exceptionTargetDepth--;
-	lRootsRet(callingClosure->rsp);
 	free(ctx.closureStack);
 	free(ctx.valueStack);
 	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);

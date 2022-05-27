@@ -10,7 +10,6 @@
 #define VAL_MAX (1<<21)
 #define BCA_MAX (1<<14)
 
-
 extern lArray  lArrayList[ARR_MAX];
 extern uint    lArrayMax;
 extern lArray *lArrayFFree;
@@ -71,10 +70,6 @@ static inline int lValIndex(const lVal *v){
 static inline lVal *lIndexVal(uint i){
 	return (i >= lValMax) ? NULL : &lValList[i];
 }
-static inline lVal *lValAlloc(lType t){
-	lVal *ret = lValAllocRaw();
-	ret->type = t;
-	return ret;
-}
+lVal *lValAlloc(lType t);
 
 #endif

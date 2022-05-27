@@ -25,6 +25,7 @@ extern lSymbol *symDocumentation;
 void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);
 lSymbol  *lSymS         (const char *s);
+lSymbol  *lSymSM        (const char *s);
 lSymbol  *lSymSL        (const char *s, uint len);
 lSymbol  *getTypeSymbol (const lVal *a);
 lSymbol  *getTypeSymbolT(const lType T);

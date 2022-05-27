@@ -111,6 +111,10 @@ release.san: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
+bootstrap.san: $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
+	@rm -f $(NUJEL)
+	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o nujel-bootstrap $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
+
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
 	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@

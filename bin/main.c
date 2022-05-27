@@ -32,12 +32,12 @@ const char *run(const char *line){
 
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(){
-	mainClosure = lNewRoot();
-	lOperationsIO(mainClosure);
-	lOperationsReadline(mainClosure);
-	mainClosure = lLoad(mainClosure, (const char *)binlib_no_data);
+	lClosure *c = lRootsClosurePush(lNewRoot());
+	lOperationsIO(c);
+	lOperationsReadline(c);
+	mainClosure = lLoad(c, (const char *)binlib_no_data);
 	lGarbageCollect();
-	return mainClosure;
+	return c;
 }
 
 /* Parse options that might radically alter runtime behaviour, like running
@@ -85,20 +85,8 @@ int initNujel(int argc, char *argv[], lClosure *c){
 	return 0;
 }
 
-void (*mainRootsMarkerChain)() = NULL;
-void mainMarker(){
-	lClosureGCMark(mainClosure);
-	lValGCMark(replInitSym);
-	if(mainRootsMarkerChain){mainRootsMarkerChain();}
-}
-
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
-	volatile void *lStartOfStackTestVal = NULL;
-	lSetStartOfStack(&lStartOfStackTestVal);
-	mainRootsMarkerChain = rootsMarkerChain;
-	rootsMarkerChain = mainMarker;
-
 	#ifndef __WATCOMC__
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);

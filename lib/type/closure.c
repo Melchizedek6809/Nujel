@@ -128,7 +128,6 @@ lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char 
 	return lDefineAliased(c,v,sym);
 }
 
-
 /* Create a new Lambda Value */
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
@@ -139,11 +138,10 @@ lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	ret->vClosure->args = args;
 	ret->vClosure->text = requireBytecodeArray(parent, body);
 	ret->vClosure->ip   = ret->vClosure->text->data;
-
 	return ret;
 }
 
 void lClosureSetMeta(lClosure *c, lVal *doc){
 	if((doc == NULL) || (doc->type != ltTree)){return;}
-	c->meta = lTreeDup(doc->vTree);
+	c->meta = (doc->vTree->flags & TREE_IMMUTABLE) ? lTreeDup(doc->vTree) : doc->vTree;
 }

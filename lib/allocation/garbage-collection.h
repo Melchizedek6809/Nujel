@@ -3,6 +3,7 @@
 
 #include "../nujel.h"
 
+extern bool lGCShouldRunSoon;
 extern int lGCRuns;
 extern void (*sweeperChain)();
 
@@ -19,5 +20,10 @@ void lThreadGCMark      (lThread *c);
 void lBytecodeArrayMark (const lBytecodeArray *v);
 
 void lGarbageCollect();
+static inline void lGarbageCollectIfNecessary(){
+	if(lGCShouldRunSoon){
+		lGarbageCollect();
+	}
+}
 
 #endif

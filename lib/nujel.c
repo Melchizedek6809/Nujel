@@ -132,13 +132,16 @@ static void lAddPlatformVars(lClosure *c){
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
-	lVal * volatile v = lRead(expr);
+	lVal *v = lRead(expr);
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
+		const int RSP = lRootsGet();
+		lRootsValPush(n);
 		lVal *car = n->vList.car;
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}
 		lBytecodeEval(c, car->vBytecodeArr, false);
+		lRootsRet(RSP);
 	}
 	return c;
 }

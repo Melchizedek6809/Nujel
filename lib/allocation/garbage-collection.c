@@ -9,7 +9,6 @@
 
 #include "bytecode.h"
 #include "allocator.h"
-#include "marker.h"
 #include "roots.h"
 #include "symbol.h"
 #include "../printer.h"
@@ -35,7 +34,7 @@ void lThreadGCMark(lThread *c){
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
-	for(int i=0;i <= c->sp;i++){
+	for(int i=0;i < c->sp;i++){
 		lValGCMark(c->valueStack[i]);
 	}
 }
@@ -155,12 +154,12 @@ void lClosureGCMark(const lClosure *c){
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);
-	lClosureGCMark(c->caller);
 	lTreeGCMark(c->data);
 	lTreeGCMark(c->meta);
-	lValGCMark(c->args);
 	lBytecodeArrayMark(c->text);
+	lValGCMark(c->args);
 	lSymbolGCMark(c->name);
+	lClosureGCMark(c->caller);
 }
 
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
@@ -183,6 +182,7 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lBytecodeArrayList;
 	if(ci >= lBytecodeArrayMax){
+		//exit(*((u8 *)NULL));
 		epf("Tried to mark invalid lBytecodeArray\n");
 		exit(1);
 	}
@@ -228,9 +228,6 @@ static void lMarkFree(){
 
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
-	void *currentStack = NULL;
-	__sync_synchronize();
-	lGCMarkStack(&currentStack);
 	lRootsMark();
 	lMarkFree();
 }
@@ -258,4 +255,5 @@ void lGarbageCollect(){
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();
+	lGCShouldRunSoon = false;
 }

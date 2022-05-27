@@ -64,38 +64,6 @@ lSymbol *lSymLTBytecodeArray;
 uint symbolLookups = 0;
 uint tombLookups = 0;
 
-void (*symbolMarkerChain)() = NULL;
-void symbolMarker(){
-	lSymbolGCMark(symNull);
-	lSymbolGCMark(symQuote);
-	lSymbolGCMark(symQuasiquote);
-	lSymbolGCMark(symUnquote);
-	lSymbolGCMark(symUnquoteSplicing);
-	lSymbolGCMark(symArr);
-	lSymbolGCMark(symTreeNew);
-	lSymbolGCMark(symDocumentation);
-
-	lSymbolGCMark(lSymLTNil);
-	lSymbolGCMark(lSymLTNoAlloc);
-	lSymbolGCMark(lSymLTBool);
-	lSymbolGCMark(lSymLTPair);
-	lSymbolGCMark(lSymLTObject);
-	lSymbolGCMark(lSymLTLambda);
-	lSymbolGCMark(lSymLTInt);
-	lSymbolGCMark(lSymLTFloat);
-	lSymbolGCMark(lSymLTVec);
-	lSymbolGCMark(lSymLTString);
-	lSymbolGCMark(lSymLTSymbol);
-	lSymbolGCMark(lSymLTKeyword);
-	lSymbolGCMark(lSymLTNativeFunction);
-	lSymbolGCMark(lSymLTArray);
-	lSymbolGCMark(lSymLTGUIWidget);
-	lSymbolGCMark(lSymLTMacro);
-	lSymbolGCMark(lSymLTTree);
-	lSymbolGCMark(lSymLTBytecodeOp);
-	lSymbolGCMark(lSymLTBytecodeArray);
-}
-
 void lSymbolInit(){
 	lSymbolActive = 0;
 	lSymbolMax    = 0;
@@ -108,39 +76,39 @@ void lSymbolInit(){
 		exit(123);
 	}
 
-	symNull              = lSymS("");
-	symQuote             = lSymS("quote");
-	symQuasiquote        = lSymS("quasiquote");
-	symUnquote           = lSymS("unquote");
-	symUnquoteSplicing   = lSymS("unquote-splicing");
-	symArr               = lSymS("array/new");
-	symTreeNew           = lSymS("tree/new");
-	symDocumentation     = lSymS("documentation");
+	symNull              = lSymSM("");
+	symQuote             = lSymSM("quote");
+	symQuasiquote        = lSymSM("quasiquote");
+	symUnquote           = lSymSM("unquote");
+	symUnquoteSplicing   = lSymSM("unquote-splicing");
+	symArr               = lSymSM("array/new");
+	symTreeNew           = lSymSM("tree/new");
+	symDocumentation     = lSymSM("documentation");
 
-	symType              = lSymS("type");
-	symArguments         = lSymS("arguments");
-	symCode              = lSymS("code");
-	symData              = lSymS("data");
+	symType              = lSymSM("type");
+	symArguments         = lSymSM("arguments");
+	symCode              = lSymSM("code");
+	symData              = lSymSM("data");
 
-	lSymLTNil            = lSymS("nil");
-	lSymLTNoAlloc        = lSymS("no-alloc");
-	lSymLTBool           = lSymS("bool");
-	lSymLTPair           = lSymS("pair");
-	lSymLTObject         = lSymS("object");
-	lSymLTLambda         = lSymS("lambda");
-	lSymLTInt            = lSymS("int");
-	lSymLTFloat          = lSymS("float");
-	lSymLTVec            = lSymS("vec");
-	lSymLTString         = lSymS("string");
-	lSymLTSymbol         = lSymS("symbol");
-	lSymLTKeyword        = lSymS("keyword");
-	lSymLTNativeFunction = lSymS("native-function");
-	lSymLTArray          = lSymS("array");
-	lSymLTGUIWidget      = lSymS("gui-widget");
-	lSymLTMacro          = lSymS("macro");
-	lSymLTTree           = lSymS("tree");
-	lSymLTBytecodeOp     = lSymS("bytecode-op");
-	lSymLTBytecodeArray  = lSymS("bytecode-array");
+	lSymLTNil            = lSymSM("nil");
+	lSymLTNoAlloc        = lSymSM("no-alloc");
+	lSymLTBool           = lSymSM("bool");
+	lSymLTPair           = lSymSM("pair");
+	lSymLTObject         = lSymSM("object");
+	lSymLTLambda         = lSymSM("lambda");
+	lSymLTInt            = lSymSM("int");
+	lSymLTFloat          = lSymSM("float");
+	lSymLTVec            = lSymSM("vec");
+	lSymLTString         = lSymSM("string");
+	lSymLTSymbol         = lSymSM("symbol");
+	lSymLTKeyword        = lSymSM("keyword");
+	lSymLTNativeFunction = lSymSM("native-function");
+	lSymLTArray          = lSymSM("array");
+	lSymLTGUIWidget      = lSymSM("gui-widget");
+	lSymLTMacro          = lSymSM("macro");
+	lSymLTTree           = lSymSM("tree");
+	lSymLTBytecodeOp     = lSymSM("bytecode-op");
+	lSymLTBytecodeArray  = lSymSM("bytecode-array");
 }
 
 void lSymbolFree(lSymbol *s){
@@ -159,6 +127,10 @@ lSymbol *lSymSL(const char *str, uint len){
 	memcpy(buf,str,len);
 	buf[len] = 0;
 	return lSymS(buf);
+}
+
+lSymbol *lSymSM(const char *str){
+	return lRootsSymbolPush(lSymS(str));
 }
 
 const u32 hashLookupTable[8] = {

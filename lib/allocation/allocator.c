@@ -7,63 +7,68 @@
 #include <stdlib.h>
 #include <string.h>
 
+bool lGCShouldRunSoon = false;
+
 lArray   lArrayList[ARR_MAX];
+uint     lArrayActive = 0;
 uint     lArrayMax    = 0;
 lArray  *lArrayFFree  = NULL;
 
 lClosure  lClosureList[CLO_MAX];
+uint      lClosureActive = 0;
 uint      lClosureMax    = 0;
 lClosure *lClosureFFree  = NULL;
 
-lNFunc   lNFuncList[NFN_MAX];
-uint     lNFuncMax    = 0;
-
 lString  lStringList[STR_MAX];
+uint     lStringActive = 0;
 uint     lStringMax    = 0;
 lString *lStringFFree  = NULL;
 
 lTree    lTreeList[TRE_MAX];
+uint     lTreeActive = 0;
 uint     lTreeMax    = 0;
 lTree   *lTreeFFree  = NULL;
 
 lVal     lValList[VAL_MAX];
+uint     lValActive = 0;
 uint     lValMax    = 0;
 lVal    *lValFFree  = NULL;
 
 lBytecodeArray  lBytecodeArrayList[BCA_MAX];
+uint            lBytecodeArrayActive = 0;
 uint            lBytecodeArrayMax    = 0;
 lBytecodeArray *lBytecodeArrayFFree  = NULL;
 
-#define defineAllocator(T, funcName, list, listMax, typeMax, listFree, errorMsg) \
+lNFunc   lNFuncList[NFN_MAX];
+uint     lNFuncMax    = 0;
+
+
+#define defineAllocator(T, funcName, list, listMax, listActive, typeMax, listFree, errorMsg) \
 T * funcName (){\
 	T *ret;\
 	if(listFree == NULL){\
 		if(listMax >= typeMax-1){\
-			lGarbageCollect();\
-			if(listFree == NULL){\
-				fpf(stderr, "%S", errorMsg);\
-				exit(123);\
-			}else{\
-				goto allocateFromFreeList;\
-			}\
+			fpf(stderr, "%S", errorMsg);\
+			exit(123);\
 		}else{\
 			ret = &list[listMax++];\
 		}\
 	}else{\
-		allocateFromFreeList:\
 		ret = listFree;\
 		listFree = ret->nextFree;\
 	}\
+	listActive++;\
+	if((typeMax - listActive) < 32){lGCShouldRunSoon = true;}\
 	memset(ret, 0, sizeof(T));\
 	return ret;\
 }
 
-defineAllocator(lArray, lArrayAllocRaw, lArrayList, lArrayMax, ARR_MAX, lArrayFFree, "lArray OOM")
-defineAllocator(lClosure, lClosureAlloc, lClosureList, lClosureMax, CLO_MAX, lClosureFFree, "lClosure OOM")
-defineAllocator(lString, lStringAlloc, lStringList, lStringMax, STR_MAX, lStringFFree, "lString OOM")
-defineAllocator(lTree, lTreeAlloc, lTreeList, lTreeMax, TRE_MAX, lTreeFFree, "lTree OOM")
-defineAllocator(lVal, lValAllocRaw, lValList, lValMax, VAL_MAX, lValFFree, "lVal OOM")
-defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
+defineAllocator(lArray, lArrayAllocRaw, lArrayList, lArrayMax, lArrayActive, ARR_MAX, lArrayFFree, "lArray OOM")
+defineAllocator(lClosure, lClosureAlloc, lClosureList, lClosureMax, lClosureActive, CLO_MAX, lClosureFFree, "lClosure OOM")
+defineAllocator(lString, lStringAlloc, lStringList, lStringMax, lStringActive, STR_MAX, lStringFFree, "lString OOM")
+defineAllocator(lTree, lTreeAlloc, lTreeList, lTreeMax, lTreeActive, TRE_MAX, lTreeFFree, "lTree OOM")
+defineAllocator(lVal, lValAllocRaw, lValList, lValMax, lValActive, VAL_MAX, lValFFree, "lVal OOM")
+defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, lBytecodeArrayActive, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
 
 lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
@@ -80,6 +85,7 @@ void lBytecodeArrayFree(lBytecodeArray *v){
 	free(v->data);
 	v->data     = NULL;
 	v->nextFree = lBytecodeArrayFFree;
+	lBytecodeArrayActive--;
 	lBytecodeArrayFFree = v;
 }
 
@@ -104,6 +110,7 @@ lNFunc *lNFuncAlloc(){
 void lValFree(lVal *v){
 	v->nextFree = lValFFree;
 	lValFFree   = v;
+	lValActive--;
 }
 
 void lArrayFree(lArray *v){
@@ -112,12 +119,14 @@ void lArrayFree(lArray *v){
 	v->data     = NULL;
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;
+	lArrayActive--;
 }
 
 void lClosureFree(lClosure *clo){
 	if(clo == NULL){return;}
 	clo->nextFree = lClosureFFree;
 	lClosureFFree = clo;
+	lClosureActive--;
 }
 
 void lStringFree(lString *s){
@@ -128,10 +137,18 @@ void lStringFree(lString *s){
 	s->flags = 0;
 	s->nextFree = lStringFFree;
 	lStringFFree = s;
+	lStringActive--;
 }
 
 void lTreeFree(lTree *t){
 	if(t == NULL){return;}
 	t->nextFree = lTreeFFree;
 	lTreeFFree = t;
+	lTreeActive--;
+}
+
+lVal *lValAlloc(lType t){
+	lVal *ret = lValAllocRaw();
+	ret->type = t;
+	return ret;
 }

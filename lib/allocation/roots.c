@@ -44,9 +44,17 @@ static void *lRootsPush(const lType t, void *ptr){
 	return ptr;
 }
 
-/* Push an lVal onto the root stack, protecting it from being freed by the GC */
 lVal *lRootsValPush(lVal *v){
-	return lRootsPush(ltPair,v);
+	return lRootsPush(ltPair, v);
+}
+lClosure *lRootsClosurePush(lClosure *v){
+	return lRootsPush(ltLambda, v);
+}
+lSymbol *lRootsSymbolPush(lSymbol *v){
+	return lRootsPush(ltSymbol, v);
+}
+lThread *lRootsThreadPush(lThread *v){
+	return lRootsPush(ltThread, v);
 }
 
 /* Mark every single root and everything they point to */
@@ -54,8 +62,17 @@ void lRootsMark(){
 	//pf("rootSP: %i\n", (i64)rootSP);
 	for(int i=0;i<rootSP;i++){
 		switch(rootStack[i].t){
+		case ltSymbol:
+			lSymbolGCMark(rootStack[i].vSymbol);
+			break;
+		case ltLambda:
+			lClosureGCMark(rootStack[i].vClosure);
+			break;
 		case ltPair:
 			lValGCMark(rootStack[i].vVal);
+			break;
+		case ltThread:
+			lThreadGCMark(rootStack[i].vThread);
 			break;
 		default:
 			break;

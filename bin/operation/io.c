@@ -42,44 +42,22 @@ lSymbol *lsCharacterDevice;
 lSymbol *lsBlockDevice;
 lSymbol *lsNamedPipe;
 
-void (*ioMarkerChain)() = NULL;
-void ioSymbolMarker(){
-	lSymbolGCMark(lsError);
-	lSymbolGCMark(lsErrorText);
-	lSymbolGCMark(lsMode);
-	lSymbolGCMark(lsSize);
-	lSymbolGCMark(lsUserID);
-	lSymbolGCMark(lsGroupID);
-	lSymbolGCMark(lsAccessTime);
-	lSymbolGCMark(lsModificationTime);
-	lSymbolGCMark(lsRegularFile);
-	lSymbolGCMark(lsDirectory);
-	lSymbolGCMark(lsCharacterDevice);
-	lSymbolGCMark(lsBlockDevice);
-	lSymbolGCMark(lsNamedPipe);
-
-	if(ioMarkerChain){ioMarkerChain();}
-}
-
 void setIOSymbols(){
-	lsError            = lSymS("error?");
-	lsErrorNumber      = lSymS("error-number");
-	lsErrorText        = lSymS("error-text");
-	lsMode             = lSymS("mode");
-	lsSize             = lSymS("size");
-	lsUserID           = lSymS("user-id");
-	lsGroupID          = lSymS("group-id");
-	lsAccessTime       = lSymS("access-time");
-	lsModificationTime = lSymS("modification-time");
+	lsError            = lSymSM("error?");
+	lsErrorNumber      = lSymSM("error-number");
+	lsErrorText        = lSymSM("error-text");
+	lsMode             = lSymSM("mode");
+	lsSize             = lSymSM("size");
+	lsUserID           = lSymSM("user-id");
+	lsGroupID          = lSymSM("group-id");
+	lsAccessTime       = lSymSM("access-time");
+	lsModificationTime = lSymSM("modification-time");
 
-	lsRegularFile      = lSymS("regular-file?");
-	lsDirectory        = lSymS("directory?");
-	lsCharacterDevice  = lSymS("character-device?");
-	lsBlockDevice      = lSymS("block-device?");
-	lsNamedPipe        = lSymS("named-pipe?");
-
-	ioMarkerChain = rootsMarkerChain;
-	rootsMarkerChain = ioSymbolMarker;
+	lsRegularFile      = lSymSM("regular-file?");
+	lsDirectory        = lSymSM("directory?");
+	lsCharacterDevice  = lSymSM("character-device?");
+	lsBlockDevice      = lSymSM("block-device?");
+	lsNamedPipe        = lSymSM("named-pipe?");
 }
 
 extern uint symbolLookups;
