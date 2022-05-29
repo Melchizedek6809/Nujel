@@ -63,6 +63,9 @@ test.verbose: $(NUJEL)
 test.bootstrap: $(NUJEL_BOOTSTRAP)
 	@./$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
 
+test.bootstrap.verbose: $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) --verbose --only-test-suite tools/tests.nuj
+
 test.slow: $(NUJEL)
 	@./$(NUJEL) --slow-test tools/tests.nuj
 
@@ -76,18 +79,18 @@ test.ridiculous: $(NUJEL)
 	@./$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
 
 rund: $(NUJEL)
-	@gdb $(NUJEL) -ex "r"
+	@gdb ./$(NUJEL) -ex "r"
 
 runn: $(NUJEL)
-	@rlwrap $(NUJEL)
+	@rlwrap ./$(NUJEL)
 
 install: release
 	mkdir -p $(bindir)
-	$(INSTALL) $(NUJEL) $(bindir)
+	$(INSTALL) ./$(NUJEL) $(bindir)
 
 install.musl: release.musl
 	mkdir -p $(bindir)
-	$(INSTALL) $(NUJEL) $(bindir)
+	$(INSTALL) ./$(NUJEL) $(bindir)
 
 profile: $(NUJEL)
 	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) --only-test-suite tools/tests.nuj
