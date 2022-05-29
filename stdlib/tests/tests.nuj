@@ -1178,6 +1178,18 @@
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:a 1 :b 3]]]
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:c 1 :b 2]]]
 [test/add #f [tree/equal? @[:a 1 :b 2] @[:b 1 :b 2]]]
+[test/add 4 [let [[<point> [make-instance #nil]]]
+                  [defproperty <point> :x 2]
+                  [defproperty <point> :y 2]
+                  [defmethod <point> :square [] [* [tree/get this :x] [tree/get this :y]]]
+                  [_ <point> :square]]]
+[test/add 10 [let [[<point> [make-instance #nil]]]
+                  [defproperty <point> :x 2]
+                  [defproperty <point> :y 2]
+                  [defmethod <point> :square [] [* [tree/get this :x] [tree/get this :y]]]
+                  [def a [make-instance <point>]]
+                  [tree/set! a :x 3]
+                  [+ [_ a :square] [_ <point> :square]]]]
 
 ;[test/add 102334155 [def fib-iter [λ [a b count] [cond [[== count 0] b] [#t [fib-iter [+ a b] a [- count 1]]]]]] [def fib [λ [n] [fib-iter 1 0 n]]] [fib 40]]
 

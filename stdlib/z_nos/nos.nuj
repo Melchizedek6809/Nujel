@@ -1,0 +1,53 @@
+[defun dup [l]
+      [case [type-of l]
+            [:tree [tree/dup l]]
+            [:array [array/dup l]]
+            [otherwise l]]]
+
+
+[defun make-instance [parent]
+      [when [and [not [nil? parent]]
+                 [!= [type-of parent] :tree]]
+            [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]]
+      [def ret @[]]
+      [for-in [k [tree/keys parent]]
+              [when [!= k :parent]
+                    [def pv [tree/get parent k]]
+                    [when-not [== [type-of pv] :lambda]
+                              [tree/set! ret k [dup pv]]]]]
+      [tree/set! ret :parent parent]]
+
+[defun nos/funcall* [o method-name args]
+      [if o
+          [do [def v [tree/get o method-name]]
+              [if v
+                  [apply v args]
+                  [nos/funcall* [tree/get o :parent] method-name args]]]
+          [throw [list :missing-method "Can't find that method" o [current-lambda]]]]]
+
+[defun nos/funcall [o method-name . args]
+      [nos/funcall* o method-name [cons o args]]]
+
+
+[defun nos/funcall*/try [o method-name args]
+      [when o
+            [def v [tree/get o method-name]]
+            [if v
+                [apply v args]
+                [nos/funcall* [tree/get o :parent] method-name args]]]]
+
+[defun nos/funcall/try [o method-name . args]
+      [nos/funcall*/try o method-name [cons o args]]]
+
+
+[defmacro defobject [parent]
+          `[make-instance ~parent]]
+
+[defmacro defproperty [o name val]
+          `[tree/set! ~o ~name ~val]]
+
+[defmacro defmethod [o name args . body]
+          `[tree/set! ~o ~name [\ ~[cons 'this args] ~@body]]]
+
+[defmacro _ [o name . args]
+          `[nos/funcall ~o ~name ~@args]]
