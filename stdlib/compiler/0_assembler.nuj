@@ -1,28 +1,113 @@
 [defn $nop []
-  "- | Do nothing"
-  '[#$00]]
+      "[] -> []"
+      "Do nothing"
+      :inline
+      '[#$00]]
 
 [defn $ret []
-  "a - | Return top of value stack"
-  '[#$01]]
+      "[a] -> []"
+      "Return top of value stack"
+      :inline
+      '[#$01]]
 
 [defn $add/int []
-  "a b - c | Adds the two topmost values and pushes the result"
-  '[#$03]]
+      "[a b] -> [result]"
+      "Adds the two topmost values and pushes the result"
+      :inline
+      '[#$03]]
 
-[defn $dup           [] '[#$0C]]
-[defn $drop          [] '[#$0D]]
-[defn $closure/push  [] '[#$13]]
-[defn $let           [] '[#$15]]
-[defn $closure/pop   [] '[#$16]]
-[defn $roots/save    [] '[#$1B]]
-[defn $roots/restore [] '[#$1C]]
-[defn $<             [] '[#$1E]]
-[defn $<=            [] '[#$1F]]
-[defn $==            [] '[#$20]]
-[defn $>=            [] '[#$21]]
-[defn $>             [] '[#$22]]
-[defn $push/nil      [] '[#$24]]
-[defn $car           [] '[#$11]]
-[defn $cdr           [] '[#$12]]
-[defn $cons          [] '[#$14]]
+[defn $dup []
+      "[a] -> [a a]"
+      "Duplicates the value that is on the top of the stack"
+      :inline
+      '[#$0C]]
+
+[defn $drop []
+      "[a] -> []"
+      "Drop whatever is on top of the stack"
+      :inline
+      '[#$0D]]
+
+[defn $closure/push []
+      "[] -> [closure]"
+      "Push the current closure as a λ on the stack"
+      :inline
+      '[#$13]]
+
+[defn $let []
+      "[] -> []"
+      "Create a new let closure and switch to it"
+      :inline
+      '[#$15]]
+
+[defn $closure/pop []
+      "[] -> []"
+      "Leave the current closure and return to the parent one"
+      :inline
+      '[#$16]]
+
+[defn $roots/save []
+      "[] -> []"
+      "Store the current root stack pointer used for guarding allocations into the current closure"
+      :inline
+      '[#$1B]]
+
+[defn $roots/restore []
+      "[] -> []"
+      "Restore the current root stack pointer to what is stored within the current closure"
+      :inline
+      '[#$1C]]
+
+[defn $< []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$1E]]
+
+[defn $<= []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$1F]]
+
+[defn $== []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$20]]
+
+[defn $>= []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$21]]
+
+[defn $> []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$22]]
+
+[defn $push/nil []
+      "[] -> [nil]"
+      "Push a #nil on the stack"
+      :inline
+      '[#$24]]
+
+[defn $car []
+      "[l] -> [car]"
+      "Replace L with its car"
+      :inline
+      '[#$11]]
+
+[defn $cdr []
+      "[l] -> [cdr]"
+      "Replace L with its cdr"
+      :inline
+      '[#$12]]
+
+[defn $cons []
+      "[car cdr] -> [pair]"
+      "Cons CAR and CDR together and put it on the stack"
+      :inline
+      '[#$14]]

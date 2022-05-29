@@ -4,159 +4,172 @@
 ;; Contains the bytecode assembler, so we don't have to write opcodes directly
 
 [defn val->bytecode-op [v]
-  [def i [val->index v]]
-  [list [int->bytecode-op [logand [>> i 16] #xFF]]
-        [int->bytecode-op [logand [>> i  8] #xFF]]
-        [int->bytecode-op [logand     i     #xFF]]]]
+      [def i [val->index v]]
+      [list [int->bytecode-op [logand [>> i 16] #xFF]]
+            [int->bytecode-op [logand [>> i  8] #xFF]]
+            [int->bytecode-op [logand     i     #xFF]]]]
 
 [defn sym->bytecode-op [v]
-  [def i [sym->index v]]
-  [list [int->bytecode-op [logand [>> i 16] #xFF]]
-        [int->bytecode-op [logand [>> i  8] #xFF]]
-        [int->bytecode-op [logand     i     #xFF]]]]
+      [def i [sym->index v]]
+      [list [int->bytecode-op [logand [>> i 16] #xFF]]
+            [int->bytecode-op [logand [>> i  8] #xFF]]
+            [int->bytecode-op [logand     i     #xFF]]]]
 
 [defn int-fit-in-byte? [a]
-  [and [<= a 127] [>= a -128]]]
+      [and [<= a 127] [>= a -128]]]
 
 [defn $push/int [a]
-  "- a | Return top of value stack"
-  [if [int-fit-in-byte? a]
-      [$push/int/byte a]
-      [$push/lval a]]]
+      "[] -> [a]"
+      "Push A on the stack as an :int"
+      [if [int-fit-in-byte? a]
+          [$push/int/byte a]
+          [$push/lval a]]]
 
 [defn $push/int/byte [a]
-  "- a | Return top of value stack"
-  [when-not [int-fit-in-byte? a]
-            [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
-  [list #$2 [int->bytecode-op a]]]
+      "[] -> [a]"
+      "Push A on the stack as an :int that fits within a byte"
+      [when-not [int-fit-in-byte? a]
+                [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+      [list #$2 [int->bytecode-op a]]]
 
 [defn $push/lval [v]
-  "- v | Pushes v onto the stack"
-  [when [nil? v]
-    [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
-  [list #$5 [val->bytecode-op v]]]
+      "[] -> [v]"
+      "Pushes v onto the stack"
+      [when [nil? v]
+        [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
+      [list #$5 [val->bytecode-op v]]]
 
-[defn $push/symbol [v]
-  "- v | Pushes v onto the stack"
-  [list #$23 [sym->bytecode-op v]]]
+[defn $push/symbol [sym]
+      "[] -> [sym]"
+      "Pushes v onto the stack"
+      [list #$23 [sym->bytecode-op sym]]]
 
-[defn $def [v]
-  [list #$E [sym->bytecode-op v]]]
+[defn $def [sym]
+      "[val] -> [val]"
+      "Define a new binding for SYM and associate VAL to it"
+      [list #$E [sym->bytecode-op sym]]]
 
-[defn $set [v]
-  [list #$F [sym->bytecode-op v]]]
+[defn $set [sym]
+      "[val] -> [val]"
+      "Update the binding for SYM and associate VAL to it"
+      [list #$F [sym->bytecode-op sym]]]
 
-[defn $get [v]
-  [list #$10 [sym->bytecode-op v]]]
+[defn $get [sym]
+      "[] -> [val]"
+      "Push whatever value is associated to SYM on the stack"
+      [list #$10 [sym->bytecode-op sym]]]
 
 [defn $apply [arg-count fun]
-  "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-  [case arg-count
-    [1 [case fun
-         [car [$car]]
-         [cdr [$cdr]]
-         [otherwise [list #$8
-                          [int->bytecode-op arg-count]
-                          [val->bytecode-op fun]]]]]
-    [2 [case fun
-         [add/int [$add/int]]
-         [cons [$cons]]
-         [< [$<]]
-         [<= [$<=]]
-         [== [$==]]
-         [>= [$>=]]
-         [> [$>]]
-         [otherwise [list #$8
-                          [int->bytecode-op arg-count]
-                          [val->bytecode-op fun]]]]]
-    [otherwise [list #$8
-                     [int->bytecode-op arg-count]
-                     [val->bytecode-op fun]]]]]
+      "arguments -> [result]"
+      "Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+      [case arg-count
+        [1 [case fun
+             [car [$car]]
+             [cdr [$cdr]]
+             [otherwise [list #$8
+                              [int->bytecode-op arg-count]
+                              [val->bytecode-op fun]]]]]
+        [2 [case fun
+             [add/int [$add/int]]
+             [cons [$cons]]
+             [< [$<]]
+             [<= [$<=]]
+             [== [$==]]
+             [>= [$>=]]
+             [> [$>]]
+             [otherwise [list #$8
+                              [int->bytecode-op arg-count]
+                              [val->bytecode-op fun]]]]]
+        [otherwise [list #$8
+                         [int->bytecode-op arg-count]
+                         [val->bytecode-op fun]]]]]
 
 [defn $apply/dynamic [arg-count fun]
-  [list #$7 [int->bytecode-op arg-count]]]
-
-[defn $apply/dynamic/new [arg-count fun]
-  [list #$7 [int->bytecode-op arg-count]]]
+      [list #$7 [int->bytecode-op arg-count]]]
 
 [defn $try [target]
-  " - | Try something, jumping to target if an exception occurs"
-  [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]]
-        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      "[] -> []"
+      "Try something, jumping to target if an exception occurs"
+      [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]]
+            [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jmp [target]
-  [list #$9 [list :relocate target 8 0 [int->bytecode-op 0]]
-        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      [list #$9
+            [list :relocate target 8 0 [int->bytecode-op 0]]
+            [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jt [target]
-  [list #$A [list :relocate target 8 0 [int->bytecode-op 0]]
-        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      [list #$A
+            [list :relocate target 8 0 [int->bytecode-op 0]]
+            [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jf [target]
-  [list #$B [list :relocate target 8 0 [int->bytecode-op 0]]
-        [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      [list #$B
+            [list :relocate target 8 0 [int->bytecode-op 0]]
+            [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $fn [name args docs body]
-  [list #$25
-        [val->bytecode-op name]
-        [val->bytecode-op args]
-        [val->bytecode-op docs]
-        [val->bytecode-op body]]]
+      [list #$25
+            [val->bytecode-op name]
+            [val->bytecode-op args]
+            [val->bytecode-op docs]
+            [val->bytecode-op body]]]
 
 [defn $macro* [name args docs body]
-  [list #$26
-        [val->bytecode-op name]
-        [val->bytecode-op args]
-        [val->bytecode-op docs]
-        [val->bytecode-op body]]]
+      [list #$26
+            [val->bytecode-op name]
+            [val->bytecode-op args]
+            [val->bytecode-op docs]
+            [val->bytecode-op body]]]
 
 [defn assemble/build-sym-map [code sym-map pos]
-  [while code
-    [case [type-of [car code]]
-      [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
-      [[:symbol :keyword] [and [== [car code] :label]
-                               [tree/set! sym-map [cadr code] pos]]]
-      [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
-    [cdr! code]]
-  [return pos]]
+      [while code
+        [case [type-of [car code]]
+          [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
+          [[:symbol :keyword] [and [== [car code] :label]
+                                   [tree/set! sym-map [cadr code] pos]]]
+          [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
+        [cdr! code]]
+      [when [zero? 123] 123]
+      [return pos]]
 
 [defn assemble/relocate-op [code sym-map pos out]
-  [def target [tree/ref sym-map [cadr code]]]
-  [def off [- [+ target [cadddr code]] pos]]
-  [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
-  [return pos]]
+      [def target [tree/ref sym-map [cadr code]]]
+      [def off [- [+ target [cadddr code]] pos]]
+      [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
+      [return pos]]
 
 [defn assemble/emit-relocated-ops [code sym-map pos out]
-  [if [== [car code] :relocate]
-      [set! pos [assemble/relocate-op code sym-map pos out]]
-      [for-in [op code]
-              [case [type-of op]
-                [:bytecode-op [array/set! out [++ pos] op]]
-                [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
-  [return pos]]
+      [if [== [car code] :relocate]
+          [set! pos [assemble/relocate-op code sym-map pos out]]
+          [for-in [op code]
+                  [case [type-of op]
+                    [:bytecode-op [array/set! out [++ pos] op]]
+                    [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
+      [return pos]]
 
 [def assemble/verbose #f]
 [defn assemble* [code]
-  "Assemble all arguments into a single :bytecode-array"
-  [def sym-map @[]]
+      "Assemble all arguments into a single :bytecode-array"
+      [def sym-map @[]]
 
-  [and assemble/verbose [println [cat [ansi-blue "Input:\n" [str/write code]]]]]
-  [assemble/build-sym-map code sym-map 0]
-  [and assemble/verbose [println [cat [ansi-yellow "Symbol Map:\n" [str/write sym-map]]]]]
-  [def out [array/allocate [tree/ref sym-map :last-op]]]
-  [assemble/emit-relocated-ops code sym-map -1 out]
-  [and assemble/verbose [println [cat [ansi-green "Output:\n" [str/write out]]]]]
+      [and assemble/verbose [println [cat [ansi-blue "Input:\n" [str/write code]]]]]
+      [assemble/build-sym-map code sym-map 0]
+      [and assemble/verbose [println [cat [ansi-yellow "Symbol Map:\n" [str/write sym-map]]]]]
+      [def out [array/allocate [tree/ref sym-map :last-op]]]
+      [assemble/emit-relocated-ops code sym-map -1 out]
+      [and assemble/verbose [println [cat [ansi-green "Output:\n" [str/write out]]]]]
 
-  [arr->bytecode-arr out]]
+      [arr->bytecode-arr out]]
 
 [defn assemble l
-  "Assemble all arguments into a single :bytecode-array"
-  [assemble* l]]
+      "Assemble all arguments into a single :bytecode-array"
+      [assemble* l]]
 
 [defmacro asmrun ops
-  "Assemble and evaluate all bytecode arguments"
-  `[bytecode-eval [assemble ~@ops]]]
+          "Assemble and evaluate all bytecode arguments"
+          `[bytecode-eval [assemble ~@ops]]]
 
 [defmacro asmdebug ops
-  "Assemble and evaluate all bytecode arguments"
-  `[bytecode-eval [assemble ~@ops] [environment*] #t]]
+          "Assemble and evaluate all bytecode arguments"
+          `[bytecode-eval [assemble ~@ops] [environment*] #t]]
