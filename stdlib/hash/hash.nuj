@@ -4,9 +4,9 @@
 ;; Contains various implementations for various hashing functions
 
 [defn hash/adler32 [data]
-       [def a 1]
-       [def b 0]
-       [for [i 0 [string/length data]]
-            [set! a [mod/int [add/int a [char-at data i]] 65521]]
-            [set! b [mod/int [add/int a b] 65521]]]
-       [logior a [ash b 16]]]
+      [def a 1]
+      [def b 0]
+      [for [i 0 [string/length data]]
+        [set! a [mod/int [add/int a [char-at data i]] 65521]]
+        [set! b [mod/int [add/int a b] 65521]]]
+      [logior a [ash b 16]]]

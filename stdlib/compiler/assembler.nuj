@@ -63,29 +63,30 @@
       "arguments -> [result]"
       "Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       [case arg-count
-        [1 [case fun
-             [car [$car]]
-             [cdr [$cdr]]
-             [otherwise [list #$8
-                              [int->bytecode-op arg-count]
-                              [val->bytecode-op fun]]]]]
-        [2 [case fun
-             [add/int [$add/int]]
-             [cons [$cons]]
-             [< [$<]]
-             [<= [$<=]]
-             [== [$==]]
-             [>= [$>=]]
-             [> [$>]]
-             [otherwise [list #$8
-                              [int->bytecode-op arg-count]
-                              [val->bytecode-op fun]]]]]
-        [otherwise [list #$8
-                         [int->bytecode-op arg-count]
-                         [val->bytecode-op fun]]]]]
+            [1 [case fun
+                     [car [$car]]
+                     [cdr [$cdr]]
+                     [otherwise [list #$8
+                                      [int->bytecode-op arg-count]
+                                      [val->bytecode-op fun]]]]]
+            [2 [case fun
+                     [add/int [$add/int]]
+                     [cons [$cons]]
+                     [< [$<]]
+                     [<= [$<=]]
+                     [== [$==]]
+                     [>= [$>=]]
+                     [> [$>]]
+                     [otherwise [list #$8
+                                      [int->bytecode-op arg-count]
+                                      [val->bytecode-op fun]]]]]
+            [otherwise [list #$8
+                             [int->bytecode-op arg-count]
+                             [val->bytecode-op fun]]]]]
 
 [defn $apply/dynamic [arg-count fun]
-      [list #$7 [int->bytecode-op arg-count]]]
+      [list #$7
+            [int->bytecode-op arg-count]]]
 
 [defn $try [target]
       "[] -> []"
@@ -124,12 +125,12 @@
 
 [defn assemble/build-sym-map [code sym-map pos]
       [while code
-        [case [type-of [car code]]
-          [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
-          [[:symbol :keyword] [and [== [car code] :label]
-                                   [tree/set! sym-map [cadr code] pos]]]
-          [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
-        [cdr! code]]
+             [case [type-of [car code]]
+                   [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
+                   [[:symbol :keyword] [and [== [car code] :label]
+                                            [tree/set! sym-map [cadr code] pos]]]
+                   [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
+             [cdr! code]]
       [when [zero? 123] 123]
       [return pos]]
 
@@ -144,8 +145,8 @@
           [set! pos [assemble/relocate-op code sym-map pos out]]
           [for-in [op code]
                   [case [type-of op]
-                    [:bytecode-op [array/set! out [++ pos] op]]
-                    [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
+                        [:bytecode-op [array/set! out [++ pos] op]]
+                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 
 [def assemble/verbose #f]

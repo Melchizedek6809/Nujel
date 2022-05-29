@@ -5,33 +5,33 @@
 [def π  3.141592653589793]
 
 [defmacro ++ [i]
-  "Increment I by 1 and store the result in I"
-  `[set! ~i [+ 1 ~i]]]
+          "Increment I by 1 and store the result in I"
+          `[set! ~i [+ 1 ~i]]]
 
 [defmacro -- [i]
-  "Decrement I by 1 and store the result in I"
-  `[set! ~i [+ -1 ~i]]]
+          "Decrement I by 1 and store the result in I"
+          `[set! ~i [+ -1 ~i]]]
 
 [defn +x [α]
-  "Return a function that adds α to it's argument, useful for mapping"
-  [fn [β]
-      [+ α β]]]
+      "Return a function that adds α to it's argument, useful for mapping"
+      [fn [β]
+        [+ α β]]]
 
 [defn >> [val amount]
-  "Shifts VAL by AMOUNT bits to the right"
-  [ash val [- amount]]]
+      "Shifts VAL by AMOUNT bits to the right"
+      [ash val [- amount]]]
 
 [defn fib [i]
-  "Terribly inefficient, but, useful for testing the GC"
-  [if [< i 2] i
-      [+ [fib [- i 2]] [fib [- i 1]]]]]
+      "Terribly inefficient, but, useful for testing the GC"
+      [if [< i 2] i
+          [+ [fib [- i 2]] [fib [- i 1]]]]]
 
 [defn wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
-  [+ min [% [- val min] [- max min]]]]
+      [+ min [% [- val min] [- max min]]]]
 
 [defmacro +1 [v]
-  `[+ 1 ~v]]
+          `[+ 1 ~v]]
 
 [defn radians [degrees]
-  "Convert a quantity in degrees to radians"
-  [/ [* π degrees] 180.0]]
+      "Convert a quantity in degrees to radians"
+      [/ [* π degrees] 180.0]]

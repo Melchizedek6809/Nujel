@@ -4,200 +4,200 @@
 ;; Put all the LISt Processing stuff in here
 
 [defn array->list [arr]
-  [def i [- [array/length arr] 1]]
-  [def ret #nil]
-  [while [>= i 0]
-    [set! ret [cons [array/ref arr i] ret]]
-    [-- i]]
-  [return ret]]
+      [def i [- [array/length arr] 1]]
+      [def ret #nil]
+      [while [>= i 0]
+             [set! ret [cons [array/ref arr i] ret]]
+             [-- i]]
+      [return ret]]
 
 [defn except-last-pair/iter [list rest]
-  "Iterator for except-last-pair"
-  [if [nil? [cdr list]]
-      [reverse rest]
-      [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
+      "Iterator for except-last-pair"
+      [if [nil? [cdr list]]
+          [reverse rest]
+          [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
 
 [defn except-last-pair [list]
-  "Return a copy of LIST without the last pair"
-  [except-last-pair/iter list #nil]]
+      "Return a copy of LIST without the last pair"
+      [except-last-pair/iter list #nil]]
 
 [defn last-pair [list]
-  "Return the last pair of LIST"
-  [while [cdr list]
-    [cdr! list]]
-  list]
+      "Return the last pair of LIST"
+      [while [cdr list]
+             [cdr! list]]
+      list]
 
 [defn make-list [number value]
-  "Return a list of NUMBER elements containing VALUE in every car"
-  [def list #nil]
-  [while [>= [-- number] 0]
-    [set! list [cons value list]]]
-  list]
+      "Return a list of NUMBER elements containing VALUE in every car"
+      [def list #nil]
+      [while [>= [-- number] 0]
+             [set! list [cons value list]]]
+      list]
 
 [defn range [end start step]
-  "Return a list containing values from START (inclusive) to END (exclusive) by STEP"
-  [when-not end   [throw [list :arity-error "[range] needs at least a specific end"]]]
-  [when-not start [set! start 0]]
-  [when-not step  [set! step 1]]
-  [def pred [if [pos? step] < >]]
-  [def ret #nil]
-  [while [pred start end]
-    [set! ret [cons start ret]]
-    [set! start [+ start step]]]
-  [nreverse ret]]
+      "Return a list containing values from START (inclusive) to END (exclusive) by STEP"
+      [when-not end   [throw [list :arity-error "[range] needs at least a specific end"]]]
+      [when-not start [set! start 0]]
+      [when-not step  [set! step 1]]
+      [def pred [if [pos? step] < >]]
+      [def ret #nil]
+      [while [pred start end]
+             [set! ret [cons start ret]]
+             [set! start [+ start step]]]
+      [nreverse ret]]
 
 [defn list/reduce [l o s]
-  "Combine all elements in l using operation o and starting value s"
-  [for-in [e l]
-          [set! s [o s e]]]
-  s]
+      "Combine all elements in l using operation o and starting value s"
+      [for-in [e l]
+              [set! s [o s e]]]
+      s]
 
 [defn list/ref [l i]
-  "Returns the the element of list l at location i"
-  [while [and l [> i 0]]
-    [-- i]
-    [cdr! l]]
-  [car l]]
+      "Returns the the element of list l at location i"
+      [while [and l [> i 0]]
+             [-- i]
+             [cdr! l]]
+      [car l]]
 
 [defn reverse [l]
-  "Return the list l in reverse order"
-  [def ret]
-  [for-in [e l]
-          [set! ret [cons e ret]]]
-  ret]
+      "Return the list l in reverse order"
+      [def ret]
+      [for-in [e l]
+              [set! ret [cons e ret]]]
+      ret]
 
 [defn list/length [l]
-  "Returns the length of list l"
-  [def ret 0]
-  [for-in [e l]
-          [++ ret]]
-  ret]
+      "Returns the length of list l"
+      [def ret 0]
+      [for-in [e l]
+              [++ ret]]
+      ret]
 
 [defn list/filter [l p]
-  "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-  [def ret #nil]
-  [for-in [e l]
-          [when [p e]
-            [set! ret [cons e ret]]]]
-  [nreverse ret]]
+      "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
+      [def ret #nil]
+      [for-in [e l]
+              [when [p e]
+                    [set! ret [cons e ret]]]]
+      [nreverse ret]]
 
 [defn list/map [l f]
-  "Runs f over every item in list l and returns the resulting list"
-  [def ret #nil]
-  [for-in [e l]
-          [set! ret [cons [f e] ret]]]
-  [nreverse ret]]
+      "Runs f over every item in list l and returns the resulting list"
+      [def ret #nil]
+      [for-in [e l]
+              [set! ret [cons [f e] ret]]]
+      [nreverse ret]]
 
 [defn append [a b]
-  "Appends two lists A and B together"
-  [def ret b]
-  [set! a [reverse a]]
-  [for-in [t a]
-          [set! ret [cons t ret]]]
-  ret]
+      "Appends two lists A and B together"
+      [def ret b]
+      [set! a [reverse a]]
+      [for-in [t a]
+              [set! ret [cons t ret]]]
+      ret]
 
 [defn sublist [l start end ret]
-  "Returns a new list containing all elements of l from start to end"
-  [cond [[nil?    l] [reverse ret]]
-        [[neg?  end] [sublist      l      start  [+ [length l] end]]]
-        [[zero? end] [reverse ret]]
-        [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
-        [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]]]
+      "Returns a new list containing all elements of l from start to end"
+      [cond [[nil?    l] [reverse ret]]
+            [[neg?  end] [sublist      l      start  [+ [length l] end]]]
+            [[zero? end] [reverse ret]]
+            [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
+            [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]]]
 
 [defn list-head [l k]
-  "Returns the first k elements of list l"
-  [sublist l 0 k]]
+      "Returns the first k elements of list l"
+      [sublist l 0 k]]
 
 [defn list-tail [l k]
-  "Returns the sublist of l obtained by omitting the first l elements"
-  [sublist l k [length l]]]
+      "Returns the sublist of l obtained by omitting the first l elements"
+      [sublist l k [length l]]]
 
 [defn list/member [l m]
-  "Returns the first pair of list l whose car is equal to m"
-  [cond [[nil? l] #f]
-        [[== [car l] m] l]
-        [#t [list/member [cdr l] m]]]]
+      "Returns the first pair of list l whose car is equal to m"
+      [cond [[nil? l] #f]
+            [[== [car l] m] l]
+            [#t [list/member [cdr l] m]]]]
 
 [defn getf [l key]
-  "Return the value in LIST following KEY"
-  [cond [[nil? l] #nil]
-        [[== key [car l]] [cadr l]]
-        [#t [getf [cdr l] key]]]]
+      "Return the value in LIST following KEY"
+      [cond [[nil? l] #nil]
+            [[== key [car l]] [cadr l]]
+            [#t [getf [cdr l] key]]]]
 
 [defn list/sort/bubble [l]
-  "Terribly slow way to sort a list, though it was simple to write"
-  [if-not l #nil
-          [do [def top [car l]]
-	      [def next #nil]
-	    [cdr! l]
-	    [while l
-              [if [<= [car l] top]
-                  [do [set! next [cons top next]]
-		      [set! top [car l]]]
-                  [set! next [cons [car l] next]]]
-	      [cdr! l]]
-	    [cons top [list/sort/bubble next]]]]]
+      "Terribly slow way to sort a list, though it was simple to write"
+      [if-not l #nil
+              [do [def top [car l]]
+	          [def next #nil]
+	        [cdr! l]
+	        [while l
+                       [if [<= [car l] top]
+                           [do [set! next [cons top next]]
+		               [set! top [car l]]]
+                           [set! next [cons [car l] next]]]
+	               [cdr! l]]
+	        [cons top [list/sort/bubble next]]]]]
 
 [defn list/merge-sorted-lists [l1 l2]
-  [cond [[nil? l1] l2]
-        [[nil? l2] l1]
-        [#t [if [< [car l1] [car l2]]
-                [cons [car l1] [list/merge-sorted-lists [cdr l1] l2]]
-                [cons [car l2] [list/merge-sorted-lists l1 [cdr l2]]]]]]]
+      [cond [[nil? l1] l2]
+            [[nil? l2] l1]
+            [#t [if [< [car l1] [car l2]]
+                    [cons [car l1] [list/merge-sorted-lists [cdr l1] l2]]
+                    [cons [car l2] [list/merge-sorted-lists l1 [cdr l2]]]]]]]
 
 [defn list/split-half-rec [l acc1 acc2]
-  [cond [[nil? l] [cons acc1 acc2]]
-        [[nil? [cdr l]] [cons [cons [car l] acc1] acc2]]
-        [#t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]]]]]
+      [cond [[nil? l] [cons acc1 acc2]]
+            [[nil? [cdr l]] [cons [cons [car l] acc1] acc2]]
+            [#t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]]]]]
 
 [defn list/split-half [l] [list/split-half-rec l #nil #nil]]
 
 [defn list/sort/merge [l]
-  "Sorts a list"
-  [if [nil? [cdr l]]
-      l
-      [do [def parts [list/split-half l]]
-          [list/merge-sorted-lists
-           [list/sort/merge [car parts]]
-           [list/sort/merge [cdr parts]]]]]]
+      "Sorts a list"
+      [if [nil? [cdr l]]
+          l
+          [do [def parts [list/split-half l]]
+              [list/merge-sorted-lists
+               [list/sort/merge [car parts]]
+               [list/sort/merge [cdr parts]]]]]]
 
                                         ; Set default sort to merge-sort
 [def list/sort list/sort/merge]
 
 [defn list/equal? [a b]
-  "#t if A and B are equal"
-  [if [pair? a]
-      [and [list/equal? [car a] [car b]]
-           [list/equal? [cdr a] [cdr b]]]
-      [equal? a b]]]
+      "#t if A and B are equal"
+      [if [pair? a]
+          [and [list/equal? [car a] [car b]]
+               [list/equal? [cdr a] [cdr b]]]
+          [equal? a b]]]
 
 [defn list/take [l count]
-  "Take the first COUNT elements from list L"
-  [if [<= count 0]
-      #nil
-      [cons [car l] [list/take [cdr l] [- count 1]]]]]
+      "Take the first COUNT elements from list L"
+      [if [<= count 0]
+          #nil
+          [cons [car l] [list/take [cdr l] [- count 1]]]]]
 
 [defn list/drop [l count]
-  "Drop the final COUNT elements from list L"
-  [if [<= count 0]
-      l
-      [list/drop [cdr l] [- count 1]]]]
+      "Drop the final COUNT elements from list L"
+      [if [<= count 0]
+          l
+          [list/drop [cdr l] [- count 1]]]]
 
 [defn list/cut [l start end]
-  "Return a subsequence of L from START to END"
-  [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]
+      "Return a subsequence of L from START to END"
+      [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]
 
 [defn list/replace [l search-for replace-with]
-  "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
-  ""
-  "Uses [equal?] so we can search/replace lists/trees and other complex data structures"
-  [cond [[not l] #nil]
-        [[equal? l search-for]
-         replace-with]
-        [[equal? [car l] search-for]
-         [cons replace-with
-               [list/replace [cdr l] search-for replace-with]]]
-        [#t [cons [if [pair? [car l]]
-                      [list/replace [car l] search-for replace-with]
-                      [car l]]
-                  [list/replace [cdr l] search-for replace-with]]]]]
+      "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
+      ""
+      "Uses [equal?] so we can search/replace lists/trees and other complex data structures"
+      [cond [[not l] #nil]
+            [[equal? l search-for]
+             replace-with]
+            [[equal? [car l] search-for]
+             [cons replace-with
+                   [list/replace [cdr l] search-for replace-with]]]
+            [#t [cons [if [pair? [car l]]
+                          [list/replace [car l] search-for replace-with]
+                          [car l]]
+                      [list/replace [cdr l] search-for replace-with]]]]]

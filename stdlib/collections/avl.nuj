@@ -12,11 +12,11 @@
 [defn avl/empty? [n] [== :e n]]
 [defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
 [defn avl/typecheck [r k]
-  [or [avl/empty? [avl/root r]]
-      [== [type-of k] [type-of [avl/key [avl/root r]]]]
-      [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
+      [or [avl/empty? [avl/root r]]
+          [== [type-of k] [type-of [avl/key [avl/root r]]]]
+          [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
 [defn avl/tree [cmp]
-  #[avl/empty [or cmp avl/default-cmp]]]
+      #[avl/empty [or cmp avl/default-cmp]]]
 
 [defn avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]]
 [defn avl/key    [n] [array/ref n 1]]
@@ -27,12 +27,12 @@
 [defn avl/cmp    [r] [array/ref r 1]]
 
 [defn avl/min-node [n]
-  [if [avl/empty? n]
-      avl/empty
-      [let [[l [avl/left n]]]
-        [if [avl/empty? l]
-            n
-            [avl/min-mode l]]]]]
+      [if [avl/empty? n]
+          avl/empty
+          [let [[l [avl/left n]]]
+               [if [avl/empty? l]
+                   n
+                   [avl/min-mode l]]]]]
 
 [defn avl/update-left   [n l] [array/set! [array/dup n] 2 l]]
 [defn avl/update-right  [n r] [array/set! [array/dup n] 3 r]]
@@ -41,9 +41,9 @@
 [defn avl/update-root   [t r] [array/set! [array/dup t] 0 r]]
 
 [defn avl/update-height [n]
-  [array/set! [array/dup n] 0
-              [+ 1 [max [avl/height [avl/left n]]
-                        [avl/height [avl/right n]]]]]]
+      [array/set! [array/dup n] 0
+                  [+ 1 [max [avl/height [avl/left n]]
+                            [avl/height [avl/right n]]]]]]
 
 ;;        y               x
 ;;       / \             / \
@@ -57,141 +57,141 @@
 ;; rotate-right transforms the right node configuration to the left.
 
 [defn avl/rotate-right [y]
-  [let [[x [avl/left y]]]
-    [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]
+      [let [[x [avl/left y]]]
+           [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]
 
 [defn avl/rotate-left [x]
-  [let [[y [avl/right x]]]
-    [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]
+      [let [[y [avl/right x]]]
+           [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]
 
 [defn avl/balance [n]
-  [if [avl/empty? n]
-      0
-      [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]
+      [if [avl/empty? n]
+          0
+          [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]
 
 [defn avl/insert-rebalance [n cmp v]
-  [let [[b [avl/balance n]]]
-    [cond
-     [[> b 1]
-      [case [cmp v [avl/key [avl/left n]]]
-        [-1 [avl/rotate-right n]]
-        [1  [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]]
-        [0  n]]]
-     [[< b -1]
-      [case [cmp v [avl/key [avl/right n]]]
-        [1  [avl/rotate-left n]]
-        [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]]
-        [0  n]]]
-     [#t n]]]]
+      [let [[b [avl/balance n]]]
+           [cond
+            [[> b 1]
+             [case [cmp v [avl/key [avl/left n]]]
+                   [-1 [avl/rotate-right n]]
+                   [1  [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]]
+                   [0  n]]]
+            [[< b -1]
+             [case [cmp v [avl/key [avl/right n]]]
+                   [1  [avl/rotate-left n]]
+                   [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]]
+                   [0  n]]]
+            [#t n]]]]
 
 [defn avl/node-insert [n cmp v]
-  [if [avl/empty? n]
-      #[1 v avl/empty avl/empty]
-      [case [cmp v [avl/key n]]
-        [-1 [avl/insert-rebalance [avl/update-height [avl/update-left  n [avl/node-insert [avl/left  n] cmp v]]] cmp v]]
-        [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
-        [0  [avl/update-key n v]]]]]
+      [if [avl/empty? n]
+          #[1 v avl/empty avl/empty]
+          [case [cmp v [avl/key n]]
+                [-1 [avl/insert-rebalance [avl/update-height [avl/update-left  n [avl/node-insert [avl/left  n] cmp v]]] cmp v]]
+                [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
+                [0  [avl/update-key n v]]]]]
 
 [defn avl/insert [t v]
-  "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
-  [avl/typecheck t v]
-  [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
+      "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
+      [avl/typecheck t v]
+      [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
 
 [defn avl/node-get [n cmp v]
-  [if [avl/empty? n]
-      #nil
-      [case [cmp v [avl/key n]]
-        [0  [avl/key n]]
-        [-1 [avl/node-get [avl/left  n] cmp v]]
-        [1  [avl/node-get [avl/right n] cmp v]]]]]
+      [if [avl/empty? n]
+          #nil
+          [case [cmp v [avl/key n]]
+                [0  [avl/key n]]
+                [-1 [avl/node-get [avl/left  n] cmp v]]
+                [1  [avl/node-get [avl/right n] cmp v]]]]]
 
 [defn avl/get [t v]
-  "Retrieve the key V from tree T, or #nil if V is not in it"
-  [if [or [avl/empty? [avl/root t]]
-          [!= [type-of v] [type-of [avl/key [avl/root t]]]]]
-      #nil
-      [avl/node-get [avl/root t] [avl/cmp t] v]]]
+      "Retrieve the key V from tree T, or #nil if V is not in it"
+      [if [or [avl/empty? [avl/root t]]
+              [!= [type-of v] [type-of [avl/key [avl/root t]]]]]
+          #nil
+          [avl/node-get [avl/root t] [avl/cmp t] v]]]
 
 [defn avl/from-list [l cmp]
-  "Create a new avl tree using the keys in L and the comparison function CMP"
-  [list/reduce l avl/insert [avl/tree cmp]]]
+      "Create a new avl tree using the keys in L and the comparison function CMP"
+      [list/reduce l avl/insert [avl/tree cmp]]]
 
 [defn avl/remove-rebalance [n]
-  [if [avl/empty? n]
-      n
-      [let [[b [avl/balance n]]
-            [l [avl/left n]]
-            [r [avl/right n]]]
-        [cond
-         [[> b 1]
-          [if [>= [avl/balance l] 0]
-              [avl/rotate-right n]
-              [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]]
-         [[< b -1]
-          [if [<= [avl/balance r] 0]
-              [avl/rotate-left n]
-              [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]]
-         [#t n]]]]]
+      [if [avl/empty? n]
+          n
+          [let [[b [avl/balance n]]
+                [l [avl/left n]]
+                [r [avl/right n]]]
+               [cond
+                [[> b 1]
+                 [if [>= [avl/balance l] 0]
+                     [avl/rotate-right n]
+                     [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]]
+                [[< b -1]
+                 [if [<= [avl/balance r] 0]
+                     [avl/rotate-left n]
+                     [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]]
+                [#t n]]]]]
 
 [defn avl/node-remove [n cmp v]
-  [if [avl/empty? n]
-      n
-      [let [[root
-                [case [cmp v [avl/key n]]
-                  [-1 [avl/update-left  n [avl/node-remove [avl/left  n] cmp v]]]
-                  [1  [avl/update-right n [avl/node-remove [avl/right n] cmp v]]]
-                  [0  [cond
-                       [[avl/empty? [avl/left  n]] [avl/right n]]
-                       [[avl/empty? [avl/right n]] [avl/left  n]]
-                       [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]]
-                             [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]]
-        [set! root [avl/update-height root]]
-        [avl/remove-rebalance root]]]]
+      [if [avl/empty? n]
+          n
+          [let [[root
+                    [case [cmp v [avl/key n]]
+                          [-1 [avl/update-left  n [avl/node-remove [avl/left  n] cmp v]]]
+                          [1  [avl/update-right n [avl/node-remove [avl/right n] cmp v]]]
+                          [0  [cond
+                               [[avl/empty? [avl/left  n]] [avl/right n]]
+                               [[avl/empty? [avl/right n]] [avl/left  n]]
+                               [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]]
+                                        [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]]
+               [set! root [avl/update-height root]]
+               [avl/remove-rebalance root]]]]
 
 [defn avl/remove [t v]
-  "Remove the key V from tree T if it is contained within it"
-  [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]
+      "Remove the key V from tree T if it is contained within it"
+      [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]
 
 [defn avl/equal-node? [a b]
-  [if [avl/empty? a]
-      [avl/empty? b]
-      [and [equal? [avl/key a] [avl/key b]]
-           [avl/equal-node? [avl/left a] [avl/left b]]
-           [avl/equal-node? [avl/right a] [avl/right b]]]]]
+      [if [avl/empty? a]
+          [avl/empty? b]
+          [and [equal? [avl/key a] [avl/key b]]
+               [avl/equal-node? [avl/left a] [avl/left b]]
+               [avl/equal-node? [avl/right a] [avl/right b]]]]]
 
 [defn avl/equal? [a b]
-  "Test if two avl trees are equal"
-  [avl/equal-node? [avl/root a] [avl/root b]]]
+      "Test if two avl trees are equal"
+      [avl/equal-node? [avl/root a] [avl/root b]]]
 
 [defn avl/reduce-node [node o s]
-  [if [avl/empty? node]
-      s
-      [o [avl/key node]
-         [avl/reduce-node [avl/right node] o
-                          [avl/reduce-node [avl/left node] o s]]]]]
+      [if [avl/empty? node]
+          s
+          [o [avl/key node]
+             [avl/reduce-node [avl/right node] o
+                              [avl/reduce-node [avl/left node] o s]]]]]
 
 [defn avl/reduce [t o s]
-  "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
-  [avl/reduce-node [avl/root t] o s]]
+      "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
+      [avl/reduce-node [avl/root t] o s]]
 
 [defn avl/reduce-node-bin [n o s]
-  [if [avl/empty? n]
-      s
-      [o [o [avl/key n]
-            [avl/reduce-node-bin [avl/left n] o s]]
-         [avl/reduce-node-bin [avl/right n] o s]]]]
+      [if [avl/empty? n]
+          s
+          [o [o [avl/key n]
+                [avl/reduce-node-bin [avl/left n] o s]]
+             [avl/reduce-node-bin [avl/right n] o s]]]]
 
 [defn avl/reduce-bin [t o s]
-  "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"
-  [avl/reduce-node-bin [avl/root t] o s]]
+      "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"
+      [avl/reduce-node-bin [avl/root t] o s]]
 
 [defn avl/map [t f]
-  "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
-  [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
+      "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
+      [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
 
 [defn avl/map-to [t f cmp]
-  "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
-  [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
+      "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
+      [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
 
 [defn avl/to-list [t]
-  [avl/reduce t cons #nil]]
+      [avl/reduce t cons #nil]]

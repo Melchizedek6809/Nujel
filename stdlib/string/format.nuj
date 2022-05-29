@@ -3,216 +3,212 @@
 ;;
 ;; Subroutines and macros for formatted text output
 
-[def fmt/format-arg/default @[
-                              :align :right
-                                     :debug #f
-                                     :base #f
-                                     :width #nil
-                                     :padding-char " "
-                                     ]]
+[def fmt/format-arg/default @[ :align :right
+                               :debug #f
+                               :base #f
+                               :width #nil
+                               :padding-char " "]]
 
 [defn fmt/find-non-digit-from-right [s i]
-  [if [< i 0]
-      -1
-      [do [def char [char-at s i]]
-          [if [and [>= char #\0] [<= char #\9]]
-              [fmt/find-non-digit-from-right s [- i 1]]
-              i]]]]
+      [if [< i 0]
+          -1
+          [do [def char [char-at s i]]
+              [if [and [>= char #\0] [<= char #\9]]
+                  [fmt/find-non-digit-from-right s [- i 1]]
+                  i]]]]
 
 [defn fmt/parse-spec [opts spec]
-  [if [zero? [string/length spec]]
-      opts
-      [case [char-at spec [- [string/length spec] 1]]
-        [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
-         [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]]
-         [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]]
-         [tree/set! opts :width [read/single number]]
-         [when [== #\0 [char-at number 0]]
-           [tree/set! opts :padding-char "0"]]
-         [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]]
-        [#\? [fmt/parse-spec [tree/set! opts :debug #t]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\X [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\x [fmt/parse-spec [tree/set! opts :base :hexadecimal]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\d [fmt/parse-spec [tree/set! opts :base :decimal]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\o [fmt/parse-spec [tree/set! opts :base :octal]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\b [fmt/parse-spec [tree/set! opts :base :binary]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\< [fmt/parse-spec [tree/set! opts :align :left]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\^ [fmt/parse-spec [tree/set! opts :align :center]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\> [fmt/parse-spec [tree/set! opts :align :right]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [#\. [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]]
-                             [string/cut spec 0 [- [string/length spec] 1]]]]
-        [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
+      [if [zero? [string/length spec]]
+          opts
+          [case [char-at spec [- [string/length spec] 1]]
+                [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
+                 [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]]
+                 [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]]
+                 [tree/set! opts :width [read/single number]]
+                 [when [== #\0 [char-at number 0]]
+                       [tree/set! opts :padding-char "0"]]
+                 [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]]
+                [#\? [fmt/parse-spec [tree/set! opts :debug #t]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\X [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\x [fmt/parse-spec [tree/set! opts :base :hexadecimal]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\d [fmt/parse-spec [tree/set! opts :base :decimal]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\o [fmt/parse-spec [tree/set! opts :base :octal]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\b [fmt/parse-spec [tree/set! opts :base :binary]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\< [fmt/parse-spec [tree/set! opts :align :left]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\^ [fmt/parse-spec [tree/set! opts :align :center]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\> [fmt/parse-spec [tree/set! opts :align :right]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [#\. [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]]
+                                     [string/cut spec 0 [- [string/length spec] 1]]]]
+                [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]
 
 [defn fmt/debug [opts]
-  [if-not [tree/ref opts :debug]
-          opts
-          [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]
+      [if-not [tree/ref opts :debug]
+              opts
+              [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]
 
 [defn fmt/number-format [opts]
-  [case [tree/ref opts :base]
-    [:binary      [tree/set! opts :argument [list int->string/binary  [tree/ref opts :argument]]]]
-    [:octal       [tree/set! opts :argument [list int->string/octal   [tree/ref opts :argument]]]]
-    [:decimal     [tree/set! opts :argument [list int->string/decimal [tree/ref opts :argument]]]]
-    [:hexadecimal [tree/set! opts :argument [list int->string/hex     [tree/ref opts :argument]]]]
-    [:HEXADECIMAL [tree/set! opts :argument [list int->string/HEX     [tree/ref opts :argument]]]]
-    [otherwise opts]]]
+      [case [tree/ref opts :base]
+            [:binary      [tree/set! opts :argument [list int->string/binary  [tree/ref opts :argument]]]]
+            [:octal       [tree/set! opts :argument [list int->string/octal   [tree/ref opts :argument]]]]
+            [:decimal     [tree/set! opts :argument [list int->string/decimal [tree/ref opts :argument]]]]
+            [:hexadecimal [tree/set! opts :argument [list int->string/hex     [tree/ref opts :argument]]]]
+            [:HEXADECIMAL [tree/set! opts :argument [list int->string/HEX     [tree/ref opts :argument]]]]
+            [otherwise opts]]]
 
-[def fmt/number-format-prefixex @[
-                                  :binary "#b"
-                                          :octal "#o"
-                                          :decimal "#d"
-                                          :hexadecimal "#x"
-                                          :HEXADECIMAL "#x"
-                                          ]]
+[def fmt/number-format-prefixex @[ :binary "#b"
+                                   :octal "#o"
+                                   :decimal "#d"
+                                   :hexadecimal "#x"
+                                   :HEXADECIMAL "#x"]]
 
 [defn fmt/number-format-prefix [opts]
-  [if [or [not [tree/ref opts :debug]] [not [tree/ref opts :base]]] opts
-      [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [tree/ref opts :base]]
-              [tree/set! opts :argument [list cat
-                                              [tree/ref fmt/number-format-prefixex [tree/ref opts :base]]
-                                              [tree/ref opts :argument]]]
-              opts]
-          [tree/set! :debug #f]]]]
+      [if [or [not [tree/ref opts :debug]] [not [tree/ref opts :base]]] opts
+          [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [tree/ref opts :base]]
+                  [tree/set! opts :argument [list cat
+                                                  [tree/ref fmt/number-format-prefixex [tree/ref opts :base]]
+                                                  [tree/ref opts :argument]]]
+                  opts]
+              [tree/set! :debug #f]]]]
 
 [defn fmt/add-padding [opts]
-  [if-not [tree/ref opts :width]
-          opts
-          [tree/set! opts :argument [list [case [tree/ref opts :align]
-                                            [:right   string/pad-start]
-                                            [:center string/pad-middle]
-                                            [:left  string/pad-end]]
-                                          [tree/ref opts :argument]
-                                          [if [and [tree/ref opts :debug] [tree/ref opts :base]]
-                                              [- [tree/ref opts :width] 2]
-                                              [tree/ref opts :width]]
-                                          [tree/ref opts :padding-char]]]]]
+      [if-not [tree/ref opts :width]
+              opts
+              [tree/set! opts :argument [list [case [tree/ref opts :align]
+                                                    [:right   string/pad-start]
+                                                    [:center string/pad-middle]
+                                                    [:left  string/pad-end]]
+                                              [tree/ref opts :argument]
+                                              [if [and [tree/ref opts :debug] [tree/ref opts :base]]
+                                                  [- [tree/ref opts :width] 2]
+                                                  [tree/ref opts :width]]
+                                              [tree/ref opts :padding-char]]]]]
 
 [defn fmt/precision [opts]
-  [if-not [tree/ref opts :precision]
-          opts
-          [tree/set! opts :argument [list string/round
-                                          [tree/ref opts :argument]
-                                          [tree/ref opts :precision]]]]]
+      [if-not [tree/ref opts :precision]
+              opts
+              [tree/set! opts :argument [list string/round
+                                              [tree/ref opts :argument]
+                                              [tree/ref opts :precision]]]]]
 
 [defn fmt/truncate [opts]
-  [if-not [tree/ref opts :width]
-          opts
-          [tree/set! opts :argument [list string/cut
-                                          [tree/ref opts :argument]
-                                          0
-                                          [+ 1 [tree/ref opts :width]]]]]]
+      [if-not [tree/ref opts :width]
+              opts
+              [tree/set! opts :argument [list string/cut
+                                              [tree/ref opts :argument]
+                                              0
+                                              [+ 1 [tree/ref opts :width]]]]]]
 
 [defn fmt/output [opts]
-  [tree/ref opts :argument]]
+      [tree/ref opts :argument]]
 
 [defn fmt/format-arg [spec argument]
-  [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
-      fmt/number-format
-      fmt/precision
-      fmt/add-padding
-      fmt/truncate
-      fmt/number-format-prefix
-      fmt/debug
-      fmt/output]]
+      [-> [tree/set! [fmt/parse-spec [tree/dup fmt/format-arg/default] spec] :argument argument]
+          fmt/number-format
+          fmt/precision
+          fmt/add-padding
+          fmt/truncate
+          fmt/number-format-prefix
+          fmt/debug
+          fmt/output]]
 
 [defn fmt/valid-argument? [argument]
-  [or [int? argument] [symbol? argument]]]
+      [or [int? argument] [symbol? argument]]]
 
 [defn fmt/arg-sym [v]
-  [case [type-of v]
-    [:int [fmt/arg-sym [cat "fmt-arg-" [string v]]]]
-    [:symbol v]
-    [:string [str->sym v]]
-    [otherwise [throw [list :type-error "Invalid fmt argument name" v [current-lambda]]]]]]
+      [case [type-of v]
+            [:int [fmt/arg-sym [cat "fmt-arg-" [string v]]]]
+            [:symbol v]
+            [:string [str->sym v]]
+            [otherwise [throw [list :type-error "Invalid fmt argument name" v [current-lambda]]]]]]
 
 [defn fmt/expr [expr arguments-used opts]
-  [when-not [string? expr]
-            [throw [list :format-error "fmt needs a string literal as a first argument, since it is implemented as a macro" expr [current-lambda]]]]
-  [def split-expr  [split expr ":"]]
-  [def argument    [car split-expr]]
-  [def format-spec [or [cadr split-expr] ""]]
+      [when-not [string? expr]
+                [throw [list :format-error "fmt needs a string literal as a first argument, since it is implemented as a macro" expr [current-lambda]]]]
+      [def split-expr  [split expr ":"]]
+      [def argument    [car split-expr]]
+      [def format-spec [or [cadr split-expr] ""]]
 
-  [if [== "" argument]
-      [do [tree/-- opts :expr-count]
-          [array/set! arguments-used [tree/ref opts :expr-count] #t]
-        [fmt/format-arg format-spec [fmt/arg-sym [tree/ref opts :expr-count]]]]
-      [let [[read-vals [read argument]]]
-        [when [cdr read-vals]
-          [throw [list :format-error "Format argument specifier contains more than a single atom" argument [current-lambda]]]]
-        [when-not [fmt/valid-argument? [car read-vals]]
-                  [throw [list :format-error "Format argument specifier should be either an integer or a symbol" argument [current-lambda]]]]
+      [if [== "" argument]
+          [do [tree/-- opts :expr-count]
+              [array/set! arguments-used [tree/ref opts :expr-count] #t]
+            [fmt/format-arg format-spec [fmt/arg-sym [tree/ref opts :expr-count]]]]
+          [let [[read-vals [read argument]]]
+               [when [cdr read-vals]
+                     [throw [list :format-error "Format argument specifier contains more than a single atom" argument [current-lambda]]]]
+               [when-not [fmt/valid-argument? [car read-vals]]
+                         [throw [list :format-error "Format argument specifier should be either an integer or a symbol" argument [current-lambda]]]]
 
-        [when [int? [car read-vals]]
-          [when [or [< [car read-vals] 0] [>= [car read-vals] [array/length arguments-used]]]
-            [throw [list :format-error "fmt numbered argument is out of bounds" argument [current-lambda]]]]
-          [array/set! arguments-used [car read-vals] #t]]
-        [fmt/format-arg format-spec [fmt/arg-sym [car read-vals]]]]]]
+               [when [int? [car read-vals]]
+                     [when [or [< [car read-vals] 0] [>= [car read-vals] [array/length arguments-used]]]
+                           [throw [list :format-error "fmt numbered argument is out of bounds" argument [current-lambda]]]]
+                     [array/set! arguments-used [car read-vals] #t]]
+               [fmt/format-arg format-spec [fmt/arg-sym [car read-vals]]]]]]
 
 [defmacro fmt [format-string . args]
-  "Return a formatted string"
-  [when-not [string? format-string]
-            [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]]
-  [def cuts #nil]
-  [for [i 0 [string/length format-string]]
-    [case [char-at format-string i]
-      [#\{ [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]]
-               [set! cuts [cons i cuts]]]]
-      [#\} [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]]
-               [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]]
-  [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]]
-  [def expr-list #nil]
-  [def last-pos [string/length format-string]]
-  [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]]
+          "Return a formatted string"
+          [when-not [string? format-string]
+                    [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]]
+          [def cuts #nil]
+          [for [i 0 [string/length format-string]]
+            [case [char-at format-string i]
+                  [#\{ [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]]
+                           [set! cuts [cons i cuts]]]]
+                  [#\} [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]]
+                           [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]]
+          [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]]
+          [def expr-list #nil]
+          [def last-pos [string/length format-string]]
+          [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]]
 
-  [def opts @[:expr-count [array/length arguments-used]]]
-  [for-in [c cuts]
-          [def lit [string/cut format-string [+ [cdr c] 1] last-pos]]
-          [when-not [== "" lit] [set! expr-list [cons lit expr-list]]]
-          [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]]
-          [set! expr-list [cons expr expr-list]]
-          [set! last-pos [car c]]]
-  [when [> last-pos 0]
-    [def lit [string/cut format-string 0 last-pos]]
-    [set! expr-list [cons lit expr-list]]]
-  [for [i 0 [array/length arguments-used]]
-    [when-not [array/ref arguments-used i]
-              [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]]
-  [def expr [if [cdr expr-list]
-                [cons 'cat expr-list]
-                [if [string? [car expr-list]]
-                    [car expr-list]
-                    [cons 'string expr-list]]]]
-  [def fmt/args/map-fun/count 0]
-  [defn fmt/args/map-fun [arg]
-    [def s [str->sym [cat "fmt-arg-"[string fmt/args/map-fun/count]]]]
-    [++ fmt/args/map-fun/count]
-    [list 'def s arg]]
-  [if args
-      `[let* ~@[map args fmt/args/map-fun]
-             ~expr]
-      expr]]
+          [def opts @[:expr-count [array/length arguments-used]]]
+          [for-in [c cuts]
+                  [def lit [string/cut format-string [+ [cdr c] 1] last-pos]]
+                  [when-not [== "" lit] [set! expr-list [cons lit expr-list]]]
+                  [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]]
+                  [set! expr-list [cons expr expr-list]]
+                  [set! last-pos [car c]]]
+          [when [> last-pos 0]
+                [def lit [string/cut format-string 0 last-pos]]
+                [set! expr-list [cons lit expr-list]]]
+          [for [i 0 [array/length arguments-used]]
+            [when-not [array/ref arguments-used i]
+                      [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]]
+          [def expr [if [cdr expr-list]
+                        [cons 'cat expr-list]
+                        [if [string? [car expr-list]]
+                            [car expr-list]
+                            [cons 'string expr-list]]]]
+          [def fmt/args/map-fun/count 0]
+          [defn fmt/args/map-fun [arg]
+                [def s [str->sym [cat "fmt-arg-"[string fmt/args/map-fun/count]]]]
+                [++ fmt/args/map-fun/count]
+                [list 'def s arg]]
+          [if args
+              `[let* ~@[map args fmt/args/map-fun]
+                     ~expr]
+              expr]]
 
 [defmacro pfmt [format-string . args]
-  "Print a formatted string"
-  `[print [fmt ~format-string ~@args]]]
+          "Print a formatted string"
+          `[print [fmt ~format-string ~@args]]]
 
 [defmacro efmt [format-string . args]
-  "Print a formatted string"
-  `[error [fmt ~format-string ~@args]]]
+          "Print a formatted string"
+          `[error [fmt ~format-string ~@args]]]
 
 [defmacro pfmtln [format-string . args]
-  "Print a formatted string"
-  `[println [fmt ~format-string ~@args]]]
+          "Print a formatted string"
+          `[println [fmt ~format-string ~@args]]]
 
 [defmacro efmtln [format-string . args]
-  "Print a formatted string"
-  `[errorln [fmt ~format-string ~@args]]]
+          "Print a formatted string"
+          `[errorln [fmt ~format-string ~@args]]]

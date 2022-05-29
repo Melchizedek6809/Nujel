@@ -4,25 +4,25 @@
 ;; Time related λs
 
 [defn time/seconds [timestamp]
-  "Return the seconds part of TIMESTAMP, defaults to current time"
-  [% [default timestamp [time]] 60]]
+      "Return the seconds part of TIMESTAMP, defaults to current time"
+      [% [default timestamp [time]] 60]]
 
 [defn time/minutes [timestamp]
-  "Return the minutes part of TIMESTAMP, defaults to current time"
-  [% [/ [default timestamp [time]] 60] 60]]
+      "Return the minutes part of TIMESTAMP, defaults to current time"
+      [% [/ [default timestamp [time]] 60] 60]]
 
 [defn time/hours [timestamp]
-  "Return the hours part of TIMESTAMP, defaults to current time"
-  [% [/ [default timestamp [time]] 3600] 24]]
+      "Return the hours part of TIMESTAMP, defaults to current time"
+      [% [/ [default timestamp [time]] 3600] 24]]
 
 [defn profile-form [raw]
-  [def start-time [time/milliseconds]]
-  [def val [eval raw]]
-  [def end-time [time/milliseconds]]
-  [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]
+      [def start-time [time/milliseconds]]
+      [def val [eval raw]]
+      [def end-time [time/milliseconds]]
+      [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]
 
 [defmacro profile body
-  "Measure and display how much time and ressources it takes for BODY to be evaluated"
-  `[profile-form '~[if [last? body]
-                       [car body]
-                       [cons 'do body]]]]
+          "Measure and display how much time and ressources it takes for BODY to be evaluated"
+          `[profile-form '~[if [last? body]
+                               [car body]
+                               [cons 'do body]]]]

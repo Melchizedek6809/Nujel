@@ -359,7 +359,7 @@
 }
 0Es array/++
 0D
-25v array/fill! v [a v] v #@[documentation: "Fills array a with value v" source: ["Fills array a with value v" [def len [array/length a]] [for [i 0 len] [array/set! a i v]] a]] v #{
+25v array/fill! v [a v] v #@[documentation: "Fills array a with value v" source: ["Fills array a with value v" [def len [array/length a]] [for [i 0 len] [array/set! a i v]] [return a]]] v #{
 10s a
 08i 1 v array/length
 0Es len
@@ -393,10 +393,11 @@
 0D
 10s a
 01
+01
 }
 0Es array/fill!
 0D
-25v array/append v [a b] v #@[documentation: "Append array A to array B" source: ["Append array A to array B" [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]] [def ret [array/allocate [+ [array/length a] [array/length b]]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] [for [i [array/length a] [array/length ret]] [array/set! ret i [array/ref b [- i [array/length a]]]]] ret]] v #{
+25v array/append v [a b] v #@[documentation: "Append array A to array B" source: ["Append array A to array B" [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]] [def ret [array/allocate [+ [array/length a] [array/length b]]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] [for [i [array/length a] [array/length ret]] [array/set! ret i [array/ref b [- i [array/length a]]]]] [return ret]]] v #{
 10s a
 08i 1 v array?
 0C
@@ -488,10 +489,11 @@
 0D
 10s ret
 01
+01
 }
 0Es array/append
 0D
-25v array/dup v [a] v #@[documentation: "Duplicate Array A" source: ["Duplicate Array A" [def ret [array/allocate [array/length a]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] ret]] v #{
+25v array/dup v [a] v #@[documentation: "Duplicate Array A" source: ["Duplicate Array A" [def ret [array/allocate [array/length a]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] [return ret]]] v #{
 10s a
 08i 1 v array/length
 08i 1 v array/allocate
@@ -529,10 +531,11 @@
 0D
 10s ret
 01
+01
 }
 0Es array/dup
 0D
-25v array/reduce v [arr fun α] v #@[documentation: "Reduce an array, [reduce] should be preferred" source: ["Reduce an array, [reduce] should be preferred" [def len [array/length arr]] [for [i 0 len] [set! α [fun α [array/ref arr i]]]] α]] v #{
+25v array/reduce v [arr fun α] v #@[documentation: "Reduce an array, [reduce] should be preferred" source: ["Reduce an array, [reduce] should be preferred" [def len [array/length arr]] [for [i 0 len] [set! α [fun α [array/ref arr i]]]] [return α]]] v #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -569,10 +572,11 @@
 0D
 10s α
 01
+01
 }
 0Es array/reduce
 0D
-25v array/map v [arr fun] v #@[documentation: "Map an array, [map] should be preferred" source: ["Map an array, [map] should be preferred" [def len [array/length arr]] [for [i 0 len] [array/set! arr i [fun [array/ref arr i]]]] arr]] v #{
+25v array/map v [arr fun] v #@[documentation: "Map an array, [map] should be preferred" source: ["Map an array, [map] should be preferred" [def len [array/length arr]] [for [i 0 len] [array/set! arr i [fun [array/ref arr i]]]] [return arr]]] v #{
 10s arr
 08i 1 v array/length
 0Es len
@@ -609,6 +613,7 @@
 16
 0D
 10s arr
+01
 01
 }
 0Es array/map
@@ -674,7 +679,7 @@
 }
 0Es array/filter
 0D
-25v array/equal? v [a b] v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] #f [let [[ret #t]] [for [i 0 [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] ret]]]] v #{
+25v array/equal? v [a b] v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] [return #f] [let [[ret #t]] [for [i 0 [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] [return ret]]]]] v #{
 10s a
 08i 1 v array?
 0Bo 10
@@ -702,9 +707,10 @@
 0Ao 8
 0D
 05v #f
-0Bo 10
+0Bo 11
 05v #f
-09o 134
+01
+09o 135
 15
 05v #t
 0Es ret
@@ -750,6 +756,7 @@
 16
 0D
 10s ret
+01
 16
 01
 }
@@ -791,7 +798,7 @@
 }
 0Es array/swap
 0D
-25v array/heapify v [arr n at] v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [ash at 1] 1]] [def r [+ [ash at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [== top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] arr]] v #{
+25v array/heapify v [arr n at] v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [ash at 1] 1]] [def r [+ [ash at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [== top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] [return arr]]] v #{
 10s at
 0Es top
 0D
@@ -874,10 +881,11 @@
 0D
 10s arr
 01
+01
 }
 0Es array/heapify
 0D
-25v array/make-heap v [arr] v #@[source: [[def l [array/length arr]] [def l2 [/ l 2]] [while [>= l2 0] [array/heapify arr l l2] [-- l2]] arr]] v #{
+25v array/make-heap v [arr] v #@[source: [[def l [array/length arr]] [def l2 [/ l 2]] [while [>= l2 0] [array/heapify arr l l2] [-- l2]] [return arr]]] v #{
 10s arr
 08i 1 v array/length
 0Es l
@@ -908,10 +916,11 @@
 0D
 10s arr
 01
+01
 }
 0Es array/make-heap
 0D
-25v array/heap-sort v [arr] v #@[source: [[array/make-heap arr] [def l [array/length arr]] [while [> l 0] [-- l] [array/swap arr 0 l] [array/heapify arr l 0]] arr]] v #{
+25v array/heap-sort v [arr] v #@[source: [[array/make-heap arr] [def l [array/length arr]] [while [> l 0] [-- l] [array/swap arr 0 l] [array/heapify arr l 0]] [return arr]]] v #{
 10s arr
 08i 1 v array/make-heap
 0D
@@ -945,13 +954,14 @@
 0D
 10s arr
 01
+01
 }
 0Es array/heap-sort
 0D
 10s array/heap-sort
 0Es array/sort
 0D
-25v array/cut v [arr start end] v #@[documentation: "Return a newly allocated array with the values of ARR from START to END" source: ["Return a newly allocated array with the values of ARR from START to END" [set! start [max 0 start]] [set! end [min [array/length arr] end]] [def ret [array/allocate [max 0 [- end start]]]] [for [i start end] [array/set! ret [- i start] [array/ref arr i]]] ret]] v #{
+25v array/cut v [arr start end] v #@[documentation: "Return a newly allocated array with the values of ARR from START to END" source: ["Return a newly allocated array with the values of ARR from START to END" [set! start [max 0 start]] [set! end [min [array/length arr] end]] [def ret [array/allocate [max 0 [- end start]]]] [for [i start end] [array/set! ret [- i start] [array/ref arr i]]] [return ret]]] v #{
 02i 0
 10s start
 08i 2 v max
@@ -1003,6 +1013,7 @@
 16
 0D
 10s ret
+01
 01
 }
 0Es array/cut

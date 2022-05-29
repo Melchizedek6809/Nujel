@@ -43,98 +43,98 @@
 
 
 [defn ansi-wrap [code string]
-  "Wrap STRING in the ansi color CODE"
-  [cat [or ansi/disabled [array/ref ansi-fg code]]
-       string
-       [or ansi/disabled ansi-reset]]]
+      "Wrap STRING in the ansi color CODE"
+      [cat [or ansi/disabled [array/ref ansi-fg code]]
+           string
+           [or ansi/disabled ansi-reset]]]
 
 [defn ansi-black args
-  "Wrap ARGS in black"
-  [ansi-wrap 0 [apply cat args]]]
+      "Wrap ARGS in black"
+      [ansi-wrap 0 [apply cat args]]]
 
 [defn ansi-dark-red args
-  "Wrap ARGS in dark red"
-  [ansi-wrap 1 [apply cat args]]]
+      "Wrap ARGS in dark red"
+      [ansi-wrap 1 [apply cat args]]]
 
 [defn ansi-dark-green args
-  "Wrap ARGS in dark green"
-  [ansi-wrap 2 [apply cat args]]]
+      "Wrap ARGS in dark green"
+      [ansi-wrap 2 [apply cat args]]]
 
 [defn ansi-brown args
-  "Wrap ARGS in brown"
-  [ansi-wrap 3 [apply cat args]]]
+      "Wrap ARGS in brown"
+      [ansi-wrap 3 [apply cat args]]]
 
 [defn ansi-dark-blue args
-  "Wrap ARGS in dark blue"
-  [ansi-wrap 4 [apply cat args]]]
+      "Wrap ARGS in dark blue"
+      [ansi-wrap 4 [apply cat args]]]
 
 [defn ansi-purple args
-  "Wrap ARGS in purple"
-  [ansi-wrap 5 [apply cat args]]]
+      "Wrap ARGS in purple"
+      [ansi-wrap 5 [apply cat args]]]
 
 [defn ansi-teal args
-  "Wrap ARGS in teal"
-  [ansi-wrap 6 [apply cat args]]]
+      "Wrap ARGS in teal"
+      [ansi-wrap 6 [apply cat args]]]
 
 [defn ansi-dark-gray args
-  "Wrap ARGS in dark gray"
-  [ansi-wrap 7 [apply cat args]]]
+      "Wrap ARGS in dark gray"
+      [ansi-wrap 7 [apply cat args]]]
 
 [defn ansi-gray args
-  "Wrap ARGS in gray"
-  [ansi-wrap 8 [apply cat args]]]
+      "Wrap ARGS in gray"
+      [ansi-wrap 8 [apply cat args]]]
 
 [defn ansi-red args
-  "Wrap ARGS in red"
-  [ansi-wrap 9 [apply cat args]]]
+      "Wrap ARGS in red"
+      [ansi-wrap 9 [apply cat args]]]
 
 [defn ansi-green args
-  "Wrap ARGS in green"
-  [ansi-wrap 10 [apply cat args]]]
+      "Wrap ARGS in green"
+      [ansi-wrap 10 [apply cat args]]]
 
 [defn ansi-yellow args
-  "Wrap ARGS in yellow"
-  [ansi-wrap 11 [apply cat args]]]
+      "Wrap ARGS in yellow"
+      [ansi-wrap 11 [apply cat args]]]
 
 [defn ansi-blue args
-  "Wrap ARGS in blue"
-  [ansi-wrap 12 [apply cat args]]]
+      "Wrap ARGS in blue"
+      [ansi-wrap 12 [apply cat args]]]
 
 [defn ansi-pink args
-  "Wrap ARGS in pink"
-  [ansi-wrap 13 [apply cat args]]]
+      "Wrap ARGS in pink"
+      [ansi-wrap 13 [apply cat args]]]
 
 [defn ansi-cyan args
-  "Wrap ARGS in cyan"
-  [ansi-wrap 14 [apply cat args]]]
+      "Wrap ARGS in cyan"
+      [ansi-wrap 14 [apply cat args]]]
 
 [defn ansi-white args
-  "Wrap ARGS in white"
-  [ansi-wrap 15 [apply cat args]]]
+      "Wrap ARGS in white"
+      [ansi-wrap 15 [apply cat args]]]
 
 [defn ansi-rainbow args
-  "Wrap ARGS in the colors of the rainbow!"
-  [let* [def count 0]
-    [cat [join [map [split [apply cat args] ""]
-                    [fn [a]
-                        [set! count [logand [+ 1 count] #x7]]
-                        [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
-         [or ansi/disabled ansi-fg-reset]]]]
+      "Wrap ARGS in the colors of the rainbow!"
+      [let* [def count 0]
+            [cat [join [map [split [apply cat args] ""]
+                            [fn [a]
+                              [set! count [logand [+ 1 count] #x7]]
+                              [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
+                 [or ansi/disabled ansi-fg-reset]]]]
 
 [defn ansi-rainbow-bg args
-  "Wrap ARGS in the colors of the rainbow!"
-  [def count 0]
-  [def colored-list [map [split [apply cat args] ""]
-			 [fn [a]
-			     [set! count [logand [+ 1 count] #x7]]
-			     [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
-  [cat [join colored-list ""]
-       [or ansi/disabled ansi-reset]]]
+      "Wrap ARGS in the colors of the rainbow!"
+      [def count 0]
+      [def colored-list [map [split [apply cat args] ""]
+			     [fn [a]
+			       [set! count [logand [+ 1 count] #x7]]
+			       [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
+      [cat [join colored-list ""]
+           [or ansi/disabled ansi-reset]]]
 
 [defn reprint-line [text width]
-  [when-not width [set! width 20]]
-  [print "\r"]
-  [for [i 0 width]
-    [print " "]]
-  [print "\r"]
-  [print text]]
+      [when-not width [set! width 20]]
+      [print "\r"]
+      [for [i 0 width]
+        [print " "]]
+      [print "\r"]
+      [print text]]
