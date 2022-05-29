@@ -1,3 +1,5 @@
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ * This project uses the MIT license, a copy should be included under /LICENSE */
 #if defined(__TINYC__) || defined(__WATCOMC__)
 #include <stdint.h>
 /* Classic binary divide-and-conquer popcount.

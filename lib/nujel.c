@@ -3,10 +3,11 @@
 #include "nujel.h"
 
 #include "printer.h"
-#include "allocation/symbol.h"
 #include "reader.h"
+#include "operations.h"
+#include "allocation/symbol.h"
+#include "compatibility/platform.h"
 #include "type/closure.h"
-#include "type/val.h"
 #include "vm/eval.h"
 
 #include <setjmp.h>
@@ -68,66 +69,6 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	}
 }
 
-/* Add all the platform specific constants to C */
-static void lAddPlatformVars(lClosure *c){
-	lVal *valOS, *valArch;
-	#if defined(__HAIKU__)
-	valOS = lValSym("Haiku");
-	#elif defined(__APPLE__)
-	valOS =  lValSym("MacOS");
-	#elif defined(__EMSCRIPTEN__)
-	valOS =  lValSym("Emscripten");
-	#elif defined(__MINGW32__)
-	valOS =  lValSym("Windows");
-	#elif defined(__MSYS__)
-	valOS = lValSym("Legacy Windows");
-	#elif defined(__MINIX__) || defined(__MINIX3__)
-	valOS = lValSym("Minix");
-	#elif defined(__linux__)
-		#if defined(__UCLIBC__)
-		valOS = lValSym("uClibc/Linux");
-		#elif defined(__GLIBC__)
-		valOS = lValSym("GNU/Linux");
-		#elif defined(__BIONIC__)
-		valOS = lValSym("Android");
-		#else
-		valOS = lValSym("musl?/Linux");
-		#endif
-	#elif defined(__FreeBSD__)
-	valOS = lValSym("FreeBSD");
-	#elif defined(__OpenBSD__)
-	valOS = lValSym("OpenBSD");
-	#elif defined(__NetBSD__)
-	valOS = lValSym("NetBSD");
-	#elif defined(__DragonFly__)
-	valOS = lValSym("DragonFlyBSD");
-	#elif defined(__WATCOMC__)
-	valOS = lValSym("DOS");
-	#else
-	valOS = lValSym("Unknown");
-	#endif
-	lDefineVal(c, "System/OS", valOS);
-
-	#if defined(__arm__)
-	valArch = lValSym("armv7l");
-	#elif defined(__aarch64__)
-	valArch = lValSym("aarch64");
-	#elif defined(__x86_64__) || defined(__amd64__)
-	valArch = lValSym("x86_64");
-	#elif defined(__i386__)
-	valArch = lValSym("x86");
-	#elif defined(__EMSCRIPTEN__)
-	valArch = lValSym("wasm");
-	#elif defined(__powerpc__)
-	valArch = lValSym("powerpc");
-	#elif defined(__WATCOMC__)
-	valArch = lValSym("x86");
-	#else
-	valArch = lValSym("unknown");
-	#endif
-	lDefineVal(c, "System/Architecture", valArch);
-}
-
 /* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
@@ -146,35 +87,11 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	return c;
 }
 
-/* These add all the core NFuncs, since they are only ever used within
- | lNewRoot() there is no need to export these declearations
- */
-void lOperationsArithmetic (lClosure *c);
-void lOperationsArray      (lClosure *c);
-void lOperationsBytecode   (lClosure *c);
-void lOperationsCore       (lClosure *c);
-void lOperationsMath       (lClosure *c);
-void lOperationsSpecial    (lClosure *c);
-void lOperationsString     (lClosure *c);
-void lOperationsTree       (lClosure *c);
-void lOperationsVector     (lClosure *c);
-
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
 	lClosure *c = lClosureAlloc();
-	c->parent = NULL;
 	c->type = closureLet;
-
-	lOperationsArithmetic(c);
-	lOperationsMath(c);
-	lOperationsArray(c);
-	lOperationsBytecode(c);
-	lOperationsCore(c);
-	lOperationsSpecial(c);
-	lOperationsString(c);
-	lOperationsTree(c);
-	lOperationsVector(c);
-
+	lOperationsBase(c);
 	lAddPlatformVars(c);
 	return lLoad(c, (const char *)stdlib_no_data);
 }
