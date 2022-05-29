@@ -119,6 +119,24 @@
 01
 }
 0Es bit-clear?!
+0D
+25v test-function v [i] v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [def mask [ash 1 i]] [fn [α] [zero? [logand α mask]]]]] v #{
+02i 1
+10s i
+08i 2 v ash
+0Es mask
+0D
+25v anonymous v [α] v #@[source: [[zero? [logand α mask]]]] v #{
+02i 0
+10s α
+10s mask
+08i 2 v logand
+20
+01
+}
+01
+}
+0Es test-function
 01
 }#{
 25v array/2d/allocate v [width height] v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]] v #{
@@ -3528,115 +3546,115 @@
 0Es tree/filter
 01
 }#{
-25v $nop v [] v #@[documentation: "- | Do nothing" source: ["- | Do nothing" '[#$0]]] v #{
+25v $nop v [] v #@[documentation: "[] -> []\nDo nothing" source: ["[] -> []" "Do nothing" :inline '[#$0]] inline: #t] v #{
 05v [#$0]
 01
 }
 0Es $nop
 0D
-25v $ret v [] v #@[documentation: "a - | Return top of value stack" source: ["a - | Return top of value stack" '[#$1]]] v #{
+25v $ret v [] v #@[documentation: "[a] -> []\nReturn top of value stack" source: ["[a] -> []" "Return top of value stack" :inline '[#$1]] inline: #t] v #{
 05v [#$1]
 01
 }
 0Es $ret
 0D
-25v $add/int v [] v #@[documentation: "a b - c | Adds the two topmost values and pushes the result" source: ["a b - c | Adds the two topmost values and pushes the result" '[#$3]]] v #{
+25v $add/int v [] v #@[documentation: "[a b] -> [result]\nAdds the two topmost values and pushes the result" source: ["[a b] -> [result]" "Adds the two topmost values and pushes the result" :inline '[#$3]] inline: #t] v #{
 05v [#$3]
 01
 }
 0Es $add/int
 0D
-25v $dup v [] v #@[source: ['[#$C]]] v #{
+25v $dup v [] v #@[documentation: "[a] -> [a a]\nDuplicates the value that is on the top of the stack" source: ["[a] -> [a a]" "Duplicates the value that is on the top of the stack" :inline '[#$C]] inline: #t] v #{
 05v [#$C]
 01
 }
 0Es $dup
 0D
-25v $drop v [] v #@[source: ['[#$D]]] v #{
+25v $drop v [] v #@[documentation: "[a] -> []\nDrop whatever is on top of the stack" source: ["[a] -> []" "Drop whatever is on top of the stack" :inline '[#$D]] inline: #t] v #{
 05v [#$D]
 01
 }
 0Es $drop
 0D
-25v $closure/push v [] v #@[source: ['[#$13]]] v #{
+25v $closure/push v [] v #@[documentation: "[] -> [closure]\nPush the current closure as a λ on the stack" source: ["[] -> [closure]" "Push the current closure as a λ on the stack" :inline '[#$13]] inline: #t] v #{
 05v [#$13]
 01
 }
 0Es $closure/push
 0D
-25v $let v [] v #@[source: ['[#$15]]] v #{
+25v $let v [] v #@[documentation: "[] -> []\nCreate a new let closure and switch to it" source: ["[] -> []" "Create a new let closure and switch to it" :inline '[#$15]] inline: #t] v #{
 05v [#$15]
 01
 }
 0Es $let
 0D
-25v $closure/pop v [] v #@[source: ['[#$16]]] v #{
+25v $closure/pop v [] v #@[documentation: "[] -> []\nLeave the current closure and return to the parent one" source: ["[] -> []" "Leave the current closure and return to the parent one" :inline '[#$16]] inline: #t] v #{
 05v [#$16]
 01
 }
 0Es $closure/pop
 0D
-25v $roots/save v [] v #@[source: ['[#$1B]]] v #{
+25v $roots/save v [] v #@[documentation: "[] -> []\nStore the current root stack pointer used for guarding allocations into the current closure" source: ["[] -> []" "Store the current root stack pointer used for guarding allocations into the current closure" :inline '[#$1B]] inline: #t] v #{
 05v [#$1B]
 01
 }
 0Es $roots/save
 0D
-25v $roots/restore v [] v #@[source: ['[#$1C]]] v #{
+25v $roots/restore v [] v #@[documentation: "[] -> []\nRestore the current root stack pointer to what is stored within the current closure" source: ["[] -> []" "Restore the current root stack pointer to what is stored within the current closure" :inline '[#$1C]] inline: #t] v #{
 05v [#$1C]
 01
 }
 0Es $roots/restore
 0D
-25v $< v [] v #@[source: ['[#$1E]]] v #{
+25v $< v [] v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$1E]] inline: #t] v #{
 05v [#$1E]
 01
 }
 0Es $<
 0D
-25v $<= v [] v #@[source: ['[#$1F]]] v #{
+25v $<= v [] v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$1F]] inline: #t] v #{
 05v [#$1F]
 01
 }
 0Es $<=
 0D
-25v $== v [] v #@[source: ['[#$20]]] v #{
+25v $== v [] v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$20]] inline: #t] v #{
 05v [#$20]
 01
 }
 0Es $==
 0D
-25v $>= v [] v #@[source: ['[#$21]]] v #{
+25v $>= v [] v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$21]] inline: #t] v #{
 05v [#$21]
 01
 }
 0Es $>=
 0D
-25v $> v [] v #@[source: ['[#$22]]] v #{
+25v $> v [] v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$22]] inline: #t] v #{
 05v [#$22]
 01
 }
 0Es $>
 0D
-25v $push/nil v [] v #@[source: ['[#$24]]] v #{
+25v $push/nil v [] v #@[documentation: "[] -> [nil]\nPush a #nil on the stack" source: ["[] -> [nil]" "Push a #nil on the stack" :inline '[#$24]] inline: #t] v #{
 05v [#$24]
 01
 }
 0Es $push/nil
 0D
-25v $car v [] v #@[source: ['[#$11]]] v #{
+25v $car v [] v #@[documentation: "[l] -> [car]\nReplace L with its car" source: ["[l] -> [car]" "Replace L with its car" :inline '[#$11]] inline: #t] v #{
 05v [#$11]
 01
 }
 0Es $car
 0D
-25v $cdr v [] v #@[source: ['[#$12]]] v #{
+25v $cdr v [] v #@[documentation: "[l] -> [cdr]\nReplace L with its cdr" source: ["[l] -> [cdr]" "Replace L with its cdr" :inline '[#$12]] inline: #t] v #{
 05v [#$12]
 01
 }
 0Es $cdr
 0D
-25v $cons v [] v #@[source: ['[#$14]]] v #{
+25v $cons v [] v #@[documentation: "[car cdr] -> [pair]\nCons CAR and CDR together and put it on the stack" source: ["[car cdr] -> [pair]" "Cons CAR and CDR together and put it on the stack" :inline '[#$14]] inline: #t] v #{
 05v [#$14]
 01
 }
@@ -3709,7 +3727,7 @@
 }
 0Es int-fit-in-byte?
 0D
-25v $push/int v [a] v #@[documentation: "- a | Return top of value stack" source: ["- a | Return top of value stack" [if [int-fit-in-byte? a] [$push/int/byte a] [$push/lval a]]]] v #{
+25v $push/int v [a] v #@[documentation: "[] -> [a]\nPush A on the stack as an :int" source: ["[] -> [a]" "Push A on the stack as an :int" [if [int-fit-in-byte? a] [$push/int/byte a] [$push/lval a]]]] v #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 15
@@ -3722,7 +3740,7 @@
 }
 0Es $push/int
 0D
-25v $push/int/byte v [a] v #@[documentation: "- a | Return top of value stack" source: ["- a | Return top of value stack" [when-not [int-fit-in-byte? a] [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]] [list #$2 [int->bytecode-op a]]]] v #{
+25v $push/int/byte v [a] v #@[documentation: "[] -> [a]\nPush A on the stack as an :int that fits within a byte" source: ["[] -> [a]" "Push A on the stack as an :int that fits within a byte" [when-not [int-fit-in-byte? a] [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]] [list #$2 [int->bytecode-op a]]]] v #{
 10s a
 08i 1 v int-fit-in-byte?
 0Bo 7
@@ -3743,7 +3761,7 @@
 }
 0Es $push/int/byte
 0D
-25v $push/lval v [v] v #@[documentation: "- v | Pushes v onto the stack" source: ["- v | Pushes v onto the stack" [when [nil? v] [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]] [list #$5 [val->bytecode-op v]]]] v #{
+25v $push/lval v [v] v #@[documentation: "[] -> [v]\nPushes v onto the stack" source: ["[] -> [v]" "Pushes v onto the stack" [when [nil? v] [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]] [list #$5 [val->bytecode-op v]]]] v #{
 10s v
 08i 1 v nil?
 0Bo 33
@@ -3764,43 +3782,43 @@
 }
 0Es $push/lval
 0D
-25v $push/symbol v [v] v #@[documentation: "- v | Pushes v onto the stack" source: ["- v | Pushes v onto the stack" [list #$23 [sym->bytecode-op v]]]] v #{
+25v $push/symbol v [sym] v #@[documentation: "[] -> [sym]\nPushes v onto the stack" source: ["[] -> [sym]" "Pushes v onto the stack" [list #$23 [sym->bytecode-op sym]]]] v #{
 05v #$23
-10s v
+10s sym
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
 }
 0Es $push/symbol
 0D
-25v $def v [v] v #@[source: [[list #$E [sym->bytecode-op v]]]] v #{
+25v $def v [sym] v #@[documentation: "[val] -> [val]\nDefine a new binding for SYM and associate VAL to it" source: ["[val] -> [val]" "Define a new binding for SYM and associate VAL to it" [list #$E [sym->bytecode-op sym]]]] v #{
 05v #$E
-10s v
+10s sym
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
 }
 0Es $def
 0D
-25v $set v [v] v #@[source: [[list #$F [sym->bytecode-op v]]]] v #{
+25v $set v [sym] v #@[documentation: "[val] -> [val]\nUpdate the binding for SYM and associate VAL to it" source: ["[val] -> [val]" "Update the binding for SYM and associate VAL to it" [list #$F [sym->bytecode-op sym]]]] v #{
 05v #$F
-10s v
+10s sym
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
 }
 0Es $set
 0D
-25v $get v [v] v #@[source: [[list #$10 [sym->bytecode-op v]]]] v #{
+25v $get v [sym] v #@[documentation: "[] -> [val]\nPush whatever value is associated to SYM on the stack" source: ["[] -> [val]" "Push whatever value is associated to SYM on the stack" [list #$10 [sym->bytecode-op sym]]]] v #{
 05v #$10
-10s v
+10s sym
 08i 1 v sym->bytecode-op
 08i 2 v list
 01
 }
 0Es $get
 0D
-25v $apply v [arg-count fun] v #@[documentation: "arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments ... - result | Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]] [2 [case fun [add/int [$add/int]] [cons [$cons]] [< [$<]] [<= [$<=]] [== [$==]] [>= [$>=]] [> [$>]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]]] v #{
+25v $apply v [arg-count fun] v #@[documentation: "arguments -> [result]\nRead arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments -> [result]" "Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]] [2 [case fun [add/int [$add/int]] [cons [$cons]] [< [$<]] [<= [$<=]] [== [$==]] [>= [$>=]] [> [$>]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]] [otherwise [list #$8 [int->bytecode-op arg-count] [val->bytecode-op fun]]]]]] v #{
 15
 10s arg-count
 0Es ΓεnΣym-76
@@ -3808,7 +3826,7 @@
 10s ΓεnΣym-76
 02i 1
 20
-0Bo 84
+0Bo 82
 15
 10s fun
 0Es ΓεnΣym-77
@@ -3816,14 +3834,14 @@
 10s ΓεnΣym-77
 10s car
 20
-0Bo 11
-08i 0 v $car
-09o 50
+0Bo 10
+05v [#$11]
+09o 49
 10s ΓεnΣym-77
 10s cdr
 20
-0Bo 11
-08i 0 v $cdr
+0Bo 10
+05v [#$12]
 09o 30
 05v #$8
 10s arg-count
@@ -3832,11 +3850,11 @@
 08i 1 v val->bytecode-op
 08i 3 v list
 16
-09o 221
+09o 214
 10s ΓεnΣym-76
 02i 2
 20
-0Bo 184
+0Bo 177
 15
 10s fun
 0Es ΓεnΣym-78
@@ -3844,44 +3862,44 @@
 10s ΓεnΣym-78
 10s add/int
 20
-0Bo 11
-08i 0 v $add/int
-09o 150
+0Bo 10
+05v [#$3]
+09o 144
 10s ΓεnΣym-78
 10s cons
 20
-0Bo 11
-08i 0 v $cons
-09o 130
+0Bo 10
+05v [#$14]
+09o 125
 10s ΓεnΣym-78
 10s <
 20
-0Bo 11
-08i 0 v $<
-09o 110
+0Bo 10
+05v [#$1E]
+09o 106
 10s ΓεnΣym-78
 10s <=
 20
-0Bo 11
-08i 0 v $<=
-09o 90
+0Bo 10
+05v [#$1F]
+09o 87
 10s ΓεnΣym-78
 10s ==
 20
-0Bo 11
-08i 0 v $==
-09o 70
+0Bo 10
+05v [#$20]
+09o 68
 10s ΓεnΣym-78
 10s >=
 20
-0Bo 11
-08i 0 v $>=
-09o 50
+0Bo 10
+05v [#$21]
+09o 49
 10s ΓεnΣym-78
 10s >
 20
-0Bo 11
-08i 0 v $>
+0Bo 10
+05v [#$22]
 09o 30
 05v #$8
 10s arg-count
@@ -3911,16 +3929,7 @@
 }
 0Es $apply/dynamic
 0D
-25v $apply/dynamic/new v [arg-count fun] v #@[source: [[list #$7 [int->bytecode-op arg-count]]]] v #{
-05v #$7
-10s arg-count
-08i 1 v int->bytecode-op
-08i 2 v list
-01
-}
-0Es $apply/dynamic/new
-0D
-25v $try v [target] v #@[documentation: "- | Try something, jumping to target if an exception occurs" source: [" - | Try something, jumping to target if an exception occurs" [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]] [list :relocate target 0 1 [int->bytecode-op 0]]]]] v #{
+25v $try v [target] v #@[documentation: "[] -> []\nTry something, jumping to target if an exception occurs" source: ["[] -> []" "Try something, jumping to target if an exception occurs" [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]] [list :relocate target 0 1 [int->bytecode-op 0]]]]] v #{
 05v #$19
 05v :relocate
 10s target
@@ -4034,7 +4043,7 @@
 }
 0Es $macro*
 0D
-25v assemble/build-sym-map v [code sym-map pos] v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [++ pos]]] [[:symbol :keyword] [and [== [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [return pos]]] v #{
+25v assemble/build-sym-map v [code sym-map pos] v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [++ pos]]] [[:symbol :keyword] [and [== [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [when [zero? 123] 123] [return pos]]] v #{
 02i 0
 1B
 1C
@@ -4105,6 +4114,14 @@
 12
 0Fs code
 09o -189
+0D
+02i 0
+02i 123
+20
+0Bo 8
+02i 123
+09o 4
+24
 0D
 10s pos
 01
@@ -4374,19 +4391,19 @@
 09o 12
 10s source
 08i 1 v $get
-09o 56
+09o 55
 10s ΓεnΣym-87
 05v :int
 20
 0Bo 15
 10s source
 08i 1 v $push/int
-09o 32
+09o 31
 10s ΓεnΣym-87
 05v :nil
 20
-0Bo 11
-08i 0 v $push/nil
+0Bo 10
+05v [#$24]
 09o 12
 10s source
 08i 1 v $push/lval
@@ -4424,7 +4441,7 @@
 0D
 25v bytecompile/do/form v [source env] v #@[source: [[when source [cons [cons [bytecompile* [car source] env] [if [last? source] #nil [cons [$drop] #nil]]] [bytecompile/do/form [cdr source] env]]]]] v #{
 10s source
-0Bo 60
+0Bo 59
 10s source
 11
 10s env
@@ -4434,8 +4451,8 @@
 08i 1 v nil?
 0Bo 7
 24
-09o 10
-08i 0 v $drop
+09o 9
+05v [#$D]
 24
 14
 14
@@ -4615,11 +4632,11 @@
 0D
 02i 0
 08i 1 v $push/int
-08i 0 v $roots/save
+05v [#$1B]
 05v :label
 10s sym-start
 08i 2 v list
-08i 0 v $roots/restore
+05v [#$1C]
 10s source
 12
 11
@@ -4627,7 +4644,7 @@
 08i 2 v bytecompile*
 10s sym-end
 08i 1 v $jf
-08i 0 v $drop
+05v [#$D]
 10s source
 12
 12
@@ -4807,11 +4824,11 @@
 08i 2 v bytecompile*
 10s source
 12
-0Bo 48
-08i 0 v $dup
+0Bo 46
+05v [#$C]
 10s label-end
 08i 1 v $jf
-08i 0 v $drop
+05v [#$D]
 10s source
 12
 10s env
@@ -4844,15 +4861,15 @@
 0D
 25v bytecompile/or/rec v [source env label-end] v #@[source: [[when source [list [bytecompile* [car source] env] [$dup] [$jt label-end] [$drop] [bytecompile/or/rec [cdr source] env label-end]]]]] v #{
 10s source
-0Bo 62
+0Bo 60
 10s source
 11
 10s env
 08i 2 v bytecompile*
-08i 0 v $dup
+05v [#$C]
 10s label-end
 08i 1 v $jt
-08i 0 v $drop
+05v [#$D]
 10s source
 12
 10s env
@@ -4930,27 +4947,27 @@
 0Es bytecompile/macro*
 0D
 25v bytecompile/ω* v [source env] v #@[source: [[list [$let] [bytecompile/do/form [cdr source] env] [$drop] [$closure/push] [$closure/pop]]]] v #{
-08i 0 v $let
+05v [#$15]
 10s source
 12
 10s env
 08i 2 v bytecompile/do/form
-08i 0 v $drop
-08i 0 v $closure/push
-08i 0 v $closure/pop
+05v [#$D]
+05v [#$13]
+05v [#$16]
 08i 5 v list
 01
 }
 0Es bytecompile/ω*
 0D
 25v bytecompile/let* v [source env] v #@[source: [[list [$let] [bytecompile/do [cadr source] env] [$closure/pop]]]] v #{
-08i 0 v $let
+05v [#$15]
 10s source
 12
 11
 10s env
 08i 2 v bytecompile/do
-08i 0 v $closure/pop
+05v [#$16]
 08i 3 v list
 01
 }
@@ -4962,7 +4979,7 @@
 11
 10s env
 08i 2 v bytecompile*
-08i 0 v $ret
+05v [#$1]
 08i 2 v list
 01
 }
@@ -4984,7 +5001,7 @@
 12
 10s env
 08i 2 v bytecompile/do/form
-08i 0 v $closure/pop
+05v [#$16]
 05v :label
 10s end-sym
 08i 2 v list
@@ -5206,7 +5223,7 @@
 10s form
 10s environment
 08i 2 v bytecompile*
-08i 0 v $ret
+05v [#$1]
 08i 2 v list
 01
 }

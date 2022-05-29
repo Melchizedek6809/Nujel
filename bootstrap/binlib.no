@@ -196,7 +196,7 @@
 }
 0Es repl/wasm
 0D
-25v repl/cmd/raw v [ctx line] v #@[source: [[when [nil? line] [display "Bye!\r\n"] [exit 0]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [set! repl/history [cons line repl/history]] [println [if [nil? result] "" [str/write result]]]]] v #{
+25v repl/cmd/raw v [ctx line] v #@[source: [[when [nil? line] [display "Bye!\r\n"] [exit 0]] [try [fn [err] [if [== [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [set! repl/history [cons line repl/history]] [println [if [nil? result] "" [str/write result]]]]]] v #{
 10s line
 08i 1 v nil?
 0Bo 23
@@ -208,6 +208,24 @@
 09o 4
 24
 0D
+25v anonymous v [err] v #@[source: [[if [== [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] v #{
+10s err
+11
+05v :unmatched-opening-bracket
+20
+0Bo 33
+10s ctx
+10s line
+05v "... "
+08i 1 v readline
+08i 2 v cat
+08i 2 v repl/cmd/raw
+09o 12
+10s err
+08i 1 v throw
+01
+}
+19o 121
 10s line
 08i 1 v read
 0Es expr
@@ -244,6 +262,7 @@
 10s result
 08i 1 v str/write
 08i 1 v println
+16
 01
 }
 0Es repl/cmd/raw

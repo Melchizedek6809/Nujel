@@ -24,6 +24,11 @@ static NORETURN void lExceptionThrowReader(lString *s, const char *msg){
 	lExceptionThrowValClo("read-error", msg, err, readClosure);
 }
 
+static NORETURN void lExceptionThrowReaderCustom(lString *s, const char *msg, const char *customError){
+	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+	lExceptionThrowValClo(customError, msg, err, readClosure);
+}
+
 static NORETURN void lExceptionThrowReaderStartEnd(lString *s, const char *msg){
 	const char *start, *end;
 	for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
@@ -414,7 +419,7 @@ lVal *lReadList(lString *s, bool rootForm){
 		}
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				lExceptionThrowReader(s, "Unmatched opening bracket");
+				lExceptionThrowReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;

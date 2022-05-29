@@ -11,6 +11,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
+	char buf[128];
+	spf(buf, &buf[sizeof(buf)], "Stack underflow at during lop%s", opcode);
+	lExceptionThrowValClo("stack-underflow", buf, NULL, c);
+}
+
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	if(len == 0){return lCons(NULL, NULL);}
@@ -47,12 +54,6 @@ static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
 	c[3] = (i      ) & 0xFF;
 }
 
-NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
-	char buf[128];
-	spf(buf, &buf[sizeof(buf)], "Stack underflow at during lop%s", opcode);
-	lExceptionThrowValClo("stack-underflow", buf, NULL, c);
-}
-
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	jmp_buf oldExceptionTarget;
@@ -65,8 +66,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.valueStackSize   = 8;
 	ctx.closureStack     = calloc(ctx.closureStackSize, sizeof(lClosure *));
 	ctx.valueStack       = calloc(ctx.valueStackSize,   sizeof(lVal *));
-	ctx.csp = 0;
-	ctx.sp  = 0;
+	ctx.csp              = 0;
+	ctx.sp               = 0;
 	ctx.closureStack[ctx.csp] = c;
 
 	int exceptionCount = 0;
@@ -294,9 +295,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopApplyDynamic:
 	case lopApply: {
 		const int applyRSP = lRootsGet();
-		const lBytecodeOp curOp = *ip;
+		const lBytecodeOp curOp = ip[0];
 		const int len = ip[1];
-		if(ctx.sp < len){throwStackUnderflowError(c, "ApplyNew");}
+		if(ctx.sp < len){
+			throwStackUnderflowError(c, "Apply");
+		}
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len + 1;
 		lVal *fun;
@@ -312,7 +315,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ip+=2;
 		}
 		lVal *res = lApply(c, cargs, fun);
-		if(curOp == lopApplyDynamic){ ctx.sp--; }
+		if(curOp == lopApplyDynamic){
+			ctx.sp--;
+		}
 		ctx.valueStack[ctx.sp-1] = res;
 		(void)applyRSP;
 		//lRootsRet(applyRSP);
