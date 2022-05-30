@@ -47,7 +47,7 @@
           `[tree/set! ~o ~name ~val]]
 
 [defmacro defmethod [o name args . body]
-          `[tree/set! ~o ~name [\ ~[cons 'this args] ~@body]]]
+          `[tree/set! ~o ~name [fn ~[cons 'this args] ~@body]]]
 
 [defmacro _ [o name . args]
           `[nos/funcall ~o ~name ~@args]]
