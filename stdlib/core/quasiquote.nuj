@@ -25,7 +25,7 @@
                               [cons [quasiquote-real [car l] depth]
                                     [quasiquote-real [cdr l] depth]]]]]]
               [if [and [zero? depth] [symbol? l]]
-                  [cons 'quote [cons l]]
+                  [cons 'quote [cons l #nil]]
                   l]]]]
 
 [defmacro quasiquote [l]

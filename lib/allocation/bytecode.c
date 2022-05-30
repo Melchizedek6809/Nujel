@@ -34,7 +34,7 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopGreaterPred:
 	case lopPushNil:
 		return 1;
-	case lopApplyDynamic:
+	case lopApply:
 	case lopIntByte:
 		return 2;
 	case lopTry:
@@ -48,8 +48,6 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopGet:
 	case lopPushLVal:
 		return 4;
-	case lopApply:
-		return 5;
 	case lopMacroAst:
 	case lopFn:
 		return 4*3+1;
@@ -68,9 +66,9 @@ void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 			if(&c[3] >= v->dataEnd){break;}
 			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
-		case lopApply:
-			if(&c[4] >= v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[ 2] << 16) | (c[ 3] << 8) | c[ 4]));
+		case lopPushLVal:
+			if(&c[3] >= v->dataEnd){break;}
+			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		case lopMacroAst:
 		case lopFn:
@@ -79,10 +77,6 @@ void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 			lValGCMark(lIndexVal((c[ 4] << 16) | (c[ 5] << 8) | c[ 6]));
 			lValGCMark(lIndexVal((c[ 7] << 16) | (c[ 8] << 8) | c[ 9]));
 			lValGCMark(lIndexVal((c[10] << 16) | (c[11] << 8) | c[12]));
-			break;
-		case lopPushLVal:
-			if(&c[3] >= v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		}
 	}

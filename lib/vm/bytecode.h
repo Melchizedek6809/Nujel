@@ -8,11 +8,11 @@ typedef enum lOpcode {
 	lopRet             =  0x1,
 	lopIntByte         =  0x2,
 	lopIntAdd          =  0x3,
-	lopUNUSED3         =  0x4,
+	lopApply           =  0x4,
 	lopPushLVal        =  0x5,
 	lopUNUSED6         =  0x6,
-	lopApplyDynamic    =  0x7,
-	lopApply           =  0x8,
+	lopUNUSED8         =  0x7,
+	lopUNUSED1         =  0x8,
 	lopJmp             =  0x9,
 	lopJt              =  0xA,
 	lopJf              =  0xB,
@@ -27,8 +27,8 @@ typedef enum lOpcode {
 	lopCons            = 0x14,
 	lopLet             = 0x15,
 	lopClosurePop      = 0x16,
-	lopUNUSED4         = 0x17,
-	lopUNUSED5         = 0x18,
+	lopFnDynamic       = 0x17,
+	lopMacroDynamic    = 0x18,
 	lopTry             = 0x19,
 	lopUNUSED7         = 0x1A,
 	lopRootsSave       = 0x1B,
@@ -43,7 +43,6 @@ typedef enum lOpcode {
 	lopPushNil         = 0x24,
 	lopFn              = 0x25,
 	lopMacroAst        = 0x26
-	/* BE SURE TO ADD A CASE TO lBytecodeOpLength!!! */
 } lOpcode;
 
 const char *lBytecodeGetOpcodeName(const lBytecodeOp op);

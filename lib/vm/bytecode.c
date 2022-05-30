@@ -12,7 +12,6 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopIntByte:         return "push/int/byte";
 	case lopIntAdd:          return "add/int";
 	case lopPushLVal:        return "push/lval";
-	case lopApply:           return "apply";
 	case lopJmp:             return "jmp";
 	case lopJt:              return "jt";
 	case lopJf:              return "jf";
@@ -28,7 +27,7 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopLet:             return "let";
 	case lopClosurePop:      return "closure/pop";
 	case lopTry:             return "try";
-	case lopApplyDynamic:    return "apply/dynamic";
+	case lopApply:           return "apply/dynamic";
 	case lopRootsSave:       return "roots/save";
 	case lopRootsRestore:    return "roots/restore";
 	case lopLessPred:        return "<";
@@ -38,6 +37,8 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopGreaterEqPred:   return ">=";
 	case lopPushSymbol:      return "push/symbol";
 	case lopPushNil:         return "push/nil";
+	case lopFnDynamic:       return "fn/dynamic";
+	case lopMacroDynamic:    return "macro/dynamic";
 	case lopFn:              return "fn";
 	case lopMacroAst:        return "macro";
 	default:                 return ":UNKNOWN-OP";

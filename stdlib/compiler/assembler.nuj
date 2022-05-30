@@ -59,6 +59,10 @@
       "Push whatever value is associated to SYM on the stack"
       [list #$10 [sym->bytecode-op sym]]]
 
+[defn $apply/optimize? [fun]
+      [case fun
+            [[car cdr add/int cons < <= == >= >] #t]]]
+
 [defn $apply [arg-count fun]
       "arguments -> [result]"
       "Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
@@ -66,9 +70,7 @@
             [1 [case fun
                      [car [$car]]
                      [cdr [$cdr]]
-                     [otherwise [list #$8
-                                      [int->bytecode-op arg-count]
-                                      [val->bytecode-op fun]]]]]
+                     [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
             [2 [case fun
                      [add/int [$add/int]]
                      [cons [$cons]]
@@ -77,15 +79,11 @@
                      [== [$==]]
                      [>= [$>=]]
                      [> [$>]]
-                     [otherwise [list #$8
-                                      [int->bytecode-op arg-count]
-                                      [val->bytecode-op fun]]]]]
-            [otherwise [list #$8
-                             [int->bytecode-op arg-count]
-                             [val->bytecode-op fun]]]]]
+                     [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
+            [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 
 [defn $apply/dynamic [arg-count fun]
-      [list #$7
+      [list #$4
             [int->bytecode-op arg-count]]]
 
 [defn $try [target]

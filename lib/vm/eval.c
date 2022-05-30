@@ -30,18 +30,6 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	return stack[nsp];
 }
 
-static void lBytecodeLinkApply(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
-	if(&c[4] >= v->dataEnd){return;}
-	lVal *raw = lIndexVal((c[2] << 16) | (c[3] << 8) | c[4]);
-	if((!raw) || (raw->type != ltSymbol)){return;}
-	lVal *n = lGetClosureSym(clo, raw->vSymbol);
-	if(n == raw){return;}
-	int i = lValIndex(n);
-	c[2] = (i >> 16) & 0xFF;
-	c[3] = (i >>  8) & 0xFF;
-	c[4] = (i      ) & 0xFF;
-}
-
 static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
 	if(&c[3] >= v->dataEnd){return;}
 	lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
@@ -292,32 +280,18 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=3;
 		break;
-	case lopApplyDynamic:
 	case lopApply: {
 		const int applyRSP = lRootsGet();
-		const lBytecodeOp curOp = ip[0];
 		const int len = ip[1];
 		if(ctx.sp < len){
 			throwStackUnderflowError(c, "Apply");
 		}
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len + 1;
-		lVal *fun;
-		if(curOp == lopApply){
-			fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-			if(fun && (fun->type == ltSymbol)){
-				lBytecodeLinkApply(c, ops, ip);
-				fun = lIndexVal((ip[2] << 16) | (ip[3] << 8) | ip[4]);
-			}
-			ip += 5;
-		}else{
-			fun = ctx.valueStack[ctx.sp-2];
-			ip+=2;
-		}
+		lVal *fun = ctx.valueStack[ctx.sp-2];
+		ip+=2;
 		lVal *res = lApply(c, cargs, fun);
-		if(curOp == lopApplyDynamic){
-			ctx.sp--;
-		}
+		ctx.sp--;
 		ctx.valueStack[ctx.sp-1] = res;
 		(void)applyRSP;
 		//lRootsRet(applyRSP);

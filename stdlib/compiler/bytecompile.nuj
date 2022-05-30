@@ -84,13 +84,6 @@
           [cons [bytecompile* [car source] env]
                 [bytecompile/procedure/arg [cdr source] env]]]]
 
-[defn bytecompile/procedure/default [op args env]
-      [def arg-count [length args]]
-      [if args
-          [list [bytecompile/procedure/arg args]
-                [$apply arg-count op]]
-          [$apply 0 op]]]
-
 [defn bytecompile/procedure/inline? [op]
       [case [type-of op]
             [:lambda [closure/meta op :inline]]
@@ -111,11 +104,14 @@
           [bytecompile/procedure/inline op args env]
           [bytecompile/procedure/default op args env]]]
 
-[defn bytecompile/procedure/dynamic [op args env]
+[defn bytecompile/procedure/default [op args env]
       [def arg-count [length args]]
-      [list [bytecompile* op env]
-            [when args [bytecompile/procedure/arg args]]
-            [$apply/dynamic arg-count]]]
+      [if [$apply/optimize? op]
+          [list [when args [bytecompile/procedure/arg args]]
+                [$apply arg-count op]]
+          [list [bytecompile* op env]
+                [when args [bytecompile/procedure/arg args]]
+                [$apply/dynamic arg-count]]]]
 
 [defn bytecompile/and/rec [source env label-end]
       [list [bytecompile* [car source] env]
@@ -205,7 +201,7 @@
                    [return [bytecompile/return  source env]]
                    [quote  [bytecompile/quote   [cadr source]]]
                    [otherwise [bytecompile/procedure op [cdr source] env]]]]
-            [[:pair :symbol]            [bytecompile/procedure/dynamic op [cdr source] env]]
+            [[:pair :symbol]            [bytecompile/procedure op [cdr source] env]]
             [:string                    [bytecompile/string source env]]
             [:array                     [bytecompile/array source env]]
             [:tree                      [bytecompile/tree source env]]
