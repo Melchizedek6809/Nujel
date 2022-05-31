@@ -8,10 +8,7 @@ rapidly.
 ## Performance
 While Nujel is still quite slow, it is definitely not the slowest Lisp out there. To make sure that
 there are no performance regression benchmarks are regularly run which are also used to compare Nujel
-against other runtimes, if you are interested you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
-
-## Future direction
-To get an idea about the design and future direction of Nujel have a look at the [FUTURE.md](/FUTURE.md).
+against other runtimes, if you like colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
 
 ## Current status
 Here is a collection of features already implemented, or about to be finished.
@@ -23,12 +20,12 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Maps (using binary trees)
 - [X] Garbage Collection (Mark-and-Sweep for now)
 - [X] Macros (expander written in Nujel itself)
-- [X] Bytecoded (compiler/assembler/disassemble all written in Nujel)
+- [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
 - [ ] Tail-call elimination
 - [ ] NaN Boxing
 - [ ] Modules
 - [ ] Continuations
-- [ ] Fibers
+- [ ] Fibers (preemtible!)
 - [ ] Serializable Fibers
 
 ## Current Limitations
