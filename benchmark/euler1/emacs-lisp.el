@@ -1,0 +1,11 @@
+(require 'cl-lib)
+(defun test ()
+  (let ((ret 0))
+    (dotimes (i 10000000)
+      (when (or (zerop (mod i 3))
+                (zerop (mod i 5)))
+                (cl-incf ret i)))
+    ret))
+(byte-compile 'test)
+
+(princ (format "THE SUM IS %d\n" (test)))
