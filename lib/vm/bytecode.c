@@ -37,10 +37,8 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopGreaterEqPred:   return ">=";
 	case lopPushSymbol:      return "push/symbol";
 	case lopPushNil:         return "push/nil";
-	case lopFnDynamic:       return "fn/dynamic";
-	case lopMacroDynamic:    return "macro/dynamic";
-	case lopFn:              return "fn";
-	case lopMacroAst:        return "macro";
+	case lopFnDynamic:       return "fn";
+	case lopMacroDynamic:    return "macro";
 	default:                 return ":UNKNOWN-OP";
 	}
 }

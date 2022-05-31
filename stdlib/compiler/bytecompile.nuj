@@ -32,11 +32,6 @@
 [defn bytecompile/do [source env]
       [list [bytecompile/do/form [cdr source] env]]]
 
-[defn bytecompile/procedure [op source env]
-      [def args [map [cdr source] bytecompile*]]
-      [list args
-            [$apply [length args] op]]]
-
 [defn bytecompile/def [source env]
       [when [or [not [symbol? [cadr source]]]
                 [not [cddr source]]]
@@ -149,10 +144,24 @@
       [bytecompile/procedure tree/ref source env]]
 
 [defn bytecompile/fn* [source env]
-      [apply $fn [cdr source]]]
+      [def arg-count [length [cdr source]]]
+      [when [!= arg-count 5] [exception :arity-error "[fn*] needs exactly 4 arguments" source]]
+      [cdr! source]
+      [list [bytecompile* [car source] env]
+            [bytecompile* [cadr source] env]
+            [bytecompile* [caddr source] env]
+            [bytecompile* [cadddr source] env]
+            [$fn/dynamic]]]
 
 [defn bytecompile/macro* [source env]
-      [apply $macro* [cdr source]]]
+      [def arg-count [length [cdr source]]]
+      [when [!= arg-count 5] [exception :arity-error "[macro*] needs exactly 4 arguments" source]]
+      [cdr! source]
+      [list [bytecompile* [car source] env]
+            [bytecompile* [cadr source] env]
+            [bytecompile* [caddr source] env]
+            [bytecompile* [cadddr source] env]
+            [$macro/dynamic]]]
 
 [defn bytecompile/ω*  [source env]
       [list [$let]

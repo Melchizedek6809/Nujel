@@ -1,4 +1,4 @@
-/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "printer.h"
 
@@ -108,18 +108,6 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
 				}
 				c++;
-				break;
-			case lopFn:
-			case lopMacroAst:
-				if(&c[12] >= v->dataEnd){
-					c+=12;
-					break;
-				}
-				for(int i=0;i<4;i++){
-					const i64 val = (c[1] << 16) | (c[2] << 8) | c[3];
-					cur = writeBytecodeArrayValue(cur, bufEnd, val);
-					c+=3;
-				}
 				break;
 			case lopIntByte:
 				if(&c[1] < v->dataEnd){

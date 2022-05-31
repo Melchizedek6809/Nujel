@@ -215,18 +215,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = lBytecodeReadOPSym(ip+1, &sym);
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
-	case lopMacroAst:
-	case lopFn: {
-		const lBytecodeOp curOp = *ip;
-		lVal *cName, *cArgs, *cDocs, *cBody;
-		ip = lBytecodeReadOPVal(ip+1, &cName);
-		ip = lBytecodeReadOPVal(ip,   &cArgs);
-		ip = lBytecodeReadOPVal(ip,   &cDocs);
-		ip = lBytecodeReadOPVal(ip,   &cBody);
-		ctx.valueStack[ctx.sp++] = lLambdaNew(c, cName, cArgs, cBody);
-		lClosureSetMeta(ctx.valueStack[ctx.sp-1]->vClosure, cDocs);
-		if(curOp == lopMacroAst){ctx.valueStack[ctx.sp-1]->type = ltMacro;}
-		break;}
 	case lopRootsSave:
 		c->rsp = lRootsGet();
 		ip++;
@@ -280,6 +268,20 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=3;
 		break;
+	case lopMacroDynamic:
+	case lopFnDynamic: {
+		if(ctx.sp < 4){throwStackUnderflowError(c, "Fn");}
+		const lBytecodeOp curOp = *ip;
+		lVal *cBody = ctx.valueStack[--ctx.sp];
+		lVal *cDocs = ctx.valueStack[--ctx.sp];
+		lVal *cArgs = ctx.valueStack[--ctx.sp];
+		lVal *cName = ctx.valueStack[--ctx.sp];
+		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
+		lClosureSetMeta(fun->vClosure, cDocs);
+		ctx.valueStack[ctx.sp++] = fun;
+		if(curOp == lopMacroDynamic){ fun->type = ltMacro; }
+		ip++;
+		break;}
 	case lopApply: {
 		const int applyRSP = lRootsGet();
 		const int len = ip[1];

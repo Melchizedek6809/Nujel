@@ -48,15 +48,24 @@
 
 [defmacro defmacro [name args . body]
           "Define a new macro"
-          `[def ~name [macro* ~name ~args ~[tree/set! [meta/parse/body :macro args body] :source body] ~[compile/do* body [current-closure]]]]]
+          `[def ~name [macro* '~name
+                               '~args
+                               ~[tree/set! [meta/parse/body :macro args body] :source body]
+                               '~[compile/do* body [current-closure]]]]]
 
 [defmacro fn [args . body]
           "Define an anonymous function"
-          `[fn* anonymous ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]
+          `[fn* 'anonymous
+                 '~args
+                 ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                 '~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
           "Define a new function"
-          `[def ~name [fn* ~name ~args ~[tree/set! [meta/parse/body :lambda args body] :source body] ~[compile/do* body [current-closure]]]]]
+          `[def ~name [fn* '~name
+                            '~args
+                            ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                            '~[compile/do* body [current-closure]]]]]
 
 [defmacro ω body
           "Defines and returns new object after evaluating body within"

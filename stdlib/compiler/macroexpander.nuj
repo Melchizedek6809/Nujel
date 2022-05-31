@@ -61,7 +61,7 @@
                    [[try while]         [macroexpand/form source env op 1 #t #b0]]
                    [[def set!]          [macroexpand/form source env op 2 #f #b01]]
                    [if                  [macroexpand/form source env op 3 #f #b0]]
-                   [[fn* macro*]        [macroexpand/form source env op 4 #t #b0111]]
+                   [[fn* macro* fnn* macron*] [macroexpand/form source env op 4 #t #b0111]]
                    [[let* environment*] [list op [macroexpand/do [cdr source] env]]]
                    [quote source]
                    [otherwise [map source [fn [α] [macroexpand* α env]]]]]]

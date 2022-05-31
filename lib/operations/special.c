@@ -20,8 +20,8 @@ lVMErrorPlaceholder(lnfReturn)
 lVMErrorPlaceholder(lnfDef)
 lVMErrorPlaceholder(lnfSet)
 lVMErrorPlaceholder(lnfLetRaw)
-lVMErrorPlaceholder(lnfLambdaBytecodeAst)
-lVMErrorPlaceholder(lnfMacroBytecodeAst)
+lVMErrorPlaceholder(lnfLambda)
+lVMErrorPlaceholder(lnfMacro)
 lVMErrorPlaceholder(lnfObjectAst)
 
 void lOperationsSpecial(lClosure *c){
@@ -35,7 +35,7 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"return",           "[v]",                     "Do an early return with V", lnfReturn);
 	lAddNativeFunc(c,"def",              "[sym val]",               "Define a new symbol SYM and link it to value VAL", lnfDef);
 	lAddNativeFunc(c,"set!",             "[s v]",                   "Bind a new value v to already defined symbol s",   lnfSet);
-	lAddNativeFunc(c,"macro*",           "[name args source body]", "Create a new, bytecoded, macro", lnfMacroBytecodeAst);
-	lAddNativeFunc(c,"fn*",              "[name args source body]", "Create a new, bytecoded, lambda", lnfLambdaBytecodeAst);
+	lAddNativeFunc(c,"macro* macron*",          "[name args source body]", "Create a new, bytecoded, macro", lnfMacro);
+	lAddNativeFunc(c,"fn* fnn*",             "[name args source body]", "Create a new, bytecoded, lambda", lnfLambda);
 	lAddNativeFunc(c,"ω* environment*", "[]",                      "Create a new object",       lnfObjectAst);
 }

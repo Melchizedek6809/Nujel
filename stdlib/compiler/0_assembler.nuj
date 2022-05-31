@@ -111,3 +111,15 @@
       "Cons CAR and CDR together and put it on the stack"
       :inline
       '[#$14]]
+
+[defn $fn/dynamic []
+      "[name args docs body] -> [λ]"
+      "Create a new λ"
+      :inline
+      '[#$17]]
+
+[defn $macro/dynamic []
+      "[name args docs body] -> [μ]"
+      "Create a new μ"
+      :inline
+      '[#$18]]
