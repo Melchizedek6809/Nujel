@@ -12,21 +12,21 @@ against other runtimes, if you like colorful charts you can see the results [her
 
 ## Current status
 Here is a collection of features already implemented, or about to be finished.
+- [X] Garbage collection (simple Mark-and-Sweep for now)
 - [X] Extensive test suite
 - [X] Lexical scoping
 - [X] Exceptions
 - [X] WASM support
 - [X] Formatted output (inspired by Python/Rust/Zig)
 - [X] Maps (using binary trees)
-- [X] Garbage Collection (Mark-and-Sweep for now)
 - [X] Macros (expander written in Nujel itself)
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
-- [ ] Tail-call elimination
-- [ ] NaN Boxing
-- [ ] Modules
+- [ ] Tail-call optimization
+- [ ] NaN boxing
+- [ ] Module system
 - [ ] Continuations
 - [ ] Fibers (preemtible!)
-- [ ] Serializable Fibers
+- [ ] Serializable fibers
 
 ## Current Limitations
 These will be addressed in later versions
