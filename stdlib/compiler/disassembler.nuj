@@ -17,6 +17,9 @@
 
 [defn bytecode-op->val [a b c]
       "Turn three bytecode ops representing an encoded value into an actual value"
+      [pfmtln "A:{a} B:{b} C:{c} -> {}" [index->val [logior [ash [bytecode-op->int a] 16]
+                          [ash [bytecode-op->int b]  8]
+                          [bytecode-op->int c]]]]
       [index->val [logior [ash [bytecode-op->int a] 16]
                           [ash [bytecode-op->int b]  8]
                           [bytecode-op->int c]]]]
@@ -27,6 +30,7 @@
 
 [defn bytecode-op->sym [a b c]
       "Turn three bytecode ops representing an encoded symbol into an actual symbol"
+      [pfmtln "A:{a} B:{b} C:{c}"]
       [index->sym [logior [ash [bytecode-op->int a] 16]
                           [ash [bytecode-op->int b]  8]
                           [bytecode-op->int c]]]]
