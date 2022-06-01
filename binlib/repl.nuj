@@ -8,72 +8,72 @@
 [def repl/option-map @[]]
 
 [defn repl/exception-handler [error]
-  [display/error error]]
+      [display/error error]]
 
 [def repl/history #nil]
 
 [defn repl/prompt []
-  "> "]
+      "> "]
 
 [defn repl/wasm [line]
-  "Evaluate LINE in the wasm context"
-  [try repl/exception-handler
-       [eval-in root-closure [cons do [read line]]]]]
+      "Evaluate LINE in the wasm context"
+      [try repl/exception-handler
+           [eval-in root-closure [cons do [read line]]]]]
 
 [defn repl/cmd/raw [ctx line]
-  [when [nil? line]
-    [display "Bye!\r\n"]
-    [exit 0]]
-  [try [fn [err]
-         [if [== [car err] :unmatched-opening-bracket]
-             [repl/cmd/raw ctx [cat line [readline "... "]]]
-             [throw err]]]
-       [def expr [read line]]
-       [when [equal? '[] expr]
-         [print "\r"]
-         [return]]
-       [def result [eval-in ctx [cons do expr]]]
-       [set! repl/history [cons line repl/history]]
-       [println [if [nil? result] "" [str/write result]]]]]
+      [try [fn [err]
+               [if [== [car err] :unmatched-opening-bracket]
+                   [repl/cmd/raw ctx [cat line [readline "... "]]]
+                   [throw err]]]
+           [def expr [read line]]
+           [when [equal? '[] expr]
+             [print "\r"]
+             [return]]
+           [def result [eval-in ctx [cons do expr]]]
+           [set! repl/history [cons line repl/history]]
+           [println [if [nil? result] "" [str/write result]]]]]
 
 [defn repl/cmd [ctx]
-  [def buf ""]
-  [def line ""]
-  [while [!= line "[/cmd]\n"]
-    [set! buf [cat buf line]]
-    [set! line [readline]]]
-  [def expr [cons do [read buf]]]
-  [set! repl/history [cons buf repl/history]]
-  [def result [eval-in ctx expr]]
-  [println [if [nil? result] "" [str/write result]]]]
+      [def buf ""]
+      [def line ""]
+      [while [!= line "[/cmd]\n"]
+        [set! buf [cat buf line]]
+        [set! line [readline]]]
+      [def expr [cons do [read buf]]]
+      [set! repl/history [cons buf repl/history]]
+      [def result [eval-in ctx expr]]
+      [println [if [nil? result] "" [str/write result]]]]
 
 [defn repl/readline [ctx]
-  [def line [readline [repl/prompt]]]
-  [if [== line "[cmd]\n"]
-      [repl/cmd ctx]
-      [repl/cmd/raw ctx line]]]
+      [def line [readline [repl/prompt]]]
+      [when [nil? line]
+        [display "See you space cowboy...\r\n"]
+        [exit 0]]
+      [if [== line "[cmd]\n"]
+          [repl/cmd ctx]
+          [repl/cmd/raw ctx line]]]
 
 [defn repl []
-  [while #t
-    [try repl/exception-handler
-         [repl/readline root-closure]]]]
+      [while #t
+        [try repl/exception-handler
+             [repl/readline root-closure]]]]
 
 [defn repl/print-help []
-  [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
-  [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]]
-  [println [cat "\nLow-level options - for work on the runtime itself"]]
-  [println [cat "  " [ansi-yellow "v"] " - be verbose"]]
-  [println [cat "\nHigh-level options - for working with/on Nujel code"]]
-  [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]]
-  [println [cat "  " [ansi-blue "h"] " - Print this help screen"]]
-  [println [cat "\nLong options - for working with/on Nujel code"]]
-  [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]]
-  [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]
+      [println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
+      [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]]
+      [println [cat "\nLow-level options - for work on the runtime itself"]]
+      [println [cat "  " [ansi-yellow "v"] " - be verbose"]]
+      [println [cat "\nHigh-level options - for working with/on Nujel code"]]
+      [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]]
+      [println [cat "  " [ansi-blue "h"] " - Print this help screen"]]
+      [println [cat "\nLong options - for working with/on Nujel code"]]
+      [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]]
+      [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]
 
 [tree/set! repl/option-map 'h
            [fn [option]
                [repl/print-help]
-               [set! repl/parse-args/run-repl #f]]]
+             [set! repl/parse-args/run-repl #f]]]
 [tree/set! repl/option-map 'no-color
            [fn [option]
                [set! ansi/disabled ""]]]
@@ -83,44 +83,44 @@
 [tree/set! repl/option-map 'x
            [fn [option]
                [set! repl/parse-args/eval-next #t]
-               [set! repl/parse-args/run-repl #f]]]
+             [set! repl/parse-args/run-repl #f]]]
 [tree/set! repl/option-map :default
            [fn [option]
                [tree/set! repl/options option #t]]]
 
 [defn repl/parse-option [option]
-  [[or [ref repl/option-map option]
-       [ref repl/option-map :default]] option]]
+      [[or [ref repl/option-map option]
+           [ref repl/option-map :default]] option]]
 
 [defn repl/parse-options [options]
-  [if [== [char-at options 0] #\-]
-      [repl/parse-option [string->keyword [cut options 1]]]
-      [for-each [map [split options ""] str->sym] repl/parse-option]]]
+      [if [== [char-at options 0] #\-]
+          [repl/parse-option [string->keyword [cut options 1]]]
+          [for-each [map [split options ""] str->sym] repl/parse-option]]]
 
 [defn repl/parse-arg [arg]
-  [cond [repl/parse-args/eval-next [try display/error
-                                        [eval-in root-closure [cons do [read arg]]]
-                                        [set! repl/parse-args/eval-next #f]]]
-        [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
-        [#t [try display/error
-                 [file/eval arg]]
-            [set! repl/parse-args/run-repl #f]]]]
+      [cond [repl/parse-args/eval-next [try display/error
+                                            [eval-in root-closure [cons do [read arg]]]
+                                            [set! repl/parse-args/eval-next #f]]]
+            [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
+            [#t [try display/error
+                     [file/eval arg]]
+                [set! repl/parse-args/run-repl #f]]]]
 
 [defn repl/parse-args [args]
-  [if args
-      [do [repl/parse-arg [car args]]
-          [repl/parse-args [cdr args]]]
-      repl/parse-args/run-repl]]
+      [if args
+          [do [repl/parse-arg [car args]]
+              [repl/parse-args [cdr args]]]
+          repl/parse-args/run-repl]]
 
 [defn repl/init/wasm [args]
-  [println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]
+      [println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]
 
 [defn repl/init/bin [args]
-  [try repl/exception-handler
-       [set! repl/executable-name [car args]]
-       [when [repl/parse-args [cdr args]] [repl]]]]
+      [try repl/exception-handler
+           [set! repl/executable-name [car args]]
+           [when [repl/parse-args [cdr args]] [repl]]]]
 
 [defn repl/init args
-  [if [== System/Architecture 'wasm]
-      [repl/init/wasm args]
-      [repl/init/bin args]]]
+      [if [== System/Architecture 'wasm]
+          [repl/init/wasm args]
+          [repl/init/bin args]]]

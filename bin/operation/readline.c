@@ -38,6 +38,7 @@ static lVal *lnfReadline(lClosure *c, lVal *v){
 		prompt = promptS->data;
 	}
 	char *line = bestline(prompt);
+	if(line == NULL){return NULL;}
 	return lValStringNoCopy(line, strnlen(line, BUF_SIZE));
 }
 
