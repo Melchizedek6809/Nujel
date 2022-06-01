@@ -83,38 +83,6 @@ static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 	}
 }
 
-static void lClosureSetRec(lClosure *clo, lTree *data){
-	if(data == NULL){return;}
-	const lSymbol *sym = data->key;
-	if(data->key == symArguments){
-		clo->args = data->value;
-	}else if(data->key == symCode){
-		clo->text = requireBytecodeArray(clo, data->value);
-	}else if(data->key == symData){
-		lTree *newData = requireTree(clo, data->value);
-		clo->data = newData;
-	}else {
-		lExceptionThrowValClo("invalid-field","Trying to set an unknown or forbidden field for a closure", lValSymS(sym), clo);
-	}
-	lClosureSetRec(clo,data->left);
-	lClosureSetRec(clo,data->right);
-}
-
-static lVal *lnfClosureSet(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL)
-		|| !((car->type == ltLambda)
-		||   (car->type == ltObject)
-		||   (car->type == ltMacro))){
-		return NULL;
-	}
-	lTree *data = requireTree(c, lCadr(v));
-	lClosure *clo = car->vClosure;
-	lClosureSetRec(clo,data);
-	return NULL;
-}
-
 static lVal *lnfResolve(lClosure *c, lVal *v){
 	const lSymbol *sym = requireSymbol(c, lCar(v));
 	lVal *env = lCadr(v);
@@ -373,7 +341,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"closure/meta!", "[clo key value]", "Set KEY to VALUE in CLO's metadata", lnfClosureMetaSet);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
-	lAddNativeFunc(c,"closure!",       "[clo data]",    "Overwrite fields of CLO with DATA",          lnfClosureSet);
 	lAddNativeFunc(c,"closure/parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
 	lAddNativeFunc(c,"closure/caller", "[clo]",         "Return the caller of CLO",                   lnfClosureCaller);
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
