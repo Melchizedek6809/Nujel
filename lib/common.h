@@ -154,7 +154,6 @@ struct lClosure {
 };
 
 struct lThread {
-	u64 magicValue;
 	lVal **valueStack;
 	lClosure **closureStack;
 	int valueStackSize;

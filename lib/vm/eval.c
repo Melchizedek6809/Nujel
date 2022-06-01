@@ -49,7 +49,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lBytecodeArray * volatile ops = text;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
-	ctx.magicValue = 0xbaddbeefcafebabe;
 	ctx.closureStackSize = 4;
 	ctx.valueStackSize   = 8;
 	ctx.closureStack     = calloc(ctx.closureStackSize, sizeof(lClosure *));
@@ -57,6 +56,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.csp              = 0;
 	ctx.sp               = 0;
 	ctx.closureStack[ctx.csp] = c;
+	ctx.text             = text;
 
 	int exceptionCount = 0;
 	const int RSP = lRootsGet();
@@ -276,6 +276,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
 		lVal *cArgs = ctx.valueStack[--ctx.sp];
 		lVal *cName = ctx.valueStack[--ctx.sp];
+		if(cBody->type == ltNoAlloc){
+			pf("SP: %i CSP: %i\n", (i64)ctx.sp, (i64)ctx.csp);
+			pf("%V\n",cBody);
+			pf("%V\n",cDocs);
+			pf("%V\n",cArgs);
+			pf("%V\n",cName);
+		}
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
@@ -283,18 +290,17 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip++;
 		break;}
 	case lopApply: {
-		const int applyRSP = lRootsGet();
 		const int len = ip[1];
 		if(ctx.sp < len){
 			throwStackUnderflowError(c, "Apply");
 		}
+		const int applyRSP = lRootsGet();
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp = ctx.sp - len + 1;
-		lVal *fun = ctx.valueStack[ctx.sp-2];
+		ctx.sp = ctx.sp - len;
+		lVal *fun = ctx.valueStack[--ctx.sp];
 		ip+=2;
 		lVal *res = lApply(c, cargs, fun);
-		ctx.sp--;
-		ctx.valueStack[ctx.sp-1] = res;
+		ctx.valueStack[ctx.sp++] = res;
 		(void)applyRSP;
 		//lRootsRet(applyRSP);
 		break; }

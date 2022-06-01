@@ -10,7 +10,6 @@ const char *    castToString(const lVal *v, const char *fallback);
 
 NORETURN void   throwTypeError      (lClosure *c, lVal *v, lType T);
 NORETURN void   throwArityError     (lClosure *c, lVal *v, int arity);
-void            requireCertainType  (lClosure *c, lVal *v, lType T);
 vec             requireVec          (lClosure *c, lVal *v);
 vec             requireVecCompatible(lClosure *c, lVal *v);
 i64             requireInt          (lClosure *c, lVal *v);
@@ -26,6 +25,7 @@ lTree *         requireMutableTree  (lClosure *c, lVal *v);
 lBytecodeOp     requireBytecodeOp   (lClosure *c, lVal *v);
 lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v);
 lClosure       *requireClosure      (lClosure *c, lVal *v);
+lVal           *requireEnvironment  (lClosure *c, lVal *v);
 
 lType lTypecast         (const lType a, const lType b);
 

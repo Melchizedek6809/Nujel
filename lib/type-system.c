@@ -21,7 +21,7 @@ NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
 	lExceptionThrowValClo("arity-error", buf, v, c);
 }
 
-void requireCertainType(lClosure *c, lVal *v, lType T){
+static void requireCertainType(lClosure *c, lVal *v, lType T){
 	if((v == NULL) || (v->type != T)){
 		throwTypeError(c, v, T);
 	}
@@ -151,4 +151,9 @@ lClosure *requireClosure(lClosure *c, lVal *v){
 			return NULL;
 	}
 	return v->vClosure;
+}
+
+lVal *requireEnvironment(lClosure *c, lVal *v){
+	requireCertainType(c, v, ltObject);
+	return v;
 }

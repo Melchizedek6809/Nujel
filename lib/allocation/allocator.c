@@ -108,6 +108,7 @@ lNFunc *lNFuncAlloc(){
 }
 
 void lValFree(lVal *v){
+	v->type     = ltNoAlloc;
 	v->nextFree = lValFFree;
 	lValFFree   = v;
 	lValActive--;

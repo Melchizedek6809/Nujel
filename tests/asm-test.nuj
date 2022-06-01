@@ -1,9 +1,3 @@
 #!/usr/bin/env nujel
 
-[let* [defn min [a b]
-        [if [< a b] a b]]
-
-  [def bc [assemble [$push/int 42] [$push/int 23] [$apply 2 min] [$ret]]]
-  [println [bytecode-eval bc #nil root-closure #t]]
-
-]
+[asmdebug [$push/lval +] [$push/int 2] [$push/int 3] [$apply/dynamic 2] [$ret]]

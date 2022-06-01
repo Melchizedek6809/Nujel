@@ -61,7 +61,7 @@ static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	lClosure *bcc = c;
 	const bool trace = castToBool(lCaddr(v));
 	if(env){
-		requireCertainType(c, env, ltObject);
+		requireEnvironment(c, env);
 		bcc = env->vClosure;
 	}
 	return lBytecodeEval(bcc, arr, trace);

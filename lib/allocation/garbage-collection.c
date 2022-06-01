@@ -29,8 +29,10 @@ u8 lBytecodeArrayMarkMap [BCA_MAX];
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
 	if((c->csp > 8192) || (c->csp < 0)){
+		epf("Ignoring closure due to strangely sized CSP\n");
 		return;
 	}
+	lBytecodeArrayMark(c->text);
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
@@ -78,10 +80,8 @@ void lNFuncGCMark(const lNFunc *v){
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
-	if(ci >= lValMax){
-		return;
-	}
-	if(lValMarkMap[ci]){return;}
+	if(ci >= lValMax){ return; }
+	if(lValMarkMap[ci]){ return; }
 	lValMarkMap[ci] = 1;
 
 	switch(v->type){
@@ -252,6 +252,7 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
+	//pf("GC!\n");
 	lGCRuns++;
 	lGCMark();
 	lGCSweep();

@@ -147,17 +147,13 @@
                         [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 
-[def assemble/verbose #f]
 [defn assemble* [code]
       "Assemble all arguments into a single :bytecode-array"
-      [def sym-map @[]]
+      [def sym-map @[:literals #[]]]
 
-      [and assemble/verbose [println [cat [ansi-blue "Input:\n" [str/write code]]]]]
       [assemble/build-sym-map code sym-map 0]
-      [and assemble/verbose [println [cat [ansi-yellow "Symbol Map:\n" [str/write sym-map]]]]]
       [def out [array/allocate [tree/ref sym-map :last-op]]]
       [assemble/emit-relocated-ops code sym-map -1 out]
-      [and assemble/verbose [println [cat [ansi-green "Output:\n" [str/write out]]]]]
 
       [arr->bytecode-arr out]]
 
