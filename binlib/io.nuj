@@ -19,6 +19,14 @@
        [for-in [form [read [file/read path]]]
                [eval-in environment form]]]
 
+[defn load [filename]
+  [try [fn [err]
+         [display/error err]
+         #f]
+       [file/eval filename]
+       [pfmtln "Loaded {filename}"]
+       #t]]
+
 [defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]
 
