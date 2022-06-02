@@ -30,9 +30,16 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	lArray *arr = requireArray(c, lCar(v));
 	const int len = arr->length;
 
+	lVal *litv = lCadr(v);
+	lArray *literals = NULL;
+	if(litv){
+		literals = requireArray(c, litv);
+	}
+
 	lVal *ret = lValAlloc(ltBytecodeArr);
 	lBytecodeArray *bca = lBytecodeArrayAlloc(len);
 	ret->vBytecodeArr = bca;
+	bca->literals = literals;
 
 	for(int i=0;i<len;i++){
 		bca->data[i] = requireBytecodeOp(c, arr->data[i]);

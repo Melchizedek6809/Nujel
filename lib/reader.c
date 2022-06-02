@@ -290,6 +290,15 @@ static lVal *lParseBytecodeArray(lString *s){
 	u8 *d    = NULL;
 	int size = 0;
 	int len  = 0;
+	lArray *literals = NULL;
+
+	if(*s->data == '#'){
+		lVal *v = lReadValue(s);
+		if(v->type != ltArray){
+			throwBCReadError(readClosure, v, s, "Invalid literal array in BCA");
+		}
+		literals = v->vArray;
+	}
 
 	while(s->data < s->bufEnd){
 		if((len+4) >= size){
@@ -363,6 +372,7 @@ static lVal *lParseBytecodeArray(lString *s){
 	}
 	lVal *ret = lValAlloc(ltBytecodeArr);
 	ret->vBytecodeArr = lBytecodeArrayAlloc(len);
+	ret->vBytecodeArr->literals = literals;
 	memcpy(ret->vBytecodeArr->data, d, len);
 	free(d);
 	return ret;

@@ -97,6 +97,14 @@
             [list :relocate target 8 0 [int->bytecode-op 0]]
             [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
+[defn $push/val [v]
+      "[] -> [v]"
+      "Pushes v onto the stack"
+      [when [nil? v]
+        [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
+      [list #$1A
+            [list :literal v]]]
+
 [defn $jt [target]
       [list #$A
             [list :relocate target 8 0 [int->bytecode-op 0]]
@@ -147,15 +155,31 @@
                         [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 
+[defn assemble/add-literal [code lit-arr]
+      [when [>= [array/length lit-arr] 255]
+        [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
+      [array/length! lit-arr [+ 1 [array/length lit-arr]]]
+      [array/set! lit-arr [- [array/length lit-arr] 1] [cadr code]]
+      [int->bytecode-op [- [array/length lit-arr] 1]]]
+
+[defn assemble/build-lit-arr [code lit-arr]
+      [when-not code [return #nil]]
+      [cons [cond [[pair? [car code]]
+                   [assemble/build-lit-arr [car code] lit-arr]]
+                  [[== :literal [car code]]
+                   [assemble/add-literal code lit-arr]]
+                  [#t [car code]]]
+            [assemble/build-lit-arr [cdr code] lit-arr]]]
+
 [defn assemble* [code]
       "Assemble all arguments into a single :bytecode-array"
-      [def sym-map @[:literals #[]]]
-
-      [assemble/build-sym-map code sym-map 0]
+      [def sym-map @[]]
+      [def lit-arr #[]]
+      [def tmp [assemble/build-lit-arr code lit-arr]]
+      [assemble/build-sym-map tmp sym-map 0]
       [def out [array/allocate [tree/ref sym-map :last-op]]]
-      [assemble/emit-relocated-ops code sym-map -1 out]
-
-      [arr->bytecode-arr out]]
+      [assemble/emit-relocated-ops tmp sym-map -1 out]
+      [arr->bytecode-arr out lit-arr]]
 
 [defn assemble l
       "Assemble all arguments into a single :bytecode-array"

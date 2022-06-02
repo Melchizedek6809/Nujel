@@ -38,6 +38,7 @@ static int lBytecodeOpLength(lBytecodeOp op){
 		return 1;
 	case lopApply:
 	case lopIntByte:
+	case lopPushVal:
 		return 2;
 	case lopTry:
 	case lopJmp:

@@ -175,6 +175,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp++] = val;
 		ip += 4;
 		break; }
+	case lopPushVal: {
+		const u8 v = ip[1];
+		if(v >= ops->literals->length){throwStackUnderflowError(c, "PushVal");}
+		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
+		ip+=2;
+		break; }
 	case lopPushSymbol: {
 		lSymbol *sym;
 		ip = lBytecodeReadOPSym(ip+1, &sym);

@@ -42,14 +42,6 @@ typedef struct vec vec;
 
 typedef uint8_t lBytecodeOp;
 
-struct lBytecodeArray{
-	lBytecodeOp *data;
-	union {
-		lBytecodeOp *dataEnd;
-		struct lBytecodeArray *nextFree;
-	};
-};
-
 
 typedef enum lType {
 	ltNoAlloc = 0,
@@ -88,6 +80,16 @@ typedef struct lTree    lTree;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 typedef struct lBytecodeArray lBytecodeArray;
+
+struct lBytecodeArray{
+	lBytecodeOp *data;
+	lArray *literals;
+	union {
+		lBytecodeOp *dataEnd;
+		struct lBytecodeArray *nextFree;
+	};
+};
+
 
 typedef struct {
 	lVal *car,*cdr;

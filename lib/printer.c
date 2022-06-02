@@ -80,6 +80,8 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 		return cur = spf(cur, bufEnd, "#{ 01 }");
 	}
 	cur = spf(cur, bufEnd, "#{");
+	cur = writeArray(cur, bufEnd, v->literals);
+	cur = spf(cur, bufEnd, " ");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
 			if(cur[-1] == ' '){--cur;}

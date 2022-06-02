@@ -30,7 +30,7 @@ typedef enum lOpcode {
 	lopFnDynamic       = 0x17,
 	lopMacroDynamic    = 0x18,
 	lopTry             = 0x19,
-	lopUNUSED7         = 0x1A,
+	lopPushVal         = 0x1A,
 	lopRootsSave       = 0x1B,
 	lopRootsRestore    = 0x1C,
 	lopUNUSED          = 0x1D,

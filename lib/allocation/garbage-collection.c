@@ -188,6 +188,7 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	}
 	if(lBytecodeArrayMarkMap[ci]){return;}
 	lBytecodeArrayMarkMap[ci] = 1;
+	lArrayGCMark(v->literals);
 	lBytecodeArrayMarkRefs(v);
 }
 
