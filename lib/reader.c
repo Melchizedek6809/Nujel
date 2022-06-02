@@ -298,6 +298,7 @@ static lVal *lParseBytecodeArray(lString *s){
 			throwBCReadError(readClosure, v, s, "Invalid literal array in BCA");
 		}
 		literals = v->vArray;
+		literals->flags = ARRAY_IMMUTABLE;
 	}
 
 	while(s->data < s->bufEnd){

@@ -8,20 +8,26 @@
       [++ bytecompile/gen-label/counter]
       [str->sym [cat prefix "label-" bytecompile/gen-label/counter]]]
 
+[def *bytecompile-push* #f]
+[defn $push/v [v]
+      [if *bytecompile-push*
+          [$push/val v]
+          [$push/lval v]]]
+
 [defn bytecompile/literal [source]
       [case [type-of source]
             [[:symbol :keyword] [if [keyword? source]
-                                    [$push/lval source]
+                                    [$push/v source]
                                     [$get source]]]
             [:int      [$push/int source]]
             [:nil      [$push/nil]]
-            [otherwise [$push/lval source]]]]
+            [otherwise [$push/v source]]]]
 
 [defn bytecompile/quote [source]
       [case [type-of source]
             [:int      [$push/int source]]
             [:symbol   [$push/symbol source]]
-            [otherwise [$push/lval source]]]]
+            [otherwise [$push/v source]]]]
 
 [defn bytecompile/do/form [source env]
       [when source [cons [cons [bytecompile* [car source] env]

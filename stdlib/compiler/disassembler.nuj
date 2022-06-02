@@ -17,9 +17,6 @@
 
 [defn bytecode-op->val [a b c]
       "Turn three bytecode ops representing an encoded value into an actual value"
-      [pfmtln "A:{a} B:{b} C:{c} -> {}" [index->val [logior [ash [bytecode-op->int a] 16]
-                          [ash [bytecode-op->int b]  8]
-                          [bytecode-op->int c]]]]
       [index->val [logior [ash [bytecode-op->int a] 16]
                           [ash [bytecode-op->int b]  8]
                           [bytecode-op->int c]]]]
@@ -30,7 +27,6 @@
 
 [defn bytecode-op->sym [a b c]
       "Turn three bytecode ops representing an encoded symbol into an actual symbol"
-      [pfmtln "A:{a} B:{b} C:{c}"]
       [index->sym [logior [ash [bytecode-op->int a] 16]
                           [ash [bytecode-op->int b]  8]
                           [bytecode-op->int c]]]]
@@ -50,7 +46,7 @@
       "Read a bytecode encoded offset in A at I and return it as a signed integer"
       [bytecode-op->offset [ref a i] [ref a [+ 1 i]]]]
 
-[defn disassemble/op [a i]
+[defn disassemble/op [a i literals]
       "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
       [case [ref a i]
             [#$0  '[$nop]]
@@ -79,7 +75,7 @@
 
             [#$18 `[$try/old ~[bytecode-arr->offset a [+ i 1]]]]
             [#$19 `[$try ~[bytecode-arr->offset a [+ i 1]]]]
-            [#$1A `[$apply/dynamic ~[bytecode-op->int [ref a [+ i 1]]]]]
+            [#$1A `[$push/val ~[ref literals [bytecode-op->int [ref a [+ i 1]]]]]]
             [#$1B `[$roots/push]]
             [#$1C `[$roots/pop]]
 
@@ -92,17 +88,17 @@
             [#$24 `[$push/nil]]
             [otherwise :unknown-op]]]
 
-[defn disassemble/array [a i]
+[defn disassemble/array [a i literals]
       "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression"
       [def ret #nil]
       [while [< i [array/length a]]
-             [set! ret [cons [cons i [disassemble/op a i]] ret]]
+             [set! ret [cons [cons i [disassemble/op a i literals]] ret]]
              [set! i [+ i [disassemble/length [ref a i]]]]]
       [nreverse ret]]
 
 [defn disassemble/bytecode-array [code]
       "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
-      [disassemble/array [bytecode-arr->arr code] 0]]
+      [disassemble/array [bytecode-arr->arr code] 0 [bytecode-literals code]]]
 
 [defn disassemble/print [bc]
       [for-in [a [disassemble/bytecode-array bc]]

@@ -42,6 +42,18 @@ static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
 	c[3] = (i      ) & 0xFF;
 }
 
+static void lBytecodeArrayLink(lClosure *c, lBytecodeArray *text){
+	if(text->literals){
+		for(int i=0;i<text->literals->length;i++){
+			if(text->literals->data[i] == NULL){continue;}
+			if(text->literals->data[i]->type != ltSymbol){continue;}
+			lVal *new = lGetClosureSym(c, text->literals->data[i]->vSymbol);
+			text->literals->data[i] = new;
+		}
+	}
+	text->flags |= BYTECODE_ARRAY_LINKED;
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	jmp_buf oldExceptionTarget;
@@ -57,6 +69,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.sp               = 0;
 	ctx.closureStack[ctx.csp] = c;
 	ctx.text             = text;
+
+	if(!(text->flags & BYTECODE_ARRAY_LINKED)){
+		lBytecodeArrayLink(c,text);
+	}
 
 	int exceptionCount = 0;
 	const int RSP = lRootsGet();

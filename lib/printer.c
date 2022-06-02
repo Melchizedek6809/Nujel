@@ -111,6 +111,12 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c++;
 				break;
+			case lopPushVal:
+				if(&c[1] < v->dataEnd){
+					cur = spf(cur, bufEnd, "i %i ", (i64)((u8)c[1]));
+				}
+				c++;
+				break;
 			case lopIntByte:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)((i8)c[1]));

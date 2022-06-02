@@ -88,7 +88,9 @@ struct lBytecodeArray{
 		lBytecodeOp *dataEnd;
 		struct lBytecodeArray *nextFree;
 	};
+	u8 flags;
 };
+#define BYTECODE_ARRAY_LINKED 1
 
 
 typedef struct {
