@@ -46,18 +46,6 @@
       :inline
       '[#$16]]
 
-[defn $roots/save []
-      "[] -> []"
-      "Store the current root stack pointer used for guarding allocations into the current closure"
-      :inline
-      '[#$1B]]
-
-[defn $roots/restore []
-      "[] -> []"
-      "Restore the current root stack pointer to what is stored within the current closure"
-      :inline
-      '[#$1C]]
-
 [defn $< []
       "[a b] -> [bool]"
       "Compare A and B and push the result on the stack"

@@ -86,10 +86,8 @@
 0Es ΓεnΣym-3
 0D
 10s ΓεnΣym-3
-0Bo 55
+0Bo 53
 02i 0
-1B
-1C
 10s ΓεnΣym-3
 0Bo 41
 0D
@@ -105,7 +103,7 @@
 10s ΓεnΣym-3
 12
 0Fs ΓεnΣym-3
-09o -43
+09o -42
 09o 4
 24
 16
@@ -407,8 +405,6 @@
 0Es line
 0D
 02i 0
-1B
-1C
 05v !=
 10s line
 05v "[/cmd]\n"
@@ -424,7 +420,7 @@
 05v readline
 04i 0
 0Fs line
-09o -48
+09o -47
 0D
 10s do
 05v read
@@ -506,8 +502,6 @@
 05v #@[source: [[while #t [try repl/exception-handler [repl/readline root-closure]]]]]
 05v #{##[]
 02i 0
-1B
-1C
 05v #t
 0Bo 25
 0D
@@ -517,7 +511,7 @@
 10s root-closure
 04i 1
 16
-09o -27
+09o -26
 01
 }
 17

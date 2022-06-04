@@ -237,14 +237,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = lBytecodeReadOPSym(ip+1, &sym);
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
-	case lopRootsSave:
-		c->rsp = lRootsGet();
-		ip++;
-		break;
-	case lopRootsRestore:
-		lRootsRet(c->rsp);
-		ip++;
-		break;
 	case lopCar:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Car");}
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
