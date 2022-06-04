@@ -74,16 +74,18 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
 	lVal *v = lRead(expr);
+	const int RSP = lRootsGet();
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
-		const int RSP = lRootsGet();
-		lRootsValPush(n);
 		lVal *car = n->vList.car;
+		lRootsValPush(n);
 		if((car == NULL) || (car->type != ltBytecodeArr)){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
+		}else{
+			lBytecodeEval(c, car->vBytecodeArr, false);
 		}
-		lBytecodeEval(c, car->vBytecodeArr, false);
 		lRootsRet(RSP);
 	}
+	lRootsRet(RSP);
 	return c;
 }
 

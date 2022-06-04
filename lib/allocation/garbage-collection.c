@@ -36,7 +36,7 @@ void lThreadGCMark(lThread *c){
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
-	for(int i=0;i < c->sp;i++){
+	for(int i=0;i <= c->sp;i++){
 		lValGCMark(c->valueStack[i]);
 	}
 }

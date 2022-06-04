@@ -108,11 +108,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 
 	while((ip >= ops->data) && (ip < ops->dataEnd)){
 		lGarbageCollectIfNecessary();
-		if(ctx.csp == ctx.closureStackSize-1){
+		if(ctx.csp >= ctx.closureStackSize-1){
 			ctx.closureStackSize *= 2;
 			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
 		}
-		if(ctx.sp == ctx.valueStackSize-1){
+		if(ctx.sp >= ctx.valueStackSize-1){
 			ctx.valueStackSize *= 2;
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
 		}
@@ -204,8 +204,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;}
 	case lopDup:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Dup");}
-		ctx.valueStack[ctx.sp] = ctx.valueStack[ctx.sp-1];
 		ctx.sp++;
+		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
 		ip++;
 		break;
 	case lopDrop:
