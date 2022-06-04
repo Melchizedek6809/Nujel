@@ -25,6 +25,8 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopClosurePush:
 	case lopLet:
 	case lopClosurePop:
+	case lopRootsSave:
+	case lopRootsRestore:
 	case lopLessPred:
 	case lopLessEqPred:
 	case lopEqualPred:

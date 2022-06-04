@@ -86,8 +86,10 @@
 0Es ΓεnΣym-3
 0D
 10s ΓεnΣym-3
-0Bo 53
+0Bo 55
 02i 0
+1B
+1C
 10s ΓεnΣym-3
 0Bo 41
 0D
@@ -103,7 +105,7 @@
 10s ΓεnΣym-3
 12
 0Fs ΓεnΣym-3
-09o -42
+09o -43
 09o 4
 24
 16
@@ -285,6 +287,23 @@
 24
 0Es repl/history
 0D
+23s repl/welcome
+05v []
+05v #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]]
+05v #{##[]
+05v println
+05v cat
+05v ansi-rainbow
+05v "Nujel"
+04i 1
+05v " is ready for business!"
+04i 2
+04i 1
+01
+}
+17
+0Es repl/welcome
+0D
 23s repl/prompt
 05v []
 05v #@[documentation: ">" source: ["> "]]
@@ -405,6 +424,8 @@
 0Es line
 0D
 02i 0
+1B
+1C
 05v !=
 10s line
 05v "[/cmd]\n"
@@ -420,7 +441,7 @@
 05v readline
 04i 0
 0Fs line
-09o -47
+09o -48
 0D
 10s do
 05v read
@@ -458,7 +479,7 @@
 0D
 23s repl/readline
 05v [ctx]
-05v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "See you space cowboy...\r\n"] [exit 0]] [if [== line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]]
+05v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [== line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]]
 05v #{##[]
 05v readline
 05v repl/prompt
@@ -471,7 +492,7 @@
 04i 1
 0Bo 25
 05v print
-05v "See you space cowboy...\r\n"
+05v "Adios, cowboy...\r\n"
 04i 1
 0D
 05v exit
@@ -499,9 +520,14 @@
 0D
 23s repl
 05v []
-05v #@[source: [[while #t [try repl/exception-handler [repl/readline root-closure]]]]]
+05v #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]]
 05v #{##[]
+10s repl/welcome
+04i 0
+0D
 02i 0
+1B
+1C
 05v #t
 0Bo 25
 0D
@@ -511,7 +537,7 @@
 10s root-closure
 04i 1
 16
-09o -26
+09o -27
 01
 }
 17
@@ -830,16 +856,10 @@
 0D
 23s repl/init/wasm
 05v [args]
-05v #@[source: [[println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]]
+05v #@[source: [[repl/welcome]]]
 05v #{##[]
-05v println
-05v cat
-05v ansi-rainbow
-05v "Nujel"
-04i 1
-05v " heißt euch willkommen!"
-04i 2
-04i 1
+10s repl/welcome
+04i 0
 01
 }
 17

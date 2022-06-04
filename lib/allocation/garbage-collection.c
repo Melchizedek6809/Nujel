@@ -182,9 +182,9 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lBytecodeArrayList;
 	if(ci >= lBytecodeArrayMax){
-		exit(*((u8 *)NULL));
+		//exit(*((u8 *)NULL));
 		epf("Tried to mark invalid lBytecodeArray\n");
-		//exit(1);
+		exit(1);
 	}
 	if(lBytecodeArrayMarkMap[ci]){return;}
 	lBytecodeArrayMarkMap[ci] = 1;
