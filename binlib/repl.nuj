@@ -12,6 +12,9 @@
 
 [def repl/history #nil]
 
+[defn repl/welcome []
+      [println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]
+
 [defn repl/prompt []
       "> "]
 
@@ -47,13 +50,14 @@
 [defn repl/readline [ctx]
       [def line [readline [repl/prompt]]]
       [when [nil? line]
-        [display "See you space cowboy...\r\n"]
+        [display "Adios, cowboy...\r\n"]
         [exit 0]]
       [if [== line "[cmd]\n"]
           [repl/cmd ctx]
           [repl/cmd/raw ctx line]]]
 
 [defn repl []
+      [repl/welcome]
       [while #t
         [try repl/exception-handler
              [repl/readline root-closure]]]]
@@ -113,7 +117,7 @@
           repl/parse-args/run-repl]]
 
 [defn repl/init/wasm [args]
-      [println [cat [ansi-rainbow "Nujel"] " heißt euch willkommen!"]]]
+      [repl/welcome]]
 
 [defn repl/init/bin [args]
       [try repl/exception-handler
