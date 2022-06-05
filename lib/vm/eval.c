@@ -76,6 +76,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 
 	int exceptionCount = 0;
 	const int RSP = lRootsGet();
+	lRootsClosurePush(callingClosure);
 	lRootsThreadPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
@@ -91,6 +92,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 
 			c = ctx.closureStack[--ctx.csp];
 			ops = c->text;
+			ctx.text = ops;
 			ip = c->ip;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NULL), handler);
@@ -304,6 +306,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			pf("%V\n",cDocs);
 			pf("%V\n",cArgs);
 			pf("%V\n",cName);
+			*((u8 *)NULL)=0;
 		}
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);
@@ -336,6 +339,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			c   = ctx.closureStack[--ctx.csp];
 			ip  = c->ip;
 			ops = c->text;
+			ctx.text = ops;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = ret;
 			break;

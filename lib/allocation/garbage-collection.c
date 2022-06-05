@@ -36,7 +36,7 @@ void lThreadGCMark(lThread *c){
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
 	}
-	for(int i=0;i <= c->sp;i++){
+	for(int i=0;i < c->sp;i++){
 		lValGCMark(c->valueStack[i]);
 	}
 }
@@ -66,7 +66,7 @@ void lSymbolGCMark(const lSymbol *v){
 void lNFuncGCMark(const lNFunc *v){
 	if(v == NULL){return;}
 	const uint ci = v - lNFuncList;
-	if(ci > lNFuncMax){
+	if(ci >= lNFuncMax){
 		return;
 		epf("Tried to mark invalid lNFunc\n");
 		exit(1);
@@ -120,14 +120,6 @@ void lValGCMark(lVal *v){
 	}
 }
 
-bool lValIsMarked(lVal *v){
-	const uint ci = v - lValList;
-	if((ci < lValMax) && lValMarkMap[ci]){
-		return true;
-	}
-	return false;
-}
-
 /* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
@@ -147,10 +139,8 @@ void lTreeGCMark(const lTree *v){
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
-	if(ci >= lClosureMax){
-		return;
-	}
-	if(lClosureMarkMap[ci]){return;}
+	if(ci >= lClosureMax){ return; }
+	if(lClosureMarkMap[ci]){ return; }
 	lClosureMarkMap[ci] = 1;
 
 	lClosureGCMark(c->parent);

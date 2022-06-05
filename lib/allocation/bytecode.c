@@ -63,11 +63,11 @@ void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 		case lopDef:
 		case lopGet:
 		case lopSet:
-			if(&c[3] >= v->dataEnd){break;}
+			if(&c[4] > v->dataEnd){break;}
 			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		case lopPushLVal:
-			if(&c[3] >= v->dataEnd){break;}
+			if(&c[4] > v->dataEnd){break;}
 			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		}

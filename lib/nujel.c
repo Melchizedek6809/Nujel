@@ -49,11 +49,7 @@ NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal 
 
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
-	const int SP = lRootsGet();
-	lClosure *tmpc = lClosureNewFunCall(c, args, lambda);
-	lVal *ret = lBytecodeEval(tmpc, lambda->vClosure->text, false);
-	lRootsRet(SP);
-	return ret;
+	return lBytecodeEval(lClosureNewFunCall(c, args, lambda), lambda->vClosure->text, false);
 }
 
 /* Run fun with args, evaluating args if necessary  */
@@ -92,7 +88,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
 	lClosure *c = lClosureAlloc();
-	c->type = closureLet;
+	c->type = closureRoot;
 	lOperationsBase(c);
 	lAddPlatformVars(c);
 	return lLoad(c, (const char *)stdlib_no_data);

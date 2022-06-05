@@ -135,14 +135,13 @@ typedef enum closureType {
 	closureObject = 1,
 	closureCall = 2,
 	closureLet = 3,
-	closureTry = 4
+	closureTry = 4,
+	closureRoot = 5,
 } closureType;
 
 struct lClosure {
-	union {
-		lClosure *parent;
-		lClosure *nextFree;
-	};
+	lClosure *parent;
+	lClosure *nextFree;
 	lTree *data, *meta;
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
