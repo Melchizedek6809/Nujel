@@ -3,16 +3,6 @@
 
 [def test-context "Nujel Standalone"]
 
-[defn help [off]
-       "Describe 10 functions at OFFset"
-       [when-not [int? off] [set! off [int off]]]
-
-       [for-each [map [symbol-table off 10] string]
-                 [fn [l] [def desc [describe l]]
-                         [pfmtln "{l} {desc}"]]]
-       [def sc [/ [symbol-count] 10]]
-       [pfmtln "Help page {off} of {sc}"]]
-
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]

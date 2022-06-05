@@ -306,7 +306,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			pf("%V\n",cDocs);
 			pf("%V\n",cArgs);
 			pf("%V\n",cName);
- 			*((u8 *)NULL)=0;
+ 			//*((u8 *)NULL)=0;
 		}
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);

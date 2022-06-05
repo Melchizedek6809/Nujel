@@ -166,7 +166,6 @@
 [test/add #x0B [char-at "\v" 0]]
 [test/add #x27 [char-at "'" 0]]
 [test/add #x22 [char-at "\"" 0]]
-[test/add #t [> [symbol-count] 200]] ; Probably not gonna shrink over time
 [test/add #t [== + +]]
 [test/add #t [== min min]]
 [test/add #t [let [[some-value #f]] [not some-value]]]

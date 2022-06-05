@@ -55,59 +55,48 @@
       [not [equal? a b]]]
 
 [defn int? [val]
-      "#t if VAL is a integer"
       [== :int [type-of val]]]
 
 [defn float? [val]
-      "#t if VAL is a floating-point number"
       [== :float [type-of val]]]
 
 [defn vec? [val]
-      "#t if VAL is a vector"
       [== :vec [type-of val]]]
 
 [defn bool? [val]
-      "#t if VAL is a boolean"
       [== :bool [type-of val]]]
 
 [defn pair? [val]
-      "#t if VAL is a pair"
       [== :pair [type-of val]]]
 
 [defn array? [val]
-      "#t if VAL is an array"
       [== :array [type-of val]]]
 
 [defn string? [val]
-      "#t if VAL is a string"
       [== :string [type-of val]]]
 
 [defn symbol? [val]
-      "#t if VAL is a symbol"
       [== :symbol [type-of val]]]
 
 [defn object? [val]
-      "#t if VAL is an object"
       [== :object [type-of val]]]
 
 [defn tree? [val]
-      "#t if VAL is an object"
       [== :tree [type-of val]]]
 
+[defn keyword? [v]
+      [== :keyword [type-of v]]]
+
 [defn macro? [val]
-      "#t if VAL is an object"
       [== :macro [type-of val]]]
 
 [defn lambda? [val]
-      "#t if VAL is a lambda"
       [or [== :lambda [type-of val]]]]
 
 [defn native? [val]
-      "#t if VAL is a native function"
       [== :native-function [type-of val]]]
 
 [defn procedure? [val]
-      "#t if VAL is a native or lisp function"
       [or [lambda? val] [native? val]]]
 
 [defn bytecode-array? [v]

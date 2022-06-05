@@ -19,15 +19,6 @@ static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	return l;
 }
 
-static int lSymCount(lClosure *c, int ret){
-	return c ? lSymCount(c->parent,lTreeSize(c->data) + ret) : ret;
-}
-
-static lVal *lnfSymCount(lClosure *c, lVal *v){
-	(void)v;
-	return lValInt(lSymCount(c,0));
-}
-
 static lVal *lnfClosure(lClosure *c, lVal *v){
 	(void)c;
 	lVal *car = lCar(v);
@@ -118,8 +109,7 @@ static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 }
 
 static lVal *lnfApply(lClosure *c, lVal *v){
-	lVal *fun = lCar(v);
-	return lApply(c, lCadr(v), fun);
+	return lApply(c, lCadr(v), lCar(v));
 }
 
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
@@ -202,12 +192,6 @@ static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
 static lVal *lnfNilPred(lClosure *c, lVal *v){
 	(void)c;
 	return lValBool(lCar(v) == NULL);
-}
-
-static lVal *lnfKeywordPred(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	return lValBool(car ? car->type == ltKeyword : false);
 }
 
 static lVal *lnfQuote(lClosure *c, lVal *v){
@@ -346,7 +330,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
 
-	lAddNativeFunc(c,"symbol-count",   "[]",            "Return a count of the symbols accessible from the current closure",lnfSymCount);
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 
 	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
@@ -367,7 +350,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
 	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
 	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
-	lAddNativeFunc(c,"keyword?", "[α]",   "Return true if α is a keyword symbol",        lnfKeywordPred);
 
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
 

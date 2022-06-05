@@ -5845,6 +5845,28 @@
 }
 18
 0Es asmrun
+0D
+23s bytecode-eval
+05v [bc env]
+05v #@[source: [[apply [or env [current-closure]] bc]]]
+05v #{##[]
+05v apply
+10s env
+0C
+0Ao 19
+0D
+05v current-closure
+04i 0
+0C
+0Ao 8
+0D
+05v #f
+10s bc
+04i 2
+01
+}
+17
+0Es bytecode-eval
 01
 }#{##[]
 02i 0
@@ -8810,7 +8832,7 @@
 0D
 23s macroexpand*
 05v [source env]
-05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / % logand logior logxor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro* fnn* macron*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
+05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / % logand logior logxor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
 05v #{##[]
 05v resolves?
 10s source
@@ -8839,11 +8861,11 @@
 20
 0Bo 10
 10s source
-09o 673
+09o 645
 10s ΓεnΣym-112
 05v :native-function
 20
-0Bo 594
+0Bo 566
 15
 10s op
 0Es ΓεnΣym-113
@@ -8903,7 +8925,7 @@
 10s source
 12
 04i 2
-09o 443
+09o 415
 10s ΓεnΣym-113
 10s do
 20
@@ -8912,7 +8934,7 @@
 10s source
 10s env
 04i 2
-09o 414
+09o 386
 10s ΓεnΣym-113
 10s return
 20
@@ -8925,7 +8947,7 @@
 05v #f
 02i 0
 04i 6
-09o 373
+09o 345
 10s ΓεnΣym-113
 10s try
 20
@@ -8948,7 +8970,7 @@
 05v #t
 02i 0
 04i 6
-09o 309
+09o 281
 10s ΓεnΣym-113
 10s def
 20
@@ -8971,7 +8993,7 @@
 05v #f
 02i 1
 04i 6
-09o 245
+09o 217
 10s ΓεnΣym-113
 10s if
 20
@@ -8984,27 +9006,15 @@
 05v #f
 02i 0
 04i 6
-09o 204
+09o 176
 10s ΓεnΣym-113
 10s fn*
-20
-0C
-0Ao 50
-0D
-10s ΓεnΣym-113
-10s macro*
-20
-0C
-0Ao 36
-0D
-10s ΓεnΣym-113
-10s fnn*
 20
 0C
 0Ao 22
 0D
 10s ΓεnΣym-113
-10s macron*
+10s macro*
 20
 0C
 0Ao 8
@@ -10534,7 +10544,7 @@
 0D
 23s int?
 05v [val]
-05v #@[documentation: "#t if VAL is a integer" source: ["#t if VAL is a integer" [== :int [type-of val]]]]
+05v #@[source: [[== :int [type-of val]]]]
 05v #{##[]
 05v :int
 05v type-of
@@ -10548,7 +10558,7 @@
 0D
 23s float?
 05v [val]
-05v #@[documentation: "#t if VAL is a floating-point number" source: ["#t if VAL is a floating-point number" [== :float [type-of val]]]]
+05v #@[source: [[== :float [type-of val]]]]
 05v #{##[]
 05v :float
 05v type-of
@@ -10562,7 +10572,7 @@
 0D
 23s vec?
 05v [val]
-05v #@[documentation: "#t if VAL is a vector" source: ["#t if VAL is a vector" [== :vec [type-of val]]]]
+05v #@[source: [[== :vec [type-of val]]]]
 05v #{##[]
 05v :vec
 05v type-of
@@ -10576,7 +10586,7 @@
 0D
 23s bool?
 05v [val]
-05v #@[documentation: "#t if VAL is a boolean" source: ["#t if VAL is a boolean" [== :bool [type-of val]]]]
+05v #@[source: [[== :bool [type-of val]]]]
 05v #{##[]
 05v :bool
 05v type-of
@@ -10590,7 +10600,7 @@
 0D
 23s pair?
 05v [val]
-05v #@[documentation: "#t if VAL is a pair" source: ["#t if VAL is a pair" [== :pair [type-of val]]]]
+05v #@[source: [[== :pair [type-of val]]]]
 05v #{##[]
 05v :pair
 05v type-of
@@ -10604,7 +10614,7 @@
 0D
 23s array?
 05v [val]
-05v #@[documentation: "#t if VAL is an array" source: ["#t if VAL is an array" [== :array [type-of val]]]]
+05v #@[source: [[== :array [type-of val]]]]
 05v #{##[]
 05v :array
 05v type-of
@@ -10618,7 +10628,7 @@
 0D
 23s string?
 05v [val]
-05v #@[documentation: "#t if VAL is a string" source: ["#t if VAL is a string" [== :string [type-of val]]]]
+05v #@[source: [[== :string [type-of val]]]]
 05v #{##[]
 05v :string
 05v type-of
@@ -10632,7 +10642,7 @@
 0D
 23s symbol?
 05v [val]
-05v #@[documentation: "#t if VAL is a symbol" source: ["#t if VAL is a symbol" [== :symbol [type-of val]]]]
+05v #@[source: [[== :symbol [type-of val]]]]
 05v #{##[]
 05v :symbol
 05v type-of
@@ -10646,7 +10656,7 @@
 0D
 23s object?
 05v [val]
-05v #@[documentation: "#t if VAL is an object" source: ["#t if VAL is an object" [== :object [type-of val]]]]
+05v #@[source: [[== :object [type-of val]]]]
 05v #{##[]
 05v :object
 05v type-of
@@ -10660,7 +10670,7 @@
 0D
 23s tree?
 05v [val]
-05v #@[documentation: "#t if VAL is an object" source: ["#t if VAL is an object" [== :tree [type-of val]]]]
+05v #@[source: [[== :tree [type-of val]]]]
 05v #{##[]
 05v :tree
 05v type-of
@@ -10672,9 +10682,23 @@
 17
 0Es tree?
 0D
+23s keyword?
+05v [v]
+05v #@[source: [[== :keyword [type-of v]]]]
+05v #{##[]
+05v :keyword
+05v type-of
+10s v
+04i 1
+20
+01
+}
+17
+0Es keyword?
+0D
 23s macro?
 05v [val]
-05v #@[documentation: "#t if VAL is an object" source: ["#t if VAL is an object" [== :macro [type-of val]]]]
+05v #@[source: [[== :macro [type-of val]]]]
 05v #{##[]
 05v :macro
 05v type-of
@@ -10688,7 +10712,7 @@
 0D
 23s lambda?
 05v [val]
-05v #@[documentation: "#t if VAL is a lambda" source: ["#t if VAL is a lambda" [or [== :lambda [type-of val]]]]]
+05v #@[source: [[or [== :lambda [type-of val]]]]]
 05v #{##[]
 05v :lambda
 05v type-of
@@ -10706,7 +10730,7 @@
 0D
 23s native?
 05v [val]
-05v #@[documentation: "#t if VAL is a native function" source: ["#t if VAL is a native function" [== :native-function [type-of val]]]]
+05v #@[source: [[== :native-function [type-of val]]]]
 05v #{##[]
 05v :native-function
 05v type-of
@@ -10720,7 +10744,7 @@
 0D
 23s procedure?
 05v [val]
-05v #@[documentation: "#t if VAL is a native or lisp function" source: ["#t if VAL is a native or lisp function" [or [lambda? val] [native? val]]]]
+05v #@[source: [[or [lambda? val] [native? val]]]]
 05v #{##[]
 05v lambda?
 10s val
