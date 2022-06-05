@@ -21,10 +21,11 @@ NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
 	lExceptionThrowValClo("arity-error", buf, v, c);
 }
 
-static void requireCertainType(lClosure *c, lVal *v, lType T){
+static lVal *requireCertainType(lClosure *c, lVal *v, lType T){
 	if((v == NULL) || (v->type != T)){
 		throwTypeError(c, v, T);
 	}
+	return v;
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
@@ -55,8 +56,7 @@ lType lTypecast(const lType a, const lType b){
 }
 
 i64 requireInt(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltInt);
-	return v->vInt;
+	return requireCertainType(c, v, ltInt)->vInt;
 }
 
 i64 requireNaturalInt(lClosure *c, lVal *v){
@@ -66,57 +66,44 @@ i64 requireNaturalInt(lClosure *c, lVal *v){
 }
 
 lBytecodeOp requireBytecodeOp(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltBytecodeOp);
-	return v->vBytecodeOp;
+	return requireCertainType(c, v, ltBytecodeOp)->vBytecodeOp;
 }
 
 lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltBytecodeArr);
-	return v->vBytecodeArr;
+	return requireCertainType(c, v, ltBytecodeArr)->vBytecodeArr;
 }
 
 double requireFloat(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
-	default:
-		throwTypeError(c, v, ltFloat);
-	case ltFloat:
-		return v->vFloat;
-	case ltInt:
-		return v->vInt;
+	default:      throwTypeError(c, v, ltFloat);
+	case ltFloat: return v->vFloat;
+	case ltInt:   return v->vInt;
 	}
 }
 
 vec requireVec(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltVec);
-	return v->vVec;
+	return requireCertainType(c, v, ltVec)->vVec;
 }
 
 vec requireVecCompatible(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
-	default:
-		throwTypeError(c, v, ltVec);
-	case ltVec:
-		return v->vVec;
-	case ltFloat:
-		return vecNew(v->vFloat, v->vFloat, v->vFloat);
-	case ltInt:
-		return vecNew(v->vInt, v->vInt, v->vInt);
+	default:      throwTypeError(c, v, ltVec);
+	case ltVec:   return v->vVec;
+	case ltFloat: return vecNew(v->vFloat, v->vFloat, v->vFloat);
+	case ltInt:   return vecNew(v->vInt, v->vInt, v->vInt);
 	}
 }
 
 lArray *requireArray(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltArray);
-	return v->vArray;
+	return requireCertainType(c, v, ltArray)->vArray;
 }
 
 lString *requireString(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltString);
-	return v->vString;
+	return requireCertainType(c, v, ltString)->vString;
 }
 
 lTree *requireTree(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltTree);
-	return v->vTree;
+	return requireCertainType(c, v, ltTree)->vTree;
 }
 
 lTree *requireMutableTree(lClosure *c, lVal *v){
@@ -126,13 +113,11 @@ lTree *requireMutableTree(lClosure *c, lVal *v){
 }
 
 const lSymbol *requireSymbol(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltSymbol);
-	return v->vSymbol;
+	return requireCertainType(c, v, ltSymbol)->vSymbol;
 }
 
 const lSymbol *requireKeyword(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltKeyword);
-	return v->vSymbol;
+	return requireCertainType(c, v, ltKeyword)->vSymbol;
 }
 
 const lSymbol *requireSymbolic(lClosure *c, lVal *v){
@@ -154,6 +139,5 @@ lClosure *requireClosure(lClosure *c, lVal *v){
 }
 
 lVal *requireEnvironment(lClosure *c, lVal *v){
-	requireCertainType(c, v, ltObject);
-	return v;
+	return requireCertainType(c, v, ltObject);
 }

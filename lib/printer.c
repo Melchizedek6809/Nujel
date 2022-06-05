@@ -20,8 +20,7 @@ static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
 	if((v == NULL) || (v->key == NULL)){return cur;}
 	cur = writeTreeRec(cur, bufEnd, v->left);
 	cur = spf(cur,bufEnd," %s: %v",v->key->c, v->value);
-	cur = writeTreeRec(cur, bufEnd, v->right);
-	return cur;
+	return writeTreeRec(cur, bufEnd, v->right);
 }
 
 /* Write an entire Tree structure, including @[] wrapping */
@@ -54,29 +53,31 @@ static char getHexChar(int c){
 static char *writeBytecodeArrayValue(char *cur, char *bufEnd, i64 index){
 	if((index < 0) || (index >= lValMax)){
 		return spf(cur, bufEnd, "v :INVALID-VALUE ");
+	}else{
+		return spf(cur, bufEnd, "v %v ", lIndexVal(index));
 	}
-	return spf(cur, bufEnd, "v %v ", lIndexVal(index));
 }
 
 static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
 	if((index < 0) || (index >= lSymbolMax)){
 		return spf(cur, bufEnd, "s --INVALID-SYMBOL-- ");
+	}else{
+		return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
 	}
-	return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
 }
 
 static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
 		return spf(cur, bufEnd, "o --INVALID-OFFSET--", offset);
+	}else{
+		return spf(cur, bufEnd, "o %i ", offset);
 	}
-	return spf(cur, bufEnd, "o %i ", offset);
 }
 
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	if((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax)){
 		epf("ERROR writing BCA\n");
-		//exit(2);
 		return cur = spf(cur, bufEnd, "#{ 01 }");
 	}
 	cur = spf(cur, bufEnd, "#{");
@@ -166,92 +167,80 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 }
 
 /* Write boxed value V, display determines if it should be machine- or human-readable */
-static char *writeVal(char *buf, char *bufEnd, const lVal *v, bool display){
-	char *cur = buf;
-	char *ret = buf;
-
-	if(v == NULL){return spf(buf,bufEnd,"#nil");}
+static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
+	if(v == NULL){return spf(cur,bufEnd,"#nil");}
 	for(int i=0;i<writeValSP;i++){
 		if(writeValStack[i] != v){continue;}
 		return spf(cur, bufEnd, " -+- Loop detected -+- ");
 	}
-	writeValStack[writeValSP++] = v;
 
 	switch(v->type){
 	default:
-		break;
+		return cur;
 	case ltNoAlloc:
-		ret = spf(cur, bufEnd,"#zzz");
-		break;
+		return spf(cur, bufEnd,"#zzz");
 	case ltBool:
-		ret = spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
-		break;
+		return spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
 	case ltObject:
 		if(v->vClosure->parent == NULL){
-			ret = spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
+			return spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
 		}else{
-			ret = spf(cur, bufEnd, "[ω]", v->vClosure->data);
+			return spf(cur, bufEnd, "[ω]", v->vClosure->data);
 		}
-		break;
 	case ltMacro:
 	case ltLambda: {
 		const int ID = lClosureID(v->vClosure);
 		if(ID == 0){
-			ret = spf(cur, bufEnd, "root-closure");
+			return spf(cur, bufEnd, "root-closure");
 		}else if(v->vClosure && v->vClosure->name){
-			ret = spf(cur, bufEnd, "%s", v->vClosure->name->c);
+			return spf(cur, bufEnd, "%s", v->vClosure->name->c);
 		}else{
-			ret = spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", (i64)ID);
+			return spf(cur, bufEnd, "#%s_%u", v->type == ltLambda ? "λ" : "μ", (i64)ID);
 		}
-		break;
 	}
-	case ltPair:
-		ret = writePair(cur, bufEnd, v);
-		break;
-	case ltTree:
-		ret = writeTree(cur, bufEnd, v->vTree);
-		break;
-	case ltArray:
-		ret = writeArray(cur, bufEnd, v->vArray);
-		break;
-	case ltBytecodeArr:
-		ret = writeBytecodeArray(cur, bufEnd, v->vBytecodeArr);
-		break;
+	case ltPair: {
+		writeValStack[writeValSP++] = v;
+		char *ret = writePair(cur, bufEnd, v);
+		writeValSP--;
+		return ret; }
+	case ltTree: {
+		writeValStack[writeValSP++] = v;
+		char *ret = writeTree(cur, bufEnd, v->vTree);
+		writeValSP--;
+		return ret; }
+	case ltArray: {
+		writeValStack[writeValSP++] = v;
+		char *ret = writeArray(cur, bufEnd, v->vArray);
+		writeValSP--;
+		return ret; }
+	case ltBytecodeArr: {
+		writeValStack[writeValSP++] = v;
+		char *ret = writeBytecodeArray(cur, bufEnd, v->vBytecodeArr);
+		writeValSP--;
+		return ret; }
 	case ltBytecodeOp:
-		ret = spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));
-		break;
+		return spf(cur , bufEnd, "#$%x" , (i64)(v->vBytecodeOp & 0xFF));
 	case ltInt:
-		ret = spf(cur , bufEnd, "%i" ,v->vInt);
-		break;
+		return spf(cur , bufEnd, "%i" ,v->vInt);
 	case ltFloat:
-		ret = spf(cur , bufEnd, "%f" ,v->vFloat);
-		break;
+		return spf(cur , bufEnd, "%f" ,v->vFloat);
 	case ltVec:
-		ret = spf(cur, bufEnd, "#v[%f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
-		break;
+		return spf(cur, bufEnd, "#v[%f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
 	case ltString:
-		ret = spf(buf, bufEnd, display ? "%s" : "%S", v->vString->data);
-		break;
+		return spf(cur, bufEnd, display ? "%s" : "%S", v->vString->data);
 	case ltSymbol:
-		ret = spf(cur, bufEnd, "%s",v->vSymbol->c);
-		break;
+		return spf(cur, bufEnd, "%s",v->vSymbol->c);
 	case ltKeyword:
-		ret = spf(cur, bufEnd, ":%s",v->vSymbol->c);
-		break;
+		return spf(cur, bufEnd, ":%s",v->vSymbol->c);
 	case ltNativeFunc:
 		if(v->vNFunc->name){
-			ret = spf(cur, bufEnd, "%s",v->vNFunc->name->c);
+			return spf(cur, bufEnd, "%s",v->vNFunc->name->c);
 		}else{
-			ret = spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
+			return spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
 		}
-		break;
 	case ltGUIWidget:
-		ret = spf(cur, bufEnd, "#gui_%p", v->vPointer);
-		break;
+		return spf(cur, bufEnd, "#gui_%p", v->vPointer);
 	}
-
-	writeValSP--;
-	return ret;
 }
 
 /* Write the string S into the buffer */

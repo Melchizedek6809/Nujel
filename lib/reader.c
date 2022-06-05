@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define isopenparen(v)  ((v=='[')||(v=='(')||(v=='{'))
-#define iscloseparen(v) ((v==']')||(v==')')||(v=='}'))
+#define isopenparen(v)  ((v=='[')||(v=='('))
+#define iscloseparen(v) ((v==']')||(v==')'))
 #define isparen(v) (isopenparen(v) || (iscloseparen(v)))
 #define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`')||(v==';'))
 #define isnumericseparator(v) ((v=='_') || (v==','))
@@ -485,7 +485,6 @@ lVal *lReadValue(lString *s){
 	case 0:
 		return NULL;
 	case '(':
-	case '{':
 	case '[':
 		s->data++;
 		return lReadList(s,false);
