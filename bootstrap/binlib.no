@@ -522,7 +522,7 @@
 05v []
 05v #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]]
 05v #{##[]
-10s repl/welcome
+05v repl/welcome
 04i 0
 0D
 02i 0
@@ -858,7 +858,7 @@
 05v [args]
 05v #@[source: [[repl/welcome]]]
 05v #{##[]
-10s repl/welcome
+05v repl/welcome
 04i 0
 01
 }

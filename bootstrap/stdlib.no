@@ -5825,9 +5825,12 @@
 0D
 23s asmrun
 23s ops
-05v #@[documentation: "Assemble and evaluate all bytecode arguments" source: ["Assemble and evaluate all bytecode arguments" [quasiquote [bytecode-eval [assemble [unquote-splicing ops]]]]]]
+05v #@[documentation: "Assemble and evaluate all bytecode arguments" source: ["Assemble and evaluate all bytecode arguments" [quasiquote [apply [current-closure] [assemble [unquote-splicing ops]]]]]]
 05v #{##[]
-23s bytecode-eval
+23s apply
+23s current-closure
+24
+14
 23s assemble
 05v append
 10s ops
@@ -5835,37 +5838,13 @@
 04i 2
 14
 24
+14
 14
 14
 01
 }
 18
 0Es asmrun
-0D
-23s asmdebug
-23s ops
-05v #@[documentation: "Assemble and evaluate all bytecode arguments" source: ["Assemble and evaluate all bytecode arguments" [quasiquote [bytecode-eval [assemble [unquote-splicing ops]] [environment*] #t]]]]
-05v #{##[]
-23s bytecode-eval
-23s assemble
-05v append
-10s ops
-24
-04i 2
-14
-23s environment*
-24
-14
-05v #t
-24
-14
-14
-14
-14
-01
-}
-18
-0Es asmdebug
 01
 }#{##[]
 02i 0
@@ -7107,7 +7086,7 @@
 }#{##[]
 23s load/forms
 05v [source environment]
-05v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [for-in [form source] [-> [macroexpand form environment] bytecompile assemble* [bytecode-eval environment]]]]]
+05v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [for-in [form source] [apply environment [-> [macroexpand form environment] bytecompile assemble*]]]]]
 05v #{##[]
 15
 10s source
@@ -7125,7 +7104,8 @@
 11
 0Es form
 0D
-05v bytecode-eval
+05v apply
+10s environment
 05v assemble*
 05v bytecompile
 05v macroexpand
@@ -7134,7 +7114,6 @@
 04i 2
 04i 1
 04i 1
-10s environment
 04i 2
 0D
 10s ΓεnΣym-97
@@ -7520,50 +7499,22 @@
 0D
 23s eval-in
 05v [closure expr]
-05v #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [try display/error [-> [compile* expr closure] [bytecode-eval closure]]]]]
+05v #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [try display/error [apply closure [compile* expr closure]]]]]
 05v #{##[]
 10s display/error
 19o 28
-05v bytecode-eval
+05v apply
+10s closure
 05v compile*
 10s expr
 10s closure
 04i 2
-10s closure
 04i 2
 16
 01
 }
 17
 0Es eval-in
-0D
-23s eval-in/trace
-05v [closure expr]
-05v #@[documentation: "Compile and the immediatly evaluate the result\nmostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "mostly used by lRun()" [try display/error [def bc [compile* expr closure]] [println [str/write bc]] [bytecode-eval bc closure]]]]
-05v #{##[]
-10s display/error
-19o 54
-05v compile*
-10s expr
-10s closure
-04i 2
-0Es bc
-0D
-05v println
-05v str/write
-10s bc
-04i 1
-04i 1
-0D
-05v bytecode-eval
-10s bc
-10s closure
-04i 2
-16
-01
-}
-17
-0Es eval-in/trace
 0D
 23s eval
 05v [expr]

@@ -45,29 +45,29 @@ typedef uint8_t lBytecodeOp;
 
 typedef enum lType {
 	ltNoAlloc = 0,
-	ltComment,
+	ltComment = 1,
 
-	ltSymbol,
-	ltKeyword,
-	ltBool,
-	ltInt,
-	ltFloat,
-	ltVec,
+	ltSymbol = 2,
+	ltKeyword = 3,
+	ltBool = 4,
+	ltInt = 5,
+	ltFloat = 6,
+	ltVec = 7,
 
-	ltPair,
-	ltString,
-	ltArray,
-	ltTree,
+	ltPair = 8,
+	ltString = 9,
+	ltArray = 10,
+	ltTree = 11,
 
-	ltLambda,
-	ltObject,
-	ltMacro,
-	ltThread,
-	ltNativeFunc,
-	ltBytecodeOp,
-	ltBytecodeArr,
+	ltLambda = 12,
+	ltObject = 13,
+	ltMacro = 14,
+	ltThread = 15,
+	ltNativeFunc = 16,
+	ltBytecodeOp = 17,
+	ltBytecodeArr = 18,
 
-	ltGUIWidget
+	ltGUIWidget = 19
 } lType;
 
 typedef struct lArray   lArray;

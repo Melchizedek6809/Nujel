@@ -1,10 +1,9 @@
 [defn load/forms [source environment]
       "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
       [for-in [form source]
-              [-> [macroexpand form environment]
-                  bytecompile
-                  assemble*
-                  [bytecode-eval environment]]]]
+              [apply environment [-> [macroexpand form environment]
+                                     bytecompile
+                                     assemble*]]]]
 
 [defn macroexpand/forms [source-raw environment]
       "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
@@ -76,17 +75,9 @@
       "Compile and the immediatly evaluate the result"
       ""
       "Mostly used by lRun()"
-      [try display/error [-> [compile* expr closure]
-                             [bytecode-eval closure]]]]
-
-[defn eval-in/trace [closure expr]
-      "Compile and the immediatly evaluate the result"
-      ""
-      "mostly used by lRun()"
       [try display/error
-           [def bc [compile* expr closure]]
-           [println [str/write bc]]
-           [bytecode-eval bc closure]]]
+           [apply closure
+                  [compile* expr closure]]]]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"

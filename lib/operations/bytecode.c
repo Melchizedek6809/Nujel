@@ -71,18 +71,6 @@ static lVal *lnfBytecodeLiterals(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	lVal *env = lCadr(v);
-	lClosure *bcc = c;
-	const bool trace = castToBool(lCaddr(v));
-	if(env){
-		requireEnvironment(c, env);
-		bcc = env->vClosure;
-	}
-	return lBytecodeEval(bcc, arr, trace);
-}
-
 static lVal *lnfValIndex(lClosure *c, lVal *v){
 	(void)c;
 	return lValInt(lValIndex(lCar(v)));
@@ -111,6 +99,4 @@ void lOperationsBytecode(lClosure *c){
 	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
 	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
 	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
-
-	lAddNativeFunc(c,"bytecode-eval",    "[bc environment trace]", "Evaluate a bytecode array and return the result", lnfBytecodeEval);
 }

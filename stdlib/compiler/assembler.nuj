@@ -187,8 +187,8 @@
 
 [defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
-          `[bytecode-eval [assemble ~@ops]]]
+          `[apply [current-closure]
+                  [assemble ~@ops]]]
 
-[defmacro asmdebug ops
-          "Assemble and evaluate all bytecode arguments"
-          `[bytecode-eval [assemble ~@ops] [environment*] #t]]
+[defn bytecode-eval [bc env]
+      [apply [or env [current-closure]] bc]]
