@@ -132,10 +132,20 @@ lClosure *requireClosure(lClosure *c, lVal *v){
 		|| !((v->type == ltLambda)
 		||   (v->type == ltObject)
 		||   (v->type == ltMacro))){
-			lExceptionThrowValClo("type-error", "Can't get metadata from that value: ", v, c);
+			lExceptionThrowValClo("type-error", "Need a closure, not: ", v, c);
 			return NULL;
 	}
 	return v->vClosure;
+}
+
+lVal *requireCallable(lClosure *c, lVal *v){
+	if((v == NULL)
+		|| !((v->type == ltLambda)
+		||   (v->type == ltNativeFunc)
+		||   (v->type == ltMacro))){
+			lExceptionThrowValClo("type-error", "Need sometihng callable, not: ", v, c);
+	}
+	return v;
 }
 
 lVal *requireEnvironment(lClosure *c, lVal *v){

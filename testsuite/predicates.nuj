@@ -109,7 +109,7 @@
 [test/add #f [tree? 123]]
 [test/add #f [tree? "asd"]]
 [test/add #f [tree? #t]]
-[test/add #t [tree? [closure +]]]
+[test/add #t [tree? [closure/data min]]]
 [test/add #t [last? '[]]]
 [test/add #t [last? '[1]]]
 [test/add #f [last? '[1 2]]]

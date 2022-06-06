@@ -19,39 +19,6 @@ static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	return l;
 }
 
-static lVal *lnfClosure(lClosure *c, lVal *v){
-	(void)c;
-	lVal *car = lCar(v);
-	if((car == NULL)
-		|| !((car->type == ltNativeFunc)
-		||   (car->type == ltLambda)
-		||   (car->type == ltObject)
-		||   (car->type == ltMacro))){
-		return NULL;
-	}
-	lVal *ret = lValTree(NULL);
-	ret->vTree = lTreeInsert(ret->vTree, lSymS("type"), lValSymS(getTypeSymbol(car)));
-	if(car->type == ltNativeFunc){
-		lNFunc *nf = car->vNFunc;
-		if(nf == NULL){return ret;}
-		ret->vTree = lTreeInsert(ret->vTree, symArguments,nf->args);
-		ret->vTree = lTreeInsert(ret->vTree, lSymS("name"),lValSymS(nf->name));
-	}else{
-		lClosure *clo = car->vClosure;
-		if(clo == NULL){return ret;}
-		ret->vTree = lTreeInsert(ret->vTree, symArguments, clo->args);
-		ret->vTree = lTreeInsert(ret->vTree, lSymS("name"), lValSymS(clo->name));
-		lVal *text = lValAlloc(ltBytecodeArr);
-		text->vBytecodeArr = clo->text;
-		ret->vTree = lTreeInsert(ret->vTree, lSymS("code"), text);
-		ret->vTree = lTreeInsert(ret->vTree, lSymS("data"), lValTree(clo->data));
-		if(clo->type == closureCall){
-			ret->vTree = lTreeInsert(ret->vTree, lSymS("call"), lValBool(true));
-		}
-	}
-	return ret;
-}
-
 static lVal *lnfClosureParent(lClosure *c, lVal *v){
 	lClosure *cc = requireClosure(c, lCar(v));
 	if(cc->parent == NULL){
@@ -72,6 +39,32 @@ static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 		ret->vClosure = cc->caller;
 		return ret;
 	}
+}
+
+static lVal *lnfClosureArguments(lClosure *c, lVal *v){
+	lVal *cc = requireCallable(c, lCar(v));
+	if(cc->type == ltNativeFunc){
+		return cc->vNFunc->args;
+	}else{
+		return cc->vClosure->args;
+	}
+}
+
+static lVal *lnfClosureCode(lClosure *c, lVal *v){
+	lClosure *clo = requireClosure(c, lCar(v));
+	lVal *text = lValAlloc(ltBytecodeArr);
+	text->vBytecodeArr = clo->text;
+	return text;
+}
+
+static lVal *lnfClosureData(lClosure *c, lVal *v){
+	lClosure *clo = requireClosure(c, lCar(v));
+	return lValTree(clo->data);
+}
+
+static lVal *lnfClosureName(lClosure *c, lVal *v){
+	lVal *cc = requireCallable(c, lCar(v));
+	return lValSymS((cc->type == ltNativeFunc) ? cc->vNFunc->name : cc->vClosure->name);
 }
 
 static lVal *lnfResolve(lClosure *c, lVal *v){
@@ -324,11 +317,15 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"meta",  "[v key]",      "Retrieve KEY from V's metadata", lnfMetaGet);
 	lAddNativeFunc(c,"meta!", "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
 
-	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
-	lAddNativeFunc(c,"closure/parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
-	lAddNativeFunc(c,"closure/caller", "[clo]",         "Return the caller of CLO",                   lnfClosureCaller);
-	lAddNativeFunc(c,"current-closure","[]",            "Return the current closure as an object",    lnfCurrentClosure);
-	lAddNativeFunc(c,"current-lambda", "[]",            "Return the current closure as a lambda",     lnfCurrentLambda);
+	lAddNativeFunc(c,"closure/data",     "[clo]", "Return the data of CLO",                     lnfClosureData);
+	lAddNativeFunc(c,"closure/code",     "[clo]", "Return the code of CLO",                     lnfClosureCode);
+	lAddNativeFunc(c,"closure/name",     "[clo]", "Return the name of CLO",                     lnfClosureName);
+	lAddNativeFunc(c,"closure/arguments","[clo]", "Return the argument list of CLO",            lnfClosureArguments);
+	lAddNativeFunc(c,"closure/parent",   "[clo]", "Return the parent of CLO",                   lnfClosureParent);
+	lAddNativeFunc(c,"closure/caller",   "[clo]", "Return the caller of CLO",                   lnfClosureCaller);
+
+	lAddNativeFunc(c,"current-closure",  "[]",    "Return the current closure as an object",    lnfCurrentClosure);
+	lAddNativeFunc(c,"current-lambda",   "[]",    "Return the current closure as a lambda",     lnfCurrentLambda);
 
 	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 

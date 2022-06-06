@@ -309,7 +309,7 @@
 [test/add "NUJ" [uppercase [path/extension "Another/test.nuj"]]]
 [test/add "no" [path/extension "asd/test.nuj.no"]]
 [test/add "asd/test.nuj" [path/without-extension "asd/test.nuj.no"]]
-[test/add 'source [car [tree/ref [closure macroexpand] :arguments]]]
+[test/add 'source [car [closure/arguments macroexpand]]]
 [test/add '[1 2 3] `[1 ~@`[2 3]]]
 [test/add '[1 [2 [3 4]]] `[1 `[2 ~[3 ~[+ 2 2]]]]]
 [test/add 2 [cadar '[[1 2 3] 4 5]]]

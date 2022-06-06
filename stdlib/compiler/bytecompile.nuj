@@ -95,7 +95,7 @@
       [when [> arg-count 1]
         [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]]
       [def form [macroexpand/do [meta op :source] env]]
-      [def arg-name [car [tree/ref [closure op] :arguments]]]
+      [def arg-name [car [closure/arguments op]]]
       [if args
           [bytecompile* [list/replace form arg-name [car args]] env]
           [bytecompile* form env]]]

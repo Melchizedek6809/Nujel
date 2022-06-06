@@ -21,9 +21,6 @@
       "Display ERROR in a nice, human readable way"
       [display [join [display/error/iter error 0] "\r\n"]]]
 
-[defn closure/arguments [o]
-      [ref [closure o] :arguments]]
-
 [defn closure/documentation [o]
       [meta o :documentation]]
 

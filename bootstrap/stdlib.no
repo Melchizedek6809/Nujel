@@ -6343,7 +6343,7 @@
 0D
 23s bytecompile/procedure/inline
 05v [op args env]
-05v #@[source: [[def arg-count [length args]] [when [> arg-count 1] [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]] [def form [macroexpand/do [meta op :source] env]] [def arg-name [car [tree/ref [closure op] :arguments]]] [if args [bytecompile* [list/replace form arg-name [car args]] env] [bytecompile* form env]]]]
+05v #@[source: [[def arg-count [length args]] [when [> arg-count 1] [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]] [def form [macroexpand/do [meta op :source] env]] [def arg-name [car [closure/arguments op]]] [if args [bytecompile* [list/replace form arg-name [car args]] env] [bytecompile* form env]]]]
 05v #{##[]
 05v length
 10s args
@@ -6375,12 +6375,9 @@
 04i 2
 0Es form
 0D
-05v tree/ref
-05v closure
+05v closure/arguments
 10s op
 04i 1
-05v :arguments
-04i 2
 11
 0Es arg-name
 0D
@@ -8540,7 +8537,7 @@
 0D
 23s disassemble
 05v [bc]
-05v #@[documentation: "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," source: ["Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," [case [type-of bc] [[:lambda :macro] [disassemble/print [ref [closure bc] :code]]] [:bytecode-array [disassemble/print bc]] [otherwise [throw [list :type-error "Can't disassemble that" bc [current-lambda]]]]]]]
+05v #@[documentation: "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," source: ["Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," [case [type-of bc] [[:lambda :macro] [disassemble/print [closure/code bc]]] [:bytecode-array [disassemble/print bc]] [otherwise [throw [list :type-error "Can't disassemble that" bc [current-lambda]]]]]]]
 05v #{##[]
 15
 05v type-of
@@ -8561,14 +8558,11 @@
 0Ao 8
 0D
 05v #f
-0Bo 32
+0Bo 22
 05v disassemble/print
-05v ref
-05v closure
+05v closure/code
 10s bc
 04i 1
-05v :code
-04i 2
 04i 1
 09o 58
 10s ΓεnΣym-107
@@ -11003,10 +10997,10 @@
 }#{##[]
 23s describe/closure
 05v [c i]
-05v #@[source: [[when c [if [== c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def info [closure c]] [when info [def data [ref info :data]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]] " - " [if [< l 16] [str/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]]
+05v #@[source: [[when c [if [== c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]] " - " [if [< l 16] [str/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
 05v #{##[]
 10s c
-0Bo 276
+0Bo 246
 10s c
 10s root-closure
 20
@@ -11030,18 +11024,10 @@
 04i 1
 05v "\r\n"
 04i 2
-09o 206
-05v closure
+09o 176
+05v closure/data
 10s c
 04i 1
-0Es info
-0D
-10s info
-0Bo 183
-05v ref
-10s info
-05v :data
-04i 2
 0Es data
 0D
 05v length
@@ -11100,8 +11086,6 @@
 04i 2
 04i 2
 04i 5
-09o 4
-24
 09o 4
 24
 01
@@ -11594,21 +11578,6 @@
 }
 17
 0Es display/error
-0D
-23s closure/arguments
-05v [o]
-05v #@[source: [[ref [closure o] :arguments]]]
-05v #{##[]
-05v ref
-05v closure
-10s o
-04i 1
-05v :arguments
-04i 2
-01
-}
-17
-0Es closure/arguments
 0D
 23s closure/documentation
 05v [o]

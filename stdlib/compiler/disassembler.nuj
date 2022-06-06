@@ -109,6 +109,6 @@
 [defn disassemble [bc]
       "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
       [case [type-of bc]
-            [[:lambda :macro] [disassemble/print [ref [closure bc] :code]]]
+            [[:lambda :macro] [disassemble/print [closure/code bc]]]
             [:bytecode-array  [disassemble/print bc]]
             [otherwise [throw [list :type-error "Can't disassemble that" bc [current-lambda]]]]]]
