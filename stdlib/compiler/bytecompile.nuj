@@ -87,14 +87,14 @@
 
 [defn bytecompile/procedure/inline? [op]
       [case [type-of op]
-            [:lambda [closure/meta op :inline]]
+            [:lambda [meta op :inline]]
             [#t #f]]]
 
 [defn bytecompile/procedure/inline [op args env]
       [def arg-count [length args]]
       [when [> arg-count 1]
         [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]]
-      [def form [macroexpand/do [closure/meta op :source] env]]
+      [def form [macroexpand/do [meta op :source] env]]
       [def arg-name [car [tree/ref [closure op] :arguments]]]
       [if args
           [bytecompile* [list/replace form arg-name [car args]] env]

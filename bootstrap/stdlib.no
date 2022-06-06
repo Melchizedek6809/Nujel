@@ -6311,7 +6311,7 @@
 0D
 23s bytecompile/procedure/inline?
 05v [op]
-05v #@[source: [[case [type-of op] [:lambda [closure/meta op :inline]] [#t #f]]]]
+05v #@[source: [[case [type-of op] [:lambda [meta op :inline]] [#t #f]]]]
 05v #{##[]
 15
 05v type-of
@@ -6323,7 +6323,7 @@
 05v :lambda
 20
 0Bo 20
-05v closure/meta
+05v meta
 10s op
 05v :inline
 04i 2
@@ -6343,7 +6343,7 @@
 0D
 23s bytecompile/procedure/inline
 05v [op args env]
-05v #@[source: [[def arg-count [length args]] [when [> arg-count 1] [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]] [def form [macroexpand/do [closure/meta op :source] env]] [def arg-name [car [tree/ref [closure op] :arguments]]] [if args [bytecompile* [list/replace form arg-name [car args]] env] [bytecompile* form env]]]]
+05v #@[source: [[def arg-count [length args]] [when [> arg-count 1] [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]] [def form [macroexpand/do [meta op :source] env]] [def arg-name [car [tree/ref [closure op] :arguments]]] [if args [bytecompile* [list/replace form arg-name [car args]] env] [bytecompile* form env]]]]
 05v #{##[]
 05v length
 10s args
@@ -6367,7 +6367,7 @@
 24
 0D
 05v macroexpand/do
-05v closure/meta
+05v meta
 10s op
 05v :source
 04i 2
@@ -11612,9 +11612,9 @@
 0D
 23s closure/documentation
 05v [o]
-05v #@[source: [[closure/meta o :documentation]]]
+05v #@[source: [[meta o :documentation]]]
 05v #{##[]
-05v closure/meta
+05v meta
 10s o
 05v :documentation
 04i 2

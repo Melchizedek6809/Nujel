@@ -25,7 +25,7 @@
       [ref [closure o] :arguments]]
 
 [defn closure/documentation [o]
-      [closure/meta o :documentation]]
+      [meta o :documentation]]
 
 [defn describe/thing [o]
       "Describe a specific value O"

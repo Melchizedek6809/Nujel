@@ -226,13 +226,13 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 	return NULL;
 }
 
-static lVal *lnfClosureMetaGet(lClosure *c, lVal *v){
+static lVal *lnfMetaGet(lClosure *c, lVal *v){
 	lClosure *clo = requireClosure(c, lCar(v));
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
 	return lTreeGet(clo->meta, key, NULL);
 }
 
-static lVal *lnfClosureMetaSet(lClosure *c, lVal *v){
+static lVal *lnfMetaSet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	lClosure *clo = requireClosure(c, car);
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
@@ -321,8 +321,8 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
 
-	lAddNativeFunc(c,"closure/meta",  "[clo key]",      "Retrieve KEY from CLO's metadata", lnfClosureMetaGet);
-	lAddNativeFunc(c,"closure/meta!", "[clo key value]", "Set KEY to VALUE in CLO's metadata", lnfClosureMetaSet);
+	lAddNativeFunc(c,"meta",  "[v key]",      "Retrieve KEY from V's metadata", lnfMetaGet);
+	lAddNativeFunc(c,"meta!", "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
 
 	lAddNativeFunc(c,"closure",        "[clo]",         "Return a tree with data about CLO",          lnfClosure);
 	lAddNativeFunc(c,"closure/parent", "[clo]",         "Return the parent of CLO",                   lnfClosureParent);
