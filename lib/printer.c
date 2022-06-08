@@ -74,6 +74,15 @@ static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	}
 }
 
+static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v){
+	cur = spf(cur, bufEnd, "#m");
+	for(uint i=0;i<v->length;i++){
+		const u8 c = ((u8 *)v->data)[i];
+		cur = spf(cur, bufEnd, "%c%c", (i64)getHexChar(c >> 4), (i64)getHexChar(c));
+	}
+	return cur;
+}
+
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	if((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax)){
@@ -232,6 +241,10 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		return spf(cur, bufEnd, "%s",v->vSymbol->c);
 	case ltKeyword:
 		return spf(cur, bufEnd, ":%s",v->vSymbol->c);
+	case ltBuffer:
+		return writeBuffer(cur, bufEnd, v->vBuffer);
+	case ltBufferView:
+		return spf(cur, bufEnd, "#<buffer-view %x>", v->vBufferView - lBufferViewList);
 	case ltNativeFunc:
 		if(v->vNFunc->name){
 			return spf(cur, bufEnd, "%s",v->vNFunc->name->c);

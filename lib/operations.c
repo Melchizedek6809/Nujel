@@ -7,6 +7,7 @@
  */
 void lOperationsArithmetic (lClosure *c);
 void lOperationsArray      (lClosure *c);
+void lOperationsBuffer     (lClosure *c);
 void lOperationsBytecode   (lClosure *c);
 void lOperationsCore       (lClosure *c);
 void lOperationsMath       (lClosure *c);
@@ -17,6 +18,7 @@ void lOperationsVector     (lClosure *c);
 
 void lOperationsBase(lClosure *c){
 	lOperationsArithmetic(c);
+	lOperationsBuffer(c);
 	lOperationsMath(c);
 	lOperationsArray(c);
 	lOperationsBytecode(c);

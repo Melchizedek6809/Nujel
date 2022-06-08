@@ -9,6 +9,8 @@
 #define STR_MAX (1<<14)
 #define VAL_MAX (1<<21)
 #define BCA_MAX (1<<14)
+#define BUF_MAX (1<<14)
+#define BFV_MAX (1<<14)
 
 extern lArray  lArrayList[ARR_MAX];
 extern uint    lArrayMax;
@@ -37,6 +39,14 @@ extern lVal    *lValFFree;
 extern lBytecodeArray  lBytecodeArrayList[BCA_MAX];
 extern uint            lBytecodeArrayMax;
 extern lBytecodeArray *lBytecodeArrayFFree;
+
+extern lBuffer  lBufferList[BUF_MAX];
+extern uint     lBufferMax;
+extern lBuffer *lBufferFFree;
+
+extern lBufferView  lBufferViewList[BUF_MAX];
+extern uint         lBufferViewMax;
+extern lBufferView *lBufferViewFFree;
 
 
 lArray *  lArrayAlloc  (size_t len);
@@ -71,5 +81,13 @@ static inline lVal *lIndexVal(uint i){
 	return (i >= lValMax) ? NULL : &lValList[i];
 }
 lVal *lValAlloc(lType t);
+
+int      lBufferViewTypeSize(lBufferViewType T);
+lBuffer *lBufferAllocRaw();
+lBuffer *lBufferAlloc(size_t length, bool immutable);
+void     lBufferFree (lBuffer *buf);
+
+lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
+void         lBufferViewFree (lBufferView *buf);
 
 #endif

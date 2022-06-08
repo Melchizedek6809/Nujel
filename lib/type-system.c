@@ -102,6 +102,26 @@ lString *requireString(lClosure *c, lVal *v){
 	return requireCertainType(c, v, ltString)->vString;
 }
 
+lBuffer *requireBuffer(lClosure *c, lVal *v){
+	return requireCertainType(c, v, ltBuffer)->vBuffer;
+}
+
+lBuffer *requireMutableBuffer(lClosure *c, lVal *v){
+	lBuffer *ret = requireBuffer(c, v);
+	if(ret->flags & BUFFER_IMMUTABLE){ lExceptionThrowValClo("type-error", "Buffer is immutable", v, c); }
+	return ret;
+}
+
+lBufferView *requireBufferView(lClosure *c, lVal *v){
+	return requireCertainType(c, v, ltBufferView)->vBufferView;
+}
+
+lBufferView *requireMutableBufferView(lClosure *c, lVal *v){
+	lBufferView *ret = requireBufferView(c, v);
+	if(ret->flags & BUFFER_VIEW_IMMUTABLE){ lExceptionThrowValClo("type-error", "BufferView is immutable", v, c); }
+	return ret;
+}
+
 lTree *requireTree(lClosure *c, lVal *v){
 	return requireCertainType(c, v, ltTree)->vTree;
 }

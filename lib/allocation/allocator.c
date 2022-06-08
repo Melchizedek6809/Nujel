@@ -39,6 +39,16 @@ uint            lBytecodeArrayActive = 0;
 uint            lBytecodeArrayMax    = 0;
 lBytecodeArray *lBytecodeArrayFFree  = NULL;
 
+lBuffer  lBufferList[BUF_MAX];
+uint     lBufferMax = 0;
+uint     lBufferActive = 0;
+lBuffer *lBufferFFree = NULL;
+
+lBufferView  lBufferViewList[BFV_MAX];
+uint         lBufferViewMax = 0;
+uint         lBufferViewActive = 0;
+lBufferView *lBufferViewFFree = NULL;
+
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncMax    = 0;
 
@@ -69,6 +79,66 @@ defineAllocator(lString, lStringAlloc, lStringList, lStringMax, lStringActive, S
 defineAllocator(lTree, lTreeAlloc, lTreeList, lTreeMax, lTreeActive, TRE_MAX, lTreeFFree, "lTree OOM")
 defineAllocator(lVal, lValAllocRaw, lValList, lValMax, lValActive, VAL_MAX, lValFFree, "lVal OOM")
 defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, lBytecodeArrayActive, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
+defineAllocator(lBuffer, lBufferAllocRaw, lBufferList, lBufferMax, lBufferActive, BUF_MAX, lBufferFFree, "lBuffer OOM")
+defineAllocator(lBufferView, lBufferViewAllocRaw, lBufferViewList, lBufferViewMax, lBufferViewActive, BFV_MAX, lBufferViewFFree, "lBufferView OOM")
+
+int lBufferViewTypeSize(lBufferViewType T){
+	switch(T){
+	default:
+		exit(4);
+	case lbvtU8:
+	case lbvtS8:
+		return 1;
+	case lbvtS16:
+	case lbvtU16:
+		return 2;
+	case lbvtF32:
+	case lbvtS32:
+	case lbvtU32:
+		return 4;
+	case lbvtF64:
+	case lbvtS64:
+		return 8;
+	}
+}
+
+
+lBuffer *lBufferAlloc(size_t length, bool immutable){
+	lBuffer *ret = lBufferAllocRaw();
+	ret->length = length;
+	if(immutable){
+		ret->flags = BUFFER_IMMUTABLE;
+	}else{
+		ret->data = calloc(length, 1);
+	}
+	return ret;
+}
+
+void lBufferFree(lBuffer *buf){
+	if(buf == NULL){return;}
+	free(buf->data);
+	buf->nextFree = lBufferFFree;
+	lBufferActive--;
+	lBufferFFree = buf;
+}
+
+lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable){
+	lBufferView *ret = lBufferViewAllocRaw();
+	ret->buf    = buf;
+	ret->offset = offset;
+	ret->length = length;
+	ret->flags  = immutable;
+	ret->type   = type;
+	return ret;
+}
+
+void lBufferViewFree(lBufferView *buf){
+	if(buf == NULL){return;}
+	buf->buf = NULL;
+	buf->nextFree = lBufferViewFFree;
+	lBufferViewActive--;
+	lBufferViewFFree = buf;
+}
 
 lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();

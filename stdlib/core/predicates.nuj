@@ -99,6 +99,12 @@
 [defn procedure? [val]
       [or [lambda? val] [native? val]]]
 
+[defn buffer? [v]
+      [== :buffer [type-of v]]]
+
+[defn buffer-view? [v]
+      [== :buffer-view [type-of v]]]
+
 [defn bytecode-array? [v]
       [== :bytecode-array [type-of v]]]
 

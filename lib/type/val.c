@@ -145,6 +145,10 @@ bool lValEqual(const lVal *a, const lVal *b){
 		return b->vNFunc == a->vNFunc;
 	case ltBytecodeOp:
 		return a->vBytecodeOp == b->vBytecodeOp;
+	case ltBuffer:
+		return a->vBuffer == b->vBuffer;
+	case ltBufferView:
+		return a->vBufferView == b->vBufferView;
 	case ltBool:
 		return a->vBool == b->vBool;
         case ltGUIWidget:
@@ -267,4 +271,14 @@ lVal *lValKeywordS(const lSymbol *s){
 /* Return a nujel value for the keyword within S */
 lVal *lValKeyword(const char *s){
 	return lValKeywordS(lSymS(s));
+}
+
+lVal *lValBufferNoCopy(void *data, size_t length, bool immutable){
+	lVal *ret = lValAlloc(ltBuffer);
+	lBuffer *buf = lBufferAllocRaw();
+	buf->data = data;
+	buf->length = length;
+	buf->flags = immutable ? BUFFER_IMMUTABLE : 0;
+	ret->vBuffer = buf;
+	return ret;
 }

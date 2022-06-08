@@ -379,6 +379,57 @@ static lVal *lParseBytecodeArray(lString *s){
 	return ret;
 }
 
+static u8 lReadNibble(lString *s, const u8 c){
+	if(c < '0'){lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");}
+	if(c <= '9'){
+		return c - '0';
+	}else{
+		if((c < 'A') || (c > 'F')){
+			lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");
+		}
+		return (c - 'A') + 0xA;
+	}
+}
+
+static lVal *lParseBuffer(lString *s){
+	u8 *buf = NULL;
+	size_t len = 0;
+	size_t bufSize = 0;
+	while(s->data < s->bufEnd){
+		u8 curByte = 0;
+		u8 c = *s->data;
+		if(isspace(c) || isnonsymbol(c)){break;}
+		curByte  = lReadNibble(s, c) << 4;
+
+		s->data++;
+		if(s->data >= s->bufEnd){
+			lExceptionThrowReaderStartEnd(s, "Unexpected end of buffer");
+		}
+		c = *s->data++;
+		if(isspace(c)){
+			lExceptionThrowReaderStartEnd(s, "Unexpected end of literal");
+		}
+		curByte |= lReadNibble(s, c);
+
+		if(len >= bufSize){
+			bufSize = MAX(bufSize*2, 256);
+			buf = realloc(buf, bufSize);
+			if(buf == NULL){
+				epf("OOM during buffer literal reading");
+				exit(2);
+			}
+		}
+		buf[len++] = curByte;
+	}
+	lStringAdvanceToNextCharacter(s);
+
+	buf = realloc(buf, len);
+	lVal *ret = lValAlloc(ltBuffer);
+	ret->vBuffer = lBufferAlloc(len, true);
+	ret->vBuffer->data = buf;
+	return ret;
+}
+
 static lVal *lParseSpecial(lString *s){
 	if(s->data >= s->bufEnd){return NULL;}
 	switch(*s->data++){
@@ -390,7 +441,8 @@ static lVal *lParseSpecial(lString *s){
 	case '!': // Ignore Shebang's
 		lStringAdvanceToNextLine(s);
 		return lValComment();
-	case '\\':return lParseCharacter(s);
+	case '\\': return lParseCharacter(s);
+	case 'm': return lParseBuffer(s);
 	case 'x': return lParseNumber(s, 16, 16);
 	case 'd': return lParseNumber(s, 10, 18);
 	case 'o': return lParseNumber(s,  8, 21);

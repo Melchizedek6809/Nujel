@@ -60,6 +60,9 @@ lSymbol *lSymLTGUIWidget;
 lSymbol *lSymLTTree;
 lSymbol *lSymLTBytecodeOp;
 lSymbol *lSymLTBytecodeArray;
+lSymbol *lSymLTBuffer;
+lSymbol *lSymLTBufferView;
+lSymbol *lSymLTUnknownType;
 
 uint symbolLookups = 0;
 uint tombLookups = 0;
@@ -109,6 +112,9 @@ void lSymbolInit(){
 	lSymLTTree           = lSymSM("tree");
 	lSymLTBytecodeOp     = lSymSM("bytecode-op");
 	lSymLTBytecodeArray  = lSymSM("bytecode-array");
+	lSymLTBuffer         = lSymSM("buffer");
+	lSymLTBufferView     = lSymSM("buffer-view");
+	lSymLTUnknownType    = lSymSM("unknown-type");
 }
 
 void lSymbolFree(lSymbol *s){
@@ -224,7 +230,7 @@ lSymbol *lSymS(const char *str){
 
 lSymbol *getTypeSymbolT(const lType T){
 	switch(T){
-		default:            return lSymLTNil;
+		default:            return lSymLTUnknownType;
 		case ltNoAlloc:     return lSymLTNoAlloc;
 		case ltBool:        return lSymLTBool;
 		case ltPair:        return lSymLTPair;
@@ -243,6 +249,8 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltTree:        return lSymLTTree;
 		case ltBytecodeOp:  return lSymLTBytecodeOp;
 		case ltBytecodeArr: return lSymLTBytecodeArray;
+		case ltBuffer:      return lSymLTBuffer;
+		case ltBufferView:  return lSymLTBufferView;
 	}
 }
 

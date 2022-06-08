@@ -129,12 +129,31 @@ static lVal *lnfFileRead(lClosure *c, lVal *v){
 	return lValStringNoCopy(data, len);
 }
 
+static lVal *lnfFileReadBuffer(lClosure *c, lVal *v){
+	size_t len       = 0;
+	lString *str     = requireString(c, lCar(v));
+	void *data = loadFile(str->data,&len);
+	return lValBufferNoCopy(data, len, false);
+}
+
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	lVal *contentV    = lCar(v);
-	lString *content  = requireString(c, contentV);
 	lString *filename = requireString(c, lCadr(v));
-
-	saveFile(filename->data, content->data, lStringLength(content));
+	switch(contentV ? contentV->type : ltNoAlloc){
+	default:
+		lExceptionThrowValClo("type-error", "Can't save that", contentV, c);
+	case ltString:
+		saveFile(filename->data, contentV->vString->buf, contentV->vString->bufEnd - contentV->vString->buf);
+		break;
+	case ltBuffer:
+		saveFile(filename->data, contentV->vBuffer->data, contentV->vBuffer->length);
+		break;
+	case ltBufferView:{
+		void *data = &((u8 *)contentV->vBufferView->buf->data)[contentV->vBufferView->offset * lBufferViewTypeSize(contentV->vBufferView->type)];
+		size_t length = contentV->vBufferView->length * lBufferViewTypeSize(contentV->vBufferView->type);
+		saveFile(filename->data, data, length);
+		break;
+	}}
 	return contentV;
 }
 
@@ -305,6 +324,7 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 
 	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
+	lAddNativeFunc(c,"file/read/buffer", "[path]",         "Load FILENAME and return the contents as a buffer", lnfFileReadBuffer);
 	lAddNativeFunc(c,"file/write",       "[content path]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
 	lAddNativeFunc(c,"file/remove",      "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);

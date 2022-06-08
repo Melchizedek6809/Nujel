@@ -43,7 +43,7 @@ typedef struct vec vec;
 typedef uint8_t lBytecodeOp;
 
 
-typedef enum lType {
+typedef enum {
 	ltNoAlloc = 0,
 	ltComment = 1,
 
@@ -67,8 +67,49 @@ typedef enum lType {
 	ltBytecodeOp = 17,
 	ltBytecodeArr = 18,
 
-	ltGUIWidget = 19
+	ltBuffer = 19,
+	ltBufferView = 20,
+
+	ltGUIWidget
 } lType;
+
+typedef struct lBuffer lBuffer;
+
+struct lBuffer {
+	union {
+		void *data;
+		lBuffer *nextFree;
+	};
+	size_t length;
+	u8 flags;
+};
+#define BUFFER_IMMUTABLE 1
+
+typedef enum {
+	lbvtUndefined = 0,
+	lbvtS8,
+	lbvtU8,
+	lbvtS16,
+	lbvtU16,
+	lbvtS32,
+	lbvtU32,
+	lbvtS64,
+	lbvtF32,
+	lbvtF64
+} lBufferViewType;
+
+typedef struct lBufferView lBufferView;
+struct lBufferView {
+	union {
+		lBuffer *buf;
+		lBufferView *nextFree;
+	};
+	size_t offset;
+	size_t length;
+	lBufferViewType type;
+	u8 flags;
+};
+#define BUFFER_VIEW_IMMUTABLE 1
 
 typedef struct lArray   lArray;
 typedef struct lClosure lClosure;
@@ -115,6 +156,8 @@ struct lVal {
 		lNFunc         *vNFunc;
 		void           *vPointer;
 		lVal           *nextFree;
+		lBuffer        *vBuffer;
+		lBufferView    *vBufferView;
 	};
 };
 

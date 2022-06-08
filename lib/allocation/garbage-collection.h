@@ -10,6 +10,8 @@ extern void (*sweeperChain)();
 void lWidgetMarkI       (uint i);
 
 void lValGCMark         (lVal *v);
+void lBufferGCMark      (const lBuffer *v);
+void lBufferViewGCMark  (const lBufferView *v);
 void lTreeGCMark        (const lTree *v);
 void lClosureGCMark     (const lClosure *c);
 void lStringGCMark      (const lString *v);

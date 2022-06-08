@@ -25,6 +25,8 @@ u8 lArrayMarkMap         [ARR_MAX];
 u8 lStringMarkMap        [STR_MAX];
 u8 lSymbolMarkMap        [SYM_MAX];
 u8 lBytecodeArrayMarkMap [BCA_MAX];
+u8 lBufferMarkMap        [BUF_MAX];
+u8 lBufferViewMarkMap    [BFV_MAX];
 
 void lThreadGCMark(lThread *c){
 	if(c == NULL){return;}
@@ -41,25 +43,43 @@ void lThreadGCMark(lThread *c){
 	}
 }
 
-/* Mark v as being in use so it won't get freed by the GC */
+void lBufferGCMark(const lBuffer *v){
+	if(v == NULL){return;}
+	const uint ci = v - lBufferList;
+	if(ci >= lBufferMax){
+		return;
+	}
+	lBufferMarkMap[ci] = 1;
+}
+
+void lBufferViewGCMark(const lBufferView *v){
+	if(v == NULL){return;}
+	const uint ci = v - lBufferViewList;
+	if(ci >= lBufferViewMax){
+		return;
+	}
+	if(lBufferViewMarkMap[ci]){
+		return;
+	}
+	lBufferViewMarkMap[ci] = 1;
+	lBufferGCMark(lBufferViewList[ci].buf);
+}
+
 void lStringGCMark(const lString *v){
 	if(v == NULL){return;}
 	const uint ci = v - lStringList;
 	if(ci >= lStringMax){
 		return;
 	}
-	if(lStringMarkMap[ci]){return;}
 	lStringMarkMap[ci] = 1;
 }
 
-/* Mark v as being in use so it won't get freed by the GC */
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
 	if(ci >= lSymbolMax){
 		return;
 	}
-	if(lSymbolMarkMap[ci]){return;}
 	lSymbolMarkMap[ci] = 1;
 }
 
@@ -76,7 +96,6 @@ void lNFuncGCMark(const lNFunc *v){
 	lSymbolGCMark(v->name);
 }
 
-/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lValGCMark(lVal *v){
 	if(v == NULL){return;}
 	const uint ci = v - lValList;
@@ -115,12 +134,18 @@ void lValGCMark(lVal *v){
 		break;
 	case ltBytecodeArr:
 		lBytecodeArrayMark(v->vBytecodeArr);
+		break;
+	case ltBuffer:
+		lBufferGCMark(v->vBuffer);
+		break;
+	case ltBufferView:
+		lBufferViewGCMark(v->vBufferView);
+		break;
 	default:
 		break;
 	}
 }
 
-/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lTreeGCMark(const lTree *v){
 	if(v == NULL){return;}
 	const uint ci = v - lTreeList;
@@ -135,7 +160,6 @@ void lTreeGCMark(const lTree *v){
 	lTreeGCMark(v->right);
 }
 
-/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lClosureGCMark(const lClosure *c){
 	if(c == NULL){return;}
 	const uint ci = c - lClosureList;
@@ -152,7 +176,6 @@ void lClosureGCMark(const lClosure *c){
 	lClosureGCMark(c->caller);
 }
 
-/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lArrayGCMark(const lArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lArrayList;
@@ -167,7 +190,6 @@ void lArrayGCMark(const lArray *v){
 	}
 }
 
-/* Mark v and all refeferences within as being in use so it won't get freed when sweeping */
 void lBytecodeArrayMark(const lBytecodeArray *v){
 	if(v == NULL){return;}
 	const uint ci = v - lBytecodeArrayList;
@@ -215,6 +237,14 @@ static void lMarkFree(){
 		const uint ci = t - lBytecodeArrayList;
 		lBytecodeArrayMarkMap[ci] = 1;
 	}
+	for(lBuffer *t = lBufferFFree;t != NULL;t = t->nextFree){
+		const uint ci = t - lBufferList;
+		lBufferMarkMap[ci] = 1;
+	}
+	for(lBufferView *t = lBufferViewFFree;t != NULL;t = t->nextFree){
+		const uint ci = t - lBufferViewList;
+		lBufferViewMarkMap[ci] = 1;
+	}
 }
 
 /* Mark the roots so they will be skipped by the GC,  */
@@ -224,7 +254,7 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
-#define ALLOC_MAX MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax))))))
+#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax))))))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	const uint max = ALLOC_MAX;
@@ -236,6 +266,8 @@ static void lGCSweep(){
 		if(i < lArrayMax)         {lArrayMarkMap[i]         ? lArrayMarkMap[i]         = 0 : lArrayFree(&lArrayList[i]);}
 		if(i < lTreeMax)          {lTreeMarkMap[i]          ? lTreeMarkMap[i]          = 0 : lTreeFree(&lTreeList[i]);}
 		if(i < lBytecodeArrayMax) {lBytecodeArrayMarkMap[i] ? lBytecodeArrayMarkMap[i] = 0 : lBytecodeArrayFree(&lBytecodeArrayList[i]);}
+		if(i < lBufferMax)        {lBufferMarkMap[i]        ? lBufferMarkMap[i]        = 0 : lBufferFree(&lBufferList[i]);}
+		if(i < lBufferViewMax)    {lBufferViewMarkMap[i]    ? lBufferViewMarkMap[i]    = 0 : lBufferViewFree(&lBufferViewList[i]);}
 	}
 	if(sweeperChain != NULL){sweeperChain();}
 }

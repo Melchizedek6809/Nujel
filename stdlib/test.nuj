@@ -1,0 +1,1 @@
+[def test/buf [read/single "#m0123456789ABCDEF"]]
