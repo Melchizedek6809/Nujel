@@ -16,17 +16,17 @@ const lVal *writeValStack[256];
 int         writeValSP = 0;
 
 /* Write left part, current node and then the right part of a tree */
-static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v){
+static char *writeTreeRec(char *cur, char *bufEnd, const lTree *v, bool display){
 	if((v == NULL) || (v->key == NULL)){return cur;}
-	cur = writeTreeRec(cur, bufEnd, v->left);
-	cur = spf(cur,bufEnd," %s: %v",v->key->c, v->value);
-	return writeTreeRec(cur, bufEnd, v->right);
+	cur = writeTreeRec(cur, bufEnd, v->left, display);
+	cur = spf(cur,bufEnd,display ? " %s: %V" : " %s: %v",v->key->c, v->value);
+	return writeTreeRec(cur, bufEnd, v->right, display);
 }
 
 /* Write an entire Tree structure, including @[] wrapping */
-static char *writeTree(char *cur, char *bufEnd, const lTree *v){
+static char *writeTree(char *cur, char *bufEnd, const lTree *v, bool display){
 	char *openingBracket = spf(cur,bufEnd,"#@");
-	cur = writeTreeRec(openingBracket, bufEnd, v);
+	cur = writeTreeRec(openingBracket, bufEnd, v, display);
 	cur += (cur == openingBracket);
 	if(openingBracket < bufEnd){*openingBracket = '[';}
 	if(cur < bufEnd){*cur++ = ']';}
@@ -34,11 +34,11 @@ static char *writeTree(char *cur, char *bufEnd, const lTree *v){
 }
 
 /* Write an entire array including #[] wrapper */
-static char *writeArray(char *cur, char *bufEnd, const lArray *v){
+static char *writeArray(char *cur, char *bufEnd, const lArray *v, bool display){
 	cur = spf(cur, bufEnd, "##[");
 	if(v && v->data != NULL){
 		for(int i=0;i<v->length;i++){
-			cur = spf(cur, bufEnd, "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");
+			cur = spf(cur, bufEnd, display ? "%V%s" : "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");
 		}
 	}
 	return spf(cur, bufEnd, "]");
@@ -74,7 +74,10 @@ static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	}
 }
 
-static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v){
+static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display){
+	if(display){
+		return spf(cur, bufEnd, "#<buffer :id %i :size %x>", v - lBufferList, v->length);
+	}
 	cur = spf(cur, bufEnd, "#m");
 	for(uint i=0;i<v->length;i++){
 		const u8 c = ((u8 *)v->data)[i];
@@ -90,7 +93,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 		return cur = spf(cur, bufEnd, "#{ 01 }");
 	}
 	cur = spf(cur, bufEnd, "#{");
-	cur = writeArray(cur, bufEnd, v->literals);
+	cur = writeArray(cur, bufEnd, v->literals, false);
 	cur = spf(cur, bufEnd, " ");
 	if(v && v->data != NULL){
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
@@ -146,7 +149,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 	return spf(cur, bufEnd, "\n}");
 }
 
-static char *writePair(char *cur, char *bufEnd, const lVal *v){
+static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 	const lVal *carSym = v->vList.car;
 	if((carSym != NULL) && (carSym->type == ltSymbol))		{
 		if((carSym->vSymbol == symQuote)
@@ -154,7 +157,7 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 		   && (v->vList.cdr->type == ltPair)
 		   && (v->vList.cdr->vList.cdr == NULL)
 		   && (v->vList.cdr->vList.car != NULL)){
-			return spf(cur, bufEnd, "\'%v",v->vList.cdr->vList.car);
+			return spf(cur, bufEnd, display ? "\'%V" : "\'%v",v->vList.cdr->vList.car);
 		}
 	}
 	char *openingBracket = cur;
@@ -164,9 +167,9 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v){
 		for(const lVal *n = v;n != NULL; n = n->vList.cdr){
 			if(n->type == ltPair){
 				const lVal *cv = n->vList.car;
-				cur = spf(cur, bufEnd, " %v", cv);
+				cur = spf(cur, bufEnd, display ? " %V" : " %v", cv);
 			}else{
-				cur = spf(cur, bufEnd, " . %v", n);
+				cur = spf(cur, bufEnd, display ? " %V" : " . %v", n);
 				break;
 			}
 		}
@@ -209,17 +212,17 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 	}
 	case ltPair: {
 		writeValStack[writeValSP++] = v;
-		char *ret = writePair(cur, bufEnd, v);
+		char *ret = writePair(cur, bufEnd, v, display);
 		writeValSP--;
 		return ret; }
 	case ltTree: {
 		writeValStack[writeValSP++] = v;
-		char *ret = writeTree(cur, bufEnd, v->vTree);
+		char *ret = writeTree(cur, bufEnd, v->vTree, display);
 		writeValSP--;
 		return ret; }
 	case ltArray: {
 		writeValStack[writeValSP++] = v;
-		char *ret = writeArray(cur, bufEnd, v->vArray);
+		char *ret = writeArray(cur, bufEnd, v->vArray, display);
 		writeValSP--;
 		return ret; }
 	case ltBytecodeArr: {
@@ -242,7 +245,7 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 	case ltKeyword:
 		return spf(cur, bufEnd, ":%s",v->vSymbol->c);
 	case ltBuffer:
-		return writeBuffer(cur, bufEnd, v->vBuffer);
+		return writeBuffer(cur, bufEnd, v->vBuffer, display);
 	case ltBufferView:
 		return spf(cur, bufEnd, "#<buffer-view %x>", v->vBufferView - lBufferViewList);
 	case ltNativeFunc:
@@ -410,7 +413,7 @@ char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 				cur = writeVal(cur, bufEnd, va_arg(va, const lVal *), true);
 				break;
 			case 'm':
-				cur = writeTree(cur, bufEnd, va_arg(va, const lTree *));
+				cur = writeTree(cur, bufEnd, va_arg(va, const lTree *), false);
 				break;
 			}
 			format++;

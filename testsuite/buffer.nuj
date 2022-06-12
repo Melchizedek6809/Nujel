@@ -50,5 +50,7 @@
 [test/add :out-of-bounds [try car [-> [buffer/allocate 8] buffer/view/f64* [buffer/view/ref 1]]]]
 [test/add :out-of-bounds [try car [-> [buffer/allocate 8] buffer/view/s64* [buffer/view/ref 1]]]]
 [test/add :out-of-bounds [try car [-> [buffer/allocate 15] buffer/view/s64* [buffer/view/ref 1]]]]
+[test/add "#m" [str/write [string->buffer ""]]]
 [test/add "#m2030313233" [str/write [string->buffer " 0123"]]]
+[test/add "" [buffer->string #m]]
 [test/add " 0123" [buffer->string #m2030313233]]

@@ -85,3 +85,9 @@
 
 [defmacro typecheck/only [v t]
           `[when-not [== [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
+
+[defn typecheck/numeric/single [v]
+      `[when-not [numeric? ~v] [throw [list :type-error ~[fmt "Expected numeric value"] ~v [current-lambda]]]]]
+
+[defmacro typecheck/numeric v
+          [map v typecheck/numeric/single]]

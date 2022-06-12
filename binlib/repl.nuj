@@ -34,7 +34,7 @@
              [return]]
            [def result [eval-in ctx [cons do expr]]]
            [set! repl/history [cons line repl/history]]
-           [println [if [nil? result] "" [str/write result]]]]]
+           [println [if [nil? result] "" [string result]]]]]
 
 [defn repl/cmd [ctx]
       [def buf ""]
@@ -45,7 +45,7 @@
       [def expr [cons do [read buf]]]
       [set! repl/history [cons buf repl/history]]
       [def result [eval-in ctx expr]]
-      [println [if [nil? result] "" [str/write result]]]]
+      [println [if [nil? result] "" [string result]]]]
 
 [defn repl/readline [ctx]
       [def line [readline [repl/prompt]]]

@@ -1,0 +1,2 @@
+#!/usr/bin/env nujel
+[image/save! [image/test] "test.bmp"]
