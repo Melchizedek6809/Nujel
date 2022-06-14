@@ -7,21 +7,35 @@
 		<link rel="stylesheet" href="report.css"/>
 	</head>
 	<body>
-		<div id="report-options">
-			<label><input type="checkbox" id="log-scale" checked/> logarithmic scale</label>
-			<div id="report-views">
-			</div>
-			<br>
-			<button id="add-view">Add view</button>
-		</div>
+		<h1>Nujel performance report</h1>
 		<div id="report-wrapper">
+			<h2>The good</h2>
+			<div class="bar-report" report-y="total" report-log="1" report-cat="good"></div>
+
+			<h2>The bad</h2>
+			<div class="bar-report" report-y="total" report-log="1" report-cat="bad"></div>
+
+			<h2>The ugly</h2>
+			<div class="bar-report" report-y="total" report-log="1" report-cat="ugly"></div>
+
+			<h2>Nujel performance regression tests</h2>
 			<div class="two-col">
 				<div id="report-cpu-time"></div>
 				<div id="report-memory-time"></div>
 			</div>
+
+			<h2>All x86_64 results:</h2>
+			<h3>X13 - AMD Ryzen 7 PRO 4750U - Arch Linux</h3>
 			<div class="two-col">
-				<div id="report-cpu"></div>
-				<div id="report-memory"></div>
+				<div class="bar-report" report-y="total" report-log="1"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1"></div>
+			</div>
+
+			<h2>All ARM(v8) results</h2>
+			<h3>RPi4 - Raspberry Pi OS aarch64</h3>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-hostname="mirai"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-hostname="mirai"></div>
 			</div>
 		</div>
 		<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>

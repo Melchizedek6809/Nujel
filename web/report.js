@@ -6,6 +6,8 @@ let options = defaultOptions;
 
 const getLanguageColor = lang => {
 	switch(lang){
+	case "emacs-lisp": return "#7F5AB6";
+	case "newlisp": return "#f7b430";
 	case "scheme": return "#cc2244";
 	case "julia": return "#9358a4";
 	case "common-lisp": return "#369844";
@@ -44,40 +46,11 @@ const getTestcases = () => getDistinct("testcase");
 const getOS = () => getDistinct("os");
 const getDates = () => getDistinct("date");
 
-const initConfig = () => {
-	const $logScale = document.querySelector("#log-scale");
-	const $addView = document.querySelector("#add-view");
-	const $views = document.querySelector("#report-views");
-
-	const addView = () => {
-		const $new = document.createElement("DIV");
-		$new.classList.add("report-view");
-		$new.innerHTML = `
-		<label>μArch: <select name="architecture"><option value="">ALL</option>${ getArchitectures().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<label>OS: <select name="os"><option value="">ALL</option>${ getOS().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<label>Date: <select name="date"><option value="">ALL</option>${ getDates().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<label>Commit: <select name="git-head"><option value="">ALL</option>${ getCommits().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<label>Language: <select name="language"><option value="">ALL</option>${ getLanguages().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<label>Test: <select name="testcase"><option value="">ALL</option>${ getTestcases().map(a => `<option value="${a}">${a}</option>`).join("") }</select></label>
-		<button class="remove-button">Remove view</button>
-		`;
-		for(const $select of $new.querySelectorAll("select")){
-			$select.addEventListener("change", () => { setTimeout(analyzeData, 0); });
-		}
-		for(const $but of $new.querySelectorAll("button.remove-button")){
-			$but.addEventListener("click", () => { $new.remove(); setTimeout(analyzeData, 0); });
-		}
-		$views.append($new);
-
-		setTimeout(analyzeData, 0);
-	};
-
-	$addView.addEventListener("click", e => { addView(); });
-	$logScale.addEventListener("change", e => {
-		options.log = $logScale.checked;
-		setTimeout(analyzeData, 0);
-	});
-	addView();
+const getRuntimeName = entry => {
+	if(entry.language == "nujel"){
+		return "Nujel";
+	}
+	return entry.runtime.split(' ')[0];
 };
 
 const getData = (key, filterP, name) => {
@@ -87,7 +60,7 @@ const getData = (key, filterP, name) => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(!filterP(entry)){continue;}
-			const runtime = entry.runtime == "./nujel" ? "nujel" : entry.runtime;
+			const runtime = getRuntimeName(entry);
 			if(!newestDate[runtime] || (entry.date > newestDate[runtime])){
 				newestDate[runtime] = entry.date;
 			}
@@ -97,7 +70,7 @@ const getData = (key, filterP, name) => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(!filterP(entry)){continue;}
-			const runtime = entry.runtime == "./nujel" ? "nujel" : entry.runtime;
+			const runtime = getRuntimeName(entry);
 			if(entry.date != newestDate[runtime]){continue;}
 			if(!data[runtime]){
 				data[runtime] = {
@@ -119,22 +92,58 @@ const getData = (key, filterP, name) => {
 	return ret;
 };
 
-const getViews = (key, name) => {
-	const data = [];
-	for(const $view of document.querySelectorAll(".report-view")){
-		let filterP = v => true;
-		let filterName = [];
-		for(const $select of $view.querySelectorAll("select")){
-			if(!$select.value){continue;}
-			const key = $select.getAttribute("name");
-			const value = $select.value;
-			filterName.push(value);
-			const lastP = filterP;
-			filterP = entry => lastP(entry) && entry[key] == value;
-		}
-		const n = filterName.length ? filterName.join("-") : "ALL";
-		data.push(getData(key, filterP, name+' '+n));
+const goodCatFilter = v => {
+	if(!({"scheme": true, "mal": true, "franz-lisp": true}[v.language])){return false;}
+	if(v.language == 'scheme'){
+		if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true}[v.runtime])){return false;}
 	}
+	return true;
+};
+
+const uglyCatFilter = v => {
+	if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true}[v.language])){return false;}
+	if(v.language == 'scheme'){
+		if((v.runtime != 'chez --script') && (v.runtime != 'guile') && (v.runtime != 'gosh')){return false;}
+	}
+	if(v.language == 'common-lisp'){
+		if(v.runtime != 'sbcl --script'){return false;}
+	}
+	if(v.language == 'python'){
+		if(v.runtime != 'pypy'){return false;}
+	}
+	if(v.language == 'javascript'){
+		if(v.runtime == 'mujs'){return false;}
+	}
+	return true;
+};
+
+const getCatFilter = (cat, hostname) => {
+	switch(cat){
+		case "good": return v => {
+			if(v.hostname != hostname){return false;}
+			if(v.language == 'nujel'){return true;}
+			return goodCatFilter(v);
+		};
+		case "bad": return v => {
+			if(v.hostname != hostname){return false;}
+			if(v.language == 'nujel'){return true;}
+			return !(goodCatFilter(v) || uglyCatFilter(v));
+		};
+		case "ugly": return v => {
+			if(v.hostname != hostname){return false;}
+			if(v.language == 'nujel'){return true;}
+			return uglyCatFilter(v);
+		};
+		default: return v => {
+			if(v.hostname != hostname){return false;}
+			return true;
+		}
+	}
+}
+
+const getViews = (key, viewName, cat, hostname) => {
+	const data = [];
+	data.push(getData(key, getCatFilter(cat, hostname), String(viewName)));
 	return data;
 }
 
@@ -171,6 +180,51 @@ const getSingleViews = key => {
 	return retArr;
 };
 
+const yAxisTitle = yAxis => {
+	switch(yAxis){
+		case "total": return "Total CPU Time";
+		case "max-resident": return "Memory Usage (Maximum resident set)";
+		default: return "Unknown";
+	}
+};
+
+const yAxisDescription = yAxis => {
+	switch(yAxis){
+		case "total": return "CPU Time used to complete benchmark (less is better)";
+		case "max-resident": return "Maximum resident set during benchmark run (less is better)";
+		default: return "Unknown";
+	}
+};
+
+const yAxisUnit = yAxis => {
+	switch(yAxis){
+		case "total": return "milliseconds";
+		case "max-resident": return "Bytes";
+		default: return "Unknown";
+	};
+};
+
+const drawSinglePlot = barReport => {
+	const log = Boolean(barReport.getAttribute("report-log"));
+	const yAxis = String(barReport.getAttribute("report-y"));
+	const cat = barReport.getAttribute("report-cat");
+	const hostname = barReport.getAttribute("report-hostname") || "yuno";
+	Plotly.newPlot(barReport, {
+		data: getViews(yAxis, yAxisTitle(yAxis), cat, hostname),
+		layout: {
+			title: yAxisDescription(yAxis),
+			xaxis: {
+				title: "Implementation"
+			},
+			yaxis: {
+				title: yAxisUnit(yAxis),
+				type: log ? 'log' : null,
+				autorange: true
+			}
+		}
+	});
+};
+
 const analyzeData = () => {
 	Plotly.newPlot("report-cpu-time", {
 		data: getSingleViews("total"),
@@ -202,35 +256,11 @@ const analyzeData = () => {
 		}
 	});
 
-	Plotly.newPlot("report-cpu", {
-		data: getViews("total", "CPU Time"),
-		layout: {
-			title: "CPU Time used to complete benchmark (less is better)",
-			xaxis: {
-				title: "Implementation"
-			},
-			yaxis: {
-				title: "milliseconds",
-				type: options.log ? 'log' : null,
-				autorange: true
-			}
-		}
-	});
-
-	Plotly.newPlot("report-memory", {
-		data: getViews("max-resident", "Memory Max"),
-		layout: {
-			title: "Maximum resident set during benchmark run (less is better)",
-			xaxis: {
-				title: "Implementation"
-			},
-			yaxis: {
-				title: "Bytes",
-				type: options.log ? 'log' : null,
-				autorange: true
-			}
-		}
-	});
+	const barReports = document.querySelectorAll(".bar-report");
+	let to = 0;
+	for(const barReport of barReports){
+		to += 10;
+		setTimeout(() => drawSinglePlot(barReport), to);
+	}
 };
-
-setTimeout(initConfig, 0);
+setTimeout(analyzeData, 0);

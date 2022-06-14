@@ -9,3 +9,17 @@
 	content:'';
 	clear:both;
 }
+
+h1 {
+	text-align:center;
+	display:block;
+	font-size:3em;
+	font-family:'Courier New', Courier, monospace;
+}
+
+h2 {
+	text-align:center;
+	display:block;
+	font-size:2em;
+	font-family:'Courier New', Courier, monospace;
+}
