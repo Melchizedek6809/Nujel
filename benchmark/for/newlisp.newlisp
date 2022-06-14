@@ -1,0 +1,8 @@
+(define (test-run i ret)
+  (while (< i 10000000)
+    (set 'ret (+ i ret))
+    (inc i))
+  ret)
+(print (test-run 0 0))
+(print "\n")
+(exit)

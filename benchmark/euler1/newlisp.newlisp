@@ -1,0 +1,12 @@
+(define (test-run i ret)
+  (while (< i 10000000)
+    (when (or (= 0 (mod i 3))
+              (= 0 (mod i 5)))
+      (set 'ret (+ i ret)))
+    (inc i))
+  ret)
+
+(print "The sum is: ")
+(print (test-run 0 0))
+(print "\n")
+(exit)
