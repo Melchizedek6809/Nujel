@@ -107,7 +107,7 @@
 
 [defn bytecompile/procedure/default [op args env]
       [def arg-count [length args]]
-      [if [$apply/optimize? op]
+      [if [$apply/optimize? op arg-count]
           [list [when args [bytecompile/procedure/arg args]]
                 [$apply arg-count op]]
           [list [bytecompile* op env]

@@ -35,6 +35,11 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopPushNil:
 	case lopFnDynamic:
 	case lopMacroDynamic:
+	case lopAdd:
+	case lopSub:
+	case lopMul:
+	case lopDiv:
+	case lopMod:
 		return 1;
 	case lopApply:
 	case lopIntByte:

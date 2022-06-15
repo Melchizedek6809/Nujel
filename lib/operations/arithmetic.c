@@ -23,28 +23,30 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 	return NULL;
 }
 
-static lVal *lnfAdd(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){ throwArityError(c, v, 2); }
+lVal *lAdd(lClosure *c, lVal *a, lVal *b){
 	if(a == NULL){return lValInt(0);}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
-		default:      return exceptionThrow(c, v,"addition");
+		default:      return exceptionThrow(c, a,"addition");
 		case ltInt:   return lValInt(requireInt(c,a) + requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) + requireFloat(c,b));
 		case ltVec:   return lValVec(vecAdd(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static lVal *lnfSub(lClosure *c, lVal *v){
+static lVal *lnfAdd(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){ throwArityError(c, v, 2); }
+	if(lCddr(v)){ throwArityError(c, v, 2); }
+	return lAdd(c, a, b);
+}
+
+lVal *lSub(lClosure *c, lVal *a, lVal *b){
+	if(a == NULL){ throwArityError(c, a, 2); }
 	if(b == NULL){
 		switch(a->type){
-		default:      return exceptionThrow(c, v,"subtraction");
+		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(-a->vInt);
 		case ltFloat: return lValFloat(-a->vFloat);
 		case ltVec:   return lValVec(vecInvert(a->vVec));
@@ -52,38 +54,49 @@ static lVal *lnfSub(lClosure *c, lVal *v){
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
-		default:      return exceptionThrow(c, v,"subtraction");
+		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(requireInt(c,a) - requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) - requireFloat(c,b));
 		case ltVec:   return lValVec(vecSub(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
-static lVal *lnfMul(lClosure *c, lVal *v){
+static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
+	return lSub(c, a, b);
+}
+
+lVal *lMul(lClosure *c, lVal *a, lVal *b){
 	if(a == NULL){return lValInt(1);}
-	if((b == NULL) || (lCddr(v))){
-		throwArityError(c, v, 2);
+	if(b == NULL){
+		throwArityError(c, b, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
-		default:      return exceptionThrow(c, v,"multiplication");
+		default:      return exceptionThrow(c, a,"multiplication");
 		case ltInt:   return lValInt(requireInt(c,a) * requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) * requireFloat(c,b));
 		case ltVec:   return lValVec(vecMul(requireVecCompatible(c,a), requireVecCompatible(c,b)));\
 	}
 }
 
-static lVal *lnfDiv(lClosure *c, lVal *v){
+static lVal *lnfMul(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if((a == NULL) || (b == NULL) || lCddr(v)){
+	if(lCddr(b)){
 		throwArityError(c, v, 2);
+	}
+	return lMul(c, a, b);
+}
+
+lVal *lDiv(lClosure *c, lVal *a, lVal *b){
+	if((a == NULL) || (b == NULL)){
+		throwArityError(c, b, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
-		default: return exceptionThrow(c, v,"division");
+		default: return exceptionThrow(c, a,"division");
 		case ltInt: {
 			const int av = requireInt(c,a);
 			const int bv = requireInt(c,b);
@@ -94,17 +107,21 @@ static lVal *lnfDiv(lClosure *c, lVal *v){
 	}
 }
 
-static lVal *lnfMod(lClosure *c, lVal *v){
+static lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(a == NULL){return b;}
-	if(b == NULL){return a;}
 	if(lCddr(v)){
 		throwArityError(c, v, 2);
 	}
+	return lDiv(c, a, b);
+}
+
+lVal *lMod(lClosure *c, lVal *a, lVal *b){
+	if(a == NULL){return b;}
+	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
-		default:      return exceptionThrow(c, v,"module");
+		default:      return exceptionThrow(c, a,"module");
 		case ltInt: {
 			const int av = requireInt(c,a);
 			const int bv = requireInt(c,b);
@@ -113,6 +130,15 @@ static lVal *lnfMod(lClosure *c, lVal *v){
 		case ltFloat: return lValFloat(fmod(requireFloat(c,a), requireFloat(c,b)));
 		case ltVec:   return lValVec(vecMod(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
+}
+
+static lVal *lnfMod(lClosure *c, lVal *v){
+	lVal *a = lCar(v);
+	lVal *b = lCadr(v);
+	if(lCddr(v)){
+		throwArityError(c, v, 2);
+	}
+	return lMod(c, a, b);
 }
 
 static lVal *lnfPow(lClosure *c, lVal *v){

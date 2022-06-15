@@ -4,6 +4,7 @@
 
 #include "bytecode.h"
 #include "tracing.h"
+#include "../operations.h"
 #include "../printer.h"
 #include "../type/closure.h"
 #include "../type/val.h"
@@ -260,6 +261,36 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopCons:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Cons");}
 		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopAdd:
+		if(ctx.sp < 2){throwStackUnderflowError(c, "Add");}
+		ctx.valueStack[ctx.sp-2] = lAdd(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopSub:
+		if(ctx.sp < 2){throwStackUnderflowError(c, "Sub");}
+		ctx.valueStack[ctx.sp-2] = lSub(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopMul:
+		if(ctx.sp < 2){throwStackUnderflowError(c, "Mul");}
+		ctx.valueStack[ctx.sp-2] = lMul(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopDiv:
+		if(ctx.sp < 2){throwStackUnderflowError(c, "Div");}
+		ctx.valueStack[ctx.sp-2] = lDiv(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		ip++;
+		break;
+	case lopMod:
+		if(ctx.sp < 2){throwStackUnderflowError(c, "Mod");}
+		ctx.valueStack[ctx.sp-2] = lMod(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
 		ip++;
 		break;

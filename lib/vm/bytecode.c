@@ -40,6 +40,11 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopPushNil:         return "push/nil";
 	case lopFnDynamic:       return "fn";
 	case lopMacroDynamic:    return "macro";
+	case lopAdd:             return "add";
+	case lopSub:             return "sub";
+	case lopMul:             return "mul";
+	case lopDiv:             return "div";
+	case lopMod:             return "mod";
 	default:                 return ":UNKNOWN-OP";
 	}
 }

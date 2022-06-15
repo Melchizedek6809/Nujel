@@ -123,3 +123,28 @@
       "Create a new μ"
       :inline
       '[#$18]]
+
+[defn $add []
+      "[a b] -> [result]"
+      :inline
+      '[#$25]]
+
+[defn $sub []
+      "[a b] -> [result]"
+      :inline
+      '[#$26]]
+
+[defn $mul []
+      "[a b] -> [result]"
+      :inline
+      '[#$27]]
+
+[defn $div []
+      "[a b] -> [result]"
+      :inline
+      '[#$28]]
+
+[defn $mod []
+      "[a b] -> [result]"
+      :inline
+      '[#$29]]

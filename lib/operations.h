@@ -4,4 +4,10 @@
 
 void lOperationsBase(lClosure *c);
 
+lVal *lAdd(lClosure *c, lVal *a, lVal *b);
+lVal *lSub(lClosure *c, lVal *a, lVal *b);
+lVal *lMul(lClosure *c, lVal *a, lVal *b);
+lVal *lDiv(lClosure *c, lVal *a, lVal *b);
+lVal *lMod(lClosure *c, lVal *a, lVal *b);
+
 #endif
