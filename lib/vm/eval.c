@@ -55,6 +55,37 @@ static void lBytecodeArrayLink(lClosure *c, lBytecodeArray *text){
 	text->flags |= BYTECODE_ARRAY_LINKED;
 }
 
+static lVal *lDyadicFun(lBytecodeOp op, lClosure *c, lVal *a, lVal *b){
+	switch(op){
+	case lopLessPred:
+		return lValBool((lValGreater(a, b) < 0) && !lValEqual(a, b));
+	case lopLessEqPred:
+		return lValBool(lValEqual(a, b) || (lValGreater(a, b) < 0));
+	case lopEqualPred:
+		return lValBool(lValEqual(a, b));
+	case lopGreaterEqPred:
+		return lValBool(lValEqual(a,b) || (lValGreater(a,b) > 0));
+	case lopGreaterPred:
+		return lValBool((lValGreater(a, b) > 0) && !lValEqual(a, b));
+	case lopCons:
+		return lCons(a,b);
+	case lopIntAdd:
+		return lValInt((a ? a->vInt : 0) + (b ? b->vInt : 0));
+	case lopAdd:
+		return lAdd(c,a,b);
+	case lopSub:
+		return lSub(c,a,b);
+	case lopMul:
+		return lMul(c,a,b);
+	case lopDiv:
+		return lDiv(c,a,b);
+	case lopMod:
+		return lMod(c,a,b);
+	default:
+		return NULL;
+	}
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	jmp_buf oldExceptionTarget;
@@ -130,47 +161,22 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		const i8 v = *ip++;
 		ctx.valueStack[ctx.sp++] = lValInt(v);
 		break;}
-	case lopIntAdd: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "IntAdd");}
-		lVal *a = ctx.valueStack[ctx.sp-2];
-		lVal *b = ctx.valueStack[ctx.sp-1];
-		if((a == NULL) || (b == NULL)){lExceptionThrowValClo("type-error", "Can't add #nil", NULL, c);}
-		ctx.valueStack[ctx.sp-2] = lValInt(a->vInt + b->vInt);
-		ctx.sp--;
-		break; }
-	case lopLessPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "LessPred");}
-		lVal *a = ctx.valueStack[ctx.sp-2];
-		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) < 0) && !lValEqual(a, b));
-		ctx.sp--;
-		break; }
-	case lopLessEqPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "LessEqPred");}
-		lVal *a = ctx.valueStack[ctx.sp-2];
-		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b) || (lValGreater(a, b) < 0));
-		ctx.sp--;
-		break; }
-	case lopEqualPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "EqualPred");}
-		lVal *a = ctx.valueStack[ctx.sp-2];
-		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b));
-		ctx.sp--;
-		break; }
-	case lopGreaterEqPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "GreaterEqPred");}
-		lVal *a = ctx.valueStack[ctx.sp-2];
-		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a,b) || lValGreater(a,b) > 0);
-		ctx.sp--;
-		break; }
+	case lopAdd:
+	case lopSub:
+	case lopMul:
+	case lopDiv:
+	case lopMod:
+	case lopIntAdd:
+	case lopCons:
+	case lopLessEqPred:
+	case lopLessPred:
+	case lopEqualPred:
+	case lopGreaterEqPred:
 	case lopGreaterPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, "GreaterPred");}
+		if(ctx.sp < 2){throwStackUnderflowError(c, lBytecodeGetOpcodeName(ip[-1]));}
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) > 0) && !lValEqual(a, b));
+		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
 		ctx.sp--;
 		break; }
 	case lopPushNil:
@@ -254,36 +260,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopCdr:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Cdr");}
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
-		break;
-	case lopCons:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Cons");}
-		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
-		break;
-	case lopAdd:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Add");}
-		ctx.valueStack[ctx.sp-2] = lAdd(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
-		break;
-	case lopSub:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Sub");}
-		ctx.valueStack[ctx.sp-2] = lSub(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
-		break;
-	case lopMul:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Mul");}
-		ctx.valueStack[ctx.sp-2] = lMul(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
-		break;
-	case lopDiv:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Div");}
-		ctx.valueStack[ctx.sp-2] = lDiv(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
-		break;
-	case lopMod:
-		if(ctx.sp < 2){throwStackUnderflowError(c, "Mod");}
-		ctx.valueStack[ctx.sp-2] = lMod(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
-		ctx.sp--;
 		break;
 	case lopClosurePush:
 		ctx.valueStack[ctx.sp++] = lValObject(c);

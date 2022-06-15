@@ -21,9 +21,9 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Maps (using binary trees)
 - [X] Macros (expander written in Nujel itself)
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
-- [ ] Tail-call optimization
+- [/] Module system
 - [ ] NaN boxing
-- [ ] Module system
+- [ ] Tail-call optimization
 - [ ] Continuations
 - [ ] Fibers (preemtible!)
 - [ ] Serializable fibers
