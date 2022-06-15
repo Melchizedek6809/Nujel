@@ -37,3 +37,15 @@
 [defn popen/trim [cmd]
   "Run CMD using popen and return the trimmed stdout"
   [trim [cdr [popen cmd]]]]
+
+[def +root-working-dir+ [path/working-directory]]
+
+[defn file/module-loader [name]
+      [def module-path [fmt "{+root-working-dir+}/modules/{}.nuj" [keyword->string name]]]
+      [def source [file/read module-path]]
+      [when-not source [return #nil]]
+      [def expr [list 'module [cons do [read source]]]]
+      [def mod [eval expr]]
+      [return mod]]
+
+[module/add-loader file/module-loader]

@@ -10417,6 +10417,43 @@
 04i 1
 0Es module/cache
 0D
+24
+0Es module/loader
+0D
+23s module/add-loader
+05v [f]
+05v #@[source: [[set! module/loader [cons f module/loader]]]]
+05v #{##[]
+10s f
+10s module/loader
+14
+0Fs module/loader
+01
+}
+17
+0Es module/add-loader
+0D
+23s module/save-state
+05v []
+05v #@[source: [module/cache]]
+05v #{##[]
+10s module/cache
+01
+}
+17
+0Es module/save-state
+0D
+23s module/restore-state
+05v [c]
+05v #@[source: [[set! module/cache c]]]
+05v #{##[]
+10s c
+0Fs module/cache
+01
+}
+17
+0Es module/restore-state
+0D
 23s module/qualify-symbol
 05v [module-name symbol]
 05v #@[source: [[string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]]
@@ -10452,6 +10489,24 @@
 }
 18
 0Es module
+0D
+23s defmodule
+05v [name . body]
+05v #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert [unquote name] [unquote [cons module body]]]]]]
+05v #{##[]
+23s module/insert
+10s name
+10s module
+10s body
+14
+24
+14
+14
+14
+01
+}
+18
+0Es defmodule
 0D
 23s export
 05v [name value]
@@ -10611,13 +10666,64 @@
 0D
 23s module/load/external
 05v [name]
-05v #@[source: []]
+05v #@[source: [[for-in [loader module/loader] [def mod [loader name]] [when mod [return mod]]] [return #nil]]]
 05v #{##[]
+15
+10s module/loader
+0Es ΓεnΣym-120
+0D
+10s ΓεnΣym-120
+0Bo 72
+02i 0
+1B
+1C
+10s ΓεnΣym-120
+0Bo 58
+0D
+10s ΓεnΣym-120
+11
+0Es loader
+0D
+10s loader
+10s name
+04i 1
+0Es mod
+0D
+10s mod
+0Bo 11
+10s mod
+01
+09o 4
 24
+0D
+10s ΓεnΣym-120
+12
+0Fs ΓεnΣym-120
+09o -60
+09o 4
+24
+16
+0D
+24
+01
 01
 }
 17
 0Es module/load/external
+0D
+23s module/insert
+05v [name module]
+05v #@[source: [[tree/set! module/cache name module]]]
+05v #{##[]
+05v tree/set!
+10s module/cache
+10s name
+10s module
+04i 3
+01
+}
+17
+0Es module/insert
 0D
 23s module/load
 05v [name]
@@ -10627,15 +10733,15 @@
 05v type-of
 10s name
 04i 1
-0Es ΓεnΣym-119
+0Es ΓεnΣym-121
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 05v :object
 20
 0Bo 10
 10s name
 09o 93
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 05v :keyword
 20
 0Bo 80
@@ -10909,9 +11015,9 @@
 09o 110
 15
 10s cur-type
-0Es ΓεnΣym-121
+0Es ΓεnΣym-123
 0D
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :array
 20
 0Bo 20
@@ -10920,7 +11026,7 @@
 10s b
 04i 2
 09o 70
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :tree
 20
 0Bo 20
@@ -10929,7 +11035,7 @@
 10s b
 04i 2
 09o 41
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 05v :pair
 20
 0Bo 20
@@ -11721,13 +11827,13 @@
 05v string/length
 10s data
 04i 1
-0Es ΓεnΣym-123
+0Es ΓεnΣym-125
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-123
+10s ΓεnΣym-125
 1E
 0Bo 76
 0D
@@ -11995,13 +12101,13 @@
 05v :height
 04i 2
 04i 2
-0Es ΓεnΣym-129
+0Es ΓεnΣym-131
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-129
+10s ΓεnΣym-131
 1E
 0Bo 37
 0D
@@ -12049,13 +12155,13 @@
 05v :height
 04i 2
 04i 2
-0Es ΓεnΣym-130
+0Es ΓεnΣym-132
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-130
+10s ΓεnΣym-132
 1E
 0Bo 53
 0D
@@ -12126,13 +12232,13 @@
 05v :height
 04i 2
 04i 2
-0Es ΓεnΣym-131
+0Es ΓεnΣym-133
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-131
+10s ΓεnΣym-133
 1E
 0Bo 47
 0D
@@ -12212,13 +12318,13 @@
 0Es x
 0D
 10s w
-0Es ΓεnΣym-132
+0Es ΓεnΣym-134
 0D
 02i 0
 1B
 1C
 10s x
-10s ΓεnΣym-132
+10s ΓεnΣym-134
 1E
 0Bo 137
 0D
@@ -12227,13 +12333,13 @@
 0Es y
 0D
 10s h
-0Es ΓεnΣym-133
+0Es ΓεnΣym-135
 0D
 02i 0
 1B
 1C
 10s y
-10s ΓεnΣym-133
+10s ΓεnΣym-135
 1E
 0Bo 87
 0D
@@ -12570,13 +12676,13 @@
 0Es y
 0D
 02i -1
-0Es ΓεnΣym-136
+0Es ΓεnΣym-138
 0D
 02i 0
 1B
 1C
 10s y
-10s ΓεnΣym-136
+10s ΓεnΣym-138
 22
 0Bo 136
 0D
@@ -12588,13 +12694,13 @@
 10s image
 05v :width
 04i 2
-0Es ΓεnΣym-137
+0Es ΓεnΣym-139
 0D
 02i 0
 1B
 1C
 10s x
-10s ΓεnΣym-137
+10s ΓεnΣym-139
 1E
 0Bo 57
 0D
@@ -12817,9 +12923,9 @@
 05v #{##[]
 15
 10s i
-0Es ΓεnΣym-139
+0Es ΓεnΣym-141
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 02i 0
 20
 0Bo 16
@@ -12827,7 +12933,7 @@
 10s text
 04i 1
 09o 82
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 02i 1
 20
 0Bo 16
@@ -12835,7 +12941,7 @@
 10s text
 04i 1
 09o 59
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 02i 2
 20
 0Bo 22
@@ -12845,7 +12951,7 @@
 04i 1
 04i 1
 09o 30
-10s ΓεnΣym-139
+10s ΓεnΣym-141
 02i 3
 20
 0Bo 16
@@ -13204,21 +13310,21 @@
 05v type-of
 10s v
 04i 1
-0Es ΓεnΣym-141
+0Es ΓεnΣym-143
 0D
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :nil
 20
 0Bo 10
 05v "null"
 09o 318
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :int
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :float
 20
 0C
@@ -13230,7 +13336,7 @@
 10s v
 04i 1
 09o 270
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :bool
 20
 0Bo 24
@@ -13240,13 +13346,13 @@
 09o 7
 05v "false"
 09o 237
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :pair
 20
 0C
@@ -13266,7 +13372,7 @@
 05v "]"
 04i 3
 09o 161
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :string
 20
 0Bo 16
@@ -13274,7 +13380,7 @@
 10s v
 04i 1
 09o 136
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :symbol
 20
 0Bo 30
@@ -13286,7 +13392,7 @@
 05v "\""
 04i 3
 09o 97
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :keyword
 20
 0Bo 30
@@ -13298,7 +13404,7 @@
 05v "\""
 04i 3
 09o 58
-10s ΓεnΣym-141
+10s ΓεnΣym-143
 05v :tree
 20
 0Bo 16
@@ -13839,13 +13945,13 @@
 0Es i
 0D
 10s width
-0Es ΓεnΣym-143
+0Es ΓεnΣym-145
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-143
+10s ΓεnΣym-145
 1E
 0Bo 29
 0D
@@ -13949,63 +14055,63 @@
 02i 1
 04i 2
 04i 2
-0Es ΓεnΣym-152
+0Es ΓεnΣym-154
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 57
 20
 0C
@@ -14071,7 +14177,7 @@
 04i 3
 04i 2
 09o 713
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 63
 20
 0Bo 60
@@ -14093,7 +14199,7 @@
 04i 3
 04i 2
 09o 646
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 88
 20
 0Bo 60
@@ -14115,7 +14221,7 @@
 04i 3
 04i 2
 09o 579
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 120
 20
 0Bo 60
@@ -14137,7 +14243,7 @@
 04i 3
 04i 2
 09o 512
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 100
 20
 0Bo 60
@@ -14159,7 +14265,7 @@
 04i 3
 04i 2
 09o 445
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 111
 20
 0Bo 60
@@ -14181,7 +14287,7 @@
 04i 3
 04i 2
 09o 378
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 98
 20
 0Bo 60
@@ -14203,7 +14309,7 @@
 04i 3
 04i 2
 09o 311
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 60
 20
 0Bo 60
@@ -14225,7 +14331,7 @@
 04i 3
 04i 2
 09o 244
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 94
 20
 0Bo 60
@@ -14247,7 +14353,7 @@
 04i 3
 04i 2
 09o 177
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 62
 20
 0Bo 60
@@ -14269,7 +14375,7 @@
 04i 3
 04i 2
 09o 110
-10s ΓεnΣym-152
+10s ΓεnΣym-154
 02i 46
 20
 0Bo 70
@@ -14345,9 +14451,9 @@
 10s opts
 05v :base
 04i 2
-0Es ΓεnΣym-153
+0Es ΓεnΣym-155
 0D
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 05v :binary
 20
 0Bo 44
@@ -14363,7 +14469,7 @@
 04i 2
 04i 3
 09o 219
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 05v :octal
 20
 0Bo 44
@@ -14379,7 +14485,7 @@
 04i 2
 04i 3
 09o 166
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 05v :decimal
 20
 0Bo 44
@@ -14395,7 +14501,7 @@
 04i 2
 04i 3
 09o 113
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 05v :hexadecimal
 20
 0Bo 44
@@ -14411,7 +14517,7 @@
 04i 2
 04i 3
 09o 60
-10s ΓεnΣym-153
+10s ΓεnΣym-155
 05v :HEXADECIMAL
 20
 0Bo 44
@@ -14533,21 +14639,21 @@
 10s opts
 05v :align
 04i 2
-0Es ΓεnΣym-154
+0Es ΓεnΣym-156
 0D
-10s ΓεnΣym-154
+10s ΓεnΣym-156
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-154
+10s ΓεnΣym-156
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-154
+10s ΓεnΣym-156
 05v :left
 20
 0Bo 10
@@ -14738,9 +14844,9 @@
 05v type-of
 10s v
 04i 1
-0Es ΓεnΣym-155
+0Es ΓεnΣym-157
 0D
-10s ΓεnΣym-155
+10s ΓεnΣym-157
 05v :int
 20
 0Bo 32
@@ -14753,13 +14859,13 @@
 04i 2
 04i 1
 09o 77
-10s ΓεnΣym-155
+10s ΓεnΣym-157
 05v :symbol
 20
 0Bo 10
 10s v
 09o 58
-10s ΓεnΣym-155
+10s ΓεnΣym-157
 05v :string
 20
 0Bo 16
@@ -14981,13 +15087,13 @@
 05v string/length
 10s format-string
 04i 1
-0Es ΓεnΣym-156
+0Es ΓεnΣym-158
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-156
+10s ΓεnΣym-158
 1E
 0Bo 198
 0D
@@ -14996,9 +15102,9 @@
 10s format-string
 10s i
 04i 2
-0Es ΓεnΣym-157
+0Es ΓεnΣym-159
 0D
-10s ΓεnΣym-157
+10s ΓεnΣym-159
 02i 123
 20
 0Bo 68
@@ -15024,7 +15130,7 @@
 14
 0Fs cuts
 09o 86
-10s ΓεnΣym-157
+10s ΓεnΣym-159
 02i 125
 20
 0Bo 75
@@ -15109,17 +15215,17 @@
 0D
 15
 10s cuts
-0Es ΓεnΣym-158
+0Es ΓεnΣym-160
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-160
 0Bo 173
 02i 0
 1B
 1C
-10s ΓεnΣym-158
+10s ΓεnΣym-160
 0Bo 159
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-160
 11
 0Es c
 0D
@@ -15170,9 +15276,9 @@
 11
 0Fs last-pos
 0D
-10s ΓεnΣym-158
+10s ΓεnΣym-160
 12
-0Fs ΓεnΣym-158
+0Fs ΓεnΣym-160
 09o -161
 09o 4
 24
@@ -15203,13 +15309,13 @@
 05v array/length
 10s arguments-used
 04i 1
-0Es ΓεnΣym-159
+0Es ΓεnΣym-161
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-159
+10s ΓεnΣym-161
 1E
 0Bo 90
 0D
@@ -15433,13 +15539,13 @@
 05v string/length
 10s a
 04i 1
-0Es ΓεnΣym-163
+0Es ΓεnΣym-165
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-163
+10s ΓεnΣym-165
 1E
 0Bo 47
 0D
@@ -15563,9 +15669,9 @@
 05v type-of
 10s ext
 04i 1
-0Es ΓεnΣym-164
+0Es ΓεnΣym-166
 0D
-10s ΓεnΣym-164
+10s ΓεnΣym-166
 05v :string
 20
 0Bo 23
@@ -15584,7 +15690,7 @@
 }
 17
 09o 59
-10s ΓεnΣym-164
+10s ΓεnΣym-166
 05v :pair
 20
 0Bo 23
@@ -16367,9 +16473,9 @@
 05v string/length
 10s separator
 04i 1
-0Es ΓεnΣym-165
+0Es ΓεnΣym-167
 0D
-10s ΓεnΣym-165
+10s ΓεnΣym-167
 02i 0
 20
 0Bo 16
@@ -16531,6 +16637,8 @@
 0Es contains-all?
 01
 }#{##[]
+10s module/insert
+05v :test
 15
 05v tree/new
 24
@@ -16578,13 +16686,7 @@
 0D
 13
 16
-0Es test
-0D
-05v tree/set!
-10s module/cache
-05v :test
-10s test
-04i 3
+04i 2
 01
 }#{##[]
 05v "Nujel"
@@ -16856,7 +16958,7 @@
 17
 0Es test-failure
 0D
-23s test-default
+23s test/run
 05v [result rawexpr i]
 05v #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr i]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]
 05v #{##[]
@@ -16910,12 +17012,26 @@
 01
 }
 17
-0Es test-default
+0Es test/run
 0D
-23s test-run-real
-05v [test]
-05v #@[source: [[set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [for-in [cur-test test-list] [test [car cur-test] [cdr cur-test] [-- i]]] [display-results] error-count]]
+23s test-run
+05v [output-passes hide-errors]
+05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [for-in [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [-- i]]] [display-results] [return error-count]]]
 05v #{##[]
+05v bool
+10s hide-errors
+04i 1
+0Bo 10
+05v #f
+09o 7
+05v #t
+0Fs print-errors
+0D
+05v bool
+10s output-passes
+04i 1
+0Fs print-passes
+0D
 05v time/milliseconds
 04i 0
 0Fs nujel-start
@@ -16934,26 +17050,36 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-167
+0Es ΓεnΣym-169
 0D
-10s ΓεnΣym-167
-0Bo 45
+10s ΓεnΣym-169
+0Bo 73
 02i 0
 1B
 1C
-10s ΓεnΣym-167
-0Bo 31
+10s ΓεnΣym-169
+0Bo 59
 0D
-10s ΓεnΣym-167
+10s ΓεnΣym-169
 11
 0Es cur-test
 0D
-05v [test [car cur-test] [cdr cur-test] [set! i [+ -1 i]]]
-0D
-10s ΓεnΣym-167
+10s test/run
+10s cur-test
+11
+10s cur-test
 12
-0Fs ΓεnΣym-167
-09o -33
+05v +
+02i -1
+10s i
+04i 2
+0Fs i
+04i 3
+0D
+10s ΓεnΣym-169
+12
+0Fs ΓεnΣym-169
+09o -61
 09o 4
 24
 16
@@ -16963,31 +17089,6 @@
 0D
 10s error-count
 01
-}
-17
-0Es test-run-real
-0D
-23s test-run
-05v [output-passes hide-errors]
-05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [test-run-real test-default]]]
-05v #{##[]
-05v bool
-10s hide-errors
-04i 1
-0Bo 10
-05v #f
-09o 7
-05v #t
-0Fs print-errors
-0D
-05v bool
-10s output-passes
-04i 1
-0Fs print-passes
-0D
-05v test-run-real
-10s test-default
-04i 1
 01
 }
 17
@@ -17005,9 +17106,9 @@
 05v type-of
 10s l
 04i 1
-0Es ΓεnΣym-170
+0Es ΓεnΣym-172
 0D
-10s ΓεnΣym-170
+10s ΓεnΣym-172
 05v :tree
 20
 0Bo 16
@@ -17015,7 +17116,7 @@
 10s l
 04i 1
 09o 32
-10s ΓεnΣym-170
+10s ΓεnΣym-172
 05v :array
 20
 0Bo 16
@@ -17072,17 +17173,17 @@
 05v tree/keys
 10s parent
 04i 1
-0Es ΓεnΣym-171
+0Es ΓεnΣym-173
 0D
-10s ΓεnΣym-171
+10s ΓεnΣym-173
 0Bo 127
 02i 0
 1B
 1C
-10s ΓεnΣym-171
+10s ΓεnΣym-173
 0Bo 113
 0D
-10s ΓεnΣym-171
+10s ΓεnΣym-173
 11
 0Es k
 0D
@@ -17115,9 +17216,9 @@
 09o 4
 24
 0D
-10s ΓεnΣym-171
+10s ΓεnΣym-173
 12
-0Fs ΓεnΣym-171
+0Fs ΓεnΣym-173
 09o -115
 09o 4
 24

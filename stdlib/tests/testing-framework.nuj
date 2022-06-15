@@ -59,8 +59,8 @@
 [defn test/run [result rawexpr i]
       "Tests that RAWEXPR evaluates to RESULT"
       [try [fn [err]
-             [display/error err]
-             [test-failure result [list :exception-caught err] rawexpr i]]
+               [display/error err]
+               [test-failure result [list :exception-caught err] rawexpr i]]
            [def expr [eval rawexpr]]
            [if [equal? result expr]
                [test-success result expr rawexpr i]

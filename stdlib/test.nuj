@@ -1,8 +1,0 @@
-[defmodule :test
-  [def counter 0]
-
-  [defn count [] counter]
-  [defn count! [] [++ counter]]
-
-  [export count! count!]
-  [export count count]]
