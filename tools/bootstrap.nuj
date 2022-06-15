@@ -11,7 +11,7 @@
   [def object-code [-> [macroexpand/forms source environment]
                        bytecompile
                        assemble*]]
-  [file/write [if object-code [str/write object-code] ""]
+  [file/write [if object-code [string/write object-code] ""]
               [cat [path/without-extension path] ".no"]]
   object-code]
 

@@ -1,0 +1,65 @@
+;; Contains the module system
+
+[def module/cache @[]]
+
+[defn module/save-state []
+      module/cache]
+
+[defn module/restore-state [c]
+      [set! module/cache c]]
+
+[defn module/qualify-symbol [module-name symbol]
+      [string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]
+
+[defmacro module body
+          "Define a new module and return it"
+          [macroexpand [cons 'ω* [cons '[def exports @[]] body]]]]
+
+[defmacro defmodule [name . body]
+          "Define a new named module"
+          `[module/insert ~name ~[cons module body]]]
+
+[defmacro export [name value]
+          `[tree/set! exports '~name ~value]]
+
+[defmacro import* [local-symbol module module-symbol]
+          `[def ~local-symbol [module/import ~module '~module-symbol]]]
+
+[defmacro import [names module]
+          [when-not [list? names]
+                    [return `[import* ~[module/qualify-symbol module names] [module/load ~module] ~names]]]
+          [def ret #nil]
+          [while names
+            [if [== [cadr names] :as]
+                [do [set! ret [cons `[import* ~[module/qualify-symbol module [caddr names]] [module/load ~module] ~[car names]] ret]]
+                    [set! names [cddr names]]]
+                [set! ret [cons `[import* ~[module/qualify-symbol module [car names]] [module/load ~module] ~[car names]] ret]]]
+            [cdr! names]]
+          [cons do [nreverse ret]]]
+
+[defn module/load/external [name]
+      #nil]
+
+[defn module/insert [name module]
+      [tree/set! module/cache name module]]
+
+[defn module/load [name]
+      [case [type-of name]
+            [:object name]
+            [:keyword [or [tree/ref module/cache name]
+                          [do [def mod [module/load/external name]]
+                              [when mod [tree/set! module/cache mod]]
+                              [return mod]]]]]]
+
+[defn module/import-all [module symbol]
+      [def exports [resolve 'exports module]]
+      [typecheck/only exports :tree]
+      [return exports]]
+
+[defn module/import [module symbol]
+      [def exports [module/import-all module symbol]]
+      [when-not [tree/has? exports symbol]
+                [exception :import-error [if [resolves? symbol module]
+                                             "That symbol was not exported"
+                                             "That symbol does not exist in that module"]]]
+      [tree/ref exports symbol]]

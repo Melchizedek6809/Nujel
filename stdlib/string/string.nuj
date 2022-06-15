@@ -5,7 +5,7 @@
 
 [defn string->keyword [α] :inline
       "Return string α as a keyword"
-      [symbol->keyword [str->sym α]]]
+      [symbol->keyword [string->symbol α]]]
 
 [defn string->byte-array [a]
       "Turn a string into an UTF-8 encoded byte array"

@@ -236,8 +236,8 @@ void lOperationsString(lClosure *c){
 	lAddNativeFunc(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
 	lAddNativeFunc(c,"from-char-code","codes",                    "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
 
-	lAddNativeFunc(c,"str->sym",      "[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
-	lAddNativeFunc(c,"sym->str",      "[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
+	lAddNativeFunc(c,"string->symbol","[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
+	lAddNativeFunc(c,"symbol->string","[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
 
-	lAddNativeFunc(c,"str/write",     "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
+	lAddNativeFunc(c,"string/write",     "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
 }

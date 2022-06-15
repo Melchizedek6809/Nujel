@@ -42,21 +42,21 @@
       "Should be called after a test has finished successfully"
       [when print-passes
             [efmtln "{} == {}\r\n{}\r\n\r\n"
-                    [ansi-green [str/write res-is]]
-                    [ansi-green [str/write res-should]]
-                    [str/write expr]]]
+                    [ansi-green [string/write res-is]]
+                    [ansi-green [string/write res-should]]
+                    [string/write expr]]]
       [set! success-count [+ 1 success-count]]]
 
 [defn test-failure [res-should res-is expr i]
       "Should be called if EXPR does not equal RES"
       [when print-errors
             [pfmtln "{} != {}\r\n{}\r\n\r\n"
-                    [ansi-red [str/write res-is]]
-                    [ansi-green [str/write res-should]]
-                    [str/write expr]]]
+                    [ansi-red [string/write res-is]]
+                    [ansi-green [string/write res-should]]
+                    [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
-[defn test-default [result rawexpr i]
+[defn test/run [result rawexpr i]
       "Tests that RAWEXPR evaluates to RESULT"
       [try [fn [err]
              [display/error err]
@@ -66,21 +66,22 @@
                [test-success result expr rawexpr i]
                [test-failure result expr rawexpr i]]]]
 
-[defn test-run-real [test]
+[defn test-run [output-passes hide-errors]
+      "Run through all automated Tests"
+      [set! print-errors   [not [bool hide-errors]]]
+      [set! print-passes   [bool output-passes]]
       [set! nujel-start    [time/milliseconds]]
       [set! success-count  0]
       [set! error-count    0]
+
       [def i [+ test-count 1]]
       [for-in [cur-test test-list]
-              [test [car cur-test] [cdr cur-test] [-- i]]]
-      [display-results]
-      error-count]
+              [test/run [car cur-test]
+                        [cdr cur-test]
+                        [-- i]]]
 
-[defn test-run [output-passes hide-errors]
-      "Run through all automated Tests"
-      [set! print-errors  [not [bool hide-errors]]]
-      [set! print-passes  [bool output-passes]]
-      [test-run-real test-default]]
+      [display-results]
+      [return error-count]]
 
 [test/reset]
 ;; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

@@ -9,7 +9,7 @@
 ;[test/add :type-error [try car [def cb [fn [α] [+ 1 α]]] [apply cb]]]
 ;[test/add :type-error [try car [let [[cb [fn [α] [+ 1 α]]]] [apply cb]]]]
 ;[test/add :type-error [try car [let* [def cb [fn [α] [+ 1 α]]] [apply cb]]]]
-[test/add :type-error [try car [def vs [fn [a] [vec [vec/z a] [vec/y a] [vec/x a]]]] [str/write [vs [vec 9 3.0 "1"]]]]]
+[test/add :type-error [try car [def vs [fn [a] [vec [vec/z a] [vec/y a] [vec/x a]]]] [string/write [vs [vec 9 3.0 "1"]]]]]
 [test/add :type-error [try car [+ '1 '[2]]]]
 [test/add :type-error [try car [- '1 '[2]]]]
 [test/add :type-error [try car [- '1 '[2 3]]]]

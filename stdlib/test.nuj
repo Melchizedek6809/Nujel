@@ -1,1 +1,8 @@
-[def test/buf [read/single "#m0123456789ABCDEF"]]
+[defmodule :test
+  [def counter 0]
+
+  [defn count [] counter]
+  [defn count! [] [++ counter]]
+
+  [export count! count!]
+  [export count count]]

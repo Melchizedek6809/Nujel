@@ -197,253 +197,6 @@
 0Es test-function
 01
 }#{##[]
-23s array/2d/allocate
-05v [width height]
-05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
-05v #{##[]
-05v tree/new
-05v :data
-05v array/fill!
-05v array/allocate
-05v *
-10s width
-10s height
-04i 2
-04i 1
-02i 0
-04i 2
-05v :width
-10s width
-05v :height
-10s height
-04i 6
-01
-}
-17
-0Es array/2d/allocate
-0D
-23s array/2d/fill!
-05v [data v]
-05v #@[source: [[array/fill! [tree/ref data :data] v] data]]
-05v #{##[]
-05v array/fill!
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s v
-04i 2
-0D
-10s data
-01
-}
-17
-0Es array/2d/fill!
-0D
-23s array/2d/ref
-05v [data x y oob-val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 57
-05v array/ref
-05v tree/ref
-10s data
-05v :data
-04i 2
-05v +
-10s x
-05v *
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-04i 2
-04i 2
-04i 2
-01
-}
-17
-0Es array/2d/ref
-0D
-23s array/2d/set!
-05v [data x y val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] data]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 36
-05v throw
-05v list
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-05v current-lambda
-04i 0
-04i 4
-04i 1
-09o 61
-05v array/set!
-05v tree/ref
-10s data
-05v :data
-04i 2
-05v +
-10s x
-05v *
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-04i 2
-04i 2
-10s val
-04i 3
-0D
-10s data
-01
-}
-17
-0Es array/2d/set!
-0D
-23s array/2d/print
-05v [data]
-05v #@[source: [[for [y 0 [tree/ref data :height]] [for [x 0 [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
-05v #{##[]
-15
-02i 0
-0Es y
-0D
-05v tree/ref
-10s data
-05v :height
-04i 2
-0Es ΓεnΣym-24
-0D
-02i 0
-1B
-1C
-10s y
-10s ΓεnΣym-24
-1E
-0Bo 120
-0D
-15
-02i 0
-0Es x
-0D
-05v tree/ref
-10s data
-05v :width
-04i 2
-0Es ΓεnΣym-25
-0D
-02i 0
-1B
-1C
-10s x
-10s ΓεnΣym-25
-1E
-0Bo 53
-0D
-05v print
-05v cat
-05v array/2d/ref
-10s data
-10s x
-10s y
-04i 3
-05v " "
-04i 2
-04i 1
-0D
-02i 1
-10s x
-03
-0Fs x
-09o -60
-16
-0D
-05v newline
-04i 0
-0D
-02i 1
-10s y
-03
-0Fs y
-09o -127
-16
-0D
-10s data
-01
-}
-17
-0Es array/2d/print
-01
-}#{##[]
 23s array/+=
 05v [a i v]
 05v #@[documentation: "Add V to the value in A at position I and store the result in A returning A" source: ["Add V to the value in A at position I and store the result in A returning A" [array/set! a i [+ v [array/ref a i]]]]]
@@ -1272,6 +1025,253 @@
 }
 17
 0Es array/cut
+01
+}#{##[]
+23s array/2d/allocate
+05v [width height]
+05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
+05v #{##[]
+05v tree/new
+05v :data
+05v array/fill!
+05v array/allocate
+05v *
+10s width
+10s height
+04i 2
+04i 1
+02i 0
+04i 2
+05v :width
+10s width
+05v :height
+10s height
+04i 6
+01
+}
+17
+0Es array/2d/allocate
+0D
+23s array/2d/fill!
+05v [data v]
+05v #@[source: [[array/fill! [tree/ref data :data] v] data]]
+05v #{##[]
+05v array/fill!
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s v
+04i 2
+0D
+10s data
+01
+}
+17
+0Es array/2d/fill!
+0D
+23s array/2d/ref
+05v [data x y oob-val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 57
+05v array/ref
+05v tree/ref
+10s data
+05v :data
+04i 2
+05v +
+10s x
+05v *
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+04i 2
+04i 2
+04i 2
+01
+}
+17
+0Es array/2d/ref
+0D
+23s array/2d/set!
+05v [data x y val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] data]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 36
+05v throw
+05v list
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
+05v current-lambda
+04i 0
+04i 4
+04i 1
+09o 61
+05v array/set!
+05v tree/ref
+10s data
+05v :data
+04i 2
+05v +
+10s x
+05v *
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+04i 2
+04i 2
+10s val
+04i 3
+0D
+10s data
+01
+}
+17
+0Es array/2d/set!
+0D
+23s array/2d/print
+05v [data]
+05v #@[source: [[for [y 0 [tree/ref data :height]] [for [x 0 [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
+05v #{##[]
+15
+02i 0
+0Es y
+0D
+05v tree/ref
+10s data
+05v :height
+04i 2
+0Es ΓεnΣym-24
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-24
+1E
+0Bo 120
+0D
+15
+02i 0
+0Es x
+0D
+05v tree/ref
+10s data
+05v :width
+04i 2
+0Es ΓεnΣym-25
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-25
+1E
+0Bo 53
+0D
+05v print
+05v cat
+05v array/2d/ref
+10s data
+10s x
+10s y
+04i 3
+05v " "
+04i 2
+04i 1
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -60
+16
+0D
+05v newline
+04i 0
+0D
+02i 1
+10s y
+03
+0Fs y
+09o -127
+16
+0D
+10s data
+01
+}
+17
+0Es array/2d/print
 01
 }#{##[]
 05v :e
@@ -4122,6 +4122,44 @@
 10s list/sort/merge
 0Es list/sort
 0D
+23s list?
+05v [a]
+05v #@[documentation: "Return #t is A is a proper list" source: ["Return #t is A is a proper list" [when-not a [return #f]] [while a [when-not [pair? a] [return #f]] [cdr! a]] [return #t]]]
+05v #{##[]
+10s a
+0Bo 7
+24
+09o 8
+05v #f
+01
+0D
+02i 0
+1B
+1C
+10s a
+0Bo 39
+0D
+05v pair?
+10s a
+04i 1
+0Bo 7
+24
+09o 8
+05v #f
+01
+0D
+10s a
+12
+0Fs a
+09o -41
+0D
+05v #t
+01
+01
+}
+17
+0Es list?
+0D
 23s list/equal?
 05v [a b]
 05v #@[documentation: "#t if A and B are equal" source: ["#t if A and B are equal" [if [pair? a] [and [list/equal? [car a] [car b]] [list/equal? [cdr a] [cdr b]]] [equal? a b]]]]
@@ -5874,7 +5912,7 @@
 0D
 23s bytecompile/gen-label
 05v [prefix]
-05v #@[source: [[++ bytecompile/gen-label/counter] [str->sym [cat prefix "label-" bytecompile/gen-label/counter]]]]
+05v #@[source: [[++ bytecompile/gen-label/counter] [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]]
 05v #{##[]
 05v +
 02i 1
@@ -5882,7 +5920,7 @@
 04i 2
 0Fs bytecompile/gen-label/counter
 0D
-05v str->sym
+05v string->symbol
 05v cat
 10s prefix
 05v "label-"
@@ -7597,6 +7635,55 @@
 }
 18
 0Es typecheck/only
+0D
+23s typecheck/numeric/single
+05v [v]
+05v #@[source: [[quasiquote [when-not [numeric? [unquote v]] [throw [list :type-error [unquote [fmt "Expected numeric value"]] [unquote v] [current-lambda]]]]]]]
+05v #{##[]
+23s when-not
+23s numeric?
+10s v
+24
+14
+14
+23s throw
+23s list
+05v :type-error
+05v "Expected numeric value"
+10s v
+23s current-lambda
+24
+14
+24
+14
+14
+14
+14
+14
+24
+14
+14
+24
+14
+14
+14
+01
+}
+17
+0Es typecheck/numeric/single
+0D
+23s typecheck/numeric
+23s v
+05v #@[source: [[map v typecheck/numeric/single]]]
+05v #{##[]
+05v map
+10s v
+10s typecheck/numeric/single
+04i 2
+01
+}
+18
+0Es typecheck/numeric
 01
 }#{##[]
 23s disassemble/length
@@ -9703,7 +9790,7 @@
 0D
 23s keyword->string
 05v [α]
-05v #@[source: [[when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]] [sym->str [keyword->symbol α]]]]
+05v #@[source: [[when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]] [symbol->string [keyword->symbol α]]]]
 05v #{##[]
 05v keyword?
 10s α
@@ -9721,7 +9808,7 @@
 04i 4
 04i 1
 0D
-05v sym->str
+05v symbol->string
 05v keyword->symbol
 10s α
 04i 1
@@ -9733,7 +9820,7 @@
 0D
 23s string->keyword
 05v [α]
-05v #@[source: [[when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]] [symbol->keyword [str->sym α]]]]
+05v #@[source: [[when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]] [symbol->keyword [string->symbol α]]]]
 05v #{##[]
 05v string?
 10s α
@@ -9752,7 +9839,7 @@
 04i 1
 0D
 05v symbol->keyword
-05v str->sym
+05v string->symbol
 10s α
 04i 1
 04i 1
@@ -10325,6 +10412,347 @@
 0Es ->>
 01
 }#{##[]
+05v tree/new
+24
+04i 1
+0Es module/cache
+0D
+23s module/qualify-symbol
+05v [module-name symbol]
+05v #@[source: [[string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]]
+05v #{##[]
+05v string->symbol
+05v cat
+05v keyword->symbol
+10s module-name
+04i 1
+05v "/"
+05v string
+10s symbol
+04i 1
+04i 3
+04i 1
+01
+}
+17
+0Es module/qualify-symbol
+0D
+23s module
+23s body
+05v #@[documentation: "Define a new module and return it" source: ["Define a new module and return it" [macroexpand [cons 'ω* [cons '[def exports [tree/new #nil]] body]]]]]
+05v #{##[]
+05v macroexpand
+23s ω*
+05v [def exports [tree/new #nil]]
+10s body
+14
+14
+04i 1
+01
+}
+18
+0Es module
+0D
+23s export
+05v [name value]
+05v #@[source: [[quasiquote [tree/set! exports '[unquote name] [unquote value]]]]]
+05v #{##[]
+23s tree/set!
+23s exports
+23s quote
+10s name
+24
+14
+14
+10s value
+24
+14
+14
+14
+14
+01
+}
+18
+0Es export
+0D
+23s import*
+05v [local-symbol module module-symbol]
+05v #@[source: [[quasiquote [def [unquote local-symbol] [module/import [unquote module] '[unquote module-symbol]]]]]]
+05v #{##[]
+23s def
+10s local-symbol
+23s module/import
+10s module
+23s quote
+10s module-symbol
+24
+14
+14
+24
+14
+14
+14
+24
+14
+14
+14
+01
+}
+18
+0Es import*
+0D
+23s import
+05v [names module]
+05v #@[source: [[when-not [list? names] [return [quasiquote [import* [unquote [module/qualify-symbol module names]] [module/load [unquote module]] [unquote names]]]]] [def ret #nil] [while names [if [== [cadr names] :as] [do [set! ret [cons [quasiquote [import* [unquote [module/qualify-symbol module [caddr names]]] [module/load [unquote module]] [unquote [car names]]]] ret]] [set! names [cddr names]]] [set! ret [cons [quasiquote [import* [unquote [module/qualify-symbol module [car names]]] [module/load [unquote module]] [unquote [car names]]]] ret]]] [cdr! names]] [cons do [nreverse ret]]]]
+05v #{##[]
+05v list?
+10s names
+04i 1
+0Bo 7
+24
+09o 42
+23s import*
+05v module/qualify-symbol
+10s module
+10s names
+04i 2
+23s module/load
+10s module
+24
+14
+14
+10s names
+24
+14
+14
+14
+14
+01
+0D
+24
+0Es ret
+0D
+02i 0
+1B
+1C
+10s names
+0Bo 148
+0D
+10s names
+12
+11
+05v :as
+20
+0Bo 71
+23s import*
+05v module/qualify-symbol
+10s module
+05v caddr
+10s names
+04i 1
+04i 2
+23s module/load
+10s module
+24
+14
+14
+10s names
+11
+24
+14
+14
+14
+14
+10s ret
+14
+0Fs ret
+0D
+10s names
+12
+12
+0Fs names
+09o 52
+23s import*
+05v module/qualify-symbol
+10s module
+10s names
+11
+04i 2
+23s module/load
+10s module
+24
+14
+14
+10s names
+11
+24
+14
+14
+14
+14
+10s ret
+14
+0Fs ret
+0D
+10s names
+12
+0Fs names
+09o -150
+0D
+10s do
+05v nreverse
+10s ret
+04i 1
+14
+01
+}
+18
+0Es import
+0D
+23s module/load/external
+05v [name]
+05v #@[source: []]
+05v #{##[]
+24
+01
+}
+17
+0Es module/load/external
+0D
+23s module/load
+05v [name]
+05v #@[source: [[case [type-of name] [:object name] [:keyword [or [tree/ref module/cache name] [do [def mod [module/load/external name]] [when mod [tree/set! module/cache mod]] [return mod]]]]]]]
+05v #{##[]
+15
+05v type-of
+10s name
+04i 1
+0Es ΓεnΣym-119
+0D
+10s ΓεnΣym-119
+05v :object
+20
+0Bo 10
+10s name
+09o 93
+10s ΓεnΣym-119
+05v :keyword
+20
+0Bo 80
+05v tree/ref
+10s module/cache
+10s name
+04i 2
+0C
+0Ao 59
+0D
+05v module/load/external
+10s name
+04i 1
+0Es mod
+0D
+10s mod
+0Bo 20
+05v tree/set!
+10s module/cache
+10s mod
+04i 2
+09o 4
+24
+0D
+10s mod
+01
+0C
+0Ao 8
+0D
+05v #f
+09o 4
+24
+16
+01
+}
+17
+0Es module/load
+0D
+23s module/import-all
+05v [module symbol]
+05v #@[source: [[def exports [resolve 'exports module]] [typecheck/only exports :tree] [return exports]]]
+05v #{##[]
+05v resolve
+23s exports
+10s module
+04i 2
+0Es exports
+0D
+05v type-of
+10s exports
+04i 1
+05v :tree
+20
+0Bo 7
+24
+09o 33
+05v throw
+05v list
+05v :type-error
+05v "Expected a value of type :tree"
+10s exports
+05v current-lambda
+04i 0
+04i 4
+04i 1
+0D
+10s exports
+01
+01
+}
+17
+0Es module/import-all
+0D
+23s module/import
+05v [module symbol]
+05v #@[source: [[def exports [module/import-all module symbol]] [when-not [tree/has? exports symbol] [exception :import-error [if [resolves? symbol module] "That symbol was not exported" "That symbol does not exist in that module"]]] [tree/ref exports symbol]]]
+05v #{##[]
+05v module/import-all
+10s module
+10s symbol
+04i 2
+0Es exports
+0D
+05v tree/has?
+10s exports
+10s symbol
+04i 2
+0Bo 7
+24
+09o 54
+05v throw
+05v list
+05v :import-error
+05v resolves?
+10s symbol
+10s module
+04i 2
+0Bo 10
+05v "That symbol was not exported"
+09o 7
+05v "That symbol does not exist in that module"
+24
+05v current-lambda
+04i 0
+04i 4
+04i 1
+0D
+05v tree/ref
+10s exports
+10s symbol
+04i 2
+01
+}
+17
+0Es module/import
+01
+}#{##[]
 23s numeric?
 05v [a]
 05v #@[documentation: "Return #t if a is a number" source: ["Return #t if a is a number" [or [int? a] [float? a] [vec? a]]]]
@@ -10481,9 +10909,9 @@
 09o 110
 15
 10s cur-type
-0Es ΓεnΣym-119
+0Es ΓεnΣym-121
 0D
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 05v :array
 20
 0Bo 20
@@ -10492,7 +10920,7 @@
 10s b
 04i 2
 09o 70
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 05v :tree
 20
 0Bo 20
@@ -10501,7 +10929,7 @@
 10s b
 04i 2
 09o 41
-10s ΓεnΣym-119
+10s ΓεnΣym-121
 05v :pair
 20
 0Bo 20
@@ -10758,6 +11186,34 @@
 17
 0Es procedure?
 0D
+23s buffer?
+05v [v]
+05v #@[source: [[== :buffer [type-of v]]]]
+05v #{##[]
+05v :buffer
+05v type-of
+10s v
+04i 1
+20
+01
+}
+17
+0Es buffer?
+0D
+23s buffer-view?
+05v [v]
+05v #@[source: [[== :buffer-view [type-of v]]]]
+05v #{##[]
+05v :buffer-view
+05v type-of
+10s v
+04i 1
+20
+01
+}
+17
+0Es buffer-view?
+0D
 23s bytecode-array?
 05v [v]
 05v #@[source: [[== :bytecode-array [type-of v]]]]
@@ -10997,7 +11453,7 @@
 }#{##[]
 23s describe/closure
 05v [c i]
-05v #@[source: [[when c [if [== c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [str/write c]]] " - " [if [< l 16] [str/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
+05v #@[source: [[when c [if [== c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]] " - " [if [< l 16] [string/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
 05v #{##[]
 10s c
 0Bo 246
@@ -11050,7 +11506,7 @@
 05v #f
 04i 1
 05v "# "
-05v str/write
+05v string/write
 10s c
 04i 1
 04i 3
@@ -11060,7 +11516,7 @@
 02i 16
 1E
 0Bo 16
-05v str/write
+05v string/write
 10s data
 04i 1
 09o 7
@@ -11170,7 +11626,7 @@
 0D
 23s profile-form
 05v [raw]
-05v #@[source: [[def start-time [time/milliseconds]] [def val [eval raw]] [def end-time [time/milliseconds]] [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]
+05v #@[source: [[def start-time [time/milliseconds]] [def val [eval raw]] [def end-time [time/milliseconds]] [display [cat "Evaluating " [ansi-yellow [string/write raw]] " to " [ansi-green [string/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]
 05v #{##[]
 05v time/milliseconds
 04i 0
@@ -11191,13 +11647,13 @@
 05v cat
 05v "Evaluating "
 05v ansi-yellow
-05v str/write
+05v string/write
 10s raw
 04i 1
 04i 1
 05v " to "
 05v ansi-green
-05v str/write
+05v string/write
 10s val
 04i 1
 04i 1
@@ -11265,13 +11721,13 @@
 05v string/length
 10s data
 04i 1
-0Es ΓεnΣym-121
+0Es ΓεnΣym-123
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-121
+10s ΓεnΣym-123
 1E
 0Bo 76
 0D
@@ -11312,6 +11768,878 @@
 }
 17
 0Es hash/adler32
+01
+}#{##[]
+05v tree/new
+24
+04i 1
+0Es image/decoders
+0D
+05v tree/new
+24
+04i 1
+0Es image/encoders
+0D
+23s image/add-encoder!
+05v [ext enc]
+05v #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/encoders ext enc]]]
+05v #{##[]
+05v symbol->keyword
+05v string->symbol
+05v lowercase
+10s ext
+04i 1
+04i 1
+04i 1
+0Es ext
+0D
+05v tree/set!
+10s image/encoders
+10s ext
+10s enc
+04i 3
+01
+}
+17
+0Es image/add-encoder!
+0D
+23s image/add-decoder!
+05v [ext dec]
+05v #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/decoders ext dec]]]
+05v #{##[]
+05v symbol->keyword
+05v string->symbol
+05v lowercase
+10s ext
+04i 1
+04i 1
+04i 1
+0Es ext
+0D
+05v tree/set!
+10s image/decoders
+10s ext
+10s dec
+04i 3
+01
+}
+17
+0Es image/add-decoder!
+0D
+23s image/get-encoder
+05v [path]
+05v #@[source: [[def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/encoders ext]]]
+05v #{##[]
+05v symbol->keyword
+05v string->symbol
+05v lowercase
+05v path/extension
+10s path
+04i 1
+04i 1
+04i 1
+04i 1
+0Es ext
+0D
+05v tree/ref
+10s image/encoders
+10s ext
+04i 2
+01
+}
+17
+0Es image/get-encoder
+0D
+23s image/get-decoder
+05v [path]
+05v #@[source: [[def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/decoders ext]]]
+05v #{##[]
+05v symbol->keyword
+05v string->symbol
+05v lowercase
+05v path/extension
+10s path
+04i 1
+04i 1
+04i 1
+04i 1
+0Es ext
+0D
+05v tree/ref
+10s image/decoders
+10s ext
+04i 2
+01
+}
+17
+0Es image/get-decoder
+0D
+23s image/new
+05v [width height]
+05v #@[source: [[def buffer [buffer/allocate [* width height 4]]] [tree/new :width width :height height :pixel-buffer buffer :pixels [buffer/view/u32* buffer]]]]
+05v #{##[]
+05v buffer/allocate
+05v *
+05v *
+10s width
+10s height
+04i 2
+02i 4
+04i 2
+04i 1
+0Es buffer
+0D
+05v tree/new
+05v :width
+10s width
+05v :height
+10s height
+05v :pixel-buffer
+10s buffer
+05v :pixels
+05v buffer/view/u32*
+10s buffer
+04i 1
+04i 8
+01
+}
+17
+0Es image/new
+0D
+23s image/ref
+05v [img x y]
+05v #@[source: [[def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/ref [tree/ref img :pixels] i]]]
+05v #{##[]
+05v +
+05v int
+10s x
+04i 1
+05v *
+05v int
+10s y
+04i 1
+05v tree/ref
+10s img
+05v :width
+04i 2
+04i 2
+04i 2
+0Es i
+0D
+05v buffer/view/ref
+05v tree/ref
+10s img
+05v :pixels
+04i 2
+10s i
+04i 2
+01
+}
+17
+0Es image/ref
+0D
+23s image/set!
+05v [img x y value]
+05v #@[source: [[def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/set! [tree/ref img :pixels] i value]]]
+05v #{##[]
+05v +
+05v int
+10s x
+04i 1
+05v *
+05v int
+10s y
+04i 1
+05v tree/ref
+10s img
+05v :width
+04i 2
+04i 2
+04i 2
+0Es i
+0D
+05v buffer/view/set!
+05v tree/ref
+10s img
+05v :pixels
+04i 2
+10s i
+10s value
+04i 3
+01
+}
+17
+0Es image/set!
+0D
+23s image/fill!
+05v [img value]
+05v #@[source: [[def p [tree/ref img :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i value]] [return img]]]
+05v #{##[]
+05v tree/ref
+10s img
+05v :pixels
+04i 2
+0Es p
+0D
+15
+02i 0
+0Es i
+0D
+05v *
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+04i 2
+0Es ΓεnΣym-129
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-129
+1E
+0Bo 37
+0D
+05v buffer/view/set!
+10s p
+10s i
+10s value
+04i 3
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -44
+16
+0D
+10s img
+01
+01
+}
+17
+0Es image/fill!
+0D
+23s image/map!
+05v [img fun]
+05v #@[source: [[def p [tree/ref img :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i [fun [buffer/view/ref p i]]]] [return img]]]
+05v #{##[]
+05v tree/ref
+10s img
+05v :pixels
+04i 2
+0Es p
+0D
+15
+02i 0
+0Es i
+0D
+05v *
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+04i 2
+0Es ΓεnΣym-130
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-130
+1E
+0Bo 53
+0D
+05v buffer/view/set!
+10s p
+10s i
+10s fun
+05v buffer/view/ref
+10s p
+10s i
+04i 2
+04i 1
+04i 3
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -60
+16
+0D
+10s img
+01
+01
+}
+17
+0Es image/map!
+0D
+23s image/dup
+05v [img]
+05v #@[source: [[def ret [image/new [tree/ref img :width] [tree/ref img :height]]] [def in [tree/ref img :pixels]] [def out [tree/ref ret :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! out i [buffer/view/ref in i]]] [return ret]]]
+05v #{##[]
+05v image/new
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+04i 2
+0Es ret
+0D
+05v tree/ref
+10s img
+05v :pixels
+04i 2
+0Es in
+0D
+05v tree/ref
+10s ret
+05v :pixels
+04i 2
+0Es out
+0D
+15
+02i 0
+0Es i
+0D
+05v *
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+04i 2
+0Es ΓεnΣym-131
+0D
+02i 0
+1B
+1C
+10s i
+10s ΓεnΣym-131
+1E
+0Bo 47
+0D
+05v buffer/view/set!
+10s out
+10s i
+05v buffer/view/ref
+10s in
+10s i
+04i 2
+04i 3
+0D
+02i 1
+10s i
+03
+0Fs i
+09o -54
+16
+0D
+10s ret
+01
+01
+}
+17
+0Es image/dup
+0D
+23s image/save!
+05v [img path]
+05v #@[source: [[def enc [image/get-encoder path]] [if enc [file/write [enc img] path] [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]]
+05v #{##[]
+05v image/get-encoder
+10s path
+04i 1
+0Es enc
+0D
+10s enc
+0Bo 26
+05v file/write
+10s enc
+10s img
+04i 1
+10s path
+04i 2
+09o 33
+05v throw
+05v list
+05v :missing-encoder
+05v "Currently there is no encoder loaded for that image format"
+10s path
+05v current-lambda
+04i 0
+04i 4
+04i 1
+01
+}
+17
+0Es image/save!
+0D
+23s image/test
+05v []
+05v #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [for [x 0 w] [for [y 0 h] [image/set! out x y [logior x [ash y 8] [ash [logxor x y] 16]]]]] [return out]]]
+05v #{##[]
+05v 256
+0Es w
+0D
+05v 256
+0Es h
+0D
+05v image/new
+10s w
+10s h
+04i 2
+0Es out
+0D
+15
+02i 0
+0Es x
+0D
+10s w
+0Es ΓεnΣym-132
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-132
+1E
+0Bo 137
+0D
+15
+02i 0
+0Es y
+0D
+10s h
+0Es ΓεnΣym-133
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-133
+1E
+0Bo 87
+0D
+05v image/set!
+10s out
+10s x
+10s y
+05v logior
+05v logior
+10s x
+05v ash
+10s y
+02i 8
+04i 2
+04i 2
+05v ash
+05v logxor
+10s x
+10s y
+04i 2
+02i 16
+04i 2
+04i 2
+04i 4
+0D
+02i 1
+10s y
+03
+0Fs y
+09o -94
+16
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -144
+16
+0D
+10s out
+01
+01
+}
+17
+0Es image/test
+01
+}#{##[]
+23s buffer/view/le/set!
+05v [u8v offset bytes val]
+05v #@[source: [[while [> bytes 0] [buffer/view/set! u8v [++ offset] [logand 255 val]] [-- bytes] [set! val [ash val -8]]] offset]]
+05v #{##[]
+02i 0
+1B
+1C
+10s bytes
+02i 0
+22
+0Bo 81
+0D
+05v buffer/view/set!
+10s u8v
+05v +
+02i 1
+10s offset
+04i 2
+0Fs offset
+05v logand
+05v 255
+10s val
+04i 2
+04i 3
+0D
+05v +
+02i -1
+10s bytes
+04i 2
+0Fs bytes
+0D
+05v ash
+10s val
+02i -8
+04i 2
+0Fs val
+09o -86
+0D
+10s offset
+01
+}
+17
+0Es buffer/view/le/set!
+0D
+23s image/bmp/row-padding
+05v [width pixel-length]
+05v #@[source: [[def ret [- 4 [logand [* width pixel-length] 3]]] [if [== ret 4] 0 ret]]]
+05v #{##[]
+05v -
+02i 4
+05v logand
+05v *
+10s width
+10s pixel-length
+04i 2
+02i 3
+04i 2
+04i 2
+0Es ret
+0D
+10s ret
+02i 4
+20
+0Bo 8
+02i 0
+09o 7
+10s ret
+01
+}
+17
+0Es image/bmp/row-padding
+0D
+23s image/bmp/encode
+05v [image]
+05v #@[source: [[def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [++ i] 66] [buffer/view/set! b [++ i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [for [y [- [tree/ref image :height] 1] -1 -1] [for [x 0 [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]]] out]]
+05v #{##[]
+05v *
+05v *
+05v tree/ref
+10s image
+05v :height
+04i 2
+02i 3
+04i 2
+05v +
+05v tree/ref
+10s image
+05v :width
+04i 2
+05v image/bmp/row-padding
+05v tree/ref
+10s image
+05v :width
+04i 2
+02i 3
+04i 2
+04i 2
+04i 2
+0Es image-size
+0D
+05v +
+02i 14
+02i 40
+04i 2
+0Es header-size
+0D
+05v +
+10s image-size
+10s header-size
+04i 2
+0Es file-size
+0D
+05v buffer/allocate
+10s file-size
+04i 1
+0Es out
+0D
+05v buffer/view/u8*
+10s out
+04i 1
+0Es b
+0D
+02i -1
+0Es i
+0D
+05v buffer/view/set!
+10s b
+05v +
+02i 1
+10s i
+04i 2
+0Fs i
+02i 66
+04i 3
+0D
+05v buffer/view/set!
+10s b
+05v +
+02i 1
+10s i
+04i 2
+0Fs i
+02i 77
+04i 3
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s file-size
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s header-size
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 40
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+05v tree/ref
+10s image
+05v :width
+04i 2
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+05v tree/ref
+10s image
+05v :height
+04i 2
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 1
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 24
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s image-size
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+05v 8192
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+05v 8192
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+05v buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+05v image/bmp/row-padding
+05v tree/ref
+10s image
+05v :width
+04i 2
+02i 3
+04i 2
+0Es row-padding
+0D
+05v -
+10s header-size
+02i 1
+04i 2
+0Es pixels
+0D
+15
+05v -
+05v tree/ref
+10s image
+05v :height
+04i 2
+02i 1
+04i 2
+0Es y
+0D
+02i -1
+0Es ΓεnΣym-136
+0D
+02i 0
+1B
+1C
+10s y
+10s ΓεnΣym-136
+22
+0Bo 136
+0D
+15
+02i 0
+0Es x
+0D
+05v tree/ref
+10s image
+05v :width
+04i 2
+0Es ΓεnΣym-137
+0D
+02i 0
+1B
+1C
+10s x
+10s ΓεnΣym-137
+1E
+0Bo 57
+0D
+05v buffer/view/le/set!
+10s b
+10s pixels
+02i 3
+05v image/ref
+10s image
+10s x
+10s y
+04i 3
+04i 4
+0Fs pixels
+0D
+02i 1
+10s x
+03
+0Fs x
+09o -64
+16
+0D
+05v +
+10s pixels
+10s row-padding
+04i 2
+0Fs pixels
+0D
+02i -1
+10s y
+03
+0Fs y
+09o -143
+16
+0D
+10s out
+01
+}
+17
+0Es image/bmp/encode
+0D
+05v image/add-encoder!
+05v "bmp"
+10s image/bmp/encode
+04i 2
 01
 }#{##[]
 05v 3.14159
@@ -11485,13 +12813,13 @@
 }#{##[]
 23s display/error/wrap
 05v [i text]
-05v #@[source: [[case i [0 [ansi-red text]] [1 [string text]] [2 [ansi-yellow [str/write text]]] [3 [describe/closure text]] [otherwise text]]]]
+05v #@[source: [[case i [0 [ansi-red text]] [1 [string text]] [2 [ansi-yellow [string/write text]]] [3 [describe/closure text]] [otherwise text]]]]
 05v #{##[]
 15
 10s i
-0Es ΓεnΣym-123
+0Es ΓεnΣym-139
 0D
-10s ΓεnΣym-123
+10s ΓεnΣym-139
 02i 0
 20
 0Bo 16
@@ -11499,7 +12827,7 @@
 10s text
 04i 1
 09o 82
-10s ΓεnΣym-123
+10s ΓεnΣym-139
 02i 1
 20
 0Bo 16
@@ -11507,17 +12835,17 @@
 10s text
 04i 1
 09o 59
-10s ΓεnΣym-123
+10s ΓεnΣym-139
 02i 2
 20
 0Bo 22
 05v ansi-yellow
-05v str/write
+05v string/write
 10s text
 04i 1
 04i 1
 09o 30
-10s ΓεnΣym-123
+10s ΓεnΣym-139
 02i 3
 20
 0Bo 16
@@ -11607,7 +12935,7 @@
 0Es arguments
 0D
 05v cat
-05v str/write
+05v string/write
 10s arguments
 04i 1
 05v " - "
@@ -11620,11 +12948,11 @@
 0D
 23s describe/string
 05v [a]
-05v #@[documentation: "Descibe whatever value string A resolves to" source: ["Descibe whatever value string A resolves to" [describe/thing [resolve [str->sym a]]]]]
+05v #@[documentation: "Descibe whatever value string A resolves to" source: ["Descibe whatever value string A resolves to" [describe/thing [resolve [string->symbol a]]]]]
 05v #{##[]
 05v describe/thing
 05v resolve
-05v str->sym
+05v string->symbol
 10s a
 04i 1
 04i 1
@@ -11701,7 +13029,7 @@
 0D
 23s gensym
 05v [prefix]
-05v #@[source: [[++ gensym/counter] [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]]
+05v #@[source: [[++ gensym/counter] [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]
 05v #{##[]
 05v +
 02i 1
@@ -11709,7 +13037,7 @@
 04i 2
 0Fs gensym/counter
 0D
-05v str->sym
+05v string->symbol
 05v cat
 10s prefix
 05v "ΓεnΣym-"
@@ -11870,27 +13198,27 @@
 0D
 23s val->json
 05v [v]
-05v #@[documentation: "Return V as a JSON encoded string" source: ["Return V as a JSON encoded string" [case [type-of v] [:nil "null"] [[:int :float] [string v]] [:bool [if v "true" "false"]] [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]] [:string [str/write v]] [:symbol [cat "\"" [sym->str v] "\""]] [:keyword [cat "\"" [keyword->string v] "\""]] [:tree [tree->json v]] [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]]
+05v #@[documentation: "Return V as a JSON encoded string" source: ["Return V as a JSON encoded string" [case [type-of v] [:nil "null"] [[:int :float] [string v]] [:bool [if v "true" "false"]] [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]] [:string [string/write v]] [:symbol [cat "\"" [symbol->string v] "\""]] [:keyword [cat "\"" [keyword->string v] "\""]] [:tree [tree->json v]] [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]]
 05v #{##[]
 15
 05v type-of
 10s v
 04i 1
-0Es ΓεnΣym-125
+0Es ΓεnΣym-141
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :nil
 20
 0Bo 10
 05v "null"
 09o 318
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :int
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :float
 20
 0C
@@ -11902,7 +13230,7 @@
 10s v
 04i 1
 09o 270
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :bool
 20
 0Bo 24
@@ -11912,13 +13240,13 @@
 09o 7
 05v "false"
 09o 237
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :array
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :pair
 20
 0C
@@ -11938,27 +13266,27 @@
 05v "]"
 04i 3
 09o 161
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :string
 20
 0Bo 16
-05v str/write
+05v string/write
 10s v
 04i 1
 09o 136
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :symbol
 20
 0Bo 30
 05v cat
 05v "\""
-05v sym->str
+05v symbol->string
 10s v
 04i 1
 05v "\""
 04i 3
 09o 97
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :keyword
 20
 0Bo 30
@@ -11970,7 +13298,7 @@
 05v "\""
 04i 3
 09o 58
-10s ΓεnΣym-125
+10s ΓεnΣym-141
 05v :tree
 20
 0Bo 16
@@ -12511,13 +13839,13 @@
 0Es i
 0D
 10s width
-0Es ΓεnΣym-127
+0Es ΓεnΣym-143
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-127
+10s ΓεnΣym-143
 1E
 0Bo 29
 0D
@@ -12621,63 +13949,63 @@
 02i 1
 04i 2
 04i 2
-0Es ΓεnΣym-136
+0Es ΓεnΣym-152
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 48
 20
 0C
 0Ao 116
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 49
 20
 0C
 0Ao 104
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 50
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 51
 20
 0C
 0Ao 80
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 52
 20
 0C
 0Ao 68
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 53
 20
 0C
 0Ao 56
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 54
 20
 0C
 0Ao 44
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 55
 20
 0C
 0Ao 32
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 56
 20
 0C
 0Ao 20
 0D
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 57
 20
 0C
@@ -12743,7 +14071,7 @@
 04i 3
 04i 2
 09o 713
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 63
 20
 0Bo 60
@@ -12765,7 +14093,7 @@
 04i 3
 04i 2
 09o 646
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 88
 20
 0Bo 60
@@ -12787,7 +14115,7 @@
 04i 3
 04i 2
 09o 579
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 120
 20
 0Bo 60
@@ -12809,7 +14137,7 @@
 04i 3
 04i 2
 09o 512
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 100
 20
 0Bo 60
@@ -12831,7 +14159,7 @@
 04i 3
 04i 2
 09o 445
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 111
 20
 0Bo 60
@@ -12853,7 +14181,7 @@
 04i 3
 04i 2
 09o 378
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 98
 20
 0Bo 60
@@ -12875,7 +14203,7 @@
 04i 3
 04i 2
 09o 311
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 60
 20
 0Bo 60
@@ -12897,7 +14225,7 @@
 04i 3
 04i 2
 09o 244
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 94
 20
 0Bo 60
@@ -12919,7 +14247,7 @@
 04i 3
 04i 2
 09o 177
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 62
 20
 0Bo 60
@@ -12941,7 +14269,7 @@
 04i 3
 04i 2
 09o 110
-10s ΓεnΣym-136
+10s ΓεnΣym-152
 02i 46
 20
 0Bo 70
@@ -12983,7 +14311,7 @@
 0D
 23s fmt/debug
 05v [opts]
-05v #@[source: [[if-not [tree/ref opts :debug] opts [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]]
+05v #@[source: [[if-not [tree/ref opts :debug] opts [tree/set! opts :argument [list string/write [tree/ref opts :argument]]]]]]
 05v #{##[]
 05v tree/ref
 10s opts
@@ -12994,7 +14322,7 @@
 10s opts
 05v :argument
 05v list
-10s str/write
+10s string/write
 05v tree/ref
 10s opts
 05v :argument
@@ -13017,9 +14345,9 @@
 10s opts
 05v :base
 04i 2
-0Es ΓεnΣym-137
+0Es ΓεnΣym-153
 0D
-10s ΓεnΣym-137
+10s ΓεnΣym-153
 05v :binary
 20
 0Bo 44
@@ -13035,7 +14363,7 @@
 04i 2
 04i 3
 09o 219
-10s ΓεnΣym-137
+10s ΓεnΣym-153
 05v :octal
 20
 0Bo 44
@@ -13051,7 +14379,7 @@
 04i 2
 04i 3
 09o 166
-10s ΓεnΣym-137
+10s ΓεnΣym-153
 05v :decimal
 20
 0Bo 44
@@ -13067,7 +14395,7 @@
 04i 2
 04i 3
 09o 113
-10s ΓεnΣym-137
+10s ΓεnΣym-153
 05v :hexadecimal
 20
 0Bo 44
@@ -13083,7 +14411,7 @@
 04i 2
 04i 3
 09o 60
-10s ΓεnΣym-137
+10s ΓεnΣym-153
 05v :HEXADECIMAL
 20
 0Bo 44
@@ -13205,21 +14533,21 @@
 10s opts
 05v :align
 04i 2
-0Es ΓεnΣym-138
+0Es ΓεnΣym-154
 0D
-10s ΓεnΣym-138
+10s ΓεnΣym-154
 05v :right
 20
 0Bo 10
 10s string/pad-start
 09o 42
-10s ΓεnΣym-138
+10s ΓεnΣym-154
 05v :center
 20
 0Bo 10
 10s string/pad-middle
 09o 23
-10s ΓεnΣym-138
+10s ΓεnΣym-154
 05v :left
 20
 0Bo 10
@@ -13404,15 +14732,15 @@
 0D
 23s fmt/arg-sym
 05v [v]
-05v #@[source: [[case [type-of v] [:int [fmt/arg-sym [cat "fmt-arg-" [string v]]]] [:symbol v] [:string [str->sym v]] [otherwise [throw [list :type-error "Invalid fmt argument name" v [current-lambda]]]]]]]
+05v #@[source: [[case [type-of v] [:int [fmt/arg-sym [cat "fmt-arg-" [string v]]]] [:symbol v] [:string [string->symbol v]] [otherwise [throw [list :type-error "Invalid fmt argument name" v [current-lambda]]]]]]]
 05v #{##[]
 15
 05v type-of
 10s v
 04i 1
-0Es ΓεnΣym-139
+0Es ΓεnΣym-155
 0D
-10s ΓεnΣym-139
+10s ΓεnΣym-155
 05v :int
 20
 0Bo 32
@@ -13425,17 +14753,17 @@
 04i 2
 04i 1
 09o 77
-10s ΓεnΣym-139
+10s ΓεnΣym-155
 05v :symbol
 20
 0Bo 10
 10s v
 09o 58
-10s ΓεnΣym-139
+10s ΓεnΣym-155
 05v :string
 20
 0Bo 16
-05v str->sym
+05v string->symbol
 10s v
 04i 1
 09o 33
@@ -13625,7 +14953,7 @@
 0D
 23s fmt
 05v [format-string . args]
-05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [for [i 0 [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [for-in [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [== "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [for [i 0 [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [str->sym [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
+05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [for [i 0 [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [for-in [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [== "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [for [i 0 [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
 05v #{##[]
 05v string?
 10s format-string
@@ -13653,13 +14981,13 @@
 05v string/length
 10s format-string
 04i 1
-0Es ΓεnΣym-140
+0Es ΓεnΣym-156
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-140
+10s ΓεnΣym-156
 1E
 0Bo 198
 0D
@@ -13668,9 +14996,9 @@
 10s format-string
 10s i
 04i 2
-0Es ΓεnΣym-141
+0Es ΓεnΣym-157
 0D
-10s ΓεnΣym-141
+10s ΓεnΣym-157
 02i 123
 20
 0Bo 68
@@ -13696,7 +15024,7 @@
 14
 0Fs cuts
 09o 86
-10s ΓεnΣym-141
+10s ΓεnΣym-157
 02i 125
 20
 0Bo 75
@@ -13781,17 +15109,17 @@
 0D
 15
 10s cuts
-0Es ΓεnΣym-142
+0Es ΓεnΣym-158
 0D
-10s ΓεnΣym-142
+10s ΓεnΣym-158
 0Bo 173
 02i 0
 1B
 1C
-10s ΓεnΣym-142
+10s ΓεnΣym-158
 0Bo 159
 0D
-10s ΓεnΣym-142
+10s ΓεnΣym-158
 11
 0Es c
 0D
@@ -13842,9 +15170,9 @@
 11
 0Fs last-pos
 0D
-10s ΓεnΣym-142
+10s ΓεnΣym-158
 12
-0Fs ΓεnΣym-142
+0Fs ΓεnΣym-158
 09o -161
 09o 4
 24
@@ -13875,13 +15203,13 @@
 05v array/length
 10s arguments-used
 04i 1
-0Es ΓεnΣym-143
+0Es ΓεnΣym-159
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-143
+10s ΓεnΣym-159
 1E
 0Bo 90
 0D
@@ -13940,9 +15268,9 @@
 0D
 23s fmt/args/map-fun
 05v [arg]
-05v #@[source: [[def s [str->sym [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]]]
+05v #@[source: [[def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]]]
 05v #{##[]
-05v str->sym
+05v string->symbol
 05v cat
 05v "fmt-arg-"
 05v string
@@ -14075,10 +15403,10 @@
 }#{##[]
 23s string->keyword
 05v [α]
-05v #@[documentation: "Return string α as a keyword" source: [:inline "Return string α as a keyword" [symbol->keyword [str->sym α]]] inline: #t]
+05v #@[documentation: "Return string α as a keyword" source: [:inline "Return string α as a keyword" [symbol->keyword [string->symbol α]]] inline: #t]
 05v #{##[]
 05v symbol->keyword
-05v str->sym
+05v string->symbol
 10s α
 04i 1
 04i 1
@@ -14105,13 +15433,13 @@
 05v string/length
 10s a
 04i 1
-0Es ΓεnΣym-147
+0Es ΓεnΣym-163
 0D
 02i 0
 1B
 1C
 10s i
-10s ΓεnΣym-147
+10s ΓεnΣym-163
 1E
 0Bo 47
 0D
@@ -14235,9 +15563,9 @@
 05v type-of
 10s ext
 04i 1
-0Es ΓεnΣym-148
+0Es ΓεnΣym-164
 0D
-10s ΓεnΣym-148
+10s ΓεnΣym-164
 05v :string
 20
 0Bo 23
@@ -14256,7 +15584,7 @@
 }
 17
 09o 59
-10s ΓεnΣym-148
+10s ΓεnΣym-164
 05v :pair
 20
 0Bo 23
@@ -15039,9 +16367,9 @@
 05v string/length
 10s separator
 04i 1
-0Es ΓεnΣym-149
+0Es ΓεnΣym-165
 0D
-10s ΓεnΣym-149
+10s ΓεnΣym-165
 02i 0
 20
 0Bo 16
@@ -15201,6 +16529,62 @@
 }
 17
 0Es contains-all?
+01
+}#{##[]
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+02i 0
+0Es counter
+0D
+23s count
+05v []
+05v #@[source: [counter]]
+05v #{##[]
+10s counter
+01
+}
+17
+0Es count
+0D
+23s count!
+05v []
+05v #@[source: [[++ counter]]]
+05v #{##[]
+05v +
+02i 1
+10s counter
+04i 2
+0Fs counter
+01
+}
+17
+0Es count!
+0D
+05v tree/set!
+10s exports
+23s count!
+10s count!
+04i 3
+0D
+05v tree/set!
+10s exports
+23s count
+10s count
+04i 3
+0D
+13
+16
+0Es test
+0D
+05v tree/set!
+10s module/cache
+05v :test
+10s test
+04i 3
 01
 }#{##[]
 05v "Nujel"
@@ -15374,27 +16758,27 @@
 0D
 23s test-success
 05v [res-should res-is expr i]
-05v #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]] [set! success-count [+ 1 success-count]]]]
+05v #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]]]
 05v #{##[]
 10s print-passes
 0Bo 101
 05v errorln
 15
 05v ansi-green
-05v str/write
+05v string/write
 10s res-is
 04i 1
 04i 1
 0Es fmt-arg-0
 0D
 05v ansi-green
-05v str/write
+05v string/write
 10s res-should
 04i 1
 04i 1
 0Es fmt-arg-1
 0D
-05v str/write
+05v string/write
 10s expr
 04i 1
 0Es fmt-arg-2
@@ -15424,27 +16808,27 @@
 0D
 23s test-failure
 05v [res-should res-is expr i]
-05v #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [str/write res-is]] [ansi-green [str/write res-should]] [str/write expr]]] [set! error-count [+ 1 error-count]]]]
+05v #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]]]
 05v #{##[]
 10s print-errors
 0Bo 101
 05v println
 15
 05v ansi-red
-05v str/write
+05v string/write
 10s res-is
 04i 1
 04i 1
 0Es fmt-arg-0
 0D
 05v ansi-green
-05v str/write
+05v string/write
 10s res-should
 04i 1
 04i 1
 0Es fmt-arg-1
 0D
-05v str/write
+05v string/write
 10s expr
 04i 1
 0Es fmt-arg-2
@@ -15550,36 +16934,26 @@
 0D
 15
 10s test-list
-0Es ΓεnΣym-151
+0Es ΓεnΣym-167
 0D
-10s ΓεnΣym-151
-0Bo 73
+10s ΓεnΣym-167
+0Bo 45
 02i 0
 1B
 1C
-10s ΓεnΣym-151
-0Bo 59
+10s ΓεnΣym-167
+0Bo 31
 0D
-10s ΓεnΣym-151
+10s ΓεnΣym-167
 11
 0Es cur-test
 0D
-10s test
-10s cur-test
-11
-10s cur-test
-12
-05v +
-02i -1
-10s i
-04i 2
-0Fs i
-04i 3
+05v [test [car cur-test] [cdr cur-test] [set! i [+ -1 i]]]
 0D
-10s ΓεnΣym-151
+10s ΓεnΣym-167
 12
-0Fs ΓεnΣym-151
-09o -61
+0Fs ΓεnΣym-167
+09o -33
 09o 4
 24
 16
@@ -15631,9 +17005,9 @@
 05v type-of
 10s l
 04i 1
-0Es ΓεnΣym-154
+0Es ΓεnΣym-170
 0D
-10s ΓεnΣym-154
+10s ΓεnΣym-170
 05v :tree
 20
 0Bo 16
@@ -15641,7 +17015,7 @@
 10s l
 04i 1
 09o 32
-10s ΓεnΣym-154
+10s ΓεnΣym-170
 05v :array
 20
 0Bo 16
@@ -15698,17 +17072,17 @@
 05v tree/keys
 10s parent
 04i 1
-0Es ΓεnΣym-155
+0Es ΓεnΣym-171
 0D
-10s ΓεnΣym-155
+10s ΓεnΣym-171
 0Bo 127
 02i 0
 1B
 1C
-10s ΓεnΣym-155
+10s ΓεnΣym-171
 0Bo 113
 0D
-10s ΓεnΣym-155
+10s ΓεnΣym-171
 11
 0Es k
 0D
@@ -15741,9 +17115,9 @@
 09o 4
 24
 0D
-10s ΓεnΣym-155
+10s ΓεnΣym-171
 12
-0Fs ΓεnΣym-155
+0Fs ΓεnΣym-171
 09o -115
 09o 4
 24

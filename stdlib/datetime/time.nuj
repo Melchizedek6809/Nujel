@@ -19,7 +19,7 @@
       [def start-time [time/milliseconds]]
       [def val [eval raw]]
       [def end-time [time/milliseconds]]
-      [display [cat "Evaluating " [ansi-yellow [str/write raw]] " to " [ansi-green [str/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]
+      [display [cat "Evaluating " [ansi-yellow [string/write raw]] " to " [ansi-green [string/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]
 
 [defmacro profile body
           "Measure and display how much time and ressources it takes for BODY to be evaluated"

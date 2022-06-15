@@ -99,7 +99,7 @@
 [defn repl/parse-options [options]
       [if [== [char-at options 0] #\-]
           [repl/parse-option [string->keyword [cut options 1]]]
-          [for-each [map [split options ""] str->sym] repl/parse-option]]]
+          [for-each [map [split options ""] string->symbol] repl/parse-option]]]
 
 [defn repl/parse-arg [arg]
       [cond [repl/parse-args/eval-next [try display/error

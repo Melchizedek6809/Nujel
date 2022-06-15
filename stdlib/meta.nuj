@@ -7,7 +7,7 @@
       [case i
             [0 [ansi-red text]]
             [1 [string text]]
-            [2 [ansi-yellow [str/write text]]]
+            [2 [ansi-yellow [string/write text]]]
             [3 [describe/closure text]]
             [otherwise text]]]
 
@@ -32,7 +32,7 @@
 
 [defn describe/string [a]
       "Descibe whatever value string A resolves to"
-      [describe/thing [resolve [str->sym a]]]]
+      [describe/thing [resolve [string->symbol a]]]]
 
 [defn describe [fun] "Describe FUN, if there is documentation available"
       [if [string? fun]
@@ -49,6 +49,6 @@
 [def gensym/counter 0]
 [defn gensym [prefix]
       [++ gensym/counter]
-      [str->sym [cat prefix "ΓεnΣym-" gensym/counter]]]
+      [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]
 
 [def root-closure [current-closure]]

@@ -53,7 +53,7 @@
 [defn fmt/debug [opts]
       [if-not [tree/ref opts :debug]
               opts
-              [tree/set! opts :argument [list str/write [tree/ref opts :argument]]]]]
+              [tree/set! opts :argument [list string/write [tree/ref opts :argument]]]]]
 
 [defn fmt/number-format [opts]
       [case [tree/ref opts :base]
@@ -127,7 +127,7 @@
       [case [type-of v]
             [:int [fmt/arg-sym [cat "fmt-arg-" [string v]]]]
             [:symbol v]
-            [:string [str->sym v]]
+            [:string [string->symbol v]]
             [otherwise [throw [list :type-error "Invalid fmt argument name" v [current-lambda]]]]]]
 
 [defn fmt/expr [expr arguments-used opts]
@@ -189,7 +189,7 @@
                             [cons 'string expr-list]]]]
           [def fmt/args/map-fun/count 0]
           [defn fmt/args/map-fun [arg]
-                [def s [str->sym [cat "fmt-arg-"[string fmt/args/map-fun/count]]]]
+                [def s [string->symbol [cat "fmt-arg-"[string fmt/args/map-fun/count]]]]
                 [++ fmt/args/map-fun/count]
                 [list 'def s arg]]
           [if args

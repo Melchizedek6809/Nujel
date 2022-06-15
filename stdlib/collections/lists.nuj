@@ -164,6 +164,15 @@
                                         ; Set default sort to merge-sort
 [def list/sort list/sort/merge]
 
+[defn list? [a]
+      "Return #t is A is a proper list"
+      [when-not a [return #f]]
+      [while a
+        [when-not [pair? a]
+                  [return #f]]
+        [cdr! a]]
+      [return #t]]
+
 [defn list/equal? [a b]
       "#t if A and B are equal"
       [if [pair? a]
