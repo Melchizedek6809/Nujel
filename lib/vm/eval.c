@@ -120,17 +120,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
 		}
 		if(trace){lBytecodeTrace(&ctx, ip, ops);}
-	switch(*ip){
+	switch(*ip++){
 	default:
 		lExceptionThrowValClo("unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
 		break;
 	case lopNOP:
-		ip++;
 		break;
 	case lopIntByte: {
-		const i8 v = ip[1];
+		const i8 v = *ip++;
 		ctx.valueStack[ctx.sp++] = lValInt(v);
-		ip+=2;
 		break;}
 	case lopIntAdd: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "IntAdd");}
@@ -139,7 +137,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		if((a == NULL) || (b == NULL)){lExceptionThrowValClo("type-error", "Can't add #nil", NULL, c);}
 		ctx.valueStack[ctx.sp-2] = lValInt(a->vInt + b->vInt);
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopLessPred: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "LessPred");}
@@ -147,7 +144,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) < 0) && !lValEqual(a, b));
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopLessEqPred: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "LessEqPred");}
@@ -155,7 +151,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b) || (lValGreater(a, b) < 0));
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopEqualPred: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "EqualPred");}
@@ -163,7 +158,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b));
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopGreaterEqPred: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "GreaterEqPred");}
@@ -171,7 +165,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a,b) || lValGreater(a,b) > 0);
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopGreaterPred: {
 		if(ctx.sp < 2){throwStackUnderflowError(c, "GreaterPred");}
@@ -179,74 +172,67 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lValBool((lValGreater(a, b) > 0) && !lValEqual(a, b));
 		ctx.sp--;
-		ip++;
 		break; }
 	case lopPushNil:
 		ctx.valueStack[ctx.sp++] = NULL;
-		ip++;
 		break;
 	case lopPushLVal: {
-		lVal *val = lIndexVal((ip[1] << 16) | (ip[2] << 8) | ip[3]);
+		lVal *val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
 		if(val && (val->type == ltSymbol)){
-			lBytecodeLinkPush(c, ops, ip);
-			val = lIndexVal((ip[1] << 16) | (ip[2] << 8) | ip[3]);
+			lBytecodeLinkPush(c, ops, ip-1);
+			val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
 		}
 		ctx.valueStack[ctx.sp++] = val;
-		ip += 4;
+		ip += 3;
 		break; }
 	case lopPushVal: {
-		const u8 v = ip[1];
+		const u8 v = *ip++;
 		if(v >= ops->literals->length){throwStackUnderflowError(c, "PushVal");}
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
-		ip+=2;
 		break; }
 	case lopPushSymbol: {
 		lSymbol *sym;
-		ip = lBytecodeReadOPSym(ip+1, &sym);
+		ip = lBytecodeReadOPSym(ip, &sym);
 		ctx.valueStack[ctx.sp++] = lValSymS(sym);
 		break;}
 	case lopDup:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Dup");}
 		ctx.sp++;
 		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
-		ip++;
 		break;
 	case lopDrop:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Drop");}
 		ctx.sp--;
-		ip++;
 		break;
 	case lopJmp:
-		ip += lBytecodeGetOffset16(ip+1);
+		ip += lBytecodeGetOffset16(ip)-1;
 		break;
 	case lopJt:
-		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip+1) : 3;
+		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
 	case lopJf:
-		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip+1) : 3;
+		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
 	case lopDef: {
 		lSymbol *sym;
-		ip = lBytecodeReadOPSym(ip+1, &sym);
+		ip = lBytecodeReadOPSym(ip, &sym);
 		lDefineClosureSym(c, sym, ctx.valueStack[ctx.sp - 1]);
 		break; }
 	case lopSet: {
 		lSymbol *sym;
-		ip = lBytecodeReadOPSym(ip+1, &sym);
+		ip = lBytecodeReadOPSym(ip, &sym);
 		lSetClosureSym(c, sym, ctx.valueStack[ctx.sp - 1]);
 		break; }
 	case lopGet: {
 		lSymbol *sym;
-		ip = lBytecodeReadOPSym(ip+1, &sym);
+		ip = lBytecodeReadOPSym(ip, &sym);
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
 	case lopRootsSave:
 		c->rsp = lRootsGet();
-		ip++;
 		break;
 	case lopRootsRestore:
 		lRootsRet(c->rsp);
-		ip++;
 		break;
 	case lopZeroPred: {
 		if(ctx.sp < 1){throwStackUnderflowError(c, "zero?");}
@@ -260,74 +246,62 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			}
 		}
 		ctx.valueStack[ctx.sp-1] = lValBool(p);
-		ip++;
 		break; }
 	case lopCar:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Car");}
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
-		ip++;
 		break;
 	case lopCdr:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Cdr");}
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
-		ip++;
 		break;
 	case lopCons:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Cons");}
 		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopAdd:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Add");}
 		ctx.valueStack[ctx.sp-2] = lAdd(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopSub:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Sub");}
 		ctx.valueStack[ctx.sp-2] = lSub(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopMul:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Mul");}
 		ctx.valueStack[ctx.sp-2] = lMul(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopDiv:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Div");}
 		ctx.valueStack[ctx.sp-2] = lDiv(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopMod:
 		if(ctx.sp < 2){throwStackUnderflowError(c, "Mod");}
 		ctx.valueStack[ctx.sp-2] = lMod(c, ctx.valueStack[ctx.sp-2],ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
-		ip++;
 		break;
 	case lopClosurePush:
 		ctx.valueStack[ctx.sp++] = lValObject(c);
-		ip++;
 		break;
 	case lopLet:
 		c = lClosureNew(c, closureLet);
 		c->type = closureLet;
 		ctx.closureStack[++ctx.csp] = c;
-		ip++;
 		break;
 	case lopClosurePop: {
 		lClosure *nclo = ctx.closureStack[--ctx.csp];
 		c = nclo;
 		if(ctx.csp < 0){throwStackUnderflowError(c, "ClosurePop");}
-		ip++;
 		break; }
 	case lopTry:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Try");}
 
-		c->ip   = ip + lBytecodeGetOffset16(ip+1);
+		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
 		c->sp   = ctx.sp;
 		c->rsp  = lRootsGet();
 		c->text = ops;
@@ -335,12 +309,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		c = lClosureNew(c, closureTry);
 		c->exceptionHandler = ctx.valueStack[--ctx.sp];
 		ctx.closureStack[++ctx.csp] = c;
-		ip+=3;
+		ip+=2;
 		break;
 	case lopMacroDynamic:
 	case lopFnDynamic: {
 		if(ctx.sp < 4){throwStackUnderflowError(c, "Fn");}
-		const lBytecodeOp curOp = *ip;
+		const lBytecodeOp curOp = ip[-1];
 		lVal *cBody = ctx.valueStack[--ctx.sp];
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
 		lVal *cArgs = ctx.valueStack[--ctx.sp];
@@ -351,16 +325,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			pf("%V\n",cDocs);
 			pf("%V\n",cArgs);
 			pf("%V\n",cName);
- 			//*((u8 *)NULL)=0;
+			//*((u8 *)NULL)=0;
 		}
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
 		if(curOp == lopMacroDynamic){ fun->type = ltMacro; }
-		ip++;
 		break;}
 	case lopApply: {
-		const int len = ip[1];
+		const int len = *ip++;
 		if(ctx.sp < len){
 			throwStackUnderflowError(c, "Apply");
 		}
@@ -368,7 +341,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		ip+=2;
 		lVal *res = lApply(c, cargs, fun);
 		ctx.valueStack[ctx.sp++] = res;
 		(void)applyRSP;
