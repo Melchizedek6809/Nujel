@@ -374,8 +374,10 @@ static lVal *lParseBytecodeArray(lString *s){
 	lVal *ret = lValAlloc(ltBytecodeArr);
 	ret->vBytecodeArr = lBytecodeArrayAlloc(len);
 	ret->vBytecodeArr->literals = literals;
-	memcpy(ret->vBytecodeArr->data, d, len);
-	free(d);
+	if(d){
+		memcpy(ret->vBytecodeArr->data, d, len);
+		free(d);
+	}
 	return ret;
 }
 

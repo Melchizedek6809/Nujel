@@ -226,7 +226,8 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 
 	FILE *child = popen(command->data, "r");
 	if(child == NULL){
-		fpf(stderr,"Error opening %s\n",command);
+		free(buf);
+		fpf(stderr,"Error opening %s\n", command);
 		return NULL;
 	}
 	while(1){

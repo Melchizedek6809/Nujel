@@ -90,7 +90,7 @@ static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	if((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax)){
 		epf("ERROR writing BCA\n");
-		return cur = spf(cur, bufEnd, "#{ 01 }");
+		return spf(cur, bufEnd, "#{ 01 }");
 	}
 	cur = spf(cur, bufEnd, "#{");
 	cur = writeArray(cur, bufEnd, v->literals, false);
