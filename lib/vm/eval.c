@@ -248,6 +248,20 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lRootsRet(c->rsp);
 		ip++;
 		break;
+	case lopZeroPred: {
+		if(ctx.sp < 1){throwStackUnderflowError(c, "zero?");}
+		lVal *a = ctx.valueStack[ctx.sp-1];
+		bool p = false;
+		if(a){
+			if(a->type == ltInt){
+				p = a->vInt == 0;
+			}else if(a->type == ltFloat){
+				p = a->vFloat == 0.0;
+			}
+		}
+		ctx.valueStack[ctx.sp-1] = lValBool(p);
+		ip++;
+		break; }
 	case lopCar:
 		if(ctx.sp < 1){throwStackUnderflowError(c, "Car");}
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);

@@ -1,4 +1,4 @@
-#!/usr/bin/env nujel
+2#!/usr/bin/env nujel
 ;; Multiples of 3 or 5 below 10,000,000
 ;; https://projecteuler.net/problem=1
 

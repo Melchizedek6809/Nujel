@@ -187,6 +187,20 @@ static lVal *lnfNilPred(lClosure *c, lVal *v){
 	return lValBool(lCar(v) == NULL);
 }
 
+static lVal *lnfZeroPred(lClosure *c, lVal *v){
+	(void)c;
+	lVal *a = lCar(v);
+	bool p = false;
+	if(a){
+		if(a->type == ltInt){
+			p = a->vInt == 0;
+		}else if(a->type == ltFloat){
+			p = a->vFloat == 0.0;
+		}
+	}
+	return lValBool(p);
+}
+
 static lVal *lnfQuote(lClosure *c, lVal *v){
 	if(v->type != ltPair){ lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c); }
 	return lCar(v);
@@ -347,6 +361,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
 	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
 	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
+	lAddNativeFunc(c,"zero?",    "[α]",   "Return true if α is 0",                       lnfZeroPred);
 
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
 

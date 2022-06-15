@@ -62,7 +62,7 @@
 [defn $apply/optimize? [fun arg-count]
       [case fun
             [[+ - * / %] [== arg-count 2]]
-            [[car cdr add/int cons < <= == >= >] #t]]]
+            [[zero? car cdr add/int cons < <= == >= >] #t]]]
 
 [defn $apply [arg-count fun]
       "arguments -> [result]"
@@ -71,6 +71,7 @@
             [1 [case fun
                      [car [$car]]
                      [cdr [$cdr]]
+                     [zero? [$zero?]]
                      [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
             [2 [case fun
                      [add/int [$add/int]]

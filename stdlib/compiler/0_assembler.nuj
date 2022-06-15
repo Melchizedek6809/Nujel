@@ -148,3 +148,8 @@
       "[a b] -> [result]"
       :inline
       '[#$29]]
+
+[defn $zero? []
+      "[a] -> [result]"
+      :inline
+      '[#$2A]]

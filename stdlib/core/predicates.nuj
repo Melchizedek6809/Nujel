@@ -31,10 +31,6 @@
       "Predicate that returns #t if a is even"
       [== [mod/int [int a] 2] 0]]
 
-[defn zero? [val] :inline
-      "#t if VAL is zero"
-      [== 0 val]]
-
 [defn not-zero? [val] :inline
       "#t if VAL is not zero"
       [!= 0 val]]
