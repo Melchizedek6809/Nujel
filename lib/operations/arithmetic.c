@@ -98,8 +98,8 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b){
 	switch(t){
 		default: return exceptionThrow(c, a,"division");
 		case ltInt: {
-			const int av = requireInt(c,a);
-			const int bv = requireInt(c,b);
+			const i64 av = requireInt(c,a);
+			const i64 bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
 		case ltFloat: return lValFloat(requireFloat(c,a) / requireFloat(c,b));
@@ -123,8 +123,8 @@ lVal *lMod(lClosure *c, lVal *a, lVal *b){
 	switch(t){
 		default:      return exceptionThrow(c, a,"module");
 		case ltInt: {
-			const int av = requireInt(c,a);
-			const int bv = requireInt(c,b);
+			const i64 av = requireInt(c,a);
+			const i64 bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av % bv);}
 		case ltFloat: return lValFloat(fmod(requireFloat(c,a), requireFloat(c,b)));

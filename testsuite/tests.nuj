@@ -647,6 +647,13 @@
 [test/add :a [let [[list '[:a :b :c]]] [car list]]]
 [test/add 15 [logior 1 2 4 8]]
 [test/add 65536 [+ 1 [reduce [map [range 16] [fn [a] [ash 1 a]]] logior 0]]]
+[test/add 300425737571 [/ 600851475143 2]]
+[test/add 1201702950286 [* 600851475143 2]]
+[test/add 1 [% 600851475143 2]]
+[test/add 600851475145 [+ 600851475143 2]]
+[test/add 600851475141 [- 600851475143 2]]
+
+
 
 ;[test/add :type-error [try car [do [def :asd #t] :asd]]]
 ;[test/add "Testing!" [let* [defn a [] "Testing!" [tree/ref [closure [closure-parent [current-closure]]] :documentation]] [a]]]
