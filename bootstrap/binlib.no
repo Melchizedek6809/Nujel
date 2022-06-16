@@ -22,13 +22,12 @@
 0Es ΓεnΣym-3
 0D
 10s ΓεnΣym-3
-0Bo 55
-02i 0
+0Bo 54
+24
 1B
-1C
-10s ΓεnΣym-3
-0Bo 41
+09o 39
 0D
+1C
 10s ΓεnΣym-3
 11
 0Es form
@@ -41,7 +40,8 @@
 10s ΓεnΣym-3
 12
 0Fs ΓεnΣym-3
-09o -43
+10s ΓεnΣym-3
+0Ao -40
 09o 4
 24
 16
@@ -422,15 +422,11 @@
 05v ""
 0Es line
 0D
-02i 0
+24
 1B
-1C
-05v !=
-10s line
-05v "[/cmd]\n"
-04i 2
-0Bo 36
+09o 34
 0D
+1C
 05v cat
 10s buf
 10s line
@@ -440,7 +436,11 @@
 05v readline
 04i 0
 0Fs line
-09o -48
+05v !=
+10s line
+05v "[/cmd]\n"
+04i 2
+0Ao -45
 0D
 10s do
 05v read
@@ -524,19 +524,19 @@
 05v repl/welcome
 04i 0
 0D
-02i 0
+24
 1B
-1C
-05v #t
-0Bo 25
+09o 23
 0D
+1C
 10s repl/exception-handler
 19o 14
 05v repl/readline
 10s root-closure
 04i 1
 16
-09o -27
+05v #t
+0Ao -24
 01
 }
 17
