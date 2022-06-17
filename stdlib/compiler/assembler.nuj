@@ -178,11 +178,21 @@
                   [#t [car code]]]
             [assemble/build-lit-arr [cdr code] lit-arr]]]
 
+[defn assemble/flatten [code ret]
+      [when-not code [return ret]]
+      [when-not [pair? code] [return ret]]
+      [set! ret [assemble/flatten [cdr code] ret]]
+      [if [and [pair? [car code]]
+               [not [keyword? [caar code]]]]
+          [assemble/flatten [car code] ret]
+          [cons [car code] ret]]]
+
 [defn assemble* [code]
       "Assemble all arguments into a single :bytecode-array"
       [def sym-map @[]]
       [def lit-arr #[]]
-      [def tmp [assemble/build-lit-arr code lit-arr]]
+      [def tmp [-> [assemble/flatten code]
+                   [assemble/build-lit-arr lit-arr]]]
       [assemble/build-sym-map tmp sym-map 0]
       [def out [array/allocate [tree/ref sym-map :last-op]]]
       [assemble/emit-relocated-ops tmp sym-map -1 out]
