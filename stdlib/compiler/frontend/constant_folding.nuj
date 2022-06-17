@@ -1,3 +1,4 @@
+;; Contains an optimization pass that does constant folding
 
 [defn pure? [expr]
       [and [not [pair? expr]]

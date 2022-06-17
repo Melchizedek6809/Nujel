@@ -1,0 +1,21 @@
+;; Contains functions abstracting over different backends
+
+[defn backend/none [expr] expr]
+[defn backend/bytecode [expr]
+      [-> [bytecompile expr]
+          assemble*]]
+
+[def *active-backend* :bytecode]
+[def backend/tree @[:bytecode backend/bytecode :none backend/none]]
+
+[defn backend [expr]
+      [[tree/ref backend/tree *active-backend*] expr]]
+
+[defn compile/for [expr backend environment]
+      [def last-backend *active-backend*]
+      [def ret #nil]
+      [try [fn [e] [set! *active-backend* last-backend] [throw e]]
+           [set! *active-backend* backend]
+           [set! ret [compile expr environment]]
+           [set! *active-backend* last-backend]
+           [return ret]]]

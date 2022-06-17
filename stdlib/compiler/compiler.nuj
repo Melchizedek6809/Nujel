@@ -13,8 +13,7 @@
       "Compile SOURCE so it can be evaluated/applied"
       [-> [macroexpand source environment]
           constant-fold
-          bytecompile
-          assemble*]]
+          backend]]
 
 [defn compile/debug [expr]
       [disassemble [compile expr]]]

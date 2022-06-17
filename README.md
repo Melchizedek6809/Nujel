@@ -1,9 +1,8 @@
 Nujel
 --------------------------------------------------------
-A small, portable Lisp dialect for games and other latency sensitive applications.
-Development was started in order to give [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) a scripting runtime.
-While Nujel is still very early in development, and for the most part just an incompatible Scheme, it is evolving
-rapidly.
+A tiny, easily embeddable Lisp dialect.
+While providing a scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) was what
+started the development effort for Nujel, it is now trying to become useful for other tasks as well.
 
 ## Performance
 While Nujel is still quite slow, it is definitely not the slowest Lisp out there. To make sure that
@@ -21,6 +20,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Maps (using binary trees)
 - [X] Macros (expander written in Nujel itself)
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
+- [X] Constant Folding
 - [/] Module system
 - [ ] NaN boxing
 - [ ] Tail-call optimization
