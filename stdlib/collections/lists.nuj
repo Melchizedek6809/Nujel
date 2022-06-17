@@ -128,15 +128,15 @@
       "Terribly slow way to sort a list, though it was simple to write"
       [if-not l #nil
               [do [def top [car l]]
-	          [def next #nil]
-	        [cdr! l]
-	        [while l
+                  [def next #nil]
+                [cdr! l]
+                [while l
                        [if [<= [car l] top]
                            [do [set! next [cons top next]]
-		               [set! top [car l]]]
+                               [set! top [car l]]]
                            [set! next [cons [car l] next]]]
-	               [cdr! l]]
-	        [cons top [list/sort/bubble next]]]]]
+                       [cdr! l]]
+                [cons top [list/sort/bubble next]]]]]
 
 [defn list/merge-sorted-lists [l1 l2]
       [cond [[nil? l1] l2]

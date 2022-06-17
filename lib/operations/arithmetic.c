@@ -38,8 +38,11 @@ lVal *lAdd(lClosure *c, lVal *a, lVal *b){
 static lVal *lnfAdd(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(lCddr(v)){ throwArityError(c, v, 2); }
-	return lAdd(c, a, b);
+	if(lCddr(v)){
+		return lnfAdd(c, lCons(lAdd(c, a, b), lCddr(v)));
+	} else {
+		return lAdd(c, a, b);
+	}
 }
 
 lVal *lSub(lClosure *c, lVal *a, lVal *b){
@@ -64,7 +67,11 @@ lVal *lSub(lClosure *c, lVal *a, lVal *b){
 static lVal *lnfSub(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	return lSub(c, a, b);
+	if(lCddr(v)){
+		return lnfSub(c, lCons(lSub(c, a, b), lCddr(v)));
+	} else {
+		return lSub(c, a, b);
+	}
 }
 
 lVal *lMul(lClosure *c, lVal *a, lVal *b){
@@ -84,10 +91,11 @@ lVal *lMul(lClosure *c, lVal *a, lVal *b){
 static lVal *lnfMul(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(lCddr(b)){
-		throwArityError(c, v, 2);
+	if(lCddr(v)){
+		return lnfMul(c, lCons(lMul(c, a, b), lCddr(v)));
+	} else {
+		return lMul(c, a, b);
 	}
-	return lMul(c, a, b);
 }
 
 lVal *lDiv(lClosure *c, lVal *a, lVal *b){
@@ -111,9 +119,10 @@ static lVal *lnfDiv(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(lCddr(v)){
-		throwArityError(c, v, 2);
+		return lnfDiv(c, lCons(lDiv(c, a, b), lCddr(v)));
+	} else {
+		return lDiv(c, a, b);
 	}
-	return lDiv(c, a, b);
 }
 
 lVal *lMod(lClosure *c, lVal *a, lVal *b){
@@ -136,9 +145,10 @@ static lVal *lnfMod(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(lCddr(v)){
-		throwArityError(c, v, 2);
+		return lnfMod(c, lCons(lMod(c, a, b), lCddr(v)));
+	} else {
+		return lMod(c, a, b);
 	}
-	return lMod(c, a, b);
 }
 
 static lVal *lnfPow(lClosure *c, lVal *v){

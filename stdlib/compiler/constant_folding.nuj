@@ -1,0 +1,36 @@
+
+[defn pure? [expr]
+      [and [not [pair? expr]]
+           [not [symbol? expr]]
+           #t]]
+
+[defn constant-foldable? [fun]
+      [case fun
+            [[ add/int  logand  logior  logxor  lognot  ash  popcount  abs  sqrt  pow  %  +  -  *  /  cat  trim  string/length  uppercase  lowercase  capitalize] #t]
+            [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow '% '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t]
+            [#t #f]]]
+
+[defn constant-fold/resolve [sym]
+      [when-not [symbol? sym] [return sym]]
+      [resolve sym]]
+
+[defn constant-fold/args [expr]
+      [when-not expr [return expr]]
+      [if [pair? [car expr]]
+          [cons [constant-fold [car expr]]
+                [constant-fold/args [cdr expr]]]
+          [cons [car expr]
+                [constant-fold/args [cdr expr]]]]]
+
+[defn constant-fold [expr]
+      "Will try and evaluate as many constant as possible to make the expression simpler."
+      [if-not [pair? expr] expr
+              [do
+                  [def folded-fun  [car expr]]
+                  [when [== 'quote folded-fun] [return expr]]
+                  [def folded-args [constant-fold/args [cdr expr]]]
+                  [if [and [constant-foldable? folded-fun]
+                           [every? folded-args pure?]]
+                      [try [fn [] [cons folded-fun folded-args]]
+                           [apply [constant-fold/resolve folded-fun] folded-args]]
+                      [cons folded-fun folded-args]]]]]

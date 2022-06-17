@@ -1,9 +1,7 @@
 [defn load/forms [source environment]
       "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
       [for-in [form source]
-              [apply environment [-> [macroexpand form environment]
-                                     bytecompile
-                                     assemble*]]]]
+              [apply environment [compile* source environment]]]]
 
 [defn macroexpand/forms [source-raw environment]
       "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
@@ -11,17 +9,15 @@
       [load/forms source-raw environment]
       [macroexpand source-raw environment]]
 
-[defn compile/debug [expr]
-      [-> [macroexpand expr]
-          bytecompile
-          assemble*
-          disassemble]]
-
 [defn compile* [source environment]
       "Compile SOURCE so it can be evaluated/applied"
       [-> [macroexpand source environment]
+          constant-fold
           bytecompile
           assemble*]]
+
+[defn compile/debug [expr]
+      [disassemble [compile expr]]]
 
 [defn compile/do* [source environment]
       [compile* [cons do source] environment]]

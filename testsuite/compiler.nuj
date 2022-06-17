@@ -2,3 +2,4 @@
 [test/add :arity-error [try car [macroexpand '[if 1 2 3 4]]]]
 [test/add :arity-error [try car [macroexpand '[def 1 2 3]]]]
 [test/add :arity-error [try car [macroexpand '[set! 1 2 3]]]]
+[test/add 8 [constant-fold [macroexpand '[+ 1 1 [* 2 3]]]]]

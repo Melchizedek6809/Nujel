@@ -7,6 +7,10 @@
       "Return the sum of every value in collection C"
       [reduce c + 0]]
 
+[defn every? [l p]
+      "Returns #t if P is true for every entry of collection L"
+      [reduce l [fn [a b] [and a [p b]]] #t]]
+
 [defn join [l glue]
       "Join every element of α together into a string with GLUE inbetween"
       [when-not glue [set! glue ""]]
