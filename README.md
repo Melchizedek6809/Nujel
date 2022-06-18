@@ -21,7 +21,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Macros (expander written in Nujel itself)
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
 - [X] Constant Folding
-- [/] Module system
+- [X] Module system
 - [ ] NaN boxing
 - [ ] Tail-call optimization
 - [ ] Continuations
