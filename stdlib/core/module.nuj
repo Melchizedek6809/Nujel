@@ -27,18 +27,29 @@
 [defmacro export [name value]
           `[tree/set! exports '~name ~value]]
 
+[defn require* [module env]
+      [def mod [module/load module]]
+      [def exports [resolve 'exports mod]]
+      [for-in [k [tree/keys exports]]
+              [def q [module/qualify-symbol module [keyword->symbol k]]]
+              [def expr `[def ~q [module/import ~mod '~[keyword->symbol k]]]]
+              [apply env [compile* expr env]]]]
+
+[defmacro require [module]
+          `[require* ~module [current-closure]]]
+
 [defmacro import* [local-symbol module module-symbol]
           `[def ~local-symbol [module/import ~module '~module-symbol]]]
 
 [defmacro import [names module]
           [when-not [list? names]
-                    [return `[import* ~[module/qualify-symbol module names] [module/load ~module] ~names]]]
+                    [return `[import* ~names [module/load ~module] ~names]]]
           [def ret #nil]
           [while names
             [if [== [cadr names] :as]
-                [do [set! ret [cons `[import* ~[module/qualify-symbol module [caddr names]] [module/load ~module] ~[car names]] ret]]
+                [do [set! ret [cons `[import* ~[caddr names] [module/load ~module] ~[car names]] ret]]
                     [set! names [cddr names]]]
-                [set! ret [cons `[import* ~[module/qualify-symbol module [car names]] [module/load ~module] ~[car names]] ret]]]
+                [set! ret [cons `[import* ~[car names] [module/load ~module] ~[car names]] ret]]]
             [cdr! names]]
           [cons do [nreverse ret]]]
 

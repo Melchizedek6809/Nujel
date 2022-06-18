@@ -2,7 +2,6 @@
 ;; This project uses the MIT license, a copy should be included under /LICENSE
 ;;
 ;; Mostly macros for all kinds of let varieties
-
 [defn let/arg [arg]
       [when arg
             [when [or [not [pair? arg]]

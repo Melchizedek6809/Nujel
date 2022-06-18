@@ -11296,6 +11296,106 @@
 18
 0Es export
 0D
+23s require*
+05v [module env]
+05v #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [for-in [k [tree/keys exports]] [def q [module/qualify-symbol module [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]]
+05v #{##[]
+05v module/load
+10s module
+04i 1
+0Es mod
+0D
+05v resolve
+23s exports
+10s mod
+04i 2
+0Es exports
+0D
+15
+05v tree/keys
+10s exports
+04i 1
+0Es ΓεnΣym-1
+0D
+10s ΓεnΣym-1
+0Bo 135
+24
+1B
+09o 120
+0D
+1C
+10s ΓεnΣym-1
+11
+0Es k
+0D
+05v module/qualify-symbol
+10s module
+05v keyword->symbol
+10s k
+04i 1
+04i 2
+0Es q
+0D
+23s def
+10s q
+23s module/import
+10s mod
+23s quote
+05v keyword->symbol
+10s k
+04i 1
+24
+14
+14
+24
+14
+14
+14
+24
+14
+14
+14
+0Es expr
+0D
+05v apply
+10s env
+05v compile*
+10s expr
+10s env
+04i 2
+04i 2
+0D
+10s ΓεnΣym-1
+12
+0Fs ΓεnΣym-1
+10s ΓεnΣym-1
+0Ao -121
+09o 4
+24
+16
+01
+}
+17
+0Es require*
+0D
+23s require
+05v [module]
+05v #@[source: [[quasiquote [require* [unquote module] [current-closure]]]]]
+05v #{##[]
+23s require*
+10s module
+23s current-closure
+24
+14
+24
+14
+14
+14
+01
+}
+18
+0Es require
+0D
 23s import*
 05v [local-symbol module module-symbol]
 05v #@[source: [[quasiquote [def [unquote local-symbol] [module/import [unquote module] '[unquote module-symbol]]]]]]
@@ -11324,19 +11424,16 @@
 0D
 23s import
 05v [names module]
-05v #@[source: [[when-not [list? names] [return [quasiquote [import* [unquote [module/qualify-symbol module names]] [module/load [unquote module]] [unquote names]]]]] [def ret #nil] [while names [if [== [cadr names] :as] [do [set! ret [cons [quasiquote [import* [unquote [module/qualify-symbol module [caddr names]]] [module/load [unquote module]] [unquote [car names]]]] ret]] [set! names [cddr names]]] [set! ret [cons [quasiquote [import* [unquote [module/qualify-symbol module [car names]]] [module/load [unquote module]] [unquote [car names]]]] ret]]] [cdr! names]] [cons do [nreverse ret]]]]
+05v #@[source: [[when-not [list? names] [return [quasiquote [import* [unquote names] [module/load [unquote module]] [unquote names]]]]] [def ret #nil] [while names [if [== [cadr names] :as] [do [set! ret [cons [quasiquote [import* [unquote [caddr names]] [module/load [unquote module]] [unquote [car names]]]] ret]] [set! names [cddr names]]] [set! ret [cons [quasiquote [import* [unquote [car names]] [module/load [unquote module]] [unquote [car names]]]] ret]]] [cdr! names]] [cons do [nreverse ret]]]]
 05v #{##[]
 05v list?
 10s names
 04i 1
 0Bo 7
 24
-09o 42
+09o 32
 23s import*
-05v module/qualify-symbol
-10s module
 10s names
-04i 2
 23s module/load
 10s module
 24
@@ -11355,7 +11452,7 @@
 0D
 24
 1B
-09o 146
+09o 126
 0D
 1C
 10s names
@@ -11363,14 +11460,11 @@
 11
 05v :as
 20
-0Bo 71
+0Bo 61
 23s import*
-05v module/qualify-symbol
-10s module
 05v caddr
 10s names
 04i 1
-04i 2
 23s module/load
 10s module
 24
@@ -11391,13 +11485,10 @@
 12
 12
 0Fs names
-09o 52
+09o 42
 23s import*
-05v module/qualify-symbol
-10s module
 10s names
 11
-04i 2
 23s module/load
 10s module
 24
@@ -11418,7 +11509,7 @@
 12
 0Fs names
 10s names
-0Ao -147
+0Ao -127
 0D
 10s do
 05v nreverse
@@ -11436,16 +11527,16 @@
 05v #{##[]
 15
 10s module/loader
-0Es ΓεnΣym-1
+0Es ΓεnΣym-2
 0D
-10s ΓεnΣym-1
+10s ΓεnΣym-2
 0Bo 71
 24
 1B
 09o 56
 0D
 1C
-10s ΓεnΣym-1
+10s ΓεnΣym-2
 11
 0Es loader
 0D
@@ -11461,10 +11552,10 @@
 09o 4
 24
 0D
-10s ΓεnΣym-1
+10s ΓεnΣym-2
 12
-0Fs ΓεnΣym-1
-10s ΓεnΣym-1
+0Fs ΓεnΣym-2
+10s ΓεnΣym-2
 0Ao -57
 09o 4
 24
@@ -11499,15 +11590,15 @@
 05v type-of
 10s name
 04i 1
-0Es ΓεnΣym-2
+0Es ΓεnΣym-3
 0D
-10s ΓεnΣym-2
+10s ΓεnΣym-3
 05v :object
 20
 0Bo 10
 10s name
 09o 97
-10s ΓεnΣym-2
+10s ΓεnΣym-3
 05v :keyword
 20
 0Bo 84
