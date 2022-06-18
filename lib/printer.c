@@ -237,7 +237,7 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 	case ltFloat:
 		return spf(cur , bufEnd, "%f" ,v->vFloat);
 	case ltVec:
-		return spf(cur, bufEnd, "#v[%f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z);
+		return spf(cur, bufEnd, "#v[%f %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z, v->vVec.w);
 	case ltString:
 		return spf(cur, bufEnd, display ? "%s" : "%S", v->vString->data);
 	case ltSymbol:

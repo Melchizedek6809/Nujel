@@ -239,10 +239,10 @@
       [println [term/blit img/gradient]]
       [throw [list :wrong-result "Raymarched gradient wrong" digest/gradient]]]
 
-[when [!= digest/sphere/simple 2493881632]
+[when [!= digest/sphere/simple 3084425744]
       [println [term/blit img/sphere/simple]]
       [throw [list :wrong-result "Raymarched simple sphere wrong" digest/sphere/simple]]]
 
-[when [!= digest/sphere/phong 4145117077]
+[when [!= digest/sphere/phong 3858860202]
       [println [term/blit img/sphere/phong]]
       [throw [list :wrong-result "Raymarched phong spheres wrong" digest/sphere/phong]]]

@@ -89,8 +89,8 @@ vec requireVecCompatible(lClosure *c, lVal *v){
 	switch(v ? v->type : ltNoAlloc){
 	default:      throwTypeError(c, v, ltVec);
 	case ltVec:   return v->vVec;
-	case ltFloat: return vecNew(v->vFloat, v->vFloat, v->vFloat);
-	case ltInt:   return vecNew(v->vInt, v->vInt, v->vInt);
+	case ltFloat: return vecNew(v->vFloat, v->vFloat, v->vFloat, v->vFloat);
+	case ltInt:   return vecNew(v->vInt, v->vInt, v->vInt, v->vInt);
 	}
 }
 

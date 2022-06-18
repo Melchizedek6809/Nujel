@@ -16,6 +16,10 @@ static lVal *lnfVZ(lClosure *c, lVal *v){
 	return lValFloat(requireVec(c, lCar(v)).z);
 }
 
+static lVal *lnfVW(lClosure *c, lVal *v){
+	return lValFloat(requireVec(c, lCar(v)).w);
+}
+
 static lVal *lnfVecDot(lClosure *c, lVal *v){
 	const vec a = requireVec(c, lCar(v));
 	const vec b = requireVec(c, lCadr(v));
@@ -71,10 +75,50 @@ static lVal *lnfVecReflect(lClosure *c, lVal *v){
 	return lValVec(vecReflect(i,n));
 }
 
+lVal *lnfVec(lClosure *c, lVal *v){
+	vec nv = vecNew(0,0,0,0);
+	if(v == NULL){return lValVec(nv);}
+	if(v->type != ltPair){
+		if(v->type == ltInt){
+			return lValVec(vecNew(v->vInt, v->vInt, v->vInt, v->vInt));
+		}else if(v->type == ltFloat){
+			return lValVec(vecNew(v->vFloat, v->vFloat, v->vFloat, v->vFloat));
+		}else if(v->type == ltVec){
+			return v;
+		}
+	}
+	int i = 0;
+	for(lVal *cv = v; cv && cv->type == ltPair; cv = cv->vList.cdr){
+		lVal *t = lCar(cv);
+		if(t == NULL){break;}
+		switch(t->type){
+		case ltInt:
+			nv.v[i] = t->vInt;
+			break;
+		case ltFloat:
+			nv.v[i] = t->vFloat;
+			break;
+		case ltVec:
+			if(i == 0){return t;}
+			lExceptionThrowValClo("type-error", "vectors can't contain other vectors, only :float and :int values", t, c);
+		default:
+			lExceptionThrowValClo("type-error", "Unexpected value in [vec]", t, c);
+			break;
+		}
+		if(++i >= 4){break;}
+	}
+	for(int ii=MAX(1,i);ii<4;ii++){
+		nv.v[ii] = nv.v[ii-1];
+	}
+	return lValVec(nv);
+}
+
 void lOperationsVector(lClosure *c){
+	lAddNativeFunc(c,"vec",           "[x y z w]", "Convert α into a vector value consisting of 4 floats x,y,z and w", lnfVec);
 	lAddNativeFunc(c,"vec/x",         "[vec]",     "Return x part of VEC", lnfVX);
 	lAddNativeFunc(c,"vec/y",         "[vec]",     "Return y part of VEC", lnfVY);
 	lAddNativeFunc(c,"vec/z",         "[vec]",     "Return z part of VEC", lnfVZ);
+	lAddNativeFunc(c,"vec/w",         "[vec]",     "Return z part of VEC", lnfVW);
 	lAddNativeFunc(c,"vec/dot",       "[a b]",     "Return the dot product of A and B", lnfVecDot);
 	lAddNativeFunc(c,"vec/magnitude", "[a]",       "Return the magnitude of vector A", lnfVecMagnitude);
 	lAddNativeFunc(c,"vec/sum",       "[a]",       "Return the sum of vector A", lnfVecSum);

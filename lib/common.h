@@ -33,9 +33,9 @@ typedef  int8_t            i8;
 
 struct vec {
 	union {
-		struct { float x,y,z; };
-		struct { float v[3]; };
-		struct { float yaw,pitch,roll; };
+		struct { float x,y,z,w; };
+		struct { float v[4]; };
+		struct { float yaw,pitch,roll,_w; };
 	};
 };
 typedef struct vec vec;
@@ -139,7 +139,7 @@ typedef struct {
 } lPair;
 
 struct lVal {
-	u8 type;
+	u32 type;
 	union {
 		bool            vBool;
 		lPair           vList;

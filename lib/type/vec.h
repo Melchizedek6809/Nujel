@@ -2,7 +2,7 @@
 #define NUJEL_LIB_MISC_VEC
 #include "../common.h"
 
-vec   vecNew      (float x, float y, float z);
+vec   vecNew      (float x, float y, float z, float w);
 vec   vecNewP     (const float *p);
 vec   vecNOne     ();
 vec   vecZero     ();
@@ -10,12 +10,10 @@ vec   vecOne      ();
 vec   vecInvert   (const vec a);
 vec   vecAdd      (const vec a, const vec   b);
 vec   vecAddS     (const vec a, const float b);
-vec   vecAddT     (const vec a, const vec   b, const vec c);
 vec   vecSub      (const vec a, const vec   b);
 vec   vecSubS     (const vec a, const float b);
 vec   vecMul      (const vec a, const vec   b);
 vec   vecMulS     (const vec a, const float b);
-vec   vecMulT     (const vec a, const vec   b, const vec c);
 vec   vecDiv      (const vec a, const vec   b);
 vec   vecDivS     (const vec a, const float b);
 vec   vecMod      (const vec a, const vec   b);
