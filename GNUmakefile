@@ -64,6 +64,10 @@ endif
 FILES_TO_CLEAN := $(shell find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
 NOBS_TO_CLEAN  := $(shell find binlib stdlib -type f -name '*.no')
 
+%.no: %.nuj | $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $^
+	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
+
 %.o: %.c
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@

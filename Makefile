@@ -33,6 +33,11 @@ NOBS_TO_CLEAN  != find binlib stdlib -type f -name '*.no'
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
+.SUFFIXES: .nuj .no
+.nuj.no: $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $<
+	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
+
 tools/assets: tools/assets.c
 	@$(CC) -o $@ $> $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@

@@ -9,6 +9,18 @@
        [for-in [form [read [file/read path]]]
                [eval-in environment form]]]
 
+[defn file/compile [path environment]
+      "Compile a Nujel source file into optimized object code"
+      [when-not environment [set! environment [environment*]]]
+      [def source [cons 'do [read [file/read path]]]]
+      [def object-code [compile* source environment]]
+      [file/write [if object-code [string/write object-code] ""]
+                  [cat [path/without-extension path] ".no"]]
+      [return object-code]]
+
+[defn file/compile/argv []
+      [file/compile [car [last-pair repl/args]]]]
+
 [defn load [filename]
   [try [fn [err]
          [display/error err]

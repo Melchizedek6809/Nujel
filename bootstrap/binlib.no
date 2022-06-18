@@ -19,16 +19,16 @@
 10s path
 04i 1
 04i 1
-0Es ΓεnΣym-14
+0Es ΓεnΣym-1
 0D
-10s ΓεnΣym-14
+10s ΓεnΣym-1
 0Bo 54
 24
 1B
 09o 39
 0D
 1C
-10s ΓεnΣym-14
+10s ΓεnΣym-1
 11
 0Es form
 0D
@@ -37,10 +37,10 @@
 10s form
 04i 2
 0D
-10s ΓεnΣym-14
+10s ΓεnΣym-1
 12
-0Fs ΓεnΣym-14
-10s ΓεnΣym-14
+0Fs ΓεnΣym-1
+10s ΓεnΣym-1
 0Ao -40
 09o 4
 24
@@ -49,6 +49,74 @@
 }
 17
 0Es file/eval
+0D
+23s file/compile
+05v [path environment]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [when-not environment [set! environment [environment*]]] [def source [cons 'do [read [file/read path]]]] [def object-code [compile* source environment]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
+05v #{##[]
+10s environment
+0Bo 7
+24
+09o 12
+15
+24
+0D
+13
+16
+0Fs environment
+0D
+23s do
+05v read
+05v file/read
+10s path
+04i 1
+04i 1
+14
+0Es source
+0D
+05v compile*
+10s source
+10s environment
+04i 2
+0Es object-code
+0D
+05v file/write
+10s object-code
+0Bo 16
+05v string/write
+10s object-code
+04i 1
+09o 7
+05v ""
+05v cat
+05v path/without-extension
+10s path
+04i 1
+05v ".no"
+04i 2
+04i 2
+0D
+10s object-code
+01
+01
+}
+17
+0Es file/compile
+0D
+23s file/compile/argv
+05v []
+05v #@[source: [[file/compile [car [last-pair repl/args]]]]]
+05v #{##[]
+05v file/compile
+05v last-pair
+10s repl/args
+04i 1
+11
+04i 1
+01
+}
+17
+0Es file/compile/argv
 0D
 23s load
 05v [filename]
@@ -254,6 +322,9 @@
 }#{##[]
 05v "nujel"
 0Es repl/executable-name
+0D
+24
+0Es repl/args
 0D
 05v #f
 0Es repl/parse-args/eval-next
@@ -885,8 +956,11 @@
 0D
 23s repl/init
 23s args
-05v #@[source: [[if [== System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]]
+05v #@[source: [[set! repl/args args] [if [== System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]]
 05v #{##[]
+10s args
+0Fs repl/args
+0D
 10s System/Architecture
 23s wasm
 20
