@@ -5,7 +5,7 @@
             [otherwise l]]]
 
 
-[defun make-instance [parent]
+[defun make-instance [parent name]
       [when [and [not [nil? parent]]
                  [!= [type-of parent] :tree]]
             [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]]
@@ -15,7 +15,9 @@
                     [def pv [tree/get parent k]]
                     [when-not [== [type-of pv] :lambda]
                               [tree/set! ret k [dup pv]]]]]
-      [tree/set! ret :parent parent]]
+      [-> ret
+          [tree/set! :parent parent]
+          [tree/set! :name name]]]
 
 [defun nos/funcall* [o method-name args]
       [if o
@@ -39,9 +41,8 @@
 [defun nos/funcall/try [o method-name . args]
       [nos/funcall*/try o method-name [cons o args]]]
 
-
-[defmacro defobject [parent]
-          `[make-instance ~parent]]
+[defmacro defobject [name parent]
+          `[def ~name [make-instance ~parent '~name]]]
 
 [defmacro defproperty [o name val]
           `[tree/set! ~o ~name ~val]]
