@@ -53,4 +53,4 @@
 [test/add "00620062" [fmt "{:08X}" [hash/adler32 "a"]]]
 [test/add "0F9D02BC" [fmt "{:08X}" [hash/adler32 "asdQWE123"]]]
 [test/add "796B110D" [fmt "{:08X}" [hash/adler32 "DiesIstEinTestDerNujelAdler32Implementierung"]]]
-[test/add #t [== [cat test-context " " System/OS " " System/Architecture " " 5] [fmt "{test-context} {System/OS} {System/Architecture} {}" [if #t 5 0]]]]
+[test/add #t [= [cat test-context " " System/OS " " System/Architecture " " 5] [fmt "{test-context} {System/OS} {System/Architecture} {}" [if #t 5 0]]]]

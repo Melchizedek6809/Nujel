@@ -38,7 +38,7 @@
 
 [defn delete [l e]
       "Returns a filtered list l with all elements equal to e omitted"
-      [filter l [fn [a] [not [== a e]]]]]
+      [filter l [fn [a] [not [= a e]]]]]
 
 [defn remove [l p]
       "Returns a filtered list l with all elements where P equal true removed"

@@ -12,7 +12,7 @@
        [tree/zip '[:x :y] [map [split text ","] read/single]]]
 
 [defn line/dir [start end]
-       [cond [[== start end] 0]
+       [cond [[= start end] 0]
 	     [[< start end] 1]
 	     [#t -1]]]
 

@@ -4,19 +4,19 @@
 [defn quasiquote-real [l depth]
       [if [nil? l] #nil
           [if [pair? l]
-              [if [== [caar l] 'unquote-splicing]
+              [if [= [caar l] 'unquote-splicing]
                   [if [zero? depth]
                       [list 'append
                             [cadr [car l]]
                             [quasiquote-real [cdr l] depth]]
                       [list 'unquote-splicing
                             [quasiquote-real [cadr l] [+ -1 depth]]]]
-                  [if [== [car l] 'unquote]
+                  [if [= [car l] 'unquote]
                       [if [zero? depth]
                           [cadr l]
                           [list 'unquote
                                 [quasiquote-real [cadr l] [+ -1 depth]]]]
-                      [if [== [car l] 'quasiquote]
+                      [if [= [car l] 'quasiquote]
                           [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth]
                           [if [zero? depth]
                               [list 'cons

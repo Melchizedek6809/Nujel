@@ -61,8 +61,8 @@
 
 [defn $apply/optimize? [fun arg-count]
       [case fun
-            [[+ - * / %] [== arg-count 2]]
-            [[zero? car cdr add/int cons < <= == >= >] #t]]]
+            [[+ - * / %] [= arg-count 2]]
+            [[zero? car cdr add/int cons < <= = >= >] #t]]]
 
 [defn $apply [arg-count fun]
       "arguments -> [result]"
@@ -83,7 +83,7 @@
                      [cons [$cons]]
                      [< [$<]]
                      [<= [$<=]]
-                     [== [$==]]
+                     [= [$=]]
                      [>= [$>=]]
                      [> [$>]]
                      [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
@@ -140,7 +140,7 @@
       [while code
              [case [type-of [car code]]
                    [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
-                   [[:symbol :keyword] [and [== [car code] :label]
+                   [[:symbol :keyword] [and [= [car code] :label]
                                             [tree/set! sym-map [cadr code] pos]]]
                    [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
              [cdr! code]]
@@ -154,7 +154,7 @@
       [return pos]]
 
 [defn assemble/emit-relocated-ops [code sym-map pos out]
-      [if [== [car code] :relocate]
+      [if [= [car code] :relocate]
           [set! pos [assemble/relocate-op code sym-map pos out]]
           [doseq [op code]
                  [case [type-of op]
@@ -173,7 +173,7 @@
       [when-not code [return #nil]]
       [cons [cond [[pair? [car code]]
                    [assemble/build-lit-arr [car code] lit-arr]]
-                  [[== :literal [car code]]
+                  [[= :literal [car code]]
                    [assemble/add-literal code lit-arr]]
                   [#t [car code]]]
             [assemble/build-lit-arr [cdr code] lit-arr]]]

@@ -21,7 +21,7 @@
                [>= x [ref data :width]]
                [< y 0]
                [>= y [ref data :height]]
-               [== 9 [array/2d/ref data x y]]]
+               [= 9 [array/2d/ref data x y]]]
            0
            [do [array/2d/set! data x y 9]
                [+ 1 [count-basin-size data [- x 1] y]

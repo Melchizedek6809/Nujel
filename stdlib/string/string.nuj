@@ -40,10 +40,10 @@
       "Return a predicate that checks if a path ends on EXT"
       [case [type-of ext]
             [:string [fn [path]
-                       [== ext [lowercase [path/extension path]]]]]
+                       [= ext [lowercase [path/extension path]]]]]
             [:pair [fn [path]
                      [def cext [lowercase [path/extension path]]]
-                     [reduce ext [fn [α β] [or α [== β cext]]]]]]
+                     [reduce ext [fn [α β] [or α [= β cext]]]]]]
             [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
 
 
@@ -187,7 +187,7 @@
       [float [read/single text]]]
 
 [defn string/length?! [chars]
-      [fn [a] [== chars [string/length a]]]]
+      [fn [a] [= chars [string/length a]]]]
 
 [defn contains-any? [str chars]
       [apply or [map [split chars ""]

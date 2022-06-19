@@ -26,7 +26,7 @@
 
 [defn repl/cmd/raw [ctx line]
       [try [fn [err]
-               [if [== [car err] :unmatched-opening-bracket]
+               [if [= [car err] :unmatched-opening-bracket]
                    [repl/cmd/raw ctx [cat line [readline "... "]]]
                    [throw err]]]
            [def expr [read line]]
@@ -53,7 +53,7 @@
       [when [nil? line]
         [display "Adios, cowboy...\r\n"]
         [exit 0]]
-      [if [== line "[cmd]\n"]
+      [if [= line "[cmd]\n"]
           [repl/cmd ctx]
           [repl/cmd/raw ctx line]]]
 
@@ -98,7 +98,7 @@
            [ref repl/option-map :default]] option]]
 
 [defn repl/parse-options [options]
-      [if [== [char-at options 0] #\-]
+      [if [= [char-at options 0] #\-]
           [repl/parse-option [string->keyword [cut options 1]]]
           [for-each [map [split options ""] string->symbol] repl/parse-option]]]
 
@@ -106,7 +106,7 @@
       [cond [repl/parse-args/eval-next [try display/error
                                             [eval-in root-closure [cons do [read arg]]]
                                             [set! repl/parse-args/eval-next #f]]]
-            [[== [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
+            [[= [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
             [#t [try display/error
                      [file/eval arg]]
                 [set! repl/parse-args/run-repl #f]]]]
@@ -127,6 +127,6 @@
 
 [defn repl/init args
       [set! repl/args args]
-      [if [== System/Architecture 'wasm]
+      [if [= System/Architecture 'wasm]
           [repl/init/wasm args]
           [repl/init/bin args]]]

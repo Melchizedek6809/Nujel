@@ -12,7 +12,7 @@
        [tree/zip '[:x :y] [map [split text ","] read/single]]]
 
 [defn line/dir [start end]
-       [cond [[== start end] 0]
+       [cond [[= start end] 0]
 	     [[< start end] 1]
 	     [#t -1]]]
 
@@ -26,11 +26,11 @@
        [array/++ [ref vents x] y 1]]
 
 [defn line/horiz? [line]
-       [== [ref [ref line :a] :y]
+       [= [ref [ref line :a] :y]
            [ref [ref line :b] :y]]]
 
 [defn line/vert? [line]
-       [== [ref [ref line :a] :x]
+       [= [ref [ref line :a] :x]
            [ref [ref line :b] :x]]]
 
 [defn line/draw-vents [line]

@@ -25,11 +25,11 @@
 
 [defn odd? [a]
       "Predicate that returns #t if a is odd"
-      [== [% [int a] 2] 1]]
+      [= [% [int a] 2] 1]]
 
 [defn even? [a]
       "Predicate that returns #t if a is even"
-      [== [mod/int [int a] 2] 0]]
+      [= [mod/int [int a] 2] 0]]
 
 [defn not-zero? [val] :inline
       "#t if VAL is not zero"
@@ -44,68 +44,68 @@
                 [:array [array/equal? a b]]
                 [:tree [tree/equal? a b]]
                 [:pair [list/equal? a b]]
-                [otherwise [== a b]]]]]
+                [otherwise [= a b]]]]]
 
 [defn inequal? [a b]
       "High level inequality comparator"
       [not [equal? a b]]]
 
 [defn int? [val]
-      [== :int [type-of val]]]
+      [= :int [type-of val]]]
 
 [defn float? [val]
-      [== :float [type-of val]]]
+      [= :float [type-of val]]]
 
 [defn vec? [val]
-      [== :vec [type-of val]]]
+      [= :vec [type-of val]]]
 
 [defn bool? [val]
-      [== :bool [type-of val]]]
+      [= :bool [type-of val]]]
 
 [defn pair? [val]
-      [== :pair [type-of val]]]
+      [= :pair [type-of val]]]
 
 [defn array? [val]
-      [== :array [type-of val]]]
+      [= :array [type-of val]]]
 
 [defn string? [val]
-      [== :string [type-of val]]]
+      [= :string [type-of val]]]
 
 [defn symbol? [val]
-      [== :symbol [type-of val]]]
+      [= :symbol [type-of val]]]
 
 [defn object? [val]
-      [== :object [type-of val]]]
+      [= :object [type-of val]]]
 
 [defn tree? [val]
-      [== :tree [type-of val]]]
+      [= :tree [type-of val]]]
 
 [defn keyword? [v]
-      [== :keyword [type-of v]]]
+      [= :keyword [type-of v]]]
 
 [defn macro? [val]
-      [== :macro [type-of val]]]
+      [= :macro [type-of val]]]
 
 [defn lambda? [val]
-      [or [== :lambda [type-of val]]]]
+      [or [= :lambda [type-of val]]]]
 
 [defn native? [val]
-      [== :native-function [type-of val]]]
+      [= :native-function [type-of val]]]
 
 [defn procedure? [val]
       [or [lambda? val] [native? val]]]
 
 [defn buffer? [v]
-      [== :buffer [type-of v]]]
+      [= :buffer [type-of v]]]
 
 [defn buffer-view? [v]
-      [== :buffer-view [type-of v]]]
+      [= :buffer-view [type-of v]]]
 
 [defn bytecode-array? [v]
-      [== :bytecode-array [type-of v]]]
+      [= :bytecode-array [type-of v]]]
 
 [defn bytecode-op? [v]
-      [== :bytecode-op [type-of v]]]
+      [= :bytecode-op [type-of v]]]
 
 [defn in-range? [v min max]
       [and [>= v min] [<= v max]]]

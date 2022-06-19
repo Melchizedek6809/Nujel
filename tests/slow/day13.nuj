@@ -5,7 +5,7 @@
        [def γ [reduce [split [file/read filename] "\n"]
                        [fn [α β]
                          [cond [[zero? [string/length β]] α]
-                               [[== [char-at β 0] #\f]
+                               [[= [char-at β 0] #\f]
                                 [tree/set! α :folds [cons [split [caddr [split β " "]] "="] [ref α :folds]]]]
                                [#t [def τ [map [split β ","] read/single]]
                                    [set! points [cons τ points]]
@@ -43,7 +43,7 @@
        [tree/set! ret :folds [cdr [ref data :folds]]]]
 
 [defn do-fold [α]
-       [if [== [caar [ref α :folds]] "x"]
+       [if [= [caar [ref α :folds]] "x"]
            [fold-x α [cadr [ref α :folds]]]
            [fold-y α [cadr [ref α :folds]]]]]
 

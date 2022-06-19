@@ -4,7 +4,7 @@
 0D
 23s file/eval
 05v [path environment]
-05v #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [for-in [form [read [file/read path]]] [eval-in environment form]]]]
+05v #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [doseq [form [read [file/read path]]] [eval-in environment form]]]]
 05v #{##[]
 10s environment
 0Bo 7
@@ -406,11 +406,11 @@
 0D
 23s repl/cmd/raw
 05v [ctx line]
-05v #@[source: [[try [fn [err] [if [== [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [set! repl/history [cons line repl/history]] [println [if [nil? result] "" [string result]]]]]]
+05v #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [set! repl/history [cons line repl/history]] [println [if [nil? result] "" [string result]]]]]]
 05v #{##[]
 23s anonymous
 05v [err]
-05v #@[source: [[if [== [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]]
+05v #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]]
 05v #{##[]
 10s err
 11
@@ -549,7 +549,7 @@
 0D
 23s repl/readline
 05v [ctx]
-05v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [== line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]]
+05v #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]]
 05v #{##[]
 05v readline
 05v repl/prompt
@@ -808,7 +808,7 @@
 0D
 23s repl/parse-options
 05v [options]
-05v #@[source: [[if [== [char-at options 0] 45] [repl/parse-option [string->keyword [cut options 1]]] [for-each [map [split options ""] string->symbol] repl/parse-option]]]]
+05v #@[source: [[if [= [char-at options 0] 45] [repl/parse-option [string->keyword [cut options 1]]] [for-each [map [split options ""] string->symbol] repl/parse-option]]]]
 05v #{##[]
 05v char-at
 10s options
@@ -845,7 +845,7 @@
 0D
 23s repl/parse-arg
 05v [arg]
-05v #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[== [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]]
+05v #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[= [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]]
 05v #{##[]
 10s repl/parse-args/eval-next
 0Bo 48
@@ -956,7 +956,7 @@
 0D
 23s repl/init
 23s args
-05v #@[source: [[set! repl/args args] [if [== System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]]
+05v #@[source: [[set! repl/args args] [if [= System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]]
 05v #{##[]
 10s args
 0Fs repl/args

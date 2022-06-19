@@ -28,7 +28,7 @@
       [if-not [pair? expr] expr
               [do
                   [def folded-fun  [car expr]]
-                  [when [== 'quote folded-fun] [return expr]]
+                  [when [= 'quote folded-fun] [return expr]]
                   [def folded-args [constant-fold/args [cdr expr]]]
                   [if [and [constant-foldable? folded-fun]
                            [every? folded-args pure?]]

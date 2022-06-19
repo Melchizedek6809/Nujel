@@ -1,6 +1,6 @@
 #!/usr/bin/env nujel
 [def hostname [popen/trim "uname -n"]]
-[when [== hostname "wolkenwelten"]
+[when [= hostname "wolkenwelten"]
  [popen "rsync -avh web/benchmark-results/ /home/nujel/nujel/benchmark-results/"]
  [popen "rsync -avh /home/nujel/nujel/benchmark-results/ web/benchmark-results/"]
  [popen "./tools/benchmark-aggregate.nuj"]

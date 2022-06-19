@@ -46,7 +46,7 @@
                     [return `[import* ~names [module/load ~module] ~names]]]
           [def ret #nil]
           [while names
-                 [if [== [cadr names] :as]
+                 [if [= [cadr names] :as]
                      [do [set! ret [cons `[import* ~[caddr names] [module/load ~module] ~[car names]] ret]]
                          [set! names [cddr names]]]
                      [set! ret [cons `[import* ~[car names] [module/load ~module] ~[car names]] ret]]]

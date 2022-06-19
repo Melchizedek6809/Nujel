@@ -11,7 +11,7 @@
 
 [defn bits/> [a b] [if [> a b] 1 0]]
 [defn bits/< [a b] [if [< a b] 1 0]]
-[defn bits/= [a b] [if [== a b] 1 0]]
+[defn bits/= [a b] [if [= a b] 1 0]]
 [defn bits/type->op [t]
        [case t
              [0 +]
@@ -22,7 +22,7 @@
 	     [6 bits/<]
 	     [7 bits/=]]]
 [defn bits/compile [p]
-       [if [== 4 [ref p :type]]
+       [if [= 4 [ref p :type]]
 	   [ref p :value]
 	   [cons [bits/type->op [ref p :type]]
                  [map [ref p :value] bits/compile]]]]
@@ -48,14 +48,14 @@
        [cons off p]]
 
 [defn packet/operator [p s offset]
-       [if [== [char-at s offset] #\1]
+       [if [= [char-at s offset] #\1]
            [packet/operator/packets p s [+ offset 12] [bits/read-value s [+ 1 offset] 11]]
            [packet/operator/bits p s [+ offset 16] [bits/read-value s [+ 1 offset] 15]]]]
 
 [defn packet/literal [p s offset]
        [def parts #nil]
        [def off offset]
-       [while [== [char-at s off] #\1]
+       [while [= [char-at s off] #\1]
 	      [++ off]
 	      [set! parts [cons [string/cut s off [+ 4 off]] parts]]
 	      [+= off 4]]

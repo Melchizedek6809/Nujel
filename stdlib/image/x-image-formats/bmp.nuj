@@ -12,7 +12,7 @@
 
 [defn image/bmp/row-padding [width pixel-length]
       [def ret [- 4 [logand [* width pixel-length] 3]]]
-      [if [== ret 4] 0 ret]]
+      [if [= ret 4] 0 ret]]
 
 [defn image/bmp/encode [image]
       [def image-size [* [tree/ref image :height]

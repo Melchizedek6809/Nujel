@@ -70,7 +70,7 @@
       :inline
       '[#$1F]]
 
-[defn $== []
+[defn $= []
       "[a b] -> [bool]"
       "Compare A and B and push the result on the stack"
       :inline

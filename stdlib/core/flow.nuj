@@ -16,20 +16,20 @@
 
 [defn case/clauses/multiple [key-sym cases]
       [when cases
-            [cons [list '== key-sym [car cases]]
+            [cons [list '= key-sym [car cases]]
                   [case/clauses/multiple key-sym [cdr cases]]]]]
 [defn case/clauses [key-sym clauses]
       [when clauses
-            [if [== [caar clauses] 'otherwise]
+            [if [= [caar clauses] 'otherwise]
                 [cons 'do [cdar clauses]]
                 [list 'if
                       [if [pair? [caar clauses]]
-                          [if [and [== [car [caar clauses]] 'quote]
+                          [if [and [= [car [caar clauses]] 'quote]
                                    [last? [cdr [caar clauses]]]
                                    [symbol? [cadr [caar clauses]]]]
-                              [list '== key-sym [caar clauses]]
+                              [list '= key-sym [caar clauses]]
                               [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
-                          [list '== key-sym [caar clauses]]]
+                          [list '= key-sym [caar clauses]]]
                       [cons 'do [cdar clauses]]
                       [case/clauses key-sym [cdr clauses]]]]]]
 [defmacro case [key-form . clauses]

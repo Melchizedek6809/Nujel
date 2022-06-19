@@ -997,7 +997,7 @@
 0D
 23s array/heapify
 05v [arr n at]
-05v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [ash at 1] 1]] [def r [+ [ash at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [== top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] [return arr]]]
+05v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [ash at 1] 1]] [def r [+ [ash at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [= top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] [return arr]]]
 05v #{##[]
 10s at
 0Es top
@@ -1257,7 +1257,7 @@
 0D
 23s avl/empty?
 05v [n]
-05v #@[source: [[== :e n]]]
+05v #@[source: [[= :e n]]]
 05v #{##[]
 05v :e
 10s n
@@ -1291,7 +1291,7 @@
 0D
 23s avl/typecheck
 05v [r k]
-05v #@[source: [[or [avl/empty? [avl/root r]] [== [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]]
+05v #@[source: [[or [avl/empty? [avl/root r]] [= [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]]
 05v #{##[]
 05v avl/empty?
 05v avl/root
@@ -2669,13 +2669,13 @@
 0D
 23s delete
 05v [l e]
-05v #@[documentation: "Returns a filtered list l with all elements equal to e omitted" source: ["Returns a filtered list l with all elements equal to e omitted" [filter l [fn [a] [not [== a e]]]]]]
+05v #@[documentation: "Returns a filtered list l with all elements equal to e omitted" source: ["Returns a filtered list l with all elements equal to e omitted" [filter l [fn [a] [not [= a e]]]]]]
 05v #{##[]
 05v filter
 10s l
 23s anonymous
 05v [a]
-05v #@[source: [[not [== a e]]]]
+05v #@[source: [[not [= a e]]]]
 05v #{##[]
 10s a
 10s e
@@ -3445,7 +3445,7 @@
 0D
 23s list/reduce
 05v [l o s]
-05v #@[documentation: "Combine all elements in l using operation o and starting value s" source: ["Combine all elements in l using operation o and starting value s" [for-in [e l] [set! s [o s e]]] s]]
+05v #@[documentation: "Combine all elements in l using operation o and starting value s" source: ["Combine all elements in l using operation o and starting value s" [doseq [e l] [set! s [o s e]]] s]]
 05v #{##[]
 15
 10s l
@@ -3518,7 +3518,7 @@
 0D
 23s reverse
 05v [l]
-05v #@[documentation: "Return the list l in reverse order" source: ["Return the list l in reverse order" [def ret] [for-in [e l] [set! ret [cons e ret]]] ret]]
+05v #@[documentation: "Return the list l in reverse order" source: ["Return the list l in reverse order" [def ret] [doseq [e l] [set! ret [cons e ret]]] ret]]
 05v #{##[]
 24
 0Es ret
@@ -3560,7 +3560,7 @@
 0D
 23s list/length
 05v [l]
-05v #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [for-in [e l] [++ ret]] ret]]
+05v #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [doseq [e l] [++ ret]] ret]]
 05v #{##[]
 02i 0
 0Es ret
@@ -3602,7 +3602,7 @@
 0D
 23s list/filter
 05v [l p]
-05v #@[documentation: "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" [def ret #nil] [for-in [e l] [when [p e] [set! ret [cons e ret]]]] [nreverse ret]]]
+05v #@[documentation: "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" [def ret #nil] [doseq [e l] [when [p e] [set! ret [cons e ret]]]] [nreverse ret]]]
 05v #{##[]
 24
 0Es ret
@@ -3652,7 +3652,7 @@
 0D
 23s list/map
 05v [l f]
-05v #@[documentation: "Runs f over every item in list l and returns the resulting list" source: ["Runs f over every item in list l and returns the resulting list" [def ret #nil] [for-in [e l] [set! ret [cons [f e] ret]]] [nreverse ret]]]
+05v #@[documentation: "Runs f over every item in list l and returns the resulting list" source: ["Runs f over every item in list l and returns the resulting list" [def ret #nil] [doseq [e l] [set! ret [cons [f e] ret]]] [nreverse ret]]]
 05v #{##[]
 24
 0Es ret
@@ -3698,7 +3698,7 @@
 0D
 23s append
 05v [a b]
-05v #@[documentation: "Appends two lists A and B together" source: ["Appends two lists A and B together" [def ret b] [set! a [reverse a]] [for-in [t a] [set! ret [cons t ret]]] ret]]
+05v #@[documentation: "Appends two lists A and B together" source: ["Appends two lists A and B together" [def ret b] [set! a [reverse a]] [doseq [t a] [set! ret [cons t ret]]] ret]]
 05v #{##[]
 10s b
 0Es ret
@@ -3847,7 +3847,7 @@
 0D
 23s list/member
 05v [l m]
-05v #@[documentation: "Returns the first pair of list l whose car is equal to m" source: ["Returns the first pair of list l whose car is equal to m" [cond [[nil? l] #f] [[== [car l] m] l] [#t [list/member [cdr l] m]]]]]
+05v #@[documentation: "Returns the first pair of list l whose car is equal to m" source: ["Returns the first pair of list l whose car is equal to m" [cond [[nil? l] #f] [[= [car l] m] l] [#t [list/member [cdr l] m]]]]]
 05v #{##[]
 05v nil?
 10s l
@@ -3878,7 +3878,7 @@
 0D
 23s getf
 05v [l key]
-05v #@[documentation: "Return the value in LIST following KEY" source: ["Return the value in LIST following KEY" [cond [[nil? l] #nil] [[== key [car l]] [cadr l]] [#t [getf [cdr l] key]]]]]
+05v #@[documentation: "Return the value in LIST following KEY" source: ["Return the value in LIST following KEY" [cond [[nil? l] #nil] [[= key [car l]] [cadr l]] [#t [getf [cdr l] key]]]]]
 05v #{##[]
 05v nil?
 10s l
@@ -4321,7 +4321,7 @@
 }#{##[]
 23s tree/zip
 05v [keys values]
-05v #@[documentation: "Return a tree where KEYS point to VALUES" source: ["Return a tree where KEYS point to VALUES" [def ret [tree/new #nil]] [for-in [key keys] [tree/set! ret key [car values]] [cdr! values]] ret]]
+05v #@[documentation: "Return a tree where KEYS point to VALUES" source: ["Return a tree where KEYS point to VALUES" [def ret [tree/new #nil]] [doseq [key keys] [tree/set! ret key [car values]] [cdr! values]] ret]]
 05v #{##[]
 05v tree/new
 24
@@ -4458,7 +4458,7 @@
 0D
 23s tree/equal?
 05v [a b]
-05v #@[documentation: "Compares two trees for equality" source: ["Compares two trees for equality" [if [and [tree? a] [tree? b]] [and [== [tree/key* a] [tree/key* b]] [equal? [tree/value* a] [tree/value* b]] [tree/equal? [tree/left* a] [tree/left* b]] [tree/equal? [tree/right* a] [tree/right* b]]] [equal? a b]]]]
+05v #@[documentation: "Compares two trees for equality" source: ["Compares two trees for equality" [if [and [tree? a] [tree? b]] [and [= [tree/key* a] [tree/key* b]] [equal? [tree/value* a] [tree/value* b]] [tree/equal? [tree/left* a] [tree/left* b]] [tree/equal? [tree/right* a] [tree/right* b]]] [equal? a b]]]]
 05v #{##[]
 05v tree?
 10s a
@@ -4538,7 +4538,7 @@
 0D
 23s tree/filter
 05v [l f]
-05v #@[documentation: "Return a new tree with all elements from L where F retunrs true" source: ["Return a new tree with all elements from L where F retunrs true" [def ret [tree/new #nil]] [for-in [e [tree/keys l]] [def t [tree/ref l e]] [when [f t] [tree/set! ret e t]]] ret]]
+05v #@[documentation: "Return a new tree with all elements from L where F retunrs true" source: ["Return a new tree with all elements from L where F retunrs true" [def ret [tree/new #nil]] [doseq [e [tree/keys l]] [def t [tree/ref l e]] [when [f t] [tree/set! ret e t]]] ret]]
 05v #{##[]
 05v tree/new
 24
@@ -4716,7 +4716,7 @@
 17
 0Es $<=
 0D
-23s $==
+23s $=
 05v []
 05v #@[documentation: "[a b] -> [bool]\nCompare A and B and push the result on the stack" source: ["[a b] -> [bool]" "Compare A and B and push the result on the stack" :inline '[#$20]] inline: #t]
 05v #{##[]
@@ -4724,7 +4724,7 @@
 01
 }
 17
-0Es $==
+0Es $=
 0D
 23s $>=
 05v []
@@ -5109,7 +5109,7 @@
 0D
 23s $apply/optimize?
 05v [fun arg-count]
-05v #@[source: [[case fun [[+ - * / %] [== arg-count 2]] [[zero? car cdr add/int cons < <= == >= >] #t]]]]
+05v #@[source: [[case fun [[+ - * / %] [= arg-count 2]] [[zero? car cdr add/int cons < <= = >= >] #t]]]]
 05v #{##[]
 15
 10s fun
@@ -5194,7 +5194,7 @@
 0Ao 50
 0D
 10s ΓεnΣym-1
-10s ==
+10s =
 20
 0C
 0Ao 36
@@ -5224,7 +5224,7 @@
 0D
 23s $apply
 05v [arg-count fun]
-05v #@[documentation: "arguments -> [result]\nRead arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments -> [result]" "Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [zero? [$zero?]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [2 [case fun [add/int [$add/int]] [+ [$add]] [- [$sub]] [* [$mul]] [/ [$div]] [% [$mod]] [cons [$cons]] [< [$<]] [<= [$<=]] [== [$==]] [>= [$>=]] [> [$>]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]]
+05v #@[documentation: "arguments -> [result]\nRead arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments -> [result]" "Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [zero? [$zero?]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [2 [case fun [add/int [$add/int]] [+ [$add]] [- [$sub]] [* [$mul]] [/ [$div]] [% [$mod]] [cons [$cons]] [< [$<]] [<= [$<=]] [= [$=]] [>= [$>=]] [> [$>]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]]
 05v #{##[]
 15
 10s arg-count
@@ -5330,7 +5330,7 @@
 05v [#$1F]
 09o 90
 10s ΓεnΣym-4
-10s ==
+10s =
 20
 0Bo 10
 05v [#$20]
@@ -5590,7 +5590,7 @@
 0D
 23s assemble/build-sym-map
 05v [code sym-map pos]
-05v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [++ pos]]] [[:symbol :keyword] [and [== [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [when [zero? 123] 123] [return pos]]]
+05v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [++ pos]]] [[:symbol :keyword] [and [= [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [when [zero? 123] 123] [return pos]]]
 05v #{##[]
 24
 1B
@@ -5730,7 +5730,7 @@
 0D
 23s assemble/emit-relocated-ops
 05v [code sym-map pos out]
-05v #@[source: [[if [== [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [for-in [op code] [case [type-of op] [:bytecode-op [array/set! out [++ pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]]
+05v #@[source: [[if [= [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [doseq [op code] [case [type-of op] [:bytecode-op [array/set! out [++ pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]]
 05v #{##[]
 10s code
 11
@@ -5867,7 +5867,7 @@
 0D
 23s assemble/build-lit-arr
 05v [code lit-arr]
-05v #@[source: [[when-not code [return #nil]] [cons [cond [[pair? [car code]] [assemble/build-lit-arr [car code] lit-arr]] [[== :literal [car code]] [assemble/add-literal code lit-arr]] [#t [car code]]] [assemble/build-lit-arr [cdr code] lit-arr]]]]
+05v #@[source: [[when-not code [return #nil]] [cons [cond [[pair? [car code]] [assemble/build-lit-arr [car code] lit-arr]] [[= :literal [car code]] [assemble/add-literal code lit-arr]] [#t [car code]]] [assemble/build-lit-arr [cdr code] lit-arr]]]]
 05v #{##[]
 10s code
 0Bo 7
@@ -7590,7 +7590,7 @@
 0D
 23s bytecode/nil-catcher
 05v [error]
-05v #@[source: [[if [== [car error] :type-error] #nil [throw error]]]]
+05v #@[source: [[if [= [car error] :type-error] #nil [throw error]]]]
 05v #{##[]
 10s error
 11
@@ -7783,7 +7783,7 @@
 0D
 23s disassemble/op
 05v [a i literals]
-05v #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$5 [quasiquote [$push/lval [unquote [bytecode-arr->val a [+ i 1]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]] [#$1B [quasiquote [$roots/push]]] [#$1C [quasiquote [$roots/pop]]] [#$1E [quasiquote [$<]]] [#$1F [quasiquote [$<=]]] [#$20 [quasiquote [$==]]] [#$21 [quasiquote [$>=]]] [#$22 [quasiquote [$>]]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 [quasiquote [$push/nil]]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$mod]] [#$2A '[$zero?]] [otherwise :unknown-op]]]]
+05v #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$5 [quasiquote [$push/lval [unquote [bytecode-arr->val a [+ i 1]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]] [#$1B [quasiquote [$roots/push]]] [#$1C [quasiquote [$roots/pop]]] [#$1E [quasiquote [$<]]] [#$1F [quasiquote [$<=]]] [#$20 [quasiquote [$=]]] [#$21 [quasiquote [$>=]]] [#$22 [quasiquote [$>]]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 [quasiquote [$push/nil]]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$mod]] [#$2A '[$zero?]] [otherwise :unknown-op]]]]
 05v #{##[]
 15
 05v ref
@@ -8100,7 +8100,7 @@
 05v #$20
 20
 0Bo 12
-23s $==
+23s $=
 24
 14
 09o 223
@@ -8253,7 +8253,7 @@
 0D
 23s disassemble/print
 05v [bc]
-05v #@[source: [[for-in [a [disassemble/bytecode-array bc]] [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]]]]
+05v #@[source: [[doseq [a [disassemble/bytecode-array bc]] [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]]]]
 05v #{##[]
 15
 05v disassemble/bytecode-array
@@ -8454,7 +8454,7 @@
 }#{##[]
 23s load/forms
 05v [source environment]
-05v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [for-in [form source] [apply environment [compile* source environment]]]]]
+05v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]]
 05v #{##[]
 15
 10s source
@@ -8613,7 +8613,7 @@
 0D
 23s meta/parse/body
 05v [type args body]
-05v #@[source: [[def meta [tree/new #nil]] [for-in [v body] [case [type-of v] [:pair [return meta]] [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]] "\n" v]]]] [:keyword [tree/set! meta v #t]]]] [return meta]]]
+05v #@[source: [[def meta [tree/new #nil]] [doseq [v body] [case [type-of v] [:pair [return meta]] [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]] "\n" v]]]] [:keyword [tree/set! meta v #t]]]] [return meta]]]
 05v #{##[]
 05v tree/new
 24
@@ -8898,10 +8898,10 @@
 0D
 23s typecheck/only
 05v [v t]
-05v #@[source: [[quasiquote [when-not [== [type-of [unquote v]] [unquote t]] [throw [list :type-error [unquote [fmt "Expected a value of type {t}"]] [unquote v] [current-lambda]]]]]]]
+05v #@[source: [[quasiquote [when-not [= [type-of [unquote v]] [unquote t]] [throw [list :type-error [unquote [fmt "Expected a value of type {t}"]] [unquote v] [current-lambda]]]]]]]
 05v #{##[]
 23s when-not
-23s ==
+23s =
 23s type-of
 10s v
 24
@@ -9363,7 +9363,7 @@
 0D
 23s constant-fold
 05v [expr]
-05v #@[documentation: "Will try and evaluate as many constant as possible to make the expression simpler." source: ["Will try and evaluate as many constant as possible to make the expression simpler." [if-not [pair? expr] expr [do [def folded-fun [car expr]] [when [== 'quote folded-fun] [return expr]] [def folded-args [constant-fold/args [cdr expr]]] [if [and [constant-foldable? folded-fun] [every? folded-args pure?]] [try [fn [] [cons folded-fun folded-args]] [apply [constant-fold/resolve folded-fun] folded-args]] [cons folded-fun folded-args]]]]]]
+05v #@[documentation: "Will try and evaluate as many constant as possible to make the expression simpler." source: ["Will try and evaluate as many constant as possible to make the expression simpler." [if-not [pair? expr] expr [do [def folded-fun [car expr]] [when [= 'quote folded-fun] [return expr]] [def folded-args [constant-fold/args [cdr expr]]] [if [and [constant-foldable? folded-fun] [every? folded-args pure?]] [try [fn [] [cons folded-fun folded-args]] [apply [constant-fold/resolve folded-fun] folded-args]] [cons folded-fun folded-args]]]]]]
 05v #{##[]
 05v pair?
 10s expr
@@ -9987,7 +9987,7 @@
 0D
 23s yield-run
 05v []
-05v #@[documentation: "Executes pending coroutines if their predicate evaluates to #t" source: ["Executes pending coroutines if their predicate evaluates to #t" [def old yield-queue] [set! yield-queue #nil] [for-in [cur old] [if [[car cur]] [[cdr cur]] [set! yield-queue [cons cur yield-queue]]]]]]
+05v #@[documentation: "Executes pending coroutines if their predicate evaluates to #t" source: ["Executes pending coroutines if their predicate evaluates to #t" [def old yield-queue] [set! yield-queue #nil] [doseq [cur old] [if [[car cur]] [[cdr cur]] [set! yield-queue [cons cur yield-queue]]]]]]
 05v #{##[]
 10s yield-queue
 0Es old
@@ -10098,7 +10098,7 @@
 0D
 23s event-fire
 05v [event val]
-05v #@[documentation: "Applies ...val to all event handlers associated with event-name" source: ["Applies ...val to all event handlers associated with event-name" [for-in [h [tree/values event]] [h val]]]]
+05v #@[documentation: "Applies ...val to all event handlers associated with event-name" source: ["Applies ...val to all event handlers associated with event-name" [doseq [h [tree/values event]] [h val]]]]
 05v #{##[]
 15
 05v tree/values
@@ -10693,12 +10693,12 @@
 0D
 23s case/clauses/multiple
 05v [key-sym cases]
-05v #@[source: [[when cases [cons [list '== key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]]]]]
+05v #@[source: [[when cases [cons [list '= key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]]]]]
 05v #{##[]
 10s cases
 0Bo 41
 05v list
-23s ==
+23s =
 10s key-sym
 10s cases
 11
@@ -10718,7 +10718,7 @@
 0D
 23s case/clauses
 05v [key-sym clauses]
-05v #@[source: [[when clauses [if [== [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [== [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '== key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '== key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]]]]
+05v #@[source: [[when clauses [if [= [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [= [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '= key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '= key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]]]]
 05v #{##[]
 10s clauses
 0Bo 205
@@ -10770,7 +10770,7 @@
 04i 1
 0Bo 26
 05v list
-23s ==
+23s =
 10s key-sym
 10s clauses
 11
@@ -10787,7 +10787,7 @@
 14
 09o 23
 05v list
-23s ==
+23s =
 10s key-sym
 10s clauses
 11
@@ -11005,9 +11005,92 @@
 18
 0Es for
 0D
-23s for-in
+23s dotimes
+05v [binding . body]
+05v #@[documentation: "binding => [name n result-form]\nRepeatedly executes body with name bound to integers from 0 through n-1. Returns result-form or #nil." source: ["binding => [name n result-form]" "Repeatedly executes body with name bound to integers from 0 through n-1. Returns result-form or #nil." [def sym [car binding]] [typecheck/only sym :symbol] [def times [cadr binding]] [def result-form [caddr binding]] [quasiquote [let [[[unquote sym] 0]] [while [< [unquote sym] [unquote times]] [unquote-splicing body] [set! [unquote sym] [add/int 1 [unquote sym]]]] [unquote result-form]]]]]
+05v #{##[]
+10s binding
+11
+0Es sym
+0D
+05v type-of
+10s sym
+04i 1
+05v :symbol
+20
+0Bo 7
+24
+09o 33
+05v throw
+05v list
+05v :type-error
+05v "Expected a value of type :symbol"
+10s sym
+05v current-lambda
+04i 0
+04i 4
+04i 1
+0D
+10s binding
+12
+11
+0Es times
+0D
+05v caddr
+10s binding
+04i 1
+0Es result-form
+0D
+23s let
+10s sym
+02i 0
+24
+14
+14
+24
+14
+23s while
+23s <
+10s sym
+10s times
+24
+14
+14
+14
+05v append
+10s body
+23s set!
+10s sym
+23s add/int
+02i 1
+10s sym
+24
+14
+14
+14
+24
+14
+14
+14
+24
+14
+04i 2
+14
+14
+10s result-form
+24
+14
+14
+14
+14
+01
+}
+18
+0Es dotimes
+0D
+23s doseq
 05v [for-loop . body]
-05v #@[documentation: "[for-in [l [list 1 2 3 4]] [println l]]" source: ["[for-in [l [list 1 2 3 4]] [println l]]" [def symbol-name [gensym]] [quasiquote [let [[[unquote symbol-name] [unquote [cadr for-loop]]]] [when [unquote symbol-name] [while [unquote symbol-name] [def [unquote [car for-loop]] [car [unquote symbol-name]]] [unquote-splicing body] [cdr! [unquote symbol-name]]]]]]]]
+05v #@[documentation: "[doseq [l [list 1 2 3 4]] [println l]]" source: ["[doseq [l [list 1 2 3 4]] [println l]]" [def symbol-name [gensym]] [quasiquote [let [[[unquote symbol-name] [unquote [cadr for-loop]]]] [when [unquote symbol-name] [while [unquote symbol-name] [def [unquote [car for-loop]] [car [unquote symbol-name]]] [unquote-splicing body] [cdr! [unquote symbol-name]]]]]]]]
 05v #{##[]
 05v gensym
 04i 0
@@ -11063,9 +11146,6 @@
 01
 }
 18
-0Es for-in
-0D
-10s for-in
 0Es doseq
 0D
 23s thread/->
@@ -11301,7 +11381,7 @@
 0D
 23s require*
 05v [module env]
-05v #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [for-in [k [tree/keys exports]] [def q [module/qualify-symbol module [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]]
+05v #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [module/qualify-symbol module [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]]
 05v #{##[]
 05v module/load
 10s module
@@ -11427,7 +11507,7 @@
 0D
 23s import
 05v [names module]
-05v #@[source: [[when-not [list? names] [return [quasiquote [import* [unquote names] [module/load [unquote module]] [unquote names]]]]] [def ret #nil] [while names [if [== [cadr names] :as] [do [set! ret [cons [quasiquote [import* [unquote [caddr names]] [module/load [unquote module]] [unquote [car names]]]] ret]] [set! names [cddr names]]] [set! ret [cons [quasiquote [import* [unquote [car names]] [module/load [unquote module]] [unquote [car names]]]] ret]]] [cdr! names]] [cons do [nreverse ret]]]]
+05v #@[source: [[when-not [list? names] [return [quasiquote [import* [unquote names] [module/load [unquote module]] [unquote names]]]]] [def ret #nil] [while names [if [= [cadr names] :as] [do [set! ret [cons [quasiquote [import* [unquote [caddr names]] [module/load [unquote module]] [unquote [car names]]]] ret]] [set! names [cddr names]]] [set! ret [cons [quasiquote [import* [unquote [car names]] [module/load [unquote module]] [unquote [car names]]]] ret]]] [cdr! names]] [cons do [nreverse ret]]]]
 05v #{##[]
 05v list?
 10s names
@@ -11526,7 +11606,7 @@
 0D
 23s module/load/external
 05v [name]
-05v #@[source: [[for-in [loader module/loader] [def mod [loader name]] [when mod [return mod]]] [return #nil]]]
+05v #@[source: [[doseq [loader module/loader] [def mod [loader name]] [when mod [return mod]]] [return #nil]]]
 05v #{##[]
 15
 10s module/loader
@@ -11799,7 +11879,7 @@
 0D
 23s odd?
 05v [a]
-05v #@[documentation: "Predicate that returns #t if a is odd" source: ["Predicate that returns #t if a is odd" [== [% [int a] 2] 1]]]
+05v #@[documentation: "Predicate that returns #t if a is odd" source: ["Predicate that returns #t if a is odd" [= [% [int a] 2] 1]]]
 05v #{##[]
 05v int
 10s a
@@ -11815,7 +11895,7 @@
 0D
 23s even?
 05v [a]
-05v #@[documentation: "Predicate that returns #t if a is even" source: ["Predicate that returns #t if a is even" [== [mod/int [int a] 2] 0]]]
+05v #@[documentation: "Predicate that returns #t if a is even" source: ["Predicate that returns #t if a is even" [= [mod/int [int a] 2] 0]]]
 05v #{##[]
 05v mod/int
 05v int
@@ -11845,7 +11925,7 @@
 0D
 23s equal?
 05v [a b]
-05v #@[documentation: "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." source: ["High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." [def cur-type [type-of a]] [if [!= cur-type [type-of b]] #f [case cur-type [:array [array/equal? a b]] [:tree [tree/equal? a b]] [:pair [list/equal? a b]] [otherwise [== a b]]]]]]
+05v #@[documentation: "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." source: ["High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." [def cur-type [type-of a]] [if [!= cur-type [type-of b]] #f [case cur-type [:array [array/equal? a b]] [:tree [tree/equal? a b]] [:pair [list/equal? a b]] [otherwise [= a b]]]]]]
 05v #{##[]
 05v type-of
 10s a
@@ -11920,7 +12000,7 @@
 0D
 23s int?
 05v [val]
-05v #@[source: [[== :int [type-of val]]]]
+05v #@[source: [[= :int [type-of val]]]]
 05v #{##[]
 05v :int
 05v type-of
@@ -11934,7 +12014,7 @@
 0D
 23s float?
 05v [val]
-05v #@[source: [[== :float [type-of val]]]]
+05v #@[source: [[= :float [type-of val]]]]
 05v #{##[]
 05v :float
 05v type-of
@@ -11948,7 +12028,7 @@
 0D
 23s vec?
 05v [val]
-05v #@[source: [[== :vec [type-of val]]]]
+05v #@[source: [[= :vec [type-of val]]]]
 05v #{##[]
 05v :vec
 05v type-of
@@ -11962,7 +12042,7 @@
 0D
 23s bool?
 05v [val]
-05v #@[source: [[== :bool [type-of val]]]]
+05v #@[source: [[= :bool [type-of val]]]]
 05v #{##[]
 05v :bool
 05v type-of
@@ -11976,7 +12056,7 @@
 0D
 23s pair?
 05v [val]
-05v #@[source: [[== :pair [type-of val]]]]
+05v #@[source: [[= :pair [type-of val]]]]
 05v #{##[]
 05v :pair
 05v type-of
@@ -11990,7 +12070,7 @@
 0D
 23s array?
 05v [val]
-05v #@[source: [[== :array [type-of val]]]]
+05v #@[source: [[= :array [type-of val]]]]
 05v #{##[]
 05v :array
 05v type-of
@@ -12004,7 +12084,7 @@
 0D
 23s string?
 05v [val]
-05v #@[source: [[== :string [type-of val]]]]
+05v #@[source: [[= :string [type-of val]]]]
 05v #{##[]
 05v :string
 05v type-of
@@ -12018,7 +12098,7 @@
 0D
 23s symbol?
 05v [val]
-05v #@[source: [[== :symbol [type-of val]]]]
+05v #@[source: [[= :symbol [type-of val]]]]
 05v #{##[]
 05v :symbol
 05v type-of
@@ -12032,7 +12112,7 @@
 0D
 23s object?
 05v [val]
-05v #@[source: [[== :object [type-of val]]]]
+05v #@[source: [[= :object [type-of val]]]]
 05v #{##[]
 05v :object
 05v type-of
@@ -12046,7 +12126,7 @@
 0D
 23s tree?
 05v [val]
-05v #@[source: [[== :tree [type-of val]]]]
+05v #@[source: [[= :tree [type-of val]]]]
 05v #{##[]
 05v :tree
 05v type-of
@@ -12060,7 +12140,7 @@
 0D
 23s keyword?
 05v [v]
-05v #@[source: [[== :keyword [type-of v]]]]
+05v #@[source: [[= :keyword [type-of v]]]]
 05v #{##[]
 05v :keyword
 05v type-of
@@ -12074,7 +12154,7 @@
 0D
 23s macro?
 05v [val]
-05v #@[source: [[== :macro [type-of val]]]]
+05v #@[source: [[= :macro [type-of val]]]]
 05v #{##[]
 05v :macro
 05v type-of
@@ -12088,7 +12168,7 @@
 0D
 23s lambda?
 05v [val]
-05v #@[source: [[or [== :lambda [type-of val]]]]]
+05v #@[source: [[or [= :lambda [type-of val]]]]]
 05v #{##[]
 05v :lambda
 05v type-of
@@ -12106,7 +12186,7 @@
 0D
 23s native?
 05v [val]
-05v #@[source: [[== :native-function [type-of val]]]]
+05v #@[source: [[= :native-function [type-of val]]]]
 05v #{##[]
 05v :native-function
 05v type-of
@@ -12142,7 +12222,7 @@
 0D
 23s buffer?
 05v [v]
-05v #@[source: [[== :buffer [type-of v]]]]
+05v #@[source: [[= :buffer [type-of v]]]]
 05v #{##[]
 05v :buffer
 05v type-of
@@ -12156,7 +12236,7 @@
 0D
 23s buffer-view?
 05v [v]
-05v #@[source: [[== :buffer-view [type-of v]]]]
+05v #@[source: [[= :buffer-view [type-of v]]]]
 05v #{##[]
 05v :buffer-view
 05v type-of
@@ -12170,7 +12250,7 @@
 0D
 23s bytecode-array?
 05v [v]
-05v #@[source: [[== :bytecode-array [type-of v]]]]
+05v #@[source: [[= :bytecode-array [type-of v]]]]
 05v #{##[]
 05v :bytecode-array
 05v type-of
@@ -12184,7 +12264,7 @@
 0D
 23s bytecode-op?
 05v [v]
-05v #@[source: [[== :bytecode-op [type-of v]]]]
+05v #@[source: [[= :bytecode-op [type-of v]]]]
 05v #{##[]
 05v :bytecode-op
 05v type-of
@@ -12217,7 +12297,7 @@
 }#{##[]
 23s quasiquote-real
 05v [l depth]
-05v #@[source: [[if [nil? l] #nil [if [pair? l] [if [== [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [== [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l #nil]] l]]]]]
+05v #@[source: [[if [nil? l] #nil [if [pair? l] [if [= [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l #nil]] l]]]]]
 05v #{##[]
 05v nil?
 10s l
@@ -12400,7 +12480,7 @@
 }#{##[]
 23s describe/closure
 05v [c i]
-05v #@[source: [[when c [if [== c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]] " - " [if [< l 16] [string/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
+05v #@[source: [[when c [if [= c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]] " - " [if [< l 16] [string/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]]
 05v #{##[]
 10s c
 0Bo 241
@@ -13256,7 +13336,7 @@
 0D
 23s image/bmp/row-padding
 05v [width pixel-length]
-05v #@[source: [[def ret [- 4 [logand [* width pixel-length] 3]]] [if [== ret 4] 0 ret]]]
+05v #@[source: [[def ret [- 4 [logand [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]]
 05v #{##[]
 02i 4
 05v logand
@@ -14823,7 +14903,7 @@
 0D
 23s fmt/parse-spec
 05v [opts spec]
-05v #@[source: [[if [zero? [string/length spec]] opts [case [char-at spec [- [string/length spec] 1]] [[48 49 50 51 52 53 54 55 56 57] [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]] [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]] [tree/set! opts :width [read/single number]] [when [== 48 [char-at number 0]] [tree/set! opts :padding-char "0"]] [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]] [63 [fmt/parse-spec [tree/set! opts :debug #t] [string/cut spec 0 [- [string/length spec] 1]]]] [88 [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL] [string/cut spec 0 [- [string/length spec] 1]]]] [120 [fmt/parse-spec [tree/set! opts :base :hexadecimal] [string/cut spec 0 [- [string/length spec] 1]]]] [100 [fmt/parse-spec [tree/set! opts :base :decimal] [string/cut spec 0 [- [string/length spec] 1]]]] [111 [fmt/parse-spec [tree/set! opts :base :octal] [string/cut spec 0 [- [string/length spec] 1]]]] [98 [fmt/parse-spec [tree/set! opts :base :binary] [string/cut spec 0 [- [string/length spec] 1]]]] [60 [fmt/parse-spec [tree/set! opts :align :left] [string/cut spec 0 [- [string/length spec] 1]]]] [94 [fmt/parse-spec [tree/set! opts :align :center] [string/cut spec 0 [- [string/length spec] 1]]]] [62 [fmt/parse-spec [tree/set! opts :align :right] [string/cut spec 0 [- [string/length spec] 1]]]] [46 [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]] [string/cut spec 0 [- [string/length spec] 1]]]] [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]]
+05v #@[source: [[if [zero? [string/length spec]] opts [case [char-at spec [- [string/length spec] 1]] [[48 49 50 51 52 53 54 55 56 57] [def next-non-digit [fmt/find-non-digit-from-right spec [- [string/length spec] 1]]] [def number [string/cut spec [+ 1 next-non-digit] [string/length spec]]] [tree/set! opts :width [read/single number]] [when [= 48 [char-at number 0]] [tree/set! opts :padding-char "0"]] [fmt/parse-spec opts [string/cut spec 0 [+ 1 next-non-digit]]]] [63 [fmt/parse-spec [tree/set! opts :debug #t] [string/cut spec 0 [- [string/length spec] 1]]]] [88 [fmt/parse-spec [tree/set! opts :base :HEXADECIMAL] [string/cut spec 0 [- [string/length spec] 1]]]] [120 [fmt/parse-spec [tree/set! opts :base :hexadecimal] [string/cut spec 0 [- [string/length spec] 1]]]] [100 [fmt/parse-spec [tree/set! opts :base :decimal] [string/cut spec 0 [- [string/length spec] 1]]]] [111 [fmt/parse-spec [tree/set! opts :base :octal] [string/cut spec 0 [- [string/length spec] 1]]]] [98 [fmt/parse-spec [tree/set! opts :base :binary] [string/cut spec 0 [- [string/length spec] 1]]]] [60 [fmt/parse-spec [tree/set! opts :align :left] [string/cut spec 0 [- [string/length spec] 1]]]] [94 [fmt/parse-spec [tree/set! opts :align :center] [string/cut spec 0 [- [string/length spec] 1]]]] [62 [fmt/parse-spec [tree/set! opts :align :right] [string/cut spec 0 [- [string/length spec] 1]]]] [46 [fmt/parse-spec [tree/set! opts :precision [tree/ref opts :width]] [string/cut spec 0 [- [string/length spec] 1]]]] [otherwise [throw [list :format-error "Unknown form-spec option" spec [current-closure]]]]]]]]
 05v #{##[]
 05v string/length
 10s spec
@@ -15661,7 +15741,7 @@
 0D
 23s fmt/expr
 05v [expr arguments-used opts]
-05v #@[source: [[when-not [string? expr] [throw [list :format-error "fmt needs a string literal as a first argument, since it is implemented as a macro" expr [current-lambda]]]] [def split-expr [split expr ":"]] [def argument [car split-expr]] [def format-spec [or [cadr split-expr] ""]] [if [== "" argument] [do [tree/-- opts :expr-count] [array/set! arguments-used [tree/ref opts :expr-count] #t] [fmt/format-arg format-spec [fmt/arg-sym [tree/ref opts :expr-count]]]] [let [[read-vals [read argument]]] [when [cdr read-vals] [throw [list :format-error "Format argument specifier contains more than a single atom" argument [current-lambda]]]] [when-not [fmt/valid-argument? [car read-vals]] [throw [list :format-error "Format argument specifier should be either an integer or a symbol" argument [current-lambda]]]] [when [int? [car read-vals]] [when [or [< [car read-vals] 0] [>= [car read-vals] [array/length arguments-used]]] [throw [list :format-error "fmt numbered argument is out of bounds" argument [current-lambda]]]] [array/set! arguments-used [car read-vals] #t]] [fmt/format-arg format-spec [fmt/arg-sym [car read-vals]]]]]]]
+05v #@[source: [[when-not [string? expr] [throw [list :format-error "fmt needs a string literal as a first argument, since it is implemented as a macro" expr [current-lambda]]]] [def split-expr [split expr ":"]] [def argument [car split-expr]] [def format-spec [or [cadr split-expr] ""]] [if [= "" argument] [do [tree/-- opts :expr-count] [array/set! arguments-used [tree/ref opts :expr-count] #t] [fmt/format-arg format-spec [fmt/arg-sym [tree/ref opts :expr-count]]]] [let [[read-vals [read argument]]] [when [cdr read-vals] [throw [list :format-error "Format argument specifier contains more than a single atom" argument [current-lambda]]]] [when-not [fmt/valid-argument? [car read-vals]] [throw [list :format-error "Format argument specifier should be either an integer or a symbol" argument [current-lambda]]]] [when [int? [car read-vals]] [when [or [< [car read-vals] 0] [>= [car read-vals] [array/length arguments-used]]] [throw [list :format-error "fmt numbered argument is out of bounds" argument [current-lambda]]]] [array/set! arguments-used [car read-vals] #t]] [fmt/format-arg format-spec [fmt/arg-sym [car read-vals]]]]]]]
 05v #{##[]
 05v string?
 10s expr
@@ -15828,7 +15908,7 @@
 0D
 23s fmt
 05v [format-string . args]
-05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [for [i 0 [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [for-in [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [== "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [for [i 0 [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
+05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [for [i 0 [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [for [i 0 [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
 05v #{##[]
 05v string?
 10s format-string
@@ -16428,7 +16508,7 @@
 0D
 23s path/ext?!
 05v [ext]
-05v #@[documentation: "Return a predicate that checks if a path ends on EXT" source: ["Return a predicate that checks if a path ends on EXT" [case [type-of ext] [:string [fn [path] [== ext [lowercase [path/extension path]]]]] [:pair [fn [path] [def cext [lowercase [path/extension path]]] [reduce ext [fn [α β] [or α [== β cext]]]]]] [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]]
+05v #@[documentation: "Return a predicate that checks if a path ends on EXT" source: ["Return a predicate that checks if a path ends on EXT" [case [type-of ext] [:string [fn [path] [= ext [lowercase [path/extension path]]]]] [:pair [fn [path] [def cext [lowercase [path/extension path]]] [reduce ext [fn [α β] [or α [= β cext]]]]]] [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]]
 05v #{##[]
 15
 05v type-of
@@ -16442,7 +16522,7 @@
 0Bo 23
 23s anonymous
 05v [path]
-05v #@[source: [[== ext [lowercase [path/extension path]]]]]
+05v #@[source: [[= ext [lowercase [path/extension path]]]]]
 05v #{##[]
 10s ext
 05v lowercase
@@ -16461,7 +16541,7 @@
 0Bo 23
 23s anonymous
 05v [path]
-05v #@[source: [[def cext [lowercase [path/extension path]]] [reduce ext [fn [α β] [or α [== β cext]]]]]]
+05v #@[source: [[def cext [lowercase [path/extension path]]] [reduce ext [fn [α β] [or α [= β cext]]]]]]
 05v #{##[]
 05v lowercase
 05v path/extension
@@ -16474,7 +16554,7 @@
 10s ext
 23s anonymous
 05v [α β]
-05v #@[source: [[or α [== β cext]]]]
+05v #@[source: [[or α [= β cext]]]]
 05v #{##[]
 10s α
 0C
@@ -17303,11 +17383,11 @@
 0D
 23s string/length?!
 05v [chars]
-05v #@[source: [[fn [a] [== chars [string/length a]]]]]
+05v #@[source: [[fn [a] [= chars [string/length a]]]]]
 05v #{##[]
 23s anonymous
 05v [a]
-05v #@[source: [[== chars [string/length a]]]]
+05v #@[source: [[= chars [string/length a]]]]
 05v #{##[]
 10s chars
 05v string/length
@@ -17706,7 +17786,7 @@
 0D
 23s test-run
 05v [output-passes hide-errors]
-05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [for-in [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [-- i]]] [display-results] [return error-count]]]
+05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [-- i]]] [display-results] [return error-count]]]
 05v #{##[]
 05v bool
 10s hide-errors
@@ -17821,7 +17901,7 @@
 0D
 23s make-instance
 05v [parent]
-05v #@[source: [[when [and [not [nil? parent]] [!= [type-of parent] :tree]] [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]] [def ret [tree/new #nil]] [for-in [k [tree/keys parent]] [when [!= k :parent] [def pv [tree/get parent k]] [when-not [== [type-of pv] :lambda] [tree/set! ret k [dup pv]]]]] [tree/set! ret :parent parent]]]
+05v #@[source: [[when [and [not [nil? parent]] [!= [type-of parent] :tree]] [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]] [def ret [tree/new #nil]] [doseq [k [tree/keys parent]] [when [!= k :parent] [def pv [tree/get parent k]] [when-not [= [type-of pv] :lambda] [tree/set! ret k [dup pv]]]]] [tree/set! ret :parent parent]]]
 05v #{##[]
 05v nil?
 10s parent

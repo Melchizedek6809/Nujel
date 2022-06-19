@@ -28,7 +28,7 @@
             [array/2d/set! β x y [+ 1 [array/2d/ref α x y]]]]]]
 
 [defn step/flash-increase [β flash-map x y]
-       [when [and [== #f [array/2d/ref flash-map x y]]
+       [when [and [= #f [array/2d/ref flash-map x y]]
                   [>= x 0]
                   [>= y 0]
                   [< x [ref β :width]]
@@ -61,10 +61,10 @@
 
 [defn step/do-many [α steps]
        [for [i 0 steps]
-            [if [== i 100] [set! p1-res [flashes/get]]]
+            [if [= i 100] [set! p1-res [flashes/get]]]
             [def pre-flashes [flashes/get]]
             [set! α [step α]]
-            [when [== 100 [- [flashes/get] pre-flashes]]
+            [when [= 100 [- [flashes/get] pre-flashes]]
                   [set! p2-res [+ 1 i]]
                   [throw [list :all-flashes]]]]
        α]

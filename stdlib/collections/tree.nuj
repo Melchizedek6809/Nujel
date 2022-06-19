@@ -31,7 +31,7 @@
       "Compares two trees for equality"
       [if [and [tree? a]
                [tree? b]]
-          [and [== [tree/key* a]
+          [and [= [tree/key* a]
                    [tree/key* b]]
                [equal? [tree/value* a]
                        [tree/value* b]]

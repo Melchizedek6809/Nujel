@@ -99,7 +99,7 @@
           [set! top l]]
         [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]
           [set! top r]]
-        [if [== top at]
+        [if [= top at]
             [set! looping #f]
             [do [array/swap arr at top]
                 [set! at top]]]]

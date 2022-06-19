@@ -4,7 +4,7 @@
        [def qq #nil]
        [def q #nil]
        [while l
-              [if [== [car l] ""]
+              [if [= [car l] ""]
                   [do [set! qq [cons [reverse q] qq]]
                       [set! q #nil]]
                   [set! q [cons [car l] q]]]

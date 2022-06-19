@@ -9,11 +9,11 @@
 
 [def avl/empty :e]
 
-[defn avl/empty? [n] [== :e n]]
+[defn avl/empty? [n] [= :e n]]
 [defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
 [defn avl/typecheck [r k]
       [or [avl/empty? [avl/root r]]
-          [== [type-of k] [type-of [avl/key [avl/root r]]]]
+          [= [type-of k] [type-of [avl/key [avl/root r]]]]
           [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
 [defn avl/tree [cmp]
       #[avl/empty [or cmp avl/default-cmp]]]

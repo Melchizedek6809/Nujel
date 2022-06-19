@@ -3,7 +3,7 @@
 
 [defn describe/closure [c i]
       [when c
-            [if [== c root-closure]
+            [if [= c root-closure]
                 [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]]
                      "\r\n"]
                 [do [def data [closure/data c]]

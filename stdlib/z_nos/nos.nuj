@@ -13,7 +13,7 @@
       [doseq [k [tree/keys parent]]
              [when [!= k :parent]
                    [def pv [tree/get parent k]]
-                   [when-not [== [type-of pv] :lambda]
+                   [when-not [= [type-of pv] :lambda]
                              [tree/set! ret k [dup pv]]]]]
       [tree/set! ret :parent parent]]
 

@@ -23,7 +23,7 @@
        [defn rec [t root needle]
 
               [cond [[snail/int? t] [set! last t] #f]
-                    [[== needle t] last]
+                    [[= needle t] last]
                     [#t [or [rec [ref t as] root needle]
                             [rec [ref t bs] root needle]]]]]
        [rec root root needle]]
