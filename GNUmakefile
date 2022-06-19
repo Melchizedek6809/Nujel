@@ -2,7 +2,7 @@ INSTALL_BIN_DIR := ~/bin/
 
 EMCC        := emcc
 EMAR        := emar
-EMMEM       := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
+EMMEM       := -s TOTAL_MEMORY=128MB -s ALLOW_MEMORY_GROWTH=1 -s TOTAL_STACK=32MB
 
 LIB_SRCS    := $(shell find lib -type f -name '*.c')
 LIB_HDRS    := $(shell find lib -type f -name '*.h')
@@ -99,7 +99,7 @@ distclean:
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
 %.wo: %.c
-	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.wd}
+	@$(EMCC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) -O3 $(WARNINGS) $(CSTD) -MD > ${<:.c=.wd}
 	@echo "$(ANSI_GREEN)" "[WCC]" "$(ANSI_RESET)" $@
 
 nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo

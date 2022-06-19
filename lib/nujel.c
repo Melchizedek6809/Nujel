@@ -37,7 +37,6 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 	if(lambda->type != ltMacro){
 		lExceptionThrowValClo(":macro-apply-error","Trying to use macro-apply on anything but a macro is an error, please fix it",lambda, c);
 	}
-	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
 	tmpc->text = lambda->vClosure->text;
@@ -54,14 +53,11 @@ lVal *lMacro(lClosure *c,lVal *args, lVal *lambda){
 			lExceptionThrowValClo(":invalid-macro", "Incorrect type in argument list", lambda, c);
 		}
 	}
-	lVal *ret = lEval(tmpc,lambda->vClosure->text);
-	lRootsRet(SP);
-	return ret;
+	return lEval(tmpc,lambda->vClosure->text);
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
-	const int SP = lRootsGet();
 	lVal *vn = args;
 	lClosure *tmpc = RCP(lClosureNew(lambda->vClosure));
 	tmpc->text = lambda->vClosure->text;
@@ -78,9 +74,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 			lExceptionThrowValClo(":invalid-lambda", "Incorrect type in argument list", lambda, c);
 		}
 	}
-	lVal *ret = lEval(tmpc,lambda->vClosure->text);
-	lRootsRet(SP);
-	return ret;
+	return lEval(tmpc,lambda->vClosure->text);
 }
 
 /* Run fun with args, evaluating args if necessary  */

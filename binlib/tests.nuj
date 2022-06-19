@@ -2,9 +2,6 @@
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
 [when [and [!= ARCH "wasm"] popen]
-          [test/add '[0 . ""] [repl/run-forked 1]]
-          [test/add '[123 . ""] [repl/run-forked [exit 123]]]
-          [test/add '[0 . "123"] [repl/run-forked [display 123]]]
           [test/add #t [file/dir? "stdlib"]]
           [test/add #f [file/file? "stdlib"]]
           [test/add #t [file/file? "GNUmakefile"]]
