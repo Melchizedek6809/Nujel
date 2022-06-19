@@ -123,7 +123,7 @@ lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char 
 	lVal *v = lValAlloc(ltNativeFunc);
 	v->vNFunc = lNFuncAlloc();
 	v->vNFunc->fp   = func;
-	v->vNFunc->doc  = lValString(doc);
+	v->vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
 	v->vNFunc->args = lCar(lRead(args));
 	return lDefineAliased(c,v,sym);
 }

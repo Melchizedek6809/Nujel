@@ -91,7 +91,7 @@ void lNFuncGCMark(const lNFunc *v){
 		epf("Tried to mark invalid lNFunc\n");
 		exit(1);
 	}
-	lValGCMark(v->doc);
+	lTreeGCMark(v->meta);
 	lValGCMark(v->args);
 	lSymbolGCMark(v->name);
 }

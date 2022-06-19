@@ -234,7 +234,7 @@ struct lTree {
 
 struct lNFunc {
 	lVal *(*fp)(lClosure *, lVal *);
-	lVal *doc;
+	lTree *meta;
 	lVal *args;
 	lSymbol *name;
 };

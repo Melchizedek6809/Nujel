@@ -174,6 +174,7 @@ lNFunc *lNFuncAlloc(){
 		fpf(stderr, "lNFunc OOM ");
 		exit(123);
 	}
+	memset(&lNFuncList[lNFuncMax++], 0, sizeof(ltNativeFunc));
 	return &lNFuncList[lNFuncMax++];
 }
 

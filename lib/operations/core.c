@@ -234,16 +234,25 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 }
 
 static lVal *lnfMetaGet(lClosure *c, lVal *v){
-	lClosure *clo = requireClosure(c, lCar(v));
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
-	return lTreeGet(clo->meta, key, NULL);
+	lVal *l = requireCallable(c, lCar(v));
+	if(l->type == ltNativeFunc){
+		return lTreeGet(l->vNFunc->meta, key, NULL);
+	}else{
+		return lTreeGet(l->vClosure->meta, key, NULL);
+	}
 }
 
 static lVal *lnfMetaSet(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
-	lClosure *clo = requireClosure(c, car);
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
-	clo->meta = lTreeInsert(clo->meta, key, lCaddr(v));
+	lVal *car = requireCallable(c, lCar(v));
+
+	if(car->type == ltNativeFunc){
+		lExceptionThrowValClo("type-error", "Can't add new metadata to native functions", car, c);
+	}else{
+		car->vClosure->meta = lTreeInsert(car->vClosure->meta, key, lCaddr(v));
+	}
+
 	return car;
 }
 
