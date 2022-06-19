@@ -23,7 +23,7 @@
               [if v
                   [apply v args]
                   [nos/funcall* [tree/get o :parent] method-name args]]]
-          [throw [list :missing-method "Can't find that method" o [current-lambda]]]]]
+          [throw [list :missing-method "Can't find that method" method-name [current-lambda]]]]]
 
 [defun nos/funcall [o method-name . args]
       [nos/funcall* o method-name [cons o args]]]

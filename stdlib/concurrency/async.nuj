@@ -33,4 +33,5 @@
 [defun event-fire [event . val]
        "Applies ...val to all event handlers associated with event-name"
        [for-in [h [tree/values event]]
-               [h val]]]
+               [try display/error
+                    [h val]]]]
