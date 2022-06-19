@@ -111,7 +111,7 @@ $(ASSET): tools/assets.c
 	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
 
-nujel.a: $(LIB_OBJS)
+nujel.a: $(LIB_OBJS) tmp/stdlib.o
 	@rm -rf $@
 	@ar cq $@ $^
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
