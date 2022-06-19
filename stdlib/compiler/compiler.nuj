@@ -1,7 +1,7 @@
 [defn load/forms [source environment]
       "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
-      [for-in [form source]
-              [apply environment [compile* source environment]]]]
+      [doseq [form source]
+             [apply environment [compile* source environment]]]]
 
 [defn macroexpand/forms [source-raw environment]
       "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
@@ -31,13 +31,13 @@
 
 [defn meta/parse/body [type args body]
       [def meta @[]]
-      [for-in [v body]
-              [case [type-of v]
-                    [:pair [return meta]]
-                    [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
-                                                                       "\n"
+      [doseq [v body]
+             [case [type-of v]
+                   [:pair [return meta]]
+                   [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
+                                                                      "\n"
                                                                        v]]]]
-                    [:keyword [tree/set! meta v #t]]]]
+                   [:keyword [tree/set! meta v #t]]]]
       [return meta]]
 
 [defmacro defmacro [name args . body]

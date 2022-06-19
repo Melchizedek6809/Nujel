@@ -48,8 +48,8 @@
 
 [defn list/reduce [l o s]
       "Combine all elements in l using operation o and starting value s"
-      [for-in [e l]
-              [set! s [o s e]]]
+      [doseq [e l]
+             [set! s [o s e]]]
       s]
 
 [defn list/ref [l i]
@@ -62,38 +62,38 @@
 [defn reverse [l]
       "Return the list l in reverse order"
       [def ret]
-      [for-in [e l]
-              [set! ret [cons e ret]]]
+      [doseq [e l]
+             [set! ret [cons e ret]]]
       ret]
 
 [defn list/length [l]
       "Returns the length of list l"
       [def ret 0]
-      [for-in [e l]
-              [++ ret]]
+      [doseq [e l]
+             [++ ret]]
       ret]
 
 [defn list/filter [l p]
       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
       [def ret #nil]
-      [for-in [e l]
-              [when [p e]
-                    [set! ret [cons e ret]]]]
+      [doseq [e l]
+             [when [p e]
+                   [set! ret [cons e ret]]]]
       [nreverse ret]]
 
 [defn list/map [l f]
       "Runs f over every item in list l and returns the resulting list"
       [def ret #nil]
-      [for-in [e l]
-              [set! ret [cons [f e] ret]]]
+      [doseq [e l]
+             [set! ret [cons [f e] ret]]]
       [nreverse ret]]
 
 [defn append [a b]
       "Appends two lists A and B together"
       [def ret b]
       [set! a [reverse a]]
-      [for-in [t a]
-              [set! ret [cons t ret]]]
+      [doseq [t a]
+             [set! ret [cons t ret]]]
       ret]
 
 [defn sublist [l start end ret]
@@ -168,9 +168,9 @@
       "Return #t is A is a proper list"
       [when-not a [return #f]]
       [while a
-        [when-not [pair? a]
-                  [return #f]]
-        [cdr! a]]
+             [when-not [pair? a]
+                       [return #f]]
+             [cdr! a]]
       [return #t]]
 
 [defn list/equal? [a b]

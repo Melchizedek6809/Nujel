@@ -12,16 +12,15 @@
       "Executes pending coroutines if their predicate evaluates to #t"
       [def old yield-queue]
       [set! yield-queue #nil]
-      [for-in [cur old]
-              [if [[car cur]]
-                  [[cdr cur]]
-                  [set! yield-queue [cons cur yield-queue]]]]]
+      [doseq [cur old]
+             [if [[car cur]]
+                 [[cdr cur]]
+                 [set! yield-queue [cons cur yield-queue]]]]]
 
 [defn timeout [milliseconds]
       "Returns a function that evaluates to true once MILLISECONDS have passed"
       [def goal [+ [time/milliseconds] milliseconds]]
-      [fn []
-        [> [time/milliseconds] goal]]]
+      [fn [] [> [time/milliseconds] goal]]]
 
 [defn event-bind [event id handler]
       "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before."
@@ -33,5 +32,5 @@
 
 [defn event-fire [event val]
       "Applies ...val to all event handlers associated with event-name"
-      [for-in [h [tree/values event]]
-              [h val]]]
+      [doseq [h [tree/values event]]
+             [h val]]]

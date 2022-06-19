@@ -107,10 +107,10 @@
       [disassemble/array [bytecode-arr->arr code] 0 [bytecode-literals code]]]
 
 [defn disassemble/print [bc]
-      [for-in [a [disassemble/bytecode-array bc]]
-              [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
-                            " - "
-                            [cdr a]]]]]
+      [doseq [a [disassemble/bytecode-array bc]]
+             [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+                           " - "
+                           [cdr a]]]]]
 
 [defn disassemble [bc]
       "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"

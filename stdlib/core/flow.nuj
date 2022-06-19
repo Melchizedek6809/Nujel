@@ -67,8 +67,8 @@
                   ~@body
                   [set! ~symbol-name [add/int ~dir ~symbol-name]]]]]
 
-[defmacro for-in [for-loop . body]
-          "[for-in [l [list 1 2 3 4]] [println l]]"
+[defmacro doseq [for-loop . body]
+          "[doseq [l [list 1 2 3 4]] [println l]]"
           [def symbol-name [gensym]]
           `[let [[~symbol-name ~[cadr for-loop]]]
                 [when ~symbol-name

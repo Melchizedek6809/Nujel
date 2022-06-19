@@ -11065,6 +11065,9 @@
 18
 0Es for-in
 0D
+10s for-in
+0Es doseq
+0D
 23s thread/->
 05v [init fun]
 05v #@[source: [[if-not fun init [if [pair? [car fun]] [quasiquote [[unquote [caar fun]] [unquote [thread/-> init [cdr fun]]] [unquote-splicing [cdar fun]]]] [list [car fun] [thread/-> init [cdr fun]]]]]]]

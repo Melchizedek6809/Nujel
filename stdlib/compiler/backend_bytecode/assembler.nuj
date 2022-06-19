@@ -36,7 +36,7 @@
       "[] -> [v]"
       "Pushes v onto the stack"
       [when [nil? v]
-        [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
+            [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
       [list #$5 [val->bytecode-op v]]]
 
 [defn $push/symbol [sym]
@@ -108,7 +108,7 @@
       "[] -> [v]"
       "Pushes v onto the stack"
       [when [nil? v]
-        [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
+            [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
       [list #$1A
             [list :literal v]]]
 
@@ -156,15 +156,15 @@
 [defn assemble/emit-relocated-ops [code sym-map pos out]
       [if [== [car code] :relocate]
           [set! pos [assemble/relocate-op code sym-map pos out]]
-          [for-in [op code]
-                  [case [type-of op]
-                        [:bytecode-op [array/set! out [++ pos] op]]
-                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
+          [doseq [op code]
+                 [case [type-of op]
+                       [:bytecode-op [array/set! out [++ pos] op]]
+                       [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 
 [defn assemble/add-literal [code lit-arr]
       [when [>= [array/length lit-arr] 255]
-        [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
+            [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
       [array/length! lit-arr [+ 1 [array/length lit-arr]]]
       [array/set! lit-arr [- [array/length lit-arr] 1] [cadr code]]
       [int->bytecode-op [- [array/length lit-arr] 1]]]

@@ -75,10 +75,10 @@
       [set! error-count    0]
 
       [def i [+ test-count 1]]
-      [for-in [cur-test test-list]
-              [test/run [car cur-test]
-                        [cdr cur-test]
-                        [-- i]]]
+      [doseq [cur-test test-list]
+             [test/run [car cur-test]
+                       [cdr cur-test]
+                       [-- i]]]
 
       [display-results]
       [return error-count]]
