@@ -660,6 +660,12 @@
 [test/add 1 [% 600851475143 2]]
 [test/add 600851475145 [+ 600851475143 2]]
 [test/add 600851475141 [- 600851475143 2]]
+[test/add 5 [dotimes [i 5 i]]]
+[test/add 10 [let [[x 0]] [dotimes [i 5] [set! x [+ x i]]] x]]
+[test/add 10 [let [[x 0]] [dotimes [i 5 x] [set! x [+ x i]]]]]
+[test/add 0 [let [[x 0]] [dotimes [i -4] [set! x [+ x i]]] x]]
+[test/add 0 [let [[x 0]] [dotimes [i -4] [set! x 9]] x]]
+[test/add 0 [let [[x 0]] [dotimes [i 0] [set! x 9]] x]]
 
 
 

@@ -67,6 +67,19 @@
                   ~@body
                   [set! ~symbol-name [add/int ~dir ~symbol-name]]]]]
 
+[defmacro dotimes [binding . body]
+          "binding => [name n result-form]"
+          "Repeatedly executes body with name bound to integers from 0 through n-1. Returns result-form or #nil."
+          [def sym [car binding]]
+          [typecheck/only sym :symbol]
+          [def times [cadr binding]]
+          [def result-form [caddr binding]]
+          `[let [[~sym 0]]
+                [while [< ~sym ~times]
+                       ~@body
+                       [set! ~sym [add/int 1 ~sym]]]
+                ~result-form]]
+
 [defmacro doseq [for-loop . body]
           "[doseq [l [list 1 2 3 4]] [println l]]"
           [def symbol-name [gensym]]
