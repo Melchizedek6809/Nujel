@@ -12,9 +12,8 @@
 	 [ref a 0]]]
 
 [defn do-steps [l count]
-       [for [i 0 count]
-            [set! l [step l]]]
-       l]
+       [dotimes [i count l]
+                [set! l [step l]]]]
 
 [defn input/parse [l]
        [def ret #[0 0 0 0 0 0 0 0 0]]

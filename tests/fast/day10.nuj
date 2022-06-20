@@ -1,43 +1,43 @@
 #!/usr/bin/env nujel
 
 [defn char-to-score [cc]
-       [case cc
-             [#\)     3]
-             [#\]    57]
-             [#\}  1197]
-             [#\> 25137]
-             [otherwise 0]]]
+      [case cc
+            [#\)     3]
+            [#\]    57]
+            [#\}  1197]
+            [#\> 25137]
+            [otherwise 0]]]
 
 [defn p2-score [cc]
-       [case cc
-             [#\) 1]
-             [#\] 2]
-             [#\} 3]
-             [#\> 4]
-             [otherwise 0]]]
+      [case cc
+            [#\) 1]
+            [#\] 2]
+            [#\} 3]
+            [#\> 4]
+            [otherwise 0]]]
 
 [defn calc-part2-score [stack α]
-       [if-not stack α
-               [calc-part2-score [cdr stack]
-                                 [+ [* 5 α]
-                                    [p2-score [car stack]]]]]]
+      [if-not stack α
+              [calc-part2-score [cdr stack]
+                                [+ [* 5 α]
+                                   [p2-score [car stack]]]]]]
 
 [defn find-first-syntax-error [line]
-       [def stack #nil]
-       [try [fn [ε] [if [= [car ε] :return]
+      [def stack #nil]
+      [try [fn [ε] [if [= [car ε] :return]
                        [cons :part1 [char-to-score [cadr ε]]]
                        [throw ε]]]
-            [for [i 0 [string/length line]]
-                 [def cc [char-at line i]]
-                 [case cc
-                       [[#\(] [set! stack [cons #\) stack]]]
-                       [[#\{] [set! stack [cons #\} stack]]]
-                       [[#\[] [set! stack [cons #\] stack]]]
-                       [[#\<] [set! stack [cons #\> stack]]]
-                       [[#\) #\} #\] #\>] [if [= cc [car stack]]
-                                              [set! stack [cdr stack]]
-                                              [throw [list :return cc i]]]]]]
-            [calc-part2-score stack 0]]]
+           [dotimes [i [string/length line]]
+                    [def cc [char-at line i]]
+                    [case cc
+                          [[#\(] [set! stack [cons #\) stack]]]
+                          [[#\{] [set! stack [cons #\} stack]]]
+                          [[#\[] [set! stack [cons #\] stack]]]
+                          [[#\<] [set! stack [cons #\> stack]]]
+                          [[#\) #\} #\] #\>] [if [= cc [car stack]]
+                                                 [set! stack [cdr stack]]
+                                                 [throw [list :return cc i]]]]]]
+           [calc-part2-score stack 0]]]
 
 [def lines [split [file/read "tests/fast/day10.dat"] "\n"]]
 [def res [map lines find-first-syntax-error]]

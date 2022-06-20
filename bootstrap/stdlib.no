@@ -362,32 +362,20 @@
 0D
 23s array/2d/print
 05v [data]
-05v #@[source: [[for [y 0 [tree/ref data :height]] [for [x 0 [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
+05v #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
 05v #{##[]
 15
 02i 0
 0Es y
 0D
-05v tree/ref
-10s data
-05v :height
-04i 2
-0Es ΓεnΣym-1
-0D
 24
 1B
-09o 117
+09o 110
 0D
 1C
 15
 02i 0
 0Es x
-0D
-05v tree/ref
-10s data
-05v :width
-04i 2
-0Es ΓεnΣym-2
 0D
 24
 1B
@@ -410,9 +398,14 @@
 03
 0Fs x
 10s x
-10s ΓεnΣym-2
+05v tree/ref
+10s data
+05v :width
+04i 2
 1E
-0Ao -57
+0Ao -67
+0D
+24
 16
 0D
 05v newline
@@ -423,9 +416,14 @@
 03
 0Fs y
 10s y
-10s ΓεnΣym-1
+05v tree/ref
+10s data
+05v :height
+04i 2
 1E
-0Ao -123
+0Ao -126
+0D
+24
 16
 0D
 10s data
@@ -470,7 +468,7 @@
 0D
 23s array/fill!
 05v [a v]
-05v #@[documentation: "Fills array a with value v" source: ["Fills array a with value v" [def len [array/length a]] [for [i 0 len] [array/set! a i v]] [return a]]]
+05v #@[documentation: "Fills array a with value v" source: ["Fills array a with value v" [def len [array/length a]] [dotimes [i len] [array/set! a i v]] [return a]]]
 05v #{##[]
 05v array/length
 10s a
@@ -480,9 +478,6 @@
 15
 02i 0
 0Es i
-0D
-10s len
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -500,9 +495,11 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+10s len
 1E
 0Ao -41
+0D
+24
 16
 0D
 10s a
@@ -514,7 +511,7 @@
 0D
 23s array/append
 05v [a b]
-05v #@[documentation: "Append array A to array B" source: ["Append array A to array B" [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]] [def ret [array/allocate [+ [array/length a] [array/length b]]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] [for [i [array/length a] [array/length ret]] [array/set! ret i [array/ref b [- i [array/length a]]]]] [return ret]]]
+05v #@[documentation: "Append array A to array B" source: ["Append array A to array B" [when-not [and [array? a] [array? b]] [throw [list :type-error "array/append expects two arrays as its arguments" #nil [current-lambda]]]] [def ret [array/allocate [+ [array/length a] [array/length b]]]] [dotimes [i [array/length a]] [array/set! ret i [array/ref a i]]] [let [[i [array/length a]] [rl [array/length ret]]] [while [< i rl] [array/set! ret i [array/ref b [- i [array/length a]]]] [set! i [add/int i 1]]]] [return ret]]]
 05v #{##[]
 05v array?
 10s a
@@ -553,11 +550,6 @@
 02i 0
 0Es i
 0D
-05v array/length
-10s a
-04i 1
-0Es ΓεnΣym-2
-0D
 24
 1B
 09o 45
@@ -577,9 +569,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-2
+05v array/length
+10s a
+04i 1
 1E
-0Ao -51
+0Ao -57
+0D
+24
 16
 0D
 15
@@ -591,7 +587,7 @@
 05v array/length
 10s ret
 04i 1
-0Es ΓεnΣym-3
+0Es rl
 0D
 24
 1B
@@ -611,12 +607,12 @@
 04i 2
 04i 3
 0D
-02i 1
 10s i
+02i 1
 03
 0Fs i
 10s i
-10s ΓεnΣym-3
+10s rl
 1E
 0Ao -62
 16
@@ -630,7 +626,7 @@
 0D
 23s array/dup
 05v [a]
-05v #@[documentation: "Duplicate Array A" source: ["Duplicate Array A" [def ret [array/allocate [array/length a]]] [for [i 0 [array/length a]] [array/set! ret i [array/ref a i]]] [return ret]]]
+05v #@[documentation: "Duplicate Array A" source: ["Duplicate Array A" [def ret [array/allocate [array/length a]]] [dotimes [i [array/length a]] [array/set! ret i [array/ref a i]]] [return ret]]]
 05v #{##[]
 05v array/allocate
 05v array/length
@@ -642,11 +638,6 @@
 15
 02i 0
 0Es i
-0D
-05v array/length
-10s a
-04i 1
-0Es ΓεnΣym-4
 0D
 24
 1B
@@ -667,9 +658,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-4
+05v array/length
+10s a
+04i 1
 1E
-0Ao -51
+0Ao -57
+0D
+24
 16
 0D
 10s ret
@@ -681,7 +676,7 @@
 0D
 23s array/reduce
 05v [arr fun α]
-05v #@[documentation: "Reduce an array, [reduce] should be preferred" source: ["Reduce an array, [reduce] should be preferred" [def len [array/length arr]] [for [i 0 len] [set! α [fun α [array/ref arr i]]]] [return α]]]
+05v #@[documentation: "Reduce an array, [reduce] should be preferred" source: ["Reduce an array, [reduce] should be preferred" [def len [array/length arr]] [dotimes [i len] [set! α [fun α [array/ref arr i]]]] [return α]]]
 05v #{##[]
 05v array/length
 10s arr
@@ -691,9 +686,6 @@
 15
 02i 0
 0Es i
-0D
-10s len
-0Es ΓεnΣym-5
 0D
 24
 1B
@@ -714,9 +706,11 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-5
+10s len
 1E
 0Ao -51
+0D
+24
 16
 0D
 10s α
@@ -728,7 +722,7 @@
 0D
 23s array/map
 05v [arr fun]
-05v #@[documentation: "Map an array, [map] should be preferred" source: ["Map an array, [map] should be preferred" [def len [array/length arr]] [for [i 0 len] [array/set! arr i [fun [array/ref arr i]]]] [return arr]]]
+05v #@[documentation: "Map an array, [map] should be preferred" source: ["Map an array, [map] should be preferred" [def len [array/length arr]] [dotimes [i len] [array/set! arr i [fun [array/ref arr i]]]] [return arr]]]
 05v #{##[]
 05v array/length
 10s arr
@@ -738,9 +732,6 @@
 15
 02i 0
 0Es i
-0D
-10s len
-0Es ΓεnΣym-6
 0D
 24
 1B
@@ -763,9 +754,11 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-6
+10s len
 1E
 0Ao -57
+0D
+24
 16
 0D
 10s arr
@@ -777,7 +770,7 @@
 0D
 23s array/filter
 05v [arr pred]
-05v #@[documentation: "Filter an array, [filter] should be preferred" source: ["Filter an array, [filter] should be preferred" [def ri 0] [def len [array/length arr]] [def ret [array/allocate len]] [for [ai 0 len] [when [pred [array/ref arr ai]] [array/set! ret ri [array/ref arr ai]] [++ ri]]] [array/length! ret ri]]]
+05v #@[documentation: "Filter an array, [filter] should be preferred" source: ["Filter an array, [filter] should be preferred" [def ri 0] [def len [array/length arr]] [def ret [array/allocate len]] [dotimes [ai len] [when [pred [array/ref arr ai]] [array/set! ret ri [array/ref arr ai]] [++ ri]]] [array/length! ret ri]]]
 05v #{##[]
 02i 0
 0Es ri
@@ -795,9 +788,6 @@
 15
 02i 0
 0Es ai
-0D
-10s len
-0Es ΓεnΣym-7
 0D
 24
 1B
@@ -832,9 +822,11 @@
 03
 0Fs ai
 10s ai
-10s ΓεnΣym-7
+10s len
 1E
 0Ao -90
+0D
+24
 16
 0D
 05v array/length!
@@ -848,7 +840,7 @@
 0D
 23s array/equal?
 05v [a b]
-05v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] [return #f] [let [[ret #t]] [for [i 0 [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] [return ret]]]]]
+05v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] [return #f] [let [[ret #t]] [dotimes [i [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] [return ret]]]]]
 05v #{##[]
 05v array?
 10s a
@@ -885,7 +877,7 @@
 0Bo 11
 05v #f
 01
-09o 139
+09o 132
 15
 05v #t
 0Es ret
@@ -893,11 +885,6 @@
 15
 02i 0
 0Es i
-0D
-05v array/length
-10s a
-04i 1
-0Es ΓεnΣym-8
 0D
 24
 1B
@@ -930,9 +917,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-8
+05v array/length
+10s a
+04i 1
 1E
-0Ao -87
+0Ao -93
+0D
+24
 16
 0D
 10s ret
@@ -1216,7 +1207,7 @@
 0Es i
 0D
 10s end
-0Es ΓεnΣym-9
+0Es ΓεnΣym-1
 0D
 24
 1B
@@ -1239,7 +1230,7 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-9
+10s ΓεnΣym-1
 1E
 0Ao -56
 16
@@ -9516,7 +9507,7 @@
 0D
 23s macroexpand/form
 05v [source env op arity implicit-do? no-expand-bitmap]
-05v #@[source: [[def ret [cons op #nil]] [def l [cdr source]] [for [i 0 arity] [set! ret [cons [if [bit-set? no-expand-bitmap i] [car l] [macroexpand* [car l] env]] ret]] [cdr! l]] [if implicit-do? [set! ret [cons [macroexpand/do l env] ret]] [when l [throw [list :arity-error [cat "form contains more than " arity " arguments"] source [current-lambda]]]]] [return [nreverse ret]]]]
+05v #@[source: [[def ret [cons op #nil]] [def l [cdr source]] [dotimes [i arity] [set! ret [cons [if [bit-set? no-expand-bitmap i] [car l] [macroexpand* [car l] env]] ret]] [cdr! l]] [if implicit-do? [set! ret [cons [macroexpand/do l env] ret]] [when l [throw [list :arity-error [cat "form contains more than " arity " arguments"] source [current-lambda]]]]] [return [nreverse ret]]]]
 05v #{##[]
 10s op
 24
@@ -9530,9 +9521,6 @@
 15
 02i 0
 0Es i
-0D
-10s arity
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -9565,9 +9553,11 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+10s arity
 1E
 0Ao -82
+0D
+24
 16
 0D
 10s implicit-do?
@@ -9688,65 +9678,65 @@
 05v type-of
 10s op
 04i 1
-0Es ΓεnΣym-2
+0Es ΓεnΣym-1
 0D
-10s ΓεnΣym-2
+10s ΓεnΣym-1
 05v :nil
 20
 0Bo 10
 10s source
 09o 645
-10s ΓεnΣym-2
+10s ΓεnΣym-1
 05v :native-function
 20
 0Bo 566
 15
 10s op
-0Es ΓεnΣym-3
+0Es ΓεnΣym-2
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s +
 20
 0C
 0Ao 106
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s -
 20
 0C
 0Ao 92
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s *
 20
 0C
 0Ao 78
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s /
 20
 0C
 0Ao 64
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s %
 20
 0C
 0Ao 50
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s logand
 20
 0C
 0Ao 36
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s logior
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s logxor
 20
 0C
@@ -9760,7 +9750,7 @@
 12
 04i 2
 09o 415
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s do
 20
 0Bo 20
@@ -9769,7 +9759,7 @@
 10s env
 04i 2
 09o 386
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s return
 20
 0Bo 32
@@ -9782,13 +9772,13 @@
 02i 0
 04i 6
 09o 345
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s try
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s while
 20
 0C
@@ -9805,13 +9795,13 @@
 02i 0
 04i 6
 09o 281
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s def
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s set!
 20
 0C
@@ -9828,7 +9818,7 @@
 02i 1
 04i 6
 09o 217
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s if
 20
 0Bo 32
@@ -9841,13 +9831,13 @@
 02i 0
 04i 6
 09o 176
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s fn*
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s macro*
 20
 0C
@@ -9864,13 +9854,13 @@
 02i 7
 04i 6
 09o 112
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s let*
 20
 0C
 0Ao 22
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s environment*
 20
 0C
@@ -9887,7 +9877,7 @@
 04i 2
 04i 2
 09o 49
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 10s quote
 20
 0Bo 10
@@ -9909,7 +9899,7 @@
 04i 2
 16
 09o 70
-10s ΓεnΣym-2
+10s ΓεnΣym-1
 05v :macro
 20
 0Bo 31
@@ -10870,140 +10860,6 @@
 }
 18
 0Es cond
-0D
-23s for
-05v [for-loop . body]
-05v #@[documentation: "For loops, [for [name start stop] body]" source: ["For loops, [for [name start stop] body]" [def symbol-name [car for-loop]] [def loop-start [cadr for-loop]] [def loop-stop [caddr for-loop]] [def stop-var [gensym]] [def dir 1] [when [cadddr for-loop] [set! dir [cadddr for-loop]]] [when-not [symbol? symbol-name] [throw [list :invalid-for "Expected a symbol name within the for loop" symbol-name]]] [when-not loop-start [throw [list :invalid-for "Expected a start value at the second position" for-loop]]] [when-not loop-stop [throw [list :invalid-for "Expected a stop value at the third position" for-loop]]] [def pred [if [> dir 0] < >]] [quasiquote [let [[[unquote symbol-name] [unquote loop-start]] [[unquote stop-var] [unquote loop-stop]]] [while [[unquote pred] [unquote symbol-name] [unquote stop-var]] [unquote-splicing body] [set! [unquote symbol-name] [add/int [unquote dir] [unquote symbol-name]]]]]]]]
-05v #{##[]
-10s for-loop
-11
-0Es symbol-name
-0D
-10s for-loop
-12
-11
-0Es loop-start
-0D
-05v caddr
-10s for-loop
-04i 1
-0Es loop-stop
-0D
-05v gensym
-04i 0
-0Es stop-var
-0D
-02i 1
-0Es dir
-0D
-05v cadddr
-10s for-loop
-04i 1
-0Bo 20
-05v cadddr
-10s for-loop
-04i 1
-0Fs dir
-09o 4
-24
-0D
-05v symbol?
-10s symbol-name
-04i 1
-0Bo 7
-24
-09o 27
-05v throw
-05v list
-05v :invalid-for
-05v "Expected a symbol name within the for loop"
-10s symbol-name
-04i 3
-04i 1
-0D
-10s loop-start
-0Bo 7
-24
-09o 27
-05v throw
-05v list
-05v :invalid-for
-05v "Expected a start value at the second position"
-10s for-loop
-04i 3
-04i 1
-0D
-10s loop-stop
-0Bo 7
-24
-09o 27
-05v throw
-05v list
-05v :invalid-for
-05v "Expected a stop value at the third position"
-10s for-loop
-04i 3
-04i 1
-0D
-10s dir
-02i 0
-22
-0Bo 10
-10s <
-09o 7
-10s >
-0Es pred
-0D
-23s let
-10s symbol-name
-10s loop-start
-24
-14
-14
-10s stop-var
-10s loop-stop
-24
-14
-14
-24
-14
-14
-23s while
-10s pred
-10s symbol-name
-10s stop-var
-24
-14
-14
-14
-05v append
-10s body
-23s set!
-10s symbol-name
-23s add/int
-10s dir
-10s symbol-name
-24
-14
-14
-14
-24
-14
-14
-14
-24
-14
-04i 2
-14
-14
-24
-14
-14
-14
-01
-}
-18
-0Es for
 0D
 23s dotimes
 05v [binding . body]
@@ -12726,7 +12582,7 @@
 }#{##[]
 23s hash/adler32
 05v [data]
-05v #@[source: [[def a 1] [def b 0] [for [i 0 [string/length data]] [set! a [mod/int [add/int a [char-at data i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [logior a [ash b 16]]]]
+05v #@[source: [[def a 1] [def b 0] [dotimes [i [string/length data]] [set! a [mod/int [add/int a [char-at data i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [logior a [ash b 16]]]]
 05v #{##[]
 02i 1
 0Es a
@@ -12737,11 +12593,6 @@
 15
 02i 0
 0Es i
-0D
-05v string/length
-10s data
-04i 1
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -12772,9 +12623,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+05v string/length
+10s data
+04i 1
 1E
-0Ao -80
+0Ao -86
+0D
+24
 16
 0D
 05v logior
@@ -12987,7 +12842,7 @@
 0D
 23s image/fill!
 05v [img value]
-05v #@[source: [[def p [tree/ref img :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i value]] [return img]]]
+05v #@[source: [[def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i value]] [return img]]]
 05v #{##[]
 05v tree/ref
 10s img
@@ -12998,17 +12853,6 @@
 15
 02i 0
 0Es i
-0D
-05v tree/ref
-10s img
-05v :width
-04i 2
-05v tree/ref
-10s img
-05v :height
-04i 2
-27
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -13026,9 +12870,19 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+27
 1E
-0Ao -41
+0Ao -66
+0D
+24
 16
 0D
 10s img
@@ -13040,7 +12894,7 @@
 0D
 23s image/map!
 05v [img fun]
-05v #@[source: [[def p [tree/ref img :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i [fun [buffer/view/ref p i]]]] [return img]]]
+05v #@[source: [[def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i [fun [buffer/view/ref p i]]]] [return img]]]
 05v #{##[]
 05v tree/ref
 10s img
@@ -13051,17 +12905,6 @@
 15
 02i 0
 0Es i
-0D
-05v tree/ref
-10s img
-05v :width
-04i 2
-05v tree/ref
-10s img
-05v :height
-04i 2
-27
-0Es ΓεnΣym-2
 0D
 24
 1B
@@ -13084,9 +12927,19 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-2
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+27
 1E
-0Ao -57
+0Ao -82
+0D
+24
 16
 0D
 10s img
@@ -13098,7 +12951,7 @@
 0D
 23s image/dup
 05v [img]
-05v #@[source: [[def ret [image/new [tree/ref img :width] [tree/ref img :height]]] [def in [tree/ref img :pixels]] [def out [tree/ref ret :pixels]] [for [i 0 [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! out i [buffer/view/ref in i]]] [return ret]]]
+05v #@[source: [[def ret [image/new [tree/ref img :width] [tree/ref img :height]]] [def in [tree/ref img :pixels]] [def out [tree/ref ret :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! out i [buffer/view/ref in i]]] [return ret]]]
 05v #{##[]
 05v image/new
 05v tree/ref
@@ -13128,17 +12981,6 @@
 02i 0
 0Es i
 0D
-05v tree/ref
-10s img
-05v :width
-04i 2
-05v tree/ref
-10s img
-05v :height
-04i 2
-27
-0Es ΓεnΣym-3
-0D
 24
 1B
 09o 45
@@ -13158,9 +13000,19 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-3
+05v tree/ref
+10s img
+05v :width
+04i 2
+05v tree/ref
+10s img
+05v :height
+04i 2
+27
 1E
-0Ao -51
+0Ao -76
+0D
+24
 16
 0D
 10s ret
@@ -13204,7 +13056,7 @@
 0D
 23s image/test
 05v []
-05v #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [for [x 0 w] [for [y 0 h] [image/set! out x y [logior x [ash y 8] [ash [logxor x y] 16]]]]] [return out]]]
+05v #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [dotimes [x w] [dotimes [y h] [image/set! out x y [logior x [ash y 8] [ash [logxor x y] 16]]]]] [return out]]]
 05v #{##[]
 05v 256
 0Es w
@@ -13222,20 +13074,14 @@
 02i 0
 0Es x
 0D
-10s w
-0Es ΓεnΣym-4
-0D
 24
 1B
-09o 134
+09o 127
 0D
 1C
 15
 02i 0
 0Es y
-0D
-10s h
-0Es ΓεnΣym-5
 0D
 24
 1B
@@ -13269,9 +13115,11 @@
 03
 0Fs y
 10s y
-10s ΓεnΣym-5
+10s h
 1E
 0Ao -91
+0D
+24
 16
 0D
 02i 1
@@ -13279,9 +13127,11 @@
 03
 0Fs x
 10s x
-10s ΓεnΣym-4
+10s w
 1E
-0Ao -140
+0Ao -133
+0D
+24
 16
 0D
 10s out
@@ -13362,7 +13212,7 @@
 0D
 23s image/bmp/encode
 05v [image]
-05v #@[source: [[def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [++ i] 66] [buffer/view/set! b [++ i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [for [y [- [tree/ref image :height] 1] -1 -1] [for [x 0 [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]]] out]]
+05v #@[source: [[def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [++ i] 66] [buffer/view/set! b [++ i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y 1]]]] [return out]]]
 05v #{##[]
 05v tree/ref
 10s image
@@ -13565,23 +13415,14 @@
 26
 0Es y
 0D
-02i -1
-0Es ΓεnΣym-1
-0D
 24
 1B
-09o 128
+09o 121
 0D
 1C
 15
 02i 0
 0Es x
-0D
-05v tree/ref
-10s image
-05v :width
-04i 2
-0Es ΓεnΣym-2
 0D
 24
 1B
@@ -13605,9 +13446,14 @@
 03
 0Fs x
 10s x
-10s ΓεnΣym-2
+05v tree/ref
+10s image
+05v :width
+04i 2
 1E
-0Ao -61
+0Ao -71
+0D
+24
 16
 0D
 10s pixels
@@ -13615,17 +13461,18 @@
 25
 0Fs pixels
 0D
-02i -1
 10s y
+02i 1
 03
 0Fs y
 10s y
-10s ΓεnΣym-1
-22
-0Ao -134
+02i 0
+21
+0Ao -125
 16
 0D
 10s out
+01
 01
 }
 17
@@ -14796,7 +14643,7 @@
 0D
 23s reprint-line
 05v [text width]
-05v #@[source: [[when-not width [set! width 20]] [print "\r"] [for [i 0 width] [print " "]] [print "\r"] [print text]]]
+05v #@[source: [[when-not width [set! width 20]] [print "\r"] [dotimes [i width] [print " "]] [print "\r"] [print text]]]
 05v #{##[]
 10s width
 0Bo 7
@@ -14813,9 +14660,6 @@
 02i 0
 0Es i
 0D
-10s width
-0Es ΓεnΣym-1
-0D
 24
 1B
 09o 27
@@ -14830,9 +14674,11 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+10s width
 1E
 0Ao -33
+0D
+24
 16
 0D
 05v print
@@ -15908,7 +15754,7 @@
 0D
 23s fmt
 05v [format-string . args]
-05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [for [i 0 [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [for [i 0 [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
+05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [dotimes [i [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [dotimes [i [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
 05v #{##[]
 05v string?
 10s format-string
@@ -15933,11 +15779,6 @@
 02i 0
 0Es i
 0D
-05v string/length
-10s format-string
-04i 1
-0Es ΓεnΣym-5
-0D
 24
 1B
 09o 196
@@ -15948,9 +15789,9 @@
 10s format-string
 10s i
 04i 2
-0Es ΓεnΣym-6
+0Es ΓεnΣym-5
 0D
-10s ΓεnΣym-6
+10s ΓεnΣym-5
 02i 123
 20
 0Bo 68
@@ -15976,7 +15817,7 @@
 14
 0Fs cuts
 09o 86
-10s ΓεnΣym-6
+10s ΓεnΣym-5
 02i 125
 20
 0Bo 75
@@ -16014,9 +15855,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-5
+05v string/length
+10s format-string
+04i 1
 1E
-0Ao -202
+0Ao -208
+0D
+24
 16
 0D
 05v int?
@@ -16064,16 +15909,16 @@
 0D
 15
 10s cuts
-0Es ΓεnΣym-7
+0Es ΓεnΣym-6
 0D
-10s ΓεnΣym-7
+10s ΓεnΣym-6
 0Bo 162
 24
 1B
 09o 147
 0D
 1C
-10s ΓεnΣym-7
+10s ΓεnΣym-6
 11
 0Es c
 0D
@@ -16122,10 +15967,10 @@
 11
 0Fs last-pos
 0D
-10s ΓεnΣym-7
+10s ΓεnΣym-6
 12
-0Fs ΓεnΣym-7
-10s ΓεnΣym-7
+0Fs ΓεnΣym-6
+10s ΓεnΣym-6
 0Ao -148
 09o 4
 24
@@ -16152,11 +15997,6 @@
 15
 02i 0
 0Es i
-0D
-05v array/length
-10s arguments-used
-04i 1
-0Es ΓεnΣym-8
 0D
 24
 1B
@@ -16191,9 +16031,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-8
+05v array/length
+10s arguments-used
+04i 1
 1E
-0Ao -94
+0Ao -100
+0D
+24
 16
 0D
 10s expr-list
@@ -16369,7 +16213,7 @@
 0D
 23s string->byte-array
 05v [a]
-05v #@[documentation: "Turn a string into an UTF-8 encoded byte array" source: ["Turn a string into an UTF-8 encoded byte array" [def ret [array/allocate [string/length a]]] [for [i 0 [string/length a]] [array/set! ret i [char-at a i]]] ret]]
+05v #@[documentation: "Turn a string into an UTF-8 encoded byte array" source: ["Turn a string into an UTF-8 encoded byte array" [def ret [array/allocate [string/length a]]] [dotimes [i [string/length a]] [array/set! ret i [char-at a i]]] ret]]
 05v #{##[]
 05v array/allocate
 05v string/length
@@ -16381,11 +16225,6 @@
 15
 02i 0
 0Es i
-0D
-05v string/length
-10s a
-04i 1
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -16406,9 +16245,13 @@
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+05v string/length
+10s a
+04i 1
 1E
-0Ao -51
+0Ao -57
+0D
+24
 16
 0D
 10s ret
@@ -16514,9 +16357,9 @@
 05v type-of
 10s ext
 04i 1
-0Es ΓεnΣym-2
+0Es ΓεnΣym-1
 0D
-10s ΓεnΣym-2
+10s ΓεnΣym-1
 05v :string
 20
 0Bo 23
@@ -16535,7 +16378,7 @@
 }
 17
 09o 59
-10s ΓεnΣym-2
+10s ΓεnΣym-1
 05v :pair
 20
 0Bo 23
@@ -17301,9 +17144,9 @@
 05v string/length
 10s separator
 04i 1
-0Es ΓεnΣym-3
+0Es ΓεnΣym-2
 0D
-10s ΓεnΣym-3
+10s ΓεnΣym-2
 02i 0
 20
 0Bo 16

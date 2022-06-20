@@ -25,9 +25,9 @@
 
 [defn find-max []
        [def ret 0]
-       [for [vx 0 300]
-       [for [vy -300 300]
-	    [def res [shoot 0 0 vx vy 0]]
+       [dotimes [vx 300]
+       [dotimes [vy 600]
+	    [def res [shoot 0 0 vx [- vy 300] 0]]
 	    [set! ret [max ret res]]
        ]] ret]
 

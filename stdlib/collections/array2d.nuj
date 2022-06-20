@@ -31,8 +31,8 @@
       data]
 
 [defn array/2d/print [data]
-      [for [y 0 [tree/ref data :height]]
-           [for [x 0 [tree/ref data :width]]
-                [display [cat [array/2d/ref data x y] " "]]]
-           [newline]]
+      [dotimes [y [tree/ref data :height]]
+               [dotimes [x [tree/ref data :width]]
+                        [display [cat [array/2d/ref data x y] " "]]]
+               [newline]]
       data]

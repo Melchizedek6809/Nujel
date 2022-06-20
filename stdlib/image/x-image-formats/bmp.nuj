@@ -44,10 +44,12 @@
 
       [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]]
       [def pixels [- header-size 1]] ; Pixel data comes immediatly after the header
-      [for [y [- [tree/ref image :height] 1] -1 -1]
-        [for [x 0 [tree/ref image :width]]
-          [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]]
-        [set! pixels [+ pixels row-padding]]]
-      out]
+      [let [[y [- [tree/ref image :height] 1]]]
+           [while [>= y 0]
+                  [dotimes [x [tree/ref image :width]]
+                           [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]]
+                  [set! pixels [+ pixels row-padding]]
+                  [set! y [add/int y 1]]]]
+      [return out]]
 
 [image/add-encoder! "bmp" image/bmp/encode]

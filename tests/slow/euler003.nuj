@@ -1,12 +1,16 @@
 #!/usr/bin/env nujel
-; Prime factorization
-; https://projecteuler.net/problem=3
-;
-; Find the largest prime factor of 600851475143
+;; Prime factorization
+;; https://projecteuler.net/problem=3
+;;
+;; Find the largest prime factor of 600851475143
 
 [defn prime? [v]
-      [for [i 2 [int v]]
-           [when [zero? [% v i]] [return #f]]]
+      [def mv [int v]]
+      [def i 2]
+      [while [< i mv]
+             [when [zero? [% v i]]
+                   [return #f]]
+             [set! i [add/int i 1]]]
       [return #t]]
 
 [defn prime-factors [v]
@@ -14,12 +18,12 @@
       [def mv [+ 1 [int [/ v 2]]]]
       [def i 2]
       [while [<= i mv]
-           [when [prime? i]
-                 [while [zero? [% v i]]
-                        [set! v [/ v i]]
-                        [set! mv [+ 1 [int v]]]
-                        [set! factors [cons i factors]]]]
-            [++ i]]
+             [when [prime? i]
+                   [while [zero? [% v i]]
+                          [set! v [/ v i]]
+                          [set! mv [+ 1 [int v]]]
+                          [set! factors [cons i factors]]]]
+             [++ i]]
       [return factors]]
 
 [defn largest-prime-factor [v]

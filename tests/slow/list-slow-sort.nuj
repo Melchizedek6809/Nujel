@@ -2,8 +2,8 @@
 
 [defn test-sort [times sort-func]
        [def l #nil]
-       [for [i 0 times]
-            [set! l [cons [random/rng!] l]]]
+       [dotimes [i times]
+                [set! l [cons [random/rng!] l]]]
        [def sorted [sort-func l]]
        [while sorted
               [when [and [cadr sorted]
