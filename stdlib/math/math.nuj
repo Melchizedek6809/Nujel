@@ -4,13 +4,23 @@
 [def PI 3.141592653589793]
 [def π  3.141592653589793]
 
-[defmacro ++ [i]
-          "Increment I by 1 and store the result in I"
-          `[set! ~i [+ 1 ~i]]]
+[defn inc [x]
+      :inline
+      "Return a number 1 greater than x"
+      [+ 1 x]]
 
-[defmacro -- [i]
-          "Decrement I by 1 and store the result in I"
-          `[set! ~i [+ -1 ~i]]]
+[defmacro inc! [i v]
+          "Decrement I by V (defaults to 1) and store the result in I"
+          `[set! ~i [+ ~i ~[or v 1]]]]
+
+[defn dec [x]
+      :inline
+      "Return a number 1 less than x"
+      [+ -1 x]]
+
+[defmacro dec! [i v]
+          "Decrement I by V and store the result in I"
+          `[set! ~i [- ~i ~[or v 1]]]]
 
 [defn +x [α]
       "Return a function that adds α to it's argument, useful for mapping"

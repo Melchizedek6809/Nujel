@@ -8,7 +8,7 @@
       [def ret #nil]
       [while [>= i 0]
              [set! ret [cons [array/ref arr i] ret]]
-             [-- i]]
+             [dec! i]]
       [return ret]]
 
 [defn except-last-pair/iter [list rest]
@@ -30,7 +30,7 @@
 [defn make-list [number value]
       "Return a list of NUMBER elements containing VALUE in every car"
       [def list #nil]
-      [while [>= [-- number] 0]
+      [while [>= [dec! number] 0]
              [set! list [cons value list]]]
       list]
 
@@ -55,7 +55,7 @@
 [defn list/ref [l i]
       "Returns the the element of list l at location i"
       [while [and l [> i 0]]
-             [-- i]
+             [dec! i]
              [cdr! l]]
       [car l]]
 
@@ -70,7 +70,7 @@
       "Returns the length of list l"
       [def ret 0]
       [doseq [e l]
-             [++ ret]]
+             [inc! ret]]
       ret]
 
 [defn list/filter [l p]

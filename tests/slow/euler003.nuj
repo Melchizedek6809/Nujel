@@ -23,7 +23,7 @@
                           [set! v [/ v i]]
                           [set! mv [+ 1 [int v]]]
                           [set! factors [cons i factors]]]]
-             [++ i]]
+             [inc! i]]
       [return factors]]
 
 [defn largest-prime-factor [v]

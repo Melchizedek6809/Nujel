@@ -8,7 +8,7 @@
        [def acc 0]
        [while [and l [cdr l]]
               [when [> [cadr l] [car l]]
-                    [++ acc]]
+                    [inc! acc]]
               [cdr! l]]
        acc]
 

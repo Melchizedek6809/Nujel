@@ -5,8 +5,8 @@
 
 [defn buffer/view/le/set! [u8v offset bytes val]
       [while [> bytes 0]
-        [buffer/view/set! u8v [++ offset] [logand #xFF val]]
-        [-- bytes]
+        [buffer/view/set! u8v [inc! offset] [logand #xFF val]]
+        [dec! bytes]
         [set! val [ash val -8]]]
       offset]
 
@@ -25,8 +25,8 @@
       [def out [buffer/allocate file-size]]
       [def b [buffer/view/u8* out]]
       [def i -1]
-      [buffer/view/set! b [++ i] #\B]
-      [buffer/view/set! b [++ i] #\M]
+      [buffer/view/set! b [inc! i] #\B]
+      [buffer/view/set! b [inc! i] #\M]
       [set! i [buffer/view/le/set! b i 4 file-size]]
       [set! i [buffer/view/le/set! b i 4 0]]
       [set! i [buffer/view/le/set! b i 4 header-size]]

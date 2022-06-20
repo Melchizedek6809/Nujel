@@ -78,7 +78,7 @@
       [doseq [cur-test test-list]
              [test/run [car cur-test]
                        [cdr cur-test]
-                       [-- i]]]
+                       [dec! i]]]
 
       [display-results]
       [return error-count]]

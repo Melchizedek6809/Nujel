@@ -4,7 +4,7 @@
 [def flashes/inc!]
 [let [[flashes/counter 0]]
      [set! flashes/get [fn [] flashes/counter]]
-     [set! flashes/inc! [fn [] [++ flashes/counter]]]]
+     [set! flashes/inc! [fn [] [inc! flashes/counter]]]]
 [def p1-res 0]
 [def p2-res 0]
 
@@ -47,8 +47,8 @@
                              [def cy [- y 1]]
                              [while [< cy [+ y 2]]
                                     [step/flash-increase β flash-map cx cy]
-                                    [set! cy [add/int cy 1]]]
-                             [set! cx [add/int cx 1]]]]]]
+                                    [inc! cy]]
+                             [inc! cx]]]]]
 
 [defn step/flash [β]
       [def flash-map [array/2d/allocate [ref β :width] [ref β :height]]]

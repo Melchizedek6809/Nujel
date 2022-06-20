@@ -14,7 +14,7 @@
               [def mask [ash 1 i]]
               [when [zero? [logand number mask]]
                     [array/set! state i [+ 1 [ref state i]]]]
-              [++ i]]]
+              [inc! i]]]
 
 [defn count-bits [numbers bit-count]
        [def count 0]
@@ -23,7 +23,7 @@
        [while numbers
               [count-bits/single [car numbers] state bit-count]
               [cdr! numbers]
-              [++ count]]
+              [inc! count]]
        @[:bit-count bit-count :count count :zeroes state]]
 
 [defn calc-γε [state]
@@ -36,7 +36,7 @@
               [if [< [ref arr i] threshold]
                   [set! γ [logior γ [ash 1 i]]]
                   [set! ε [logior ε [ash 1 i]]]]
-              [++ i]]
+              [inc! i]]
 
        @[:γ γ :ε ε :power-consumption [* ε γ]]]
 

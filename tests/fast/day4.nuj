@@ -61,7 +61,7 @@
 
 [def board/get-order]
 [let [[cur-order 0]]
-     [set! board/get-order [fn [] [++ cur-order]]]]
+     [set! board/get-order [fn [] [inc! cur-order]]]]
 
 [defn board/score! [board marks last-num]
        [defn board/score/num [a b] [+ a [if [ref marks b] 0 b]]]

@@ -139,7 +139,7 @@
 [defn assemble/build-sym-map [code sym-map pos]
       [while code
              [case [type-of [car code]]
-                   [:bytecode-op [tree/set! sym-map :last-op [++ pos]]]
+                   [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]]
                    [[:symbol :keyword] [and [= [car code] :label]
                                             [tree/set! sym-map [cadr code] pos]]]
                    [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
@@ -150,7 +150,7 @@
 [defn assemble/relocate-op [code sym-map pos out]
       [def target [tree/ref sym-map [cadr code]]]
       [def off [- [+ target [cadddr code]] pos]]
-      [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
+      [array/set! out [inc! pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
       [return pos]]
 
 [defn assemble/emit-relocated-ops [code sym-map pos out]
@@ -158,7 +158,7 @@
           [set! pos [assemble/relocate-op code sym-map pos out]]
           [doseq [op code]
                  [case [type-of op]
-                       [:bytecode-op [array/set! out [++ pos] op]]
+                       [:bytecode-op [array/set! out [inc! pos] op]]
                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 

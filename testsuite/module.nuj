@@ -4,7 +4,7 @@
                   [import a :test]
                   a]]
 [test/add 3 [let [[mod [module [def counter 0]
-                         [export count! [fn [] [++ counter]]]]]]
+                         [export count! [fn [] [inc! counter]]]]]]
                   [module/insert :test mod]
                   [require :test]
                   [test/count!]

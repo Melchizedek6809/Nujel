@@ -57,7 +57,7 @@
        [def len [array/length β]]
        [def ret 0]
        [dotimes [i len ret]
-            [when [> [array/ref β i] 0] [++ ret]]]]
+            [when [> [array/ref β i] 0] [inc! ret]]]]
 
 [defn print-folded [α]
        [dotimes [y [ref α :height]]

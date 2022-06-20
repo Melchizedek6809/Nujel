@@ -5,7 +5,7 @@
        [def x 0]
        [while [< x width]
 	      [array/set! ret x [array/fill! [array/allocate height] val]]
-	      [++ x]]
+	      [inc! x]]
        ret]
 
 [defn parse/point [text]
@@ -21,8 +21,8 @@
        [def dir-y [line/dir y end-y]]
        [while [or [!= x end-x] [!= y end-y]]
 	      [array/++ [ref vents x] y 1]
-	      [+= x dir-x]
-	      [+= y dir-y]]
+	      [inc! x dir-x]
+	      [inc! y dir-y]]
        [array/++ [ref vents x] y 1]]
 
 [defn line/draw-vents [line]

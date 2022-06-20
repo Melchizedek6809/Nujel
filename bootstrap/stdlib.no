@@ -770,7 +770,7 @@
 0D
 23s array/filter
 05v [arr pred]
-05v #@[documentation: "Filter an array, [filter] should be preferred" source: ["Filter an array, [filter] should be preferred" [def ri 0] [def len [array/length arr]] [def ret [array/allocate len]] [dotimes [ai len] [when [pred [array/ref arr ai]] [array/set! ret ri [array/ref arr ai]] [++ ri]]] [array/length! ret ri]]]
+05v #@[documentation: "Filter an array, [filter] should be preferred" source: ["Filter an array, [filter] should be preferred" [def ri 0] [def len [array/length arr]] [def ret [array/allocate len]] [dotimes [ai len] [when [pred [array/ref arr ai]] [array/set! ret ri [array/ref arr ai]] [inc! ri]]] [array/length! ret ri]]]
 05v #{##[]
 02i 0
 0Es ri
@@ -1086,7 +1086,7 @@
 0D
 23s array/make-heap
 05v [arr]
-05v #@[source: [[def l [array/length arr]] [def l2 [/ l 2]] [while [>= l2 0] [array/heapify arr l l2] [-- l2]] [return arr]]]
+05v #@[source: [[def l [array/length arr]] [def l2 [/ l 2]] [while [>= l2 0] [array/heapify arr l l2] [dec! l2]] [return arr]]]
 05v #{##[]
 05v array/length
 10s arr
@@ -1127,7 +1127,7 @@
 0D
 23s array/heap-sort
 05v [arr]
-05v #@[source: [[array/make-heap arr] [def l [array/length arr]] [while [> l 0] [-- l] [array/swap arr 0 l] [array/heapify arr l 0]] [return arr]]]
+05v #@[source: [[array/make-heap arr] [def l [array/length arr]] [while [> l 0] [dec! l] [array/swap arr 0 l] [array/heapify arr l 0]] [return arr]]]
 05v #{##[]
 05v array/make-heap
 10s arr
@@ -3228,7 +3228,7 @@
 }#{##[]
 23s array->list
 05v [arr]
-05v #@[source: [[def i [- [array/length arr] 1]] [def ret #nil] [while [>= i 0] [set! ret [cons [array/ref arr i] ret]] [-- i]] [return ret]]]
+05v #@[source: [[def i [- [array/length arr] 1]] [def ret #nil] [while [>= i 0] [set! ret [cons [array/ref arr i] ret]] [dec! i]] [return ret]]]
 05v #{##[]
 05v array/length
 10s arr
@@ -3332,7 +3332,7 @@
 0D
 23s make-list
 05v [number value]
-05v #@[documentation: "Return a list of NUMBER elements containing VALUE in every car" source: ["Return a list of NUMBER elements containing VALUE in every car" [def list #nil] [while [>= [-- number] 0] [set! list [cons value list]]] list]]
+05v #@[documentation: "Return a list of NUMBER elements containing VALUE in every car" source: ["Return a list of NUMBER elements containing VALUE in every car" [def list #nil] [while [>= [dec! number] 0] [set! list [cons value list]]] list]]
 05v #{##[]
 24
 0Es list
@@ -3471,7 +3471,7 @@
 0D
 23s list/ref
 05v [l i]
-05v #@[documentation: "Returns the the element of list l at location i" source: ["Returns the the element of list l at location i" [while [and l [> i 0]] [-- i] [cdr! l]] [car l]]]
+05v #@[documentation: "Returns the the element of list l at location i" source: ["Returns the the element of list l at location i" [while [and l [> i 0]] [dec! i] [cdr! l]] [car l]]]
 05v #{##[]
 24
 1B
@@ -3546,7 +3546,7 @@
 0D
 23s list/length
 05v [l]
-05v #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [doseq [e l] [++ ret]] ret]]
+05v #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [doseq [e l] [inc! ret]] ret]]
 05v #{##[]
 02i 0
 0Es ret
@@ -5576,7 +5576,7 @@
 0D
 23s assemble/build-sym-map
 05v [code sym-map pos]
-05v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [++ pos]]] [[:symbol :keyword] [and [= [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [when [zero? 123] 123] [return pos]]]
+05v #@[source: [[while code [case [type-of [car code]] [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]] [[:symbol :keyword] [and [= [car code] :label] [tree/set! sym-map [cadr code] pos]]] [:pair [set! pos [assemble/build-sym-map [car code] sym-map pos]]]] [cdr! code]] [when [zero? 123] 123] [return pos]]]
 05v #{##[]
 24
 1B
@@ -5669,7 +5669,7 @@
 0D
 23s assemble/relocate-op
 05v [code sym-map pos out]
-05v #@[source: [[def target [tree/ref sym-map [cadr code]]] [def off [- [+ target [cadddr code]] pos]] [array/set! out [++ pos] [int->bytecode-op [logand [>> off [caddr code]] 255]]] [return pos]]]
+05v #@[source: [[def target [tree/ref sym-map [cadr code]]] [def off [- [+ target [cadddr code]] pos]] [array/set! out [inc! pos] [int->bytecode-op [logand [>> off [caddr code]] 255]]] [return pos]]]
 05v #{##[]
 05v tree/ref
 10s sym-map
@@ -5716,7 +5716,7 @@
 0D
 23s assemble/emit-relocated-ops
 05v [code sym-map pos out]
-05v #@[source: [[if [= [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [doseq [op code] [case [type-of op] [:bytecode-op [array/set! out [++ pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]]
+05v #@[source: [[if [= [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [doseq [op code] [case [type-of op] [:bytecode-op [array/set! out [inc! pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]]
 05v #{##[]
 10s code
 11
@@ -6074,7 +6074,7 @@
 0D
 23s bytecompile/gen-label
 05v [prefix]
-05v #@[source: [[++ bytecompile/gen-label/counter] [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]]
+05v #@[source: [[inc! bytecompile/gen-label/counter] [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]]
 05v #{##[]
 02i 1
 10s bytecompile/gen-label/counter
@@ -13139,7 +13139,7 @@
 }#{##[]
 23s buffer/view/le/set!
 05v [u8v offset bytes val]
-05v #@[source: [[while [> bytes 0] [buffer/view/set! u8v [++ offset] [logand 255 val]] [-- bytes] [set! val [ash val -8]]] offset]]
+05v #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [logand 255 val]] [dec! bytes] [set! val [ash val -8]]] offset]]
 05v #{##[]
 24
 1B
@@ -13207,7 +13207,7 @@
 0D
 23s image/bmp/encode
 05v [image]
-05v #@[source: [[def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [++ i] 66] [buffer/view/set! b [++ i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y 1]]]] [return out]]]
+05v #@[source: [[def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y 1]]]] [return out]]]
 05v #{##[]
 05v tree/ref
 10s image
@@ -13485,37 +13485,35 @@
 05v 3.14159
 0Es π
 0D
-23s ++
-05v [i]
-05v #@[documentation: "Increment I by 1 and store the result in I" source: ["Increment I by 1 and store the result in I" [quasiquote [set! [unquote i] [+ 1 [unquote i]]]]]]
+23s inc
+05v [x]
+05v #@[documentation: "Return a number 1 greater than x" source: [:inline "Return a number 1 greater than x" [+ 1 x]] inline: #t]
 05v #{##[]
-23s set!
-10s i
-23s +
 02i 1
-10s i
-24
-14
-14
-14
-24
-14
-14
-14
+10s x
+25
 01
 }
-18
-0Es ++
+17
+0Es inc
 0D
-23s --
-05v [i]
-05v #@[documentation: "Decrement I by 1 and store the result in I" source: ["Decrement I by 1 and store the result in I" [quasiquote [set! [unquote i] [+ -1 [unquote i]]]]]]
+23s inc!
+05v [i v]
+05v #@[documentation: "Decrement I by V (defaults to 1) and store the result in I" source: ["Decrement I by V (defaults to 1) and store the result in I" [quasiquote [set! [unquote i] [+ [unquote i] [unquote [or v 1]]]]]]]
 05v #{##[]
 23s set!
 10s i
 23s +
-02i -1
 10s i
+10s v
+0C
+0Ao 15
+0D
+02i 1
+0C
+0Ao 8
+0D
+05v #f
 24
 14
 14
@@ -13527,7 +13525,49 @@
 01
 }
 18
-0Es --
+0Es inc!
+0D
+23s dec
+05v [x]
+05v #@[documentation: "Return a number 1 less than x" source: [:inline "Return a number 1 less than x" [+ -1 x]] inline: #t]
+05v #{##[]
+02i -1
+10s x
+25
+01
+}
+17
+0Es dec
+0D
+23s dec!
+05v [i v]
+05v #@[documentation: "Decrement I by V and store the result in I" source: ["Decrement I by V and store the result in I" [quasiquote [set! [unquote i] [- [unquote i] [unquote [or v 1]]]]]]]
+05v #{##[]
+23s set!
+10s i
+23s -
+10s i
+10s v
+0C
+0Ao 15
+0D
+02i 1
+0C
+0Ao 8
+0D
+05v #f
+24
+14
+14
+14
+24
+14
+14
+14
+01
+}
+18
+0Es dec!
 0D
 23s +x
 05v [α]
@@ -13854,7 +13894,7 @@
 0D
 23s gensym
 05v [prefix]
-05v #@[source: [[++ gensym/counter] [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]
+05v #@[source: [[inc! gensym/counter] [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]
 05v #{##[]
 02i 1
 10s gensym/counter
@@ -15749,7 +15789,7 @@
 0D
 23s fmt
 05v [format-string . args]
-05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [dotimes [i [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [dotimes [i [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
+05v #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [dotimes [i [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [dotimes [i [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]]
 05v #{##[]
 05v string?
 10s format-string
@@ -16060,7 +16100,7 @@
 0D
 23s fmt/args/map-fun
 05v [arg]
-05v #@[source: [[def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [++ fmt/args/map-fun/count] [list 'def s arg]]]
+05v #@[source: [[def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]]]
 05v #{##[]
 05v string->symbol
 05v cat
@@ -16997,7 +17037,7 @@
 0D
 23s split/empty
 05v [str separator]
-05v #@[source: [[def slen [string/length str]] [def start 0] [def ret #nil] [while [< start slen] [set! ret [cons [string/cut str start [+ 1 start]] ret]] [++ start]] [reverse ret]]]
+05v #@[source: [[def slen [string/length str]] [def start 0] [def ret #nil] [while [< start slen] [set! ret [cons [string/cut str start [+ 1 start]] ret]] [inc! start]] [reverse ret]]]
 05v #{##[]
 05v string/length
 10s str
@@ -17624,7 +17664,7 @@
 0D
 23s test-run
 05v [output-passes hide-errors]
-05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [-- i]]] [display-results] [return error-count]]]
+05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [dec! i]]] [display-results] [return error-count]]]
 05v #{##[]
 05v bool
 10s hide-errors

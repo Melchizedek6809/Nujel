@@ -23,7 +23,7 @@
 
 [defn calc-routes [position s twice]
   [if [= position 'start]
-      [++ valid-routes]
+      [inc! valid-routes]
       [when-not [and [= position 'end]
                      [> [ref s 'end] 0]]
                 [def routes [ref cave-map position]]

@@ -19,7 +19,7 @@
 
 [defn shoot [x y vx vy max-y]
        ;[println [cat x " " y " " vx " " vy]]
-       [cond [[in-area? x y] [++ counter] max-y]
+       [cond [[in-area? x y] [inc! counter] max-y]
 	     [[over? x y] 0]
 	     [#t [shoot [+ x vx] [+ y vy] [+ vx [zdir vx]] [+ vy -1] [max y max-y]]]]]
 

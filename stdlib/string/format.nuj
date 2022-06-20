@@ -190,7 +190,7 @@
           [def fmt/args/map-fun/count 0]
           [defn fmt/args/map-fun [arg]
                 [def s [string->symbol [cat "fmt-arg-"[string fmt/args/map-fun/count]]]]
-                [++ fmt/args/map-fun/count]
+                [inc! fmt/args/map-fun/count]
                 [list 'def s arg]]
           [if args
               `[let* ~@[map args fmt/args/map-fun]

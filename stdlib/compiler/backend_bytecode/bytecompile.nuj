@@ -5,7 +5,7 @@
 ;; Bytecode assembly
 [def bytecompile/gen-label/counter 0]
 [defn bytecompile/gen-label [prefix]
-      [++ bytecompile/gen-label/counter]
+      [inc! bytecompile/gen-label/counter]
       [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]
 
 [def *bytecompile-push* #f]
