@@ -74,9 +74,9 @@
       α]
 
 [def state [map/load "tests/fast/day11.dat" 10 10]]
-[try [fn [ε] [when [!= [car ε] :all-flashes] [throw ε]]]
+[try [fn [ε] [when [not= [car ε] :all-flashes] [throw ε]]]
      [def ret [step/do-many state 1000]]]
-[when [!= p1-res 1694]
+[when [not= p1-res 1694]
       [throw [list :wrong-result "Wrong result" p1-res]]]
-[when [!= p2-res 346]
+[when [not= p2-res 346]
       [throw [list :wrong-result "Wrong result" p2-res]]]

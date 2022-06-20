@@ -24,8 +24,8 @@
 
 [def input [input/parse [map [split [file/read "tests/fast/day6.dat"] ","] read/int]]]
 [def result [sum [do-steps input 80]]]
-[when [!= result 349549]
+[when [not= result 349549]
       [throw [list :wrong-result "Wrong result" result]]]
 [def result [sum [do-steps input 256]]]
-[when [!= result 1589590444365]
+[when [not= result 1589590444365]
       [throw [list :wrong-result "Wrong result" result]]]

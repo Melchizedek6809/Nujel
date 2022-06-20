@@ -16,5 +16,5 @@
 [def ret [-> [fib-range 4,000,000]
              [filter even?]
              [sum]]]
-[when [!= ret 4613732]
+[when [not= ret 4613732]
       [throw [list :wrong-result "Wrong result" ret]]]

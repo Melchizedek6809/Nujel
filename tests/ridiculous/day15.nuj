@@ -67,8 +67,8 @@
 
 
 [def res-p1 [map/walk [map/load "day15.input" 100 100]]]
-[when [!= res-p1 315]
+[when [not= res-p1 315]
       [throw [list :wrong-result "Wrong result" res-p1]]]
 [def res-p2 [map/walk [map/supersize [map/load "day15.input" 100 100]]]]
-[when [!= res-p2 3040]
+[when [not= res-p2 3040]
       [throw [list :wrong-result "Wrong result" res-p2]]]

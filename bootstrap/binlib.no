@@ -485,7 +485,7 @@
 0D
 23s repl/cmd
 05v [ctx]
-05v #@[source: [[def buf ""] [def line ""] [while [!= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [set! repl/history [cons buf repl/history]] [def result [eval-in ctx expr]] [println [if [nil? result] "" [string result]]]]]
+05v #@[source: [[def buf ""] [def line ""] [while [not= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [set! repl/history [cons buf repl/history]] [def result [eval-in ctx expr]] [println [if [nil? result] "" [string result]]]]]
 05v #{##[]
 05v ""
 0Es buf
@@ -507,7 +507,7 @@
 05v readline
 04i 0
 0Fs line
-05v !=
+05v not=
 10s line
 05v "[/cmd]\n"
 04i 2

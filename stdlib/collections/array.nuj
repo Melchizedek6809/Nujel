@@ -67,7 +67,7 @@
 [defn array/equal? [a b]
       [if [or [not [array? a]]
               [not [array? b]]
-              [!= [array/length a]
+              [not= [array/length a]
                   [array/length b]]]
           [return #f]
           [let [[ret #t]]

@@ -152,7 +152,7 @@
       [when-not filename [return ret]]
       [def language [bench/get-language filename]]
       [and [tree/has? repl/options :only-nujel]
-           [!= language :nujel]
+           [not= language :nujel]
            [return ret]]
       [def cur-runs [if [= language :nujel]
                         nujel-runs

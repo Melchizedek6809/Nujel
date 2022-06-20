@@ -32,8 +32,8 @@
        ]] ret]
 
 [def res-p1 [find-max]]
-[when [!= res-p1 4950]
+[when [not= res-p1 4950]
       [throw [list :wrong-result "Wrong result" res-p1]]]
 [def res-p2 counter]
-[when [!= res-p2 1477]
+[when [not= res-p2 1477]
       [throw [list :wrong-result "Wrong result" res-p2]]]

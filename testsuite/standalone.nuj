@@ -1,8 +1,8 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-[when [and [!= System/Architecture 'wasm]
-           [!= System/OS 'DOS]
+[when [and [not= System/Architecture 'wasm]
+           [not= System/OS 'DOS]
            [resolves? 'popen]]
   [test/add #t [file/dir? "stdlib"]]
   [test/add #f [file/file? "stdlib"]]

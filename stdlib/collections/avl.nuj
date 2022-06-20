@@ -108,7 +108,7 @@
 [defn avl/get [t v]
       "Retrieve the key V from tree T, or #nil if V is not in it"
       [if [or [avl/empty? [avl/root t]]
-              [!= [type-of v] [type-of [avl/key [avl/root t]]]]]
+              [not= [type-of v] [type-of [avl/key [avl/root t]]]]]
           #nil
           [avl/node-get [avl/root t] [avl/cmp t] v]]]
 

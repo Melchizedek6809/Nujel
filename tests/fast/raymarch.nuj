@@ -235,14 +235,14 @@
 [def digest/sphere/simple [hash/adler32 [term/blit img/sphere/simple]]]
 [def digest/sphere/phong [hash/adler32 [term/blit img/sphere/phong]]]
 
-[when [!= digest/gradient 3691418998]
+[when [not= digest/gradient 3691418998]
       [println [term/blit img/gradient]]
       [throw [list :wrong-result "Raymarched gradient wrong" digest/gradient]]]
 
-[when [!= digest/sphere/simple 3084425744]
+[when [not= digest/sphere/simple 3084425744]
       [println [term/blit img/sphere/simple]]
       [throw [list :wrong-result "Raymarched simple sphere wrong" digest/sphere/simple]]]
 
-[when [!= digest/sphere/phong 3858860202]
+[when [not= digest/sphere/phong 3858860202]
       [println [term/blit img/sphere/phong]]
       [throw [list :wrong-result "Raymarched phong spheres wrong" digest/sphere/phong]]]

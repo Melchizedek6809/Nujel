@@ -95,7 +95,7 @@
 
 [def res-p1 [bits/version-sum [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]]
 [def res-p2 [eval [bits/compile [cdr [bits/parse/hex [file/read "tests/fast/day16.dat"]]]]]]
-[when [!= res-p1 951]
+[when [not= res-p1 951]
       [throw [list :wrong-result "Wrong result" res-p1]]]
-[when [!= res-p2 902198718880]
+[when [not= res-p2 902198718880]
       [throw [list :wrong-result "Wrong result" res-p2]]]

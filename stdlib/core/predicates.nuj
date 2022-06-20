@@ -33,12 +33,12 @@
 
 [defn not-zero? [val] :inline
       "#t if VAL is not zero"
-      [!= 0 val]]
+      [not= 0 val]]
 
 [defn equal? [a b]
       "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow."
       [def cur-type [type-of a]]
-      [if [!= cur-type [type-of b]]
+      [if [not= cur-type [type-of b]]
           #f
           [case cur-type
                 [:array [array/equal? a b]]

@@ -41,9 +41,9 @@
        @[:γ γ :ε ε :power-consumption [* ε γ]]]
 
 [def result [calc-γε [count-bits [read-data example-data] 5]]]
-[when [!= [ref result :power-consumption] 198]
+[when [not= [ref result :power-consumption] 198]
       [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [calc-γε [count-bits [read-data input-data] 12]]]
-[when [!= [ref result :power-consumption] 4103154]
+[when [not= [ref result :power-consumption] 4103154]
       [throw [list :wrong-result "Wrong result" result]]]

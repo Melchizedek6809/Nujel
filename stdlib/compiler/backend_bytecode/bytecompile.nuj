@@ -151,7 +151,7 @@
 
 [defn bytecompile/fn* [source env]
       [def arg-count [length [cdr source]]]
-      [when [!= arg-count 5] [exception :arity-error "[fn*] needs exactly 4 arguments" source]]
+      [when [not= arg-count 5] [exception :arity-error "[fn*] needs exactly 4 arguments" source]]
       [cdr! source]
       [list [bytecompile* [car source] env]
             [bytecompile* [cadr source] env]
@@ -161,7 +161,7 @@
 
 [defn bytecompile/macro* [source env]
       [def arg-count [length [cdr source]]]
-      [when [!= arg-count 5] [exception :arity-error "[macro*] needs exactly 4 arguments" source]]
+      [when [not= arg-count 5] [exception :arity-error "[macro*] needs exactly 4 arguments" source]]
       [cdr! source]
       [list [bytecompile* [car source] env]
             [bytecompile* [cadr source] env]

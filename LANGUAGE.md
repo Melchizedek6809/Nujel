@@ -1,7 +1,7 @@
 # The Nujel Programming Language
 
 ## Foreword
-Most functions/macros borrow their name directly from Clojure or Common Lisp, while the reader syntax is very similar to (Guile) Scheme, with some changes due to different semantics. In general I am aiming to make the syntax of Nujel quite boring and unsuprising to seasoned Lispers, since one can always use macros to customize the surface-level syntax.
+Most functions/macros borrow their name directly from Clojure or Common Lisp, while the reader syntax is very similar to (Guile) Scheme, with some changes due to different semantics.
 
 ## Parentheses
 One very obvious difference however is that Nujel defaults to using brackets instead of parentheses, you can however use parentheses as well since in Nujel (just like most Scheme's) the two are interchangeable.

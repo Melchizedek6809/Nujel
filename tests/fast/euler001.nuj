@@ -17,5 +17,5 @@
 [def result [-> [range 1000]
                 [filter multiple-of-3-or-5?]
                 [sum]]]
-[when [!= result 233168]
+[when [not= result 233168]
       [throw [list :wrong-result "Wrong result" result]]]

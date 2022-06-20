@@ -40,7 +40,7 @@
 [defn repl/cmd [ctx]
       [def buf ""]
       [def line ""]
-      [while [!= line "[/cmd]\n"]
+      [while [not= line "[/cmd]\n"]
         [set! buf [cat buf line]]
         [set! line [readline]]]
       [def expr [cons do [read buf]]]

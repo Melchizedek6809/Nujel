@@ -7,11 +7,11 @@
 
 [defn make-instance [parent]
       [when [and [not [nil? parent]]
-                 [!= [type-of parent] :tree]]
+                 [not= [type-of parent] :tree]]
             [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]]
       [def ret @[]]
       [doseq [k [tree/keys parent]]
-             [when [!= k :parent]
+             [when [not= k :parent]
                    [def pv [tree/get parent k]]
                    [when-not [= [type-of pv] :lambda]
                              [tree/set! ret k [dup pv]]]]]

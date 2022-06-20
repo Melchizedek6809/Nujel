@@ -810,8 +810,8 @@
 04i 2
 04i 3
 0D
-02i 1
 10s ri
+02i 1
 25
 0Fs ri
 09o 4
@@ -840,7 +840,7 @@
 0D
 23s array/equal?
 05v [a b]
-05v #@[source: [[if [or [not [array? a]] [not [array? b]] [!= [array/length a] [array/length b]]] [return #f] [let [[ret #t]] [dotimes [i [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] [return ret]]]]]
+05v #@[source: [[if [or [not [array? a]] [not [array? b]] [not= [array/length a] [array/length b]]] [return #f] [let [[ret #t]] [dotimes [i [array/length a]] [when-not [equal? [array/ref a i] [array/ref b i]] [set! ret #f] [set! i [array/length a]]]] [return ret]]]]]
 05v #{##[]
 05v array?
 10s a
@@ -862,7 +862,7 @@
 0C
 0Ao 39
 0D
-05v !=
+05v not=
 05v array/length
 10s a
 04i 1
@@ -1109,9 +1109,9 @@
 10s l2
 04i 3
 0D
-02i -1
 10s l2
-25
+02i 1
+26
 0Fs l2
 10s l2
 02i 0
@@ -1143,9 +1143,9 @@
 09o 50
 0D
 1C
-02i -1
 10s l
-25
+02i 1
+26
 0Fs l
 0D
 05v array/swap
@@ -1915,7 +1915,7 @@
 0D
 23s avl/get
 05v [t v]
-05v #@[documentation: "Retrieve the key V from tree T, or #nil if V is not in it" source: ["Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [!= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]]
+05v #@[documentation: "Retrieve the key V from tree T, or #nil if V is not in it" source: ["Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [not= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]]
 05v #{##[]
 05v avl/empty?
 05v avl/root
@@ -1925,7 +1925,7 @@
 0C
 0Ao 51
 0D
-05v !=
+05v not=
 05v type-of
 10s v
 04i 1
@@ -3253,9 +3253,9 @@
 14
 0Fs ret
 0D
-02i -1
 10s i
-25
+02i 1
+26
 0Fs i
 10s i
 02i 0
@@ -3346,9 +3346,9 @@
 10s list
 14
 0Fs list
-02i -1
 10s number
-25
+02i 1
+26
 0Fs number
 02i 0
 21
@@ -3478,9 +3478,9 @@
 09o 26
 0D
 1C
-02i -1
 10s i
-25
+02i 1
+26
 0Fs i
 0D
 10s l
@@ -3566,8 +3566,8 @@
 11
 0Es e
 0D
-02i 1
 10s ret
+02i 1
 25
 0Fs ret
 0D
@@ -5597,8 +5597,8 @@
 05v tree/set!
 10s sym-map
 05v :last-op
-02i 1
 10s pos
+02i 1
 25
 0Fs pos
 04i 3
@@ -5690,8 +5690,8 @@
 0D
 05v array/set!
 10s out
-02i 1
 10s pos
+02i 1
 25
 0Fs pos
 05v int->bytecode-op
@@ -5758,8 +5758,8 @@
 0Bo 31
 05v array/set!
 10s out
-02i 1
 10s pos
+02i 1
 25
 0Fs pos
 10s op
@@ -6076,8 +6076,8 @@
 05v [prefix]
 05v #@[source: [[inc! bytecompile/gen-label/counter] [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]]
 05v #{##[]
-02i 1
 10s bytecompile/gen-label/counter
+02i 1
 25
 0Fs bytecompile/gen-label/counter
 0D
@@ -6834,7 +6834,7 @@
 0D
 23s bytecompile/fn*
 05v [source env]
-05v #@[source: [[def arg-count [length [cdr source]]] [when [!= arg-count 5] [exception :arity-error "[fn*] needs exactly 4 arguments" source]] [cdr! source] [list [bytecompile* [car source] env] [bytecompile* [cadr source] env] [bytecompile* [caddr source] env] [bytecompile* [cadddr source] env] [$fn/dynamic]]]]
+05v #@[source: [[def arg-count [length [cdr source]]] [when [not= arg-count 5] [exception :arity-error "[fn*] needs exactly 4 arguments" source]] [cdr! source] [list [bytecompile* [car source] env] [bytecompile* [cadr source] env] [bytecompile* [caddr source] env] [bytecompile* [cadddr source] env] [$fn/dynamic]]]]
 05v #{##[]
 05v length
 10s source
@@ -6842,7 +6842,7 @@
 04i 1
 0Es arg-count
 0D
-05v !=
+05v not=
 10s arg-count
 02i 5
 04i 2
@@ -6896,7 +6896,7 @@
 0D
 23s bytecompile/macro*
 05v [source env]
-05v #@[source: [[def arg-count [length [cdr source]]] [when [!= arg-count 5] [exception :arity-error "[macro*] needs exactly 4 arguments" source]] [cdr! source] [list [bytecompile* [car source] env] [bytecompile* [cadr source] env] [bytecompile* [caddr source] env] [bytecompile* [cadddr source] env] [$macro/dynamic]]]]
+05v #@[source: [[def arg-count [length [cdr source]]] [when [not= arg-count 5] [exception :arity-error "[macro*] needs exactly 4 arguments" source]] [cdr! source] [list [bytecompile* [car source] env] [bytecompile* [cadr source] env] [bytecompile* [caddr source] env] [bytecompile* [cadddr source] env] [$macro/dynamic]]]]
 05v #{##[]
 05v length
 10s source
@@ -6904,7 +6904,7 @@
 04i 1
 0Es arg-count
 0D
-05v !=
+05v not=
 10s arg-count
 02i 5
 04i 2
@@ -11763,9 +11763,9 @@
 0D
 23s not-zero?
 05v [val]
-05v #@[documentation: "#t if VAL is not zero" source: [:inline "#t if VAL is not zero" [!= 0 val]] inline: #t]
+05v #@[documentation: "#t if VAL is not zero" source: [:inline "#t if VAL is not zero" [not= 0 val]] inline: #t]
 05v #{##[]
-05v !=
+05v not=
 02i 0
 10s val
 04i 2
@@ -11776,14 +11776,14 @@
 0D
 23s equal?
 05v [a b]
-05v #@[documentation: "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." source: ["High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." [def cur-type [type-of a]] [if [!= cur-type [type-of b]] #f [case cur-type [:array [array/equal? a b]] [:tree [tree/equal? a b]] [:pair [list/equal? a b]] [otherwise [= a b]]]]]]
+05v #@[documentation: "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." source: ["High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow." [def cur-type [type-of a]] [if [not= cur-type [type-of b]] #f [case cur-type [:array [array/equal? a b]] [:tree [tree/equal? a b]] [:pair [list/equal? a b]] [otherwise [= a b]]]]]]
 05v #{##[]
 05v type-of
 10s a
 04i 1
 0Es cur-type
 0D
-05v !=
+05v not=
 10s cur-type
 05v type-of
 10s b
@@ -13148,8 +13148,8 @@
 1C
 05v buffer/view/set!
 10s u8v
-02i 1
 10s offset
+02i 1
 25
 0Fs offset
 05v logand
@@ -13158,9 +13158,9 @@
 04i 2
 04i 3
 0D
-02i -1
 10s bytes
-25
+02i 1
+26
 0Fs bytes
 0D
 05v ash
@@ -13253,8 +13253,8 @@
 0D
 05v buffer/view/set!
 10s b
-02i 1
 10s i
+02i 1
 25
 0Fs i
 02i 66
@@ -13262,8 +13262,8 @@
 0D
 05v buffer/view/set!
 10s b
-02i 1
 10s i
+02i 1
 25
 0Fs i
 02i 77
@@ -13896,8 +13896,8 @@
 05v [prefix]
 05v #@[source: [[inc! gensym/counter] [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]
 05v #{##[]
-02i 1
 10s gensym/counter
+02i 1
 25
 0Fs gensym/counter
 0D
@@ -16112,8 +16112,8 @@
 04i 1
 0Es s
 0D
-02i 1
 10s fmt/args/map-fun/count
+02i 1
 25
 0Fs fmt/args/map-fun/count
 0D
@@ -16567,7 +16567,7 @@
 02i -1
 04i 2
 0Fs α
-05v !=
+05v not=
 02i 0
 10s α
 04i 2
@@ -16624,7 +16624,7 @@
 02i -3
 04i 2
 0Fs α
-05v !=
+05v not=
 02i 0
 10s α
 04i 2
@@ -16716,7 +16716,7 @@
 02i -4
 04i 2
 0Fs α
-05v !=
+05v not=
 02i 0
 10s α
 04i 2
@@ -17066,8 +17066,8 @@
 14
 0Fs ret
 0D
-02i 1
 10s start
+02i 1
 25
 0Fs start
 10s start
@@ -17715,9 +17715,9 @@
 11
 10s cur-test
 12
-02i -1
 10s i
-25
+02i 1
+26
 0Fs i
 04i 3
 0D
@@ -17779,7 +17779,7 @@
 0D
 23s make-instance
 05v [parent]
-05v #@[source: [[when [and [not [nil? parent]] [!= [type-of parent] :tree]] [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]] [def ret [tree/new #nil]] [doseq [k [tree/keys parent]] [when [!= k :parent] [def pv [tree/get parent k]] [when-not [= [type-of pv] :lambda] [tree/set! ret k [dup pv]]]]] [tree/set! ret :parent parent]]]
+05v #@[source: [[when [and [not [nil? parent]] [not= [type-of parent] :tree]] [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]] [def ret [tree/new #nil]] [doseq [k [tree/keys parent]] [when [not= k :parent] [def pv [tree/get parent k]] [when-not [= [type-of pv] :lambda] [tree/set! ret k [dup pv]]]]] [tree/set! ret :parent parent]]]
 05v #{##[]
 05v nil?
 10s parent
@@ -17791,7 +17791,7 @@
 0C
 0Bo 24
 0D
-05v !=
+05v not=
 05v type-of
 10s parent
 04i 1
@@ -17832,7 +17832,7 @@
 11
 0Es k
 0D
-05v !=
+05v not=
 10s k
 05v :parent
 04i 2

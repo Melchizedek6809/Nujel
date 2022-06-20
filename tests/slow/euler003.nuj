@@ -30,5 +30,5 @@
       [car [prime-factors v]]]
 
 [def ret [largest-prime-factor 600851475143]]
-[when [!= ret 6857]
+[when [not= ret 6857]
       [throw [list :wrong-result "Wrong result" ret]]]

@@ -102,9 +102,9 @@
                                   [set! first-board board]]
                             [when [> [ref board :order] [ref last-board :order]]
                                   [set! last-board board]]]]
-       [when [!= [ref first-board :score] 10680]
+       [when [not= [ref first-board :score] 10680]
              [throw [list :wrong-result "Wrong Part 1 result" first-board]]]
-       [when [!= [ref last-board :score] 31892]
+       [when [not= [ref last-board :score] 31892]
              [throw [list :wrong-result "Wrong Part 2 result" last-board]]]]
 
 [def raw [split [file/read "tests/fast/day4.dat"] "\n"]]

@@ -27,7 +27,7 @@
        ]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 6 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn find/five [vals numbers]
        [def ret [-> vals
@@ -35,7 +35,7 @@
                 [filter [fn [α] [= α [logand α [array/ref numbers 6]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 5 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn find/nine [vals numbers]
        [def ret [-> vals
@@ -43,14 +43,14 @@
                 [filter [fn [α] [= α [logior α [array/ref numbers 4]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 9 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn find/zero [vals numbers]
        [def ret [-> vals
                 [filter [fn [α] [= [popcount α] 6]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 0 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn find/three [vals numbers]
        [def ret [-> vals
@@ -58,15 +58,15 @@
                 [filter [fn [α] [= α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 3 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn find/two [vals numbers]
        [def ret [-> vals
                 [filter [fn [α] [= [popcount α] 5]]]
-                [filter [fn [α] [!= α [logior α [array/ref numbers 1]]]]]]]
+                [filter [fn [α] [not= α [logior α [array/ref numbers 1]]]]]]]
        [when [> [length ret] 1] [stacktrace]]
        [array/set! numbers 2 [car ret]]
-       [filter vals [fn [α] [!= α [car ret]]]]]
+       [filter vals [fn [α] [not= α [car ret]]]]]
 
 [defn seven-seg->binary [str]
        [reduce [split str ""]
@@ -111,8 +111,8 @@
           [+ Σ output-sum]] 0]]
 
 [def result [sum counts]]
-[when [!= result 532]
+[when [not= result 532]
       [throw [list :wrong-result "Wrong result" result]]]
 [def result part-2]
-[when [!= result 1011284]
+[when [not= result 1011284]
       [throw [list :wrong-result "Wrong result" result]]]

@@ -21,10 +21,10 @@
        [nreverse ret]]
 
 [def result [count-increases example-list]]
-[when [!= result 7] [throw [list :wrong-result "Wrong result" result]]]
+[when [not= result 7] [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [count-increases [read [file/read "tests/fast/day1.dat"]]]]
-[when [!= result 1711] [throw [list :wrong-result "Wrong result" result]]]
+[when [not= result 1711] [throw [list :wrong-result "Wrong result" result]]]
 
 [def result [count-increases [build-sums [read [file/read "tests/fast/day1.dat"]]]]]
-[when [!= result 1743] [throw [list :wrong-result "Wrong result" result]]]
+[when [not= result 1743] [throw [list :wrong-result "Wrong result" result]]]

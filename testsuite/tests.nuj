@@ -58,7 +58,7 @@
 [test/add 2 [def test 1] [def test 2] test]
 [test/add #t [int? [random]]]
 [test/add #t [set! random/seed 123] [def first-value [random]] [set! random/seed 123] [= first-value [random]]]
-[test/add #t [!= [random] [random]]]
+[test/add #t [not= [random] [random]]]
 [test/add 1 [def a 1] [when-not [= 2 2] [set! a 4]] a]
 [test/add 4 [def a 1] [when-not [= 2 3] [set! a 4]] a]
 [test/add 4 [def a 1] [when     [= 2 2] [set! a 4]] a]

@@ -31,8 +31,8 @@
       @[:pos ret-pos :fuel ret-fuel]]
 
 [def result [calc/optimal real-data calc/fuel/simple]]
-[when [!= [ref result :fuel] 355989]
+[when [not= [ref result :fuel] 355989]
       [throw [list :wrong-result "Wrong result" result]]]
 [def result [calc/optimal real-data calc/fuel/complex]]
-[when [!= [ref result :fuel] 102245489]
+[when [not= [ref result :fuel] 102245489]
       [throw [list :wrong-result "Wrong result" result]]]

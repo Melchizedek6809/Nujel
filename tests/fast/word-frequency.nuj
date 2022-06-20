@@ -13,7 +13,7 @@
            [map [fn [v] [split v " "]]]
            [flatten]
            [map trim]
-           [filter [fn [a] [!= a ""]]]
+           [filter [fn [a] [not= a ""]]]
            [reduce [fn [freq word]
                       [let [[old-entry [avl/get freq #[word 1]]]
                             [new-entry #[word [if old-entry
@@ -25,5 +25,5 @@
                           [+ sum [max 0 [- [array/ref e 1] 5]]]]]]]
 
 [def words [count-words [string [or [file/read "CODE_OF_CONDUCT.md"] ""]]]]
-[when [!= words 122]
+[when [not= words 122]
       [throw [list :wrong-result "CoC Words Wrong" words]]]

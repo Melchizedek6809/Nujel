@@ -70,7 +70,7 @@
 [def final-map [do-all-folds [fold/load "tests/slow/day13.input"]]]
 [def res-p2 [dot-count final-map]]
 
-[when [!= res-p1 842]
+[when [not= res-p1 842]
       [throw [list :wrong-result "Wrong result" res-p1]]]
-[when [!= res-p2 95]
+[when [not= res-p2 95]
       [throw [list :wrong-result "Wrong result" res-p2]]]
