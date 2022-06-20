@@ -45,7 +45,7 @@ typedef enum lOpcode {
 	lopSub             = 0x26,
 	lopMul             = 0x27,
 	lopDiv             = 0x28,
-	lopMod             = 0x29,
+	lopRem             = 0x29,
 	lopZeroPred        = 0x2A
 } lOpcode;
 

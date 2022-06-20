@@ -90,7 +90,7 @@
             [#$26 '[$sub]]
             [#$27 '[$mul]]
             [#$28 '[$div]]
-            [#$29 '[$mod]]
+            [#$29 '[$rem]]
             [#$2A '[$zero?]]
             [otherwise :unknown-op]]]
 

@@ -79,8 +79,8 @@ static lVal *lDyadicFun(lBytecodeOp op, lClosure *c, lVal *a, lVal *b){
 		return lMul(c,a,b);
 	case lopDiv:
 		return lDiv(c,a,b);
-	case lopMod:
-		return lMod(c,a,b);
+	case lopRem:
+		return lRem(c,a,b);
 	default:
 		return NULL;
 	}
@@ -165,7 +165,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopSub:
 	case lopMul:
 	case lopDiv:
-	case lopMod:
+	case lopRem:
 	case lopIntAdd:
 	case lopCons:
 	case lopLessEqPred:

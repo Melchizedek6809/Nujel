@@ -125,7 +125,7 @@ static lVal *lnfDiv(lClosure *c, lVal *v){
 	}
 }
 
-lVal *lMod(lClosure *c, lVal *a, lVal *b){
+lVal *lRem(lClosure *c, lVal *a, lVal *b){
 	if(a == NULL){return b;}
 	if(b == NULL){return a;}
 	lType t = lTypecast(a->type, b->type);
@@ -141,13 +141,13 @@ lVal *lMod(lClosure *c, lVal *a, lVal *b){
 	}
 }
 
-static lVal *lnfMod(lClosure *c, lVal *v){
+static lVal *lnfRem(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
 	if(lCddr(v)){
-		return lnfMod(c, lCons(lMod(c, a, b), lCddr(v)));
+		return lnfRem(c, lCons(lRem(c, a, b), lCddr(v)));
 	} else {
-		return lMod(c, a, b);
+		return lRem(c, a, b);
 	}
 }
 
@@ -241,7 +241,7 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"-",   "[a b]", "Substraction",  lnfSub);
 	lAddNativeFunc(c,"*",   "[a b]", "Multiplication",lnfMul);
 	lAddNativeFunc(c,"/",   "[a b]", "Division",      lnfDiv);
-	lAddNativeFunc(c,"%",   "[a b]", "Modulo",        lnfMod);
+	lAddNativeFunc(c,"rem %", "[a b]", "Remainder",     lnfRem);
 	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
 	lAddNativeFunc(c,"add/int", "[a b]", "Return a:int + b:int",  lnfAddAstI);

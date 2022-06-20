@@ -7,8 +7,8 @@
 
 [defn constant-foldable? [fun]
       [case fun
-            [[ add/int  logand  logior  logxor  lognot  ash  popcount  abs  sqrt  pow  %  +  -  *  /  cat  trim  string/length  uppercase  lowercase  capitalize] #t]
-            [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow '% '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t]
+            [[ add/int  logand  logior  logxor  lognot  ash  popcount  abs  sqrt  pow  rem  +  -  *  /  cat  trim  string/length  uppercase  lowercase  capitalize] #t]
+            [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow 'rem '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t]
             [#t #f]]]
 
 [defn constant-fold/resolve [sym]

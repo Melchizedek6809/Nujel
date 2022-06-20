@@ -5,15 +5,15 @@
 
 [defn time/seconds [timestamp]
       "Return the seconds part of TIMESTAMP, defaults to current time"
-      [% [default timestamp [time]] 60]]
+      [rem [default timestamp [time]] 60]]
 
 [defn time/minutes [timestamp]
       "Return the minutes part of TIMESTAMP, defaults to current time"
-      [% [/ [default timestamp [time]] 60] 60]]
+      [rem [/ [default timestamp [time]] 60] 60]]
 
 [defn time/hours [timestamp]
       "Return the hours part of TIMESTAMP, defaults to current time"
-      [% [/ [default timestamp [time]] 3600] 24]]
+      [rem [/ [default timestamp [time]] 3600] 24]]
 
 [defn profile-form [raw]
       [def start-time [time/milliseconds]]

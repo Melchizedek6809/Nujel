@@ -61,7 +61,7 @@
 
 [defn $apply/optimize? [fun arg-count]
       [case fun
-            [[+ - * / %] [= arg-count 2]]
+            [[+ - * / rem] [= arg-count 2]]
             [[zero? car cdr add/int cons < <= = >= >] #t]]]
 
 [defn $apply [arg-count fun]
@@ -79,7 +79,7 @@
                      [- [$sub]]
                      [* [$mul]]
                      [/ [$div]]
-                     [% [$mod]]
+                     [rem [$rem]]
                      [cons [$cons]]
                      [< [$<]]
                      [<= [$<=]]

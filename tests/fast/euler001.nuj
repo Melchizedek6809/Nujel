@@ -5,10 +5,10 @@
 ; Find the sum of all the multiples of 3 or 5 below 1000.
 
 [defn multiple-of-3? [α]
-       [zero? [% α 3]]]
+       [zero? [rem α 3]]]
 
 [defn multiple-of-5? [α]
-       [zero? [% α 5]]]
+       [zero? [rem α 5]]]
 
 [defn multiple-of-3-or-5? [α]
        [or [multiple-of-3? α]

@@ -5,8 +5,8 @@
 [defn test-run []
       [def ret 0]
       [dotimes [i 10,000,000 ret]
-        [when [or [zero? [% i 3]]
-                  [zero? [% i 5]]]
+        [when [or [zero? [rem i 3]]
+                  [zero? [rem i 5]]]
           [set! ret [+ ret i]]]]]
 
 [pfmtln "The sum is: {}" [test-run]]

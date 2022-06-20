@@ -144,7 +144,7 @@
       :inline
       '[#$28]]
 
-[defn $mod []
+[defn $rem []
       "[a b] -> [result]"
       :inline
       '[#$29]]

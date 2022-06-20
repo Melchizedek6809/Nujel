@@ -1176,7 +1176,7 @@
 0D
 23s array/cut
 05v [arr start end]
-05v #@[documentation: "Return a newly allocated array with the values of ARR from START to END" source: ["Return a newly allocated array with the values of ARR from START to END" [set! start [max 0 start]] [set! end [min [array/length arr] end]] [def ret [array/allocate [max 0 [- end start]]]] [for [i start end] [array/set! ret [- i start] [array/ref arr i]]] [return ret]]]
+05v #@[documentation: "Return a newly allocated array with the values of ARR from START to END" source: ["Return a newly allocated array with the values of ARR from START to END" [set! start [max 0 start]] [set! end [min [array/length arr] end]] [def ret [array/allocate [max 0 [- end start]]]] [def i start] [while [< i end] [array/set! ret [- i start] [array/ref arr i]] [set! i [add/int i 1]]] [return ret]]]
 05v #{##[]
 05v max
 02i 0
@@ -1202,12 +1202,8 @@
 04i 1
 0Es ret
 0D
-15
 10s start
 0Es i
-0D
-10s end
-0Es ΓεnΣym-1
 0D
 24
 1B
@@ -1225,15 +1221,14 @@
 04i 2
 04i 3
 0D
-02i 1
 10s i
+02i 1
 03
 0Fs i
 10s i
-10s ΓεnΣym-1
+10s end
 1E
 0Ao -56
-16
 0D
 10s ret
 01
@@ -4837,7 +4832,7 @@
 17
 0Es $div
 0D
-23s $mod
+23s $rem
 05v []
 05v #@[documentation: "[a b] -> [result]" source: ["[a b] -> [result]" :inline '[#$29]] inline: #t]
 05v #{##[]
@@ -4845,7 +4840,7 @@
 01
 }
 17
-0Es $mod
+0Es $rem
 0D
 23s $zero?
 05v []
@@ -5100,7 +5095,7 @@
 0D
 23s $apply/optimize?
 05v [fun arg-count]
-05v #@[source: [[case fun [[+ - * / %] [= arg-count 2]] [[zero? car cdr add/int cons < <= = >= >] #t]]]]
+05v #@[source: [[case fun [[+ - * / rem] [= arg-count 2]] [[zero? car cdr add/int cons < <= = >= >] #t]]]]
 05v #{##[]
 15
 10s fun
@@ -5131,7 +5126,7 @@
 0Ao 22
 0D
 10s ΓεnΣym-1
-10s %
+10s rem
 20
 0C
 0Ao 8
@@ -5215,7 +5210,7 @@
 0D
 23s $apply
 05v [arg-count fun]
-05v #@[documentation: "arguments -> [result]\nRead arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments -> [result]" "Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [zero? [$zero?]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [2 [case fun [add/int [$add/int]] [+ [$add]] [- [$sub]] [* [$mul]] [/ [$div]] [% [$mod]] [cons [$cons]] [< [$<]] [<= [$<=]] [= [$=]] [>= [$>=]] [> [$>]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]]
+05v #@[documentation: "arguments -> [result]\nRead arg-count arguments from the stack, apply the to fun and push the result on the stack" source: ["arguments -> [result]" "Read arg-count arguments from the stack, apply the to fun and push the result on the stack" [case arg-count [1 [case fun [car [$car]] [cdr [$cdr]] [zero? [$zero?]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [2 [case fun [add/int [$add/int]] [+ [$add]] [- [$sub]] [* [$mul]] [/ [$div]] [rem [$rem]] [cons [$cons]] [< [$<]] [<= [$<=]] [= [$=]] [>= [$>=]] [> [$>]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]] [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]]
 05v #{##[]
 15
 10s arg-count
@@ -5297,7 +5292,7 @@
 05v [#$28]
 09o 166
 10s ΓεnΣym-4
-10s %
+10s rem
 20
 0Bo 10
 05v [#$29]
@@ -7774,7 +7769,7 @@
 0D
 23s disassemble/op
 05v [a i literals]
-05v #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$5 [quasiquote [$push/lval [unquote [bytecode-arr->val a [+ i 1]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]] [#$1B [quasiquote [$roots/push]]] [#$1C [quasiquote [$roots/pop]]] [#$1E [quasiquote [$<]]] [#$1F [quasiquote [$<=]]] [#$20 [quasiquote [$=]]] [#$21 [quasiquote [$>=]]] [#$22 [quasiquote [$>]]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 [quasiquote [$push/nil]]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$mod]] [#$2A '[$zero?]] [otherwise :unknown-op]]]]
+05v #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$5 [quasiquote [$push/lval [unquote [bytecode-arr->val a [+ i 1]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]] [#$1B [quasiquote [$roots/push]]] [#$1C [quasiquote [$roots/pop]]] [#$1E [quasiquote [$<]]] [#$1F [quasiquote [$<=]]] [#$20 [quasiquote [$=]]] [#$21 [quasiquote [$>=]]] [#$22 [quasiquote [$>]]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 [quasiquote [$push/nil]]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$rem]] [#$2A '[$zero?]] [otherwise :unknown-op]]]]
 05v #{##[]
 15
 05v ref
@@ -8162,7 +8157,7 @@
 05v #$29
 20
 0Bo 10
-05v [$mod]
+05v [$rem]
 09o 26
 10s ΓεnΣym-2
 05v #$2A
@@ -9014,7 +9009,7 @@
 0D
 23s constant-foldable?
 05v [fun]
-05v #@[source: [[case fun [[add/int logand logior logxor lognot ash popcount abs sqrt pow % + - * / cat trim string/length uppercase lowercase capitalize] #t] [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow '% '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t] [#t #f]]]]
+05v #@[source: [[case fun [[add/int logand logior logxor lognot ash popcount abs sqrt pow rem + - * / cat trim string/length uppercase lowercase capitalize] #t] [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow 'rem '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t] [#t #f]]]]
 05v #{##[]
 15
 10s fun
@@ -9081,7 +9076,7 @@
 0Ao 162
 0D
 10s ΓεnΣym-1
-10s %
+10s rem
 20
 0C
 0Ao 148
@@ -9211,7 +9206,7 @@
 0Ao 162
 0D
 10s ΓεnΣym-1
-23s %
+23s rem
 20
 0C
 0Ao 148
@@ -9656,7 +9651,7 @@
 0D
 23s macroexpand*
 05v [source env]
-05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / % logand logior logxor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
+05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / rem logand logior logxor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
 05v #{##[]
 05v resolves?
 10s source
@@ -9719,7 +9714,7 @@
 0Ao 64
 0D
 10s ΓεnΣym-2
-10s %
+10s rem
 20
 0C
 0Ao 50
@@ -11735,7 +11730,7 @@
 0D
 23s odd?
 05v [a]
-05v #@[documentation: "Predicate that returns #t if a is odd" source: ["Predicate that returns #t if a is odd" [= [% [int a] 2] 1]]]
+05v #@[documentation: "Predicate that returns #t if a is odd" source: ["Predicate that returns #t if a is odd" [= [rem [int a] 2] 1]]]
 05v #{##[]
 05v int
 10s a
@@ -12451,7 +12446,7 @@
 }#{##[]
 23s time/seconds
 05v [timestamp]
-05v #@[documentation: "Return the seconds part of TIMESTAMP, defaults to current time" source: ["Return the seconds part of TIMESTAMP, defaults to current time" [% [default timestamp [time]] 60]]]
+05v #@[documentation: "Return the seconds part of TIMESTAMP, defaults to current time" source: ["Return the seconds part of TIMESTAMP, defaults to current time" [rem [default timestamp [time]] 60]]]
 05v #{##[]
 05v default
 10s timestamp
@@ -12467,7 +12462,7 @@
 0D
 23s time/minutes
 05v [timestamp]
-05v #@[documentation: "Return the minutes part of TIMESTAMP, defaults to current time" source: ["Return the minutes part of TIMESTAMP, defaults to current time" [% [/ [default timestamp [time]] 60] 60]]]
+05v #@[documentation: "Return the minutes part of TIMESTAMP, defaults to current time" source: ["Return the minutes part of TIMESTAMP, defaults to current time" [rem [/ [default timestamp [time]] 60] 60]]]
 05v #{##[]
 05v default
 10s timestamp
@@ -12485,7 +12480,7 @@
 0D
 23s time/hours
 05v [timestamp]
-05v #@[documentation: "Return the hours part of TIMESTAMP, defaults to current time" source: ["Return the hours part of TIMESTAMP, defaults to current time" [% [/ [default timestamp [time]] 3600] 24]]]
+05v #@[documentation: "Return the hours part of TIMESTAMP, defaults to current time" source: ["Return the hours part of TIMESTAMP, defaults to current time" [rem [/ [default timestamp [time]] 3600] 24]]]
 05v #{##[]
 05v default
 10s timestamp
@@ -13596,7 +13591,7 @@
 0D
 23s wrap-value
 05v [val min max]
-05v #@[documentation: "Constrains VAL to be within MIN and MAX, wrapping it around" source: ["Constrains VAL to be within MIN and MAX, wrapping it around" [+ min [% [- val min] [- max min]]]]]
+05v #@[documentation: "Constrains VAL to be within MIN and MAX, wrapping it around" source: ["Constrains VAL to be within MIN and MAX, wrapping it around" [+ min [rem [- val min] [- max min]]]]]
 05v #{##[]
 10s min
 10s val
@@ -13957,7 +13952,7 @@
 0D
 23s random
 05v [max]
-05v #@[documentation: "Return a value from 0 to MAX, or, if left out, a random int" source: ["Return a value from 0 to MAX, or, if left out, a random int" [if [numeric? max] [% [abs [random/rng!]] max] [random/rng!]]]]
+05v #@[documentation: "Return a value from 0 to MAX, or, if left out, a random int" source: ["Return a value from 0 to MAX, or, if left out, a random int" [if [numeric? max] [rem [abs [random/rng!]] max] [random/rng!]]]]
 05v #{##[]
 05v numeric?
 10s max

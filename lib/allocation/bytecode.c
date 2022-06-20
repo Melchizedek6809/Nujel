@@ -39,7 +39,7 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopSub:
 	case lopMul:
 	case lopDiv:
-	case lopMod:
+	case lopRem:
 	case lopZeroPred:
 		return 1;
 	case lopApply:
