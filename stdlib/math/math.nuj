@@ -27,10 +27,6 @@
       [fn [β]
           [+ α β]]]
 
-[defn >> [val amount]
-      "Shifts VAL by AMOUNT bits to the right"
-      [ash val [- amount]]]
-
 [defn fib [i]
       "Terribly inefficient, but, useful for testing the GC"
       [if [< i 2] i

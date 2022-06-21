@@ -5,15 +5,15 @@
 
 [defn val->bytecode-op [v]
       [def i [val->index v]]
-      [list [int->bytecode-op [logand [>> i 16] #xFF]]
-            [int->bytecode-op [logand [>> i  8] #xFF]]
-            [int->bytecode-op [logand     i     #xFF]]]]
+      [list [int->bytecode-op [bit-and [bit-shift-right i 16] #xFF]]
+            [int->bytecode-op [bit-and [bit-shift-right i  8] #xFF]]
+            [int->bytecode-op [bit-and                  i     #xFF]]]]
 
 [defn sym->bytecode-op [v]
       [def i [sym->index v]]
-      [list [int->bytecode-op [logand [>> i 16] #xFF]]
-            [int->bytecode-op [logand [>> i  8] #xFF]]
-            [int->bytecode-op [logand     i     #xFF]]]]
+      [list [int->bytecode-op [bit-and [bit-shift-right i 16] #xFF]]
+            [int->bytecode-op [bit-and [bit-shift-right i  8] #xFF]]
+            [int->bytecode-op [bit-and                  i     #xFF]]]]
 
 [defn int-fit-in-byte? [a]
       [and [<= a 127] [>= a -128]]]
@@ -150,7 +150,7 @@
 [defn assemble/relocate-op [code sym-map pos out]
       [def target [tree/ref sym-map [cadr code]]]
       [def off [- [+ target [cadddr code]] pos]]
-      [array/set! out [inc! pos] [int->bytecode-op [logand [>> off [caddr code]] #xFF]]]
+      [array/set! out [inc! pos] [int->bytecode-op [bit-and [bit-shift-right off [caddr code]] #xFF]]]
       [return pos]]
 
 [defn assemble/emit-relocated-ops [code sym-map pos out]

@@ -241,7 +241,7 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"-",   "[a b]", "Substraction",  lnfSub);
 	lAddNativeFunc(c,"*",   "[a b]", "Multiplication",lnfMul);
 	lAddNativeFunc(c,"/",   "[a b]", "Division",      lnfDiv);
-	lAddNativeFunc(c,"rem %", "[a b]", "Remainder",     lnfRem);
+	lAddNativeFunc(c,"rem", "[a b]", "Remainder",     lnfRem);
 	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
 	lAddNativeFunc(c,"add/int", "[a b]", "Return a:int + b:int",  lnfAddAstI);
@@ -251,10 +251,11 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
 	lAddNativeFunc(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
 
-	lAddNativeFunc(c,"logand",  "[a b]",       "And ARGS together",               lnfLogAnd);
-	lAddNativeFunc(c,"logior",  "args",        "Or ARGS",                         lnfLogIor);
-	lAddNativeFunc(c,"logxor",  "args",        "Xor ARGS",                        lnfLogXor);
-	lAddNativeFunc(c,"lognot",  "[val]",       "Binary not of VAL",               lnfLogNot);
-	lAddNativeFunc(c,"ash",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFunc(c,"bit-and",  "[a b]", "Bitwise and",          lnfLogAnd);
+	lAddNativeFunc(c,"bit-or",   "[a b]", "Bitwise or",           lnfLogIor);
+	lAddNativeFunc(c,"bit-xor",  "[a b]", "Bitwise exclusive or", lnfLogXor);
+	lAddNativeFunc(c,"bit-not",  "[a]",   "Bitwise not",          lnfLogNot);
+
+	lAddNativeFunc(c,"bit-shift-left ash",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
 	lAddNativeFunc(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
 }

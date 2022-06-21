@@ -4,12 +4,12 @@
 [def random/seed 0]
 
 [defn random/seed-initialize! []
-      [set! random/seed [logxor [time] [time/milliseconds]]]]
+      [set! random/seed [bit-xor [time] [time/milliseconds]]]]
 
 [defn random/rng! []
       [set! random/seed [+ 12345 [* random/seed 1103515245]]]
-      [logior [ash [logand random/seed #xFFFF] 16]
-              [logand [ash random/seed -16] #xFFFF]]]
+      [bit-or [bit-shift-left [bit-and random/seed #xFFFF] 16]
+              [bit-and [bit-shift-right random/seed 16] #xFFFF]]]
 
 [defn random/seed! [new-seed]
       "Set a new seed value for the RNG"

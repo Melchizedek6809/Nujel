@@ -117,7 +117,7 @@
       [let* [def count 0]
             [cat [join [map [split [apply cat args] ""]
                             [fn [a]
-                              [set! count [logand [+ 1 count] #x7]]
+                              [set! count [bit-and [+ 1 count] #x7]]
                               [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
                  [or ansi/disabled ansi-fg-reset]]]]
 
@@ -126,8 +126,8 @@
       [def count 0]
       [def colored-list [map [split [apply cat args] ""]
 			     [fn [a]
-			       [set! count [logand [+ 1 count] #x7]]
-			       [cat [or ansi/disabled [array/ref ansi-fg [logxor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
+			       [set! count [bit-and [+ 1 count] #x7]]
+			       [cat [or ansi/disabled [array/ref ansi-fg [bit-xor count #x7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]]
       [cat [join colored-list ""]
            [or ansi/disabled ansi-reset]]]
 

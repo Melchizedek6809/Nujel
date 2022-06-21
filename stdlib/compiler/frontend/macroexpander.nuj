@@ -55,7 +55,7 @@
             [:nil source]
             [:native-function
              [case op
-                   [[+ - * / rem logand logior logxor] [macroexpand/fold op [cdr source]]]
+                   [[+ - * / rem bit-and bit-or bit-xor] [macroexpand/fold op [cdr source]]]
                    [do                  [macroexpand/do   source env]]
                    [return              [macroexpand/form source env op 1 #f #b0]]
                    [[try while]         [macroexpand/form source env op 1 #t #b0]]

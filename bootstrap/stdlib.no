@@ -1,22 +1,40 @@
 #{##[]
-23s lognand
+23s bit-nand
 23s l
-05v #@[documentation: "Returns the Nand of its arguments" source: ["Returns the Nand of its arguments" [lognot [apply logand l]]]]
+05v #@[documentation: "Returns the Nand of its arguments" source: ["Returns the Nand of its arguments" [bit-not [apply bit-and l]]]]
 05v #{##[]
-05v lognot
+05v bit-not
 05v apply
-10s logand
+10s bit-and
 10s l
 04i 2
 04i 1
 01
 }
 17
+0Es bit-nand
+0D
+10s bit-nand
 0Es lognand
 0D
-23s bit-set?
+23s bit-and-not
+05v [x y]
+05v #@[documentation: "Bitwise and with complement" source: ["Bitwise and with complement" [bit-and x [bit-not y]]]]
+05v #{##[]
+05v bit-and
+10s x
+05v bit-not
+10s y
+04i 1
+04i 2
+01
+}
+17
+0Es bit-and-not
+0D
+23s bit-test?
 05v [α i]
-05v #@[documentation: "Returns #t if bit I is set in Α" source: ["Returns #t if bit I is set in Α" [typecheck/only α :int] [typecheck/only i :int] [not [zero? [logand α [ash 1 i]]]]]]
+05v #@[documentation: "Test bit at position i" source: ["Test bit at position i" [typecheck/only α :int] [typecheck/only i :int] [not [zero? [bit-and α [bit-shift-left 1 i]]]]]]
 05v #{##[]
 05v type-of
 10s α
@@ -54,9 +72,9 @@
 04i 4
 04i 1
 0D
-05v logand
+05v bit-and
 10s α
-05v ash
+05v bit-shift-left
 02i 1
 10s i
 04i 2
@@ -69,107 +87,31 @@
 01
 }
 17
+0Es bit-test?
+0D
+10s bit-test?
 0Es bit-set?
 0D
-23s bit-set?!
-05v [i]
-05v #@[documentation: "Returns a function that checks if bit I is set in the provided number" source: ["Returns a function that checks if bit I is set in the provided number" [typecheck/only i :int] [def mask [ash 1 i]] [fn [α] [not [zero? [logand α mask]]]]]]
+23s bit-shift-right
+05v [α i]
+05v #@[documentation: "Bitwise shift right" source: ["Bitwise shift right" [bit-shift-left α [- i]]]]
 05v #{##[]
-05v type-of
-10s i
-04i 1
-05v :int
-20
-0Bo 7
-24
-09o 33
-05v throw
-05v list
-05v :type-error
-05v "Expected a value of type :int"
-10s i
-05v current-lambda
-04i 0
-04i 4
-04i 1
-0D
-05v ash
-02i 1
-10s i
-04i 2
-0Es mask
-0D
-23s anonymous
-05v [α]
-05v #@[source: [[not [zero? [logand α mask]]]]]
-05v #{##[]
-05v logand
+05v bit-shift-left
 10s α
-10s mask
-04i 2
-2A
-0Bo 10
-05v #f
-09o 7
-05v #t
-01
-}
-17
-01
-}
-17
-0Es bit-set?!
-0D
-23s bit-clear?!
-05v [i]
-05v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [typecheck/only i :int] [def mask [ash 1 i]] [fn [α] [zero? [logand α mask]]]]]
-05v #{##[]
-05v type-of
+05v -
 10s i
 04i 1
-05v :int
-20
-0Bo 7
-24
-09o 33
-05v throw
-05v list
-05v :type-error
-05v "Expected a value of type :int"
-10s i
-05v current-lambda
-04i 0
-04i 4
-04i 1
-0D
-05v ash
-02i 1
-10s i
 04i 2
-0Es mask
-0D
-23s anonymous
-05v [α]
-05v #@[source: [[zero? [logand α mask]]]]
-05v #{##[]
-05v logand
-10s α
-10s mask
-04i 2
-2A
 01
 }
 17
-01
-}
-17
-0Es bit-clear?!
+0Es bit-shift-right
 0D
 23s test-function
 05v [i]
-05v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [def mask [ash 1 i]] [fn [α] [zero? [logand α mask]]]]]
+05v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [def mask [bit-shift-left 1 i]] [fn [α] [zero? [bit-and α mask]]]]]
 05v #{##[]
-05v ash
+05v bit-shift-left
 02i 1
 10s i
 04i 2
@@ -177,9 +119,9 @@
 0D
 23s anonymous
 05v [α]
-05v #@[source: [[zero? [logand α mask]]]]
+05v #@[source: [[zero? [bit-and α mask]]]]
 05v #{##[]
-05v logand
+05v bit-and
 10s α
 10s mask
 04i 2
@@ -988,7 +930,7 @@
 0D
 23s array/heapify
 05v [arr n at]
-05v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [ash at 1] 1]] [def r [+ [ash at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [= top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] [return arr]]]
+05v #@[documentation: "bubble up the element from index AT to until the max-heap property is satisfied" source: ["bubble up the element from index AT to until the max-heap property is satisfied" [def top at] [def looping #t] [while looping [def l [+ [bit-shift-left at 1] 1]] [def r [+ [bit-shift-left at 1] 2]] [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]] [set! top l]] [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]] [set! top r]] [if [= top at] [set! looping #f] [do [array/swap arr at top] [set! at top]]]] [return arr]]]
 05v #{##[]
 10s at
 0Es top
@@ -1001,7 +943,7 @@
 09o 213
 0D
 1C
-05v ash
+05v bit-shift-left
 10s at
 02i 1
 04i 2
@@ -1009,7 +951,7 @@
 25
 0Es l
 0D
-05v ash
+05v bit-shift-left
 10s at
 02i 1
 04i 2
@@ -4855,7 +4797,7 @@
 }#{##[]
 23s val->bytecode-op
 05v [v]
-05v #@[source: [[def i [val->index v]] [list [int->bytecode-op [logand [>> i 16] 255]] [int->bytecode-op [logand [>> i 8] 255]] [int->bytecode-op [logand i 255]]]]]
+05v #@[source: [[def i [val->index v]] [list [int->bytecode-op [bit-and [bit-shift-right i 16] 255]] [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]]
 05v #{##[]
 05v val->index
 10s v
@@ -4864,8 +4806,8 @@
 0D
 05v list
 05v int->bytecode-op
-05v logand
-05v >>
+05v bit-and
+10s bit-shift-right
 10s i
 02i 16
 04i 2
@@ -4873,8 +4815,8 @@
 04i 2
 04i 1
 05v int->bytecode-op
-05v logand
-05v >>
+05v bit-and
+10s bit-shift-right
 10s i
 02i 8
 04i 2
@@ -4882,7 +4824,7 @@
 04i 2
 04i 1
 05v int->bytecode-op
-05v logand
+05v bit-and
 10s i
 05v 255
 04i 2
@@ -4895,7 +4837,7 @@
 0D
 23s sym->bytecode-op
 05v [v]
-05v #@[source: [[def i [sym->index v]] [list [int->bytecode-op [logand [>> i 16] 255]] [int->bytecode-op [logand [>> i 8] 255]] [int->bytecode-op [logand i 255]]]]]
+05v #@[source: [[def i [sym->index v]] [list [int->bytecode-op [bit-and [bit-shift-right i 16] 255]] [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]]
 05v #{##[]
 05v sym->index
 10s v
@@ -4904,8 +4846,8 @@
 0D
 05v list
 05v int->bytecode-op
-05v logand
-05v >>
+05v bit-and
+10s bit-shift-right
 10s i
 02i 16
 04i 2
@@ -4913,8 +4855,8 @@
 04i 2
 04i 1
 05v int->bytecode-op
-05v logand
-05v >>
+05v bit-and
+10s bit-shift-right
 10s i
 02i 8
 04i 2
@@ -4922,7 +4864,7 @@
 04i 2
 04i 1
 05v int->bytecode-op
-05v logand
+05v bit-and
 10s i
 05v 255
 04i 2
@@ -5669,7 +5611,7 @@
 0D
 23s assemble/relocate-op
 05v [code sym-map pos out]
-05v #@[source: [[def target [tree/ref sym-map [cadr code]]] [def off [- [+ target [cadddr code]] pos]] [array/set! out [inc! pos] [int->bytecode-op [logand [>> off [caddr code]] 255]]] [return pos]]]
+05v #@[source: [[def target [tree/ref sym-map [cadr code]]] [def off [- [+ target [cadddr code]] pos]] [array/set! out [inc! pos] [int->bytecode-op [bit-and [bit-shift-right off [caddr code]] 255]]] [return pos]]]
 05v #{##[]
 05v tree/ref
 10s sym-map
@@ -5695,8 +5637,8 @@
 25
 0Fs pos
 05v int->bytecode-op
-05v logand
-05v >>
+05v bit-and
+10s bit-shift-right
 10s off
 05v caddr
 10s code
@@ -7595,18 +7537,18 @@
 0D
 23s bytecode-op->val
 05v [a b c]
-05v #@[documentation: "Turn three bytecode ops representing an encoded value into an actual value" source: ["Turn three bytecode ops representing an encoded value into an actual value" [index->val [logior [ash [bytecode-op->int a] 16] [ash [bytecode-op->int b] 8] [bytecode-op->int c]]]]]
+05v #@[documentation: "Turn three bytecode ops representing an encoded value into an actual value" source: ["Turn three bytecode ops representing an encoded value into an actual value" [index->val [bit-or [bit-shift-left [bytecode-op->int a] 16] [bit-shift-left [bytecode-op->int b] 8] [bytecode-op->int c]]]]]
 05v #{##[]
 05v index->val
-05v logior
-05v logior
-05v ash
+05v bit-or
+05v bit-or
+05v bit-shift-left
 05v bytecode-op->int
 10s a
 04i 1
 02i 16
 04i 2
-05v ash
+05v bit-shift-left
 05v bytecode-op->int
 10s b
 04i 1
@@ -7655,18 +7597,18 @@
 0D
 23s bytecode-op->sym
 05v [a b c]
-05v #@[documentation: "Turn three bytecode ops representing an encoded symbol into an actual symbol" source: ["Turn three bytecode ops representing an encoded symbol into an actual symbol" [index->sym [logior [ash [bytecode-op->int a] 16] [ash [bytecode-op->int b] 8] [bytecode-op->int c]]]]]
+05v #@[documentation: "Turn three bytecode ops representing an encoded symbol into an actual symbol" source: ["Turn three bytecode ops representing an encoded symbol into an actual symbol" [index->sym [bit-or [bit-shift-left [bytecode-op->int a] 16] [bit-shift-left [bytecode-op->int b] 8] [bytecode-op->int c]]]]]
 05v #{##[]
 05v index->sym
-05v logior
-05v logior
-05v ash
+05v bit-or
+05v bit-or
+05v bit-shift-left
 05v bytecode-op->int
 10s a
 04i 1
 02i 16
 04i 2
-05v ash
+05v bit-shift-left
 05v bytecode-op->int
 10s b
 04i 1
@@ -7715,10 +7657,10 @@
 0D
 23s bytecode-op->offset
 05v [a b]
-05v #@[documentation: "Turn two bytecode ops encoding an offset into the integer representation" source: ["Turn two bytecode ops encoding an offset into the integer representation" [def t [logior [ash [bytecode-op->int a] 8] [bytecode-op->int b]]] [if-not [> t 32768] t [- [- 65536 t]]]]]
+05v #@[documentation: "Turn two bytecode ops encoding an offset into the integer representation" source: ["Turn two bytecode ops encoding an offset into the integer representation" [def t [bit-or [bit-shift-left [bytecode-op->int a] 8] [bytecode-op->int b]]] [if-not [> t 32768] t [- [- 65536 t]]]]]
 05v #{##[]
-05v logior
-05v ash
+05v bit-or
+05v bit-shift-left
 05v bytecode-op->int
 10s a
 04i 1
@@ -9009,7 +8951,7 @@
 0D
 23s constant-foldable?
 05v [fun]
-05v #@[source: [[case fun [[add/int logand logior logxor lognot ash popcount abs sqrt pow rem + - * / cat trim string/length uppercase lowercase capitalize] #t] [['add/int 'logand 'logior 'logxor 'lognot 'ash 'popcount 'abs 'sqrt 'pow 'rem '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t] [#t #f]]]]
+05v #@[source: [[case fun [[add/int bit-and bit-or bit-xor bit-not bit-shift-left bit-shift-right popcount abs sqrt pow rem + - * / cat trim string/length uppercase lowercase capitalize] #t] [['add/int 'bit-and 'bit-or 'bit-xor 'bit-not 'bit-shift-left 'bit-shift-right 'popcount 'abs 'sqrt 'pow 'rem '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t] [#t #f]]]]
 05v #{##[]
 15
 10s fun
@@ -9019,34 +8961,40 @@
 10s add/int
 20
 0C
+0Ao 302
+0D
+10s ΓεnΣym-1
+10s bit-and
+20
+0C
 0Ao 288
 0D
 10s ΓεnΣym-1
-10s logand
+10s bit-or
 20
 0C
 0Ao 274
 0D
 10s ΓεnΣym-1
-10s logior
+10s bit-xor
 20
 0C
 0Ao 260
 0D
 10s ΓεnΣym-1
-10s logxor
+10s bit-not
 20
 0C
 0Ao 246
 0D
 10s ΓεnΣym-1
-10s lognot
+10s bit-shift-left
 20
 0C
 0Ao 232
 0D
 10s ΓεnΣym-1
-10s ash
+10s bit-shift-right
 20
 0C
 0Ao 218
@@ -9144,39 +9092,45 @@
 05v #f
 0Bo 10
 05v #t
-09o 331
+09o 345
 10s ΓεnΣym-1
 23s add/int
+20
+0C
+0Ao 302
+0D
+10s ΓεnΣym-1
+23s bit-and
 20
 0C
 0Ao 288
 0D
 10s ΓεnΣym-1
-23s logand
+23s bit-or
 20
 0C
 0Ao 274
 0D
 10s ΓεnΣym-1
-23s logior
+23s bit-xor
 20
 0C
 0Ao 260
 0D
 10s ΓεnΣym-1
-23s logxor
+23s bit-not
 20
 0C
 0Ao 246
 0D
 10s ΓεnΣym-1
-23s lognot
+23s bit-shift-left
 20
 0C
 0Ao 232
 0D
 10s ΓεnΣym-1
-23s ash
+23s bit-shift-right
 20
 0C
 0Ao 218
@@ -9651,7 +9605,7 @@
 0D
 23s macroexpand*
 05v [source env]
-05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / rem logand logior logxor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
+05v #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / rem bit-and bit-or bit-xor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]
 05v #{##[]
 05v resolves?
 10s source
@@ -9720,19 +9674,19 @@
 0Ao 50
 0D
 10s ΓεnΣym-2
-10s logand
+10s bit-and
 20
 0C
 0Ao 36
 0D
 10s ΓεnΣym-2
-10s logior
+10s bit-or
 20
 0C
 0Ao 22
 0D
 10s ΓεnΣym-2
-10s logxor
+10s bit-xor
 20
 0C
 0Ao 8
@@ -12577,7 +12531,7 @@
 }#{##[]
 23s hash/adler32
 05v [data]
-05v #@[source: [[def a 1] [def b 0] [dotimes [i [string/length data]] [set! a [mod/int [add/int a [char-at data i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [logior a [ash b 16]]]]
+05v #@[source: [[def a 1] [def b 0] [dotimes [i [string/length data]] [set! a [mod/int [add/int a [char-at data i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [bit-or a [bit-shift-left b 16]]]]
 05v #{##[]
 02i 1
 0Es a
@@ -12627,9 +12581,9 @@
 24
 16
 0D
-05v logior
+05v bit-or
 10s a
-05v ash
+05v bit-shift-left
 10s b
 02i 16
 04i 2
@@ -13051,7 +13005,7 @@
 0D
 23s image/test
 05v []
-05v #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [dotimes [x w] [dotimes [y h] [image/set! out x y [logior x [ash y 8] [ash [logxor x y] 16]]]]] [return out]]]
+05v #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [dotimes [x w] [dotimes [y h] [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]] [return out]]]
 05v #{##[]
 05v 256
 0Es w
@@ -13087,16 +13041,16 @@
 10s out
 10s x
 10s y
-05v logior
-05v logior
+05v bit-or
+05v bit-or
 10s x
-05v ash
+05v bit-shift-left
 10s y
 02i 8
 04i 2
 04i 2
-05v ash
-05v logxor
+05v bit-shift-left
+05v bit-xor
 10s x
 10s y
 04i 2
@@ -13139,7 +13093,7 @@
 }#{##[]
 23s buffer/view/le/set!
 05v [u8v offset bytes val]
-05v #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [logand 255 val]] [dec! bytes] [set! val [ash val -8]]] offset]]
+05v #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]]
 05v #{##[]
 24
 1B
@@ -13152,7 +13106,7 @@
 02i 1
 25
 0Fs offset
-05v logand
+05v bit-and
 05v 255
 10s val
 04i 2
@@ -13163,9 +13117,9 @@
 26
 0Fs bytes
 0D
-05v ash
+10s bit-shift-right
 10s val
-02i -8
+02i 8
 04i 2
 0Fs val
 10s bytes
@@ -13181,10 +13135,10 @@
 0D
 23s image/bmp/row-padding
 05v [width pixel-length]
-05v #@[source: [[def ret [- 4 [logand [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]]
+05v #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]]
 05v #{##[]
 02i 4
-05v logand
+05v bit-and
 10s width
 10s pixel-length
 27
@@ -13588,21 +13542,6 @@
 17
 0Es +x
 0D
-23s >>
-05v [val amount]
-05v #@[documentation: "Shifts VAL by AMOUNT bits to the right" source: ["Shifts VAL by AMOUNT bits to the right" [ash val [- amount]]]]
-05v #{##[]
-05v ash
-10s val
-05v -
-10s amount
-04i 1
-04i 2
-01
-}
-17
-0Es >>
-0D
 23s fib
 05v [i]
 05v #@[documentation: "Terribly inefficient, but, useful for testing the GC" source: ["Terribly inefficient, but, useful for testing the GC" [if [< i 2] i [+ [fib [- i 2]] [fib [- i 1]]]]]]
@@ -13923,9 +13862,9 @@
 0D
 23s random/seed-initialize!
 05v []
-05v #@[source: [[set! random/seed [logxor [time] [time/milliseconds]]]]]
+05v #@[source: [[set! random/seed [bit-xor [time] [time/milliseconds]]]]]
 05v #{##[]
-05v logxor
+05v bit-xor
 05v time
 04i 0
 05v time/milliseconds
@@ -13939,7 +13878,7 @@
 0D
 23s random/rng!
 05v []
-05v #@[source: [[set! random/seed [+ 12345 [* random/seed 1103515245]]] [logior [ash [logand random/seed 65535] 16] [logand [ash random/seed -16] 65535]]]]
+05v #@[source: [[set! random/seed [+ 12345 [* random/seed 1103515245]]] [bit-or [bit-shift-left [bit-and random/seed 65535] 16] [bit-and [bit-shift-right random/seed 16] 65535]]]]
 05v #{##[]
 05v 12345
 10s random/seed
@@ -13948,18 +13887,18 @@
 25
 0Fs random/seed
 0D
-05v logior
-05v ash
-05v logand
+05v bit-or
+05v bit-shift-left
+05v bit-and
 10s random/seed
 05v 65535
 04i 2
 02i 16
 04i 2
-05v logand
-05v ash
+05v bit-and
+10s bit-shift-right
 10s random/seed
-02i -16
+02i 16
 04i 2
 05v 65535
 04i 2
@@ -14521,7 +14460,7 @@
 0D
 23s ansi-rainbow
 23s args
-05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [let* [def count 0] [cat [join [map [split [apply cat args] ""] [fn [a] [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""] [or ansi/disabled ansi-fg-reset]]]]]
+05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [let* [def count 0] [cat [join [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""] [or ansi/disabled ansi-fg-reset]]]]]
 05v #{##[]
 15
 02i 0
@@ -14539,9 +14478,9 @@
 04i 2
 23s anonymous
 05v [a]
-05v #@[source: [[set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]]
+05v #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]]
 05v #{##[]
-05v logand
+05v bit-and
 02i 1
 10s count
 25
@@ -14595,7 +14534,7 @@
 0D
 23s ansi-rainbow-bg
 23s args
-05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [def count 0] [def colored-list [map [split [apply cat args] ""] [fn [a] [set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [logxor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]] [cat [join colored-list ""] [or ansi/disabled ansi-reset]]]]
+05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [def count 0] [def colored-list [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [bit-xor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]] [cat [join colored-list ""] [or ansi/disabled ansi-reset]]]]
 05v #{##[]
 02i 0
 0Es count
@@ -14610,9 +14549,9 @@
 04i 2
 23s anonymous
 05v [a]
-05v #@[source: [[set! count [logand [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [logxor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]
+05v #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or ansi/disabled [array/ref ansi-fg [bit-xor count 7]]] [or ansi/disabled [array/ref ansi-bg count]] a]]]
 05v #{##[]
-05v logand
+05v bit-and
 02i 1
 10s count
 25
@@ -14627,7 +14566,7 @@
 0D
 05v array/ref
 10s ansi-fg
-05v logxor
+05v bit-xor
 10s count
 02i 7
 04i 2
@@ -16524,7 +16463,7 @@
 0D
 23s int->string/binary
 05v [α]
-05v #@[documentation: "Turn α into a its **binary** string representation" source: ["Turn α into a its **binary** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [while [not-zero? α] [set! ret [cat [from-char-code [+ 48 [logand α 1]]] ret]] [set! α [ash α -1]]] ret]]
+05v #@[documentation: "Turn α into a its **binary** string representation" source: ["Turn α into a its **binary** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [while [not-zero? α] [set! ret [cat [from-char-code [+ 48 [bit-and α 1]]] ret]] [set! α [bit-shift-right α 1]]] ret]]
 05v #{##[]
 05v ""
 0Es ret
@@ -16552,7 +16491,7 @@
 05v cat
 05v from-char-code
 02i 48
-05v logand
+05v bit-and
 10s α
 02i 1
 04i 2
@@ -16562,9 +16501,9 @@
 04i 2
 0Fs ret
 0D
-05v ash
+05v bit-shift-right
 10s α
-02i -1
+02i 1
 04i 2
 0Fs α
 05v not=
@@ -16581,7 +16520,7 @@
 0D
 23s int->string/octal
 05v [α]
-05v #@[documentation: "Turn α into a its **octal** string representation" source: ["Turn α into a its **octal** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [while [not-zero? α] [set! ret [cat [from-char-code [+ 48 [logand α 7]]] ret]] [set! α [ash α -3]]] ret]]
+05v #@[documentation: "Turn α into a its **octal** string representation" source: ["Turn α into a its **octal** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [while [not-zero? α] [set! ret [cat [from-char-code [+ 48 [bit-and α 7]]] ret]] [set! α [bit-shift-right α 3]]] ret]]
 05v #{##[]
 05v ""
 0Es ret
@@ -16609,7 +16548,7 @@
 05v cat
 05v from-char-code
 02i 48
-05v logand
+05v bit-and
 10s α
 02i 7
 04i 2
@@ -16619,9 +16558,9 @@
 04i 2
 0Fs ret
 0D
-05v ash
+05v bit-shift-right
 10s α
-02i -3
+02i 3
 04i 2
 0Fs α
 05v not=
@@ -16658,7 +16597,7 @@
 0D
 23s int->string/HEX
 05v [α]
-05v #@[documentation: "Turn α into a its **hexadecimal** string representation" source: ["Turn α into a its **hexadecimal** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]] [while [not-zero? α] [set! ret [cat [array/ref int->string/hex/conversion-arr [logand α 15]] ret]] [set! α [ash α -4]]] ret]]
+05v #@[documentation: "Turn α into a its **hexadecimal** string representation" source: ["Turn α into a its **hexadecimal** string representation" [def ret ""] [when-not α [def α 0]] [when [zero? α] [set! ret "0"]] [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]] [while [not-zero? α] [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α 15]] ret]] [set! α [bit-shift-right α 4]]] ret]]
 05v #{##[]
 05v ""
 0Es ret
@@ -16702,7 +16641,7 @@
 05v cat
 05v array/ref
 10s int->string/hex/conversion-arr
-05v logand
+05v bit-and
 10s α
 02i 15
 04i 2
@@ -16711,9 +16650,9 @@
 04i 2
 0Fs ret
 0D
-05v ash
+05v bit-shift-right
 10s α
-02i -4
+02i 4
 04i 2
 0Fs α
 05v not=

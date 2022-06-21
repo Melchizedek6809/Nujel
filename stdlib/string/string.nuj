@@ -67,8 +67,8 @@
       [when-not α [def α 0]]
       [when [zero? α] [set! ret "0"]]
       [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [logand α #b1]]] ret]]
-             [set! α [ash α -1]]]
+             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b1]]] ret]]
+             [set! α [bit-shift-right α 1]]]
       ret]
 
 [defn int->string/octal [α]
@@ -77,8 +77,8 @@
       [when-not α [def α 0]]
       [when [zero? α] [set! ret "0"]]
       [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [logand α #b111]]] ret]]
-             [set! α [ash α -3]]]
+             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b111]]] ret]]
+             [set! α [bit-shift-right α 3]]]
       ret]
 
 [def int->string/hex/conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
@@ -89,8 +89,8 @@
       [when [zero? α] [set! ret "0"]]
       [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
       [while [not-zero? α]
-             [set! ret [cat [array/ref int->string/hex/conversion-arr [logand α #b1111]] ret]]
-             [set! α [ash α -4]]]
+             [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
+             [set! α [bit-shift-right α 4]]]
       ret]
 
 [defn int->string/hex [α]

@@ -3,32 +3,34 @@
 ;;
 ;; Some functions manipulating binary date
 
-[defn lognand l
+[defn bit-nand l
       "Returns the Nand of its arguments"
-      [lognot [apply logand l]]]
+      [bit-not [apply bit-and l]]]
+[def lognand bit-nand]
 
-[defn bit-set? [α i]
-      "Returns #t if bit I is set in Α"
+[defn bit-and-not [x y]
+      "Bitwise and with complement"
+      [bit-and x [bit-not y]]]
+
+[defn bit-test? [α i]
+      "Test bit at position i"
       [typecheck/only α :int]
       [typecheck/only i :int]
-      [not [zero? [logand α [ash 1 i]]]]]
+      [not [zero? [bit-and α [bit-shift-left 1 i]]]]]
+[def bit-set? bit-test?]
 
-[defn bit-set?! [i]
-      "Returns a function that checks if bit I is set in the provided number"
-      [typecheck/only i :int]
-      [def mask [ash 1 i]]
-      [fn [α]
-          [not [zero? [logand α mask]]]]]
+[defn bit-shift-right [α i]
+      "Bitwise shift right"
+      [bit-shift-left α [- i]]]
 
-[defn bit-clear?! [i]
-      "Returns a function that checks if bit I is clear in the provided number"
-      [typecheck/only i :int]
-      [def mask [ash 1 i]]
-      [fn [α]
-          [zero? [logand α mask]]]]
+[defn bit-set [x i]
+      "Set bit at i"
+      [bit-or x [bit-shift-left 1 i]]]
 
-[defn test-function [i]
-      "Returns a function that checks if bit I is clear in the provided number"
-      [def mask [ash 1 i]]
-      [fn [α]
-          [zero? [logand α mask]]]]
+[defn bit-flip [x i]
+      "Flip bit at i"
+      [bit-xor x [bit-shift-left 1 i]]]
+
+[defn bit-clear [x i]
+      "Clear bit at i"
+      [bit-and x [bit-not [bit-shift-left 1 i]]]]

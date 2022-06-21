@@ -5,13 +5,13 @@
 
 [defn buffer/view/le/set! [u8v offset bytes val]
       [while [> bytes 0]
-        [buffer/view/set! u8v [inc! offset] [logand #xFF val]]
+        [buffer/view/set! u8v [inc! offset] [bit-and #xFF val]]
         [dec! bytes]
-        [set! val [ash val -8]]]
+        [set! val [bit-shift-right val 8]]]
       offset]
 
 [defn image/bmp/row-padding [width pixel-length]
-      [def ret [- 4 [logand [* width pixel-length] 3]]]
+      [def ret [- 4 [bit-and [* width pixel-length] 3]]]
       [if [= ret 4] 0 ret]]
 
 [defn image/bmp/encode [image]

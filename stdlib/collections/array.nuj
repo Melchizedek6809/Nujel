@@ -96,8 +96,8 @@
       [def top at]
       [def looping #t]
       [while looping
-             [def l [+ [ash at 1] 1]]
-             [def r [+ [ash at 1] 2]]
+             [def l [+ [bit-shift-left at 1] 1]]
+             [def r [+ [bit-shift-left at 1] 2]]
              [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]]
                    [set! top l]]
              [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]

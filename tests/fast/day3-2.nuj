@@ -1,9 +1,17 @@
  #!/usr/bin/env nujel
 
-
-
 [def example-data "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"]
 [def input-data [file/read "tests/fast/day3.dat"]]
+
+[defn bit-set?! [i]
+      "Returns a function that checks if bit I is set in the provided number"
+      [def mask [bit-shift-left 1 i]]
+      [fn [α] [not [zero? [bit-and α mask]]]]]
+
+[defn bit-clear?! [i]
+      "Returns a function that checks if bit I is clear in the provided number"
+      [def mask [bit-shift-left 1 i]]
+      [fn [α] [zero? [bit-and α mask]]]]
 
 [defn read-data [lines]
        [map [split lines "\n"]
@@ -17,8 +25,8 @@
        [def threshold [/ [length numbers] 2]]
        [while [< i bit-count]
               [if [> [count numbers [bit-set?! i]] threshold]
-                  [set! γ [logior γ [ash 1 i]]]
-                  [set! ε [logior ε [ash 1 i]]]]
+                  [set! γ [bit-or γ [bit-shift-left 1 i]]]
+                  [set! ε [bit-or ε [bit-shift-left 1 i]]]]
               [inc! i]]
        @[:γ γ :ε ε :power-consumption [* γ ε]]]
 

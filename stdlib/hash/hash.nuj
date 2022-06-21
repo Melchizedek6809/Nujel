@@ -9,4 +9,4 @@
       [dotimes [i [string/length data]]
                [set! a [mod/int [add/int a [char-at data i]] 65521]]
                [set! b [mod/int [add/int a b] 65521]]]
-      [logior a [ash b 16]]]
+      [bit-or a [bit-shift-left b 16]]]
