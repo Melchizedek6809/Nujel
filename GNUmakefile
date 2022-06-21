@@ -7,7 +7,9 @@ LIB_HDRS      := $(shell find lib -type f -name '*.h')
 LIB_OBJS      := $(LIB_SRCS:.c=.o)
 LIB_DEPS      := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS   := $(shell find stdlib -type f -name '*.nuj' | sort)
+STDLIB_MODS   := $(shell find stdlib_modules -type f -name '*.nuj' | sort)
 STDLIB_NOBS   := $(STDLIB_NUJS:.nuj=.no)
+STDLIB_MOBS   := $(STDLIB_MODS:.nuj=.no)
 
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)
 LIB_WASM_DEPS := ${LIB_SRCS:.c=.wd}

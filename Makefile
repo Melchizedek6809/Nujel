@@ -6,7 +6,9 @@ LIB_HDRS             != find lib -type f -name '*.h'
 LIB_OBJS             := $(LIB_SRCS:.c=.o)
 LIB_DEPS             := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS          != find stdlib -type f -name '*.nuj' | sort
+STDLIB_MODS          != find stdlib_modules -type f -name '*.nuj' | sort
 STDLIB_NOBS          := $(STDLIB_NUJS:.nuj=.no)
+STDLIB_MOBS          := $(STDLIB_MODS:.nuj=.no)
 
 BIN_SRCS             != find bin vendor -type f -name '*.c'
 BIN_HDRS             != find bin vendor -type f -name '*.h'
@@ -25,7 +27,7 @@ all: $(NUJEL)
 .endif
 
 FILES_TO_CLEAN != find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps'
-NOBS_TO_CLEAN  != find binlib stdlib -type f -name '*.no'
+NOBS_TO_CLEAN  != find binlib stdlib stdlib_modules -type f -name '*.no'
 
 .SUFFIXES:
 .SUFFIXES: .c .o

@@ -107,32 +107,55 @@
 17
 0Es bit-shift-right
 0D
-23s test-function
-05v [i]
-05v #@[documentation: "Returns a function that checks if bit I is clear in the provided number" source: ["Returns a function that checks if bit I is clear in the provided number" [def mask [bit-shift-left 1 i]] [fn [α] [zero? [bit-and α mask]]]]]
+23s bit-set
+05v [x i]
+05v #@[documentation: "Set bit at i" source: ["Set bit at i" [bit-or x [bit-shift-left 1 i]]]]
 05v #{##[]
+05v bit-or
+10s x
 05v bit-shift-left
 02i 1
 10s i
 04i 2
-0Es mask
+04i 2
+01
+}
+17
+0Es bit-set
 0D
-23s anonymous
-05v [α]
-05v #@[source: [[zero? [bit-and α mask]]]]
+23s bit-flip
+05v [x i]
+05v #@[documentation: "Flip bit at i" source: ["Flip bit at i" [bit-xor x [bit-shift-left 1 i]]]]
+05v #{##[]
+05v bit-xor
+10s x
+05v bit-shift-left
+02i 1
+10s i
+04i 2
+04i 2
+01
+}
+17
+0Es bit-flip
+0D
+23s bit-clear
+05v [x i]
+05v #@[documentation: "Clear bit at i" source: ["Clear bit at i" [bit-and x [bit-not [bit-shift-left 1 i]]]]]
 05v #{##[]
 05v bit-and
-10s α
-10s mask
+10s x
+05v bit-not
+05v bit-shift-left
+02i 1
+10s i
 04i 2
-2A
+04i 1
+04i 2
 01
 }
 17
-01
-}
-17
-0Es test-function
+0Es bit-clear
 01
 }#{##[]
 23s array/2d/allocate
@@ -4807,7 +4830,7 @@
 05v list
 05v int->bytecode-op
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s i
 02i 16
 04i 2
@@ -4816,7 +4839,7 @@
 04i 1
 05v int->bytecode-op
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s i
 02i 8
 04i 2
@@ -4847,7 +4870,7 @@
 05v list
 05v int->bytecode-op
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s i
 02i 16
 04i 2
@@ -4856,7 +4879,7 @@
 04i 1
 05v int->bytecode-op
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s i
 02i 8
 04i 2
@@ -5638,7 +5661,7 @@
 0Fs pos
 05v int->bytecode-op
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s off
 05v caddr
 10s code
@@ -8917,6 +8940,84 @@
 }
 18
 0Es typecheck/numeric
+0D
+23s profile-form
+05v [raw]
+05v #@[source: [[def start-time [time/milliseconds]] [def val [eval raw]] [def end-time [time/milliseconds]] [display [cat "Evaluating " [ansi-yellow [string/write raw]] " to " [ansi-green [string/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]
+05v #{##[]
+05v time/milliseconds
+04i 0
+0Es start-time
+0D
+05v eval-in
+05v current-closure
+04i 0
+10s raw
+04i 2
+0Es val
+0D
+05v time/milliseconds
+04i 0
+0Es end-time
+0D
+05v print
+05v cat
+05v "Evaluating "
+05v ansi-yellow
+05v string/write
+10s raw
+04i 1
+04i 1
+05v " to "
+05v ansi-green
+05v string/write
+10s val
+04i 1
+04i 1
+05v " took "
+05v ansi-red
+05v cat
+10s end-time
+10s start-time
+26
+05v "ms"
+04i 2
+05v "\n"
+04i 2
+04i 6
+04i 1
+01
+}
+17
+0Es profile-form
+0D
+23s profile
+23s body
+05v #@[documentation: "Measure and display how much time and ressources it takes for BODY to be evaluated" source: ["Measure and display how much time and ressources it takes for BODY to be evaluated" [quasiquote [profile-form '[unquote [if [last? body] [car body] [cons 'do body]]]]]]]
+05v #{##[]
+23s profile-form
+23s quote
+05v nil?
+10s body
+12
+04i 1
+0Bo 11
+10s body
+11
+09o 12
+23s do
+10s body
+14
+24
+14
+14
+24
+14
+14
+01
+}
+18
+0Es profile
 01
 }#{##[]
 23s pure?
@@ -9476,7 +9577,7 @@
 09o 76
 0D
 1C
-05v bit-set?
+05v bit-test?
 10s no-expand-bitmap
 10s i
 04i 2
@@ -12398,135 +12499,7 @@
 0Es stacktrace
 01
 }#{##[]
-23s time/seconds
-05v [timestamp]
-05v #@[documentation: "Return the seconds part of TIMESTAMP, defaults to current time" source: ["Return the seconds part of TIMESTAMP, defaults to current time" [rem [default timestamp [time]] 60]]]
-05v #{##[]
-05v default
-10s timestamp
-05v time
-04i 0
-04i 2
-02i 60
-29
-01
-}
-17
-0Es time/seconds
-0D
-23s time/minutes
-05v [timestamp]
-05v #@[documentation: "Return the minutes part of TIMESTAMP, defaults to current time" source: ["Return the minutes part of TIMESTAMP, defaults to current time" [rem [/ [default timestamp [time]] 60] 60]]]
-05v #{##[]
-05v default
-10s timestamp
-05v time
-04i 0
-04i 2
-02i 60
-28
-02i 60
-29
-01
-}
-17
-0Es time/minutes
-0D
-23s time/hours
-05v [timestamp]
-05v #@[documentation: "Return the hours part of TIMESTAMP, defaults to current time" source: ["Return the hours part of TIMESTAMP, defaults to current time" [rem [/ [default timestamp [time]] 3600] 24]]]
-05v #{##[]
-05v default
-10s timestamp
-05v time
-04i 0
-04i 2
-05v 3600
-28
-02i 24
-29
-01
-}
-17
-0Es time/hours
-0D
-23s profile-form
-05v [raw]
-05v #@[source: [[def start-time [time/milliseconds]] [def val [eval raw]] [def end-time [time/milliseconds]] [display [cat "Evaluating " [ansi-yellow [string/write raw]] " to " [ansi-green [string/write val]] " took " [ansi-red [cat [- end-time start-time] "ms"] "\n"]]]]]
-05v #{##[]
-05v time/milliseconds
-04i 0
-0Es start-time
-0D
-05v eval-in
-05v current-closure
-04i 0
-10s raw
-04i 2
-0Es val
-0D
-05v time/milliseconds
-04i 0
-0Es end-time
-0D
-05v print
-05v cat
-05v "Evaluating "
-05v ansi-yellow
-05v string/write
-10s raw
-04i 1
-04i 1
-05v " to "
-05v ansi-green
-05v string/write
-10s val
-04i 1
-04i 1
-05v " took "
-05v ansi-red
-05v cat
-10s end-time
-10s start-time
-26
-05v "ms"
-04i 2
-05v "\n"
-04i 2
-04i 6
-04i 1
-01
-}
-17
-0Es profile-form
-0D
-23s profile
-23s body
-05v #@[documentation: "Measure and display how much time and ressources it takes for BODY to be evaluated" source: ["Measure and display how much time and ressources it takes for BODY to be evaluated" [quasiquote [profile-form '[unquote [if [last? body] [car body] [cons 'do body]]]]]]]
-05v #{##[]
-23s profile-form
-23s quote
-05v nil?
-10s body
-12
-04i 1
-0Bo 11
-10s body
-11
-09o 12
-23s do
-10s body
-14
 24
-14
-14
-24
-14
-14
-01
-}
-18
-0Es profile
 01
 }#{##[]
 23s hash/adler32
@@ -13117,7 +13090,7 @@
 26
 0Fs bytes
 0D
-10s bit-shift-right
+05v bit-shift-right
 10s val
 02i 8
 04i 2
@@ -13896,7 +13869,7 @@
 02i 16
 04i 2
 05v bit-and
-10s bit-shift-right
+05v bit-shift-right
 10s random/seed
 02i 16
 04i 2
@@ -18004,5 +17977,97 @@
 }
 18
 0Es _
+01
+}#{##[]
+05v module/insert
+05v :time
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+05v tree/set!
+10s exports
+23s seconds
+23s seconds
+05v [timestamp]
+05v #@[documentation: "Return the seconds part of TIMESTAMP, defaults to current time" source: ["Return the seconds part of TIMESTAMP, defaults to current time" [rem [or timestamp [time]] 60]]]
+05v #{##[]
+10s timestamp
+0C
+0Ao 19
+0D
+05v time
+04i 0
+0C
+0Ao 8
+0D
+05v #f
+02i 60
+29
+01
+}
+17
+0Es seconds
+04i 3
+0D
+05v tree/set!
+10s exports
+23s minutes
+23s minutes
+05v [timestamp]
+05v #@[documentation: "Return the minutes part of TIMESTAMP, defaults to current time" source: ["Return the minutes part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 60] 60]]]
+05v #{##[]
+10s timestamp
+0C
+0Ao 19
+0D
+05v time
+04i 0
+0C
+0Ao 8
+0D
+05v #f
+02i 60
+28
+02i 60
+29
+01
+}
+17
+0Es minutes
+04i 3
+0D
+05v tree/set!
+10s exports
+23s hours
+23s hours
+05v [timestamp]
+05v #@[documentation: "Return the hours part of TIMESTAMP, defaults to current time" source: ["Return the hours part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 3600] 24]]]
+05v #{##[]
+10s timestamp
+0C
+0Ao 19
+0D
+05v time
+04i 0
+0C
+0Ao 8
+0D
+05v #f
+05v 3600
+28
+02i 24
+29
+01
+}
+17
+0Es hours
+04i 3
+0D
+13
+16
+04i 2
 01
 }

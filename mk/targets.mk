@@ -23,9 +23,9 @@ bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
 	@./$(ASSET) bootstrap/binlib bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/stdlib.no: $(STDLIB_NOBS)
+tmp/stdlib.no: $(STDLIB_NOBS) $(STDLIB_MOBS)
 	@mkdir -p tmp/
-	@cat $(STDLIB_NOBS) > tmp/stdlib.no
+	@cat $(STDLIB_NOBS) $(STDLIB_MOBS) > tmp/stdlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
 
 tmp/binlib.no: $(BINLIB_NOBS)
