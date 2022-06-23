@@ -18,7 +18,7 @@
 
 [defmacro module body
           "Define a new module and return it"
-          [macroexpand [cons 'ω* [cons '[def exports @[]] body]]]]
+          [macroexpand [cons 'environment* [cons '[def exports @[]] body]]]]
 
 [defmacro defmodule [name . body]
           "Define a new named module"

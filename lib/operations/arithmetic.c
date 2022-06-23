@@ -256,6 +256,6 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFunc(c,"bit-xor",  "[a b]", "Bitwise exclusive or", lnfLogXor);
 	lAddNativeFunc(c,"bit-not",  "[a]",   "Bitwise not",          lnfLogNot);
 
-	lAddNativeFunc(c,"bit-shift-left ash",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFunc(c,"bit-shift-left",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
 	lAddNativeFunc(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
 }

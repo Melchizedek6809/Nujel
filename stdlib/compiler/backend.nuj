@@ -6,7 +6,8 @@
           assemble*]]
 
 [def *active-backend* :bytecode]
-[def backend/tree @[:bytecode compile/backend/bytecode :none compile/backend/none]]
+[def backend/tree @[ :bytecode compile/backend/bytecode
+                     :none compile/backend/none]]
 
 [defn backend [expr]
       [[tree/ref backend/tree *active-backend*] expr]]
@@ -14,7 +15,9 @@
 [defn compile/for [backend expr environment]
       [def last-backend *active-backend*]
       [def ret #nil]
-      [try [fn [e] [set! *active-backend* last-backend] [throw e]]
+      [try [fn [e]
+               [set! *active-backend* last-backend]
+               [throw e]]
            [set! *active-backend* backend]
            [set! ret [compile expr environment]]
            [set! *active-backend* last-backend]

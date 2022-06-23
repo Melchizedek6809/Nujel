@@ -40,8 +40,6 @@ struct vec {
 };
 typedef struct vec vec;
 
-typedef uint8_t lBytecodeOp;
-
 
 typedef enum {
 	ltNoAlloc = 0,
@@ -74,16 +72,19 @@ typedef enum {
 } lType;
 
 typedef struct lBuffer lBuffer;
+typedef struct lBufferView lBufferView;
+typedef struct lArray   lArray;
+typedef struct lClosure lClosure;
+typedef struct lThread  lThread;
+typedef struct lNFunc   lNFunc;
+typedef struct lSymbol  lSymbol;
+typedef struct lString  lString;
+typedef struct lTree    lTree;
+typedef struct lVec     lVec;
+typedef struct lVal     lVal;
+typedef struct lBytecodeArray lBytecodeArray;
+typedef uint8_t lBytecodeOp;
 
-struct lBuffer {
-	union {
-		void *data;
-		lBuffer *nextFree;
-	};
-	size_t length;
-	u8 flags;
-};
-#define BUFFER_IMMUTABLE 1
 
 typedef enum {
 	lbvtUndefined = 0,
@@ -98,7 +99,6 @@ typedef enum {
 	lbvtF64
 } lBufferViewType;
 
-typedef struct lBufferView lBufferView;
 struct lBufferView {
 	union {
 		lBuffer *buf;
@@ -111,17 +111,6 @@ struct lBufferView {
 };
 #define BUFFER_VIEW_IMMUTABLE 1
 
-typedef struct lArray   lArray;
-typedef struct lClosure lClosure;
-typedef struct lThread  lThread;
-typedef struct lNFunc   lNFunc;
-typedef struct lSymbol  lSymbol;
-typedef struct lString  lString;
-typedef struct lTree    lTree;
-typedef struct lVec     lVec;
-typedef struct lVal     lVal;
-typedef struct lBytecodeArray lBytecodeArray;
-
 struct lBytecodeArray{
 	lBytecodeOp *data;
 	lArray *literals;
@@ -132,6 +121,47 @@ struct lBytecodeArray{
 	u8 flags;
 };
 #define BYTECODE_ARRAY_LINKED 1
+
+struct lBuffer {
+	union {
+		void *data;
+		lBuffer *nextFree;
+	};
+	size_t length;
+	u8 flags;
+};
+#define BUFFER_IMMUTABLE 1
+
+struct lString{
+	const char *buf,*bufEnd;
+	union {
+		const char *data;
+		lString *nextFree;
+	};
+	u8 flags;
+};
+#define HEAP_ALLOCATED 2
+
+struct lArray {
+	lVal **data;
+	union {
+		lArray *nextFree;
+		struct {
+			i32 length;
+			u8 flags;
+		};
+	};
+};
+#define ARRAY_IMMUTABLE 1
+
+
+struct lSymbol {
+	union {
+		char c[32];
+		struct lSymbol *nextFree;
+	};
+};
+
 
 
 typedef struct {
@@ -160,18 +190,6 @@ struct lVal {
 		lBufferView    *vBufferView;
 	};
 };
-
-struct lArray {
-	lVal **data;
-	union {
-		lArray *nextFree;
-		struct {
-			i32 length;
-			u8 flags;
-		};
-	};
-};
-#define ARRAY_IMMUTABLE 1
 
 typedef enum closureType {
 	closureDefault = 0,
@@ -209,16 +227,6 @@ struct lThread {
 	lBytecodeArray *text;
 };
 
-struct lString{
-	const char *buf,*bufEnd;
-	union {
-		const char *data;
-		lString *nextFree;
-	};
-	u8 flags;
-};
-#define HEAP_ALLOCATED 2
-
 struct lTree {
 	lTree *left;
 	lTree *right;
@@ -237,13 +245,6 @@ struct lNFunc {
 	lTree *meta;
 	lVal *args;
 	lSymbol *name;
-};
-
-struct lSymbol {
-	union {
-		char c[32];
-		struct lSymbol *nextFree;
-	};
 };
 
 #endif

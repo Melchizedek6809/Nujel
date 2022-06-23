@@ -5,7 +5,7 @@
 
 [defn macroexpand/forms [source-raw environment]
       "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
-      [when-not environment [set! environment [ω]]]
+      [when-not environment [set! environment [environment*]]]
       [load/forms source-raw environment]
       [macroexpand source-raw environment]]
 
@@ -36,35 +36,30 @@
                    [:pair [return meta]]
                    [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
                                                                       "\n"
-                                                                       v]]]]
+                                                                      v]]]]
                    [:keyword [tree/set! meta v #t]]]]
       [return meta]]
 
 [defmacro defmacro [name args . body]
           "Define a new macro"
           `[def ~name [macro* '~name
-                               '~args
-                               ~[tree/set! [meta/parse/body :macro args body] :source body]
-                               '~[compile/do* body [current-closure]]]]]
+                              '~args
+                              ~[tree/set! [meta/parse/body :macro args body] :source body]
+                              '~[compile/do* body [current-closure]]]]]
 
 [defmacro fn [args . body]
           "Define an anonymous function"
           `[fn* 'anonymous
-                 '~args
-                 ~[tree/set! [meta/parse/body :lambda args body] :source body]
-                 '~[compile/do* body [current-closure]]]]
+                '~args
+                ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                '~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
           "Define a new function"
           `[def ~name [fn* '~name
-                            '~args
-                            ~[tree/set! [meta/parse/body :lambda args body] :source body]
-                            '~[compile/do* body [current-closure]]]]]
-
-[defmacro ω body
-          "Defines and returns new object after evaluating body within"
-          [macroexpand [cons 'ω* body]]]
-[def defobj ω]
+                           '~args
+                           ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                           '~[compile/do* body [current-closure]]]]]
 
 [defn eval-in [closure expr]
       "Compile and the immediatly evaluate the result"

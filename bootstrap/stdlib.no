@@ -6921,7 +6921,7 @@
 17
 0Es bytecompile/macro*
 0D
-23s bytecompile/ω*
+23s bytecompile/environment*
 05v [source env]
 05v #@[source: [[list [$let] [bytecompile/do/form [cdr source] env] [$drop] [$closure/push] [$closure/pop]]]]
 05v #{##[]
@@ -6939,7 +6939,7 @@
 01
 }
 17
-0Es bytecompile/ω*
+0Es bytecompile/environment*
 0D
 23s bytecompile/let*
 05v [source env]
@@ -7015,7 +7015,7 @@
 0D
 23s bytecompile*
 05v [source env]
-05v #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [ω* [bytecompile/ω* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env]]]] [[:pair :symbol] [bytecompile/procedure op [cdr source] env]] [:string [bytecompile/string source env]] [:array [bytecompile/array source env]] [:tree [bytecompile/tree source env]] [otherwise [bytecompile/literal source]]]]]
+05v #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [environment* [bytecompile/environment* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env]]]] [[:pair :symbol] [bytecompile/procedure op [cdr source] env]] [:string [bytecompile/string source env]] [:array [bytecompile/array source env]] [:tree [bytecompile/tree source env]] [otherwise [bytecompile/literal source]]]]]
 05v #{##[]
 05v resolves?
 10s source
@@ -7148,10 +7148,10 @@
 04i 2
 09o 136
 10s ΓεnΣym-5
-10s ω*
+10s environment*
 20
 0Bo 20
-05v bytecompile/ω*
+10s bytecompile/environment*
 10s source
 10s env
 04i 2
@@ -8445,7 +8445,7 @@
 0D
 23s macroexpand/forms
 05v [source-raw environment]
-05v #@[documentation: "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." source: ["Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." [when-not environment [set! environment [ω]]] [load/forms source-raw environment] [macroexpand source-raw environment]]]
+05v #@[documentation: "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." source: ["Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." [when-not environment [set! environment [environment*]]] [load/forms source-raw environment] [macroexpand source-raw environment]]]
 05v #{##[]
 10s environment
 0Bo 7
@@ -8795,10 +8795,10 @@
 0D
 23s ω
 23s body
-05v #@[documentation: "Defines and returns new object after evaluating body within" source: ["Defines and returns new object after evaluating body within" [macroexpand [cons 'ω* body]]]]
+05v #@[documentation: "Defines and returns new object after evaluating body within" source: ["Defines and returns new object after evaluating body within" [macroexpand [cons 'environment* body]]]]
 05v #{##[]
 05v macroexpand
-23s ω*
+23s environment*
 10s body
 14
 04i 1
@@ -10421,20 +10421,6 @@
 17
 0Es list
 0D
-23s default
-05v [arg default-value]
-05v #@[documentation: "Returns ARG or DEFAULT-VALUE if ARG is #nil" source: ["Returns ARG or DEFAULT-VALUE if ARG is #nil" [if arg arg default-value]]]
-05v #{##[]
-10s arg
-0Bo 10
-10s arg
-09o 7
-10s default-value
-01
-}
-17
-0Es default
-0D
 23s caar
 05v [p]
 05v #@[documentation: "[car [car p]]" source: [:inline "[car [car p]]" [car [car p]]] inline: #t]
@@ -11231,10 +11217,10 @@
 0D
 23s module
 23s body
-05v #@[documentation: "Define a new module and return it" source: ["Define a new module and return it" [macroexpand [cons 'ω* [cons '[def exports [tree/new #nil]] body]]]]]
+05v #@[documentation: "Define a new module and return it" source: ["Define a new module and return it" [macroexpand [cons 'environment* [cons '[def exports [tree/new #nil]] body]]]]]
 05v #{##[]
 05v macroexpand
-23s ω*
+23s environment*
 05v [def exports [tree/new #nil]]
 10s body
 14

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+cd ../
+
+scc --count-as "nuj:Scheme" --exclude-dir="vendor,bootstrap,web,releases,.builds,.github,tools,.gitignore,benchmark,configure,tests,testsuite" -i nuj,c,h,asm,s,mk --by-file

@@ -195,9 +195,9 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		return spf(cur, bufEnd,"%s", v->vBool ? "#t" : "#f");
 	case ltObject:
 		if(v->vClosure->parent == NULL){
-			return spf(cur, bufEnd, "[ω :--orphan-closure-most-likely-root--]");
+			return spf(cur, bufEnd, "#<environment :--orphan-closure-most-likely-root-->");
 		}else{
-			return spf(cur, bufEnd, "[ω]", v->vClosure->data);
+			return spf(cur, bufEnd, "#<environment %x>", v->vClosure - lClosureList);
 		}
 	case ltMacro:
 	case ltLambda: {

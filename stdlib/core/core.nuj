@@ -29,10 +29,6 @@
       "Return ARGUMENTS as a list"
       arguments]
 
-[defn default [arg default-value]
-      "Returns ARG or DEFAULT-VALUE if ARG is #nil"
-      [if arg arg default-value]]
-
 [defn caar [p] :inline
       "[car [car p]]"
       [car [car p]]]

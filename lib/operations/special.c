@@ -22,7 +22,7 @@ lVMErrorPlaceholder(lnfSet)
 lVMErrorPlaceholder(lnfLetRaw)
 lVMErrorPlaceholder(lnfLambda)
 lVMErrorPlaceholder(lnfMacro)
-lVMErrorPlaceholder(lnfObjectAst)
+lVMErrorPlaceholder(lnfEnvironment)
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",              "body",                    "Evaluate body in order and returns the last result", lnfDo);
@@ -37,5 +37,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"set!",            "[s v]",                   "Bind a new value v to already defined symbol s",   lnfSet);
 	lAddNativeFunc(c,"macro*",          "[name args source body]", "Create a new, bytecoded, macro", lnfMacro);
 	lAddNativeFunc(c,"fn*",             "[name args source body]", "Create a new, bytecoded, lambda", lnfLambda);
-	lAddNativeFunc(c,"ω* environment*", "[]",                      "Create a new object",       lnfObjectAst);
+	lAddNativeFunc(c,"environment*",    "[]",                      "Create a new object",       lnfEnvironment);
 }
