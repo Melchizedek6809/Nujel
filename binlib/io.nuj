@@ -11,15 +11,27 @@
 
 [defn file/compile [path environment]
       "Compile a Nujel source file into optimized object code"
-      [when-not environment [set! environment [environment*]]]
       [def source [cons 'do [read [file/read path]]]]
-      [def object-code [compile* source environment]]
+      [def object-code [compile* source [or environment [environment*]]]]
+      [file/write [if object-code [string/write object-code] ""]
+                  [cat [path/without-extension path] ".no"]]
+      [return object-code]]
+
+[defn file/compile/module [path environment base-dir]
+      "Compile a Nujel source file into optimized object code"
+      [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]]
+      [def source [cons defmodule [cons module-name [read [file/read path]]]]]
+      [def object-code [compile* source [or environment [environment*]]]]
       [file/write [if object-code [string/write object-code] ""]
                   [cat [path/without-extension path] ".no"]]
       [return object-code]]
 
 [defn file/compile/argv []
-      [file/compile [car [last-pair repl/args]]]]
+      [def path [car [last-pair repl/args]]]
+      [def module [index-of path "_modules/"]]
+      [if [>= module 0]
+          [file/compile/module path #nil [string/cut path 0 [+ module 9]]]
+          [file/compile path]]]
 
 [defn load [filename]
   [try [fn [err]

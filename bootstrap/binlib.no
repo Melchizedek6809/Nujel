@@ -52,19 +52,8 @@
 0D
 23s file/compile
 05v [path environment]
-05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [when-not environment [set! environment [environment*]]] [def source [cons 'do [read [file/read path]]]] [def object-code [compile* source environment]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def source [cons 'do [read [file/read path]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
 05v #{##[]
-10s environment
-0Bo 7
-24
-09o 12
-15
-24
-0D
-13
-16
-0Fs environment
-0D
 23s do
 05v read
 05v file/read
@@ -77,6 +66,18 @@
 05v compile*
 10s source
 10s environment
+0C
+0Ao 18
+0D
+15
+24
+0D
+13
+16
+0C
+0Ao 8
+0D
+05v #f
 04i 2
 0Es object-code
 0D
@@ -103,15 +104,110 @@
 17
 0Es file/compile
 0D
+23s file/compile/module
+05v [path environment base-dir]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]] [def source [cons defmodule [cons module-name [read [file/read path]]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
+05v #{##[]
+05v symbol->keyword
+05v string->symbol
+05v path/without-extension
+05v string/cut
+10s path
+05v length
+10s base-dir
+04i 1
+04i 2
+04i 1
+04i 1
+04i 1
+0Es module-name
+0D
+10s defmodule
+10s module-name
+05v read
+05v file/read
+10s path
+04i 1
+04i 1
+14
+14
+0Es source
+0D
+05v compile*
+10s source
+10s environment
+0C
+0Ao 18
+0D
+15
+24
+0D
+13
+16
+0C
+0Ao 8
+0D
+05v #f
+04i 2
+0Es object-code
+0D
+05v file/write
+10s object-code
+0Bo 16
+05v string/write
+10s object-code
+04i 1
+09o 7
+05v ""
+05v cat
+05v path/without-extension
+10s path
+04i 1
+05v ".no"
+04i 2
+04i 2
+0D
+10s object-code
+01
+01
+}
+17
+0Es file/compile/module
+0D
 23s file/compile/argv
 05v []
-05v #@[source: [[file/compile [car [last-pair repl/args]]]]]
+05v #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]]
 05v #{##[]
-05v file/compile
 05v last-pair
 10s repl/args
 04i 1
 11
+0Es path
+0D
+05v index-of
+10s path
+05v "_modules/"
+04i 2
+0Es module
+0D
+10s module
+02i 0
+21
+0Bo 36
+05v file/compile/module
+10s path
+24
+05v string/cut
+10s path
+02i 0
+10s module
+02i 9
+25
+04i 3
+04i 3
+09o 13
+05v file/compile
+10s path
 04i 1
 01
 }
