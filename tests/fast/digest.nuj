@@ -1,9 +1,13 @@
 #!/usr/bin/env nujel
 ;; Just testing that adler32 still works
-[def coc-hash [hash/adler32 [file/read "CODE_OF_CONDUCT.md"]]]
-[def lic-hash [hash/adler32 [file/read "LICENSE"]]]
+[import [hash :as adler32] :crypto/adler32]
+
+[def coc-hash [adler32 [file/read "CODE_OF_CONDUCT.md"]]]
+[def lic-hash [adler32 [file/read "LICENSE"]]]
 
 [when [not= coc-hash #xB5C288AD]
       [throw [list :wrong-result "CoC Adler32 digest wrong" [int->string/HEX coc-hash]]]]
 [when [not= lic-hash #xE98856BD]
       [throw [list :wrong-result "License Adler32 digest wrong" [int->string/HEX lic-hash]]]]
+
+[return :success]

@@ -112,3 +112,5 @@
 [def boards [-> [cddr raw] [split/boards] [map parse/board]]]
 
 [take-turns boards turns]
+
+[return :success]

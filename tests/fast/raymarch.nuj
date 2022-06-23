@@ -3,6 +3,8 @@
 
 ;;; Term / Raymarch Framework
 
+[import [hash :as adler32] :crypto/adler32]
+
 [def iTime 1.2]
 
 [defn term/out/truecolor [color]
@@ -231,9 +233,9 @@
 [def img/sphere/simple [term/raymarch shader/sphere/simple 40 30]]
 [def img/sphere/phong [term/raymarch shader/sphere/phong 40 30]]
 
-[def digest/gradient [hash/adler32 [term/blit img/gradient]]]
-[def digest/sphere/simple [hash/adler32 [term/blit img/sphere/simple]]]
-[def digest/sphere/phong [hash/adler32 [term/blit img/sphere/phong]]]
+[def digest/gradient [adler32 [term/blit img/gradient]]]
+[def digest/sphere/simple [adler32 [term/blit img/sphere/simple]]]
+[def digest/sphere/phong [adler32 [term/blit img/sphere/phong]]]
 
 [when [not= digest/gradient 3691418998]
       [println [term/blit img/gradient]]
@@ -246,3 +248,5 @@
 [when [not= digest/sphere/phong 3858860202]
       [println [term/blit img/sphere/phong]]
       [throw [list :wrong-result "Raymarched phong spheres wrong" digest/sphere/phong]]]
+
+[return :success]

@@ -19,3 +19,4 @@
                 [sum]]]
 [when [not= result 233168]
       [throw [list :wrong-result "Wrong result" result]]]
+[return :success]

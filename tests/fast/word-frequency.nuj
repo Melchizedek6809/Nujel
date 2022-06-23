@@ -27,3 +27,5 @@
 [def words [count-words [string [or [file/read "CODE_OF_CONDUCT.md"] ""]]]]
 [when [not= words 122]
       [throw [list :wrong-result "CoC Words Wrong" words]]]
+
+[return :success]

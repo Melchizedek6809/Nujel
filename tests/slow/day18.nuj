@@ -97,3 +97,5 @@
 [def res-p2 [snail/find-biggest [file/read "tests/slow/day18.input"]]]
 [when [not= res-p2 4832]
       [throw [list :wrong-result "Wrong result" res-p2]]]
+
+[return :success]

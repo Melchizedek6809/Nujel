@@ -25,3 +25,5 @@
 [def lwords [count-words "LICENSE"]]
 [when [not= lwords 168]
       [throw [list :wrong-result "LICENSE Words Wrong" lwords]]]
+
+[return :success]

@@ -29,3 +29,5 @@
 [def result [sum [do-steps input 256]]]
 [when [not= result 1589590444365]
       [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

@@ -47,3 +47,5 @@
 [def result [calc-γε [count-bits [read-data input-data] 12]]]
 [when [not= [ref result :power-consumption] 4103154]
       [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

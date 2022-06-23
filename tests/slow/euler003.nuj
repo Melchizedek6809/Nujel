@@ -32,3 +32,5 @@
 [def ret [largest-prime-factor 600851475143]]
 [when [not= ret 6857]
       [throw [list :wrong-result "Wrong result" ret]]]
+
+[return :success]

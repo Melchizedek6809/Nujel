@@ -64,3 +64,5 @@
 [def result [ref res :part2]]
 [when [not= result 1045660]
       [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

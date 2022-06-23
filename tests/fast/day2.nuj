@@ -30,3 +30,5 @@
 
 [def result [calc-result [step [read [file/read "tests/fast/day2.dat"]] @[:depth 0 :horiz 0 :aim 0] do-commands-2]]]
 [when [not= 1848454425 result] [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

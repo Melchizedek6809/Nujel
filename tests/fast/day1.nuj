@@ -28,3 +28,5 @@
 
 [def result [count-increases [build-sums [read [file/read "tests/fast/day1.dat"]]]]]
 [when [not= result 1743] [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

@@ -116,3 +116,5 @@
 [def result part-2]
 [when [not= result 1011284]
       [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

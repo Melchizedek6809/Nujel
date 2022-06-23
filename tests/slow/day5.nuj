@@ -51,3 +51,5 @@
 [for-each lines parse/line]
 [when [not= [points/count vents 1] 3990]
       [throw [list :wrong-result "Wrong result" result]]]
+
+[return :success]

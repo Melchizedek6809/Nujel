@@ -72,3 +72,5 @@
 [def res-p2 [map/walk [map/supersize [map/load "day15.input" 100 100]]]]
 [when [not= res-p2 3040]
       [throw [list :wrong-result "Wrong result" res-p2]]]
+
+[return :success]

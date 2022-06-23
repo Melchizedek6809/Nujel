@@ -99,3 +99,4 @@
       [throw [list :wrong-result "Wrong result" res-p1]]]
 [when [not= res-p2 902198718880]
       [throw [list :wrong-result "Wrong result" res-p2]]]
+[return :success]

@@ -37,3 +37,5 @@
 [def res-p2 counter]
 [when [not= res-p2 1477]
       [throw [list :wrong-result "Wrong result" res-p2]]]
+
+[return :success]

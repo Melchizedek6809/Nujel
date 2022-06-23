@@ -63,3 +63,4 @@
 [def res-p2 [result [state/run/many p1-state 30]]]
 [when [not= res-p2 2437698971143]
       [throw [list :wrong-result "Wrong Part 2 result" res-p2]]]
+[return :success]

@@ -80,3 +80,4 @@
       [throw [list :wrong-result "Wrong result" p1-res]]]
 [when [not= p2-res 346]
       [throw [list :wrong-result "Wrong result" p2-res]]]
+[return :success]

@@ -46,3 +46,5 @@
 [calc-routes 'end @[] #f]
 [when [not= valid-routes 136767]
   [throw [list :wrong-result "Wrong result" valid-routes]]]
+
+[return :success]
