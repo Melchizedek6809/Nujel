@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[import [serialize :as val->json] :serialization/json]
+
 [def directories '["binlib" "stdlib" "tests" "testsuite" "tools"]]
 [def output-file "web/filesystem.json"]
 

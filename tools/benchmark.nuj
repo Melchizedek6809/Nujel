@@ -6,6 +6,9 @@
 | use the benchmark-aggregate.nuj script to generate the single aggregate JSON
 | file for the viewer.
 |#
+
+[import [serialize :as val->json] :serialization/json]
+
 [def single-runs 1]
 [def nujel-runs  4]
 [def git-head [popen/trim "git rev-parse HEAD"]]
