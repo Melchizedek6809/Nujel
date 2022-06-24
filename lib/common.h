@@ -124,20 +124,20 @@ struct lBytecodeArray{
 
 struct lBuffer {
 	union {
-		void *data;
+		void *buf;
 		lBuffer *nextFree;
 	};
-	size_t length;
+	i32 length;
 	u8 flags;
 };
 #define BUFFER_IMMUTABLE 1
 
 struct lString{
-	const char *buf,*bufEnd;
 	union {
 		const char *data;
 		lString *nextFree;
 	};
+	i32 length;
 	u8 flags;
 };
 #define HEAP_ALLOCATED 2

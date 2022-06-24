@@ -100,8 +100,8 @@ i64 lValGreater(const lVal *a, const lVal *b){
 		const uint alen = lStringLength(a->vString);
 		const uint blen = lStringLength(b->vString);
 		const uint len = MIN(alen,blen);
-		const char *ab = a->vString->buf;
-		const char *bb = b->vString->buf;
+		const char *ab = a->vString->data;
+		const char *bb = b->vString->data;
 		for(uint i=0;i<len;i++){
 			const u8 ac = *ab++;
 			const u8 bc = *bb++;
@@ -169,9 +169,9 @@ bool lValEqual(const lVal *a, const lVal *b){
 static lString *lStringNewNoCopy(const char *str, uint len){
 	if(str == NULL){return NULL;}
 	lString *s = lStringAlloc();
-	s->buf    = s->data = str;
-	s->flags  = HEAP_ALLOCATED;
-	s->bufEnd = &s->buf[len];
+	s->data    = str;
+	s->flags   = HEAP_ALLOCATED;
+	s->length  = len;
 	return s;
 }
 
@@ -190,12 +190,12 @@ lString *lStringNew(const char *str, uint len){
 
 /* Return a duplicate of OS */
 lString *lStringDup(lString *os){
-	return lStringNew(os->buf, os->bufEnd - os->buf);
+	return lStringNew(os->data, os->length);
 }
 
 /* Return the length of the String S */
 int lStringLength(const lString *s){
-	return s->bufEnd - s->buf;
+	return s->length;
 }
 
 /* Create a new string value out of S */
@@ -276,7 +276,7 @@ lVal *lValKeyword(const char *s){
 lVal *lValBufferNoCopy(void *data, size_t length, bool immutable){
 	lVal *ret = lValAlloc(ltBuffer);
 	lBuffer *buf = lBufferAllocRaw();
-	buf->data = data;
+	buf->buf = data;
 	buf->length = length;
 	buf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	ret->vBuffer = buf;

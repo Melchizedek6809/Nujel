@@ -434,7 +434,7 @@ static lVal *lParseBuffer(lReadContext *s){
 	buf = realloc(buf, len);
 	lVal *ret = lValAlloc(ltBuffer);
 	ret->vBuffer = lBufferAlloc(len, true);
-	ret->vBuffer->data = buf;
+	ret->vBuffer->buf = buf;
 	return ret;
 }
 

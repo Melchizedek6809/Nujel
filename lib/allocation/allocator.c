@@ -109,14 +109,14 @@ lBuffer *lBufferAlloc(size_t length, bool immutable){
 	if(immutable){
 		ret->flags = BUFFER_IMMUTABLE;
 	}else{
-		ret->data = calloc(length, 1);
+		ret->buf = calloc(length, 1);
 	}
 	return ret;
 }
 
 void lBufferFree(lBuffer *buf){
 	if(buf == NULL){return;}
-	free(buf->data);
+	free(buf->buf);
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
 	lBufferFFree = buf;
@@ -204,7 +204,7 @@ void lClosureFree(lClosure *clo){
 void lStringFree(lString *s){
 	if(s == NULL){return;}
 	if(s->flags & HEAP_ALLOCATED){
-		free((void *)s->buf);
+		free((void *)s->data);
 	}
 	s->flags = 0;
 	s->nextFree = lStringFFree;

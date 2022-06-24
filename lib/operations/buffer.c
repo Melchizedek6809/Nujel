@@ -26,11 +26,11 @@ static lVal *lnfBufferLengthGet(lClosure *c, lVal *v){
 static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 	lVal *bufv = lCar(v);
 	lBuffer *buf = requireMutableBuffer(c, bufv);
-	const size_t length = requireNaturalInt(c, lCadr(v));
+	const int length = requireNaturalInt(c, lCadr(v));
 	if(length < buf->length){
 		lExceptionThrowValClo("error", "Buffers can only grow, not shrink.", v, c);
 	}
-	buf->data = realloc(buf->data, length);
+	buf->buf = realloc(buf->buf, length);
 	buf->length = length;
 	return bufv;
 }
@@ -45,8 +45,8 @@ static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, si
 	lBuffer *retBuf = lBufferAllocRaw();
 	retBuf->length = length;
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
-	retBuf->data = malloc(length);
-	memcpy(retBuf->data, data, length);
+	retBuf->buf = malloc(length);
+	memcpy(retBuf->buf, data, length);
 
 	lVal *retV = lValAlloc(ltBuffer);
 	retV->vBuffer = retBuf;
@@ -55,17 +55,17 @@ static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, si
 
 static lVal *lnfBufferCopy(lClosure *c, lVal *v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
-	return bufferFromPointer(c, castToBool(lCadr(v)), buf->data, buf->length);
+	return bufferFromPointer(c, castToBool(lCadr(v)), buf->buf, buf->length);
 }
 
 static lVal *lnfStringToBuffer(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
-	return bufferFromPointer(c, castToBool(lCadr(v)), str->buf, str->bufEnd - str->buf);
+	return bufferFromPointer(c, castToBool(lCadr(v)), str->data, str->length);
 }
 
 static lVal *lnfBufferToString(lClosure *c, lVal *v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
-	return lValStringLen(buf->data, buf->length);
+	return lValStringLen(buf->buf, buf->length);
 }
 
 static lVal *bufferView(lClosure *c, lVal *v, lBufferViewType T){
@@ -103,23 +103,23 @@ static lVal *lnfBufferViewRef(lClosure *c, lVal *v){
 		exit(5);
 		return NULL;
 	case lbvtU8:
-		return lValInt(((u8 *)view->buf->data)[i]);
+		return lValInt(((u8 *)view->buf->buf)[i]);
 	case lbvtS8:
-		return lValInt(((i8 *)view->buf->data)[i]);
+		return lValInt(((i8 *)view->buf->buf)[i]);
 	case lbvtU16:
-		return lValInt(((u16 *)view->buf->data)[i]);
+		return lValInt(((u16 *)view->buf->buf)[i]);
 	case lbvtS16:
-		return lValInt(((i16 *)view->buf->data)[i]);
+		return lValInt(((i16 *)view->buf->buf)[i]);
 	case lbvtU32:
-		return lValInt(((u32 *)view->buf->data)[i]);
+		return lValInt(((u32 *)view->buf->buf)[i]);
 	case lbvtS32:
-		return lValInt(((i32 *)view->buf->data)[i]);
+		return lValInt(((i32 *)view->buf->buf)[i]);
 	case lbvtS64:
-		return lValInt(((i64 *)view->buf->data)[i]);
+		return lValInt(((i64 *)view->buf->buf)[i]);
 	case lbvtF32:
-		return lValFloat(((float *)view->buf->data)[i]);
+		return lValFloat(((float *)view->buf->buf)[i]);
 	case lbvtF64:
-		return lValFloat(((double *)view->buf->data)[i]);
+		return lValFloat(((double *)view->buf->buf)[i]);
 	}
 }
 
@@ -135,31 +135,31 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 		epf("Unknown buffer-view type\n");
 		exit(5);
 	case lbvtU8:
-		((u8 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((u8 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtS8:
-		((i8 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((i8 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtS16:
-		((i16 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((i16 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtU16:
-		((u16 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((u16 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtS32:
-		((i32 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((i32 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtU32:
-		((u32 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((u32 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtS64:
-		((i64 *)view->buf->data)[i] = requireInt(c, lCaddr(v));
+		((i64 *)view->buf->buf)[i] = requireInt(c, lCaddr(v));
 		break;
 	case lbvtF32:
-		((float *)view->buf->data)[i] = requireFloat(c, lCaddr(v));
+		((float *)view->buf->buf)[i] = requireFloat(c, lCaddr(v));
 		break;
 	case lbvtF64:
-		((double *)view->buf->data)[i] = requireFloat(c, lCaddr(v));
+		((double *)view->buf->buf)[i] = requireFloat(c, lCaddr(v));
 		break;
 	}
 	return car;

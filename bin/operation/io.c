@@ -143,13 +143,13 @@ static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	default:
 		lExceptionThrowValClo("type-error", "Can't save that", contentV, c);
 	case ltString:
-		saveFile(filename->data, contentV->vString->buf, contentV->vString->bufEnd - contentV->vString->buf);
+		saveFile(filename->data, contentV->vString->data, contentV->vString->length);
 		break;
 	case ltBuffer:
-		saveFile(filename->data, contentV->vBuffer->data, contentV->vBuffer->length);
+		saveFile(filename->data, contentV->vBuffer->buf, contentV->vBuffer->length);
 		break;
 	case ltBufferView:{
-		void *data = &((u8 *)contentV->vBufferView->buf->data)[contentV->vBufferView->offset * lBufferViewTypeSize(contentV->vBufferView->type)];
+		void *data = &((u8 *)contentV->vBufferView->buf->buf)[contentV->vBufferView->offset * lBufferViewTypeSize(contentV->vBufferView->type)];
 		size_t length = contentV->vBufferView->length * lBufferViewTypeSize(contentV->vBufferView->type);
 		saveFile(filename->data, data, length);
 		break;

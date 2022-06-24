@@ -79,8 +79,8 @@ static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display
 		return spf(cur, bufEnd, "#<buffer :id %i :size %x>", v - lBufferList, v->length);
 	}
 	cur = spf(cur, bufEnd, "#m");
-	for(uint i=0;i<v->length;i++){
-		const u8 c = ((u8 *)v->data)[i];
+	for(int i=0;i<v->length;i++){
+		const u8 c = ((u8 *)v->buf)[i];
 		cur = spf(cur, bufEnd, "%c%c", (i64)getHexChar(c >> 4), (i64)getHexChar(c));
 	}
 	return cur;

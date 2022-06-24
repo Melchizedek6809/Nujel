@@ -16,15 +16,16 @@ static lVal *lnfTrim(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 
 	const char *firstNonWhitespace = str->data;
-	while(*firstNonWhitespace &&(firstNonWhitespace < (str->bufEnd-1)) && isspace((u8)*firstNonWhitespace)){
+	const char *bufEnd = &str->data[str->length];
+	while(*firstNonWhitespace &&(firstNonWhitespace < (bufEnd-1)) && isspace((u8)*firstNonWhitespace)){
 		firstNonWhitespace++;
 	}
 
-	const char *lastNonWhitespace = str->bufEnd;
+	const char *lastNonWhitespace = bufEnd;
 	while(lastNonWhitespace[-1] && (lastNonWhitespace > (firstNonWhitespace+1)) && isspace((u8)lastNonWhitespace[-1])){
 		lastNonWhitespace--;
 	}
-	lastNonWhitespace = MAX(firstNonWhitespace, MIN(str->bufEnd, lastNonWhitespace));
+	lastNonWhitespace = MAX(firstNonWhitespace, MIN(bufEnd, lastNonWhitespace));
 
 	int len = lastNonWhitespace - firstNonWhitespace;
 	lVal *ret = lValStringLen(firstNonWhitespace, len);
