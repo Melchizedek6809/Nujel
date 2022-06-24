@@ -16,7 +16,6 @@ typedef struct {
 		lClosure *vClosure;
 		lVal     *vVal;
 		lTree    *vTree;
-		lString  *vString;
 		lSymbol  *vSymbol;
 		void     *vPointer;
 		lThread  *vThread;

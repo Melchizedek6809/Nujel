@@ -168,10 +168,8 @@ bool lValEqual(const lVal *a, const lVal *b){
  * freed by the GC if it ever goes out of scope */
 static lString *lStringNewNoCopy(const char *str, uint len){
 	if(str == NULL){return NULL;}
-	lString *s = lStringAlloc();
+	lString *s = lBufferAlloc(len, true);
 	s->data    = str;
-	s->flags   = HEAP_ALLOCATED;
-	s->length  = len;
 	return s;
 }
 

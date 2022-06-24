@@ -65,15 +65,6 @@ void lBufferViewGCMark(const lBufferView *v){
 	lBufferGCMark(lBufferViewList[ci].buf);
 }
 
-void lStringGCMark(const lString *v){
-	if(v == NULL){return;}
-	const uint ci = v - lStringList;
-	if(ci >= lStringMax){
-		return;
-	}
-	lStringMarkMap[ci] = 1;
-}
-
 void lSymbolGCMark(const lSymbol *v){
 	if(v == NULL){return;}
 	const uint ci = v - lSymbolList;
@@ -119,9 +110,6 @@ void lValGCMark(lVal *v){
 	case ltNativeFunc:
 		lNFuncGCMark(v->vNFunc);
 		break;
-	case ltString:
-		lStringGCMark(v->vString);
-		break;
 	case ltKeyword:
 	case ltSymbol:
 		lSymbolGCMark(v->vSymbol);
@@ -135,6 +123,7 @@ void lValGCMark(lVal *v){
 	case ltBytecodeArr:
 		lBytecodeArrayMark(v->vBytecodeArr);
 		break;
+	case ltString:
 	case ltBuffer:
 		lBufferGCMark(v->vBuffer);
 		break;
@@ -221,10 +210,6 @@ static void lMarkFree(){
 		const uint ci = sym - lSymbolList;
 		lSymbolMarkMap[ci] = 1;
 	}
-	for(lString *str = lStringFFree;str != NULL;str = str->nextFree){
-		const uint ci = str - lStringList;
-		lStringMarkMap[ci] = 1;
-	}
 	for(lVal *v = lValFFree;v != NULL;v = v->nextFree){
 		const uint ci = v - lValList;
 		lValMarkMap[ci] = 1;
@@ -254,14 +239,13 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
-#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lStringMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax))))))))
+#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax)))))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	const uint max = ALLOC_MAX;
 	for(uint i=0;i<max;i++){
 		if(i < lValMax)           {lValMarkMap[i]           ? lValMarkMap[i]           = 0 : lValFree(&lValList[i]);}
 		if(i < lClosureMax)       {lClosureMarkMap[i]       ? lClosureMarkMap[i]       = 0 : lClosureFree(&lClosureList[i]);}
-		if(i < lStringMax)        {lStringMarkMap[i]        ? lStringMarkMap[i]        = 0 : lStringFree(&lStringList[i]);}
 		if(i < lSymbolMax)        {lSymbolMarkMap[i]        ? lSymbolMarkMap[i]        = 0 : lSymbolFree(&lSymbolList[i]);}
 		if(i < lArrayMax)         {lArrayMarkMap[i]         ? lArrayMarkMap[i]         = 0 : lArrayFree(&lArrayList[i]);}
 		if(i < lTreeMax)          {lTreeMarkMap[i]          ? lTreeMarkMap[i]          = 0 : lTreeFree(&lTreeList[i]);}

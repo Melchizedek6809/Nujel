@@ -24,10 +24,6 @@ extern lNFunc   lNFuncList  [NFN_MAX];
 extern uint     lNFuncMax;
 extern uint     lNFuncActive;
 
-extern lString  lStringList [STR_MAX];
-extern uint     lStringMax;
-extern lString *lStringFFree;
-
 extern lTree  lTreeList[TRE_MAX];
 extern uint   lTreeMax;
 extern lTree *lTreeFFree;
@@ -62,9 +58,6 @@ lNFunc   *lNFuncAlloc  ();
 static inline int lNFuncID(const lNFunc *n){
 	return n - lNFuncList;
 }
-
-lString  *lStringAlloc ();
-void      lStringFree  (lString *s);
 
 lBytecodeArray *lBytecodeArrayAlloc(size_t len);
 void            lBytecodeArrayFree(lBytecodeArray *a);

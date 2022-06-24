@@ -78,12 +78,12 @@ typedef struct lClosure lClosure;
 typedef struct lThread  lThread;
 typedef struct lNFunc   lNFunc;
 typedef struct lSymbol  lSymbol;
-typedef struct lString  lString;
 typedef struct lTree    lTree;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 typedef struct lBytecodeArray lBytecodeArray;
 typedef uint8_t lBytecodeOp;
+typedef lBuffer lString;
 
 
 typedef enum {
@@ -125,22 +125,13 @@ struct lBytecodeArray{
 struct lBuffer {
 	union {
 		void *buf;
+		const char *data;
 		lBuffer *nextFree;
 	};
 	i32 length;
 	u8 flags;
 };
 #define BUFFER_IMMUTABLE 1
-
-struct lString{
-	union {
-		const char *data;
-		lString *nextFree;
-	};
-	i32 length;
-	u8 flags;
-};
-#define HEAP_ALLOCATED 2
 
 struct lArray {
 	lVal **data;

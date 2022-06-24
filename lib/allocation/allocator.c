@@ -19,11 +19,6 @@ uint      lClosureActive = 0;
 uint      lClosureMax    = 0;
 lClosure *lClosureFFree  = NULL;
 
-lString  lStringList[STR_MAX];
-uint     lStringActive = 0;
-uint     lStringMax    = 0;
-lString *lStringFFree  = NULL;
-
 lTree    lTreeList[TRE_MAX];
 uint     lTreeActive = 0;
 uint     lTreeMax    = 0;
@@ -75,7 +70,6 @@ T * funcName (){\
 
 defineAllocator(lArray, lArrayAllocRaw, lArrayList, lArrayMax, lArrayActive, ARR_MAX, lArrayFFree, "lArray OOM")
 defineAllocator(lClosure, lClosureAlloc, lClosureList, lClosureMax, lClosureActive, CLO_MAX, lClosureFFree, "lClosure OOM")
-defineAllocator(lString, lStringAlloc, lStringList, lStringMax, lStringActive, STR_MAX, lStringFFree, "lString OOM")
 defineAllocator(lTree, lTreeAlloc, lTreeList, lTreeMax, lTreeActive, TRE_MAX, lTreeFFree, "lTree OOM")
 defineAllocator(lVal, lValAllocRaw, lValList, lValMax, lValActive, VAL_MAX, lValFFree, "lVal OOM")
 defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, lBytecodeArrayActive, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
@@ -199,17 +193,6 @@ void lClosureFree(lClosure *clo){
 	clo->nextFree = lClosureFFree;
 	lClosureFFree = clo;
 	lClosureActive--;
-}
-
-void lStringFree(lString *s){
-	if(s == NULL){return;}
-	if(s->flags & HEAP_ALLOCATED){
-		free((void *)s->data);
-	}
-	s->flags = 0;
-	s->nextFree = lStringFFree;
-	lStringFFree = s;
-	lStringActive--;
 }
 
 void lTreeFree(lTree *t){
