@@ -2,11 +2,11 @@
 ;; Multiples of 3 or 5 below 10,000,000
 ;; https://projecteuler.net/problem=1
 
-[defn test-run []
+[defn bench-run []
       [def ret 0]
       [dotimes [i 10,000,000 ret]
         [when [or [zero? [rem i 3]]
                   [zero? [rem i 5]]]
           [set! ret [+ ret i]]]]]
 
-[pfmtln "The sum is: {}" [test-run]]
+[pfmtln "The sum is: {}" [bench-run]]
