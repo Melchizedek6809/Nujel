@@ -213,13 +213,7 @@ static lVal *lnfThrow(lClosure *c, lVal *v){
 }
 
 static lVal *lnfRead(lClosure *c, lVal *v){
-	lVal *t = lCar(v);
-	if((t == NULL) || (t->type != ltString)){return NULL;}
-	lString *dup = lStringDup(t->vString);
-	readClosure = c;
-	t = lReadList(dup,true);
-	readClosure = NULL;
-	return t;
+	return lRead(c, requireString(c, lCar(v))->data);
 }
 
 static lVal *lnfTypeOf(lClosure *c, lVal *v){

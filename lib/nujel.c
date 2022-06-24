@@ -69,7 +69,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
-	lVal *v = lRead(expr);
+	lVal *v = lRead(c, expr);
 	const int RSP = lRootsGet();
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
 		lVal *car = n->vList.car;

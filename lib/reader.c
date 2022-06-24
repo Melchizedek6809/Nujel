@@ -17,29 +17,35 @@
 #define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`')||(v==';'))
 #define isnumericseparator(v) ((v=='_') || (v==','))
 
-lClosure *readClosure = NULL;
+typedef struct {
+	const char *buf, *bufEnd, *data;
+	lClosure *c;
+} lReadContext;
 
-static NORETURN void lExceptionThrowReader(lString *s, const char *msg){
+static lVal *lReadValue(lReadContext *s);
+static lVal *lReadList(lReadContext *s, bool rootForm);
+
+static NORETURN void lExceptionThrowReader(lReadContext *s, const char *msg){
 	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-	lExceptionThrowValClo("read-error", msg, err, readClosure);
+	lExceptionThrowValClo("read-error", msg, err, s->c);
 }
 
-static NORETURN void lExceptionThrowReaderCustom(lString *s, const char *msg, const char *customError){
+static NORETURN void lExceptionThrowReaderCustom(lReadContext *s, const char *msg, const char *customError){
 	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-	lExceptionThrowValClo(customError, msg, err, readClosure);
+	lExceptionThrowValClo(customError, msg, err, s->c);
 }
 
-static NORETURN void lExceptionThrowReaderStartEnd(lString *s, const char *msg){
+static NORETURN void lExceptionThrowReaderStartEnd(lReadContext *s, const char *msg){
 	const char *start, *end;
 	for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 	for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
-	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), s->c);
 }
 
-static NORETURN void lExceptionThrowReaderEnd(lString *s, const char *start, const char *msg){
+static NORETURN void lExceptionThrowReaderEnd(lReadContext *s, const char *start, const char *msg){
 	const char *end;
 	for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), readClosure);
+	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), s->c);
 }
 
 static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
@@ -48,22 +54,22 @@ static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
 	return value + mant;
 }
 
-static void lStringAdvanceToNextCharacter(lString *s){
+static void lStringAdvanceToNextCharacter(lReadContext *s){
 	for(;(s->data < s->bufEnd) && (isspace((u8)*s->data));s->data++){}
 }
 
-static void lStringAdvanceToNextSpaceOrSpecial(lString *s){
+static void lStringAdvanceToNextSpaceOrSpecial(lReadContext *s){
 	for(;(s->data < s->bufEnd) && (!isspace((u8)*s->data));s->data++){
 		const u8 c = *s->data;
 		if(isnonsymbol(c)){break;}
 		if(*s->data == ':'){break;}
 	}
 }
-static void lStringAdvanceToNextLine(lString *s){
+static void lStringAdvanceToNextLine(lReadContext *s){
 	for(;(s->data < s->bufEnd) && (*s->data != '\n');s->data++){}
 }
 
-static void lStringAdvanceUntilEndOfBlockComment(lString *s){
+static void lStringAdvanceUntilEndOfBlockComment(lReadContext *s){
 	const char *end = s->bufEnd-1;
 	for(;(s->data < end);s->data++){
 		if((s->data[0] == '#') && (s->data[1] == '|')){
@@ -77,7 +83,7 @@ static void lStringAdvanceUntilEndOfBlockComment(lString *s){
 }
 
 /* Parse the string literal in s and return the resulting ltString lVal */
-static lVal *lParseString(lString *s){
+static lVal *lParseString(lReadContext *s){
 	static char *buf = NULL;
 	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
@@ -145,18 +151,18 @@ static lVal *lParseString(lString *s){
 			return v;
 		}else if(*s->data == 0){
 			buf[i] = 0;
-			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), readClosure);
+			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
 		}else{
 			*b++ = *s->data++;
 		}
 	}
 	buf[i] = 0;
-	lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), readClosure);
+	lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
 	return NULL;
 }
 
 /* Parse s as a symbol and return the ltSymbol lVal */
-static lVal *lParseSymbol(lString *s){
+static lVal *lParseSymbol(lReadContext *s){
 	uint i;
 	char buf[128];
 	bool keyword = false;
@@ -201,7 +207,7 @@ static lVal *lParseSymbol(lString *s){
 		: lValSym(buf);
 }
 
-static i64 lParseNumberBase(lString *s, int *leadingZeroes, int base, int maxDigits){
+static i64 lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int maxDigits){
 	i64 ret = 0;
 	int zeroes = 0, digits = 0;
 	const char *start = s->data;
@@ -234,7 +240,7 @@ static i64 lParseNumberBase(lString *s, int *leadingZeroes, int base, int maxDig
 	return ret;
 }
 
-static lVal *lParseNumber(lString *s, int base, int maxDigits){
+static lVal *lParseNumber(lReadContext *s, int base, int maxDigits){
 	const char *start = s->data;
 	bool negative = false;
 	if(*start == '-'){
@@ -256,7 +262,7 @@ static lVal *lParseNumber(lString *s, int base, int maxDigits){
 	return lValInt(negative ? -val : val);
 }
 
-static lVal *lParseCharacter(lString *s){
+static lVal *lParseCharacter(lReadContext *s){
 	int ret = s->data[0];
 	if((s->data[0] == 'B') && (s->data[1] == 'a')){ret = '\b';}
 	else if((s->data[0] == 'T') && (s->data[1] == 'a')){ret = '\t';}
@@ -269,7 +275,7 @@ static lVal *lParseCharacter(lString *s){
 	return lValInt(ret);
 }
 
-static lVal *lParseBytecodeOp(lString *s){
+static lVal *lParseBytecodeOp(lReadContext *s){
 	lVal *ret = lParseNumber(s, 16, 2);
 	if((ret->vInt < 0) || (ret->vInt > 255)){
 		lExceptionThrowReaderStartEnd(s, "Out of bound op");
@@ -280,13 +286,13 @@ static lVal *lParseBytecodeOp(lString *s){
 	return ret;
 }
 
-static NORETURN void throwBCReadError(lClosure *c, lVal *v, lString *s, const char *msg){
+static NORETURN void throwBCReadError(lReadContext *s, lVal *v, const char *msg){
 	char buf[128];
 	spf(buf, &buf[sizeof(buf)], "invalid %s in Bytecoded Array", msg);
-	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), c);
+	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), s->c);
 }
 
-static lVal *lParseBytecodeArray(lString *s){
+static lVal *lParseBytecodeArray(lReadContext *s){
 	u8 *d    = NULL;
 	int size = 0;
 	int len  = 0;
@@ -295,7 +301,7 @@ static lVal *lParseBytecodeArray(lString *s){
 	if(*s->data == '#'){
 		lVal *v = lReadValue(s);
 		if(v->type != ltArray){
-			throwBCReadError(readClosure, v, s, "Invalid literal array in BCA");
+			throwBCReadError(s, v, "Invalid literal array in BCA");
 		}
 		literals = v->vArray;
 		literals->flags = ARRAY_IMMUTABLE;
@@ -316,9 +322,9 @@ static lVal *lParseBytecodeArray(lString *s){
 		if(c == 'o'){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){ throwBCReadError(readClosure, tv, s, "offset"); }
+			if(!tv || (tv->type != ltInt)){ throwBCReadError(s, tv, "offset"); }
 			const int v = tv->vInt;
-			if((v > SHRT_MAX) || (v < SHRT_MIN)){ throwBCReadError(readClosure, tv, s, "offset"); }
+			if((v > SHRT_MAX) || (v < SHRT_MIN)){ throwBCReadError(s, tv, "offset"); }
 			d[len++] = (v >> 8) & 0xFF;
 			d[len++] =  v       & 0xFF;
 			lStringAdvanceToNextCharacter(s);
@@ -327,9 +333,9 @@ static lVal *lParseBytecodeArray(lString *s){
 		if(c == 'i'){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){ throwBCReadError(readClosure, tv, s, "integer"); }
+			if(!tv || (tv->type != ltInt)){ throwBCReadError(s, tv, "integer"); }
 			const int v = tv->vInt;
-			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(readClosure, tv, s, "integer"); }
+			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(s, tv, "integer"); }
 			d[len++] = v;
 			lStringAdvanceToNextCharacter(s);
 			continue;
@@ -348,7 +354,7 @@ static lVal *lParseBytecodeArray(lString *s){
 			lStringAdvanceToNextCharacter(s);
 			lVal *tv = lReadValue(s);
 			if(!tv || ((tv->type != ltSymbol) && (tv->type != ltKeyword))){
-				throwBCReadError(readClosure, tv, s,"symbol");
+				throwBCReadError(s, tv, "symbol");
 			}
 			const int i = lSymIndex(tv->vSymbol);
 			d[len++] = (i >> 16) & 0xFF;
@@ -360,13 +366,13 @@ static lVal *lParseBytecodeArray(lString *s){
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
-			throwBCReadError(readClosure, NULL, s, "sudden end");
+			throwBCReadError(s, NULL, "sudden end");
 		}
 		c = *s->data++;
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
-		lExceptionThrowValClo("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1), readClosure);
+		lExceptionThrowValClo("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1), s->c);
 
 		storeOP:
 		d[len++] = (u8)t;
@@ -381,7 +387,7 @@ static lVal *lParseBytecodeArray(lString *s){
 	return ret;
 }
 
-static u8 lReadNibble(lString *s, const u8 c){
+static u8 lReadNibble(lReadContext *s, const u8 c){
 	if(c < '0'){lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");}
 	if(c <= '9'){
 		return c - '0';
@@ -393,7 +399,7 @@ static u8 lReadNibble(lString *s, const u8 c){
 	}
 }
 
-static lVal *lParseBuffer(lString *s){
+static lVal *lParseBuffer(lReadContext *s){
 	u8 *buf = NULL;
 	size_t len = 0;
 	size_t bufSize = 0;
@@ -432,7 +438,7 @@ static lVal *lParseBuffer(lString *s){
 	return ret;
 }
 
-static lVal *lParseSpecial(lString *s){
+static lVal *lParseSpecial(lReadContext *s){
 	if(s->data >= s->bufEnd){return NULL;}
 	switch(*s->data++){
 	default: lExceptionThrowReaderStartEnd(s, "Wrong char in special lit.");
@@ -458,21 +464,21 @@ static lVal *lParseSpecial(lString *s){
 	case '{': return lParseBytecodeArray(s);
 	case '#':
 		s->data++;
-		return lnfArrNew(readClosure, lReadList(s, false));
+		return lnfArrNew(s->c, lReadList(s, false));
 	case 'v':
 		s->data++;
-		return lnfVec(readClosure, lReadList(s, false));
+		return lnfVec(s->c, lReadList(s, false));
 	case '[':
 		return lCons(lValSymS(symArr), lReadList(s,false));
 	case '@':{
 		s->data++;
-		lVal *ret = lnfTreeNew(readClosure, lReadList(s,false));
+		lVal *ret = lnfTreeNew(s->c, lReadList(s,false));
 		ret->vTree->flags |= TREE_IMMUTABLE;
 		return ret;
 	}}
 }
 
-lVal *lReadList(lString *s, bool rootForm){
+static lVal *lReadList(lReadContext *s, bool rootForm){
 	lVal *v = NULL, *ret = NULL;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
@@ -525,11 +531,11 @@ lVal *lReadList(lString *s, bool rootForm){
 	}
 }
 
-static lVal *lReadQuote(lString *s, lSymbol *carSym){
+static lVal *lReadQuote(lReadContext *s, lSymbol *carSym){
 	return lCons(lValSymS(carSym), lCons(lReadValue(s),NULL));
 }
 
-lVal *lReadValue(lString *s){
+static lVal *lReadValue(lReadContext *s){
 	if(s->data >= s->bufEnd){
 		return NULL;
 	}
@@ -546,16 +552,16 @@ lVal *lReadValue(lString *s){
 		s->data++;
 		if(*s->data == '@'){
 			s->data++;
-			return lReadQuote(s,symUnquoteSplicing);
+			return lReadQuote(s, symUnquoteSplicing);
 		}else{
-			return lReadQuote(s,symUnquote);
+			return lReadQuote(s, symUnquote);
 		}
 	case '`':
 		s->data++;
-		return lReadQuote(s,symQuasiquote);
+		return lReadQuote(s, symQuasiquote);
 	case '\'':
 		s->data++;
-		return lReadQuote(s,symQuote);
+		return lReadQuote(s, symQuote);
 	case '"':
 		s->data++;
 		return lParseString(s);
@@ -596,12 +602,10 @@ lVal *lReadValue(lString *s){
 	}
 }
 
-lVal *lRead(const char *str){
-	const int SP = lRootsGet();
-	lString *s = lStringAlloc();
-	s->buf     = s->data = str;
-	s->bufEnd  = &str[strlen(str)];
-	lVal *ret  = lReadList(s,true);
-	lRootsRet(SP);
-	return ret;
+lVal *lRead(lClosure *c, const char *str){
+	lReadContext ctx;
+	ctx.c = c;
+	ctx.buf = ctx.data = str;
+	ctx.bufEnd = &str[strlen(str)];
+	return lReadList(&ctx, true);
 }
