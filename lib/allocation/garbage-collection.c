@@ -22,7 +22,6 @@ u8 lValMarkMap           [VAL_MAX];
 u8 lTreeMarkMap          [TRE_MAX];
 u8 lClosureMarkMap       [CLO_MAX];
 u8 lArrayMarkMap         [ARR_MAX];
-u8 lStringMarkMap        [STR_MAX];
 u8 lSymbolMarkMap        [SYM_MAX];
 u8 lBytecodeArrayMarkMap [BCA_MAX];
 u8 lBufferMarkMap        [BUF_MAX];
@@ -239,16 +238,34 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
-#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lValMax,MAX(lClosureMax,MAX(lSymbolMax,MAX(lArrayMax,lTreeMax)))))))
+#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lArrayMax,lSymbolMax))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
+	for(uint i=0;i<lValMax;i++){
+		if(lValMarkMap[i]){
+			lValMarkMap[i] = 0;
+		}else{
+			lValFree(&lValList[i]);
+		}
+	}
+	for(uint i=0;i<lTreeMax;i++){
+		if(lTreeMarkMap[i]){
+			lTreeMarkMap[i] = 0;
+		}else{
+			lTreeFree(&lTreeList[i]);
+		}
+	}
+	for(uint i=0;i<lClosureMax;i++){
+		if(lClosureMarkMap[i]){
+			lClosureMarkMap[i] = 0;
+		}else{
+			lClosureFree(&lClosureList[i]);
+		}
+	}
 	const uint max = ALLOC_MAX;
 	for(uint i=0;i<max;i++){
-		if(i < lValMax)           {lValMarkMap[i]           ? lValMarkMap[i]           = 0 : lValFree(&lValList[i]);}
-		if(i < lClosureMax)       {lClosureMarkMap[i]       ? lClosureMarkMap[i]       = 0 : lClosureFree(&lClosureList[i]);}
 		if(i < lSymbolMax)        {lSymbolMarkMap[i]        ? lSymbolMarkMap[i]        = 0 : lSymbolFree(&lSymbolList[i]);}
 		if(i < lArrayMax)         {lArrayMarkMap[i]         ? lArrayMarkMap[i]         = 0 : lArrayFree(&lArrayList[i]);}
-		if(i < lTreeMax)          {lTreeMarkMap[i]          ? lTreeMarkMap[i]          = 0 : lTreeFree(&lTreeList[i]);}
 		if(i < lBytecodeArrayMax) {lBytecodeArrayMarkMap[i] ? lBytecodeArrayMarkMap[i] = 0 : lBytecodeArrayFree(&lBytecodeArrayList[i]);}
 		if(i < lBufferMax)        {lBufferMarkMap[i]        ? lBufferMarkMap[i]        = 0 : lBufferFree(&lBufferList[i]);}
 		if(i < lBufferViewMax)    {lBufferViewMarkMap[i]    ? lBufferViewMarkMap[i]    = 0 : lBufferViewFree(&lBufferViewList[i]);}

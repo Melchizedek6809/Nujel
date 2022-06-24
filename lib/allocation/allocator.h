@@ -2,15 +2,14 @@
 #define NUJEL_LIB_ALLOC_ALLOCATOR
 #include "../nujel.h"
 
-#define ARR_MAX (1<<14)
+#define VAL_MAX (1<<21)
 #define TRE_MAX (1<<19)
 #define CLO_MAX (1<<16)
-#define NFN_MAX (1<<10)
-#define STR_MAX (1<<14)
-#define VAL_MAX (1<<21)
+#define BUF_MAX (1<<15)
+#define ARR_MAX (1<<14)
 #define BCA_MAX (1<<14)
-#define BUF_MAX (1<<14)
 #define BFV_MAX (1<<14)
+#define NFN_MAX (1<<10)
 
 extern lArray  lArrayList[ARR_MAX];
 extern uint    lArrayMax;
@@ -40,7 +39,7 @@ extern lBuffer  lBufferList[BUF_MAX];
 extern uint     lBufferMax;
 extern lBuffer *lBufferFFree;
 
-extern lBufferView  lBufferViewList[BUF_MAX];
+extern lBufferView  lBufferViewList[BFV_MAX];
 extern uint         lBufferViewMax;
 extern lBufferView *lBufferViewFFree;
 
