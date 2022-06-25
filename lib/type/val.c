@@ -20,9 +20,9 @@ lVal *lValInt(i64 v){
 }
 
 lVal *lValFloat(double v){
-	if(isnan(v)){
+	if(unlikely(isnan(v))){
 		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NULL, NULL);
-	}else if(isinf(v)){
+	}else if(unlikely(isinf(v))){
 		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NULL, NULL);
 	}
 	lVal *ret   = lValAlloc(ltFloat);
@@ -167,7 +167,7 @@ bool lValEqual(const lVal *a, const lVal *b){
 /* Create a new string containing a direct reference to STR, STR will be
  * freed by the GC if it ever goes out of scope */
 static lString *lStringNewNoCopy(const char *str, uint len){
-	if(str == NULL){return NULL;}
+	if(unlikely(str == NULL)){return NULL;}
 	lString *s = lBufferAlloc(len, true);
 	s->data    = str;
 	return s;
@@ -175,9 +175,9 @@ static lString *lStringNewNoCopy(const char *str, uint len){
 
 /* Create a new string containing a copy of STR[0] - STR[LEN] */
 lString *lStringNew(const char *str, uint len){
-	if(str == NULL){return NULL;}
+	if(unlikely(str == NULL)){return NULL;}
 	char *nbuf = malloc(len+1);
-	if(nbuf == NULL){
+	if(unlikely(nbuf == NULL)){
 		fpf(stderr,"lStringNew OOM");
 		exit(2);
 	}
@@ -198,7 +198,7 @@ int lStringLength(const lString *s){
 
 /* Create a new string value out of S */
 lVal *lValStringLen(const char *c, int len){
-	if(c == NULL){return NULL;}
+	if(unlikely(c == NULL)){return NULL;}
 	lVal *t = lValAlloc(ltString);
 	t->vString = lStringNew(c,len);
 	return t->vString == NULL ? NULL : t;
@@ -212,7 +212,7 @@ lVal *lValString(const char *c){
 /* Create a new string value out of S, using C directly, which will be
  * freed once the value leaves scope  */
 lVal *lValStringNoCopy(const char *c,int len){
-	if(c == NULL){return NULL;}
+	if(unlikely(c == NULL)){return NULL;}
 	lVal *t = lValAlloc(ltString);
 	t->vString = lStringNewNoCopy(c,len);
 	return t;
@@ -247,7 +247,7 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 
 /* Return a newly allocated nujel symbol of value S */
 lVal *lValSymS(const lSymbol *s){
-	if(s == NULL){return NULL;}
+	if(unlikely(s == NULL)){return NULL;}
 	lVal *ret = lValAlloc(ltSymbol);
 	ret->vSymbol = s;
 	return ret;
@@ -260,7 +260,7 @@ lVal *lValSym(const char *s){
 
 /* Return a newly allocated nujel keyword of value S */
 lVal *lValKeywordS(const lSymbol *s){
-	if(s == NULL){return NULL;}
+	if(unlikely(s == NULL)){return NULL;}
 	lVal *ret = lValAlloc(ltKeyword);
 	ret->vSymbol = s;
 	return ret;

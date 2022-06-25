@@ -203,18 +203,12 @@ lSymbol *lSymS(const char *str){
 	}
 	lSymbol *ret;
 	if(lSymbolFFree){
-		getFirstFree:
 		ret = lSymbolFFree;
 		lSymbolFFree = lSymbolFFree->nextFree;
 	}else{
-		if(lSymbolMax >= SYM_MAX){
-			lGarbageCollect();
-			if(lSymbolFFree != NULL){
-				goto getFirstFree;
-			} else {
-				fpf(stderr, "lSym Overflow\n");
-				exit(123);
-			}
+		if(unlikely(lSymbolMax >= SYM_MAX)){
+			fpf(stderr, "lSym Overflow\n");
+			exit(123);
 		}else{
 			ret = &lSymbolList[lSymbolMax++];
 		}
@@ -255,5 +249,5 @@ lSymbol *getTypeSymbolT(const lType T){
 }
 
 lSymbol *getTypeSymbol(const lVal *v){
-	return v ? getTypeSymbolT(v->type) : lSymLTNil;
+	return likely(v) ? getTypeSymbolT(v->type) : lSymLTNil;
 }

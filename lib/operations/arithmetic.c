@@ -24,8 +24,8 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 }
 
 lVal *lAdd(lClosure *c, lVal *a, lVal *b){
-	if(a == NULL){return lValInt(0);}
-	if(b == NULL){return a;}
+	if(unlikely(a == NULL)){return lValInt(0);}
+	if(unlikely(b == NULL)){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, a,"addition");
@@ -46,8 +46,8 @@ static lVal *lnfAdd(lClosure *c, lVal *v){
 }
 
 lVal *lSub(lClosure *c, lVal *a, lVal *b){
-	if(a == NULL){ throwArityError(c, a, 2); }
-	if(b == NULL){
+	if(unlikely(a == NULL)){ throwArityError(c, a, 2); }
+	if(unlikely(b == NULL)){
 		switch(a->type){
 		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(-a->vInt);
@@ -75,8 +75,8 @@ static lVal *lnfSub(lClosure *c, lVal *v){
 }
 
 lVal *lMul(lClosure *c, lVal *a, lVal *b){
-	if(a == NULL){return lValInt(1);}
-	if(b == NULL){
+	if(unlikely(a == NULL)){return lValInt(1);}
+	if(unlikely(b == NULL)){
 		throwArityError(c, b, 2);
 	}
 	lType t = lTypecast(a->type, b->type);
@@ -99,9 +99,7 @@ static lVal *lnfMul(lClosure *c, lVal *v){
 }
 
 lVal *lDiv(lClosure *c, lVal *a, lVal *b){
-	if((a == NULL) || (b == NULL)){
-		throwArityError(c, b, 2);
-	}
+	if(unlikely((a == NULL) || (b == NULL))){throwArityError(c, b, 2);}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default: return exceptionThrow(c, a,"division");
@@ -126,8 +124,8 @@ static lVal *lnfDiv(lClosure *c, lVal *v){
 }
 
 lVal *lRem(lClosure *c, lVal *a, lVal *b){
-	if(a == NULL){return b;}
-	if(b == NULL){return a;}
+	if(unlikely(a == NULL)){return b;}
+	if(unlikely(b == NULL)){return a;}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, a,"module");
@@ -154,8 +152,8 @@ static lVal *lnfRem(lClosure *c, lVal *v){
 static lVal *lnfPow(lClosure *c, lVal *v){
 	lVal *a = lCar(v);
 	lVal *b = lCadr(v);
-	if(b == NULL){return a;}
-	if(a == NULL){
+	if(unlikely(b == NULL)){return a;}
+	if(unlikely(a == NULL)){
 		throwArityError(c, v, 2);
 	}
 	lType t = lTypecast(a->type, b->type);

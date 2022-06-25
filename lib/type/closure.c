@@ -19,7 +19,7 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 	lClosure *c = lClosureAlloc();
 	c->parent = parent;
 	c->type = t;
-	if(parent){
+	if(likely(parent)){
 		c->caller = parent->caller;
 		c->name = parent->name;
 	}
@@ -50,7 +50,7 @@ lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
 /* Define the NFunc LNF in C with all the space separated symbols in SYM */
 lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 	const char *cur = sym;
-	if(lNF->type != ltNativeFunc){
+	if(unlikely(lNF->type != ltNativeFunc)){
 		lExceptionThrowValClo(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF, c);
 	}
 

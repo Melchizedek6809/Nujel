@@ -52,7 +52,7 @@ uint     lNFuncMax    = 0;
 T * funcName (){\
 	T *ret;\
 	if(listFree == NULL){\
-		if(listMax >= typeMax-1){\
+		if(unlikely(listMax >= typeMax-1)){	\
 			fpf(stderr, "%S", errorMsg);\
 			exit(123);\
 		}else{\
@@ -63,7 +63,7 @@ T * funcName (){\
 		listFree = ret->nextFree;\
 	}\
 	listActive++;\
-	if((typeMax - listActive) < 32){lGCShouldRunSoon = true;}\
+	if(unlikely((typeMax - listActive) < 32)){lGCShouldRunSoon = true;} \
 	memset(ret, 0, sizeof(T));\
 	return ret;\
 }
@@ -109,7 +109,7 @@ lBuffer *lBufferAlloc(size_t length, bool immutable){
 }
 
 void lBufferFree(lBuffer *buf){
-	if(buf == NULL){return;}
+	if(unlikely(buf == NULL)){return;}
 	free(buf->buf);
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
@@ -127,7 +127,7 @@ lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset,
 }
 
 void lBufferViewFree(lBufferView *buf){
-	if(buf == NULL){return;}
+	if(unlikely(buf == NULL)){return;}
 	buf->buf = NULL;
 	buf->nextFree = lBufferViewFFree;
 	lBufferViewActive--;
@@ -137,7 +137,7 @@ void lBufferViewFree(lBufferView *buf){
 lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
 	ret->data = calloc(len, sizeof(lBytecodeOp));
-	if(ret->data == NULL){
+	if(unlikely(ret->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","Couldn't allocate a new BC array", lValInt(len), NULL);
 	}
 	ret->dataEnd = &ret->data[len];
@@ -145,7 +145,7 @@ lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 }
 
 void lBytecodeArrayFree(lBytecodeArray *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	free(v->data);
 	v->data     = NULL;
 	v->nextFree = lBytecodeArrayFFree;
@@ -156,7 +156,7 @@ void lBytecodeArrayFree(lBytecodeArray *v){
 lArray *lArrayAlloc(size_t len){
 	lArray *ret = lArrayAllocRaw();
 	ret->data = calloc(len, sizeof(lVal *));
-	if(ret->data == NULL){
+	if(unlikely(ret->data == NULL)){
 		lExceptionThrowValClo("out-of-memory","Couldn't allocate a new array", lValInt(len), NULL);
 	}
 	ret->length = len;
@@ -164,7 +164,7 @@ lArray *lArrayAlloc(size_t len){
 }
 
 lNFunc *lNFuncAlloc(){
-	if(lNFuncMax >= NFN_MAX-1){
+	if(unlikely(lNFuncMax >= NFN_MAX-1)){
 		fpf(stderr, "lNFunc OOM ");
 		exit(123);
 	}
@@ -180,7 +180,7 @@ void lValFree(lVal *v){
 }
 
 void lArrayFree(lArray *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	free(v->data);
 	v->data     = NULL;
 	v->nextFree = lArrayFFree;
@@ -189,14 +189,14 @@ void lArrayFree(lArray *v){
 }
 
 void lClosureFree(lClosure *clo){
-	if(clo == NULL){return;}
+	if(unlikely(clo == NULL)){return;}
 	clo->nextFree = lClosureFFree;
 	lClosureFFree = clo;
 	lClosureActive--;
 }
 
 void lTreeFree(lTree *t){
-	if(t == NULL){return;}
+	if(unlikely(t == NULL)){return;}
 	t->nextFree = lTreeFFree;
 	lTreeFFree = t;
 	lTreeActive--;

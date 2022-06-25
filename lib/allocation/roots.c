@@ -29,7 +29,7 @@ int rootMax = 0;
 void (*rootsMarkerChain)() = NULL;
 
 static void *lRootsPush(const lType t, void *ptr){
-	if(rootSP >= rootMax){
+	if(unlikely(rootSP >= rootMax)){
 		rootMax = MAX(rootMax * 2, 256);
 		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
 		if(rootStack == NULL){

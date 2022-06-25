@@ -28,8 +28,8 @@ u8 lBufferMarkMap        [BUF_MAX];
 u8 lBufferViewMarkMap    [BFV_MAX];
 
 void lThreadGCMark(lThread *c){
-	if(c == NULL){return;}
-	if((c->csp > 8192) || (c->csp < 0)){
+	if(unlikely(c == NULL)){return;}
+	if(unlikely((c->csp > 8192) || (c->csp < 0))){
 		epf("Ignoring closure due to strangely sized CSP\n");
 		return;
 	}
@@ -43,20 +43,16 @@ void lThreadGCMark(lThread *c){
 }
 
 void lBufferGCMark(const lBuffer *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lBufferList;
-	if(ci >= lBufferMax){
-		return;
-	}
+	if(unlikely(ci >= lBufferMax)){return;}
 	lBufferMarkMap[ci] = 1;
 }
 
 void lBufferViewGCMark(const lBufferView *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lBufferViewList;
-	if(ci >= lBufferViewMax){
-		return;
-	}
+	if(unlikely(ci >= lBufferViewMax)){return;}
 	if(lBufferViewMarkMap[ci]){
 		return;
 	}
@@ -65,18 +61,16 @@ void lBufferViewGCMark(const lBufferView *v){
 }
 
 void lSymbolGCMark(const lSymbol *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lSymbolList;
-	if(ci >= lSymbolMax){
-		return;
-	}
+	if(unlikely(ci >= lSymbolMax)){return;}
 	lSymbolMarkMap[ci] = 1;
 }
 
 void lNFuncGCMark(const lNFunc *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lNFuncList;
-	if(ci >= lNFuncMax){
+	if(unlikely(ci >= lNFuncMax)){
 		return;
 		epf("Tried to mark invalid lNFunc\n");
 		exit(1);
@@ -87,9 +81,9 @@ void lNFuncGCMark(const lNFunc *v){
 }
 
 void lValGCMark(lVal *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lValList;
-	if(ci >= lValMax){ return; }
+	if(unlikely(ci >= lValMax)){ return; }
 	if(lValMarkMap[ci]){ return; }
 	lValMarkMap[ci] = 1;
 
@@ -135,11 +129,9 @@ void lValGCMark(lVal *v){
 }
 
 void lTreeGCMark(const lTree *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lTreeList;
-	if(ci >= lTreeMax){
-		return;
-	}
+	if(unlikely(ci >= lTreeMax)){return;}
 	if(lTreeMarkMap[ci]){return;}
 	lTreeMarkMap[ci] = 1;
 	lSymbolGCMark(v->key);
@@ -149,9 +141,9 @@ void lTreeGCMark(const lTree *v){
 }
 
 void lClosureGCMark(const lClosure *c){
-	if(c == NULL){return;}
+	if(unlikely(c == NULL)){return;}
 	const uint ci = c - lClosureList;
-	if(ci >= lClosureMax){ return; }
+	if(unlikely(ci >= lClosureMax)){ return; }
 	if(lClosureMarkMap[ci]){ return; }
 	lClosureMarkMap[ci] = 1;
 
@@ -165,9 +157,9 @@ void lClosureGCMark(const lClosure *c){
 }
 
 void lArrayGCMark(const lArray *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lArrayList;
-	if(ci >= lArrayMax){
+	if(unlikely(ci >= lArrayMax)){
 		epf("Tried to mark invalid lArray\n");
 		exit(1);
 	}
@@ -179,9 +171,9 @@ void lArrayGCMark(const lArray *v){
 }
 
 void lBytecodeArrayMark(const lBytecodeArray *v){
-	if(v == NULL){return;}
+	if(unlikely(v == NULL)){return;}
 	const uint ci = v - lBytecodeArrayList;
-	if(ci >= lBytecodeArrayMax){
+	if(unlikely(ci >= lBytecodeArrayMax)){
 		//exit(*((u8 *)NULL));
 		epf("Tried to mark invalid lBytecodeArray\n");
 		exit(1);

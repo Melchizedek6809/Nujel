@@ -21,7 +21,7 @@ NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
-	if(len == 0){return lCons(NULL, NULL);}
+	if(unlikely(len == 0)){return lCons(NULL, NULL);}
 	const int nsp = sp - len;
 	lVal *t = stack[nsp] = lRootsValPush(lCons(stack[nsp], NULL));
 	for(int i = len-1; i > 0; i--){
@@ -32,11 +32,11 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 }
 
 static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
-	if(&c[3] >= v->dataEnd){return;}
+	if(unlikely(&c[3] >= v->dataEnd)){return;}
 	lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-	if(!raw || (raw->type != ltSymbol)){return;}
+	if(unlikely(!raw || (raw->type != ltSymbol))){return;}
 	lVal *n = lGetClosureSym(clo, raw->vSymbol);
-	if(n == raw){return;}
+	if(unlikely(n == raw)){return;}
 	int i = lValIndex(n);
 	c[1] = (i >> 16) & 0xFF;
 	c[2] = (i >>  8) & 0xFF;
@@ -102,7 +102,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.closureStack[ctx.csp] = c;
 	ctx.text             = text;
 
-	if(!(text->flags & BYTECODE_ARRAY_LINKED)){
+	if(unlikely(!(text->flags & BYTECODE_ARRAY_LINKED))){
 		lBytecodeArrayLink(c,text);
 	}
 
@@ -114,7 +114,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
 	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
-	if(setjmpRet){
+	if(unlikely(setjmpRet)){
 		while((ctx.csp > 0) && (c->type != closureTry)){
 			ctx.csp--;
 			c = ctx.closureStack[ctx.csp];
@@ -140,17 +140,17 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = ops->data;
 	}
 
-	while((ip >= ops->data) && (ip < ops->dataEnd)){
+	while(likely(ip >= ops->data) && likely(ip < ops->dataEnd)){
 		lGarbageCollectIfNecessary();
-		if(ctx.csp >= ctx.closureStackSize-1){
+		if(unlikely(ctx.csp >= ctx.closureStackSize-1)){
 			ctx.closureStackSize *= 2;
 			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
 		}
-		if(ctx.sp >= ctx.valueStackSize-1){
+		if(unlikely(ctx.sp >= ctx.valueStackSize-1)){
 			ctx.valueStackSize *= 2;
 			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
 		}
-		if(trace){lBytecodeTrace(&ctx, ip, ops);}
+		if(unlikely(trace)){lBytecodeTrace(&ctx, ip, ops);}
 	switch(*ip++){
 	default:
 		lExceptionThrowValClo("unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
@@ -173,7 +173,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopEqualPred:
 	case lopGreaterEqPred:
 	case lopGreaterPred: {
-		if(ctx.sp < 2){throwStackUnderflowError(c, lBytecodeGetOpcodeName(ip[-1]));}
+		if(unlikely(ctx.sp < 2)){throwStackUnderflowError(c, lBytecodeGetOpcodeName(ip[-1]));}
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
@@ -184,7 +184,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;
 	case lopPushLVal: {
 		lVal *val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
-		if(val && (val->type == ltSymbol)){
+		if(unlikely(val && (val->type == ltSymbol))){
 			lBytecodeLinkPush(c, ops, ip-1);
 			val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
 		}
@@ -193,7 +193,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break; }
 	case lopPushVal: {
 		const u8 v = *ip++;
-		if(v >= ops->literals->length){throwStackUnderflowError(c, "PushVal");}
+		if(unlikely(v >= ops->literals->length)){throwStackUnderflowError(c, "PushVal");}
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
 		break; }
 	case lopPushSymbol: {
@@ -202,12 +202,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp++] = lValSymS(sym);
 		break;}
 	case lopDup:
-		if(ctx.sp < 1){throwStackUnderflowError(c, "Dup");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Dup");}
 		ctx.sp++;
 		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
 		break;
 	case lopDrop:
-		if(ctx.sp < 1){throwStackUnderflowError(c, "Drop");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Drop");}
 		ctx.sp--;
 		break;
 	case lopJmp:
@@ -235,7 +235,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
 	case lopZeroPred: {
-		if(ctx.sp < 1){throwStackUnderflowError(c, "zero?");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
 		lVal *a = ctx.valueStack[ctx.sp-1];
 		bool p = false;
 		if(a){
@@ -248,11 +248,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp-1] = lValBool(p);
 		break; }
 	case lopCar:
-		if(ctx.sp < 1){throwStackUnderflowError(c, "Car");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Car");}
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
 		break;
 	case lopCdr:
-		if(ctx.sp < 1){throwStackUnderflowError(c, "Cdr");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Cdr");}
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
 		break;
 	case lopClosurePush:
@@ -269,7 +269,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		if(ctx.csp < 0){throwStackUnderflowError(c, "ClosurePop");}
 		break; }
 	case lopTry:
-		if(ctx.sp < 1){throwStackUnderflowError(c, "Try");}
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Try");}
 
 		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
 		c->sp   = ctx.sp;
@@ -289,7 +289,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
 		lVal *cArgs = ctx.valueStack[--ctx.sp];
 		lVal *cName = ctx.valueStack[--ctx.sp];
-		if(cBody->type == ltNoAlloc){
+		if(unlikely(cBody->type == ltNoAlloc)){
 			pf("SP: %i CSP: %i\n", (i64)ctx.sp, (i64)ctx.csp);
 			pf("%V\n",cBody);
 			pf("%V\n",cDocs);
@@ -304,9 +304,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;}
 	case lopApply: {
 		const int len = *ip++;
-		if(ctx.sp < len){
-			throwStackUnderflowError(c, "Apply");
-		}
+		if(unlikely(ctx.sp < len)){throwStackUnderflowError(c, "Apply");}
 		const int applyRSP = lRootsGet();
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
@@ -317,7 +315,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		//lRootsRet(applyRSP);
 		break; }
 	case lopRet:
-		if(ctx.sp < 1){ throwStackUnderflowError(c, "Ret"); }
+		if(unlikely(ctx.sp < 1)){ throwStackUnderflowError(c, "Ret"); }
 		if(ctx.csp > 0){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
 				if(--ctx.csp <= 0){goto topLevelReturn;}

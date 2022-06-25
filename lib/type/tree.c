@@ -12,7 +12,7 @@ lTree *lTreeNew(const lSymbol *s, lVal *v){
 }
 
 static uint lTreeHeight(const lTree *t){
-	return t == NULL ? 0 : t->height;
+	return unlikely(t == NULL) ? 0 : t->height;
 }
 
 static uint lTreeCalcHeight(const lTree *t){
@@ -28,7 +28,7 @@ static int lTreeGetBalance(const lTree *t){
 /* Reset S to be associated to V if it has already been bound, storing TRUE in
  * FOUND on success */
 void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
-	if(t == NULL){
+	if(unlikely(t == NULL)){
 		return;
 	}else if(s == t->key){
 		t->value = v;
@@ -94,7 +94,7 @@ static lTree *lTreeBalance(lTree *t, const lSymbol *s){
 lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 	if(t == NULL){
 		return lTreeNew(s,v);
-	}else if(t->key == NULL){
+	}else if(unlikely(t->key == NULL)){
 		t->key = s;
 		t->value = v;
 		return t;
@@ -138,7 +138,7 @@ bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 
 /* Add every symbol/value pair within T onto list, making it a big a-list */
 static lVal *lTreeAddToList(const lTree *t, lVal *list){
-	if((t == NULL) || (t->key == NULL)){return list;}
+	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	lVal *l = lCons(NULL,NULL);
 	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
 	l->vList.cdr->vList.car = t->value;
@@ -148,14 +148,14 @@ static lVal *lTreeAddToList(const lTree *t, lVal *list){
 
 /* Add all the keys within T to the beginning LIST */
 static lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
-	if((t == NULL) || (t->key == NULL)){return list;}
+	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	list = lTreeAddKeysToList(t->right, list);
 	list = lCons(lValKeywordS(t->key), list);
 	return lTreeAddKeysToList(t->left, list);
 }
 /* Add all the values within T to the beginning LIST */
 static lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
-	if((t == NULL) || (t->key == NULL)){return list;}
+	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	list = lTreeAddValuesToList(t->right, list);
 	list = lCons(t->value, list);
 	return lTreeAddValuesToList(t->left, list);
@@ -183,7 +183,7 @@ uint lTreeSize(const lTree *t){
 
 /* Return a duplicate of t */
 lTree *lTreeDup(const lTree *t){
-	if(t == NULL){return NULL;}
+	if(unlikely(t == NULL)){return NULL;}
 	lTree *ret  = lTreeAlloc();
 	ret->key    = t->key;
 	ret->value  = t->value;
