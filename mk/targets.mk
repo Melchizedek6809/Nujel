@@ -92,7 +92,7 @@ install.musl: release.musl
 	$(INSTALL) ./$(NUJEL) $(bindir)
 
 profile: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes $(NUJEL) --only-test-suite tools/tests.nuj
+	valgrind --tool=callgrind --dump-instr=yes ./$(NUJEL) --only-test-suite tools/tests.nuj
 
 web:
 	./tools/buildwasm

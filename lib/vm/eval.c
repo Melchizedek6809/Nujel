@@ -95,8 +95,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lThread ctx;
 	ctx.closureStackSize = 4;
 	ctx.valueStackSize   = 8;
-	ctx.closureStack     = calloc(ctx.closureStackSize, sizeof(lClosure *));
-	ctx.valueStack       = calloc(ctx.valueStackSize,   sizeof(lVal *));
+	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
+	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal *));
 	ctx.csp              = 0;
 	ctx.sp               = 0;
 	ctx.closureStack[ctx.csp] = c;

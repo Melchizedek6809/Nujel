@@ -117,14 +117,13 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
  * setting FOUND to true if successful */
 lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
 	const lTree *c = t;
-	while(c != NULL){
+	while(c){
 		if(s == c->key){
 			if(found != NULL){*found = true;}
 			return c->value;
 		}
 		c = s > c->key ? c->right : c->left;
 	}
-	if(found != NULL){*found = false;}
 	return NULL;
 }
 
