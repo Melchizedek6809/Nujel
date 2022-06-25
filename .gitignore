@@ -28,6 +28,7 @@ gmon.out
 *.o
 *.err
 /stdlib/**/*.no
+/stdlib_modules/**/*.no
 /binlib/**/*.no
 /tests/**/*.no
 *.wd

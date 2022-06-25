@@ -64,7 +64,7 @@ all: nujel.wa
 endif
 
 FILES_TO_CLEAN := $(shell find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
-NOBS_TO_CLEAN  := $(shell find binlib stdlib -type f -name '*.no')
+NOBS_TO_CLEAN  := $(shell find binlib stdlib stdlib_modules -type f -name '*.no')
 
 %.no: %.nuj | $(NUJEL_BOOTSTRAP)
 	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $^
