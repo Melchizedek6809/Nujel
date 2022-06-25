@@ -1,7 +1,0 @@
-[def counter 0]
-
-[defn count [] counter]
-[defn count! [] [inc! counter]]
-
-[export count! count!]
-[export count count]
