@@ -593,10 +593,8 @@
 0Es line
 0D
 24
-1B
-09o 34
+09o 33
 0D
-1C
 05v cat
 10s buf
 10s line
@@ -610,7 +608,7 @@
 10s line
 05v "[/cmd]\n"
 04i 2
-0Ao -45
+0Ao -44
 0D
 10s do
 05v read
@@ -694,10 +692,8 @@
 04i 0
 0D
 24
-1B
-09o 23
+09o 22
 0D
-1C
 10s repl/exception-handler
 19o 14
 05v repl/readline
@@ -705,7 +701,7 @@
 04i 1
 16
 05v #t
-0Ao -24
+0Ao -23
 01
 }
 17

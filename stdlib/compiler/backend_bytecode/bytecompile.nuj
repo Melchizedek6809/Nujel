@@ -69,11 +69,9 @@
       [def sym-start [bytecompile/gen-label]]
       [def sym-end [bytecompile/gen-label]]
       [list [$push/nil] ;; Return value if predicate is #f from the beginning
-            [$roots/save]
             [$jmp sym-end]
             [list :label sym-start]
             [$drop]
-            [$roots/restore]
             [bytecompile/do/form [cddr source] env]
             [list :label sym-end]
             [bytecompile* [cadr source] env]
