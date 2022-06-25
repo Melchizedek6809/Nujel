@@ -1,1 +1,2 @@
-[test/reset]
+[require :test]
+[test/reset!]

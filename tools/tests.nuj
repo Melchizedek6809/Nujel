@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :test]
+
 [def test/beginning [time/milliseconds]]
 [def test/testsuite-errors 0]
 
@@ -11,13 +13,13 @@
 
 [when [not [tree/has? repl/options :only-test-suite]]
   [println [ansi-purple "First we test the basic functions of the runtime."]]]
-[for-each [sort [directory/read-relative "testsuite"]] file/eval]
+[for-each [-> [directory/read-relative "testsuite"] sort] file/eval]
 
 [def output-passes #f]
 [when [tree/has? repl/options :verbose]
   [set! output-passes #t]]
 
-[set! test/testsuite-errors [test-run output-passes]]
+[set! test/testsuite-errors [test/run output-passes]]
 
 [when [tree/has? repl/options :only-test-suite]
   [exit test/testsuite-errors]]

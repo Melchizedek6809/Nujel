@@ -16989,407 +16989,6 @@
 0Es contains-all?
 01
 }#{##[]
-05v "Nujel"
-0Es test-context
-0D
-23s test/reset
-05v []
-05v #@[source: [[set! test-list #nil] [set! test-count 0] [test/add 4 [+ 3 1]]]]
-05v #{##[]
-24
-0Fs test-list
-0D
-02i 0
-0Fs test-count
-0D
-05v test/add*
-02i 4
-05v [do [+ 3 1]]
-04i 2
-01
-}
-17
-0Es test/reset
-0D
-24
-0Es test-list
-0D
-02i 0
-0Es test-count
-0D
-02i 0
-0Es nujel-start
-0D
-02i 0
-0Es success-count
-0D
-02i 0
-0Es error-count
-0D
-05v #t
-0Es print-errors
-0D
-05v #f
-0Es print-passes
-0D
-23s test/add*
-05v [result expr]
-05v #@[source: [[set! test-list [cons [cons result expr] test-list]] [set! test-count [+ test-count 1]]]]
-05v #{##[]
-10s result
-10s expr
-14
-10s test-list
-14
-0Fs test-list
-0D
-10s test-count
-02i 1
-25
-0Fs test-count
-01
-}
-17
-0Es test/add*
-0D
-23s test/add
-05v [result . expr]
-05v #@[documentation: "Add a test where EXPR must eval to RESULT" source: ["Add a test where EXPR must eval to RESULT" [quasiquote [test/add* [unquote result] [unquote [list 'quote [cons 'do expr]]]]]]]
-05v #{##[]
-23s test/add*
-10s result
-05v list
-23s quote
-23s do
-10s expr
-14
-04i 2
-24
-14
-14
-14
-01
-}
-18
-0Es test/add
-0D
-23s display-results
-05v []
-05v #@[documentation: "Prints the result Message" source: ["Prints the result Message" [random/seed-initialize!] [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]]]
-05v #{##[]
-05v random/seed-initialize!
-04i 0
-0D
-05v errorln
-15
-10s error-count
-2A
-0C
-0Bo 11
-0D
-10s test-count
-02i 0
-22
-0Bo 10
-05v "Success"
-09o 7
-05v "Failed!"
-0Es fmt-arg-0
-0D
-05v ansi-green
-10s success-count
-04i 1
-0Es fmt-arg-1
-0D
-05v ansi-red
-10s error-count
-04i 1
-0Es fmt-arg-2
-0D
-05v time/milliseconds
-04i 0
-10s nujel-start
-26
-0Es fmt-arg-3
-0D
-10s error-count
-2A
-0C
-0Bo 11
-0D
-10s test-count
-02i 0
-22
-0Bo 16
-05v ansi-rainbow
-05v "Everything is working, very nice!"
-04i 1
-09o 13
-05v ansi-red
-05v "Better fix those!"
-04i 1
-0Es fmt-arg-4
-0D
-05v cat
-10s test-context
-05v " ["
-10s System/OS
-05v " "
-10s System/Architecture
-05v "] - "
-10s fmt-arg-0
-05v " - ["
-10s fmt-arg-1
-05v " / "
-10s fmt-arg-2
-05v "] in "
-10s fmt-arg-3
-05v " ms - "
-10s fmt-arg-4
-04i 15
-16
-04i 1
-01
-}
-17
-0Es display-results
-0D
-23s test-success
-05v [res-should res-is expr i]
-05v #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]]]
-05v #{##[]
-10s print-passes
-0Bo 101
-05v errorln
-15
-05v ansi-green
-05v string/write
-10s res-is
-04i 1
-04i 1
-0Es fmt-arg-0
-0D
-05v ansi-green
-05v string/write
-10s res-should
-04i 1
-04i 1
-0Es fmt-arg-1
-0D
-05v string/write
-10s expr
-04i 1
-0Es fmt-arg-2
-0D
-05v cat
-10s fmt-arg-0
-05v " == "
-10s fmt-arg-1
-05v "\r\n"
-10s fmt-arg-2
-05v "\r\n\r\n"
-04i 6
-16
-04i 1
-09o 4
-24
-0D
-02i 1
-10s success-count
-25
-0Fs success-count
-01
-}
-17
-0Es test-success
-0D
-23s test-failure
-05v [res-should res-is expr i]
-05v #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]]]
-05v #{##[]
-10s print-errors
-0Bo 101
-05v println
-15
-05v ansi-red
-05v string/write
-10s res-is
-04i 1
-04i 1
-0Es fmt-arg-0
-0D
-05v ansi-green
-05v string/write
-10s res-should
-04i 1
-04i 1
-0Es fmt-arg-1
-0D
-05v string/write
-10s expr
-04i 1
-0Es fmt-arg-2
-0D
-05v cat
-10s fmt-arg-0
-05v " != "
-10s fmt-arg-1
-05v "\r\n"
-10s fmt-arg-2
-05v "\r\n\r\n"
-04i 6
-16
-04i 1
-09o 4
-24
-0D
-02i 1
-10s error-count
-25
-0Fs error-count
-01
-}
-17
-0Es test-failure
-0D
-23s test/run
-05v [result rawexpr i]
-05v #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr i]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]
-05v #{##[]
-23s anonymous
-05v [err]
-05v #@[source: [[display/error err] [test-failure result [list :exception-caught err] rawexpr i]]]
-05v #{##[]
-05v display/error
-10s err
-04i 1
-0D
-05v test-failure
-10s result
-05v list
-05v :exception-caught
-10s err
-04i 2
-10s rawexpr
-10s i
-04i 4
-01
-}
-17
-19o 89
-05v eval-in
-05v current-closure
-04i 0
-10s rawexpr
-04i 2
-0Es expr
-0D
-05v equal?
-10s result
-10s expr
-04i 2
-0Bo 28
-05v test-success
-10s result
-10s expr
-10s rawexpr
-10s i
-04i 4
-09o 25
-05v test-failure
-10s result
-10s expr
-10s rawexpr
-10s i
-04i 4
-16
-01
-}
-17
-0Es test/run
-0D
-23s test-run
-05v [output-passes hide-errors]
-05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [test/run [car cur-test] [cdr cur-test] [dec! i]]] [display-results] [return error-count]]]
-05v #{##[]
-05v bool
-10s hide-errors
-04i 1
-0Bo 10
-05v #f
-09o 7
-05v #t
-0Fs print-errors
-0D
-05v bool
-10s output-passes
-04i 1
-0Fs print-passes
-0D
-05v time/milliseconds
-04i 0
-0Fs nujel-start
-0D
-02i 0
-0Fs success-count
-0D
-02i 0
-0Fs error-count
-0D
-10s test-count
-02i 1
-25
-0Es i
-0D
-15
-10s test-list
-0Es ΓεnΣym-1
-0D
-10s ΓεnΣym-1
-0Bo 67
-24
-1B
-09o 52
-0D
-1C
-10s ΓεnΣym-1
-11
-0Es cur-test
-0D
-05v test/run
-10s cur-test
-11
-10s cur-test
-12
-10s i
-02i 1
-26
-0Fs i
-04i 3
-0D
-10s ΓεnΣym-1
-12
-0Fs ΓεnΣym-1
-10s ΓεnΣym-1
-0Ao -53
-09o 4
-24
-16
-0D
-05v display-results
-04i 0
-0D
-10s error-count
-01
-01
-}
-17
-0Es test-run
-0D
-05v test/reset
-04i 0
-01
-}#{##[]
 23s dup
 05v [l]
 05v #@[source: [[case [type-of l] [:tree [tree/dup l]] [:array [array/dup l]] [otherwise l]]]]
@@ -17823,7 +17422,7 @@
 10s k
 04i 1
 05v "\": "
-05v val->json
+10s val->json
 05v tree/ref
 10s v
 10s k
@@ -17952,7 +17551,7 @@
 05v :tree
 20
 0Bo 16
-05v tree->json
+10s tree->json
 10s v
 04i 1
 09o 33
@@ -17971,6 +17570,427 @@
 17
 0Es val->json
 04i 3
+0D
+13
+16
+04i 2
+01
+}#{##[]
+05v module/insert
+05v :test
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+24
+0Es test-list
+0D
+02i 0
+0Es test-count
+0D
+02i 0
+0Es nujel-start
+0D
+02i 0
+0Es success-count
+0D
+02i 0
+0Es error-count
+0D
+05v #t
+0Es print-errors
+0D
+05v #f
+0Es print-passes
+0D
+23s test/add*
+05v [result expr]
+05v #@[source: [[set! test-list [cons [cons result expr] test-list]] [set! test-count [+ test-count 1]]]]
+05v #{##[]
+10s result
+10s expr
+14
+10s test-list
+14
+0Fs test-list
+0D
+10s test-count
+02i 1
+25
+0Fs test-count
+01
+}
+17
+0Es test/add*
+0D
+05v tree/set!
+10s exports
+23s add
+23s test/add
+05v [result . expr]
+05v #@[documentation: "Add a test where EXPR must eval to RESULT" source: ["Add a test where EXPR must eval to RESULT" [quasiquote [[unquote test/add*] [unquote result] [unquote [list 'quote [cons 'do expr]]]]]]]
+05v #{##[]
+10s test/add*
+10s result
+05v list
+23s quote
+23s do
+10s expr
+14
+04i 2
+24
+14
+14
+14
+01
+}
+18
+0Es test/add
+04i 3
+0D
+05v tree/set!
+10s exports
+23s reset!
+23s reset!
+05v []
+05v #@[source: [[set! test-list #nil] [set! test-count 0] [test/add 4 [+ 3 1]]]]
+05v #{##[]
+24
+0Fs test-list
+0D
+02i 0
+0Fs test-count
+0D
+05v test/add*
+02i 4
+05v [do [+ 3 1]]
+04i 2
+01
+}
+17
+0Es reset!
+04i 3
+0D
+23s display-results
+05v []
+05v #@[documentation: "Prints the result Message" source: ["Prints the result Message" [random/seed-initialize!] [efmtln "Nujel [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]]]
+05v #{##[]
+05v random/seed-initialize!
+04i 0
+0D
+05v errorln
+15
+10s error-count
+2A
+0C
+0Bo 11
+0D
+10s test-count
+02i 0
+22
+0Bo 10
+05v "Success"
+09o 7
+05v "Failed!"
+0Es fmt-arg-0
+0D
+05v ansi-green
+10s success-count
+04i 1
+0Es fmt-arg-1
+0D
+05v ansi-red
+10s error-count
+04i 1
+0Es fmt-arg-2
+0D
+05v time/milliseconds
+04i 0
+10s nujel-start
+26
+0Es fmt-arg-3
+0D
+10s error-count
+2A
+0C
+0Bo 11
+0D
+10s test-count
+02i 0
+22
+0Bo 16
+05v ansi-rainbow
+05v "Everything is working, very nice!"
+04i 1
+09o 13
+05v ansi-red
+05v "Better fix those!"
+04i 1
+0Es fmt-arg-4
+0D
+05v cat
+05v "Nujel ["
+10s System/OS
+05v " "
+10s System/Architecture
+05v "] - "
+10s fmt-arg-0
+05v " - ["
+10s fmt-arg-1
+05v " / "
+10s fmt-arg-2
+05v "] in "
+10s fmt-arg-3
+05v " ms - "
+10s fmt-arg-4
+04i 14
+16
+04i 1
+01
+}
+17
+0Es display-results
+0D
+23s test-success
+05v [res-should res-is expr i]
+05v #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]]]
+05v #{##[]
+10s print-passes
+0Bo 101
+05v errorln
+15
+05v ansi-green
+05v string/write
+10s res-is
+04i 1
+04i 1
+0Es fmt-arg-0
+0D
+05v ansi-green
+05v string/write
+10s res-should
+04i 1
+04i 1
+0Es fmt-arg-1
+0D
+05v string/write
+10s expr
+04i 1
+0Es fmt-arg-2
+0D
+05v cat
+10s fmt-arg-0
+05v " == "
+10s fmt-arg-1
+05v "\r\n"
+10s fmt-arg-2
+05v "\r\n\r\n"
+04i 6
+16
+04i 1
+09o 4
+24
+0D
+02i 1
+10s success-count
+25
+0Fs success-count
+01
+}
+17
+0Es test-success
+0D
+23s test-failure
+05v [res-should res-is expr i]
+05v #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]]]
+05v #{##[]
+10s print-errors
+0Bo 101
+05v println
+15
+05v ansi-red
+05v string/write
+10s res-is
+04i 1
+04i 1
+0Es fmt-arg-0
+0D
+05v ansi-green
+05v string/write
+10s res-should
+04i 1
+04i 1
+0Es fmt-arg-1
+0D
+05v string/write
+10s expr
+04i 1
+0Es fmt-arg-2
+0D
+05v cat
+10s fmt-arg-0
+05v " != "
+10s fmt-arg-1
+05v "\r\n"
+10s fmt-arg-2
+05v "\r\n\r\n"
+04i 6
+16
+04i 1
+09o 4
+24
+0D
+02i 1
+10s error-count
+25
+0Fs error-count
+01
+}
+17
+0Es test-failure
+0D
+23s run-test
+05v [result rawexpr i]
+05v #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr i]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]
+05v #{##[]
+23s anonymous
+05v [err]
+05v #@[source: [[display/error err] [test-failure result [list :exception-caught err] rawexpr i]]]
+05v #{##[]
+05v display/error
+10s err
+04i 1
+0D
+05v test-failure
+10s result
+05v list
+05v :exception-caught
+10s err
+04i 2
+10s rawexpr
+10s i
+04i 4
+01
+}
+17
+19o 89
+05v eval-in
+05v current-closure
+04i 0
+10s rawexpr
+04i 2
+0Es expr
+0D
+05v equal?
+10s result
+10s expr
+04i 2
+0Bo 28
+05v test-success
+10s result
+10s expr
+10s rawexpr
+10s i
+04i 4
+09o 25
+05v test-failure
+10s result
+10s expr
+10s rawexpr
+10s i
+04i 4
+16
+01
+}
+17
+0Es run-test
+0D
+05v tree/set!
+10s exports
+23s run
+23s run
+05v [output-passes hide-errors]
+05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [run-test [car cur-test] [cdr cur-test] [dec! i]]] [display-results] [return error-count]]]
+05v #{##[]
+05v bool
+10s hide-errors
+04i 1
+0Bo 10
+05v #f
+09o 7
+05v #t
+0Fs print-errors
+0D
+05v bool
+10s output-passes
+04i 1
+0Fs print-passes
+0D
+05v time/milliseconds
+04i 0
+0Fs nujel-start
+0D
+02i 0
+0Fs success-count
+0D
+02i 0
+0Fs error-count
+0D
+10s test-count
+02i 1
+25
+0Es i
+0D
+15
+10s test-list
+0Es ΓεnΣym-1
+0D
+10s ΓεnΣym-1
+0Bo 67
+24
+1B
+09o 52
+0D
+1C
+10s ΓεnΣym-1
+11
+0Es cur-test
+0D
+10s run-test
+10s cur-test
+11
+10s cur-test
+12
+10s i
+02i 1
+26
+0Fs i
+04i 3
+0D
+10s ΓεnΣym-1
+12
+0Fs ΓεnΣym-1
+10s ΓεnΣym-1
+0Ao -53
+09o 4
+24
+16
+0D
+05v display-results
+04i 0
+0D
+10s error-count
+01
+01
+}
+17
+0Es run
+04i 3
+0D
+10s reset!
+04i 0
 0D
 13
 16

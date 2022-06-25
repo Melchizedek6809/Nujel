@@ -1,13 +1,5 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-
-[def test-context "Nujel"]
-
-[defn test/reset []
-      [set! test-list #nil]
-      [set! test-count 0]
-      [test/add 4 [+ 3 1]]]
-
+;;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;;; This project uses the MIT license, a copy should be included under /LICENSE
 [def test-list   #nil]
 [def test-count     0]
 [def nujel-start    0]
@@ -20,14 +12,18 @@
       [set! test-list [cons [cons result expr] test-list]]
       [set! test-count [+ test-count 1]]]
 
-[defmacro test/add [result . expr]
-          "Add a test where EXPR must eval to RESULT"
-          `[test/add* ~result ~[list 'quote [cons 'do expr]]]]
+[export add [defmacro test/add [result . expr]
+                      "Add a test where EXPR must eval to RESULT"
+                      `[~test/add* ~result ~[list 'quote [cons 'do expr]]]]]
+
+[export reset! [defn reset! []
+                     [set! test-list [cons 4 '[+ 3 1]]]
+                     [set! test-count 1]]]
 
 [defn display-results []
       "Prints the result Message"
       [random/seed-initialize!]
-      [efmtln "{test-context} [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
+      [efmtln "Nujel [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
               [if [and [zero? error-count] [> test-count 0]]
                   "Success"
                   "Failed!"]
@@ -56,7 +52,7 @@
                     [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
-[defn test/run [result rawexpr i]
+[defn run-test [result rawexpr i]
       "Tests that RAWEXPR evaluates to RESULT"
       [try [fn [err]
                [display/error err]
@@ -66,22 +62,23 @@
                [test-success result expr rawexpr i]
                [test-failure result expr rawexpr i]]]]
 
-[defn test-run [output-passes hide-errors]
-      "Run through all automated Tests"
-      [set! print-errors   [not [bool hide-errors]]]
-      [set! print-passes   [bool output-passes]]
-      [set! nujel-start    [time/milliseconds]]
-      [set! success-count  0]
-      [set! error-count    0]
+[export run [defn run [output-passes hide-errors]
+                  "Run through all automated Tests"
+                  [set! print-errors   [not [bool hide-errors]]]
+                  [set! print-passes   [bool output-passes]]
+                  [set! nujel-start    [time/milliseconds]]
+                  [set! success-count  0]
+                  [set! error-count    0]
 
-      [def i [+ test-count 1]]
-      [doseq [cur-test test-list]
-             [test/run [car cur-test]
-                       [cdr cur-test]
-                       [dec! i]]]
+                  [def i [+ test-count 1]]
+                  [doseq [cur-test test-list]
+                         [run-test [car cur-test]
+                                   [cdr cur-test]
+                                   [dec! i]]]
 
-      [display-results]
-      [return error-count]]
+                  [display-results]
+                  [return error-count]]]
 
-[test/reset]
+[reset!]
+
 ;; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]
