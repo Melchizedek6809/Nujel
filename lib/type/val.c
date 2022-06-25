@@ -64,8 +64,8 @@ lVal *lValLambda(lClosure *v){
  | or if they are equal.
  */
 i64 lValGreater(const lVal *a, const lVal *b){
-	if((a == NULL) || (b == NULL)){return 0;}
-	if(a->type != b->type){
+	if(unlikely((a == NULL) || (b == NULL))){return 0;}
+	if(unlikely(a->type != b->type)){
 		if(((a->type == ltInt) || (a->type == ltFloat)) && ((b->type == ltInt) || (b->type == ltFloat))){
 			return ((a->type == ltInt) ? (float)a->vInt : a->vFloat) < ((b->type == ltInt) ? (float)b->vInt : b->vFloat) ? -1 : 1;
 		}else{
@@ -91,7 +91,6 @@ i64 lValGreater(const lVal *a, const lVal *b){
 		}
 		return alen - blen;
 	}
-
 	case ltInt:
 		return a->vInt - b->vInt;
 	case ltFloat:
@@ -115,10 +114,10 @@ i64 lValGreater(const lVal *a, const lVal *b){
 
 /* Check two values for equality */
 bool lValEqual(const lVal *a, const lVal *b){
-	if((a == NULL) || (b == NULL)){
+	if(unlikely((a == NULL) || (b == NULL))){
 		return ((a == NULL) && (b == NULL));
 	}
-	if(a->type != b->type){
+	if(unlikely(a->type != b->type)){
 		if(((a->type == ltInt) || (a->type == ltFloat)) && ((b->type == ltInt) || (b->type == ltFloat))){
 			return ((a->type == ltInt) ? (float)a->vInt : a->vFloat) == ((b->type == ltInt) ? (float)b->vInt : b->vFloat);
 		}else{

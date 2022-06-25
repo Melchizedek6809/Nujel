@@ -22,10 +22,11 @@ NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
 }
 
 static lVal *requireCertainType(lClosure *c, lVal *v, lType T){
-	if((v == NULL) || (v->type != T)){
+	if(unlikely((v == NULL) || (v->type != T))){
 		throwTypeError(c, v, T);
+	}else{
+		return v;
 	}
-	return v;
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
@@ -61,7 +62,7 @@ i64 requireInt(lClosure *c, lVal *v){
 
 i64 requireNaturalInt(lClosure *c, lVal *v){
 	i64 ret = requireInt(c,v);
-	if(ret < 0){ lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c); }
+	if(unlikely(ret < 0)){ lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c); }
 	return ret;
 }
 
@@ -108,7 +109,7 @@ lBuffer *requireBuffer(lClosure *c, lVal *v){
 
 lBuffer *requireMutableBuffer(lClosure *c, lVal *v){
 	lBuffer *ret = requireBuffer(c, v);
-	if(ret->flags & BUFFER_IMMUTABLE){ lExceptionThrowValClo("type-error", "Buffer is immutable", v, c); }
+	if(unlikely(ret->flags & BUFFER_IMMUTABLE)){ lExceptionThrowValClo("type-error", "Buffer is immutable", v, c); }
 	return ret;
 }
 
@@ -118,7 +119,7 @@ lBufferView *requireBufferView(lClosure *c, lVal *v){
 
 lBufferView *requireMutableBufferView(lClosure *c, lVal *v){
 	lBufferView *ret = requireBufferView(c, v);
-	if(ret->flags & BUFFER_VIEW_IMMUTABLE){ lExceptionThrowValClo("type-error", "BufferView is immutable", v, c); }
+	if(unlikely(ret->flags & BUFFER_VIEW_IMMUTABLE)){ lExceptionThrowValClo("type-error", "BufferView is immutable", v, c); }
 	return ret;
 }
 
@@ -128,7 +129,7 @@ lTree *requireTree(lClosure *c, lVal *v){
 
 lTree *requireMutableTree(lClosure *c, lVal *v){
 	lTree *ret = requireTree(c,v);
-	if(ret->flags & TREE_IMMUTABLE){ lExceptionThrowValClo("type-error", "Tree is immutable", v, c); }
+	if(unlikely(ret->flags & TREE_IMMUTABLE)){ lExceptionThrowValClo("type-error", "Tree is immutable", v, c); }
 	return ret;
 }
 
@@ -141,7 +142,7 @@ const lSymbol *requireKeyword(lClosure *c, lVal *v){
 }
 
 const lSymbol *requireSymbolic(lClosure *c, lVal *v){
-	if((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword))){
+	if(unlikely((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword)))){
 		throwTypeError(c, v, ltSymbol);
 	}
 	return v->vSymbol;

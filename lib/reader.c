@@ -94,7 +94,7 @@ static lVal *lParseString(lReadContext *s){
 	char *b = buf;
 	uint i=0;
 	while(s->data < s->bufEnd){
-		if(++i == bufSize){
+		if(unlikely(++i == bufSize)){
 			bufSize *= 2;
 			buf = realloc(buf,bufSize);
 			if(buf == NULL){
@@ -103,7 +103,7 @@ static lVal *lParseString(lReadContext *s){
 			}
 			b = &buf[i];
 		}
-		if(*s->data == '\\'){
+		if(unlikely(*s->data == '\\')){
 			s->data++;
 			switch(*s->data){
 			case '0':
@@ -144,12 +144,12 @@ static lVal *lParseString(lReadContext *s){
 				break;
 			}
 			s->data++;
-		}else if(*s->data == '"'){
+		}else if(unlikely(*s->data == '"')){
 			s->data++;
 			lVal *v = lValAlloc(ltString);
 			v->vString = lStringNew(buf,b-buf);
 			return v;
-		}else if(*s->data == 0){
+		}else if(unlikely(*s->data == 0)){
 			buf[i] = 0;
 			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
 		}else{
@@ -199,7 +199,7 @@ static lVal *lParseSymbol(lReadContext *s){
 	if(buf[0] == ':'){
 		kwstart = &buf[1];
 	}
-	if(*start == 0){
+	if(unlikely(*start == 0)){
 		lExceptionThrowReaderEnd(s, kwstart, "Sym/KW too short");
 	}
 	return keyword

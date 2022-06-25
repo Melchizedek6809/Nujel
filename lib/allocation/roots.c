@@ -32,7 +32,7 @@ static void *lRootsPush(const lType t, void *ptr){
 	if(unlikely(rootSP >= rootMax)){
 		rootMax = MAX(rootMax * 2, 256);
 		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
-		if(rootStack == NULL){
+		if(unlikely(rootStack == NULL)){
 			fpf(stderr,"Can't grow rootsStack\n");
 			exit(123);
 		}

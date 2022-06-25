@@ -34,9 +34,9 @@ lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
 	tmpc->caller = parent;
 	tmpc->ip   = tmpc->text->data;
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
-		if(n->type == ltPair){
+		if(likely(n->type == ltPair)){
 			lVal *car = lCar(n);
-			if(car){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));}
+			if(likely(car)){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));}
 			args = lCdr(args);
 		}else if(n->type == ltSymbol){
 			if(n){lDefineClosureSym(tmpc, lGetSymbol(n), args);}
@@ -106,7 +106,7 @@ void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 
 /* Set the value bound to S in C to V, if it has already been bound */
 bool lSetClosureSym(lClosure *c, const lSymbol *s, lVal *v){
-	if(c == NULL){return false;}
+	if(unlikely(c == NULL)){return false;}
 	bool found = false;
 	lTreeSet(c->data,s,v,&found);
 	if(found){return true;}

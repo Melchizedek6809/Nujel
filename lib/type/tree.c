@@ -28,7 +28,7 @@ static int lTreeGetBalance(const lTree *t){
 /* Reset S to be associated to V if it has already been bound, storing TRUE in
  * FOUND on success */
 void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
-	if(unlikely(t == NULL)){
+	if(t == NULL){
 		return;
 	}else if(s == t->key){
 		t->value = v;

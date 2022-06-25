@@ -283,7 +283,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;
 	case lopMacroDynamic:
 	case lopFnDynamic: {
-		if(ctx.sp < 4){throwStackUnderflowError(c, "Fn");}
+		if(unlikely(ctx.sp < 4)){throwStackUnderflowError(c, "Fn");}
 		const lBytecodeOp curOp = ip[-1];
 		lVal *cBody = ctx.valueStack[--ctx.sp];
 		lVal *cDocs = ctx.valueStack[--ctx.sp];

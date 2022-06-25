@@ -74,7 +74,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
 		lVal *car = n->vList.car;
 		lRootsValPush(n);
-		if((car == NULL) || (car->type != ltBytecodeArr)){
+		if(unlikely((car == NULL) || (car->type != ltBytecodeArr))){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}else{
 			lBytecodeEval(c, car->vBytecodeArr, false);
