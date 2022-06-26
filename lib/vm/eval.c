@@ -234,6 +234,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = lBytecodeReadOPSym(ip, &sym);
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, sym);
 		break; }
+	case lopRootsSave:
+		c->rsp = lRootsGet();
+		break;
+	case lopRootsRestore:
+		lRootsRet(c->rsp);
+		break;
 	case lopZeroPred: {
 		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
 		lVal *a = ctx.valueStack[ctx.sp-1];
