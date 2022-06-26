@@ -1,16 +1,22 @@
 Nujel
 --------------------------------------------------------
-A tiny, easily embeddable Lisp dialect.
-While providing a scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/) was what
-started the development effort for Nujel, it is now trying to become useful for other scripting tasks as well.
+A tiny, easy to embed Lisp dialect.
+While providing a scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/)
+was what started the development effort for Nujel, it is now trying to become
+useful for other scripting tasks as well.
 
 ## Performance
-While Nujel is still quite slow, it is definitely not the slowest Lisp out there.
-To make sure that there are no performance regression benchmarks are regularly run which are also used to compare Nujel
-against other runtimes, if you like colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
+While Nujel is still quite slow, it is definitely not the slowest runtime out there.
+To make sure that there are no performance regression benchmarks are regularly
+run which are also used to compare Nujel against other runtimes, if you like
+colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
 
 ## Syntax
-A lot of the language is still undocumented, this is because I want to preserve myself the ability to fine-tune those parts of the language as I develop a better feeling for what works and what doesn't. To read about parts of Nujel that are very unlikely to change you can look at the [LANGUAGE.md](./LANGUAGE.md) document in this repository.
+A lot of the language is still undocumented, this is because I want to preserve
+myself the ability to fine-tune those parts of the language as I develop a
+better feeling for what works and what doesn't. To read about parts of Nujel
+that are very unlikely to change you can look at the
+[LANGUAGE.md](./LANGUAGE.md) document in this repository.
 
 ## Current status
 Here is a collection of features already implemented, or about to be finished.
@@ -25,10 +31,12 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
 - [X] Constant Folding
 - [X] Module system
-- [ ] NaN boxing
+- [ ] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [ ] Tail-call optimization
 - [ ] Continuations
+- [ ] Value Types
 - [ ] Fibers (preemtible!)
+- [ ] NaN Boxing
 - [ ] Serializable fibers
 
 ## Current Limitations
