@@ -4,6 +4,7 @@
 ;;; Term / Raymarch Framework
 
 [import [hash :as adler32] :crypto/adler32]
+[require :array/2d]
 
 [def iTime 1.2]
 

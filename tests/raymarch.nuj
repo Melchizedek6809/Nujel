@@ -1,8 +1,8 @@
 #!/usr/bin/env nujel
-                                        ; Taken from here: https://www.shadertoy.com/view/sd2Gzt
+;; Taken from here: https://www.shadertoy.com/view/sd2Gzt
+;; Term / Raymarch Framework
 
-;;; Term / Raymarch Framework
-
+[require :array/2d]
 [def iTime 1.3]
 
 [defn term/cls []

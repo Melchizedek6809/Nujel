@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :array/2d]
+
 [def flashes/get]
 [def flashes/inc!]
 [let [[flashes/counter 0]]

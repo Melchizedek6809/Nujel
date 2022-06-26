@@ -939,240 +939,7 @@
 0Es array/cut
 01
 }#{##[]
-23s array/2d/allocate
-05v [width height]
-05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
-05v #{##[]
-05v tree/new
-05v :data
-05v array/fill!
-05v array/allocate
-10s width
-10s height
-27
-04i 1
-02i 0
-04i 2
-05v :width
-10s width
-05v :height
-10s height
-04i 6
-01
-}
-17
-0Es array/2d/allocate
-0D
-23s array/2d/fill!
-05v [data v]
-05v #@[source: [[array/fill! [tree/ref data :data] v] data]]
-05v #{##[]
-05v array/fill!
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s v
-04i 2
-0D
-10s data
-01
-}
-17
-0Es array/2d/fill!
-0D
-23s array/2d/ref
-05v [data x y oob-val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 47
-05v array/ref
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s x
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-27
-25
-04i 2
-01
-}
-17
-0Es array/2d/ref
-0D
-23s array/2d/set!
-05v [data x y val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] data]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 36
-05v throw
-05v list
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-05v current-lambda
-04i 0
-04i 4
-04i 1
-09o 51
-05v array/set!
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s x
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-27
-25
-10s val
-04i 3
-0D
-10s data
-01
-}
-17
-0Es array/2d/set!
-0D
-23s array/2d/print
-05v [data]
-05v #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
-05v #{##[]
-15
-02i 0
-0Es y
-0D
 24
-09o 107
-0D
-15
-02i 0
-0Es x
-0D
-24
-09o 50
-0D
-05v print
-05v cat
-05v array/2d/ref
-10s data
-10s x
-10s y
-04i 3
-05v " "
-04i 2
-04i 1
-0D
-02i 1
-10s x
-03
-0Fs x
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-1E
-0Ao -66
-0D
-24
-16
-0D
-05v newline
-04i 0
-0D
-02i 1
-10s y
-03
-0Fs y
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-1E
-0Ao -123
-0D
-24
-16
-0D
-10s data
-01
-}
-17
-0Es array/2d/print
 01
 }#{##[]
 23s sum
@@ -15935,6 +15702,277 @@
 }
 18
 0Es _
+01
+}#{##[]
+05v module/insert
+05v :array/2d
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+05v tree/set!
+10s exports
+23s allocate
+23s array/2d/allocate
+05v [width height]
+05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
+05v #{##[]
+05v tree/new
+05v :data
+05v array/fill!
+05v array/allocate
+10s width
+10s height
+27
+04i 1
+02i 0
+04i 2
+05v :width
+10s width
+05v :height
+10s height
+04i 6
+01
+}
+17
+0Es array/2d/allocate
+04i 3
+0D
+05v tree/set!
+10s exports
+23s fill!
+23s array/2d/fill!
+05v [data v]
+05v #@[source: [[array/fill! [tree/ref data :data] v] [return data]]]
+05v #{##[]
+05v array/fill!
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s v
+04i 2
+0D
+10s data
+01
+01
+}
+17
+0Es array/2d/fill!
+04i 3
+0D
+05v tree/set!
+10s exports
+23s ref
+23s array/2d/ref
+05v [data x y oob-val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 47
+05v array/ref
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s x
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+27
+25
+04i 2
+01
+}
+17
+0Es array/2d/ref
+04i 3
+0D
+05v tree/set!
+10s exports
+23s set!
+23s array/2d/set!
+05v [data x y val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [exception :out-of-bounds "Trying to set an array out of bounds" data] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] [return data]]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 36
+05v throw
+05v list
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
+05v current-lambda
+04i 0
+04i 4
+04i 1
+09o 51
+05v array/set!
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s x
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+27
+25
+10s val
+04i 3
+0D
+10s data
+01
+01
+}
+17
+0Es array/2d/set!
+04i 3
+0D
+05v tree/set!
+10s exports
+23s print
+23s array/2d/print
+05v [data]
+05v #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] [return data]]]
+05v #{##[]
+15
+02i 0
+0Es y
+0D
+24
+09o 107
+0D
+15
+02i 0
+0Es x
+0D
+24
+09o 50
+0D
+05v print
+05v cat
+05v array/2d/ref
+10s data
+10s x
+10s y
+04i 3
+05v " "
+04i 2
+04i 1
+0D
+02i 1
+10s x
+03
+0Fs x
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+1E
+0Ao -66
+0D
+24
+16
+0D
+05v newline
+04i 0
+0D
+02i 1
+10s y
+03
+0Fs y
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+1E
+0Ao -123
+0D
+24
+16
+0D
+10s data
+01
+01
+}
+17
+0Es array/2d/print
+04i 3
+0D
+13
+16
+04i 2
 01
 }#{##[]
 05v module/insert

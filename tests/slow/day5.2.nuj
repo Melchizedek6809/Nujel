@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :array/2d]
+
 [defn array/2d/new [width height val]
        [def ret [array/allocate width]]
        [def x 0]

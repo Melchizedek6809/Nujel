@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :array/2d]
+
 [defn map/set/row [data y line w]
        [def cols [map [split line ""] int]]
        [dotimes [x w]

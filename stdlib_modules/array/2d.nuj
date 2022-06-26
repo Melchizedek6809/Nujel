@@ -1,0 +1,38 @@
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
+;; Contains some routines for working with 2d data
+
+[export allocate [defn array/2d/allocate [width height]
+      @[ :data [-> [array/allocate [* width height]]
+                   [array/fill! 0]]
+         :width width
+         :height height]]]
+
+[export fill! [defn array/2d/fill! [data v]
+                    [array/fill! [tree/ref data :data] v]
+                    [return data]]]
+
+[export ref [defn array/2d/ref [data x y oob-val]
+                  [if [or [>= x [tree/ref data :width]]
+                          [>= y [tree/ref data :height]]
+                          [< x 0]
+                          [< y 0]]
+                      oob-val
+                      [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
+
+[export set! [defn array/2d/set! [data x y val]
+                   [if [or [>= x [tree/ref data :width]]
+                           [>= y [tree/ref data :height]]
+                           [< x 0]
+                           [< y 0]]
+                       [exception :out-of-bounds "Trying to set an array out of bounds" data]
+                       [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]]
+                   [return data]]]
+
+[export print [defn array/2d/print [data]
+                    [dotimes [y [tree/ref data :height]]
+                      [dotimes [x [tree/ref data :width]]
+                        [display [cat [array/2d/ref data x y] " "]]]
+                      [newline]]
+                    [return data]]]

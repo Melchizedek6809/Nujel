@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :array/2d]
+
 [defn fold/load [filename]
        [def points #nil]
        [def γ [reduce [split [file/read filename] "\n"]

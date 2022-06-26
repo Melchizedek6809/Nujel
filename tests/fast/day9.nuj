@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :array/2d]
+
 [defn is-low-point? [data x y]
       [def v [array/2d/ref data x y]]
       [def top [if [> y 0]
