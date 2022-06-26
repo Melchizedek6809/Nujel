@@ -22,6 +22,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
+#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
 
 typedef unsigned int     uint;
 

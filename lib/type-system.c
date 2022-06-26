@@ -31,7 +31,7 @@ static lVal *requireCertainType(lClosure *c, lVal *v, lType T){
 
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal *v, i64 fallback){
-	switch(v ? v->type : ltNoAlloc){
+	typeswitch(v){
 		case ltFloat: return v->vFloat;
 		case ltInt:   return v->vInt;
 		default:      return fallback;
@@ -75,7 +75,7 @@ lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v){
 }
 
 double requireFloat(lClosure *c, lVal *v){
-	switch(v ? v->type : ltNoAlloc){
+	typeswitch(v){
 	default:      throwTypeError(c, v, ltFloat);
 	case ltFloat: return v->vFloat;
 	case ltInt:   return v->vInt;
@@ -87,7 +87,7 @@ vec requireVec(lClosure *c, lVal *v){
 }
 
 vec requireVecCompatible(lClosure *c, lVal *v){
-	switch(v ? v->type : ltNoAlloc){
+	typeswitch(v){
 	default:      throwTypeError(c, v, ltVec);
 	case ltVec:   return v->vVec;
 	case ltFloat: return vecNew(v->vFloat, v->vFloat, v->vFloat, v->vFloat);

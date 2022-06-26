@@ -1,0 +1,93 @@
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
+;; This File contains various functions generating ansi escape sequences for colorful output
+
+
+[def disabled #f]
+[export disable! [defn disable! [v] [set! disabled [if [nil? v] #t v]]]]
+
+[def reset "\e[0m"]
+[def fg-reset "\e[0;39m"]
+[def bg-reset "\e[49m"]
+
+[def ansi-fg #[
+	       "\e[0;30m"
+	       "\e[0;31m"
+	       "\e[0;32m"
+	       "\e[0;33m"
+	       "\e[0;34m"
+	       "\e[0;35m"
+	       "\e[0;36m"
+	       "\e[0;37m"
+	       "\e[1;30m"
+	       "\e[1;31m"
+	       "\e[1;32m"
+	       "\e[1;33m"
+	       "\e[1;34m"
+	       "\e[1;35m"
+	       "\e[1;36m"
+	       "\e[1;37m"
+               ]]
+
+[def ansi-bg #[
+	       "\e[40m"
+	       "\e[41m"
+	       "\e[42m"
+	       "\e[43m"
+	       "\e[44m"
+	       "\e[45m"
+	       "\e[46m"
+	       "\e[47m"
+               ]]
+
+
+[export wrap [defn wrap [code string]
+                   "Wrap STRING in the ansi color CODE"
+                   [cat [or disabled [array/ref ansi-fg code]]
+                        string
+                        [or disabled reset]]]]
+
+[export black      [defn black      args [wrap  0 [apply cat args]]]]
+[export dark-red   [defn dark-red   args [wrap  1 [apply cat args]]]]
+[export dark-green [defn dark-green args [wrap  2 [apply cat args]]]]
+[export dark-brown [defn brown      args [wrap  3 [apply cat args]]]]
+[export dark-blue  [defn dark-blue  args [wrap  4 [apply cat args]]]]
+[export purple     [defn purple     args [wrap  5 [apply cat args]]]]
+[export teal       [defn teal       args [wrap  6 [apply cat args]]]]
+[export dark-gray  [defn dark-gray  args [wrap  7 [apply cat args]]]]
+[export gray       [defn gray       args [wrap  8 [apply cat args]]]]
+[export red        [defn red        args [wrap  9 [apply cat args]]]]
+[export green      [defn green      args [wrap 10 [apply cat args]]]]
+[export yellow     [defn yellow     args [wrap 11 [apply cat args]]]]
+[export blue       [defn blue       args [wrap 12 [apply cat args]]]]
+[export pink       [defn pink       args [wrap 13 [apply cat args]]]]
+[export cyan       [defn cyan       args [wrap 14 [apply cat args]]]]
+[export white      [defn white      args [wrap 15 [apply cat args]]]]
+
+[export rainbow [defn rainbow args
+                      "Wrap ARGS in the colors of the rainbow!"
+                      [let* [def count 0]
+                            [cat [join [map [split [apply cat args] ""]
+                                            [fn [a]
+                                                [set! count [bit-and [+ 1 count] #x7]]
+                                              [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
+                                 [or disabled fg-reset]]]]]
+
+[export rainbow-bg [defn rainbow-bg args
+                         "Wrap ARGS in the colors of the rainbow!"
+                         [def count 0]
+                         [def colored-list [map [split [apply cat args] ""]
+			                        [fn [a]
+			                            [set! count [bit-and [+ 1 count] #x7]]
+			                          [cat [or disabled [array/ref ansi-fg [bit-xor count #x7]]] [or disabled [array/ref ansi-bg count]] a]]]]
+                         [cat [join colored-list ""]
+                              [or disabled reset]]]]
+
+[export reprint-line [defn reprint-line [text width]
+                           [when-not width [set! width 20]]
+                           [print "\r"]
+                           [dotimes [i width]
+                                    [print " "]]
+                           [print "\r"]
+                           [print text]]]

@@ -251,7 +251,7 @@ static lVal *lnfMetaSet(lClosure *c, lVal *v){
 }
 
 static lVal *lCastFloat(lClosure *c, lVal *v){
-	switch(v ? v->type : ltNoAlloc){
+	typeswitch(v){
 	default:      throwTypeError(c, v, ltFloat);
 	case ltFloat: return v;
 	case ltInt:   return lValFloat(v->vInt);
@@ -262,7 +262,7 @@ static lVal *lnfFloat(lClosure *c, lVal *v){
 }
 
 static lVal *lCastInt(lClosure *c, lVal *v){
-	switch(v ? v->type : ltNoAlloc){
+	typeswitch(v){
 	default:      throwTypeError(c, v, ltInt);
 	case ltInt:   return v;
 	case ltFloat: return lValInt(v->vFloat);

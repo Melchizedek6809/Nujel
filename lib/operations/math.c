@@ -19,7 +19,7 @@ static lVal *exceptionThrowFloat(lClosure *c, lVal *v, const char *func){
 
 lVal *lnfAbs(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"absolute");
 		case ltFloat: return lValFloat(fabs(t->vFloat));
 		case ltInt:   return lValInt(llabs(t->vInt));
@@ -29,7 +29,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 
 lVal *lnfCbrt(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"squareroot");
 		case ltFloat: return lValFloat(cbrt(t->vFloat));
 		case ltInt:   return lValFloat(cbrt(t->vInt));
@@ -39,7 +39,7 @@ lVal *lnfCbrt(lClosure *c, lVal *v){
 
 lVal *lnfSqrt(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"squareroot");
 		case ltFloat: return lValFloat(sqrt(t->vFloat));
 		case ltInt:   return lValFloat(sqrt(t->vInt));
@@ -49,7 +49,7 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 
 lVal *lnfCeil(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"ceil");
 		case ltFloat: return lValFloat(ceil(t->vFloat));
 		case ltVec:   return lValVec(vecCeil(t->vVec));
@@ -58,7 +58,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 
 lVal *lnfFloor(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"floor");
 		case ltFloat: return lValFloat(floor(t->vFloat));
 		case ltVec:   return lValVec(vecFloor(t->vVec));
@@ -67,7 +67,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 
 lVal *lnfRound(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrow(c, v,"round");
 		case ltFloat: return lValFloat(round(t->vFloat));
 		case ltVec:   return lValVec(vecRound(t->vVec));
@@ -76,7 +76,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 
 lVal *lnfSin(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"sin");
 		case ltFloat: return lValFloat(sin(t->vFloat));
 	}
@@ -84,7 +84,7 @@ lVal *lnfSin(lClosure *c, lVal *v){
 
 lVal *lnfCos(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"cos");
 		case ltFloat: return lValFloat(cos(t->vFloat));
 	}
@@ -92,7 +92,7 @@ lVal *lnfCos(lClosure *c, lVal *v){
 
 lVal *lnfTan(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
-	switch(t->type){
+	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"tan");
 		case ltFloat: return lValFloat(tan(t->vFloat));
 	}
