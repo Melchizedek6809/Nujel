@@ -24,9 +24,8 @@ NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
 static lVal *requireCertainType(lClosure *c, lVal *v, lType T){
 	if(unlikely((v == NULL) || (v->type != T))){
 		throwTypeError(c, v, T);
-	}else{
-		return v;
 	}
+	return v;
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
