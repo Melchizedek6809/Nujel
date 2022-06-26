@@ -10,13 +10,13 @@
 [def avl/empty :e]
 
 [defn avl/empty? [n] [= :e n]]
-[defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]
+[export default-cmp [defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]]
 [defn avl/typecheck [r k]
       [or [avl/empty? [avl/root r]]
           [= [type-of k] [type-of [avl/key [avl/root r]]]]
           [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]
-[defn avl/tree [cmp]
-      #[avl/empty [or cmp avl/default-cmp]]]
+[export tree [defn avl/tree [cmp]
+                   #[avl/empty [or cmp avl/default-cmp]]]]
 
 [defn avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]]
 [defn avl/key    [n] [array/ref n 1]]
@@ -92,10 +92,10 @@
                 [1  [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]]
                 [0  [avl/update-key n v]]]]]
 
-[defn avl/insert [t v]
-      "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
-      [avl/typecheck t v]
-      [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]
+[export insert [defn avl/insert [t v]
+                     "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V"
+                     [avl/typecheck t v]
+                     [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]]
 
 [defn avl/node-get [n cmp v]
       [if [avl/empty? n]
@@ -105,16 +105,16 @@
                 [-1 [avl/node-get [avl/left  n] cmp v]]
                 [1  [avl/node-get [avl/right n] cmp v]]]]]
 
-[defn avl/get [t v]
-      "Retrieve the key V from tree T, or #nil if V is not in it"
-      [if [or [avl/empty? [avl/root t]]
-              [not= [type-of v] [type-of [avl/key [avl/root t]]]]]
-          #nil
-          [avl/node-get [avl/root t] [avl/cmp t] v]]]
+[export get [defn avl/get [t v]
+                  "Retrieve the key V from tree T, or #nil if V is not in it"
+                  [if [or [avl/empty? [avl/root t]]
+                          [not= [type-of v] [type-of [avl/key [avl/root t]]]]]
+                      #nil
+                      [avl/node-get [avl/root t] [avl/cmp t] v]]]]
 
-[defn avl/from-list [l cmp]
-      "Create a new avl tree using the keys in L and the comparison function CMP"
-      [list/reduce l avl/insert [avl/tree cmp]]]
+[export from-list [defn avl/from-list [l cmp]
+                        "Create a new avl tree using the keys in L and the comparison function CMP"
+                        [list/reduce l avl/insert [avl/tree cmp]]]]
 
 [defn avl/remove-rebalance [n]
       [if [avl/empty? n]
@@ -148,9 +148,9 @@
                [set! root [avl/update-height root]]
                [avl/remove-rebalance root]]]]
 
-[defn avl/remove [t v]
-      "Remove the key V from tree T if it is contained within it"
-      [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]
+[export remove [defn avl/remove [t v]
+                     "Remove the key V from tree T if it is contained within it"
+                     [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]]
 
 [defn avl/equal-node? [a b]
       [if [avl/empty? a]
@@ -159,9 +159,9 @@
                [avl/equal-node? [avl/left a] [avl/left b]]
                [avl/equal-node? [avl/right a] [avl/right b]]]]]
 
-[defn avl/equal? [a b]
-      "Test if two avl trees are equal"
-      [avl/equal-node? [avl/root a] [avl/root b]]]
+[export equal? [defn avl/equal? [a b]
+                     "Test if two avl trees are equal"
+                     [avl/equal-node? [avl/root a] [avl/root b]]]]
 
 [defn avl/reduce-node [node o s]
       [if [avl/empty? node]
@@ -170,9 +170,9 @@
              [avl/reduce-node [avl/right node] o
                               [avl/reduce-node [avl/left node] o s]]]]]
 
-[defn avl/reduce [t o s]
-      "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
-      [avl/reduce-node [avl/root t] o s]]
+[export reduce [defn avl/reduce [t o s]
+                     "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree"
+                     [avl/reduce-node [avl/root t] o s]]]
 
 [defn avl/reduce-node-bin [n o s]
       [if [avl/empty? n]
@@ -181,17 +181,17 @@
                 [avl/reduce-node-bin [avl/left n] o s]]
              [avl/reduce-node-bin [avl/right n] o s]]]]
 
-[defn avl/reduce-bin [t o s]
-      "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"
-      [avl/reduce-node-bin [avl/root t] o s]]
+[export reduce-bin [defn avl/reduce-bin [t o s]
+                         "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees"
+                         [avl/reduce-node-bin [avl/root t] o s]]]
 
-[defn avl/map [t f]
-      "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
-      [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]
+[export map [defn avl/map [t f]
+                  "Create a new avl tree by mapping each key in T using F, using the same comparison function as T"
+                  [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]]
 
-[defn avl/map-to [t f cmp]
-      "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
-      [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]
+[export map-to [defn avl/map-to [t f cmp]
+                     "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T"
+                     [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]]
 
-[defn avl/to-list [t]
-      [avl/reduce t cons #nil]]
+[export to-list [defn avl/to-list [t]
+                      [avl/reduce t cons #nil]]]

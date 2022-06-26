@@ -16,6 +16,10 @@
                       "Add a test where EXPR must eval to RESULT"
                       `[~test/add* ~result ~[list 'quote [cons 'do expr]]]]]
 
+[export mod [defmacro test/add [mod result . expr]
+                      "Add a test where EXPR must eval to RESULT"
+                      `[~test/add* ~result ~[list 'quote [cons 'do [cons `[require ~mod] expr]]]]]]
+
 [export reset! [defn reset! []
                      [set! test-list [cons 4 '[+ 3 1]]]
                      [set! test-count 1]]]

@@ -158,242 +158,6 @@
 0Es bit-clear
 01
 }#{##[]
-23s array/2d/allocate
-05v [width height]
-05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
-05v #{##[]
-05v tree/new
-05v :data
-05v array/fill!
-05v array/allocate
-10s width
-10s height
-27
-04i 1
-02i 0
-04i 2
-05v :width
-10s width
-05v :height
-10s height
-04i 6
-01
-}
-17
-0Es array/2d/allocate
-0D
-23s array/2d/fill!
-05v [data v]
-05v #@[source: [[array/fill! [tree/ref data :data] v] data]]
-05v #{##[]
-05v array/fill!
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s v
-04i 2
-0D
-10s data
-01
-}
-17
-0Es array/2d/fill!
-0D
-23s array/2d/ref
-05v [data x y oob-val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 10
-10s oob-val
-09o 47
-05v array/ref
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s x
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-27
-25
-04i 2
-01
-}
-17
-0Es array/2d/ref
-0D
-23s array/2d/set!
-05v [data x y val]
-05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] data]]
-05v #{##[]
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-21
-0C
-0Ao 56
-0D
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-21
-0C
-0Ao 32
-0D
-10s x
-02i 0
-1E
-0C
-0Ao 20
-0D
-10s y
-02i 0
-1E
-0C
-0Ao 8
-0D
-05v #f
-0Bo 36
-05v throw
-05v list
-05v :out-of-bounds
-05v "Trying to set an array out of bounds"
-10s data
-05v current-lambda
-04i 0
-04i 4
-04i 1
-09o 51
-05v array/set!
-05v tree/ref
-10s data
-05v :data
-04i 2
-10s x
-10s y
-05v tree/ref
-10s data
-05v :width
-04i 2
-27
-25
-10s val
-04i 3
-0D
-10s data
-01
-}
-17
-0Es array/2d/set!
-0D
-23s array/2d/print
-05v [data]
-05v #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
-05v #{##[]
-15
-02i 0
-0Es y
-0D
-24
-09o 107
-0D
-15
-02i 0
-0Es x
-0D
-24
-09o 50
-0D
-05v print
-05v cat
-05v array/2d/ref
-10s data
-10s x
-10s y
-04i 3
-05v " "
-04i 2
-04i 1
-0D
-02i 1
-10s x
-03
-0Fs x
-10s x
-05v tree/ref
-10s data
-05v :width
-04i 2
-1E
-0Ao -66
-0D
-24
-16
-0D
-05v newline
-04i 0
-0D
-02i 1
-10s y
-03
-0Fs y
-10s y
-05v tree/ref
-10s data
-05v :height
-04i 2
-1E
-0Ao -123
-0D
-24
-16
-0D
-10s data
-01
-}
-17
-0Es array/2d/print
-01
-}#{##[]
 23s array/+=
 05v [a i v]
 05v #@[documentation: "Add V to the value in A at position I and store the result in A returning A" source: ["Add V to the value in A at position I and store the result in A returning A" [array/set! a i [+ v [array/ref a i]]]]]
@@ -1175,1205 +939,240 @@
 0Es array/cut
 01
 }#{##[]
-05v :e
-0Es avl/empty
-0D
-23s avl/empty?
-05v [n]
-05v #@[source: [[= :e n]]]
+23s array/2d/allocate
+05v [width height]
+05v #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]]
 05v #{##[]
-05v :e
-10s n
-20
-01
-}
-17
-0Es avl/empty?
-0D
-23s avl/default-cmp
-05v [x y]
-05v #@[source: [[if [< x y] -1 [if [> x y] 1 0]]]]
-05v #{##[]
-10s x
-10s y
-1E
-0Bo 8
-02i -1
-09o 22
-10s x
-10s y
-22
-0Bo 8
-02i 1
-09o 5
+05v tree/new
+05v :data
+05v array/fill!
+05v array/allocate
+10s width
+10s height
+27
+04i 1
 02i 0
+04i 2
+05v :width
+10s width
+05v :height
+10s height
+04i 6
 01
 }
 17
-0Es avl/default-cmp
+0Es array/2d/allocate
 0D
-23s avl/typecheck
-05v [r k]
-05v #@[source: [[or [avl/empty? [avl/root r]] [= [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]]
+23s array/2d/fill!
+05v [data v]
+05v #@[source: [[array/fill! [tree/ref data :data] v] data]]
 05v #{##[]
-05v avl/empty?
-05v avl/root
-10s r
-04i 1
-04i 1
-0C
-0Ao 81
+05v array/fill!
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s v
+04i 2
 0D
-05v type-of
-10s k
-04i 1
-05v type-of
-05v avl/key
-05v avl/root
-10s r
-04i 1
-04i 1
-04i 1
-20
-0C
-0Ao 43
+10s data
+01
+}
+17
+0Es array/2d/fill!
 0D
+23s array/2d/ref
+05v [data x y oob-val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 10
+10s oob-val
+09o 47
+05v array/ref
+05v tree/ref
+10s data
+05v :data
+04i 2
+10s x
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+27
+25
+04i 2
+01
+}
+17
+0Es array/2d/ref
+0D
+23s array/2d/set!
+05v [data x y val]
+05v #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [throw [list :out-of-bounds "Trying to set an array out of bounds" data [current-lambda]]] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] data]]
+05v #{##[]
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+21
+0C
+0Ao 56
+0D
+10s y
+05v tree/ref
+10s data
+05v :height
+04i 2
+21
+0C
+0Ao 32
+0D
+10s x
+02i 0
+1E
+0C
+0Ao 20
+0D
+10s y
+02i 0
+1E
+0C
+0Ao 8
+0D
+05v #f
+0Bo 36
 05v throw
 05v list
-05v :type-error
-05v "AVL trees can only contains keys of a single type"
-10s k
+05v :out-of-bounds
+05v "Trying to set an array out of bounds"
+10s data
 05v current-lambda
 04i 0
 04i 4
 04i 1
-0C
-0Ao 8
-0D
-05v #f
-01
-}
-17
-0Es avl/typecheck
-0D
-23s avl/tree
-05v [cmp]
-05v #@[source: [[array/new avl/empty [or cmp avl/default-cmp]]]]
-05v #{##[]
-05v array/new
-10s avl/empty
-10s cmp
-0C
-0Ao 17
-0D
-10s avl/default-cmp
-0C
-0Ao 8
-0D
-05v #f
-04i 2
-01
-}
-17
-0Es avl/tree
-0D
-23s avl/height
-05v [n]
-05v #@[source: [[if [avl/empty? n] 0 [array/ref n 0]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 8
-02i 0
-09o 15
-05v array/ref
-10s n
-02i 0
-04i 2
-01
-}
-17
-0Es avl/height
-0D
-23s avl/key
-05v [n]
-05v #@[source: [[array/ref n 1]]]
-05v #{##[]
-05v array/ref
-10s n
-02i 1
-04i 2
-01
-}
-17
-0Es avl/key
-0D
-23s avl/left
-05v [n]
-05v #@[source: [[array/ref n 2]]]
-05v #{##[]
-05v array/ref
-10s n
-02i 2
-04i 2
-01
-}
-17
-0Es avl/left
-0D
-23s avl/right
-05v [n]
-05v #@[source: [[array/ref n 3]]]
-05v #{##[]
-05v array/ref
-10s n
-02i 3
-04i 2
-01
-}
-17
-0Es avl/right
-0D
-23s avl/root
-05v [r]
-05v #@[source: [[array/ref r 0]]]
-05v #{##[]
-05v array/ref
-10s r
-02i 0
-04i 2
-01
-}
-17
-0Es avl/root
-0D
-23s avl/cmp
-05v [r]
-05v #@[source: [[array/ref r 1]]]
-05v #{##[]
-05v array/ref
-10s r
-02i 1
-04i 2
-01
-}
-17
-0Es avl/cmp
-0D
-23s avl/min-node
-05v [n]
-05v #@[source: [[if [avl/empty? n] avl/empty [let [[l [avl/left n]]] [if [avl/empty? l] n [avl/min-mode l]]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 10
-10s avl/empty
-09o 50
-15
-05v avl/left
-10s n
-04i 1
-0Es l
-0D
-05v avl/empty?
-10s l
-04i 1
-0Bo 10
-10s n
-09o 13
-10s avl/min-mode
-10s l
-04i 1
-16
-01
-}
-17
-0Es avl/min-node
-0D
-23s avl/update-left
-05v [n l]
-05v #@[source: [[array/set! [array/dup n] 2 l]]]
-05v #{##[]
+09o 51
 05v array/set!
-05v array/dup
-10s n
-04i 1
-02i 2
-10s l
-04i 3
-01
-}
-17
-0Es avl/update-left
-0D
-23s avl/update-right
-05v [n r]
-05v #@[source: [[array/set! [array/dup n] 3 r]]]
-05v #{##[]
-05v array/set!
-05v array/dup
-10s n
-04i 1
-02i 3
-10s r
-04i 3
-01
-}
-17
-0Es avl/update-right
-0D
-23s avl/update-key
-05v [n k]
-05v #@[source: [[array/set! [array/dup n] 1 k]]]
-05v #{##[]
-05v array/set!
-05v array/dup
-10s n
-04i 1
-02i 1
-10s k
-04i 3
-01
-}
-17
-0Es avl/update-key
-0D
-23s avl/update-root
-05v [t r]
-05v #@[source: [[array/set! [array/dup t] 0 r]]]
-05v #{##[]
-05v array/set!
-05v array/dup
-10s t
-04i 1
-02i 0
-10s r
-04i 3
-01
-}
-17
-0Es avl/update-root
-0D
-23s avl/update-height
-05v [n]
-05v #@[source: [[array/set! [array/dup n] 0 [+ 1 [max [avl/height [avl/left n]] [avl/height [avl/right n]]]]]]]
-05v #{##[]
-05v array/set!
-05v array/dup
-10s n
-04i 1
-02i 0
-02i 1
-05v max
-05v avl/height
-05v avl/left
-10s n
-04i 1
-04i 1
-05v avl/height
-05v avl/right
-10s n
-04i 1
-04i 1
+05v tree/ref
+10s data
+05v :data
 04i 2
+10s x
+10s y
+05v tree/ref
+10s data
+05v :width
+04i 2
+27
 25
+10s val
 04i 3
+0D
+10s data
 01
 }
 17
-0Es avl/update-height
+0Es array/2d/set!
 0D
-23s avl/rotate-right
-05v [y]
-05v #@[source: [[let [[x [avl/left y]]] [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]]
+23s array/2d/print
+05v [data]
+05v #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] data]]
 05v #{##[]
 15
-05v avl/left
-10s y
-04i 1
-0Es x
-0D
-05v avl/update-height
-05v avl/update-right
-10s x
-05v avl/update-height
-05v avl/update-left
-10s y
-05v avl/right
-10s x
-04i 1
-04i 2
-04i 1
-04i 2
-04i 1
-16
-01
-}
-17
-0Es avl/rotate-right
-0D
-23s avl/rotate-left
-05v [x]
-05v #@[source: [[let [[y [avl/right x]]] [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]]
-05v #{##[]
-15
-05v avl/right
-10s x
-04i 1
+02i 0
 0Es y
 0D
-05v avl/update-height
-05v avl/update-left
+24
+09o 107
+0D
+15
+02i 0
+0Es x
+0D
+24
+09o 50
+0D
+05v print
+05v cat
+05v array/2d/ref
+10s data
+10s x
 10s y
-05v avl/update-height
-05v avl/update-right
+04i 3
+05v " "
+04i 2
+04i 1
+0D
+02i 1
 10s x
-05v avl/left
+03
+0Fs x
+10s x
+05v tree/ref
+10s data
+05v :width
+04i 2
+1E
+0Ao -66
+0D
+24
+16
+0D
+05v newline
+04i 0
+0D
+02i 1
 10s y
-04i 1
+03
+0Fs y
+10s y
+05v tree/ref
+10s data
+05v :height
 04i 2
-04i 1
-04i 2
-04i 1
-16
-01
-}
-17
-0Es avl/rotate-left
-0D
-23s avl/balance
-05v [n]
-05v #@[source: [[if [avl/empty? n] 0 [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 8
-02i 0
-09o 36
-05v avl/height
-05v avl/left
-10s n
-04i 1
-04i 1
-05v avl/height
-05v avl/right
-10s n
-04i 1
-04i 1
-26
-01
-}
-17
-0Es avl/balance
-0D
-23s avl/insert-rebalance
-05v [n cmp v]
-05v #@[source: [[let [[b [avl/balance n]]] [cond [[> b 1] [case [cmp v [avl/key [avl/left n]]] [-1 [avl/rotate-right n]] [1 [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]] [0 n]]] [[< b -1] [case [cmp v [avl/key [avl/right n]]] [1 [avl/rotate-left n]] [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]] [0 n]]] [#t n]]]]]
-05v #{##[]
-15
-05v avl/balance
-10s n
-04i 1
-0Es b
-0D
-10s b
-02i 1
-22
-0Bo 125
-15
-10s cmp
-10s v
-05v avl/key
-05v avl/left
-10s n
-04i 1
-04i 1
-04i 2
-0Es ΓεnΣym-1
-0D
-10s ΓεnΣym-1
-02i -1
-20
-0Bo 16
-05v avl/rotate-right
-10s n
-04i 1
-09o 66
-10s ΓεnΣym-1
-02i 1
-20
-0Bo 38
-05v avl/rotate-right
-05v avl/update-left
-10s n
-05v avl/rotate-left
-05v avl/left
-10s n
-04i 1
-04i 1
-04i 2
-04i 1
-09o 21
-10s ΓεnΣym-1
-02i 0
-20
-0Bo 10
-10s n
-09o 4
-24
-16
-09o 150
-10s b
-02i -1
 1E
-0Bo 125
-15
-10s cmp
-10s v
-05v avl/key
-05v avl/right
-10s n
-04i 1
-04i 1
-04i 2
-0Es ΓεnΣym-2
+0Ao -123
 0D
-10s ΓεnΣym-2
-02i 1
-20
-0Bo 16
-05v avl/rotate-left
-10s n
-04i 1
-09o 66
-10s ΓεnΣym-2
-02i -1
-20
-0Bo 38
-05v avl/rotate-left
-05v avl/update-right
-10s n
-05v avl/rotate-right
-05v avl/right
-10s n
-04i 1
-04i 1
-04i 2
-04i 1
-09o 21
-10s ΓεnΣym-2
-02i 0
-20
-0Bo 10
-10s n
-09o 4
 24
 16
-09o 18
-05v #t
-0Bo 10
-10s n
-09o 4
-24
-16
+0D
+10s data
 01
 }
 17
-0Es avl/insert-rebalance
-0D
-23s avl/node-insert
-05v [n cmp v]
-05v #@[source: [[if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [case [cmp v [avl/key n]] [-1 [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v]] [1 [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]] [0 [avl/update-key n v]]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 26
-05v array/new
-02i 1
-10s v
-10s avl/empty
-10s avl/empty
-04i 4
-09o 192
-15
-10s cmp
-10s v
-05v avl/key
-10s n
-04i 1
-04i 2
-0Es ΓεnΣym-3
-0D
-10s ΓεnΣym-3
-02i -1
-20
-0Bo 60
-05v avl/insert-rebalance
-05v avl/update-height
-05v avl/update-left
-10s n
-05v avl/node-insert
-05v avl/left
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-04i 2
-04i 1
-10s cmp
-10s v
-04i 3
-09o 98
-10s ΓεnΣym-3
-02i 1
-20
-0Bo 60
-05v avl/insert-rebalance
-05v avl/update-height
-05v avl/update-right
-10s n
-05v avl/node-insert
-05v avl/right
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-04i 2
-04i 1
-10s cmp
-10s v
-04i 3
-09o 31
-10s ΓεnΣym-3
-02i 0
-20
-0Bo 20
-05v avl/update-key
-10s n
-10s v
-04i 2
-09o 4
-24
-16
-01
-}
-17
-0Es avl/node-insert
-0D
-23s avl/insert
-05v [t v]
-05v #@[documentation: "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" source: ["Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" [avl/typecheck t v] [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]]
-05v #{##[]
-05v avl/typecheck
-10s t
-10s v
-04i 2
-0D
-05v avl/update-root
-10s t
-05v avl/node-insert
-05v avl/root
-10s t
-04i 1
-05v avl/cmp
-10s t
-04i 1
-10s v
-04i 3
-04i 2
-01
-}
-17
-0Es avl/insert
-0D
-23s avl/node-get
-05v [n cmp v]
-05v #@[source: [[if [avl/empty? n] #nil [case [cmp v [avl/key n]] [0 [avl/key n]] [-1 [avl/node-get [avl/left n] cmp v]] [1 [avl/node-get [avl/right n] cmp v]]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 7
-24
-09o 128
-15
-10s cmp
-10s v
-05v avl/key
-10s n
-04i 1
-04i 2
-0Es ΓεnΣym-4
-0D
-10s ΓεnΣym-4
-02i 0
-20
-0Bo 16
-05v avl/key
-10s n
-04i 1
-09o 78
-10s ΓεnΣym-4
-02i -1
-20
-0Bo 30
-05v avl/node-get
-05v avl/left
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-09o 41
-10s ΓεnΣym-4
-02i 1
-20
-0Bo 30
-05v avl/node-get
-05v avl/right
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-09o 4
-24
-16
-01
-}
-17
-0Es avl/node-get
-0D
-23s avl/get
-05v [t v]
-05v #@[documentation: "Retrieve the key V from tree T, or #nil if V is not in it" source: ["Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [not= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]]
-05v #{##[]
-05v avl/empty?
-05v avl/root
-10s t
-04i 1
-04i 1
-0C
-0Ao 51
-0D
-05v not=
-05v type-of
-10s v
-04i 1
-05v type-of
-05v avl/key
-05v avl/root
-10s t
-04i 1
-04i 1
-04i 1
-04i 2
-0C
-0Ao 8
-0D
-05v #f
-0Bo 7
-24
-09o 33
-05v avl/node-get
-05v avl/root
-10s t
-04i 1
-05v avl/cmp
-10s t
-04i 1
-10s v
-04i 3
-01
-}
-17
-0Es avl/get
-0D
-23s avl/from-list
-05v [l cmp]
-05v #@[documentation: "Create a new avl tree using the keys in L and the comparison function CMP" source: ["Create a new avl tree using the keys in L and the comparison function CMP" [list/reduce l avl/insert [avl/tree cmp]]]]
-05v #{##[]
-05v list/reduce
-10s l
-10s avl/insert
-05v avl/tree
-10s cmp
-04i 1
-04i 3
-01
-}
-17
-0Es avl/from-list
-0D
-23s avl/remove-rebalance
-05v [n]
-05v #@[source: [[if [avl/empty? n] n [let [[b [avl/balance n]] [l [avl/left n]] [r [avl/right n]]] [cond [[> b 1] [if [>= [avl/balance l] 0] [avl/rotate-right n] [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]] [[< b -1] [if [<= [avl/balance r] 0] [avl/rotate-left n] [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]] [#t n]]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 10
-10s n
-09o 201
-15
-05v avl/balance
-10s n
-04i 1
-0Es b
-0D
-05v avl/left
-10s n
-04i 1
-0Es l
-0D
-05v avl/right
-10s n
-04i 1
-0Es r
-0D
-10s b
-02i 1
-22
-0Bo 61
-05v avl/balance
-10s l
-04i 1
-02i 0
-21
-0Bo 16
-05v avl/rotate-right
-10s n
-04i 1
-09o 29
-05v avl/rotate-right
-05v avl/update-left
-10s n
-05v avl/rotate-left
-10s l
-04i 1
-04i 2
-04i 1
-09o 86
-10s b
-02i -1
-1E
-0Bo 61
-05v avl/balance
-10s r
-04i 1
-02i 0
-1F
-0Bo 16
-05v avl/rotate-left
-10s n
-04i 1
-09o 29
-05v avl/rotate-left
-05v avl/update-right
-10s n
-05v avl/rotate-right
-10s r
-04i 1
-04i 2
-04i 1
-09o 18
-05v #t
-0Bo 10
-10s n
-09o 4
-24
-16
-01
-}
-17
-0Es avl/remove-rebalance
-0D
-23s avl/node-remove
-05v [n cmp v]
-05v #@[source: [[if [avl/empty? n] n [let [[root [case [cmp v [avl/key n]] [-1 [avl/update-left n [avl/node-remove [avl/left n] cmp v]]] [1 [avl/update-right n [avl/node-remove [avl/right n] cmp v]]] [0 [cond [[avl/empty? [avl/left n]] [avl/right n]] [[avl/empty? [avl/right n]] [avl/left n]] [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 10
-10s n
-09o 324
-15
-15
-10s cmp
-10s v
-05v avl/key
-10s n
-04i 1
-04i 2
-0Es ΓεnΣym-5
-0D
-10s ΓεnΣym-5
-02i -1
-20
-0Bo 40
-05v avl/update-left
-10s n
-05v avl/node-remove
-05v avl/left
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-04i 2
-09o 218
-10s ΓεnΣym-5
-02i 1
-20
-0Bo 40
-05v avl/update-right
-10s n
-05v avl/node-remove
-05v avl/right
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-04i 2
-09o 171
-10s ΓεnΣym-5
-02i 0
-20
-0Bo 160
-05v avl/empty?
-05v avl/left
-10s n
-04i 1
-04i 1
-0Bo 16
-05v avl/right
-10s n
-04i 1
-09o 125
-05v avl/empty?
-05v avl/right
-10s n
-04i 1
-04i 1
-0Bo 16
-05v avl/left
-10s n
-04i 1
-09o 93
-05v #t
-0Bo 85
-15
-05v avl/key
-05v avl/min-node
-05v avl/right
-10s n
-04i 1
-04i 1
-04i 1
-0Es k
-0D
-05v avl/update-key
-05v avl/update-right
-05v avl/right
-10s n
-04i 1
-05v avl/node-remove
-05v avl/right
-10s n
-04i 1
-10s cmp
-10s v
-04i 3
-04i 2
-10s k
-04i 2
-16
-09o 4
-24
-09o 4
-24
-16
-0Es root
-0D
-05v avl/update-height
-10s root
-04i 1
-0Fs root
-0D
-05v avl/remove-rebalance
-10s root
-04i 1
-16
-01
-}
-17
-0Es avl/node-remove
-0D
-23s avl/remove
-05v [t v]
-05v #@[documentation: "Remove the key V from tree T if it is contained within it" source: ["Remove the key V from tree T if it is contained within it" [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]]
-05v #{##[]
-05v avl/update-root
-10s t
-05v avl/node-remove
-05v avl/root
-10s t
-04i 1
-05v avl/cmp
-10s t
-04i 1
-10s v
-04i 3
-04i 2
-01
-}
-17
-0Es avl/remove
-0D
-23s avl/equal-node?
-05v [a b]
-05v #@[source: [[if [avl/empty? a] [avl/empty? b] [and [equal? [avl/key a] [avl/key b]] [avl/equal-node? [avl/left a] [avl/left b]] [avl/equal-node? [avl/right a] [avl/right b]]]]]]
-05v #{##[]
-05v avl/empty?
-10s a
-04i 1
-0Bo 16
-05v avl/empty?
-10s b
-04i 1
-09o 91
-05v equal?
-05v avl/key
-10s a
-04i 1
-05v avl/key
-10s b
-04i 1
-04i 2
-0C
-0Bo 61
-0D
-05v avl/equal-node?
-05v avl/left
-10s a
-04i 1
-05v avl/left
-10s b
-04i 1
-04i 2
-0C
-0Bo 30
-0D
-05v avl/equal-node?
-05v avl/right
-10s a
-04i 1
-05v avl/right
-10s b
-04i 1
-04i 2
-01
-}
-17
-0Es avl/equal-node?
-0D
-23s avl/equal?
-05v [a b]
-05v #@[documentation: "Test if two avl trees are equal" source: ["Test if two avl trees are equal" [avl/equal-node? [avl/root a] [avl/root b]]]]
-05v #{##[]
-05v avl/equal-node?
-05v avl/root
-10s a
-04i 1
-05v avl/root
-10s b
-04i 1
-04i 2
-01
-}
-17
-0Es avl/equal?
-0D
-23s avl/reduce-node
-05v [node o s]
-05v #@[source: [[if [avl/empty? node] s [o [avl/key node] [avl/reduce-node [avl/right node] o [avl/reduce-node [avl/left node] o s]]]]]]
-05v #{##[]
-05v avl/empty?
-10s node
-04i 1
-0Bo 10
-10s s
-09o 63
-10s o
-05v avl/key
-10s node
-04i 1
-05v avl/reduce-node
-05v avl/right
-10s node
-04i 1
-10s o
-05v avl/reduce-node
-05v avl/left
-10s node
-04i 1
-10s o
-10s s
-04i 3
-04i 3
-04i 2
-01
-}
-17
-0Es avl/reduce-node
-0D
-23s avl/reduce
-05v [t o s]
-05v #@[documentation: "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" source: ["Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" [avl/reduce-node [avl/root t] o s]]]
-05v #{##[]
-05v avl/reduce-node
-05v avl/root
-10s t
-04i 1
-10s o
-10s s
-04i 3
-01
-}
-17
-0Es avl/reduce
-0D
-23s avl/reduce-node-bin
-05v [n o s]
-05v #@[source: [[if [avl/empty? n] s [o [o [avl/key n] [avl/reduce-node-bin [avl/left n] o s]] [avl/reduce-node-bin [avl/right n] o s]]]]]
-05v #{##[]
-05v avl/empty?
-10s n
-04i 1
-0Bo 10
-10s s
-09o 73
-10s o
-10s o
-05v avl/key
-10s n
-04i 1
-05v avl/reduce-node-bin
-05v avl/left
-10s n
-04i 1
-10s o
-10s s
-04i 3
-04i 2
-05v avl/reduce-node-bin
-05v avl/right
-10s n
-04i 1
-10s o
-10s s
-04i 3
-04i 2
-01
-}
-17
-0Es avl/reduce-node-bin
-0D
-23s avl/reduce-bin
-05v [t o s]
-05v #@[documentation: "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" source: ["Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" [avl/reduce-node-bin [avl/root t] o s]]]
-05v #{##[]
-05v avl/reduce-node-bin
-05v avl/root
-10s t
-04i 1
-10s o
-10s s
-04i 3
-01
-}
-17
-0Es avl/reduce-bin
-0D
-23s avl/map
-05v [t f]
-05v #@[documentation: "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" source: ["Create a new avl tree by mapping each key in T using F, using the same comparison function as T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]]
-05v #{##[]
-05v avl/reduce
-10s t
-23s anonymous
-05v [x acc]
-05v #@[source: [[avl/insert acc [f x]]]]
-05v #{##[]
-05v avl/insert
-10s acc
-10s f
-10s x
-04i 1
-04i 2
-01
-}
-17
-05v avl/tree
-05v avl/cmp
-10s t
-04i 1
-04i 1
-04i 3
-01
-}
-17
-0Es avl/map
-0D
-23s avl/map-to
-05v [t f cmp]
-05v #@[documentation: "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" source: ["Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]]
-05v #{##[]
-05v avl/reduce
-10s t
-23s anonymous
-05v [x acc]
-05v #@[source: [[avl/insert acc [f x]]]]
-05v #{##[]
-05v avl/insert
-10s acc
-10s f
-10s x
-04i 1
-04i 2
-01
-}
-17
-05v avl/tree
-10s cmp
-04i 1
-04i 3
-01
-}
-17
-0Es avl/map-to
-0D
-23s avl/to-list
-05v [t]
-05v #@[source: [[avl/reduce t cons #nil]]]
-05v #{##[]
-05v avl/reduce
-10s t
-10s cons
-24
-04i 3
-01
-}
-17
-0Es avl/to-list
+0Es array/2d/print
 01
 }#{##[]
 23s sum
@@ -4487,6 +3286,102 @@
 }
 17
 0Es tree/filter
+01
+}#{##[]
+23s compile/backend/none
+05v [expr]
+05v #@[source: [expr]]
+05v #{##[]
+10s expr
+01
+}
+17
+0Es compile/backend/none
+0D
+23s compile/backend/bytecode
+05v [expr]
+05v #@[source: [[-> [bytecompile expr] assemble*]]]
+05v #{##[]
+05v assemble*
+05v bytecompile
+10s expr
+04i 1
+04i 1
+01
+}
+17
+0Es compile/backend/bytecode
+0D
+05v :bytecode
+0Es *active-backend*
+0D
+05v tree/new
+05v :bytecode
+10s compile/backend/bytecode
+05v :none
+10s compile/backend/none
+04i 4
+0Es backend/tree
+0D
+23s backend
+05v [expr]
+05v #@[source: [[[tree/ref backend/tree *active-backend*] expr]]]
+05v #{##[]
+05v tree/ref
+10s backend/tree
+10s *active-backend*
+04i 2
+10s expr
+04i 1
+01
+}
+17
+0Es backend
+0D
+23s compile/for
+05v [backend expr environment]
+05v #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]]
+05v #{##[]
+10s *active-backend*
+0Es last-backend
+0D
+24
+0Es ret
+0D
+23s anonymous
+05v [e]
+05v #@[source: [[set! *active-backend* last-backend] [throw e]]]
+05v #{##[]
+10s last-backend
+0Fs *active-backend*
+0D
+05v throw
+10s e
+04i 1
+01
+}
+17
+19o 48
+10s backend
+0Fs *active-backend*
+0D
+05v compile*
+10s expr
+05v current-closure
+04i 0
+04i 2
+0Fs ret
+0D
+10s last-backend
+0Fs *active-backend*
+0D
+10s ret
+01
+16
+01
+}
+17
+0Es compile/for
 01
 }#{##[]
 23s $nop
@@ -8189,102 +7084,6 @@
 }
 17
 0Es disassemble
-01
-}#{##[]
-23s compile/backend/none
-05v [expr]
-05v #@[source: [expr]]
-05v #{##[]
-10s expr
-01
-}
-17
-0Es compile/backend/none
-0D
-23s compile/backend/bytecode
-05v [expr]
-05v #@[source: [[-> [bytecompile expr] assemble*]]]
-05v #{##[]
-05v assemble*
-05v bytecompile
-10s expr
-04i 1
-04i 1
-01
-}
-17
-0Es compile/backend/bytecode
-0D
-05v :bytecode
-0Es *active-backend*
-0D
-05v tree/new
-05v :bytecode
-10s compile/backend/bytecode
-05v :none
-10s compile/backend/none
-04i 4
-0Es backend/tree
-0D
-23s backend
-05v [expr]
-05v #@[source: [[[tree/ref backend/tree *active-backend*] expr]]]
-05v #{##[]
-05v tree/ref
-10s backend/tree
-10s *active-backend*
-04i 2
-10s expr
-04i 1
-01
-}
-17
-0Es backend
-0D
-23s compile/for
-05v [backend expr environment]
-05v #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]]
-05v #{##[]
-10s *active-backend*
-0Es last-backend
-0D
-24
-0Es ret
-0D
-23s anonymous
-05v [e]
-05v #@[source: [[set! *active-backend* last-backend] [throw e]]]
-05v #{##[]
-10s last-backend
-0Fs *active-backend*
-0D
-05v throw
-10s e
-04i 1
-01
-}
-17
-19o 48
-10s backend
-0Fs *active-backend*
-0D
-05v compile*
-10s expr
-05v current-closure
-04i 0
-04i 2
-0Fs ret
-0D
-10s last-backend
-0Fs *active-backend*
-0D
-10s ret
-01
-16
-01
-}
-17
-0Es compile/for
 01
 }#{##[]
 23s load/forms
@@ -17139,6 +15938,1267 @@
 01
 }#{##[]
 05v module/insert
+05v :avl
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+05v :e
+0Es avl/empty
+0D
+23s avl/empty?
+05v [n]
+05v #@[source: [[= :e n]]]
+05v #{##[]
+05v :e
+10s n
+20
+01
+}
+17
+0Es avl/empty?
+0D
+05v tree/set!
+10s exports
+23s default-cmp
+23s avl/default-cmp
+05v [x y]
+05v #@[source: [[if [< x y] -1 [if [> x y] 1 0]]]]
+05v #{##[]
+10s x
+10s y
+1E
+0Bo 8
+02i -1
+09o 22
+10s x
+10s y
+22
+0Bo 8
+02i 1
+09o 5
+02i 0
+01
+}
+17
+0Es avl/default-cmp
+04i 3
+0D
+23s avl/typecheck
+05v [r k]
+05v #@[source: [[or [avl/empty? [avl/root r]] [= [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]]
+05v #{##[]
+10s avl/empty?
+10s avl/root
+10s r
+04i 1
+04i 1
+0C
+0Ao 81
+0D
+05v type-of
+10s k
+04i 1
+05v type-of
+10s avl/key
+10s avl/root
+10s r
+04i 1
+04i 1
+04i 1
+20
+0C
+0Ao 43
+0D
+05v throw
+05v list
+05v :type-error
+05v "AVL trees can only contains keys of a single type"
+10s k
+05v current-lambda
+04i 0
+04i 4
+04i 1
+0C
+0Ao 8
+0D
+05v #f
+01
+}
+17
+0Es avl/typecheck
+0D
+05v tree/set!
+10s exports
+23s tree
+23s avl/tree
+05v [cmp]
+05v #@[source: [[array/new avl/empty [or cmp avl/default-cmp]]]]
+05v #{##[]
+05v array/new
+10s avl/empty
+10s cmp
+0C
+0Ao 17
+0D
+10s avl/default-cmp
+0C
+0Ao 8
+0D
+05v #f
+04i 2
+01
+}
+17
+0Es avl/tree
+04i 3
+0D
+23s avl/height
+05v [n]
+05v #@[source: [[if [avl/empty? n] 0 [array/ref n 0]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 8
+02i 0
+09o 15
+05v array/ref
+10s n
+02i 0
+04i 2
+01
+}
+17
+0Es avl/height
+0D
+23s avl/key
+05v [n]
+05v #@[source: [[array/ref n 1]]]
+05v #{##[]
+05v array/ref
+10s n
+02i 1
+04i 2
+01
+}
+17
+0Es avl/key
+0D
+23s avl/left
+05v [n]
+05v #@[source: [[array/ref n 2]]]
+05v #{##[]
+05v array/ref
+10s n
+02i 2
+04i 2
+01
+}
+17
+0Es avl/left
+0D
+23s avl/right
+05v [n]
+05v #@[source: [[array/ref n 3]]]
+05v #{##[]
+05v array/ref
+10s n
+02i 3
+04i 2
+01
+}
+17
+0Es avl/right
+0D
+23s avl/root
+05v [r]
+05v #@[source: [[array/ref r 0]]]
+05v #{##[]
+05v array/ref
+10s r
+02i 0
+04i 2
+01
+}
+17
+0Es avl/root
+0D
+23s avl/cmp
+05v [r]
+05v #@[source: [[array/ref r 1]]]
+05v #{##[]
+05v array/ref
+10s r
+02i 1
+04i 2
+01
+}
+17
+0Es avl/cmp
+0D
+23s avl/min-node
+05v [n]
+05v #@[source: [[if [avl/empty? n] avl/empty [let [[l [avl/left n]]] [if [avl/empty? l] n [avl/min-mode l]]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 10
+10s avl/empty
+09o 50
+15
+10s avl/left
+10s n
+04i 1
+0Es l
+0D
+10s avl/empty?
+10s l
+04i 1
+0Bo 10
+10s n
+09o 13
+10s avl/min-mode
+10s l
+04i 1
+16
+01
+}
+17
+0Es avl/min-node
+0D
+23s avl/update-left
+05v [n l]
+05v #@[source: [[array/set! [array/dup n] 2 l]]]
+05v #{##[]
+05v array/set!
+05v array/dup
+10s n
+04i 1
+02i 2
+10s l
+04i 3
+01
+}
+17
+0Es avl/update-left
+0D
+23s avl/update-right
+05v [n r]
+05v #@[source: [[array/set! [array/dup n] 3 r]]]
+05v #{##[]
+05v array/set!
+05v array/dup
+10s n
+04i 1
+02i 3
+10s r
+04i 3
+01
+}
+17
+0Es avl/update-right
+0D
+23s avl/update-key
+05v [n k]
+05v #@[source: [[array/set! [array/dup n] 1 k]]]
+05v #{##[]
+05v array/set!
+05v array/dup
+10s n
+04i 1
+02i 1
+10s k
+04i 3
+01
+}
+17
+0Es avl/update-key
+0D
+23s avl/update-root
+05v [t r]
+05v #@[source: [[array/set! [array/dup t] 0 r]]]
+05v #{##[]
+05v array/set!
+05v array/dup
+10s t
+04i 1
+02i 0
+10s r
+04i 3
+01
+}
+17
+0Es avl/update-root
+0D
+23s avl/update-height
+05v [n]
+05v #@[source: [[array/set! [array/dup n] 0 [+ 1 [max [avl/height [avl/left n]] [avl/height [avl/right n]]]]]]]
+05v #{##[]
+05v array/set!
+05v array/dup
+10s n
+04i 1
+02i 0
+02i 1
+05v max
+10s avl/height
+10s avl/left
+10s n
+04i 1
+04i 1
+10s avl/height
+10s avl/right
+10s n
+04i 1
+04i 1
+04i 2
+25
+04i 3
+01
+}
+17
+0Es avl/update-height
+0D
+23s avl/rotate-right
+05v [y]
+05v #@[source: [[let [[x [avl/left y]]] [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]]
+05v #{##[]
+15
+10s avl/left
+10s y
+04i 1
+0Es x
+0D
+10s avl/update-height
+10s avl/update-right
+10s x
+10s avl/update-height
+10s avl/update-left
+10s y
+10s avl/right
+10s x
+04i 1
+04i 2
+04i 1
+04i 2
+04i 1
+16
+01
+}
+17
+0Es avl/rotate-right
+0D
+23s avl/rotate-left
+05v [x]
+05v #@[source: [[let [[y [avl/right x]]] [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]]
+05v #{##[]
+15
+10s avl/right
+10s x
+04i 1
+0Es y
+0D
+10s avl/update-height
+10s avl/update-left
+10s y
+10s avl/update-height
+10s avl/update-right
+10s x
+10s avl/left
+10s y
+04i 1
+04i 2
+04i 1
+04i 2
+04i 1
+16
+01
+}
+17
+0Es avl/rotate-left
+0D
+23s avl/balance
+05v [n]
+05v #@[source: [[if [avl/empty? n] 0 [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 8
+02i 0
+09o 36
+10s avl/height
+10s avl/left
+10s n
+04i 1
+04i 1
+10s avl/height
+10s avl/right
+10s n
+04i 1
+04i 1
+26
+01
+}
+17
+0Es avl/balance
+0D
+23s avl/insert-rebalance
+05v [n cmp v]
+05v #@[source: [[let [[b [avl/balance n]]] [cond [[> b 1] [case [cmp v [avl/key [avl/left n]]] [-1 [avl/rotate-right n]] [1 [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]] [0 n]]] [[< b -1] [case [cmp v [avl/key [avl/right n]]] [1 [avl/rotate-left n]] [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]] [0 n]]] [#t n]]]]]
+05v #{##[]
+15
+10s avl/balance
+10s n
+04i 1
+0Es b
+0D
+10s b
+02i 1
+22
+0Bo 125
+15
+10s cmp
+10s v
+10s avl/key
+10s avl/left
+10s n
+04i 1
+04i 1
+04i 2
+0Es ΓεnΣym-1
+0D
+10s ΓεnΣym-1
+02i -1
+20
+0Bo 16
+10s avl/rotate-right
+10s n
+04i 1
+09o 66
+10s ΓεnΣym-1
+02i 1
+20
+0Bo 38
+10s avl/rotate-right
+10s avl/update-left
+10s n
+10s avl/rotate-left
+10s avl/left
+10s n
+04i 1
+04i 1
+04i 2
+04i 1
+09o 21
+10s ΓεnΣym-1
+02i 0
+20
+0Bo 10
+10s n
+09o 4
+24
+16
+09o 150
+10s b
+02i -1
+1E
+0Bo 125
+15
+10s cmp
+10s v
+10s avl/key
+10s avl/right
+10s n
+04i 1
+04i 1
+04i 2
+0Es ΓεnΣym-2
+0D
+10s ΓεnΣym-2
+02i 1
+20
+0Bo 16
+10s avl/rotate-left
+10s n
+04i 1
+09o 66
+10s ΓεnΣym-2
+02i -1
+20
+0Bo 38
+10s avl/rotate-left
+10s avl/update-right
+10s n
+10s avl/rotate-right
+10s avl/right
+10s n
+04i 1
+04i 1
+04i 2
+04i 1
+09o 21
+10s ΓεnΣym-2
+02i 0
+20
+0Bo 10
+10s n
+09o 4
+24
+16
+09o 18
+05v #t
+0Bo 10
+10s n
+09o 4
+24
+16
+01
+}
+17
+0Es avl/insert-rebalance
+0D
+23s avl/node-insert
+05v [n cmp v]
+05v #@[source: [[if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [case [cmp v [avl/key n]] [-1 [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v]] [1 [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]] [0 [avl/update-key n v]]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 26
+05v array/new
+02i 1
+10s v
+10s avl/empty
+10s avl/empty
+04i 4
+09o 192
+15
+10s cmp
+10s v
+10s avl/key
+10s n
+04i 1
+04i 2
+0Es ΓεnΣym-3
+0D
+10s ΓεnΣym-3
+02i -1
+20
+0Bo 60
+10s avl/insert-rebalance
+10s avl/update-height
+10s avl/update-left
+10s n
+10s avl/node-insert
+10s avl/left
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+04i 2
+04i 1
+10s cmp
+10s v
+04i 3
+09o 98
+10s ΓεnΣym-3
+02i 1
+20
+0Bo 60
+10s avl/insert-rebalance
+10s avl/update-height
+10s avl/update-right
+10s n
+10s avl/node-insert
+10s avl/right
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+04i 2
+04i 1
+10s cmp
+10s v
+04i 3
+09o 31
+10s ΓεnΣym-3
+02i 0
+20
+0Bo 20
+10s avl/update-key
+10s n
+10s v
+04i 2
+09o 4
+24
+16
+01
+}
+17
+0Es avl/node-insert
+0D
+05v tree/set!
+10s exports
+23s insert
+23s avl/insert
+05v [t v]
+05v #@[documentation: "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" source: ["Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" [avl/typecheck t v] [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]]
+05v #{##[]
+10s avl/typecheck
+10s t
+10s v
+04i 2
+0D
+10s avl/update-root
+10s t
+10s avl/node-insert
+10s avl/root
+10s t
+04i 1
+10s avl/cmp
+10s t
+04i 1
+10s v
+04i 3
+04i 2
+01
+}
+17
+0Es avl/insert
+04i 3
+0D
+23s avl/node-get
+05v [n cmp v]
+05v #@[source: [[if [avl/empty? n] #nil [case [cmp v [avl/key n]] [0 [avl/key n]] [-1 [avl/node-get [avl/left n] cmp v]] [1 [avl/node-get [avl/right n] cmp v]]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 7
+24
+09o 128
+15
+10s cmp
+10s v
+10s avl/key
+10s n
+04i 1
+04i 2
+0Es ΓεnΣym-4
+0D
+10s ΓεnΣym-4
+02i 0
+20
+0Bo 16
+10s avl/key
+10s n
+04i 1
+09o 78
+10s ΓεnΣym-4
+02i -1
+20
+0Bo 30
+10s avl/node-get
+10s avl/left
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+09o 41
+10s ΓεnΣym-4
+02i 1
+20
+0Bo 30
+10s avl/node-get
+10s avl/right
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+09o 4
+24
+16
+01
+}
+17
+0Es avl/node-get
+0D
+05v tree/set!
+10s exports
+23s get
+23s avl/get
+05v [t v]
+05v #@[documentation: "Retrieve the key V from tree T, or #nil if V is not in it" source: ["Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [not= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]]
+05v #{##[]
+10s avl/empty?
+10s avl/root
+10s t
+04i 1
+04i 1
+0C
+0Ao 51
+0D
+05v not=
+05v type-of
+10s v
+04i 1
+05v type-of
+10s avl/key
+10s avl/root
+10s t
+04i 1
+04i 1
+04i 1
+04i 2
+0C
+0Ao 8
+0D
+05v #f
+0Bo 7
+24
+09o 33
+10s avl/node-get
+10s avl/root
+10s t
+04i 1
+10s avl/cmp
+10s t
+04i 1
+10s v
+04i 3
+01
+}
+17
+0Es avl/get
+04i 3
+0D
+05v tree/set!
+10s exports
+23s from-list
+23s avl/from-list
+05v [l cmp]
+05v #@[documentation: "Create a new avl tree using the keys in L and the comparison function CMP" source: ["Create a new avl tree using the keys in L and the comparison function CMP" [list/reduce l avl/insert [avl/tree cmp]]]]
+05v #{##[]
+05v list/reduce
+10s l
+10s avl/insert
+10s avl/tree
+10s cmp
+04i 1
+04i 3
+01
+}
+17
+0Es avl/from-list
+04i 3
+0D
+23s avl/remove-rebalance
+05v [n]
+05v #@[source: [[if [avl/empty? n] n [let [[b [avl/balance n]] [l [avl/left n]] [r [avl/right n]]] [cond [[> b 1] [if [>= [avl/balance l] 0] [avl/rotate-right n] [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]] [[< b -1] [if [<= [avl/balance r] 0] [avl/rotate-left n] [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]] [#t n]]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 10
+10s n
+09o 201
+15
+10s avl/balance
+10s n
+04i 1
+0Es b
+0D
+10s avl/left
+10s n
+04i 1
+0Es l
+0D
+10s avl/right
+10s n
+04i 1
+0Es r
+0D
+10s b
+02i 1
+22
+0Bo 61
+10s avl/balance
+10s l
+04i 1
+02i 0
+21
+0Bo 16
+10s avl/rotate-right
+10s n
+04i 1
+09o 29
+10s avl/rotate-right
+10s avl/update-left
+10s n
+10s avl/rotate-left
+10s l
+04i 1
+04i 2
+04i 1
+09o 86
+10s b
+02i -1
+1E
+0Bo 61
+10s avl/balance
+10s r
+04i 1
+02i 0
+1F
+0Bo 16
+10s avl/rotate-left
+10s n
+04i 1
+09o 29
+10s avl/rotate-left
+10s avl/update-right
+10s n
+10s avl/rotate-right
+10s r
+04i 1
+04i 2
+04i 1
+09o 18
+05v #t
+0Bo 10
+10s n
+09o 4
+24
+16
+01
+}
+17
+0Es avl/remove-rebalance
+0D
+23s avl/node-remove
+05v [n cmp v]
+05v #@[source: [[if [avl/empty? n] n [let [[root [case [cmp v [avl/key n]] [-1 [avl/update-left n [avl/node-remove [avl/left n] cmp v]]] [1 [avl/update-right n [avl/node-remove [avl/right n] cmp v]]] [0 [cond [[avl/empty? [avl/left n]] [avl/right n]] [[avl/empty? [avl/right n]] [avl/left n]] [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 10
+10s n
+09o 324
+15
+15
+10s cmp
+10s v
+10s avl/key
+10s n
+04i 1
+04i 2
+0Es ΓεnΣym-5
+0D
+10s ΓεnΣym-5
+02i -1
+20
+0Bo 40
+10s avl/update-left
+10s n
+10s avl/node-remove
+10s avl/left
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+04i 2
+09o 218
+10s ΓεnΣym-5
+02i 1
+20
+0Bo 40
+10s avl/update-right
+10s n
+10s avl/node-remove
+10s avl/right
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+04i 2
+09o 171
+10s ΓεnΣym-5
+02i 0
+20
+0Bo 160
+10s avl/empty?
+10s avl/left
+10s n
+04i 1
+04i 1
+0Bo 16
+10s avl/right
+10s n
+04i 1
+09o 125
+10s avl/empty?
+10s avl/right
+10s n
+04i 1
+04i 1
+0Bo 16
+10s avl/left
+10s n
+04i 1
+09o 93
+05v #t
+0Bo 85
+15
+10s avl/key
+10s avl/min-node
+10s avl/right
+10s n
+04i 1
+04i 1
+04i 1
+0Es k
+0D
+10s avl/update-key
+10s avl/update-right
+10s avl/right
+10s n
+04i 1
+10s avl/node-remove
+10s avl/right
+10s n
+04i 1
+10s cmp
+10s v
+04i 3
+04i 2
+10s k
+04i 2
+16
+09o 4
+24
+09o 4
+24
+16
+0Es root
+0D
+10s avl/update-height
+10s root
+04i 1
+0Fs root
+0D
+10s avl/remove-rebalance
+10s root
+04i 1
+16
+01
+}
+17
+0Es avl/node-remove
+0D
+05v tree/set!
+10s exports
+23s remove
+23s avl/remove
+05v [t v]
+05v #@[documentation: "Remove the key V from tree T if it is contained within it" source: ["Remove the key V from tree T if it is contained within it" [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]]
+05v #{##[]
+10s avl/update-root
+10s t
+10s avl/node-remove
+10s avl/root
+10s t
+04i 1
+10s avl/cmp
+10s t
+04i 1
+10s v
+04i 3
+04i 2
+01
+}
+17
+0Es avl/remove
+04i 3
+0D
+23s avl/equal-node?
+05v [a b]
+05v #@[source: [[if [avl/empty? a] [avl/empty? b] [and [equal? [avl/key a] [avl/key b]] [avl/equal-node? [avl/left a] [avl/left b]] [avl/equal-node? [avl/right a] [avl/right b]]]]]]
+05v #{##[]
+10s avl/empty?
+10s a
+04i 1
+0Bo 16
+10s avl/empty?
+10s b
+04i 1
+09o 91
+05v equal?
+10s avl/key
+10s a
+04i 1
+10s avl/key
+10s b
+04i 1
+04i 2
+0C
+0Bo 61
+0D
+10s avl/equal-node?
+10s avl/left
+10s a
+04i 1
+10s avl/left
+10s b
+04i 1
+04i 2
+0C
+0Bo 30
+0D
+10s avl/equal-node?
+10s avl/right
+10s a
+04i 1
+10s avl/right
+10s b
+04i 1
+04i 2
+01
+}
+17
+0Es avl/equal-node?
+0D
+05v tree/set!
+10s exports
+23s equal?
+23s avl/equal?
+05v [a b]
+05v #@[documentation: "Test if two avl trees are equal" source: ["Test if two avl trees are equal" [avl/equal-node? [avl/root a] [avl/root b]]]]
+05v #{##[]
+10s avl/equal-node?
+10s avl/root
+10s a
+04i 1
+10s avl/root
+10s b
+04i 1
+04i 2
+01
+}
+17
+0Es avl/equal?
+04i 3
+0D
+23s avl/reduce-node
+05v [node o s]
+05v #@[source: [[if [avl/empty? node] s [o [avl/key node] [avl/reduce-node [avl/right node] o [avl/reduce-node [avl/left node] o s]]]]]]
+05v #{##[]
+10s avl/empty?
+10s node
+04i 1
+0Bo 10
+10s s
+09o 63
+10s o
+10s avl/key
+10s node
+04i 1
+10s avl/reduce-node
+10s avl/right
+10s node
+04i 1
+10s o
+10s avl/reduce-node
+10s avl/left
+10s node
+04i 1
+10s o
+10s s
+04i 3
+04i 3
+04i 2
+01
+}
+17
+0Es avl/reduce-node
+0D
+05v tree/set!
+10s exports
+23s reduce
+23s avl/reduce
+05v [t o s]
+05v #@[documentation: "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" source: ["Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" [avl/reduce-node [avl/root t] o s]]]
+05v #{##[]
+10s avl/reduce-node
+10s avl/root
+10s t
+04i 1
+10s o
+10s s
+04i 3
+01
+}
+17
+0Es avl/reduce
+04i 3
+0D
+23s avl/reduce-node-bin
+05v [n o s]
+05v #@[source: [[if [avl/empty? n] s [o [o [avl/key n] [avl/reduce-node-bin [avl/left n] o s]] [avl/reduce-node-bin [avl/right n] o s]]]]]
+05v #{##[]
+10s avl/empty?
+10s n
+04i 1
+0Bo 10
+10s s
+09o 73
+10s o
+10s o
+10s avl/key
+10s n
+04i 1
+10s avl/reduce-node-bin
+10s avl/left
+10s n
+04i 1
+10s o
+10s s
+04i 3
+04i 2
+10s avl/reduce-node-bin
+10s avl/right
+10s n
+04i 1
+10s o
+10s s
+04i 3
+04i 2
+01
+}
+17
+0Es avl/reduce-node-bin
+0D
+05v tree/set!
+10s exports
+23s reduce-bin
+23s avl/reduce-bin
+05v [t o s]
+05v #@[documentation: "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" source: ["Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" [avl/reduce-node-bin [avl/root t] o s]]]
+05v #{##[]
+10s avl/reduce-node-bin
+10s avl/root
+10s t
+04i 1
+10s o
+10s s
+04i 3
+01
+}
+17
+0Es avl/reduce-bin
+04i 3
+0D
+05v tree/set!
+10s exports
+23s map
+23s avl/map
+05v [t f]
+05v #@[documentation: "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" source: ["Create a new avl tree by mapping each key in T using F, using the same comparison function as T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]]
+05v #{##[]
+10s avl/reduce
+10s t
+23s anonymous
+05v [x acc]
+05v #@[source: [[avl/insert acc [f x]]]]
+05v #{##[]
+10s avl/insert
+10s acc
+10s f
+10s x
+04i 1
+04i 2
+01
+}
+17
+10s avl/tree
+10s avl/cmp
+10s t
+04i 1
+04i 1
+04i 3
+01
+}
+17
+0Es avl/map
+04i 3
+0D
+05v tree/set!
+10s exports
+23s map-to
+23s avl/map-to
+05v [t f cmp]
+05v #@[documentation: "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" source: ["Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]]
+05v #{##[]
+10s avl/reduce
+10s t
+23s anonymous
+05v [x acc]
+05v #@[source: [[avl/insert acc [f x]]]]
+05v #{##[]
+10s avl/insert
+10s acc
+10s f
+10s x
+04i 1
+04i 2
+01
+}
+17
+10s avl/tree
+10s cmp
+04i 1
+04i 3
+01
+}
+17
+0Es avl/map-to
+04i 3
+0D
+05v tree/set!
+10s exports
+23s to-list
+23s avl/to-list
+05v [t]
+05v #@[source: [[avl/reduce t cons #nil]]]
+05v #{##[]
+10s avl/reduce
+10s t
+10s cons
+24
+04i 3
+01
+}
+17
+0Es avl/to-list
+04i 3
+0D
+13
+16
+04i 2
+01
+}#{##[]
+05v module/insert
 05v :crypto/adler32
 15
 05v tree/new
@@ -17210,6 +17270,660 @@
 }
 17
 0Es hash
+04i 3
+0D
+13
+16
+04i 2
+01
+}#{##[]
+05v module/insert
+05v :io/ansi
+15
+05v tree/new
+24
+04i 1
+0Es exports
+0D
+05v #f
+0Es disabled
+0D
+05v tree/set!
+10s exports
+23s disable!
+23s disable!
+05v [v]
+05v #@[source: [[set! disabled [if [nil? v] #t v]]]]
+05v #{##[]
+05v nil?
+10s v
+04i 1
+0Bo 10
+05v #t
+09o 7
+10s v
+0Fs disabled
+01
+}
+17
+0Es disable!
+04i 3
+0D
+05v "\e[0m"
+0Es reset
+0D
+05v "\e[0;39m"
+0Es fg-reset
+0D
+05v "\e[49m"
+0Es bg-reset
+0D
+05v array/new
+05v "\e[0;30m"
+05v "\e[0;31m"
+05v "\e[0;32m"
+05v "\e[0;33m"
+05v "\e[0;34m"
+05v "\e[0;35m"
+05v "\e[0;36m"
+05v "\e[0;37m"
+05v "\e[1;30m"
+05v "\e[1;31m"
+05v "\e[1;32m"
+05v "\e[1;33m"
+05v "\e[1;34m"
+05v "\e[1;35m"
+05v "\e[1;36m"
+05v "\e[1;37m"
+04i 16
+0Es ansi-fg
+0D
+05v array/new
+05v "\e[40m"
+05v "\e[41m"
+05v "\e[42m"
+05v "\e[43m"
+05v "\e[44m"
+05v "\e[45m"
+05v "\e[46m"
+05v "\e[47m"
+04i 8
+0Es ansi-bg
+0D
+05v tree/set!
+10s exports
+23s wrap
+23s wrap
+05v [code string]
+05v #@[documentation: "Wrap STRING in the ansi color CODE" source: ["Wrap STRING in the ansi color CODE" [cat [or disabled [array/ref ansi-fg code]] string [or disabled reset]]]]
+05v #{##[]
+05v cat
+10s disabled
+0C
+0Ao 27
+0D
+05v array/ref
+10s ansi-fg
+10s code
+04i 2
+0C
+0Ao 8
+0D
+05v #f
+10s string
+10s disabled
+0C
+0Ao 17
+0D
+10s reset
+0C
+0Ao 8
+0D
+05v #f
+04i 3
+01
+}
+17
+0Es wrap
+04i 3
+0D
+05v tree/set!
+10s exports
+23s black
+23s black
+23s args
+05v #@[source: [[wrap 0 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 0
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es black
+04i 3
+0D
+05v tree/set!
+10s exports
+23s dark-red
+23s dark-red
+23s args
+05v #@[source: [[wrap 1 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 1
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es dark-red
+04i 3
+0D
+05v tree/set!
+10s exports
+23s dark-green
+23s dark-green
+23s args
+05v #@[source: [[wrap 2 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 2
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es dark-green
+04i 3
+0D
+05v tree/set!
+10s exports
+23s dark-brown
+23s brown
+23s args
+05v #@[source: [[wrap 3 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 3
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es brown
+04i 3
+0D
+05v tree/set!
+10s exports
+23s dark-blue
+23s dark-blue
+23s args
+05v #@[source: [[wrap 4 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 4
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es dark-blue
+04i 3
+0D
+05v tree/set!
+10s exports
+23s purple
+23s purple
+23s args
+05v #@[source: [[wrap 5 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 5
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es purple
+04i 3
+0D
+05v tree/set!
+10s exports
+23s teal
+23s teal
+23s args
+05v #@[source: [[wrap 6 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 6
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es teal
+04i 3
+0D
+05v tree/set!
+10s exports
+23s dark-gray
+23s dark-gray
+23s args
+05v #@[source: [[wrap 7 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 7
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es dark-gray
+04i 3
+0D
+05v tree/set!
+10s exports
+23s gray
+23s gray
+23s args
+05v #@[source: [[wrap 8 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 8
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es gray
+04i 3
+0D
+05v tree/set!
+10s exports
+23s red
+23s red
+23s args
+05v #@[source: [[wrap 9 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 9
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es red
+04i 3
+0D
+05v tree/set!
+10s exports
+23s green
+23s green
+23s args
+05v #@[source: [[wrap 10 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 10
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es green
+04i 3
+0D
+05v tree/set!
+10s exports
+23s yellow
+23s yellow
+23s args
+05v #@[source: [[wrap 11 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 11
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es yellow
+04i 3
+0D
+05v tree/set!
+10s exports
+23s blue
+23s blue
+23s args
+05v #@[source: [[wrap 12 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 12
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es blue
+04i 3
+0D
+05v tree/set!
+10s exports
+23s pink
+23s pink
+23s args
+05v #@[source: [[wrap 13 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 13
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es pink
+04i 3
+0D
+05v tree/set!
+10s exports
+23s cyan
+23s cyan
+23s args
+05v #@[source: [[wrap 14 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 14
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es cyan
+04i 3
+0D
+05v tree/set!
+10s exports
+23s white
+23s white
+23s args
+05v #@[source: [[wrap 15 [apply cat args]]]]
+05v #{##[]
+10s wrap
+02i 15
+05v apply
+10s cat
+10s args
+04i 2
+04i 2
+01
+}
+17
+0Es white
+04i 3
+0D
+05v tree/set!
+10s exports
+23s rainbow
+23s rainbow
+23s args
+05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [let* [def count 0] [cat [join [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""] [or disabled fg-reset]]]]]
+05v #{##[]
+15
+02i 0
+0Es count
+0D
+05v cat
+05v join
+05v map
+05v split
+05v apply
+10s cat
+10s args
+04i 2
+05v ""
+04i 2
+23s anonymous
+05v [a]
+05v #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]]
+05v #{##[]
+05v bit-and
+02i 1
+10s count
+25
+02i 7
+04i 2
+0Fs count
+0D
+05v cat
+10s disabled
+0C
+0Ao 43
+0D
+05v array/ref
+10s ansi-fg
+10s count
+2A
+0Bo 8
+02i 7
+09o 10
+10s count
+02i 8
+25
+04i 2
+0C
+0Ao 8
+0D
+05v #f
+10s a
+04i 2
+01
+}
+17
+04i 2
+05v ""
+04i 2
+10s disabled
+0C
+0Ao 17
+0D
+10s fg-reset
+0C
+0Ao 8
+0D
+05v #f
+04i 2
+16
+01
+}
+17
+0Es rainbow
+04i 3
+0D
+05v tree/set!
+10s exports
+23s rainbow-bg
+23s rainbow-bg
+23s args
+05v #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [def count 0] [def colored-list [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [bit-xor count 7]]] [or disabled [array/ref ansi-bg count]] a]]]] [cat [join colored-list ""] [or disabled reset]]]]
+05v #{##[]
+02i 0
+0Es count
+0D
+05v map
+05v split
+05v apply
+10s cat
+10s args
+04i 2
+05v ""
+04i 2
+23s anonymous
+05v [a]
+05v #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [bit-xor count 7]]] [or disabled [array/ref ansi-bg count]] a]]]
+05v #{##[]
+05v bit-and
+02i 1
+10s count
+25
+02i 7
+04i 2
+0Fs count
+0D
+05v cat
+10s disabled
+0C
+0Ao 35
+0D
+05v array/ref
+10s ansi-fg
+05v bit-xor
+10s count
+02i 7
+04i 2
+04i 2
+0C
+0Ao 8
+0D
+05v #f
+10s disabled
+0C
+0Ao 27
+0D
+05v array/ref
+10s ansi-bg
+10s count
+04i 2
+0C
+0Ao 8
+0D
+05v #f
+10s a
+04i 3
+01
+}
+17
+04i 2
+0Es colored-list
+0D
+05v cat
+05v join
+10s colored-list
+05v ""
+04i 2
+10s disabled
+0C
+0Ao 17
+0D
+10s reset
+0C
+0Ao 8
+0D
+05v #f
+04i 2
+01
+}
+17
+0Es rainbow-bg
+04i 3
+0D
+05v tree/set!
+10s exports
+23s reprint-line
+23s reprint-line
+05v [text width]
+05v #@[source: [[when-not width [set! width 20]] [print "\r"] [dotimes [i width] [print " "]] [print "\r"] [print text]]]
+05v #{##[]
+10s width
+0Bo 7
+24
+09o 9
+02i 20
+0Fs width
+0D
+05v print
+05v "\r"
+04i 1
+0D
+15
+02i 0
+0Es i
+0D
+24
+09o 26
+0D
+05v print
+05v " "
+04i 1
+0D
+02i 1
+10s i
+03
+0Fs i
+10s i
+10s width
+1E
+0Ao -32
+0D
+24
+16
+0D
+05v print
+05v "\r"
+04i 1
+0D
+05v print
+10s text
+04i 1
+01
+}
+17
+0Es reprint-line
 04i 3
 0D
 13
@@ -17462,6 +18176,37 @@
 23s quote
 23s do
 10s expr
+14
+04i 2
+24
+14
+14
+14
+01
+}
+18
+0Es test/add
+04i 3
+0D
+05v tree/set!
+10s exports
+23s mod
+23s test/add
+05v [mod result . expr]
+05v #@[documentation: "Add a test where EXPR must eval to RESULT" source: ["Add a test where EXPR must eval to RESULT" [quasiquote [[unquote test/add*] [unquote result] [unquote [list 'quote [cons 'do [cons [quasiquote [require [unquote mod]]] expr]]]]]]]]
+05v #{##[]
+10s test/add*
+10s result
+05v list
+23s quote
+23s do
+23s require
+10s mod
+24
+14
+14
+10s expr
+14
 14
 04i 2
 24

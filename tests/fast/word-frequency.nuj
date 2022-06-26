@@ -1,8 +1,10 @@
 #!/usr/bin/env nujel
-; Just stressing the AVL tree, we count how often each word appears in the CoC
-; and then sum all words which appear at list 5 times.
-; This not only tests the AVL implementation but is also a very nice benchmark
-; for allocating a lot of small arrays.
+;; Just stressing the AVL tree, we count how often each word appears in the CoC
+;; and then sum all words which appear at list 5 times.
+;; This not only tests the AVL implementation but is also a very nice benchmark
+;; for allocating a lot of small arrays.
+
+[require :avl]
 
 [defn wordfreq-cmp [a b]
        [avl/default-cmp [array/ref a 0]

@@ -8,4 +8,3 @@
 [test/add "\"asd\"" [require :serialization/json] [serialization/json/serialize 'asd]]
 [test/add "\"asd\"" [require :serialization/json] [serialization/json/serialize :asd]]
 [test/add "\"asd\"" [require :serialization/json] [serialization/json/serialize "asd"]]
-[test/add "{\"asd\": 123,\n\"qwe\": true}" [require :serialization/json] [serialization/json/serialize @[asd: 123 qwe: #t]]]
