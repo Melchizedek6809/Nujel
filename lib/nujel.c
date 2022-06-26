@@ -87,7 +87,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
-	lClosure *c = lClosureAlloc();
+	lClosure *c = lClosureAllocRaw();
 	c->type = closureRoot;
 	lOperationsBase(c);
 	lAddPlatformVars(c);

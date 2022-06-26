@@ -4,7 +4,7 @@
 #include "../type/val.h"
 
 lTree *lTreeNew(const lSymbol *s, lVal *v){
-	lTree *ret = lTreeAlloc();
+	lTree *ret = lTreeAllocRaw();
 	ret->key    = s;
 	ret->height = 1;
 	ret->value  = v;
@@ -184,7 +184,7 @@ uint lTreeSize(const lTree *t){
 /* Return a duplicate of t */
 lTree *lTreeDup(const lTree *t){
 	if(unlikely(t == NULL)){return NULL;}
-	lTree *ret  = lTreeAlloc();
+	lTree *ret  = lTreeAllocRaw();
 	ret->key    = t->key;
 	ret->value  = t->value;
         ret->height = t->height;

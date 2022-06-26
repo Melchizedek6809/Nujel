@@ -2,84 +2,40 @@
 #define NUJEL_LIB_ALLOC_ALLOCATOR
 #include "../nujel.h"
 
-#define VAL_MAX (1<<21)
-#define TRE_MAX (1<<19)
-#define CLO_MAX (1<<16)
-#define BUF_MAX (1<<15)
-#define ARR_MAX (1<<14)
-#define BCA_MAX (1<<14)
-#define BFV_MAX (1<<14)
-#define NFN_MAX (1<<10)
 
-extern lArray  lArrayList[ARR_MAX];
-extern uint    lArrayMax;
-extern lArray *lArrayFFree;
+#define defineAllocator(T, typeMax) \
+extern T T##List[typeMax]; \
+extern uint T##Max;	   \
+extern uint T##Active; \
+extern T * T##FFree; \
+T * T##AllocRaw(); \
+void T##Free(T * v);
 
-extern lClosure lClosureList[CLO_MAX];
-extern uint     lClosureMax;
-extern lClosure *lClosureFFree;
+#include "allocator-types.h"
 
-extern lNFunc   lNFuncList  [NFN_MAX];
+extern lNFunc   lNFuncList[NFN_MAX];
 extern uint     lNFuncMax;
-extern uint     lNFuncActive;
-
-extern lTree  lTreeList[TRE_MAX];
-extern uint   lTreeMax;
-extern lTree *lTreeFFree;
-
-extern lVal     lValList[VAL_MAX];
-extern uint     lValMax;
-extern lVal    *lValFFree;
-
-extern lBytecodeArray  lBytecodeArrayList[BCA_MAX];
-extern uint            lBytecodeArrayMax;
-extern lBytecodeArray *lBytecodeArrayFFree;
-
-extern lBuffer  lBufferList[BUF_MAX];
-extern uint     lBufferMax;
-extern lBuffer *lBufferFFree;
-
-extern lBufferView  lBufferViewList[BFV_MAX];
-extern uint         lBufferViewMax;
-extern lBufferView *lBufferViewFFree;
 
 
-lArray *  lArrayAlloc  (size_t len);
-void      lArrayFree   (lArray *v);
+lArray *         lArrayAlloc         (size_t len);
+lNFunc *         lNFuncAlloc         ();
+lBytecodeArray * lBytecodeArrayAlloc (size_t len);
+lVal *           lValAlloc           (lType t);
+int              lBufferViewTypeSize (lBufferViewType T);
+lBuffer *        lBufferAlloc        (size_t length, bool immutable);
+lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
 
-lClosure *lClosureAlloc();
-void      lClosureFree (lClosure *c);
 static inline int lClosureID(const lClosure *n){
 	return n - lClosureList;
 }
-
-lNFunc   *lNFuncAlloc  ();
 static inline int lNFuncID(const lNFunc *n){
 	return n - lNFuncList;
 }
-
-lBytecodeArray *lBytecodeArrayAlloc(size_t len);
-void            lBytecodeArrayFree(lBytecodeArray *a);
-
-lTree    *lTreeAlloc   ();
-void      lTreeFree    (lTree *t);
-
-lVal     *lValAllocRaw ();
-void      lValFree     (lVal *v);
 static inline int lValIndex(const lVal *v){
 	return v - lValList;
 }
 static inline lVal *lIndexVal(uint i){
 	return (i >= lValMax) ? NULL : &lValList[i];
 }
-lVal *lValAlloc(lType t);
-
-int      lBufferViewTypeSize(lBufferViewType T);
-lBuffer *lBufferAllocRaw();
-lBuffer *lBufferAlloc(size_t length, bool immutable);
-void     lBufferFree (lBuffer *buf);
-
-lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
-void         lBufferViewFree (lBufferView *buf);
 
 #endif

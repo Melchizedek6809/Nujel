@@ -9,72 +9,35 @@
 
 bool lGCShouldRunSoon = false;
 
-lArray   lArrayList[ARR_MAX];
-uint     lArrayActive = 0;
-uint     lArrayMax    = 0;
-lArray  *lArrayFFree  = NULL;
-
-lClosure  lClosureList[CLO_MAX];
-uint      lClosureActive = 0;
-uint      lClosureMax    = 0;
-lClosure *lClosureFFree  = NULL;
-
-lTree    lTreeList[TRE_MAX];
-uint     lTreeActive = 0;
-uint     lTreeMax    = 0;
-lTree   *lTreeFFree  = NULL;
-
-lVal     lValList[VAL_MAX];
-uint     lValActive = 0;
-uint     lValMax    = 0;
-lVal    *lValFFree  = NULL;
-
-lBytecodeArray  lBytecodeArrayList[BCA_MAX];
-uint            lBytecodeArrayActive = 0;
-uint            lBytecodeArrayMax    = 0;
-lBytecodeArray *lBytecodeArrayFFree  = NULL;
-
-lBuffer  lBufferList[BUF_MAX];
-uint     lBufferMax = 0;
-uint     lBufferActive = 0;
-lBuffer *lBufferFFree = NULL;
-
-lBufferView  lBufferViewList[BFV_MAX];
-uint         lBufferViewMax = 0;
-uint         lBufferViewActive = 0;
-lBufferView *lBufferViewFFree = NULL;
+#undef defineAllocator
+#define defineAllocator(T, typeMax) \
+T T##List[typeMax]; \
+uint T##Max = 0; \
+uint T##Active = 0; \
+T * T##FFree = NULL; \
+T * T##AllocRaw (){\
+	T *ret;\
+	if((T##FFree) == NULL){			\
+		if(unlikely(T##Max >= typeMax-1)){	\
+			fpf(stderr, "%S", #T " OOM");\
+			exit(123);\
+		}else{\
+			ret = &(T##List)[(T##Max)++];	\
+		}\
+	}else{\
+		ret = T ## FFree;\
+		(T##FFree) = ret->nextFree;	\
+	}\
+	(T##Active)++;							\
+	if(unlikely((typeMax - (T##Active)) < 32)){lGCShouldRunSoon = true;} \
+	memset(ret, 0, sizeof(T));\
+	return ret;\
+}
+#include "allocator-types.h"
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncMax    = 0;
 
-
-#define defineAllocator(T, funcName, list, listMax, listActive, typeMax, listFree, errorMsg) \
-T * funcName (){\
-	T *ret;\
-	if(listFree == NULL){\
-		if(unlikely(listMax >= typeMax-1)){	\
-			fpf(stderr, "%S", errorMsg);\
-			exit(123);\
-		}else{\
-			ret = &list[listMax++];\
-		}\
-	}else{\
-		ret = listFree;\
-		listFree = ret->nextFree;\
-	}\
-	listActive++;\
-	if(unlikely((typeMax - listActive) < 32)){lGCShouldRunSoon = true;} \
-	memset(ret, 0, sizeof(T));\
-	return ret;\
-}
-
-defineAllocator(lArray, lArrayAllocRaw, lArrayList, lArrayMax, lArrayActive, ARR_MAX, lArrayFFree, "lArray OOM")
-defineAllocator(lClosure, lClosureAlloc, lClosureList, lClosureMax, lClosureActive, CLO_MAX, lClosureFFree, "lClosure OOM")
-defineAllocator(lTree, lTreeAlloc, lTreeList, lTreeMax, lTreeActive, TRE_MAX, lTreeFFree, "lTree OOM")
-defineAllocator(lVal, lValAllocRaw, lValList, lValMax, lValActive, VAL_MAX, lValFFree, "lVal OOM")
-defineAllocator(lBytecodeArray, lBytecodeArrayAllocRaw, lBytecodeArrayList, lBytecodeArrayMax, lBytecodeArrayActive, BCA_MAX, lBytecodeArrayFFree, "lBytecodeArray OOM")
-defineAllocator(lBuffer, lBufferAllocRaw, lBufferList, lBufferMax, lBufferActive, BUF_MAX, lBufferFFree, "lBuffer OOM")
-defineAllocator(lBufferView, lBufferViewAllocRaw, lBufferViewList, lBufferViewMax, lBufferViewActive, BFV_MAX, lBufferViewFFree, "lBufferView OOM")
 
 int lBufferViewTypeSize(lBufferViewType T){
 	switch(T){

@@ -16,7 +16,7 @@
 #include <string.h>
 
 lClosure *lClosureNew(lClosure *parent, closureType t){
-	lClosure *c = lClosureAlloc();
+	lClosure *c = lClosureAllocRaw();
 	c->parent = parent;
 	c->type = t;
 	if(likely(parent)){
