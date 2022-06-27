@@ -129,6 +129,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NULL), handler);
 		} else {
+			exceptionTargetDepth--;
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
 			free(ctx.valueStack);

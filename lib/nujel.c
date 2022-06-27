@@ -1,4 +1,4 @@
-/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+ /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #include "nujel.h"
 
@@ -29,8 +29,8 @@ void lInit(){
 
 /* Cause an exception, passing V directly to the closest exception handler */
 NORETURN void lExceptionThrowRaw(lVal *v){
-	if(exceptionTargetDepth <= 0){
-		fpf(stderr,"%V",v);
+	if(exceptionTargetDepth < 0){
+		fpf(stderr,"%V\n",v);
 		exit(201);
 	}
 	exceptionValue = v;
