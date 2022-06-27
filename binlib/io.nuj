@@ -58,6 +58,7 @@
       "Compile a Nujel source file into optimized object code"
       [-> [directory/read-recursive base-dir]
           [flatten]
+          [sort]
           [filter [path/ext?! "nuj"]]
           [map [fn [path] [file/test/module path base-dir]]]
           [sum]]]
