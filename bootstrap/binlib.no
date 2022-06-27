@@ -84,7 +84,7 @@
 0D
 23s file/compile/module
 05v [path environment base-dir]
-05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]] [def source [cons defmodule [cons module-name [read [file/read path]]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]] [def source [quasiquote [defmodule [unquote module-name] [def *module* [unquote module-name]] [unquote-splicing [read [file/read path]]]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]]
 05v #{##[]
 05v symbol->keyword
 05v string->symbol
@@ -100,13 +100,24 @@
 04i 1
 0Es module-name
 0D
-10s defmodule
+23s defmodule
 10s module-name
+23s def
+23s *module*
+10s module-name
+24
+14
+14
+14
+05v append
 05v read
 05v file/read
 10s path
 04i 1
 04i 1
+24
+04i 2
+14
 14
 14
 0Es source
@@ -191,6 +202,184 @@
 }
 17
 0Es file/compile/argv
+0D
+23s file/test/module/run
+05v [tests module-name]
+05v #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]]
+05v #{##[]
+05v require*
+05v :test
+05v current-closure
+04i 0
+05v #t
+04i 3
+0D
+15
+10s tests
+0Es ΓεnΣym-1
+0D
+10s ΓεnΣym-1
+0Bo 94
+24
+1B
+09o 79
+0D
+1C
+10s ΓεnΣym-1
+11
+0Es expr
+0D
+10s test/run-test!
+05v eval-in
+05v current-closure
+04i 0
+10s expr
+12
+11
+04i 2
+23s do
+23s require
+10s module-name
+24
+14
+14
+05v append
+10s expr
+12
+12
+24
+04i 2
+14
+14
+04i 2
+0D
+10s ΓεnΣym-1
+12
+0Fs ΓεnΣym-1
+10s ΓεnΣym-1
+0Ao -80
+09o 4
+24
+16
+01
+}
+17
+0Es file/test/module/run
+0D
+23s valid-test-form?
+05v [form]
+05v #@[source: [[== [car form] 'deftest]]]
+05v #{##[]
+10s form
+11
+23s deftest
+20
+01
+}
+17
+0Es valid-test-form?
+0D
+23s file/test/module
+05v [path base-dir]
+05v #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]]
+05v #{##[]
+05v string/cut
+10s path
+05v length
+10s base-dir
+04i 1
+04i 2
+0Es rel-path
+0D
+05v char-at
+10s rel-path
+02i 0
+04i 2
+02i 47
+20
+0Bo 22
+05v string/cut
+10s rel-path
+02i 1
+04i 2
+0Fs rel-path
+09o 4
+24
+0D
+05v symbol->keyword
+05v string->symbol
+05v path/without-extension
+10s rel-path
+04i 1
+04i 1
+04i 1
+0Es module-name
+0D
+05v require*
+05v :test
+05v current-closure
+04i 0
+05v #t
+04i 3
+0D
+10s test/init!
+04i 0
+0D
+05v file/test/module/run
+05v filter
+05v read
+05v file/read
+10s path
+04i 1
+04i 1
+10s valid-test-form?
+04i 2
+10s module-name
+04i 2
+0D
+10s test/finish!
+05v ansi-blue
+10s module-name
+04i 1
+04i 1
+01
+}
+17
+0Es file/test/module
+0D
+23s file/test/directory
+05v [base-dir]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]]
+05v #{##[]
+05v sum
+05v map
+05v filter
+05v flatten
+05v directory/read-recursive
+10s base-dir
+04i 1
+04i 1
+05v path/ext?!
+05v "nuj"
+04i 1
+04i 2
+23s anonymous
+05v [path]
+05v #@[source: [[file/test/module path base-dir]]]
+05v #{##[]
+05v file/test/module
+10s path
+10s base-dir
+04i 2
+01
+}
+17
+04i 2
+04i 1
+01
+}
+17
+0Es file/test/directory
 0D
 23s load
 05v [filename]

@@ -56,5 +56,3 @@
 [test/add #f [= #[1] #[1]]]
 [test/add #f [= #[1] #[2]]]
 [test/add #t [let [[a #[1]]] [= a a]]]
-[test/mod :array/2d #t [-> [array/2d/allocate 4 4] [array/2d/set! 1 1 #t] [array/2d/ref 1 1]]]
-[test/mod :array/2d #t [-> [array/2d/allocate 3 3] [array/2d/fill! #t] [array/2d/ref 1 1]]]

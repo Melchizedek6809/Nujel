@@ -158,6 +158,9 @@
 0Es bit-clear
 01
 }#{##[]
+24
+01
+}#{##[]
 23s array/+=
 05v [a i v]
 05v #@[documentation: "Add V to the value in A at position I and store the result in A returning A" source: ["Add V to the value in A at position I and store the result in A returning A" [array/set! a i [+ v [array/ref a i]]]]]
@@ -961,9 +964,6 @@
 }
 17
 0Es array/cut
-01
-}#{##[]
-24
 01
 }#{##[]
 23s sum
@@ -3107,102 +3107,6 @@
 }
 17
 0Es tree/filter
-01
-}#{##[]
-23s compile/backend/none
-05v [expr]
-05v #@[source: [expr]]
-05v #{##[]
-10s expr
-01
-}
-17
-0Es compile/backend/none
-0D
-23s compile/backend/bytecode
-05v [expr]
-05v #@[source: [[-> [bytecompile expr] assemble*]]]
-05v #{##[]
-05v assemble*
-05v bytecompile
-10s expr
-04i 1
-04i 1
-01
-}
-17
-0Es compile/backend/bytecode
-0D
-05v :bytecode
-0Es *active-backend*
-0D
-05v tree/new
-05v :bytecode
-10s compile/backend/bytecode
-05v :none
-10s compile/backend/none
-04i 4
-0Es backend/tree
-0D
-23s backend
-05v [expr]
-05v #@[source: [[[tree/ref backend/tree *active-backend*] expr]]]
-05v #{##[]
-05v tree/ref
-10s backend/tree
-10s *active-backend*
-04i 2
-10s expr
-04i 1
-01
-}
-17
-0Es backend
-0D
-23s compile/for
-05v [backend expr environment]
-05v #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]]
-05v #{##[]
-10s *active-backend*
-0Es last-backend
-0D
-24
-0Es ret
-0D
-23s anonymous
-05v [e]
-05v #@[source: [[set! *active-backend* last-backend] [throw e]]]
-05v #{##[]
-10s last-backend
-0Fs *active-backend*
-0D
-05v throw
-10s e
-04i 1
-01
-}
-17
-19o 48
-10s backend
-0Fs *active-backend*
-0D
-05v compile*
-10s expr
-05v current-closure
-04i 0
-04i 2
-0Fs ret
-0D
-10s last-backend
-0Fs *active-backend*
-0D
-10s ret
-01
-16
-01
-}
-17
-0Es compile/for
 01
 }#{##[]
 23s $nop
@@ -6965,6 +6869,102 @@
 0Es disassemble
 01
 }#{##[]
+23s compile/backend/none
+05v [expr]
+05v #@[source: [expr]]
+05v #{##[]
+10s expr
+01
+}
+17
+0Es compile/backend/none
+0D
+23s compile/backend/bytecode
+05v [expr]
+05v #@[source: [[-> [bytecompile expr] assemble*]]]
+05v #{##[]
+05v assemble*
+05v bytecompile
+10s expr
+04i 1
+04i 1
+01
+}
+17
+0Es compile/backend/bytecode
+0D
+05v :bytecode
+0Es *active-backend*
+0D
+05v tree/new
+05v :bytecode
+10s compile/backend/bytecode
+05v :none
+10s compile/backend/none
+04i 4
+0Es backend/tree
+0D
+23s backend
+05v [expr]
+05v #@[source: [[[tree/ref backend/tree *active-backend*] expr]]]
+05v #{##[]
+05v tree/ref
+10s backend/tree
+10s *active-backend*
+04i 2
+10s expr
+04i 1
+01
+}
+17
+0Es backend
+0D
+23s compile/for
+05v [backend expr environment]
+05v #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]]
+05v #{##[]
+10s *active-backend*
+0Es last-backend
+0D
+24
+0Es ret
+0D
+23s anonymous
+05v [e]
+05v #@[source: [[set! *active-backend* last-backend] [throw e]]]
+05v #{##[]
+10s last-backend
+0Fs *active-backend*
+0D
+05v throw
+10s e
+04i 1
+01
+}
+17
+19o 48
+10s backend
+0Fs *active-backend*
+0D
+05v compile*
+10s expr
+05v current-closure
+04i 0
+04i 2
+0Fs ret
+0D
+10s last-backend
+0Fs *active-backend*
+0D
+10s ret
+01
+16
+01
+}
+17
+0Es compile/for
+01
+}#{##[]
 23s load/forms
 05v [source environment]
 05v #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]]
@@ -8880,6 +8880,26 @@
 05v #t
 0Es otherwise
 0D
+23s deftest
+23s l
+05v #@[source: []]
+05v #{##[]
+24
+01
+}
+18
+0Es deftest
+0D
+23s defqtest
+23s l
+05v #@[source: []]
+05v #{##[]
+24
+01
+}
+18
+0Es defqtest
+0D
 23s comment
 23s body
 05v #@[documentation: "Does nothing" source: ["Does nothing" #nil]]
@@ -9817,8 +9837,8 @@
 0Es export
 0D
 23s require*
-05v [module env]
-05v #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [module/qualify-symbol module [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]]
+05v [module env qualify?]
+05v #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [if qualify? [module/qualify-symbol module [keyword->symbol k]] [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]]
 05v #{##[]
 05v module/load
 10s module
@@ -9838,22 +9858,28 @@
 0Es ΓεnΣym-1
 0D
 10s ΓεnΣym-1
-0Bo 135
+0Bo 155
 24
 1B
-09o 120
+09o 140
 0D
 1C
 10s ΓεnΣym-1
 11
 0Es k
 0D
+10s qualify?
+0Bo 26
 05v module/qualify-symbol
 10s module
 05v keyword->symbol
 10s k
 04i 1
 04i 2
+09o 13
+05v keyword->symbol
+10s k
+04i 1
 0Es q
 0D
 23s def
@@ -9889,7 +9915,7 @@
 12
 0Fs ΓεnΣym-1
 10s ΓεnΣym-1
-0Ao -121
+0Ao -141
 09o 4
 24
 16
@@ -9898,16 +9924,38 @@
 17
 0Es require*
 0D
-23s require
+23s use
 05v [module]
-05v #@[source: [[quasiquote [require* [unquote module] [current-closure]]]]]
+05v #@[source: [[quasiquote [require* [unquote module] [current-closure] #f]]]]
 05v #{##[]
 23s require*
 10s module
 23s current-closure
 24
 14
+05v #f
 24
+14
+14
+14
+14
+01
+}
+18
+0Es use
+0D
+23s require
+05v [module]
+05v #@[source: [[quasiquote [require* [unquote module] [current-closure] #t]]]]
+05v #{##[]
+23s require*
+10s module
+23s current-closure
+24
+14
+05v #t
+24
+14
 14
 14
 14
@@ -15882,6 +15930,9 @@
 04i 1
 0Es exports
 0D
+05v :array/2d
+0Es *module*
+0D
 05v tree/set!
 10s exports
 23s allocate
@@ -16144,6 +16195,8 @@
 0Es array/2d/print
 04i 3
 0D
+24
+0D
 13
 16
 04i 2
@@ -16156,6 +16209,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :avl
+0Es *module*
 0D
 05v :e
 0Es avl/empty
@@ -17405,6 +17461,8 @@
 0Es avl/to-list
 04i 3
 0D
+24
+0D
 13
 16
 04i 2
@@ -17417,6 +17475,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :crypto/adler32
+0Es *module*
 0D
 05v tree/set!
 10s exports
@@ -17486,6 +17547,8 @@
 0Es hash
 04i 3
 0D
+24
+0D
 13
 16
 04i 2
@@ -17498,6 +17561,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :io/ansi
+0Es *module*
 0D
 05v #f
 0Es disabled
@@ -18142,6 +18208,8 @@
 0Es reprint-line
 04i 3
 0D
+24
+0D
 13
 16
 04i 2
@@ -18154,6 +18222,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :serialization/json
+0Es *module*
 0D
 23s tree->json
 05v [v]
@@ -18325,6 +18396,8 @@
 0Es val->json
 04i 3
 0D
+24
+0D
 13
 16
 04i 2
@@ -18337,6 +18410,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :test
+0Es *module*
 0D
 24
 0Es test-list
@@ -18406,37 +18482,6 @@
 0D
 05v tree/set!
 10s exports
-23s mod
-23s test/add
-05v [mod result . expr]
-05v #@[documentation: "Add a test where EXPR must eval to RESULT" source: ["Add a test where EXPR must eval to RESULT" [quasiquote [[unquote test/add*] [unquote result] [unquote [list 'quote [cons 'do [cons [quasiquote [require [unquote mod]]] expr]]]]]]]]
-05v #{##[]
-10s test/add*
-10s result
-05v list
-23s quote
-23s do
-23s require
-10s mod
-24
-14
-14
-10s expr
-14
-14
-04i 2
-24
-14
-14
-14
-01
-}
-18
-0Es test/add
-04i 3
-0D
-05v tree/set!
-10s exports
 23s reset!
 23s reset!
 05v []
@@ -18456,8 +18501,8 @@
 04i 3
 0D
 23s display-results
-05v []
-05v #@[documentation: "Prints the result Message" source: ["Prints the result Message" [random/seed-initialize!] [efmtln "Nujel [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}" [if [and [zero? error-count] [> test-count 0]] "Success" "Failed!"] [ansi-green success-count] [ansi-red error-count] [- [time/milliseconds] nujel-start] [if [and [zero? error-count] [> test-count 0]] [ansi-rainbow "Everything is working, very nice!"] [ansi-red "Better fix those!"]]]]]
+05v [description]
+05v #@[documentation: "Prints the result Message" source: ["Prints the result Message" [random/seed-initialize!] [efmtln "{} {} - [{} / {}] in {} ms" [if [and [zero? error-count] [> test-count 0]] [if [zero? success-count] [ansi-yellow "?"] [ansi-green "✓"]] [ansi-red "✗"]] description [if [zero? success-count] [ansi-yellow success-count] [ansi-green success-count]] [if [zero? error-count] [ansi-gray error-count] [ansi-red error-count]] [- [time/milliseconds] nujel-start]]]]
 05v #{##[]
 05v random/seed-initialize!
 04i 0
@@ -18472,62 +18517,68 @@
 10s test-count
 02i 0
 22
-0Bo 10
-05v "Success"
-09o 7
-05v "Failed!"
+0Bo 37
+10s success-count
+2A
+0Bo 16
+05v ansi-yellow
+05v "?"
+04i 1
+09o 13
+05v ansi-green
+05v "✓"
+04i 1
+09o 13
+05v ansi-red
+05v "✗"
+04i 1
 0Es fmt-arg-0
 0D
+10s description
+0Es fmt-arg-1
+0D
+10s success-count
+2A
+0Bo 16
+05v ansi-yellow
+10s success-count
+04i 1
+09o 13
 05v ansi-green
 10s success-count
 04i 1
-0Es fmt-arg-1
+0Es fmt-arg-2
 0D
+10s error-count
+2A
+0Bo 16
+05v ansi-gray
+10s error-count
+04i 1
+09o 13
 05v ansi-red
 10s error-count
 04i 1
-0Es fmt-arg-2
+0Es fmt-arg-3
 0D
 05v time/milliseconds
 04i 0
 10s nujel-start
 26
-0Es fmt-arg-3
-0D
-10s error-count
-2A
-0C
-0Bo 11
-0D
-10s test-count
-02i 0
-22
-0Bo 16
-05v ansi-rainbow
-05v "Everything is working, very nice!"
-04i 1
-09o 13
-05v ansi-red
-05v "Better fix those!"
-04i 1
 0Es fmt-arg-4
 0D
 05v cat
-05v "Nujel ["
-10s System/OS
-05v " "
-10s System/Architecture
-05v "] - "
 10s fmt-arg-0
-05v " - ["
+05v " "
 10s fmt-arg-1
-05v " / "
+05v " - ["
 10s fmt-arg-2
-05v "] in "
+05v " / "
 10s fmt-arg-3
-05v " ms - "
+05v "] in "
 10s fmt-arg-4
-04i 14
+05v " ms"
+04i 10
 16
 04i 1
 01
@@ -18536,7 +18587,7 @@
 0Es display-results
 0D
 23s test-success
-05v [res-should res-is expr i]
+05v [res-should res-is expr]
 05v #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]]]
 05v #{##[]
 10s print-passes
@@ -18585,7 +18636,7 @@
 0Es test-success
 0D
 23s test-failure
-05v [res-should res-is expr i]
+05v [res-should res-is expr]
 05v #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]]]
 05v #{##[]
 10s print-errors
@@ -18633,13 +18684,16 @@
 17
 0Es test-failure
 0D
-23s run-test
+05v tree/set!
+10s exports
+23s run-test!
+23s run-test!
 05v [result rawexpr i]
-05v #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr i]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr i] [test-failure result expr rawexpr i]]]]]
+05v #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr] [test-failure result expr rawexpr]]]]]
 05v #{##[]
 23s anonymous
 05v [err]
-05v #@[source: [[display/error err] [test-failure result [list :exception-caught err] rawexpr i]]]
+05v #@[source: [[display/error err] [test-failure result [list :exception-caught err] rawexpr]]]
 05v #{##[]
 05v display/error
 10s err
@@ -18652,12 +18706,11 @@
 10s err
 04i 2
 10s rawexpr
-10s i
-04i 4
+04i 3
 01
 }
 17
-19o 89
+19o 81
 05v eval-in
 05v current-closure
 04i 0
@@ -18669,32 +18722,31 @@
 10s result
 10s expr
 04i 2
-0Bo 28
+0Bo 24
 10s test-success
 10s result
 10s expr
 10s rawexpr
-10s i
-04i 4
-09o 25
+04i 3
+09o 21
 10s test-failure
 10s result
 10s expr
 10s rawexpr
-10s i
-04i 4
+04i 3
 16
 01
 }
 17
-0Es run-test
+0Es run-test!
+04i 3
 0D
 05v tree/set!
 10s exports
-23s run
-23s run
+23s init!
+23s init!
 05v [output-passes hide-errors]
-05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0] [def i [+ test-count 1]] [doseq [cur-test test-list] [run-test [car cur-test] [cdr cur-test] [dec! i]]] [display-results] [return error-count]]]
+05v #@[documentation: "Initialize the testing framework" source: ["Initialize the testing framework" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0]]]
 05v #{##[]
 05v bool
 10s hide-errors
@@ -18719,52 +18771,96 @@
 0D
 02i 0
 0Fs error-count
+01
+}
+17
+0Es init!
+04i 3
 0D
-10s test-count
-02i 1
-25
-0Es i
+05v tree/set!
+10s exports
+23s finish!
+23s finish!
+05v [description]
+05v #@[source: [[display-results description] [return error-count]]]
+05v #{##[]
+10s display-results
+10s description
+04i 1
+0D
+10s error-count
+01
+01
+}
+17
+0Es finish!
+04i 3
+0D
+05v tree/set!
+10s exports
+23s run
+23s run
+05v [output-passes hide-errors]
+05v #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [init!] [doseq [cur-test test-list] [run-test! [car cur-test] [cdr cur-test]]] [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]]
+05v #{##[]
+10s init!
+04i 0
 0D
 15
 10s test-list
 0Es ΓεnΣym-1
 0D
 10s ΓεnΣym-1
-0Bo 67
+0Bo 56
 24
 1B
-09o 52
+09o 41
 0D
 1C
 10s ΓεnΣym-1
 11
 0Es cur-test
 0D
-10s run-test
+10s run-test!
 10s cur-test
 11
 10s cur-test
 12
-10s i
-02i 1
-26
-0Fs i
-04i 3
+04i 2
 0D
 10s ΓεnΣym-1
 12
 0Fs ΓεnΣym-1
 10s ΓεnΣym-1
-0Ao -53
+0Ao -42
 09o 4
 24
 16
 0D
-10s display-results
-04i 0
+10s finish!
+15
+05v ansi-blue
+05v ":core"
+04i 1
+0Es fmt-arg-0
 0D
-10s error-count
-01
+05v ansi-rainbow
+05v "Nujel"
+04i 1
+0Es fmt-arg-1
+0D
+05v cat
+10s fmt-arg-0
+05v " "
+10s fmt-arg-1
+05v " ["
+10s System/OS
+05v " "
+10s System/Architecture
+05v "]"
+04i 8
+16
+04i 1
 01
 }
 17
@@ -18773,6 +18869,8 @@
 0D
 10s reset!
 04i 0
+0D
+24
 0D
 13
 16
@@ -18786,6 +18884,9 @@
 24
 04i 1
 0Es exports
+0D
+05v :time
+0Es *module*
 0D
 05v tree/set!
 10s exports
@@ -18865,6 +18966,8 @@
 17
 0Es hours
 04i 3
+0D
+24
 0D
 13
 16

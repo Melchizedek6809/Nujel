@@ -16,29 +16,29 @@
                       "Add a test where EXPR must eval to RESULT"
                       `[~test/add* ~result ~[list 'quote [cons 'do expr]]]]]
 
-[export mod [defmacro test/add [mod result . expr]
-                      "Add a test where EXPR must eval to RESULT"
-                      `[~test/add* ~result ~[list 'quote [cons 'do [cons `[require ~mod] expr]]]]]]
-
 [export reset! [defn reset! []
                      [set! test-list [cons 4 '[+ 3 1]]]
                      [set! test-count 1]]]
 
-[defn display-results []
+[defn display-results [description]
       "Prints the result Message"
       [random/seed-initialize!]
-      [efmtln "Nujel [{System/OS} {System/Architecture}] - {} - [{} / {}] in {} ms - {}"
+      [efmtln "{} {} - [{} / {}] in {} ms"
               [if [and [zero? error-count] [> test-count 0]]
-                  "Success"
-                  "Failed!"]
-              [ansi-green success-count]
-              [ansi-red error-count]
-              [- [time/milliseconds] nujel-start]
-              [if [and [zero? error-count] [> test-count 0]]
-                  [ansi-rainbow "Everything is working, very nice!"]
-                  [ansi-red "Better fix those!"]]]]
+                  [if [zero? success-count]
+                      [ansi-yellow "?"]
+                      [ansi-green "✓"]]
+                  [ansi-red "✗"]]
+              description
+              [if [zero? success-count]
+                  [ansi-yellow success-count]
+                  [ansi-green success-count]]
+              [if [zero? error-count]
+                  [ansi-gray error-count]
+                  [ansi-red error-count]]
+              [- [time/milliseconds] nujel-start]]]
 
-[defn test-success [res-should res-is expr i]
+[defn test-success [res-should res-is expr]
       "Should be called after a test has finished successfully"
       [when print-passes
             [efmtln "{} == {}\r\n{}\r\n\r\n"
@@ -47,7 +47,7 @@
                     [string/write expr]]]
       [set! success-count [+ 1 success-count]]]
 
-[defn test-failure [res-should res-is expr i]
+[defn test-failure [res-should res-is expr]
       "Should be called if EXPR does not equal RES"
       [when print-errors
             [pfmtln "{} != {}\r\n{}\r\n\r\n"
@@ -56,33 +56,37 @@
                     [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
-[defn run-test [result rawexpr i]
-      "Tests that RAWEXPR evaluates to RESULT"
-      [try [fn [err]
-               [display/error err]
-               [test-failure result [list :exception-caught err] rawexpr i]]
-           [def expr [eval rawexpr]]
-           [if [equal? result expr]
-               [test-success result expr rawexpr i]
-               [test-failure result expr rawexpr i]]]]
+[export run-test! [defn run-test! [result rawexpr i]
+                        "Tests that RAWEXPR evaluates to RESULT"
+                        [try [fn [err]
+                                 [display/error err]
+                               [test-failure result [list :exception-caught err] rawexpr]]
+                             [def expr [eval rawexpr]]
+                             [if [equal? result expr]
+                                 [test-success result expr rawexpr]
+                                 [test-failure result expr rawexpr]]]]]
+
+[export init! [defn init! [output-passes hide-errors]
+                   "Initialize the testing framework"
+                   [set! print-errors   [not [bool hide-errors]]]
+                   [set! print-passes   [bool output-passes]]
+                   [set! nujel-start    [time/milliseconds]]
+                   [set! success-count  0]
+                   [set! error-count    0]]]
+
+[export finish! [defn finish! [description]
+                      [display-results description]
+                      [return error-count]]]
 
 [export run [defn run [output-passes hide-errors]
                   "Run through all automated Tests"
-                  [set! print-errors   [not [bool hide-errors]]]
-                  [set! print-passes   [bool output-passes]]
-                  [set! nujel-start    [time/milliseconds]]
-                  [set! success-count  0]
-                  [set! error-count    0]
-
-                  [def i [+ test-count 1]]
+                  [init!]
                   [doseq [cur-test test-list]
-                         [run-test [car cur-test]
-                                   [cdr cur-test]
-                                   [dec! i]]]
-
-                  [display-results]
-                  [return error-count]]]
+                         [run-test! [car cur-test]
+                                    [cdr cur-test]]]
+                  [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]]
 
 [reset!]
 
+[deftest #t [lambda? test/run]]
 ;; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]

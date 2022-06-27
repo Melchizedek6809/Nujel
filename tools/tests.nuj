@@ -20,6 +20,7 @@
   [set! output-passes #t]]
 
 [set! test/testsuite-errors [test/run output-passes]]
+[file/test/directory "./stdlib_modules"]
 
 [when [tree/has? repl/options :only-test-suite]
   [exit test/testsuite-errors]]

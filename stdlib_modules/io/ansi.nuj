@@ -12,33 +12,33 @@
 [def bg-reset "\e[49m"]
 
 [def ansi-fg #[
-	       "\e[0;30m"
-	       "\e[0;31m"
-	       "\e[0;32m"
-	       "\e[0;33m"
-	       "\e[0;34m"
-	       "\e[0;35m"
-	       "\e[0;36m"
-	       "\e[0;37m"
-	       "\e[1;30m"
-	       "\e[1;31m"
-	       "\e[1;32m"
-	       "\e[1;33m"
-	       "\e[1;34m"
-	       "\e[1;35m"
-	       "\e[1;36m"
-	       "\e[1;37m"
+               "\e[0;30m"
+               "\e[0;31m"
+               "\e[0;32m"
+               "\e[0;33m"
+               "\e[0;34m"
+               "\e[0;35m"
+               "\e[0;36m"
+               "\e[0;37m"
+               "\e[1;30m"
+               "\e[1;31m"
+               "\e[1;32m"
+               "\e[1;33m"
+               "\e[1;34m"
+               "\e[1;35m"
+               "\e[1;36m"
+               "\e[1;37m"
                ]]
 
 [def ansi-bg #[
-	       "\e[40m"
-	       "\e[41m"
-	       "\e[42m"
-	       "\e[43m"
-	       "\e[44m"
-	       "\e[45m"
-	       "\e[46m"
-	       "\e[47m"
+               "\e[40m"
+               "\e[41m"
+               "\e[42m"
+               "\e[43m"
+               "\e[44m"
+               "\e[45m"
+               "\e[46m"
+               "\e[47m"
                ]]
 
 
@@ -78,9 +78,9 @@
                          "Wrap ARGS in the colors of the rainbow!"
                          [def count 0]
                          [def colored-list [map [split [apply cat args] ""]
-			                        [fn [a]
-			                            [set! count [bit-and [+ 1 count] #x7]]
-			                          [cat [or disabled [array/ref ansi-fg [bit-xor count #x7]]] [or disabled [array/ref ansi-bg count]] a]]]]
+                                                [fn [a]
+                                                    [set! count [bit-and [+ 1 count] #x7]]
+                                                  [cat [or disabled [array/ref ansi-fg [bit-xor count #x7]]] [or disabled [array/ref ansi-bg count]] a]]]]
                          [cat [join colored-list ""]
                               [or disabled reset]]]]
 
@@ -91,3 +91,23 @@
                                     [print " "]]
                            [print "\r"]
                            [print text]]]
+
+[deftest "\e[0;33mabc\e[0m" [io/ansi/wrap 3 "abc"]]
+[deftest "\e[0;30m123\e[0m" [io/ansi/black "123"]]
+[deftest "\e[0;31m123\e[0m" [io/ansi/dark-red "123"]]
+[deftest "\e[0;32m123\e[0m" [io/ansi/dark-green "123"]]
+[deftest "\e[0;33m123\e[0m" [io/ansi/dark-brown "123"]]
+[deftest "\e[0;34m123\e[0m" [io/ansi/dark-blue "123"]]
+[deftest "\e[0;35m123\e[0m" [io/ansi/purple "123"]]
+[deftest "\e[0;36m123\e[0m" [io/ansi/teal "123"]]
+[deftest "\e[0;37m123\e[0m" [io/ansi/dark-gray "123"]]
+[deftest "\e[1;30m123\e[0m" [io/ansi/gray "123"]]
+[deftest "\e[1;31m123\e[0m" [io/ansi/red "123"]]
+[deftest "\e[1;32m123\e[0m" [io/ansi/green "123"]]
+[deftest "\e[1;33m123\e[0m" [io/ansi/yellow "123"]]
+[deftest "\e[1;34m123\e[0m" [io/ansi/blue "123"]]
+[deftest "\e[1;35m123\e[0m" [io/ansi/pink "123"]]
+[deftest "\e[1;36m123\e[0m" [io/ansi/cyan "123"]]
+[deftest "\e[1;37m123\e[0m" [io/ansi/white "123"]]
+[deftest "\e[1;31mt\e[1;32me\e[1;33ms\e[1;34mt\e[1;35me\e[1;36mr\e[1;37ml\e[0;37me\e[0;39m" [io/ansi/rainbow "testerle"]]
+[deftest "\e[0;36m\e[41mt\e[0;35m\e[42me\e[0;34m\e[43ms\e[0;33m\e[44mt\e[0;32m\e[45me\e[0;31m\e[46mr\e[0;30m\e[47ml\e[0;37m\e[40me\e[0m" [io/ansi/rainbow-bg "testerle"]]

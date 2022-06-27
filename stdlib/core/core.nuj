@@ -5,6 +5,8 @@
 ;; core language constructs and essential macros
 
 [def otherwise #t]
+[defmacro deftest l #nil] ; Tests should be skipped when compiling
+[defmacro defqtest l #nil] ; Tests should be skipped when compiling
 
 [defmacro comment body
           "Does nothing"

@@ -27,16 +27,21 @@
 [defmacro export [name value]
           `[tree/set! exports '~name ~value]]
 
-[defn require* [module env]
+[defn require* [module env qualify?]
       [def mod [module/load module]]
       [def exports [resolve 'exports mod]]
       [doseq [k [tree/keys exports]]
-             [def q [module/qualify-symbol module [keyword->symbol k]]]
+             [def q [if qualify?
+                        [module/qualify-symbol module [keyword->symbol k]]
+                        [keyword->symbol k]]]
              [def expr `[def ~q [module/import ~mod '~[keyword->symbol k]]]]
              [apply env [compile* expr env]]]]
 
+[defmacro use [module]
+          `[require* ~module [current-closure] #f]]
+
 [defmacro require [module]
-          `[require* ~module [current-closure]]]
+          `[require* ~module [current-closure] #t]]
 
 [defmacro import* [local-symbol module module-symbol]
           `[def ~local-symbol [module/import ~module '~module-symbol]]]

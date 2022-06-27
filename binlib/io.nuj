@@ -19,7 +19,7 @@
 [defn file/compile/module [path environment base-dir]
       "Compile a Nujel source file into optimized object code"
       [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]]
-      [def source [cons defmodule [cons module-name [read [file/read path]]]]]
+      [def source `[defmodule ~module-name [def *module* ~module-name] ~@[read [file/read path]]]]
       [def object-code [compile* source [or environment [environment*]]]]
       [file/write [if object-code [string/write object-code] ""]
                   [cat [path/without-extension path] ".no"]]
@@ -31,6 +31,36 @@
       [if [>= module 0]
           [file/compile/module path #nil [string/cut path 0 [+ module 9]]]
           [file/compile path]]]
+
+[defn file/test/module/run [tests module-name]
+      [require :test]
+      [doseq [expr tests]
+             [test/run-test! [eval [cadr expr]]
+                             `[do [require ~module-name] ~@[cddr expr]]]]]
+
+[defn valid-test-form? [form]
+      [== [car form] 'deftest]]
+
+[defn file/test/module [path base-dir]
+      "Test a module by running all contained tests"
+      [def rel-path [string/cut path [length base-dir]]]
+      [when [== [char-at rel-path 0] #\/]
+            [set! rel-path [string/cut rel-path 1]]]
+      [def module-name [string->keyword [path/without-extension rel-path]]]
+      [require :test]
+      [test/init!]
+      [-> [read [file/read path]]
+          [filter valid-test-form?]
+          [file/test/module/run module-name]]
+      [test/finish! [ansi-blue module-name]]]
+
+[defn file/test/directory [base-dir]
+      "Compile a Nujel source file into optimized object code"
+      [-> [directory/read-recursive base-dir]
+          [flatten]
+          [filter [path/ext?! "nuj"]]
+          [map [fn [path] [file/test/module path base-dir]]]
+          [sum]]]
 
 [defn load [filename]
   [try [fn [err]
