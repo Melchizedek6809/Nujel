@@ -5,4 +5,4 @@ def testCalc():
     ret = ret + i
   return ret
 
-print('The result is: ', testCalc())
+print('The result is: {}'.format(testCalc()))
