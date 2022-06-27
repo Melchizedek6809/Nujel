@@ -1,8 +1,11 @@
 [export hash [defn hash [data]
                    [def a 1]
                    [def b 0]
-                   [dotimes [i [string/length data]]
-                            [set! a [mod/int [add/int a [char-at data i]] 65521]]
+                   [when [string? data] [set! data [string->buffer data]]]
+                   [when [not= [type-of data] :buffer] [exception :type-error "Can only hash buffers or strings"]]
+                   [def v [buffer/view/u8* data]]
+                   [dotimes [i [buffer/length data]]
+                            [set! a [mod/int [add/int a [buffer/view/ref v i]] 65521]]
                             [set! b [mod/int [add/int a b] 65521]]]
                    [bit-or a [bit-shift-left b 16]]]]
 

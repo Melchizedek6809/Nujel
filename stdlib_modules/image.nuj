@@ -1,0 +1,89 @@
+;; Contains some functions for working with image data
+;;
+;; Should only contain some basic functions, as well as some
+;; functions which can then be extended via modules, like the
+;; generic functions image/save! and image/load! which by default
+;; will probably only every support BMP files.
+;;
+;; Some simple drawing routines (line/box/circle) and some simple
+;; filters (scale/blur) would also be good to have here.
+
+[def image/decoders @[]]
+[def image/encoders @[]]
+
+[export add-encoder! [defn image/add-encoder! [ext enc]
+                           [def ext [string->keyword [lowercase ext]]]
+                           [tree/set! image/encoders ext enc]]]
+
+[export add-decoder! [defn image/add-decoder! [ext dec]
+                           [def ext [string->keyword [lowercase ext]]]
+                           [tree/set! image/decoders ext dec]]]
+
+[defn image/get-encoder [path]
+      [def ext [string->keyword [lowercase [path/extension path]]]]
+      [tree/ref image/encoders ext]]
+
+[defn image/get-decoder [path]
+      [def ext [string->keyword [lowercase [path/extension path]]]]
+      [tree/ref image/decoders ext]]
+
+
+[export new [defn image/new [width height]
+                  [def buffer [buffer/allocate [* width height 4]]]
+                  @[ :width width
+                     :height height
+                     :buffer buffer
+                     :pixels [buffer/view/u32* buffer]]]]
+
+[export ref [defn image/ref [img x y]
+                  [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
+                  [buffer/view/ref [tree/ref img :pixels] i]]]
+
+[export set! [defn image/set! [img x y value]
+                   [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
+                   [buffer/view/set! [tree/ref img :pixels] i value]]]
+
+[export fill! [defn image/fill! [img value]
+                    [def p [tree/ref img :pixels]]
+                    [dotimes [i [* [tree/ref img :width]
+                                   [tree/ref img :height]]]
+                             [buffer/view/set! p i value]]
+                    [return img]]]
+
+[export map! [defn image/map! [img fun]
+                   [def p [tree/ref img :pixels]]
+                   [dotimes [i [* [tree/ref img :width]
+                                  [tree/ref img :height]]]
+                            [buffer/view/set! p i [fun [buffer/view/ref p i]]]]
+                   [return img]]]
+
+[export dup [defn image/dup [img]
+                  [def ret [image/new [tree/ref img :width]
+                                      [tree/ref img :height]]]
+                  [def in [tree/ref img :pixels]]
+                  [def out [tree/ref ret :pixels]]
+                  [dotimes [i [* [tree/ref img :width]
+                                 [tree/ref img :height]]]
+                           [buffer/view/set! out i [buffer/view/ref in i]]]
+                  [return ret]]]
+
+[export save! [defn image/save! [img path]
+                    [def enc [image/get-encoder path]]
+                    [if enc
+                        [file/write [enc img] path]
+                        [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]]
+
+[export adler32 [defn image/adler32 [img]
+                      [import [hash] :crypto/adler32]
+                      [hash [tree/ref img :buffer]]]]
+
+[export test-image-xor [defn image/test-image-xor []
+                   [def w 256]
+                   [def h 256]
+                   [def out [image/new w h]]
+                   [dotimes [x w]
+                            [dotimes [y h]
+                                     [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]]
+                   [return out]]]
+
+[deftest 4040398435 [image/adler32 [image/test-image-xor]]]

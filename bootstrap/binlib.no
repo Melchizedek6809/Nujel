@@ -349,14 +349,16 @@
 0D
 23s file/test/directory
 05v [base-dir]
-05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]]
+05v #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [sort] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]]
 05v #{##[]
 05v sum
 05v map
 05v filter
+05v sort
 05v flatten
 05v directory/read-recursive
 10s base-dir
+04i 1
 04i 1
 04i 1
 05v path/ext?!
