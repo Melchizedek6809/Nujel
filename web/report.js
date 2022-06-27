@@ -117,33 +117,20 @@ const uglyCatFilter = v => {
 	return true;
 };
 
-const getCatFilter = (cat, hostname) => {
+const getHostFilter =     (λ, hostname) => v => λ(v) && (v.hostname == hostname);
+const getTestcaseFilter = (λ, testcase) => v => λ(v) && testcase ? (v.testcase == testcase) : true;
+const getCatFilter = (λ, cat) => {
 	switch(cat){
-		case "good": return v => {
-			if(v.hostname != hostname){return false;}
-			if(v.language == 'nujel'){return true;}
-			return goodCatFilter(v);
-		};
-		case "bad": return v => {
-			if(v.hostname != hostname){return false;}
-			if(v.language == 'nujel'){return true;}
-			return !(goodCatFilter(v) || uglyCatFilter(v));
-		};
-		case "ugly": return v => {
-			if(v.hostname != hostname){return false;}
-			if(v.language == 'nujel'){return true;}
-			return uglyCatFilter(v);
-		};
-		default: return v => {
-			if(v.hostname != hostname){return false;}
-			return true;
-		}
+		case "good": return v => λ(v) && ((v.language == 'nujel') ||    goodCatFilter(v));
+		case "bad":  return v => λ(v) && ((v.language == 'nujel') || (!(goodCatFilter(v) || uglyCatFilter(v))));
+		case "ugly": return v => λ(v) && ((v.language == 'nujel') ||                        uglyCatFilter(v));
+		default:     return λ;
 	}
 }
 
-const getViews = (key, viewName, cat, hostname) => {
+const getViews = (key, viewName, cat, hostname, testcase) => {
 	const data = [];
-	data.push(getData(key, getCatFilter(cat, hostname), String(viewName)));
+	data.push(getData(key, getCatFilter(getHostFilter(getTestcaseFilter(() => true, testcase), hostname), cat), String(viewName)));
 	return data;
 }
 
@@ -209,8 +196,9 @@ const drawSinglePlot = barReport => {
 	const yAxis = String(barReport.getAttribute("report-y"));
 	const cat = barReport.getAttribute("report-cat");
 	const hostname = barReport.getAttribute("report-hostname") || "yuno";
+	const testcase = barReport.getAttribute("report-testcase");
 	Plotly.newPlot(barReport, {
-		data: getViews(yAxis, yAxisTitle(yAxis), cat, hostname),
+		data: getViews(yAxis, yAxisTitle(yAxis), cat, hostname, testcase),
 		layout: {
 			title: yAxisDescription(yAxis),
 			xaxis: {

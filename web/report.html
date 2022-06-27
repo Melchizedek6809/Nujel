@@ -24,18 +24,56 @@
 				<div id="report-memory-time"></div>
 			</div>
 
-			<h2>All x86_64 results:</h2>
+
+			<h2>Combined x86_64 results:</h2>
 			<h3>X13 - AMD Ryzen 7 PRO 4750U - Arch Linux</h3>
 			<div class="two-col">
 				<div class="bar-report" report-y="total" report-log="1"></div>
 				<div class="bar-report" report-y="max-resident" report-log="1"></div>
 			</div>
 
-			<h2>All ARM(v8) results</h2>
+			<h2>X13 / x86_64 [hello] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="hello"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="hello"></div>
+			</div>
+
+			<h2>X13 / x86_64 [for] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="for"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="for"></div>
+			</div>
+
+			<h2>X13 / x86_64 [euler1] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="euler1"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="euler1"></div>
+			</div>
+
+
+			<h2>Combined ARM(v8) results</h2>
 			<h3>RPi4 - Raspberry Pi OS aarch64</h3>
 			<div class="two-col">
 				<div class="bar-report" report-y="total" report-log="1" report-hostname="mirai"></div>
 				<div class="bar-report" report-y="max-resident" report-log="1" report-hostname="mirai"></div>
+			</div>
+
+			<h2>RPi4 [hello] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="hello" report-hostname="mirai"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="hello" report-hostname="mirai"></div>
+			</div>
+
+			<h2>RPi4 [for] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="for" report-hostname="mirai"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="for" report-hostname="mirai"></div>
+			</div>
+
+			<h2>RPi4 [euler1] results:</h2>
+			<div class="two-col">
+				<div class="bar-report" report-y="total" report-log="1" report-testcase="euler1" report-hostname="mirai"></div>
+				<div class="bar-report" report-y="max-resident" report-log="1" report-testcase="euler1" report-hostname="mirai"></div>
 			</div>
 		</div>
 		<script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
