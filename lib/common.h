@@ -158,8 +158,6 @@ struct lSymbol {
 	};
 };
 
-
-
 typedef struct {
 	lVal *car,*cdr;
 } lPair;

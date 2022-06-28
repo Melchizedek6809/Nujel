@@ -207,5 +207,8 @@
           `[apply [current-closure]
                   [assemble ~@ops]]]
 
-[defn bytecode-eval [bc env]
-      [apply [or env [current-closure]] bc]]
+[defn asmdebug ops
+      "Assemble and evaluate all bytecode arguments"
+      [def bc [apply assemble ops]]
+      [disassemble bc]
+      [pfmtln "Result: {:?}" [apply [current-closure] bc #t]]]
