@@ -30,7 +30,7 @@ u8 lBufferViewMarkMap    [BFV_MAX];
 void lThreadGCMark(lThread *c){
 	if(unlikely(c == NULL)){return;}
 	if(unlikely((c->csp > 8192) || (c->csp < 0))){
-		epf("Ignoring closure due to strangely sized CSP\n");
+		epf("Ignoring closure due to strangely sized CSP: %i\n", (i64)c->csp);
 		return;
 	}
 	lBytecodeArrayMark(c->text);

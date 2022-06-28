@@ -8,26 +8,21 @@
       [inc! bytecompile/gen-label/counter]
       [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]
 
-[def *bytecompile-push* #f]
-[defn $push/v [v]
-      [if *bytecompile-push*
-          [$push/val v]
-          [$push/lval v]]]
-
 [defn bytecompile/literal [source]
       [case [type-of source]
-            [[:symbol :keyword] [if [keyword? source]
-                                    [$push/v source]
-                                    [$get source]]]
             [:int      [$push/int source]]
             [:nil      [$push/nil]]
-            [otherwise [$push/v source]]]]
+            [:symbol   [$get source]]
+            [[:native-function :lambda :symbol] [$get [closure/name source]]]
+            [otherwise [$push/val source]]]]
 
 [defn bytecompile/quote [source]
       [case [type-of source]
             [:int      [$push/int source]]
+            [:nil      [$push/nil]]
             [:symbol   [$push/symbol source]]
-            [otherwise [$push/v source]]]]
+            [[:native-function :lambda] [$get [closure/name source]]]
+            [otherwise [$push/val source]]]]
 
 [defn bytecompile/do/form [source env]
       [when source [cons [cons [bytecompile* [car source] env]
@@ -137,17 +132,8 @@
 [defn bytecompile/or [source env]
       [def label-end [bytecompile/gen-label]]
       [list [bytecompile/or/rec [cdr source] env label-end]
-            [$push/lval #f]
+            [$push/val #f]
             [list :label label-end]]]
-
-[defn bytecompile/string [source env]
-      [bytecompile/procedure cat source env]]
-
-[defn bytecompile/array [source env]
-      [bytecompile/procedure array/ref source env]]
-
-[defn bytecompile/tree [source env]
-      [bytecompile/procedure tree/ref source env]]
 
 [defn bytecompile/fn* [source env]
       [def arg-count [length [cdr source]]]
@@ -199,7 +185,7 @@
                   [resolve [car source] env]
                   [car source]]]
       [case [type-of op]
-            [[:lambda :native-function]
+            [[:lambda :native-function :pair :symbol]
              [case op
                    [do           [bytecompile/do           source env]]
                    [let*         [bytecompile/let*         source env]]
@@ -216,10 +202,6 @@
                    [return       [bytecompile/return       source env]]
                    [quote        [bytecompile/quote        [cadr source]]]
                    [otherwise    [bytecompile/procedure    op [cdr source] env]]]]
-            [[:pair :symbol] [bytecompile/procedure op [cdr source] env]]
-            [:string         [bytecompile/string source env]]
-            [:array          [bytecompile/array source env]]
-            [:tree           [bytecompile/tree source env]]
             [otherwise       [bytecompile/literal source]]]]
 
 [defn bytecompile [form environment]

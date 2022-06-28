@@ -11,8 +11,8 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopRet:             return "ret";
 	case lopIntByte:         return "push/int/byte";
 	case lopIntAdd:          return "add/int";
-	case lopPushLVal:        return "push/lval";
 	case lopPushVal:         return "push/val";
+	case lopPushValExt:      return "push/val/ext";
 	case lopJmp:             return "jmp";
 	case lopJt:              return "jt";
 	case lopJf:              return "jf";

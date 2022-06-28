@@ -8,9 +8,9 @@
 [def print-errors  #t]
 [def print-passes  #f]
 
-[defn test/add* [result expr]
-      [set! test-list [cons [cons result expr] test-list]]
-      [set! test-count [+ test-count 1]]]
+[export add* [defn test/add* [result expr]
+                   [set! test-list [cons [cons result expr] test-list]]
+                   [set! test-count [+ test-count 1]]]]
 
 [export add [defmacro test/add [result . expr]
                       "Add a test where EXPR must eval to RESULT"

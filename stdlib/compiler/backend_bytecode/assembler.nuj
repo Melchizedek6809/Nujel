@@ -3,12 +3,6 @@
 ;;
 ;; Contains the bytecode assembler, so we don't have to write opcodes directly
 
-[defn val->bytecode-op [v]
-      [def i [val->index v]]
-      [list [int->bytecode-op [bit-and [bit-shift-right i 16] #xFF]]
-            [int->bytecode-op [bit-and [bit-shift-right i  8] #xFF]]
-            [int->bytecode-op [bit-and                  i     #xFF]]]]
-
 [defn sym->bytecode-op [v]
       [def i [sym->index v]]
       [list [int->bytecode-op [bit-and [bit-shift-right i 16] #xFF]]
@@ -23,7 +17,7 @@
       "Push A on the stack as an :int"
       [if [int-fit-in-byte? a]
           [$push/int/byte a]
-          [$push/lval a]]]
+          [$push/val a]]]
 
 [defn $push/int/byte [a]
       "[] -> [a]"
@@ -31,13 +25,6 @@
       [when-not [int-fit-in-byte? a]
                 [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
       [list #$2 [int->bytecode-op a]]]
-
-[defn $push/lval [v]
-      "[] -> [v]"
-      "Pushes v onto the stack"
-      [when [nil? v]
-            [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
-      [list #$5 [val->bytecode-op v]]]
 
 [defn $push/symbol [sym]
       "[] -> [sym]"
@@ -111,6 +98,7 @@
             [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
       [list #$1A
             [list :literal v]]]
+[def $push/val/ext $push/val]
 
 [defn $jt [target]
       [list #$A
@@ -140,11 +128,12 @@
       [while code
              [case [type-of [car code]]
                    [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]]
-                   [[:symbol :keyword] [and [= [car code] :label]
-                                            [tree/set! sym-map [cadr code] pos]]]
+                   [:keyword [case [car code]
+                                   [:label [tree/set! sym-map [cadr code] pos]
+                                           [cdr! code]]
+                                   [:literal [cdr! code]]]]
                    [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
              [cdr! code]]
-      [when [zero? 123] 123]
       [return pos]]
 
 [defn assemble/relocate-op [code sym-map pos out]
@@ -162,21 +151,48 @@
                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
       [return pos]]
 
-[defn assemble/add-literal [code lit-arr]
-      [when [>= [array/length lit-arr] 255]
+
+[defn literal-index->bytecode-op [i]
+      [if [< i 256]
+          [int->bytecode-op i]
+          [list [int->bytecode-op [bit-and [bit-shift-right i 8] #xFF]]
+                [int->bytecode-op [bit-and i #xFF]]]]]
+
+;;[def *max-literal-arr* 0]
+[defn assemble/add-literal [lit lit-arr]
+      [when [>= [array/length lit-arr] 65535]
             [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
+      [when [not= [type-of lit] :pair]
+            [dotimes [i [array/length lit-arr]]
+                     [when [equal? [array/ref lit-arr i] lit]
+                           [return [literal-index->bytecode-op i]]]]]
       [array/length! lit-arr [+ 1 [array/length lit-arr]]]
-      [array/set! lit-arr [- [array/length lit-arr] 1] [cadr code]]
-      [int->bytecode-op [- [array/length lit-arr] 1]]]
+      [array/set! lit-arr [- [array/length lit-arr] 1] lit]
+      #;[when [> [array/length lit-arr] *max-literal-arr*]
+            [set! *max-literal-arr* [array/length lit-arr]]
+            [pfmtln "Max: {*max-literal-arr*}"]]
+      [literal-index->bytecode-op [- [array/length lit-arr] 1]]]
 
 [defn assemble/build-lit-arr [code lit-arr]
       [when-not code [return #nil]]
-      [cons [cond [[pair? [car code]]
-                   [assemble/build-lit-arr [car code] lit-arr]]
-                  [[= :literal [car code]]
-                   [assemble/add-literal code lit-arr]]
-                  [#t [car code]]]
-            [assemble/build-lit-arr [cdr code] lit-arr]]]
+      [cond [[pair? [car code]]
+             [cons [assemble/build-lit-arr [car code] lit-arr]
+                   [assemble/build-lit-arr [cdr code] lit-arr]]]
+            [[and [= [car code] #$1A]
+                  [= [car [cadr code]] :literal]]
+             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+             [def index-op [assemble/add-literal [cadar code] lit-arr]]
+             [cons [if [pair? index-op]
+                       #$6
+                       #$1A]
+                   [cons index-op
+                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
+            [[= :literal [car code]]
+             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+             [cons [assemble/add-literal [car code] lit-arr]
+                   [assemble/build-lit-arr [cdr code] lit-arr]]]
+            [otherwise [cons [car code]
+                             [assemble/build-lit-arr [cdr code] lit-arr]]]]]
 
 [defn assemble/flatten [code ret]
       [when-not code [return ret]]

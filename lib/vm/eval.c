@@ -31,30 +31,6 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	return stack[nsp];
 }
 
-static void lBytecodeLinkPush(lClosure *clo, lBytecodeArray *v, lBytecodeOp *c){
-	if(unlikely(&c[3] >= v->dataEnd)){return;}
-	lVal *raw = lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]);
-	if(unlikely(!raw || (raw->type != ltSymbol))){return;}
-	lVal *n = lGetClosureSym(clo, raw->vSymbol);
-	if(unlikely(n == raw)){return;}
-	int i = lValIndex(n);
-	c[1] = (i >> 16) & 0xFF;
-	c[2] = (i >>  8) & 0xFF;
-	c[3] = (i      ) & 0xFF;
-}
-
-static void lBytecodeArrayLink(lClosure *c, lBytecodeArray *text){
-	if(text->literals){
-		for(int i=0;i<text->literals->length;i++){
-			if(text->literals->data[i] == NULL){continue;}
-			if(text->literals->data[i]->type != ltSymbol){continue;}
-			lVal *new = lGetClosureSym(c, text->literals->data[i]->vSymbol);
-			text->literals->data[i] = new;
-		}
-	}
-	text->flags |= BYTECODE_ARRAY_LINKED;
-}
-
 static lVal *lDyadicFun(lBytecodeOp op, lClosure *c, lVal *a, lVal *b){
 	switch(op){
 	case lopLessPred:
@@ -101,10 +77,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	ctx.sp               = 0;
 	ctx.closureStack[ctx.csp] = c;
 	ctx.text             = text;
-
-	if(unlikely(!(text->flags & BYTECODE_ARRAY_LINKED))){
-		lBytecodeArrayLink(c,text);
-	}
 
 	int exceptionCount = 0;
 	const int RSP = lRootsGet();
@@ -183,18 +155,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopPushNil:
 		ctx.valueStack[ctx.sp++] = NULL;
 		break;
-	case lopPushLVal: {
-		lVal *val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
-		if(unlikely(val && (val->type == ltSymbol))){
-			lBytecodeLinkPush(c, ops, ip-1);
-			val = lIndexVal((ip[0] << 16) | (ip[1] << 8) | ip[2]);
-		}
-		ctx.valueStack[ctx.sp++] = val;
-		ip += 3;
+	case lopPushValExt: {
+		const uint v = (ip[0] << 8) | (ip[1]);
+		ip += 2;
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "PushValExt");}
+		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
 		break; }
 	case lopPushVal: {
-		const u8 v = *ip++;
-		if(unlikely(v >= ops->literals->length)){throwStackUnderflowError(c, "PushVal");}
+		const uint v = *ip++;
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "PushVal");}
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
 		break; }
 	case lopPushSymbol: {

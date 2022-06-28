@@ -50,14 +50,6 @@ static char getHexChar(int c){
 	return (v < 0xA) ? '0' + v : 'A' + (v - 10);
 }
 
-static char *writeBytecodeArrayValue(char *cur, char *bufEnd, i64 index){
-	if((index < 0) || (index >= lValMax)){
-		return spf(cur, bufEnd, "v :INVALID-VALUE ");
-	}else{
-		return spf(cur, bufEnd, "v %v ", lIndexVal(index));
-	}
-}
-
 static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
 	if((index < 0) || (index >= lSymbolMax)){
 		return spf(cur, bufEnd, "s --INVALID-SYMBOL-- ");
@@ -124,6 +116,12 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				}
 				c++;
 				break;
+			case lopPushValExt:
+				if(&c[1] < v->dataEnd){
+					cur = spf(cur, bufEnd, "o %i ", (i64)((c[1] << 8) | (c[2])));
+				}
+				c+=2;
+				break;
 			case lopPushVal:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)((u8)c[1]));
@@ -135,13 +133,6 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 					cur = spf(cur, bufEnd, "i %i ", (i64)((i8)c[1]));
 				}
 				c++;
-				break;
-			case lopPushLVal:
-				if(&c[3] < v->dataEnd){
-					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
-					cur = writeBytecodeArrayValue(cur, bufEnd, i);
-				}
-				c+=3;
 				break;
 			}
 		}

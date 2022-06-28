@@ -125,7 +125,6 @@ struct lBytecodeArray{
 	};
 	u8 flags;
 };
-#define BYTECODE_ARRAY_LINKED 1
 
 struct lBuffer {
 	union {
@@ -214,11 +213,11 @@ struct lClosure {
 struct lThread {
 	lVal **valueStack;
 	lClosure **closureStack;
+	lBytecodeArray *text;
 	int valueStackSize;
+	int closureStackSize;
 	int sp;
 	int csp;
-	int closureStackSize;
-	lBytecodeArray *text;
 };
 
 struct lTree {

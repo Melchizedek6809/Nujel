@@ -1,3 +1,4 @@
 #!/usr/bin/env nujel
 
-[asmdebug [$push/val cat] [$push/val "asd"] [$push/val " qwe"] [$apply/dynamic 2] [$ret]]
+[asmdebug [$push/lval '[1]] [$ret]]
+;[asmdebug [$push/val cat] [$push/val "asd"] [$push/val " qwe"] [$apply/dynamic 2] [$ret]]

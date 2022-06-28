@@ -50,12 +50,12 @@ static int lBytecodeOpLength(lBytecodeOp op){
 	case lopJmp:
 	case lopJf:
 	case lopJt:
+	case lopPushValExt:
 		return 3;
 	case lopPushSymbol:
 	case lopDef:
 	case lopSet:
 	case lopGet:
-	case lopPushLVal:
 		return 4;
 	}
 }
@@ -71,10 +71,6 @@ void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 		case lopSet:
 			if(&c[4] > v->dataEnd){break;}
 			lSymbolGCMark(lIndexSym((c[1] << 16) | (c[2] << 8) | c[3]));
-			break;
-		case lopPushLVal:
-			if(&c[4] > v->dataEnd){break;}
-			lValGCMark(lIndexVal((c[1] << 16) | (c[2] << 8) | c[3]));
 			break;
 		}
 	}
