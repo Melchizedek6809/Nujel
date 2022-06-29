@@ -49,15 +49,6 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	}
 }
 
-/* Read a value referenced at IP and store it in RET, retuns the new IP */
-lBytecodeOp *lBytecodeReadOPVal(lBytecodeOp *ip, lVal **ret){
-	int i = *ip++;
-	i = (i << 8) | *ip++;
-	i = (i << 8) | *ip++;
-	*ret = lIndexVal(i);
-	return ip;
-}
-
 /* Read a symbol referenced at IP and store it in RET, retuns the new IP */
 lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret){
 	int i = *ip++;

@@ -64,7 +64,8 @@ static int lBytecodeOpLength(lBytecodeOp op){
 void lBytecodeArrayMarkRefs(const lBytecodeArray *v){
 	for(const lBytecodeOp *c = v->data; c < v->dataEnd; c += lBytecodeOpLength(*c)){
 		switch(*c){
-		default: break;
+		default:
+			break;
 		case lopPushSymbol:
 		case lopDef:
 		case lopGet:

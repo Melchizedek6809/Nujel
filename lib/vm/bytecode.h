@@ -50,7 +50,6 @@ typedef enum lOpcode {
 } lOpcode;
 
 const char *lBytecodeGetOpcodeName(const lBytecodeOp op);
-lBytecodeOp *lBytecodeReadOPVal(lBytecodeOp *ip, lVal **ret);
 lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret);
 int lBytecodeGetOffset16(const lBytecodeOp *ip);
 
