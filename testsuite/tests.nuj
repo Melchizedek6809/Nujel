@@ -533,8 +533,6 @@
 [test/add '[1 3] [read/single "[1 #| 2 |# 3]"]]
 [test/add 5 [eval [read/single "[+ 2 #| 5 |# 3]"]]]
 [test/add 5 [eval [read/single "[+ 2 #| #| 5 |# |# 3]"]]]
-[test/add #t [do [event-fire @[]] #t]]
-[test/add #t [let [[ret #f]] [event-fire @[:asd [fn [] [set! ret #t]]]] ret]]
 [test/add #t [let [[ret #t]] [doseq [l #nil] [set! ret #f]] ret]]
 [test/add #f [let [[ret #t]] [doseq [l '[]] [set! ret #f]] ret]]
 [test/add 0 [string/length ""]]

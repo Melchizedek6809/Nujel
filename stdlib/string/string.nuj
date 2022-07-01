@@ -28,7 +28,7 @@
 
 [defn newline []
       "Print a single line feed character"
-      [display "\r\n"]]
+      [print "\r\n"]]
 
 [defn br [num]
       "Return NUM=1 linebreaks"

@@ -46,6 +46,10 @@
       "Read a bytecode encoded offset in A at I and return it as a signed integer"
       [bytecode-op->offset [ref a i] [ref a [+ 1 i]]]]
 
+[defn disassemble/maybe-quote [v]
+      "Quotes symbols but just passes through every other value"
+      [if [symbol? v] [list 'quote v] v]]
+
 [defn disassemble/op [a i literals]
       "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
       [case [ref a i]
@@ -56,7 +60,7 @@
             [#$4  `[$apply/dynamic ~[bytecode-op->int [ref a [+ i 1]]]]]
 
             [#$6  `[$push/val/ext ~[ref literals [bit-or [bytecode-op->int [ref a [+ i 1]]]
-                                                     [bit-shift-left [bytecode-op->int [ref a [+ i 2]]] 8]]]]]
+                                                         [bit-shift-left [bytecode-op->int [ref a [+ i 2]]] 8]]]]]
             [#$7  `[$apply/dynamic/new ~[bytecode-op->int [ref a [+ i 1]]]]]
 
             [#$9  `[$jmp*  ~[bytecode-arr->offset a [+ i 1]]]]
@@ -74,19 +78,19 @@
             [#$15 '[$let]]
             [#$16 '[$closure/pop]]
 
-            [#$18 `[$try/old ~[bytecode-arr->offset a [+ i 1]]]]
-            [#$19 `[$try ~[bytecode-arr->offset a [+ i 1]]]]
-            [#$1A `[$push/val ~[ref literals [bytecode-op->int [ref a [+ i 1]]]]]]
-            [#$1B `[$roots/push]]
-            [#$1C `[$roots/pop]]
+            [#$18 `[$try/old  ~[bytecode-arr->offset a [+ i 1]]]]
+            [#$19 `[$try      ~[bytecode-arr->offset a [+ i 1]]]]
+            [#$1A `[$push/val ~[disassemble/maybe-quote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]
+            [#$1B '[$roots/push]]
+            [#$1C '[$roots/pop]]
 
-            [#$1E `[$<]]
-            [#$1F `[$<=]]
-            [#$20 `[$=]]
-            [#$21 `[$>=]]
-            [#$22 `[$>]]
+            [#$1E '[$<]]
+            [#$1F '[$<=]]
+            [#$20 '[$=]]
+            [#$21 '[$>=]]
+            [#$22 '[$>]]
             [#$23 `[$push/symbol ~[bytecode-arr->sym a [+ i 1]]]]
-            [#$24 `[$push/nil]]
+            [#$24 '[$push/nil]]
             [#$25 '[$add]]
             [#$26 '[$sub]]
             [#$27 '[$mul]]
