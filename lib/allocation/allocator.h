@@ -12,6 +12,7 @@ T * T##AllocRaw(); \
 void T##Free(T * v);
 
 #include "allocator-types.h"
+#undef defineAllocator
 
 extern lNFunc   lNFuncList[NFN_MAX];
 extern uint     lNFuncMax;

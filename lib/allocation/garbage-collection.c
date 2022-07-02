@@ -18,14 +18,18 @@
 
 int lGCRuns = 0;
 
-u8 lValMarkMap           [VAL_MAX];
-u8 lTreeMarkMap          [TRE_MAX];
-u8 lClosureMarkMap       [CLO_MAX];
-u8 lArrayMarkMap         [ARR_MAX];
-u8 lSymbolMarkMap        [SYM_MAX];
-u8 lBytecodeArrayMarkMap [BCA_MAX];
-u8 lBufferMarkMap        [BUF_MAX];
-u8 lBufferViewMarkMap    [BFV_MAX];
+#define defineAllocator(T, TMAX) u8 T##MarkMap[TMAX];
+#include "allocator-types.h"
+defineAllocator(lSymbol, SYM_MAX)
+defineAllocator(lNFunc, NFN_MAX)
+#undef defineAllocator
+
+#define markerPrefix(T) \
+if(unlikely(v == NULL)){return;} \
+const uint ci = v - T##List; \
+if(unlikely(ci >= T##Max)){return;} \
+if(T##MarkMap[ci]){return;} \
+T##MarkMap[ci] = 1						\
 
 void lThreadGCMark(lThread *c){
 	if(unlikely(c == NULL)){return;}
@@ -43,49 +47,29 @@ void lThreadGCMark(lThread *c){
 }
 
 void lBufferGCMark(const lBuffer *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lBufferList;
-	if(unlikely(ci >= lBufferMax)){return;}
-	lBufferMarkMap[ci] = 1;
+	markerPrefix(lBuffer);
 }
 
 void lBufferViewGCMark(const lBufferView *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lBufferViewList;
-	if(unlikely(ci >= lBufferViewMax)){return;}
-	if(lBufferViewMarkMap[ci]){
-		return;
-	}
-	lBufferViewMarkMap[ci] = 1;
+	markerPrefix(lBufferView);
+
 	lBufferGCMark(lBufferViewList[ci].buf);
 }
 
 void lSymbolGCMark(const lSymbol *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lSymbolList;
-	if(unlikely(ci >= lSymbolMax)){return;}
-	lSymbolMarkMap[ci] = 1;
+	markerPrefix(lSymbol);
 }
 
 void lNFuncGCMark(const lNFunc *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lNFuncList;
-	if(unlikely(ci >= lNFuncMax)){
-		return;
-		epf("Tried to mark invalid lNFunc\n");
-		exit(1);
-	}
+	markerPrefix(lNFunc);
+
 	lTreeGCMark(v->meta);
 	lValGCMark(v->args);
 	lSymbolGCMark(v->name);
 }
 
 void lValGCMark(lVal *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lValList;
-	if(unlikely(ci >= lValMax)){ return; }
-	if(lValMarkMap[ci]){ return; }
-	lValMarkMap[ci] = 1;
+	markerPrefix(lVal);
 
 	switch(v->type){
 	case ltPair:
@@ -129,57 +113,37 @@ void lValGCMark(lVal *v){
 }
 
 void lTreeGCMark(const lTree *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lTreeList;
-	if(unlikely(ci >= lTreeMax)){return;}
-	if(lTreeMarkMap[ci]){return;}
-	lTreeMarkMap[ci] = 1;
+	markerPrefix(lTree);
+
 	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
 }
 
-void lClosureGCMark(const lClosure *c){
-	if(unlikely(c == NULL)){return;}
-	const uint ci = c - lClosureList;
-	if(unlikely(ci >= lClosureMax)){ return; }
-	if(lClosureMarkMap[ci]){ return; }
-	lClosureMarkMap[ci] = 1;
+void lClosureGCMark(const lClosure *v){
+	markerPrefix(lClosure);
 
-	lClosureGCMark(c->parent);
-	lTreeGCMark(c->data);
-	lTreeGCMark(c->meta);
-	lBytecodeArrayMark(c->text);
-	lValGCMark(c->args);
-	lSymbolGCMark(c->name);
-	lClosureGCMark(c->caller);
+	lClosureGCMark(v->parent);
+	lTreeGCMark(v->data);
+	lTreeGCMark(v->meta);
+	lBytecodeArrayMark(v->text);
+	lValGCMark(v->args);
+	lSymbolGCMark(v->name);
+	lClosureGCMark(v->caller);
 }
 
 void lArrayGCMark(const lArray *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lArrayList;
-	if(unlikely(ci >= lArrayMax)){
-		epf("Tried to mark invalid lArray\n");
-		exit(1);
-	}
-	if(lArrayMarkMap[ci]){return;}
-	lArrayMarkMap[ci] = 1;
+	markerPrefix(lArray);
+
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);
 	}
 }
 
 void lBytecodeArrayMark(const lBytecodeArray *v){
-	if(unlikely(v == NULL)){return;}
-	const uint ci = v - lBytecodeArrayList;
-	if(unlikely(ci >= lBytecodeArrayMax)){
-		//exit(*((u8 *)NULL));
-		epf("Tried to mark invalid lBytecodeArray\n");
-		exit(1);
-	}
-	if(lBytecodeArrayMarkMap[ci]){return;}
-	lBytecodeArrayMarkMap[ci] = 1;
+	markerPrefix(lBytecodeArray);
+
 	lArrayGCMark(v->literals);
 	lBytecodeArrayMarkRefs(v);
 }
@@ -189,38 +153,13 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
  * get freed again.
  */
 static void lMarkFree(){
-	for(lArray *arr = lArrayFFree;arr != NULL;arr = arr->nextFree){
-		const uint ci = arr - lArrayList;
-		lArrayMarkMap[ci] = 1;
+	#define defineAllocator(T, TMAX)\
+	for(T *v = T##FFree;v;v=v->nextFree){\
+		T##MarkMap[v - T##List] = 1;\
 	}
-	for(lClosure *clo = lClosureFFree;clo != NULL;clo = clo->nextFree){
-		const uint ci = clo - lClosureList;
-		lClosureMarkMap[ci] = 1;
-	}
-	for(lSymbol *sym = lSymbolFFree;sym != NULL;sym = sym->nextFree){
-		const uint ci = sym - lSymbolList;
-		lSymbolMarkMap[ci] = 1;
-	}
-	for(lVal *v = lValFFree;v != NULL;v = v->nextFree){
-		const uint ci = v - lValList;
-		lValMarkMap[ci] = 1;
-	}
-	for(lTree *t = lTreeFFree;t != NULL;t = t->nextFree){
-		const uint ci = t - lTreeList;
-		lTreeMarkMap[ci] = 1;
-	}
-	for(lBytecodeArray *t = lBytecodeArrayFFree;t != NULL;t = t->nextFree){
-		const uint ci = t - lBytecodeArrayList;
-		lBytecodeArrayMarkMap[ci] = 1;
-	}
-	for(lBuffer *t = lBufferFFree;t != NULL;t = t->nextFree){
-		const uint ci = t - lBufferList;
-		lBufferMarkMap[ci] = 1;
-	}
-	for(lBufferView *t = lBufferViewFFree;t != NULL;t = t->nextFree){
-		const uint ci = t - lBufferViewList;
-		lBufferViewMarkMap[ci] = 1;
-	}
+	#include "allocator-types.h"
+	defineAllocator(lSymbol, SYM_MAX)
+	#undef defineAllocator
 }
 
 /* Mark the roots so they will be skipped by the GC,  */
@@ -230,38 +169,19 @@ static void lGCMark(){
 }
 
 void (*sweeperChain)() = NULL;
-#define ALLOC_MAX MAX(lBufferViewMax,MAX(lBufferMax,MAX(lBytecodeArrayMax,MAX(lArrayMax,lSymbolMax))))
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
-	for(uint i=0;i<lValMax;i++){
-		if(lValMarkMap[i]){
-			lValMarkMap[i] = 0;
-		}else{
-			lValFree(&lValList[i]);
-		}
+	#define defineAllocator(T, TMAX) \
+	for(uint i=0;i < T##Max;i++){\
+		if(T##MarkMap[i]){\
+			T##MarkMap[i]=0;\
+		}else{\
+			T##Free(&T##List[i]);\
+		}\
 	}
-	for(uint i=0;i<lTreeMax;i++){
-		if(lTreeMarkMap[i]){
-			lTreeMarkMap[i] = 0;
-		}else{
-			lTreeFree(&lTreeList[i]);
-		}
-	}
-	for(uint i=0;i<lClosureMax;i++){
-		if(lClosureMarkMap[i]){
-			lClosureMarkMap[i] = 0;
-		}else{
-			lClosureFree(&lClosureList[i]);
-		}
-	}
-	const uint max = ALLOC_MAX;
-	for(uint i=0;i<max;i++){
-		if(i < lSymbolMax)        {lSymbolMarkMap[i]        ? lSymbolMarkMap[i]        = 0 : lSymbolFree(&lSymbolList[i]);}
-		if(i < lArrayMax)         {lArrayMarkMap[i]         ? lArrayMarkMap[i]         = 0 : lArrayFree(&lArrayList[i]);}
-		if(i < lBytecodeArrayMax) {lBytecodeArrayMarkMap[i] ? lBytecodeArrayMarkMap[i] = 0 : lBytecodeArrayFree(&lBytecodeArrayList[i]);}
-		if(i < lBufferMax)        {lBufferMarkMap[i]        ? lBufferMarkMap[i]        = 0 : lBufferFree(&lBufferList[i]);}
-		if(i < lBufferViewMax)    {lBufferViewMarkMap[i]    ? lBufferViewMarkMap[i]    = 0 : lBufferViewFree(&lBufferViewList[i]);}
-	}
+	#include "allocator-types.h"
+	defineAllocator(lSymbol, SYM_MAX)
+	#undef defineAllocator
 	if(sweeperChain != NULL){sweeperChain();}
 }
 
