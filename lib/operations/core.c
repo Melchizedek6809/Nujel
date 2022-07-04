@@ -272,11 +272,6 @@ static lVal *lnfInt(lClosure *c, lVal *v){
 	return lCastInt(c, lCar(v));
 }
 
-static lVal *lnfBool(lClosure *c, lVal *v){
-	(void)c;
-	return lValBool(castToBool(lCar(v)));
-}
-
 static lVal *lnfSymbolToKeyword(lClosure *c, lVal *v){
 	return lValKeywordS(requireSymbol(c, lCar(v)));
 }
@@ -322,7 +317,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"<",        "[α β]", "Return true if α is less than β",             lnfLess);
 	lAddNativeFunc(c,"<=",       "[α β]", "Return true if α is less or equal to β",      lnfLessEqual);
 	lAddNativeFunc(c,"= ==",     "[α β]", "Return true if α is equal to β",              lnfEqual);
-	lAddNativeFunc(c,"not=",       "[α β]", "Return true if α is not equal to  β",       lnfUnequal);
+	lAddNativeFunc(c,"not=",     "[α β]", "Return true if α is not equal to  β",       lnfUnequal);
 	lAddNativeFunc(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
 	lAddNativeFunc(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
 	lAddNativeFunc(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
@@ -331,7 +326,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
 
 	lAddNativeFunc(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
-	lAddNativeFunc(c,"bool",            "[α]",     "Convert α into a boolean value, true or false", lnfBool);
 	lAddNativeFunc(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
 	lAddNativeFunc(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
 	lAddNativeFunc(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfCat);

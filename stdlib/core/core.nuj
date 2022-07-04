@@ -19,6 +19,10 @@
           "[set! l [cdr l]]"
           `[set! ~l [cdr ~l]]]
 
+[defn boolean [v] :inline
+      "Coerce to boolean"
+      [if v #t #f]]
+
 [defn not [v] :inline
       "Return true if V is false"
       [if v #f #t]]

@@ -1555,7 +1555,7 @@
 1Ai 1
 20
 0Bo 16
-10s list/sort/merge
+10s list/sort
 10s l
 04i 1
 09o 52
@@ -1563,7 +1563,7 @@
 1Ai 2
 20
 0Bo 16
-10s array/heap-sort
+10s array/sort
 10s l
 04i 1
 09o 29
@@ -3104,102 +3104,6 @@
 1Ai 23
 17
 0Es tree/filter
-01
-}#{##[[expr] #@[source: [expr]] #{##[]
-10s expr
-01
-} [expr] #@[source: [[-> [bytecompile expr] assemble*]]] #{##[]
-10s assemble*
-10s bytecompile
-10s expr
-04i 1
-04i 1
-01
-} :bytecode :none [expr] #@[source: [[[tree/ref backend/tree *active-backend*] expr]]] #{##[]
-10s tree/ref
-10s backend/tree
-10s *active-backend*
-04i 2
-10s expr
-04i 1
-01
-} [backend expr environment] #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]] #{##[[e] #@[source: [[set! *active-backend* last-backend] [throw e]]] #{##[]
-10s last-backend
-0Fs *active-backend*
-0D
-10s throw
-10s e
-04i 1
-01
-}]
-10s *active-backend*
-0Es last-backend
-0D
-24
-0Es ret
-0D
-23s anonymous
-1Ai 0
-1Ai 1
-1Ai 2
-17
-19o 48
-10s backend
-0Fs *active-backend*
-0D
-10s compile*
-10s expr
-10s current-closure
-04i 0
-04i 2
-0Fs ret
-0D
-10s last-backend
-0Fs *active-backend*
-0D
-10s ret
-01
-16
-01
-}]
-23s compile/backend/none
-1Ai 0
-1Ai 1
-1Ai 2
-17
-0Es compile/backend/none
-0D
-23s compile/backend/bytecode
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es compile/backend/bytecode
-0D
-1Ai 6
-0Es *active-backend*
-0D
-10s tree/new
-1Ai 6
-10s compile/backend/bytecode
-1Ai 7
-10s compile/backend/none
-04i 4
-0Es backend/tree
-0D
-23s backend
-1Ai 8
-1Ai 9
-1Ai 10
-17
-0Es backend
-0D
-23s compile/for
-1Ai 11
-1Ai 12
-1Ai 13
-17
-0Es compile/for
 01
 }#{##[[] #@[documentation: "[] -> []\nDo nothing" source: ["[] -> []" "Do nothing" :inline '[#$0]] inline: #t] #{##[[#$0]]
 1Ai 0
@@ -7007,6 +6911,102 @@
 17
 0Es disassemble
 01
+}#{##[[expr] #@[source: [expr]] #{##[]
+10s expr
+01
+} [expr] #@[source: [[-> [bytecompile expr] assemble*]]] #{##[]
+10s assemble*
+10s bytecompile
+10s expr
+04i 1
+04i 1
+01
+} :bytecode :none [expr] #@[source: [[[tree/ref backend/tree *active-backend*] expr]]] #{##[]
+10s tree/ref
+10s backend/tree
+10s *active-backend*
+04i 2
+10s expr
+04i 1
+01
+} [backend expr environment] #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]] #{##[[e] #@[source: [[set! *active-backend* last-backend] [throw e]]] #{##[]
+10s last-backend
+0Fs *active-backend*
+0D
+10s throw
+10s e
+04i 1
+01
+}]
+10s *active-backend*
+0Es last-backend
+0D
+24
+0Es ret
+0D
+23s anonymous
+1Ai 0
+1Ai 1
+1Ai 2
+17
+19o 48
+10s backend
+0Fs *active-backend*
+0D
+10s compile*
+10s expr
+10s current-closure
+04i 0
+04i 2
+0Fs ret
+0D
+10s last-backend
+0Fs *active-backend*
+0D
+10s ret
+01
+16
+01
+}]
+23s compile/backend/none
+1Ai 0
+1Ai 1
+1Ai 2
+17
+0Es compile/backend/none
+0D
+23s compile/backend/bytecode
+1Ai 3
+1Ai 4
+1Ai 5
+17
+0Es compile/backend/bytecode
+0D
+1Ai 6
+0Es *active-backend*
+0D
+10s tree/new
+1Ai 6
+10s compile/backend/bytecode
+1Ai 7
+10s compile/backend/none
+04i 4
+0Es backend/tree
+0D
+23s backend
+1Ai 8
+1Ai 9
+1Ai 10
+17
+0Es backend
+0D
+23s compile/for
+1Ai 11
+1Ai 12
+1Ai 13
+17
+0Es compile/for
+01
 }#{##[[source environment] #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]] #{##[]
 15
 10s source
@@ -8147,7 +8147,7 @@
 09o 76
 0D
 1C
-10s bit-test?
+10s bit-set?
 10s no-expand-bitmap
 10s i
 04i 2
@@ -8786,6 +8786,13 @@
 14
 14
 01
+} [v] #@[documentation: "Coerce to boolean" source: [:inline "Coerce to boolean" [if v #t #f]] inline: #t] #{##[#t #f]
+10s v
+0Bo 8
+1Ai 0
+09o 5
+1Ai 1
+01
 } [v] #@[documentation: "Return true if V is false" source: [:inline "Return true if V is false" [if v #f #t]] inline: #t] #{##[#f #t]
 10s v
 0Bo 8
@@ -8971,122 +8978,129 @@
 18
 0Es cdr!
 0D
-23s not
+23s boolean
 1Ai 12
 1Ai 13
 1Ai 14
 17
-0Es not
+0Es boolean
 0D
-23s identity
+23s not
 1Ai 15
 1Ai 16
 1Ai 17
+17
+0Es not
+0D
+23s identity
+1Ai 18
+1Ai 19
+1Ai 20
 17
 0Es identity
 0D
 23s list
 23s arguments
-1Ai 18
-1Ai 19
+1Ai 21
+1Ai 22
 17
 0Es list
 0D
 23s caar
-1Ai 20
-1Ai 21
-1Ai 22
-17
-0Es caar
-0D
-23s cadr
 1Ai 23
 1Ai 24
 1Ai 25
 17
-0Es cadr
+0Es caar
 0D
-23s cdar
+23s cadr
 1Ai 26
 1Ai 27
 1Ai 28
 17
-0Es cdar
+0Es cadr
 0D
-23s cddr
+23s cdar
 1Ai 29
 1Ai 30
 1Ai 31
 17
-0Es cddr
+0Es cdar
 0D
-23s cadar
+23s cddr
 1Ai 32
 1Ai 33
 1Ai 34
 17
-0Es cadar
+0Es cddr
 0D
-23s caddr
+23s cadar
 1Ai 35
 1Ai 36
 1Ai 37
 17
-0Es caddr
+0Es cadar
 0D
-23s cdddr
+23s caddr
 1Ai 38
 1Ai 39
 1Ai 40
 17
-0Es cdddr
+0Es caddr
 0D
-23s cadddr
+23s cdddr
 1Ai 41
 1Ai 42
 1Ai 43
 17
-0Es cadddr
+0Es cdddr
 0D
-23s cddddr
+23s cadddr
 1Ai 44
 1Ai 45
 1Ai 46
 17
-0Es cddddr
+0Es cadddr
 0D
-23s caddddr
+23s cddddr
 1Ai 47
 1Ai 48
 1Ai 49
 17
-0Es caddddr
+0Es cddddr
 0D
-23s cdddddr
+23s caddddr
 1Ai 50
 1Ai 51
 1Ai 52
 17
-0Es cdddddr
+0Es caddddr
 0D
-23s keyword->string
+23s cdddddr
 1Ai 53
 1Ai 54
 1Ai 55
 17
-0Es keyword->string
+0Es cdddddr
 0D
-23s string->keyword
+23s keyword->string
 1Ai 56
 1Ai 57
 1Ai 58
 17
-0Es string->keyword
+0Es keyword->string
 0D
-23s exception
+23s string->keyword
 1Ai 59
 1Ai 60
 1Ai 61
+17
+0Es string->keyword
+0D
+23s exception
+1Ai 62
+1Ai 63
+1Ai 64
 18
 0Es exception
 01
@@ -10533,12 +10547,12 @@
 17
 0Es vec?
 0D
-23s bool?
+23s boolean?
 1Ai 39
 1Ai 40
 1Ai 41
 17
-0Es bool?
+0Es boolean?
 0D
 23s pair?
 1Ai 42
@@ -16298,6 +16312,395 @@
 16
 04i 2
 01
+}#{##[:image/bmp [u8v offset bytes val] #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]] #{##[255]
+24
+1B
+09o 67
+0D
+1C
+10s buffer/view/set!
+10s u8v
+10s offset
+02i 1
+25
+0Fs offset
+10s bit-and
+1Ai 0
+10s val
+04i 2
+04i 3
+0D
+10s bytes
+02i 1
+26
+0Fs bytes
+0D
+10s bit-shift-right
+10s val
+02i 8
+04i 2
+0Fs val
+10s bytes
+02i 0
+22
+0Ao -71
+0D
+10s offset
+01
+} [width pixel-length] #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]] #{##[]
+02i 4
+10s bit-and
+10s width
+10s pixel-length
+27
+02i 3
+04i 2
+26
+0Es ret
+0D
+10s ret
+02i 4
+20
+0Bo 8
+02i 0
+09o 7
+10s ret
+01
+} [image] #@[source: [[require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] #{##[:image #t :height :width 8192]
+10s require*
+1Ai 0
+10s current-closure
+04i 0
+1Ai 1
+04i 3
+0D
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+02i 3
+27
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+10s image/bmp/row-padding
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+02i 3
+04i 2
+25
+27
+0Es image-size
+0D
+02i 54
+0Es header-size
+0D
+10s image-size
+10s header-size
+25
+0Es file-size
+0D
+10s buffer/allocate
+10s file-size
+04i 1
+0Es out
+0D
+10s buffer/view/u8*
+10s out
+04i 1
+0Es b
+0D
+02i -1
+0Es i
+0D
+10s buffer/view/set!
+10s b
+10s i
+02i 1
+25
+0Fs i
+02i 66
+04i 3
+0D
+10s buffer/view/set!
+10s b
+10s i
+02i 1
+25
+0Fs i
+02i 77
+04i 3
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s file-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s header-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 40
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 1
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 24
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s image-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+1Ai 4
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+1Ai 4
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s image/bmp/row-padding
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+02i 3
+04i 2
+0Es row-padding
+0D
+10s header-size
+02i 1
+26
+0Es pixels
+0D
+15
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+02i 1
+26
+0Es y
+0D
+24
+1B
+09o 119
+0D
+1C
+15
+02i 0
+0Es x
+0D
+24
+1B
+09o 55
+0D
+1C
+10s buffer/view/le/set!
+10s b
+10s pixels
+02i 3
+10s image/ref
+10s image
+10s x
+10s y
+04i 3
+04i 4
+0Fs pixels
+0D
+02i 1
+10s x
+03
+0Fs x
+10s x
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+1E
+0Ao -69
+0D
+24
+16
+0D
+10s pixels
+10s row-padding
+25
+0Fs pixels
+0D
+10s y
+02i -1
+03
+0Fs y
+10s y
+02i 0
+21
+0Ao -123
+16
+0D
+10s out
+01
+01
+} [] #@[source: [[require :image] [image/add-encoder! "bmp" image/bmp/encode]]] #{##[:image #t "bmp"]
+10s require*
+1Ai 0
+10s current-closure
+04i 0
+1Ai 1
+04i 3
+0D
+10s image/add-encoder!
+1Ai 2
+10s image/bmp/encode
+04i 2
+01
+}]
+10s module/insert
+1Ai 0
+15
+10s tree/new
+24
+04i 1
+0Es exports
+0D
+1Ai 0
+0Es *module*
+0D
+23s buffer/view/le/set!
+1Ai 1
+1Ai 2
+1Ai 3
+17
+0Es buffer/view/le/set!
+0D
+23s image/bmp/row-padding
+1Ai 4
+1Ai 5
+1Ai 6
+17
+0Es image/bmp/row-padding
+0D
+10s tree/set!
+10s exports
+23s encode
+23s image/bmp/encode
+1Ai 7
+1Ai 8
+1Ai 9
+17
+0Es image/bmp/encode
+04i 3
+0D
+10s tree/set!
+10s exports
+23s init!
+23s image/bmp/init!
+1Ai 10
+1Ai 11
+1Ai 12
+17
+0Es image/bmp/init!
+04i 3
+0D
+24
+0D
+13
+16
+04i 2
+01
 }#{##[:image [ext enc] #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/encoders ext enc]]] #{##[]
 10s symbol->keyword
 10s string->symbol
@@ -16871,395 +17274,6 @@
 1Ai 39
 17
 0Es image/test-image-xor
-04i 3
-0D
-24
-0D
-13
-16
-04i 2
-01
-}#{##[:image/bmp [u8v offset bytes val] #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]] #{##[255]
-24
-1B
-09o 67
-0D
-1C
-10s buffer/view/set!
-10s u8v
-10s offset
-02i 1
-25
-0Fs offset
-10s bit-and
-1Ai 0
-10s val
-04i 2
-04i 3
-0D
-10s bytes
-02i 1
-26
-0Fs bytes
-0D
-10s bit-shift-right
-10s val
-02i 8
-04i 2
-0Fs val
-10s bytes
-02i 0
-22
-0Ao -71
-0D
-10s offset
-01
-} [width pixel-length] #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]] #{##[]
-02i 4
-10s bit-and
-10s width
-10s pixel-length
-27
-02i 3
-04i 2
-26
-0Es ret
-0D
-10s ret
-02i 4
-20
-0Bo 8
-02i 0
-09o 7
-10s ret
-01
-} [image] #@[source: [[require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] #{##[:image #t :height :width 8192]
-10s require*
-1Ai 0
-10s current-closure
-04i 0
-1Ai 1
-04i 3
-0D
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-02i 3
-27
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-10s image/bmp/row-padding
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-02i 3
-04i 2
-25
-27
-0Es image-size
-0D
-02i 54
-0Es header-size
-0D
-10s image-size
-10s header-size
-25
-0Es file-size
-0D
-10s buffer/allocate
-10s file-size
-04i 1
-0Es out
-0D
-10s buffer/view/u8*
-10s out
-04i 1
-0Es b
-0D
-02i -1
-0Es i
-0D
-10s buffer/view/set!
-10s b
-10s i
-02i 1
-25
-0Fs i
-02i 66
-04i 3
-0D
-10s buffer/view/set!
-10s b
-10s i
-02i 1
-25
-0Fs i
-02i 77
-04i 3
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s file-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s header-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 40
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 2
-02i 1
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 2
-02i 24
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s image-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-1Ai 4
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-1Ai 4
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s image/bmp/row-padding
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-02i 3
-04i 2
-0Es row-padding
-0D
-10s header-size
-02i 1
-26
-0Es pixels
-0D
-15
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-02i 1
-26
-0Es y
-0D
-24
-1B
-09o 119
-0D
-1C
-15
-02i 0
-0Es x
-0D
-24
-1B
-09o 55
-0D
-1C
-10s buffer/view/le/set!
-10s b
-10s pixels
-02i 3
-10s image/ref
-10s image
-10s x
-10s y
-04i 3
-04i 4
-0Fs pixels
-0D
-02i 1
-10s x
-03
-0Fs x
-10s x
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-1E
-0Ao -69
-0D
-24
-16
-0D
-10s pixels
-10s row-padding
-25
-0Fs pixels
-0D
-10s y
-02i -1
-03
-0Fs y
-10s y
-02i 0
-21
-0Ao -123
-16
-0D
-10s out
-01
-01
-} [] #@[source: [[require :image] [image/add-encoder! "bmp" image/bmp/encode]]] #{##[:image #t "bmp"]
-10s require*
-1Ai 0
-10s current-closure
-04i 0
-1Ai 1
-04i 3
-0D
-10s image/add-encoder!
-1Ai 2
-10s image/bmp/encode
-04i 2
-01
-}]
-10s module/insert
-1Ai 0
-15
-10s tree/new
-24
-04i 1
-0Es exports
-0D
-1Ai 0
-0Es *module*
-0D
-23s buffer/view/le/set!
-1Ai 1
-1Ai 2
-1Ai 3
-17
-0Es buffer/view/le/set!
-0D
-23s image/bmp/row-padding
-1Ai 4
-1Ai 5
-1Ai 6
-17
-0Es image/bmp/row-padding
-0D
-10s tree/set!
-10s exports
-23s encode
-23s image/bmp/encode
-1Ai 7
-1Ai 8
-1Ai 9
-17
-0Es image/bmp/encode
-04i 3
-0D
-10s tree/set!
-10s exports
-23s init!
-23s image/bmp/init!
-1Ai 10
-1Ai 11
-1Ai 12
-17
-0Es image/bmp/init!
 04i 3
 0D
 24
@@ -18362,8 +18376,8 @@
 04i 3
 16
 01
-} [output-passes hide-errors] #@[documentation: "Initialize the testing framework" source: ["Initialize the testing framework" [set! print-errors [not [bool hide-errors]]] [set! print-passes [bool output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0]]] #{##[#f #t]
-10s bool
+} [output-passes hide-errors] #@[documentation: "Initialize the testing framework" source: ["Initialize the testing framework" [set! print-errors [not [boolean hide-errors]]] [set! print-passes [boolean output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0]]] #{##[#f #t]
+10s boolean
 10s hide-errors
 04i 1
 0Bo 8
@@ -18372,7 +18386,7 @@
 1Ai 1
 0Fs print-errors
 0D
-10s bool
+10s boolean
 10s output-passes
 04i 1
 0Fs print-passes

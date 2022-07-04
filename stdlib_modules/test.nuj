@@ -68,8 +68,8 @@
 
 [export init! [defn init! [output-passes hide-errors]
                    "Initialize the testing framework"
-                   [set! print-errors   [not [bool hide-errors]]]
-                   [set! print-passes   [bool output-passes]]
+                   [set! print-errors   [not [boolean hide-errors]]]
+                   [set! print-passes   [boolean output-passes]]
                    [set! nujel-start    [time/milliseconds]]
                    [set! success-count  0]
                    [set! error-count    0]]]

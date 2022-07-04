@@ -59,7 +59,7 @@
 [defn vec? [val]
       [= :vec [type-of val]]]
 
-[defn bool? [val]
+[defn boolean? [val]
       [= :bool [type-of val]]]
 
 [defn pair? [val]
