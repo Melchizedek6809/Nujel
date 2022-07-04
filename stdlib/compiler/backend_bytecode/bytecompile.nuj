@@ -95,17 +95,17 @@
           [bytecompile* [list/replace form arg-name [car args]] env]
           [bytecompile* form env]]]
 
-[defn bytecompile/procedure [op args env]
+[defn bytecompile/procedure [op args env op-raw]
       [if [bytecompile/procedure/inline? op]
           [bytecompile/procedure/inline op args env]
-          [bytecompile/procedure/default op args env]]]
+          [bytecompile/procedure/default op args env op-raw]]]
 
-[defn bytecompile/procedure/default [op args env]
+[defn bytecompile/procedure/default [op args env op-raw]
       [def arg-count [length args]]
       [if [$apply/optimize? op arg-count]
           [list [when args [bytecompile/procedure/arg args]]
                 [$apply arg-count op]]
-          [list [bytecompile* op env]
+          [list [bytecompile* op-raw env]
                 [when args [bytecompile/procedure/arg args]]
                 [$apply/dynamic arg-count]]]]
 
@@ -201,7 +201,7 @@
                    [try          [bytecompile/try          source env]]
                    [return       [bytecompile/return       source env]]
                    [quote        [bytecompile/quote        [cadr source]]]
-                   [otherwise    [bytecompile/procedure    op [cdr source] env]]]]
+                   [otherwise    [bytecompile/procedure    op [cdr source] env [car source]]]]]
             [otherwise       [bytecompile/literal source]]]]
 
 [defn bytecompile [form environment]

@@ -157,9 +157,6 @@
 17
 0Es bit-clear
 01
-}#{##[]
-24
-01
 }#{##[[a i v] #@[documentation: "Add V to the value in A at position I and store the result in A returning A" source: ["Add V to the value in A at position I and store the result in A returning A" [array/set! a i [+ v [array/ref a i]]]]] #{##[]
 10s array/set!
 10s a
@@ -3108,6 +3105,102 @@
 17
 0Es tree/filter
 01
+}#{##[[expr] #@[source: [expr]] #{##[]
+10s expr
+01
+} [expr] #@[source: [[-> [bytecompile expr] assemble*]]] #{##[]
+10s assemble*
+10s bytecompile
+10s expr
+04i 1
+04i 1
+01
+} :bytecode :none [expr] #@[source: [[[tree/ref backend/tree *active-backend*] expr]]] #{##[]
+10s tree/ref
+10s backend/tree
+10s *active-backend*
+04i 2
+10s expr
+04i 1
+01
+} [backend expr environment] #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]] #{##[[e] #@[source: [[set! *active-backend* last-backend] [throw e]]] #{##[]
+10s last-backend
+0Fs *active-backend*
+0D
+10s throw
+10s e
+04i 1
+01
+}]
+10s *active-backend*
+0Es last-backend
+0D
+24
+0Es ret
+0D
+23s anonymous
+1Ai 0
+1Ai 1
+1Ai 2
+17
+19o 48
+10s backend
+0Fs *active-backend*
+0D
+10s compile*
+10s expr
+10s current-closure
+04i 0
+04i 2
+0Fs ret
+0D
+10s last-backend
+0Fs *active-backend*
+0D
+10s ret
+01
+16
+01
+}]
+23s compile/backend/none
+1Ai 0
+1Ai 1
+1Ai 2
+17
+0Es compile/backend/none
+0D
+23s compile/backend/bytecode
+1Ai 3
+1Ai 4
+1Ai 5
+17
+0Es compile/backend/bytecode
+0D
+1Ai 6
+0Es *active-backend*
+0D
+10s tree/new
+1Ai 6
+10s compile/backend/bytecode
+1Ai 7
+10s compile/backend/none
+04i 4
+0Es backend/tree
+0D
+23s backend
+1Ai 8
+1Ai 9
+1Ai 10
+17
+0Es backend
+0D
+23s compile/for
+1Ai 11
+1Ai 12
+1Ai 13
+17
+0Es compile/for
+01
 }#{##[[] #@[documentation: "[] -> []\nDo nothing" source: ["[] -> []" "Do nothing" :inline '[#$0]] inline: #t] #{##[[#$0]]
 1Ai 0
 01
@@ -3379,40 +3472,7 @@
 17
 0Es $zero?
 01
-}#{##[[v] #@[source: [[def i [val->index v]] [list [int->bytecode-op [bit-and [bit-shift-right i 16] 255]] [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]] #{##[255]
-10s val->index
-10s v
-04i 1
-0Es i
-0D
-10s list
-10s int->bytecode-op
-10s bit-and
-10s bit-shift-right
-10s i
-02i 16
-04i 2
-1Ai 0
-04i 2
-04i 1
-10s int->bytecode-op
-10s bit-and
-10s bit-shift-right
-10s i
-02i 8
-04i 2
-1Ai 0
-04i 2
-04i 1
-10s int->bytecode-op
-10s bit-and
-10s i
-1Ai 0
-04i 2
-04i 1
-04i 3
-01
-} [v] #@[source: [[def i [sym->index v]] [list [int->bytecode-op [bit-and [bit-shift-right i 16] 255]] [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]] #{##[255]
+}#{##[[v] #@[source: [[def i [sym->index v]] [list [int->bytecode-op [bit-and [bit-shift-right i 16] 255]] [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]] #{##[255]
 10s sym->index
 10s v
 04i 1
@@ -3490,30 +3550,6 @@
 1Ai 2
 10s int->bytecode-op
 10s a
-04i 1
-04i 2
-01
-} [v] #@[documentation: "[] -> [v]\nPushes v onto the stack" source: ["[] -> [v]" "Pushes v onto the stack" [when [nil? v] [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]] [list #$5 [val->bytecode-op v]]]] #{##[:invalid-bc-op "Can't push #nil as a normal lVal" #$5]
-10s nil?
-10s v
-04i 1
-0Bo 32
-10s throw
-10s list
-1Ai 0
-1Ai 1
-10s v
-10s current-lambda
-04i 0
-04i 4
-04i 1
-09o 4
-24
-0D
-10s list
-1Ai 2
-10s val->bytecode-op
-10s v
 04i 1
 04i 2
 01
@@ -4531,115 +4567,101 @@
 04i 1
 01
 }]
-23s val->bytecode-op
+23s sym->bytecode-op
 1Ai 0
 1Ai 1
 1Ai 2
 17
-0Es val->bytecode-op
+0Es sym->bytecode-op
 0D
-23s sym->bytecode-op
+23s int-fit-in-byte?
 1Ai 3
 1Ai 4
 1Ai 5
 17
-0Es sym->bytecode-op
+0Es int-fit-in-byte?
 0D
-23s int-fit-in-byte?
+23s $push/int
 1Ai 6
 1Ai 7
 1Ai 8
 17
-0Es int-fit-in-byte?
+0Es $push/int
 0D
-23s $push/int
+23s $push/int/byte
 1Ai 9
 1Ai 10
 1Ai 11
 17
-0Es $push/int
+0Es $push/int/byte
 0D
-23s $push/int/byte
+23s $push/symbol
 1Ai 12
 1Ai 13
 1Ai 14
 17
-0Es $push/int/byte
+0Es $push/symbol
 0D
-23s $push/lval
+23s $def
 1Ai 15
 1Ai 16
 1Ai 17
 17
-0Es $push/lval
+0Es $def
 0D
-23s $push/symbol
+23s $set
 1Ai 18
 1Ai 19
 1Ai 20
 17
-0Es $push/symbol
+0Es $set
 0D
-23s $def
+23s $get
 1Ai 21
 1Ai 22
 1Ai 23
 17
-0Es $def
+0Es $get
 0D
-23s $set
+23s $apply/optimize?
 1Ai 24
 1Ai 25
 1Ai 26
 17
-0Es $set
+0Es $apply/optimize?
 0D
-23s $get
+23s $apply
 1Ai 27
 1Ai 28
 1Ai 29
 17
-0Es $get
+0Es $apply
 0D
-23s $apply/optimize?
+23s $apply/dynamic
 1Ai 30
 1Ai 31
 1Ai 32
 17
-0Es $apply/optimize?
+0Es $apply/dynamic
 0D
-23s $apply
+23s $try
 1Ai 33
 1Ai 34
 1Ai 35
 17
-0Es $apply
+0Es $try
 0D
-23s $apply/dynamic
+23s $jmp
 1Ai 36
 1Ai 37
 1Ai 38
 17
-0Es $apply/dynamic
-0D
-23s $try
-1Ai 39
-1Ai 40
-1Ai 41
-17
-0Es $try
-0D
-23s $jmp
-1Ai 42
-1Ai 43
-1Ai 44
-17
 0Es $jmp
 0D
 23s $push/val
-1Ai 45
-1Ai 46
-1Ai 47
+1Ai 39
+1Ai 40
+1Ai 41
 17
 0Es $push/val
 0D
@@ -4647,107 +4669,107 @@
 0Es $push/val/ext
 0D
 23s $jt
-1Ai 48
-1Ai 49
-1Ai 50
+1Ai 42
+1Ai 43
+1Ai 44
 17
 0Es $jt
 0D
 23s $jf
-1Ai 51
-1Ai 52
-1Ai 53
+1Ai 45
+1Ai 46
+1Ai 47
 17
 0Es $jf
 0D
 23s $fn
-1Ai 54
-1Ai 55
-1Ai 56
+1Ai 48
+1Ai 49
+1Ai 50
 17
 0Es $fn
 0D
 23s $macro*
-1Ai 57
-1Ai 58
-1Ai 59
+1Ai 51
+1Ai 52
+1Ai 53
 17
 0Es $macro*
 0D
 23s assemble/build-sym-map
-1Ai 60
-1Ai 61
-1Ai 62
+1Ai 54
+1Ai 55
+1Ai 56
 17
 0Es assemble/build-sym-map
 0D
 23s assemble/relocate-op
-1Ai 63
-1Ai 64
-1Ai 65
+1Ai 57
+1Ai 58
+1Ai 59
 17
 0Es assemble/relocate-op
 0D
 23s assemble/emit-relocated-ops
-1Ai 66
-1Ai 67
-1Ai 68
+1Ai 60
+1Ai 61
+1Ai 62
 17
 0Es assemble/emit-relocated-ops
 0D
 23s literal-index->bytecode-op
-1Ai 69
-1Ai 70
-1Ai 71
+1Ai 63
+1Ai 64
+1Ai 65
 17
 0Es literal-index->bytecode-op
 0D
 23s assemble/add-literal
-1Ai 72
-1Ai 73
-1Ai 74
+1Ai 66
+1Ai 67
+1Ai 68
 17
 0Es assemble/add-literal
 0D
 23s assemble/build-lit-arr
-1Ai 75
-1Ai 76
-1Ai 77
+1Ai 69
+1Ai 70
+1Ai 71
 17
 0Es assemble/build-lit-arr
 0D
 23s assemble/flatten
-1Ai 78
-1Ai 79
-1Ai 80
+1Ai 72
+1Ai 73
+1Ai 74
 17
 0Es assemble/flatten
 0D
 23s assemble*
-1Ai 81
-1Ai 82
-1Ai 83
+1Ai 75
+1Ai 76
+1Ai 77
 17
 0Es assemble*
 0D
 23s assemble
 23s l
-1Ai 84
-1Ai 85
+1Ai 78
+1Ai 79
 17
 0Es assemble
 0D
 23s asmrun
 23s ops
-1Ai 86
-1Ai 87
+1Ai 80
+1Ai 81
 18
 0Es asmrun
 0D
 23s asmdebug
 23s ops
-1Ai 88
-1Ai 89
+1Ai 82
+1Ai 83
 17
 0Es asmdebug
 01
@@ -5207,7 +5229,7 @@
 10s env
 04i 2
 01
-} [op args env] #@[source: [[if [bytecompile/procedure/inline? op] [bytecompile/procedure/inline op args env] [bytecompile/procedure/default op args env]]]] #{##[]
+} [op args env op-raw] #@[source: [[if [bytecompile/procedure/inline? op] [bytecompile/procedure/inline op args env] [bytecompile/procedure/default op args env op-raw]]]] #{##[]
 10s bytecompile/procedure/inline?
 10s op
 04i 1
@@ -5217,14 +5239,15 @@
 10s args
 10s env
 04i 3
-09o 21
+09o 25
 10s bytecompile/procedure/default
 10s op
 10s args
 10s env
-04i 3
+10s op-raw
+04i 4
 01
-} [op args env] #@[source: [[def arg-count [length args]] [if [$apply/optimize? op arg-count] [list [when args [bytecompile/procedure/arg args]] [$apply arg-count op]] [list [bytecompile* op env] [when args [bytecompile/procedure/arg args]] [$apply/dynamic arg-count]]]]] #{##[]
+} [op args env op-raw] #@[source: [[def arg-count [length args]] [if [$apply/optimize? op arg-count] [list [when args [bytecompile/procedure/arg args]] [$apply arg-count op]] [list [bytecompile* op-raw env] [when args [bytecompile/procedure/arg args]] [$apply/dynamic arg-count]]]]] #{##[]
 10s length
 10s args
 04i 1
@@ -5251,7 +5274,7 @@
 09o 54
 10s list
 10s bytecompile*
-10s op
+10s op-raw
 10s env
 04i 2
 10s args
@@ -5530,7 +5553,7 @@
 04i 2
 04i 5
 01
-} [source env] #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function :pair :symbol] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [environment* [bytecompile/environment* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env]]]] [otherwise [bytecompile/literal source]]]]] #{##[:lambda :native-function :pair :symbol #f]
+} [source env] #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function :pair :symbol] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [environment* [bytecompile/environment* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env [car source]]]]] [otherwise [bytecompile/literal source]]]]] #{##[:lambda :native-function :pair :symbol #f]
 10s resolves?
 10s source
 11
@@ -5578,7 +5601,7 @@
 0Ao 6
 0D
 1Ai 4
-0Bo 440
+0Bo 445
 15
 10s op
 0Es ΓεnΣym-5
@@ -5591,7 +5614,7 @@
 10s source
 10s env
 04i 2
-09o 397
+09o 402
 10s ΓεnΣym-5
 10s let*
 20
@@ -5600,7 +5623,7 @@
 10s source
 10s env
 04i 2
-09o 368
+09o 373
 10s ΓεnΣym-5
 10s def
 20
@@ -5609,7 +5632,7 @@
 10s source
 10s env
 04i 2
-09o 339
+09o 344
 10s ΓεnΣym-5
 10s set!
 20
@@ -5618,7 +5641,7 @@
 10s source
 10s env
 04i 2
-09o 310
+09o 315
 10s ΓεnΣym-5
 10s if
 20
@@ -5627,7 +5650,7 @@
 10s source
 10s env
 04i 2
-09o 281
+09o 286
 10s ΓεnΣym-5
 10s while
 20
@@ -5636,7 +5659,7 @@
 10s source
 10s env
 04i 2
-09o 252
+09o 257
 10s ΓεnΣym-5
 10s and
 20
@@ -5645,7 +5668,7 @@
 10s source
 10s env
 04i 2
-09o 223
+09o 228
 10s ΓεnΣym-5
 10s or
 20
@@ -5654,7 +5677,7 @@
 10s source
 10s env
 04i 2
-09o 194
+09o 199
 10s ΓεnΣym-5
 10s fn*
 20
@@ -5663,7 +5686,7 @@
 10s source
 10s env
 04i 2
-09o 165
+09o 170
 10s ΓεnΣym-5
 10s macro*
 20
@@ -5672,7 +5695,7 @@
 10s source
 10s env
 04i 2
-09o 136
+09o 141
 10s ΓεnΣym-5
 10s environment*
 20
@@ -5681,7 +5704,7 @@
 10s source
 10s env
 04i 2
-09o 107
+09o 112
 10s ΓεnΣym-5
 10s try
 20
@@ -5690,7 +5713,7 @@
 10s source
 10s env
 04i 2
-09o 78
+09o 83
 10s ΓεnΣym-5
 10s return
 20
@@ -5699,7 +5722,7 @@
 10s source
 10s env
 04i 2
-09o 49
+09o 54
 10s ΓεnΣym-5
 10s quote
 20
@@ -5709,13 +5732,15 @@
 12
 11
 04i 1
-09o 22
+09o 27
 10s bytecompile/procedure
 10s op
 10s source
 12
 10s env
-04i 3
+10s source
+11
+04i 4
 16
 09o 13
 10s bytecompile/literal
@@ -5918,7 +5943,7 @@
 17
 0Es bytecompile
 01
-}#{##[[op] #@[documentation: "Return the length in bytes of a bytecode operation and all its arguments" source: ["Return the length in bytes of a bytecode operation and all its arguments" [case op [[#$0 #$1 #$3 #$C #$D #$11 #$12 #$13 #$14 #$15 #$16 #$1B #$1C #$1E #$1F #$20 #$21 #$22 #$24 #$25 #$26 #$27 #$28 #$29 #$2A] 1] [[#$2 #$4 #$7 #$1A] 2] [[#$6 #$9 #$A #$B #$18 #$19] 3] [[#$5 #$E #$F #$10 #$23] 4] [otherwise [throw [list :unknown-op "This op needs its length specified for disassembly to work" op [current-lambda]]]]]]] #{##[#$0 #$1 #$3 #$C #$D #$11 #$12 #$13 #$14 #$15 #$16 #$1B #$1C #$1E #$1F #$20 #$21 #$22 #$24 #$25 #$26 #$27 #$28 #$29 #$2A #f #$2 #$4 #$7 #$1A #$6 #$9 #$A #$B #$18 #$19 #$5 #$E #$F #$10 #$23 :unknown-op "This op needs its length specified for disassembly to work"]
+}#{##[[op] #@[documentation: "Return the length in bytes of a bytecode operation and all its arguments" source: ["Return the length in bytes of a bytecode operation and all its arguments" [case op [[#$0 #$1 #$3 #$C #$D #$11 #$12 #$13 #$14 #$15 #$16 #$1B #$1C #$1E #$1F #$20 #$21 #$22 #$24 #$25 #$26 #$27 #$28 #$29 #$2A] 1] [[#$2 #$4 #$7 #$1A] 2] [[#$6 #$9 #$A #$B #$18 #$19] 3] [[#$E #$F #$10 #$23] 4] [otherwise [throw [list :unknown-op "This op needs its length specified for disassembly to work" op [current-lambda]]]]]]] #{##[#$0 #$1 #$3 #$C #$D #$11 #$12 #$13 #$14 #$15 #$16 #$1B #$1C #$1E #$1F #$20 #$21 #$22 #$24 #$25 #$26 #$27 #$28 #$29 #$2A #f #$2 #$4 #$7 #$1A #$6 #$9 #$A #$B #$18 #$19 #$E #$F #$10 #$23 :unknown-op "This op needs its length specified for disassembly to work"]
 15
 10s op
 0Es ΓεnΣym-1
@@ -6076,7 +6101,7 @@
 1Ai 25
 0Bo 8
 02i 1
-09o 239
+09o 227
 10s ΓεnΣym-1
 1Ai 26
 20
@@ -6104,7 +6129,7 @@
 1Ai 25
 0Bo 8
 02i 2
-09o 181
+09o 169
 10s ΓεnΣym-1
 1Ai 30
 20
@@ -6144,33 +6169,27 @@
 1Ai 25
 0Bo 8
 02i 3
-09o 99
+09o 87
 10s ΓεnΣym-1
 1Ai 36
-20
-0C
-0Ao 54
-0D
-10s ΓεnΣym-1
-1Ai 37
 20
 0C
 0Ao 42
 0D
 10s ΓεnΣym-1
-1Ai 38
+1Ai 37
 20
 0C
 0Ao 30
 0D
 10s ΓεnΣym-1
-1Ai 39
+1Ai 38
 20
 0C
 0Ao 18
 0D
 10s ΓεnΣym-1
-1Ai 40
+1Ai 39
 20
 0C
 0Ao 6
@@ -6181,8 +6200,8 @@
 09o 29
 10s throw
 10s list
+1Ai 40
 1Ai 41
-1Ai 42
 10s op
 10s current-lambda
 04i 0
@@ -6334,7 +6353,19 @@
 04i 2
 04i 2
 01
-} [a i literals] #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$5 [quasiquote [$push/lval [unquote [bytecode-arr->val a [+ i 1]]]]]] [#$6 [quasiquote [$push/val/ext [unquote [ref literals [bit-or [bytecode-op->int [ref a [+ i 1]]] [bit-shift-left [bytecode-op->int [ref a [+ i 2]]] 8]]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]] [#$1B [quasiquote [$roots/push]]] [#$1C [quasiquote [$roots/pop]]] [#$1E [quasiquote [$<]]] [#$1F [quasiquote [$<=]]] [#$20 [quasiquote [$=]]] [#$21 [quasiquote [$>=]]] [#$22 [quasiquote [$>]]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 [quasiquote [$push/nil]]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$rem]] [#$2A '[$zero?]] [otherwise :unknown-op]]]] #{##[#$0 [$nop] #$1 [$ret] #$2 #$3 [$add/int] #$4 #$5 #$6 #$7 #$9 #$A #$B #$C [$dup] #$D [$drop] #$E #$F #$10 #$11 [$car] #$12 [$cdr] #$13 [$closure/push] #$14 [$cons] #$15 [$let] #$16 [$closure/pop] #$18 #$19 #$1A #$1B #$1C #$1E #$1F #$20 #$21 #$22 #$23 #$24 #$25 [$add] #$26 [$sub] #$27 [$mul] #$28 [$div] #$29 [$rem] #$2A [$zero?] :unknown-op]
+} [v] #@[documentation: "Quotes symbols but just passes through every other value" source: ["Quotes symbols but just passes through every other value" [if [symbol? v] [list 'quote v] v]]] #{##[]
+10s symbol?
+10s v
+04i 1
+0Bo 20
+10s list
+23s quote
+10s v
+04i 2
+09o 7
+10s v
+01
+} [a i literals] #@[documentation: "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" source: ["Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval" [case [ref a i] [#$0 '[$nop]] [#$1 '[$ret]] [#$2 [quasiquote [$push/int/byte [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$3 '[$add/int]] [#$4 [quasiquote [$apply/dynamic [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$6 [quasiquote [$push/val/ext [unquote [ref literals [bit-or [bytecode-op->int [ref a [+ i 1]]] [bit-shift-left [bytecode-op->int [ref a [+ i 2]]] 8]]]]]]] [#$7 [quasiquote [$apply/dynamic/new [unquote [bytecode-op->int [ref a [+ i 1]]]]]]] [#$9 [quasiquote [$jmp* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$A [quasiquote [$jt* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$B [quasiquote [$jf* [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$C '[$dup]] [#$D '[$drop]] [#$E [quasiquote [$def [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$F [quasiquote [$set [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$10 [quasiquote [$get [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$11 '[$car]] [#$12 '[$cdr]] [#$13 '[$closure/push]] [#$14 '[$cons]] [#$15 '[$let]] [#$16 '[$closure/pop]] [#$18 [quasiquote [$try/old [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$19 [quasiquote [$try [unquote [bytecode-arr->offset a [+ i 1]]]]]] [#$1A [quasiquote [$push/val [unquote [disassemble/maybe-quote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]]] [#$1B '[$roots/push]] [#$1C '[$roots/pop]] [#$1E '[$<]] [#$1F '[$<=]] [#$20 '[$=]] [#$21 '[$>=]] [#$22 '[$>]] [#$23 [quasiquote [$push/symbol [unquote [bytecode-arr->sym a [+ i 1]]]]]] [#$24 '[$push/nil]] [#$25 '[$add]] [#$26 '[$sub]] [#$27 '[$mul]] [#$28 '[$div]] [#$29 '[$rem]] [#$2A '[$zero?]] [otherwise :unknown-op]]]] #{##[#$0 [$nop] #$1 [$ret] #$2 #$3 [$add/int] #$4 #$6 #$7 #$9 #$A #$B #$C [$dup] #$D [$drop] #$E #$F #$10 #$11 [$car] #$12 [$cdr] #$13 [$closure/push] #$14 [$cons] #$15 [$let] #$16 [$closure/pop] #$18 #$19 #$1A #$1B [$roots/push] #$1C [$roots/pop] #$1E [$<] #$1F [$<=] #$20 [$=] #$21 [$>=] #$22 [$>] #$23 #$24 [$push/nil] #$25 [$add] #$26 [$sub] #$27 [$mul] #$28 [$div] #$29 [$rem] #$2A [$zero?] :unknown-op]
 15
 10s ref
 10s a
@@ -6347,13 +6378,13 @@
 20
 0Bo 8
 1Ai 1
-09o 1039
+09o 976
 10s ΓεnΣym-2
 1Ai 2
 20
 0Bo 8
 1Ai 3
-09o 1024
+09o 961
 10s ΓεnΣym-2
 1Ai 4
 20
@@ -6370,13 +6401,13 @@
 24
 14
 14
-09o 981
+09o 918
 10s ΓεnΣym-2
 1Ai 5
 20
 0Bo 8
 1Ai 6
-09o 966
+09o 903
 10s ΓεnΣym-2
 1Ai 7
 20
@@ -6393,24 +6424,9 @@
 24
 14
 14
-09o 923
+09o 860
 10s ΓεnΣym-2
 1Ai 8
-20
-0Bo 30
-23s $push/lval
-10s bytecode-arr->val
-10s a
-10s i
-02i 1
-25
-04i 2
-24
-14
-14
-09o 886
-10s ΓεnΣym-2
-1Ai 9
 20
 0Bo 83
 23s $push/val/ext
@@ -6441,9 +6457,9 @@
 24
 14
 14
-09o 796
+09o 770
 10s ΓεnΣym-2
-1Ai 10
+1Ai 9
 20
 0Bo 36
 23s $apply/dynamic/new
@@ -6458,9 +6474,9 @@
 24
 14
 14
-09o 753
+09o 727
 10s ΓεnΣym-2
-1Ai 11
+1Ai 10
 20
 0Bo 30
 23s $jmp*
@@ -6473,9 +6489,9 @@
 24
 14
 14
-09o 716
+09o 690
 10s ΓεnΣym-2
-1Ai 12
+1Ai 11
 20
 0Bo 30
 23s $jt*
@@ -6488,9 +6504,9 @@
 24
 14
 14
-09o 679
+09o 653
 10s ΓεnΣym-2
-1Ai 13
+1Ai 12
 20
 0Bo 30
 23s $jf*
@@ -6503,21 +6519,21 @@
 24
 14
 14
-09o 642
+09o 616
 10s ΓεnΣym-2
+1Ai 13
+20
+0Bo 8
 1Ai 14
-20
-0Bo 8
+09o 601
+10s ΓεnΣym-2
 1Ai 15
-09o 627
-10s ΓεnΣym-2
-1Ai 16
 20
 0Bo 8
-1Ai 17
-09o 612
+1Ai 16
+09o 586
 10s ΓεnΣym-2
-1Ai 18
+1Ai 17
 20
 0Bo 30
 23s $def
@@ -6530,9 +6546,9 @@
 24
 14
 14
-09o 575
+09o 549
 10s ΓεnΣym-2
-1Ai 19
+1Ai 18
 20
 0Bo 30
 23s $set
@@ -6545,9 +6561,9 @@
 24
 14
 14
-09o 538
+09o 512
 10s ΓεnΣym-2
-1Ai 20
+1Ai 19
 20
 0Bo 30
 23s $get
@@ -6560,45 +6576,45 @@
 24
 14
 14
-09o 501
+09o 475
 10s ΓεnΣym-2
+1Ai 20
+20
+0Bo 8
 1Ai 21
-20
-0Bo 8
+09o 460
+10s ΓεnΣym-2
 1Ai 22
-09o 486
-10s ΓεnΣym-2
+20
+0Bo 8
 1Ai 23
-20
-0Bo 8
+09o 445
+10s ΓεnΣym-2
 1Ai 24
-09o 471
-10s ΓεnΣym-2
+20
+0Bo 8
 1Ai 25
-20
-0Bo 8
+09o 430
+10s ΓεnΣym-2
 1Ai 26
-09o 456
-10s ΓεnΣym-2
+20
+0Bo 8
 1Ai 27
-20
-0Bo 8
+09o 415
+10s ΓεnΣym-2
 1Ai 28
-09o 441
-10s ΓεnΣym-2
+20
+0Bo 8
 1Ai 29
-20
-0Bo 8
+09o 400
+10s ΓεnΣym-2
 1Ai 30
-09o 426
-10s ΓεnΣym-2
-1Ai 31
 20
 0Bo 8
-1Ai 32
-09o 411
+1Ai 31
+09o 385
 10s ΓεnΣym-2
-1Ai 33
+1Ai 32
 20
 0Bo 30
 23s $try/old
@@ -6611,9 +6627,9 @@
 24
 14
 14
-09o 374
+09o 348
 10s ΓεnΣym-2
-1Ai 34
+1Ai 33
 20
 0Bo 30
 23s $try
@@ -6626,12 +6642,13 @@
 24
 14
 14
-09o 337
+09o 311
 10s ΓεnΣym-2
-1Ai 35
+1Ai 34
 20
-0Bo 46
+0Bo 52
 23s $push/val
+10s disassemble/maybe-quote
 10s ref
 10s literals
 10s bytecode-op->int
@@ -6643,68 +6660,55 @@
 04i 2
 04i 1
 04i 2
+04i 1
 24
 14
 14
-09o 284
+09o 252
 10s ΓεnΣym-2
-1Ai 36
+1Ai 35
 20
-0Bo 12
-23s $roots/push
-24
-14
-09o 265
+0Bo 8
+1Ai 36
+09o 237
 10s ΓεnΣym-2
 1Ai 37
 20
-0Bo 12
-23s $roots/pop
-24
-14
-09o 246
-10s ΓεnΣym-2
+0Bo 8
 1Ai 38
-20
-0Bo 12
-23s $<
-24
-14
-09o 227
+09o 222
 10s ΓεnΣym-2
 1Ai 39
 20
-0Bo 12
-23s $<=
-24
-14
-09o 208
-10s ΓεnΣym-2
+0Bo 8
 1Ai 40
-20
-0Bo 12
-23s $=
-24
-14
-09o 189
+09o 207
 10s ΓεnΣym-2
 1Ai 41
 20
-0Bo 12
-23s $>=
-24
-14
-09o 170
-10s ΓεnΣym-2
+0Bo 8
 1Ai 42
-20
-0Bo 12
-23s $>
-24
-14
-09o 151
+09o 192
 10s ΓεnΣym-2
 1Ai 43
+20
+0Bo 8
+1Ai 44
+09o 177
+10s ΓεnΣym-2
+1Ai 45
+20
+0Bo 8
+1Ai 46
+09o 162
+10s ΓεnΣym-2
+1Ai 47
+20
+0Bo 8
+1Ai 48
+09o 147
+10s ΓεnΣym-2
+1Ai 49
 20
 0Bo 30
 23s $push/symbol
@@ -6717,52 +6721,50 @@
 24
 14
 14
-09o 114
+09o 110
 10s ΓεnΣym-2
-1Ai 44
+1Ai 50
 20
-0Bo 12
-23s $push/nil
-24
-14
+0Bo 8
+1Ai 51
 09o 95
 10s ΓεnΣym-2
-1Ai 45
+1Ai 52
 20
 0Bo 8
-1Ai 46
+1Ai 53
 09o 80
 10s ΓεnΣym-2
-1Ai 47
+1Ai 54
 20
 0Bo 8
-1Ai 48
+1Ai 55
 09o 65
 10s ΓεnΣym-2
-1Ai 49
+1Ai 56
 20
 0Bo 8
-1Ai 50
+1Ai 57
 09o 50
 10s ΓεnΣym-2
-1Ai 51
+1Ai 58
 20
 0Bo 8
-1Ai 52
+1Ai 59
 09o 35
 10s ΓεnΣym-2
-1Ai 53
+1Ai 60
 20
 0Bo 8
-1Ai 54
+1Ai 61
 09o 20
 10s ΓεnΣym-2
-1Ai 55
+1Ai 62
 20
 0Bo 8
-1Ai 56
+1Ai 63
 09o 5
-1Ai 57
+1Ai 64
 16
 01
 } [a i literals] #@[documentation: "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" source: ["Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression" [def ret #nil] [while [< i [array/length a]] [set! ret [cons [cons i [disassemble/op a i literals]] ret]] [set! i [+ i [disassemble/length [ref a i]]]]] [nreverse ret]]] #{##[]
@@ -6963,136 +6965,47 @@
 17
 0Es bytecode-arr->offset
 0D
-23s disassemble/op
+23s disassemble/maybe-quote
 1Ai 24
 1Ai 25
 1Ai 26
 17
-0Es disassemble/op
+0Es disassemble/maybe-quote
 0D
-23s disassemble/array
+23s disassemble/op
 1Ai 27
 1Ai 28
 1Ai 29
 17
-0Es disassemble/array
+0Es disassemble/op
 0D
-23s disassemble/bytecode-array
+23s disassemble/array
 1Ai 30
 1Ai 31
 1Ai 32
 17
-0Es disassemble/bytecode-array
+0Es disassemble/array
 0D
-23s disassemble/print
+23s disassemble/bytecode-array
 1Ai 33
 1Ai 34
 1Ai 35
 17
-0Es disassemble/print
+0Es disassemble/bytecode-array
 0D
-23s disassemble
+23s disassemble/print
 1Ai 36
 1Ai 37
 1Ai 38
 17
+0Es disassemble/print
+0D
+23s disassemble
+1Ai 39
+1Ai 40
+1Ai 41
+17
 0Es disassemble
-01
-}#{##[[expr] #@[source: [expr]] #{##[]
-10s expr
-01
-} [expr] #@[source: [[-> [bytecompile expr] assemble*]]] #{##[]
-10s assemble*
-10s bytecompile
-10s expr
-04i 1
-04i 1
-01
-} :bytecode :none [expr] #@[source: [[[tree/ref backend/tree *active-backend*] expr]]] #{##[]
-10s tree/ref
-10s backend/tree
-10s *active-backend*
-04i 2
-10s expr
-04i 1
-01
-} [backend expr environment] #@[source: [[def last-backend *active-backend*] [def ret #nil] [try [fn [e] [set! *active-backend* last-backend] [throw e]] [set! *active-backend* backend] [set! ret [compile expr environment]] [set! *active-backend* last-backend] [return ret]]]] #{##[[e] #@[source: [[set! *active-backend* last-backend] [throw e]]] #{##[]
-10s last-backend
-0Fs *active-backend*
-0D
-10s throw
-10s e
-04i 1
-01
-}]
-10s *active-backend*
-0Es last-backend
-0D
-24
-0Es ret
-0D
-23s anonymous
-1Ai 0
-1Ai 1
-1Ai 2
-17
-19o 48
-10s backend
-0Fs *active-backend*
-0D
-10s compile*
-10s expr
-10s current-closure
-04i 0
-04i 2
-0Fs ret
-0D
-10s last-backend
-0Fs *active-backend*
-0D
-10s ret
-01
-16
-01
-}]
-23s compile/backend/none
-1Ai 0
-1Ai 1
-1Ai 2
-17
-0Es compile/backend/none
-0D
-23s compile/backend/bytecode
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es compile/backend/bytecode
-0D
-1Ai 6
-0Es *active-backend*
-0D
-10s tree/new
-1Ai 6
-10s compile/backend/bytecode
-1Ai 7
-10s compile/backend/none
-04i 4
-0Es backend/tree
-0D
-23s backend
-1Ai 8
-1Ai 9
-1Ai 10
-17
-0Es backend
-0D
-23s compile/for
-1Ai 11
-1Ai 12
-1Ai 13
-17
-0Es compile/for
 01
 }#{##[[source environment] #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]] #{##[]
 15
@@ -8678,176 +8591,6 @@
 1Ai 17
 17
 0Es macroexpand
-01
-}#{##[[pred fun] #@[documentation: "Evaluates FUN once PRED is true" source: ["Evaluates FUN once PRED is true" [set! yield-queue [cons [cons pred fun] yield-queue]] #t]] #{##[#t]
-10s pred
-10s fun
-14
-10s yield-queue
-14
-0Fs yield-queue
-0D
-1Ai 0
-01
-} [] #@[documentation: "Executes pending coroutines if their predicate evaluates to #t" source: ["Executes pending coroutines if their predicate evaluates to #t" [def old yield-queue] [set! yield-queue #nil] [doseq [cur old] [if [[car cur]] [[cdr cur]] [set! yield-queue [cons cur yield-queue]]]]]] #{##[]
-10s yield-queue
-0Es old
-0D
-24
-0Fs yield-queue
-0D
-15
-10s old
-0Es ΓεnΣym-1
-0D
-10s ΓεnΣym-1
-0Bo 73
-24
-1B
-09o 58
-0D
-1C
-10s ΓεnΣym-1
-11
-0Es cur
-0D
-10s cur
-11
-04i 0
-0Bo 13
-10s cur
-12
-04i 0
-09o 16
-10s cur
-10s yield-queue
-14
-0Fs yield-queue
-0D
-10s ΓεnΣym-1
-12
-0Fs ΓεnΣym-1
-10s ΓεnΣym-1
-0Ao -59
-09o 4
-24
-16
-01
-} [milliseconds] #@[documentation: "Returns a function that evaluates to true once MILLISECONDS have passed" source: ["Returns a function that evaluates to true once MILLISECONDS have passed" [def goal [+ [time/milliseconds] milliseconds]] [fn [] [> [time/milliseconds] goal]]]] #{##[[] #@[source: [[> [time/milliseconds] goal]]] #{##[]
-10s time/milliseconds
-04i 0
-10s goal
-22
-01
-}]
-10s time/milliseconds
-04i 0
-10s milliseconds
-25
-0Es goal
-0D
-23s anonymous
-1Ai 0
-1Ai 1
-1Ai 2
-17
-01
-} [event id handler] #@[documentation: "Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." source: ["Bind handler to be evaluated when event-name fires, overwriting whichever handler has been associated with id before." [tree/set! event id handler]]] #{##[]
-10s tree/set!
-10s event
-10s id
-10s handler
-04i 3
-01
-} [event] #@[documentation: "Clears all event handlers for event-name" source: ["Clears all event handlers for event-name" [quasiquote [set! [unquote event] [tree/new #nil]]]]] #{##[]
-23s set!
-10s event
-23s tree/new
-24
-24
-14
-14
-24
-14
-14
-14
-01
-} [event val] #@[documentation: "Applies ...val to all event handlers associated with event-name" source: ["Applies ...val to all event handlers associated with event-name" [doseq [h [tree/values event]] [h val]]]] #{##[]
-15
-10s tree/values
-10s event
-04i 1
-0Es ΓεnΣym-2
-0D
-10s ΓεnΣym-2
-0Bo 50
-24
-1B
-09o 35
-0D
-1C
-10s ΓεnΣym-2
-11
-0Es h
-0D
-10s h
-10s val
-04i 1
-0D
-10s ΓεnΣym-2
-12
-0Fs ΓεnΣym-2
-10s ΓεnΣym-2
-0Ao -36
-09o 4
-24
-16
-01
-}]
-24
-0Es yield-queue
-0D
-23s yield
-1Ai 0
-1Ai 1
-1Ai 2
-17
-0Es yield
-0D
-23s yield-run
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es yield-run
-0D
-23s timeout
-1Ai 6
-1Ai 7
-1Ai 8
-17
-0Es timeout
-0D
-23s event-bind
-1Ai 9
-1Ai 10
-1Ai 11
-17
-0Es event-bind
-0D
-23s event-clear
-1Ai 12
-1Ai 13
-1Ai 14
-18
-0Es event-clear
-0D
-23s event-fire
-1Ai 15
-1Ai 16
-1Ai 17
-17
-0Es event-fire
 01
 }#{##[[arg] #@[source: [[when arg [when [or [not [pair? arg]] [not [symbol? [car arg]]]] [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]] [quasiquote [def [unquote [car arg]] [unquote [cadr arg]]]]]]] #{##[#f #t :invalid-let-form "Please fix the structure of the let form"]
 10s arg
@@ -11092,121 +10835,6 @@
 17
 0Es unquote-splicing
 01
-}#{##[[c i] #@[source: [[when c [if [= c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]] " - " [if [< l 16] [string/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]] #{##[#f "# <root environment>" "\r\n" "# " " - " "-+- Very big tree structure -+-"]
-10s c
-0Bo 223
-10s c
-10s root-closure
-20
-0Bo 52
-10s cat
-10s ansi-blue
-10s cat
-10s int
-10s i
-0C
-0Ao 13
-0D
-02i 0
-0C
-0Ao 6
-0D
-1Ai 0
-04i 1
-1Ai 1
-04i 2
-04i 1
-1Ai 2
-04i 2
-09o 159
-10s closure/data
-10s c
-04i 1
-0Es data
-0D
-10s length
-10s data
-04i 1
-0Es l
-0D
-10s cat
-10s ansi-blue
-10s cat
-10s int
-10s i
-0C
-0Ao 13
-0D
-02i 0
-0C
-0Ao 6
-0D
-1Ai 0
-04i 1
-1Ai 3
-10s string/write
-10s c
-04i 1
-04i 3
-04i 1
-1Ai 4
-10s l
-02i 16
-1E
-0Bo 16
-10s string/write
-10s data
-04i 1
-09o 5
-1Ai 5
-1Ai 2
-10s describe/closure
-10s closure/caller
-10s c
-04i 1
-10s int
-10s i
-0C
-0Ao 13
-0D
-02i 0
-0C
-0Ao 6
-0D
-1Ai 0
-04i 1
-02i 1
-25
-04i 2
-04i 5
-09o 4
-24
-01
-} [] #@[source: [[display [describe/closure [closure/caller [current-lambda]]]]]] #{##[]
-10s print
-10s describe/closure
-10s closure/caller
-10s current-lambda
-04i 0
-04i 1
-04i 1
-04i 1
-01
-}]
-23s describe/closure
-1Ai 0
-1Ai 1
-1Ai 2
-17
-0Es describe/closure
-0D
-23s stacktrace
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es stacktrace
-01
 }#{##[3.14159 [x] #@[documentation: "Return a number 1 greater than x" source: [:inline "Return a number 1 greater than x" [+ 1 x]] inline: #t] #{##[]
 02i 1
 10s x
@@ -11391,7 +11019,107 @@
 17
 0Es radians
 01
-}#{##[[i text] #@[source: [[case i [0 [ansi-red text]] [1 [string text]] [2 [ansi-yellow [string/write text]]] [3 [describe/closure text]] [otherwise text]]]] #{##[]
+}#{##[[c i] #@[source: [[when c [if [= c root-closure] [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]] "\r\n"] [do [def data [closure/data c]] [def l [length data]] [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]] " - " [if [< l 16] [string/write data] "-+- Very big tree structure -+-"] "\r\n" [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]] #{##[#f "# <root environment>" "\r\n" "# " " - " "-+- Very big tree structure -+-"]
+10s c
+0Bo 223
+10s c
+10s root-closure
+20
+0Bo 52
+10s cat
+10s ansi-blue
+10s cat
+10s int
+10s i
+0C
+0Ao 13
+0D
+02i 0
+0C
+0Ao 6
+0D
+1Ai 0
+04i 1
+1Ai 1
+04i 2
+04i 1
+1Ai 2
+04i 2
+09o 159
+10s closure/data
+10s c
+04i 1
+0Es data
+0D
+10s length
+10s data
+04i 1
+0Es l
+0D
+10s cat
+10s ansi-blue
+10s cat
+10s int
+10s i
+0C
+0Ao 13
+0D
+02i 0
+0C
+0Ao 6
+0D
+1Ai 0
+04i 1
+1Ai 3
+10s string/write
+10s c
+04i 1
+04i 3
+04i 1
+1Ai 4
+10s l
+02i 16
+1E
+0Bo 16
+10s string/write
+10s data
+04i 1
+09o 5
+1Ai 5
+1Ai 2
+10s describe/closure
+10s closure/caller
+10s c
+04i 1
+10s int
+10s i
+0C
+0Ao 13
+0D
+02i 0
+0C
+0Ao 6
+0D
+1Ai 0
+04i 1
+02i 1
+25
+04i 2
+04i 5
+09o 4
+24
+01
+} [] #@[source: [[display [describe/closure [closure/caller [current-lambda]]]]]] #{##[]
+10s print
+10s describe/closure
+10s closure/caller
+10s current-lambda
+04i 0
+04i 1
+04i 1
+04i 1
+01
+} [i text] #@[source: [[case i [0 [ansi-red text]] [1 [string text]] [2 [ansi-yellow [string/write text]]] [3 [describe/closure text]] [otherwise text]]]] #{##[]
 15
 10s i
 0Es ΓεnΣym-1
@@ -11561,59 +11289,73 @@
 04i 1
 01
 }]
-23s display/error/wrap
+23s describe/closure
 1Ai 0
 1Ai 1
 1Ai 2
 17
-0Es display/error/wrap
+0Es describe/closure
 0D
-23s display/error/iter
+23s stacktrace
 1Ai 3
 1Ai 4
 1Ai 5
 17
-0Es display/error/iter
+0Es stacktrace
 0D
-23s display/error
+23s display/error/wrap
 1Ai 6
 1Ai 7
 1Ai 8
 17
-0Es display/error
+0Es display/error/wrap
 0D
-23s closure/documentation
+23s display/error/iter
 1Ai 9
 1Ai 10
 1Ai 11
 17
-0Es closure/documentation
+0Es display/error/iter
 0D
-23s describe/thing
+23s display/error
 1Ai 12
 1Ai 13
 1Ai 14
 17
-0Es describe/thing
+0Es display/error
 0D
-23s describe/string
+23s closure/documentation
 1Ai 15
 1Ai 16
 1Ai 17
 17
-0Es describe/string
+0Es closure/documentation
 0D
-23s describe
+23s describe/thing
 1Ai 18
 1Ai 19
 1Ai 20
 17
-0Es describe
+0Es describe/thing
 0D
-23s symbol-table
+23s describe/string
 1Ai 21
 1Ai 22
 1Ai 23
+17
+0Es describe/string
+0D
+23s describe
+1Ai 24
+1Ai 25
+1Ai 26
+17
+0Es describe
+0D
+23s symbol-table
+1Ai 27
+1Ai 28
+1Ai 29
 17
 0Es symbol-table
 0D
@@ -11621,9 +11363,9 @@
 0Es gensym/counter
 0D
 23s gensym
-1Ai 24
-1Ai 25
-1Ai 26
+1Ai 30
+1Ai 31
+1Ai 32
 17
 0Es gensym
 0D
@@ -13848,7 +13590,7 @@
 10s value
 04i 1
 01
-} [] #@[documentation: "Print a single line feed character" source: ["Print a single line feed character" [display "\r\n"]]] #{##["\r\n"]
+} [] #@[documentation: "Print a single line feed character" source: ["Print a single line feed character" [print "\r\n"]]] #{##["\r\n"]
 10s print
 1Ai 0
 04i 1
@@ -14888,329 +14630,6 @@
 1Ai 99
 17
 0Es contains-all?
-01
-}#{##[[l] #@[source: [[case [type-of l] [:tree [tree/dup l]] [:array [array/dup l]] [otherwise l]]]] #{##[:tree :array]
-15
-10s type-of
-10s l
-04i 1
-0Es ΓεnΣym-1
-0D
-10s ΓεnΣym-1
-1Ai 0
-20
-0Bo 16
-10s tree/dup
-10s l
-04i 1
-09o 30
-10s ΓεnΣym-1
-1Ai 1
-20
-0Bo 16
-10s array/dup
-10s l
-04i 1
-09o 7
-10s l
-16
-01
-} [parent] #@[source: [[when [and [not [nil? parent]] [not= [type-of parent] :tree]] [throw [list :type-error "Parents can only be trees or nil" parent [current-lambda]]]] [def ret [tree/new #nil]] [doseq [k [tree/keys parent]] [when [not= k :parent] [def pv [tree/get parent k]] [when-not [= [type-of pv] :lambda] [tree/set! ret k [dup pv]]]]] [tree/set! ret :parent parent]]] #{##[#f #t :tree :type-error "Parents can only be trees or nil" :parent :lambda]
-10s nil?
-10s parent
-04i 1
-0Bo 8
-1Ai 0
-09o 5
-1Ai 1
-0C
-0Bo 22
-0D
-10s not=
-10s type-of
-10s parent
-04i 1
-1Ai 2
-04i 2
-0Bo 32
-10s throw
-10s list
-1Ai 3
-1Ai 4
-10s parent
-10s current-lambda
-04i 0
-04i 4
-04i 1
-09o 4
-24
-0D
-10s tree/new
-24
-04i 1
-0Es ret
-0D
-15
-10s tree/keys
-10s parent
-04i 1
-0Es ΓεnΣym-2
-0D
-10s ΓεnΣym-2
-0Bo 122
-24
-1B
-09o 107
-0D
-1C
-10s ΓεnΣym-2
-11
-0Es k
-0D
-10s not=
-10s k
-1Ai 5
-04i 2
-0Bo 69
-10s tree/get
-10s parent
-10s k
-04i 2
-0Es pv
-0D
-10s type-of
-10s pv
-04i 1
-1Ai 6
-20
-0Bo 7
-24
-09o 27
-10s tree/set!
-10s ret
-10s k
-10s dup
-10s pv
-04i 1
-04i 3
-09o 4
-24
-0D
-10s ΓεnΣym-2
-12
-0Fs ΓεnΣym-2
-10s ΓεnΣym-2
-0Ao -108
-09o 4
-24
-16
-0D
-10s tree/set!
-10s ret
-1Ai 5
-10s parent
-04i 3
-01
-} [o method-name args] #@[source: [[if o [do [def v [tree/get o method-name]] [if v [apply v args] [nos/funcall* [tree/get o :parent] method-name args]]] [throw [list :missing-method "Can't find that method" o [current-lambda]]]]]] #{##[:parent :missing-method "Can't find that method"]
-10s o
-0Bo 75
-10s tree/get
-10s o
-10s method-name
-04i 2
-0Es v
-0D
-10s v
-0Bo 20
-10s apply
-10s v
-10s args
-04i 2
-09o 29
-10s nos/funcall*
-10s tree/get
-10s o
-1Ai 0
-04i 2
-10s method-name
-10s args
-04i 3
-09o 29
-10s throw
-10s list
-1Ai 1
-1Ai 2
-10s o
-10s current-lambda
-04i 0
-04i 4
-04i 1
-01
-} [o method-name . args] #@[source: [[nos/funcall* o method-name [cons o args]]]] #{##[]
-10s nos/funcall*
-10s o
-10s method-name
-10s o
-10s args
-14
-04i 3
-01
-} [o method-name args] #@[source: [[when o [def v [tree/get o method-name]] [if v [apply v args] [nos/funcall* [tree/get o :parent] method-name args]]]]] #{##[:parent]
-10s o
-0Bo 75
-10s tree/get
-10s o
-10s method-name
-04i 2
-0Es v
-0D
-10s v
-0Bo 20
-10s apply
-10s v
-10s args
-04i 2
-09o 29
-10s nos/funcall*
-10s tree/get
-10s o
-1Ai 0
-04i 2
-10s method-name
-10s args
-04i 3
-09o 4
-24
-01
-} [o method-name . args] #@[source: [[nos/funcall*/try o method-name [cons o args]]]] #{##[]
-10s nos/funcall*/try
-10s o
-10s method-name
-10s o
-10s args
-14
-04i 3
-01
-} [parent] #@[source: [[quasiquote [make-instance [unquote parent]]]]] #{##[]
-23s make-instance
-10s parent
-24
-14
-14
-01
-} [o name val] #@[source: [[quasiquote [tree/set! [unquote o] [unquote name] [unquote val]]]]] #{##[]
-23s tree/set!
-10s o
-10s name
-10s val
-24
-14
-14
-14
-14
-01
-} [o name args . body] #@[source: [[quasiquote [tree/set! [unquote o] [unquote name] [fn [unquote [cons 'this args]] [unquote-splicing body]]]]]] #{##[]
-23s tree/set!
-10s o
-10s name
-23s fn
-23s this
-10s args
-14
-10s append
-10s body
-24
-04i 2
-14
-14
-24
-14
-14
-14
-14
-01
-} [o name . args] #@[source: [[quasiquote [nos/funcall [unquote o] [unquote name] [unquote-splicing args]]]]] #{##[]
-23s nos/funcall
-10s o
-10s name
-10s append
-10s args
-24
-04i 2
-14
-14
-14
-01
-}]
-23s dup
-1Ai 0
-1Ai 1
-1Ai 2
-17
-0Es dup
-0D
-23s make-instance
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es make-instance
-0D
-23s nos/funcall*
-1Ai 6
-1Ai 7
-1Ai 8
-17
-0Es nos/funcall*
-0D
-23s nos/funcall
-1Ai 9
-1Ai 10
-1Ai 11
-17
-0Es nos/funcall
-0D
-23s nos/funcall*/try
-1Ai 12
-1Ai 13
-1Ai 14
-17
-0Es nos/funcall*/try
-0D
-23s nos/funcall/try
-1Ai 15
-1Ai 16
-1Ai 17
-17
-0Es nos/funcall/try
-0D
-23s defobject
-1Ai 18
-1Ai 19
-1Ai 20
-18
-0Es defobject
-0D
-23s defproperty
-1Ai 21
-1Ai 22
-1Ai 23
-18
-0Es defproperty
-0D
-23s defmethod
-1Ai 24
-1Ai 25
-1Ai 26
-18
-0Es defmethod
-0D
-23s _
-1Ai 27
-1Ai 28
-1Ai 29
-18
-0Es _
 01
 }#{##[:array/2d [width height] #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]] #{##[:data :width :height]
 10s tree/new
@@ -16879,395 +16298,6 @@
 16
 04i 2
 01
-}#{##[:image/bmp [u8v offset bytes val] #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]] #{##[255]
-24
-1B
-09o 67
-0D
-1C
-10s buffer/view/set!
-10s u8v
-10s offset
-02i 1
-25
-0Fs offset
-10s bit-and
-1Ai 0
-10s val
-04i 2
-04i 3
-0D
-10s bytes
-02i 1
-26
-0Fs bytes
-0D
-10s bit-shift-right
-10s val
-02i 8
-04i 2
-0Fs val
-10s bytes
-02i 0
-22
-0Ao -71
-0D
-10s offset
-01
-} [width pixel-length] #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]] #{##[]
-02i 4
-10s bit-and
-10s width
-10s pixel-length
-27
-02i 3
-04i 2
-26
-0Es ret
-0D
-10s ret
-02i 4
-20
-0Bo 8
-02i 0
-09o 7
-10s ret
-01
-} [image] #@[source: [[require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] #{##[:image #t :height :width 8192]
-10s require*
-1Ai 0
-10s current-closure
-04i 0
-1Ai 1
-04i 3
-0D
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-02i 3
-27
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-10s image/bmp/row-padding
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-02i 3
-04i 2
-25
-27
-0Es image-size
-0D
-02i 54
-0Es header-size
-0D
-10s image-size
-10s header-size
-25
-0Es file-size
-0D
-10s buffer/allocate
-10s file-size
-04i 1
-0Es out
-0D
-10s buffer/view/u8*
-10s out
-04i 1
-0Es b
-0D
-02i -1
-0Es i
-0D
-10s buffer/view/set!
-10s b
-10s i
-02i 1
-25
-0Fs i
-02i 66
-04i 3
-0D
-10s buffer/view/set!
-10s b
-10s i
-02i 1
-25
-0Fs i
-02i 77
-04i 3
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s file-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s header-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 40
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 2
-02i 1
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 2
-02i 24
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-10s image-size
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-1Ai 4
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-1Ai 4
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s buffer/view/le/set!
-10s b
-10s i
-02i 4
-02i 0
-04i 4
-0Fs i
-0D
-10s image/bmp/row-padding
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-02i 3
-04i 2
-0Es row-padding
-0D
-10s header-size
-02i 1
-26
-0Es pixels
-0D
-15
-10s tree/ref
-10s image
-1Ai 2
-04i 2
-02i 1
-26
-0Es y
-0D
-24
-1B
-09o 119
-0D
-1C
-15
-02i 0
-0Es x
-0D
-24
-1B
-09o 55
-0D
-1C
-10s buffer/view/le/set!
-10s b
-10s pixels
-02i 3
-10s image/ref
-10s image
-10s x
-10s y
-04i 3
-04i 4
-0Fs pixels
-0D
-02i 1
-10s x
-03
-0Fs x
-10s x
-10s tree/ref
-10s image
-1Ai 3
-04i 2
-1E
-0Ao -69
-0D
-24
-16
-0D
-10s pixels
-10s row-padding
-25
-0Fs pixels
-0D
-10s y
-02i -1
-03
-0Fs y
-10s y
-02i 0
-21
-0Ao -123
-16
-0D
-10s out
-01
-01
-} [] #@[source: [[require :image] [image/add-encoder! "bmp" image/bmp/encode]]] #{##[:image #t "bmp"]
-10s require*
-1Ai 0
-10s current-closure
-04i 0
-1Ai 1
-04i 3
-0D
-10s image/add-encoder!
-1Ai 2
-10s image/bmp/encode
-04i 2
-01
-}]
-10s module/insert
-1Ai 0
-15
-10s tree/new
-24
-04i 1
-0Es exports
-0D
-1Ai 0
-0Es *module*
-0D
-23s buffer/view/le/set!
-1Ai 1
-1Ai 2
-1Ai 3
-17
-0Es buffer/view/le/set!
-0D
-23s image/bmp/row-padding
-1Ai 4
-1Ai 5
-1Ai 6
-17
-0Es image/bmp/row-padding
-0D
-10s tree/set!
-10s exports
-23s encode
-23s image/bmp/encode
-1Ai 7
-1Ai 8
-1Ai 9
-17
-0Es image/bmp/encode
-04i 3
-0D
-10s tree/set!
-10s exports
-23s init!
-23s image/bmp/init!
-1Ai 10
-1Ai 11
-1Ai 12
-17
-0Es image/bmp/init!
-04i 3
-0D
-24
-0D
-13
-16
-04i 2
-01
 }#{##[:image [ext enc] #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/encoders ext enc]]] #{##[]
 10s symbol->keyword
 10s string->symbol
@@ -17841,6 +16871,395 @@
 1Ai 39
 17
 0Es image/test-image-xor
+04i 3
+0D
+24
+0D
+13
+16
+04i 2
+01
+}#{##[:image/bmp [u8v offset bytes val] #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]] #{##[255]
+24
+1B
+09o 67
+0D
+1C
+10s buffer/view/set!
+10s u8v
+10s offset
+02i 1
+25
+0Fs offset
+10s bit-and
+1Ai 0
+10s val
+04i 2
+04i 3
+0D
+10s bytes
+02i 1
+26
+0Fs bytes
+0D
+10s bit-shift-right
+10s val
+02i 8
+04i 2
+0Fs val
+10s bytes
+02i 0
+22
+0Ao -71
+0D
+10s offset
+01
+} [width pixel-length] #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]] #{##[]
+02i 4
+10s bit-and
+10s width
+10s pixel-length
+27
+02i 3
+04i 2
+26
+0Es ret
+0D
+10s ret
+02i 4
+20
+0Bo 8
+02i 0
+09o 7
+10s ret
+01
+} [image] #@[source: [[require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] #{##[:image #t :height :width 8192]
+10s require*
+1Ai 0
+10s current-closure
+04i 0
+1Ai 1
+04i 3
+0D
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+02i 3
+27
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+10s image/bmp/row-padding
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+02i 3
+04i 2
+25
+27
+0Es image-size
+0D
+02i 54
+0Es header-size
+0D
+10s image-size
+10s header-size
+25
+0Es file-size
+0D
+10s buffer/allocate
+10s file-size
+04i 1
+0Es out
+0D
+10s buffer/view/u8*
+10s out
+04i 1
+0Es b
+0D
+02i -1
+0Es i
+0D
+10s buffer/view/set!
+10s b
+10s i
+02i 1
+25
+0Fs i
+02i 66
+04i 3
+0D
+10s buffer/view/set!
+10s b
+10s i
+02i 1
+25
+0Fs i
+02i 77
+04i 3
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s file-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s header-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 40
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 1
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 2
+02i 24
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+10s image-size
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+1Ai 4
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+1Ai 4
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s buffer/view/le/set!
+10s b
+10s i
+02i 4
+02i 0
+04i 4
+0Fs i
+0D
+10s image/bmp/row-padding
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+02i 3
+04i 2
+0Es row-padding
+0D
+10s header-size
+02i 1
+26
+0Es pixels
+0D
+15
+10s tree/ref
+10s image
+1Ai 2
+04i 2
+02i 1
+26
+0Es y
+0D
+24
+1B
+09o 119
+0D
+1C
+15
+02i 0
+0Es x
+0D
+24
+1B
+09o 55
+0D
+1C
+10s buffer/view/le/set!
+10s b
+10s pixels
+02i 3
+10s image/ref
+10s image
+10s x
+10s y
+04i 3
+04i 4
+0Fs pixels
+0D
+02i 1
+10s x
+03
+0Fs x
+10s x
+10s tree/ref
+10s image
+1Ai 3
+04i 2
+1E
+0Ao -69
+0D
+24
+16
+0D
+10s pixels
+10s row-padding
+25
+0Fs pixels
+0D
+10s y
+02i -1
+03
+0Fs y
+10s y
+02i 0
+21
+0Ao -123
+16
+0D
+10s out
+01
+01
+} [] #@[source: [[require :image] [image/add-encoder! "bmp" image/bmp/encode]]] #{##[:image #t "bmp"]
+10s require*
+1Ai 0
+10s current-closure
+04i 0
+1Ai 1
+04i 3
+0D
+10s image/add-encoder!
+1Ai 2
+10s image/bmp/encode
+04i 2
+01
+}]
+10s module/insert
+1Ai 0
+15
+10s tree/new
+24
+04i 1
+0Es exports
+0D
+1Ai 0
+0Es *module*
+0D
+23s buffer/view/le/set!
+1Ai 1
+1Ai 2
+1Ai 3
+17
+0Es buffer/view/le/set!
+0D
+23s image/bmp/row-padding
+1Ai 4
+1Ai 5
+1Ai 6
+17
+0Es image/bmp/row-padding
+0D
+10s tree/set!
+10s exports
+23s encode
+23s image/bmp/encode
+1Ai 7
+1Ai 8
+1Ai 9
+17
+0Es image/bmp/encode
+04i 3
+0D
+10s tree/set!
+10s exports
+23s init!
+23s image/bmp/init!
+1Ai 10
+1Ai 11
+1Ai 12
+17
+0Es image/bmp/init!
 04i 3
 0D
 24
