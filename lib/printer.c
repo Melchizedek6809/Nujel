@@ -160,7 +160,7 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 				const lVal *cv = n->vList.car;
 				cur = spf(cur, bufEnd, display ? " %V" : " %v", cv);
 			}else{
-				cur = spf(cur, bufEnd, display ? " %V" : " . %v", n);
+				cur = spf(cur, bufEnd, display ? " . %V" : " . %v", n);
 				break;
 			}
 		}

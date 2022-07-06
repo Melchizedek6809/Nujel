@@ -227,4 +227,5 @@
       "Assemble and evaluate all bytecode arguments"
       [def bc [apply assemble ops]]
       [disassemble bc]
-      [pfmtln "Result: {:?}" [apply [current-closure] bc #t]]]
+      [def v [apply [current-closure] bc #t]]
+      [pfmtln "Result: {:?}{}" v [type-of v]]]
