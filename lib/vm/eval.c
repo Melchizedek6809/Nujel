@@ -23,7 +23,7 @@ NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	if(unlikely(len == 0)){return lCons(NULL, NULL);}
 	const int nsp = sp - len;
-	lVal *t = stack[nsp] = lRootsValPush(lCons(stack[nsp], NULL));
+	lVal *t = stack[nsp] = lCons(stack[nsp], NULL);
 	for(int i = len-1; i > 0; i--){
 		t->vList.cdr = lCons(stack[sp - i], NULL);
 		t = t->vList.cdr;
@@ -280,14 +280,11 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopApply: {
 		int len = *ip++;
 		if(unlikely(len >= ctx.sp)){throwStackUnderflowError(c, "Apply");}
-		const int applyRSP = lRootsGet();
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
 		lVal *res = lApply(c, cargs, fun);
 		ctx.valueStack[ctx.sp++] = res;
-		(void)applyRSP;
-		//lRootsRet(applyRSP);
 		break; }
 	case lopRet:
 		if(unlikely(ctx.sp < 1)){ throwStackUnderflowError(c, "Ret"); }
