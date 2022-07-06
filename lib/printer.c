@@ -50,14 +50,6 @@ static char getHexChar(int c){
 	return (v < 0xA) ? '0' + v : 'A' + (v - 10);
 }
 
-static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
-	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
-		return spf(cur, bufEnd, "o --INVALID-OFFSET--", offset);
-	}else{
-		return spf(cur, bufEnd, "o %i ", offset);
-	}
-}
-
 static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display){
 	if(display){
 		return spf(cur, bufEnd, "#<buffer :id %i :size %x>", v - lBufferList, v->length);
@@ -80,43 +72,13 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 	cur = writeArray(cur, bufEnd, v->literals, false);
 	cur = spf(cur, bufEnd, " ");
 	if(v && v->data != NULL){
+		int i = 0;
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
 			if(cur[-1] == ' '){--cur;}
-			cur = spf(cur, bufEnd, "\n%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
-			switch(*c){
-			case lopTry:
-			case lopJt:
-			case lopJf:
-			case lopJmp: {
-				const int off = ((i16)((c[1] << 8) | c[2]));
-				cur = writeBytecodeArrayOffset(cur, bufEnd, off);
-				c+=2;
-				break;}
-			case lopApply:
-				if(&c[1] < v->dataEnd){
-					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);
-				}
-				c++;
-				break;
-			case lopPushValExt:
-				if(&c[1] < v->dataEnd){
-					cur = spf(cur, bufEnd, "o %i ", (i64)((c[1] << 8) | (c[2])));
-				}
-				c+=2;
-				break;
-			case lopPushVal:
-				if(&c[1] < v->dataEnd){
-					cur = spf(cur, bufEnd, "i %i ", (i64)((u8)c[1]));
-				}
-				c++;
-				break;
-			case lopIntByte:
-				if(&c[1] < v->dataEnd){
-					cur = spf(cur, bufEnd, "i %i ", (i64)((i8)c[1]));
-				}
-				c++;
-				break;
+			if((i++ & 0x1F) == 0){
+				cur = spf(cur, bufEnd, "\n");
 			}
+			cur = spf(cur, bufEnd, "%c%c", (i64)getHexChar(*c >> 4), (i64)getHexChar(*c));
 		}
 	}
 	return spf(cur, bufEnd, "\n}");

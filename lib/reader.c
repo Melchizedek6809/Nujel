@@ -319,50 +319,6 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 		if((c >= 'A') && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
 		if((c >= 'a') && (c <= 'f')){t = ((c - 'a')+0xA) << 4; goto readSecondNibble;}
 		if(c == '}'){break;}
-		if(c == 'o'){
-			lStringAdvanceToNextCharacter(s);
-			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){ throwBCReadError(s, tv, "offset"); }
-			const int v = tv->vInt;
-			if((v > SHRT_MAX) || (v < SHRT_MIN)){ throwBCReadError(s, tv, "offset"); }
-			d[len++] = (v >> 8) & 0xFF;
-			d[len++] =  v       & 0xFF;
-			lStringAdvanceToNextCharacter(s);
-			continue;
-		}
-		if(c == 'i'){
-			lStringAdvanceToNextCharacter(s);
-			lVal *tv = lParseNumber(s, 10, 18);
-			if(!tv || (tv->type != ltInt)){ throwBCReadError(s, tv, "integer"); }
-			const int v = tv->vInt;
-			if((v > UCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(s, tv, "integer"); }
-			d[len++] = v;
-			lStringAdvanceToNextCharacter(s);
-			continue;
-		}
-		if(c == 'v'){
-			lStringAdvanceToNextCharacter(s);
-			lVal *tv = lReadValue(s);
-			const int i = lValIndex(tv);
-			d[len++] = (i >> 16) & 0xFF;
-			d[len++] = (i >>  8) & 0xFF;
-			d[len++] =  i        & 0xFF;
-			lStringAdvanceToNextCharacter(s);
-			continue;
-		}
-		if(c == 's'){
-			lStringAdvanceToNextCharacter(s);
-			lVal *tv = lReadValue(s);
-			if(!tv || ((tv->type != ltSymbol) && (tv->type != ltKeyword))){
-				throwBCReadError(s, tv, "symbol");
-			}
-			const int i = lSymIndex(tv->vSymbol);
-			d[len++] = (i >> 16) & 0xFF;
-			d[len++] = (i >>  8) & 0xFF;
-			d[len++] =  i        & 0xFF;
-			lStringAdvanceToNextCharacter(s);
-			continue;
-		}
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
