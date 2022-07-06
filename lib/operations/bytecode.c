@@ -14,7 +14,7 @@ static lVal *lValBytecodeOp(lBytecodeOp v){
 }
 
 static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
-	const i64 val = castToInt(lCar(v), -1);
+	const i64 val = requireInt(c, lCar(v));
 	if((val < -128) || (val > 255)){
 		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range -128 - 255", lCar(v), c);
 		return NULL;
@@ -71,32 +71,10 @@ static lVal *lnfBytecodeLiterals(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfValIndex(lClosure *c, lVal *v){
-	(void)c;
-	return lValInt(lValIndex(lCar(v)));
-}
-
-static lVal *lnfIndexVal(lClosure *c, lVal *v){
-	return lIndexVal(requireInt(c, lCar(v)));
-}
-
-static lVal *lnfSymIndex(lClosure *c, lVal *v){
-	return lValInt(lSymIndex(requireSymbolic(c, lCar(v))));
-}
-
-static lVal *lnfIndexSym(lClosure *c, lVal *v){
-	return lValSymS(lIndexSym(requireInt(c, lCar(v))));
-}
-
 void lOperationsBytecode(lClosure *c){
 	lAddNativeFunc(c,"int->bytecode-op",  "[a]", "Turns an integer into a bytecode operation with the same value", lnfIntBytecodeOp);
 	lAddNativeFunc(c,"bytecode-op->int",  "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
 	lAddNativeFunc(c,"arr->bytecode-arr", "[a]", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
 	lAddNativeFunc(c,"bytecode-arr->arr", "[a]", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
 	lAddNativeFunc(c,"bytecode-literals", "[a]", "Return the literal section of a BCA", lnfBytecodeLiterals);
-
-	lAddNativeFunc(c,"val->index", "[v]", "Return an index value pointing to V", lnfValIndex);
-	lAddNativeFunc(c,"index->val", "[i]", "Return the value at index position I", lnfIndexVal);
-	lAddNativeFunc(c,"sym->index", "[v]", "Return an index value pointing to symbol V", lnfSymIndex);
-	lAddNativeFunc(c,"index->sym", "[i]", "Return the symbol at index position I", lnfIndexSym);
 }

@@ -16,6 +16,24 @@
       :inline
       '[#$03]]
 
+[defn $get []
+      "[s] -> [a]"
+      "Resolve symbol S and put whatever is bound to it in the current context on the stack"
+      :inline
+      '[#$05]]
+
+[defn $def []
+      "[s v] -> [v]"
+      "Define S to resolve to V in the current environment"
+      :inline
+      '[#$07]]
+
+[defn $set []
+      "[s v] -> [v]"
+      "Set S to resolve to V in the current environment"
+      :inline
+      '[#$08]]
+
 [defn $dup []
       "[a] -> [a a]"
       "Duplicates the value that is on the top of the stack"

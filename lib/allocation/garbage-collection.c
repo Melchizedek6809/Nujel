@@ -7,7 +7,6 @@
  */
 #include "garbage-collection.h"
 
-#include "bytecode.h"
 #include "allocator.h"
 #include "roots.h"
 #include "symbol.h"
@@ -145,7 +144,6 @@ void lBytecodeArrayMark(const lBytecodeArray *v){
 	markerPrefix(lBytecodeArray);
 
 	lArrayGCMark(v->literals);
-	lBytecodeArrayMarkRefs(v);
 }
 
 /* There should be a way to avoid having this procedure alltogether, but for

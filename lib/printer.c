@@ -50,14 +50,6 @@ static char getHexChar(int c){
 	return (v < 0xA) ? '0' + v : 'A' + (v - 10);
 }
 
-static char *writeBytecodeArraySymbol(char *cur, char *bufEnd, i64 index){
-	if((index < 0) || (index >= lSymbolMax)){
-		return spf(cur, bufEnd, "s --INVALID-SYMBOL-- ");
-	}else{
-		return spf(cur, bufEnd, "s %s ", lIndexSym(index)->c);
-	}
-}
-
 static char *writeBytecodeArrayOffset(char *cur, char *bufEnd, i64 offset){
 	if((offset > SHRT_MAX) || (offset < SHRT_MIN)){
 		return spf(cur, bufEnd, "o --INVALID-OFFSET--", offset);
@@ -100,16 +92,6 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 				cur = writeBytecodeArrayOffset(cur, bufEnd, off);
 				c+=2;
 				break;}
-			case lopPushSymbol:
-			case lopDef:
-			case lopGet:
-			case lopSet:
-				if(&c[3] < v->dataEnd){
-					const i64 i = (c[1] << 16) | (c[2] << 8) | c[3];
-					cur = writeBytecodeArraySymbol(cur, bufEnd, i);
-				}
-				c+=3;
-				break;
 			case lopApply:
 				if(&c[1] < v->dataEnd){
 					cur = spf(cur, bufEnd, "i %i ", (i64)c[1]);

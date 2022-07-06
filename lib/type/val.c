@@ -228,9 +228,10 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	for(lineStart = errStart; (lineStart > bufStart) && (*lineStart != '\n'); lineStart--){}
 	if(*lineStart == '\n'){lineStart++;}
 	for(lineEnd = errEnd; (lineEnd < bufEnd) && (*lineEnd != '\n'); lineEnd++){}
+	lineEnd = MAX(lineEnd, lineStart);
 
 	const char *msgStart = MAX(lineStart, (errStart - 30));
-	const char *msgEnd   = MIN(lineEnd, (errEnd + 30));
+	const char *msgEnd   = MAX(msgStart, MIN(lineEnd, (errEnd + 30)));
 	const size_t bufSize = (msgEnd - msgStart) + 3 + 3 + 1;
 	char *outbuf    = malloc(bufSize);
 	char *outbufEnd = &outbuf[bufSize];

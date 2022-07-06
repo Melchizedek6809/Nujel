@@ -3,12 +3,6 @@
 ;;
 ;; Contains the bytecode assembler, so we don't have to write opcodes directly
 
-[defn sym->bytecode-op [v]
-      [def i [sym->index v]]
-      [list [int->bytecode-op [bit-and [bit-shift-right i 16] #xFF]]
-            [int->bytecode-op [bit-and [bit-shift-right i  8] #xFF]]
-            [int->bytecode-op [bit-and                  i     #xFF]]]]
-
 [defn int-fit-in-byte? [a]
       [and [<= a 127] [>= a -128]]]
 
@@ -25,26 +19,6 @@
       [when-not [int-fit-in-byte? a]
                 [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
       [list #$2 [int->bytecode-op a]]]
-
-[defn $push/symbol [sym]
-      "[] -> [sym]"
-      "Pushes v onto the stack"
-      [list #$23 [sym->bytecode-op sym]]]
-
-[defn $def [sym]
-      "[val] -> [val]"
-      "Define a new binding for SYM and associate VAL to it"
-      [list #$E [sym->bytecode-op sym]]]
-
-[defn $set [sym]
-      "[val] -> [val]"
-      "Update the binding for SYM and associate VAL to it"
-      [list #$F [sym->bytecode-op sym]]]
-
-[defn $get [sym]
-      "[] -> [val]"
-      "Push whatever value is associated to SYM on the stack"
-      [list #$10 [sym->bytecode-op sym]]]
 
 [defn $apply/optimize? [fun arg-count]
       [case fun
@@ -77,6 +51,8 @@
             [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 
 [defn $apply/dynamic [arg-count fun]
+      [when [> arg-count 255]
+        [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
       [list #$4
             [int->bytecode-op arg-count]]]
 
@@ -158,7 +134,7 @@
           [list [int->bytecode-op [bit-and [bit-shift-right i 8] #xFF]]
                 [int->bytecode-op [bit-and i #xFF]]]]]
 
-;;[def *max-literal-arr* 0]
+[def *max-literal-arr* 0]
 [defn assemble/add-literal [lit lit-arr]
       [when [>= [array/length lit-arr] 65535]
             [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]

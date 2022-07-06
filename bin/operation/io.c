@@ -335,6 +335,6 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
 	lAddNativeFunc(c,"directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
 
-	lAddNativeFunc(c,"path/change",      "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
-	lAddNativeFunc(c,"path/working-directory","[]",        "Return the current working directory",              lnfGetCurrentWorkingDirectory);
+	lAddNativeFunc(c,"cd path/change",      "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
+	lAddNativeFunc(c,"cwd path/working-directory","[]",        "Return the current working directory",              lnfGetCurrentWorkingDirectory);
 }

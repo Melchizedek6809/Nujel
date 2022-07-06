@@ -335,7 +335,7 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 			lVal *tv = lParseNumber(s, 10, 18);
 			if(!tv || (tv->type != ltInt)){ throwBCReadError(s, tv, "integer"); }
 			const int v = tv->vInt;
-			if((v > SCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(s, tv, "integer"); }
+			if((v > UCHAR_MAX) || (v < SCHAR_MIN)){ throwBCReadError(s, tv, "integer"); }
 			d[len++] = v;
 			lStringAdvanceToNextCharacter(s);
 			continue;

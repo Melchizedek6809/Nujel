@@ -1,35 +1,50 @@
-#{##["Nujel Standalone" [path environment] #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [eval-in environment [cons 'do [read [file/read path]]]]]] #{##[]
-10s environment
+#{##["Nujel Standalone" test-context file/eval [path environment] #@[documentation: "Evaluate a Nujel source file in the current context" source: ["Evaluate a Nujel source file in the current context" [when-not environment [set! environment root-closure]] [eval-in environment [cons 'do [read [file/read path]]]]]] #{##[environment root-closure eval-in do read file/read path]
+1Ai 0
+05
 0Bo 7
 24
-09o 11
-10s root-closure
-0Fs environment
+09o 9
+1Ai 1
+05
+1Ai 0
+08
 0D
-10s eval-in
-10s environment
-23s do
-10s read
-10s file/read
-10s path
+1Ai 2
+05
+1Ai 0
+05
+1Ai 3
+1Ai 4
+05
+1Ai 5
+05
+1Ai 6
+05
 04i 1
 04i 1
 14
 04i 2
 01
-} [path environment] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def source [cons 'do [read [file/read path]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]] #{##[#f "" ".no"]
-23s do
-10s read
-10s file/read
-10s path
+} file/compile [path environment] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def source [cons 'do [read [file/read path]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]] #{##[do read file/read path source compile* environment #f object-code file/write string/write "" cat path/without-extension ".no"]
+1Ai 0
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+05
 04i 1
 04i 1
 14
-0Es source
+1Ai 4
+07
 0D
-10s compile*
-10s source
-10s environment
+1Ai 5
+05
+1Ai 4
+05
+1Ai 6
+05
 0C
 0Ao 16
 0D
@@ -41,57 +56,80 @@
 0C
 0Ao 6
 0D
-1Ai 0
+1Ai 7
 04i 2
-0Es object-code
+1Ai 8
+07
 0D
-10s file/write
-10s object-code
-0Bo 16
-10s string/write
-10s object-code
+1Ai 9
+05
+1Ai 8
+05
+0Bo 14
+1Ai 10
+05
+1Ai 8
+05
 04i 1
 09o 5
+1Ai 11
+1Ai 12
+05
+1Ai 13
+05
+1Ai 3
+05
+04i 1
+1Ai 14
+04i 2
+04i 2
+0D
+1Ai 8
+05
+01
+01
+} file/compile/module [path environment base-dir] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]] [def source [quasiquote [defmodule [unquote module-name] [def *module* [unquote module-name]] [unquote-splicing [read [file/read path]]]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]] #{##[symbol->keyword string->symbol path/without-extension string/cut path length base-dir module-name defmodule def *module* append read file/read source compile* environment #f object-code file/write string/write "" cat ".no"]
+1Ai 0
+05
 1Ai 1
-10s cat
-10s path/without-extension
-10s path
-04i 1
+05
 1Ai 2
+05
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+05
+1Ai 6
+05
+04i 1
 04i 2
-04i 2
+04i 1
+04i 1
+04i 1
+1Ai 7
+07
 0D
-10s object-code
-01
-01
-} [path environment base-dir] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]] [def source [quasiquote [defmodule [unquote module-name] [def *module* [unquote module-name]] [unquote-splicing [read [file/read path]]]]]] [def object-code [compile* source [or environment [environment*]]]] [file/write [if object-code [string/write object-code] ""] [cat [path/without-extension path] ".no"]] [return object-code]]] #{##[#f "" ".no"]
-10s symbol->keyword
-10s string->symbol
-10s path/without-extension
-10s string/cut
-10s path
-10s length
-10s base-dir
-04i 1
-04i 2
-04i 1
-04i 1
-04i 1
-0Es module-name
-0D
-23s defmodule
-10s module-name
-23s def
-23s *module*
-10s module-name
+1Ai 8
+1Ai 7
+05
+1Ai 9
+1Ai 10
+1Ai 7
+05
 24
 14
 14
 14
-10s append
-10s read
-10s file/read
-10s path
+1Ai 11
+05
+1Ai 12
+05
+1Ai 13
+05
+1Ai 4
+05
 04i 1
 04i 1
 24
@@ -99,11 +137,15 @@
 14
 14
 14
-0Es source
+1Ai 14
+07
 0D
-10s compile*
-10s source
-10s environment
+1Ai 15
+05
+1Ai 14
+05
+1Ai 16
+05
 0C
 0Ao 16
 0D
@@ -115,101 +157,138 @@
 0C
 0Ao 6
 0D
-1Ai 0
+1Ai 17
 04i 2
-0Es object-code
+1Ai 18
+07
 0D
-10s file/write
-10s object-code
-0Bo 16
-10s string/write
-10s object-code
+1Ai 19
+05
+1Ai 18
+05
+0Bo 14
+1Ai 20
+05
+1Ai 18
+05
 04i 1
 09o 5
-1Ai 1
-10s cat
-10s path/without-extension
-10s path
-04i 1
+1Ai 21
+1Ai 22
+05
 1Ai 2
+05
+1Ai 4
+05
+04i 1
+1Ai 23
 04i 2
 04i 2
 0D
-10s object-code
+1Ai 18
+05
 01
 01
-} [] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##["_modules/"]
-10s last-pair
-10s repl/args
+} file/compile/argv [] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##[last-pair repl/args path index-of "_modules/" module file/compile/module string/cut file/compile]
+1Ai 0
+05
+1Ai 1
+05
 04i 1
 11
-0Es path
+1Ai 2
+07
 0D
-10s index-of
-10s path
-1Ai 0
+1Ai 3
+05
+1Ai 2
+05
+1Ai 4
 04i 2
-0Es module
+1Ai 5
+07
 0D
-10s module
+1Ai 5
+05
 02i 0
 21
-0Bo 36
-10s file/compile/module
-10s path
+0Bo 31
+1Ai 6
+05
+1Ai 2
+05
 24
-10s string/cut
-10s path
+1Ai 7
+05
+1Ai 2
+05
 02i 0
-10s module
+1Ai 5
+05
 02i 9
 25
 04i 3
 04i 3
-09o 13
-10s file/compile
-10s path
+09o 11
+1Ai 8
+05
+1Ai 2
+05
 04i 1
 01
-} [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[:test #t]
-10s require*
+} file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure #t tests ΓεnΣym-1 expr test/run-test! eval-in do require module-name append]
 1Ai 0
-10s current-closure
-04i 0
+05
 1Ai 1
+1Ai 2
+05
+04i 0
+1Ai 3
 04i 3
 0D
 15
-10s tests
-0Es ΓεnΣym-1
+1Ai 4
+05
+1Ai 5
+07
 0D
-10s ΓεnΣym-1
-0Bo 94
+1Ai 5
+05
+0Bo 78
 24
 1B
-09o 79
+09o 64
 0D
 1C
-10s ΓεnΣym-1
+1Ai 5
+05
 11
-0Es expr
+1Ai 6
+07
 0D
-10s test/run-test!
-10s eval-in
-10s current-closure
+1Ai 7
+05
+1Ai 8
+05
+1Ai 2
+05
 04i 0
-10s expr
+1Ai 6
+05
 12
 11
 04i 2
-23s do
-23s require
-10s module-name
+1Ai 9
+1Ai 10
+1Ai 11
+05
 24
 14
 14
-10s append
-10s expr
+1Ai 12
+05
+1Ai 6
+05
 12
 12
 24
@@ -218,1052 +297,1380 @@
 14
 04i 2
 0D
-10s ΓεnΣym-1
+1Ai 5
+05
 12
-0Fs ΓεnΣym-1
-10s ΓεnΣym-1
-0Ao -80
+1Ai 5
+08
+1Ai 5
+05
+0Ao -64
 09o 4
 24
 16
 01
-} [form] #@[source: [[== [car form] 'deftest]]] #{##[]
-10s form
+} valid-test-form? [form] #@[source: [[== [car form] 'deftest]]] #{##[form deftest]
+1Ai 0
+05
 11
-23s deftest
+1Ai 1
 20
 01
-} [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[:test #t]
-10s string/cut
-10s path
-10s length
-10s base-dir
+} file/test/module [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[string/cut path length base-dir rel-path char-at symbol->keyword string->symbol path/without-extension module-name require* :test current-closure #t test/init! file/test/module/run filter read file/read valid-test-form? test/finish! ansi-blue]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+05
 04i 1
 04i 2
-0Es rel-path
+1Ai 4
+07
 0D
-10s char-at
-10s rel-path
+1Ai 5
+05
+1Ai 4
+05
 02i 0
 04i 2
 02i 47
 20
-0Bo 22
-10s string/cut
-10s rel-path
+0Bo 19
+1Ai 0
+05
+1Ai 4
+05
 02i 1
 04i 2
-0Fs rel-path
+1Ai 4
+08
 09o 4
 24
 0D
-10s symbol->keyword
-10s string->symbol
-10s path/without-extension
-10s rel-path
+1Ai 6
+05
+1Ai 7
+05
+1Ai 8
+05
+1Ai 4
+05
 04i 1
 04i 1
 04i 1
-0Es module-name
+1Ai 9
+07
 0D
-10s require*
-1Ai 0
-10s current-closure
+1Ai 10
+05
+1Ai 11
+1Ai 12
+05
 04i 0
-1Ai 1
+1Ai 13
 04i 3
 0D
-10s test/init!
+1Ai 14
+05
 04i 0
 0D
-10s file/test/module/run
-10s filter
-10s read
-10s file/read
-10s path
+1Ai 15
+05
+1Ai 16
+05
+1Ai 17
+05
+1Ai 18
+05
+1Ai 1
+05
 04i 1
 04i 1
-10s valid-test-form?
+1Ai 19
+05
 04i 2
-10s module-name
+1Ai 9
+05
 04i 2
 0D
-10s test/finish!
-10s ansi-blue
-10s module-name
+1Ai 20
+05
+1Ai 21
+05
+1Ai 9
+05
 04i 1
 04i 1
 01
-} [base-dir] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [sort] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]] #{##["nuj" [path] #@[source: [[file/test/module path base-dir]]] #{##[]
-10s file/test/module
-10s path
-10s base-dir
+} file/test/directory [base-dir] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [sort] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]] #{##[sum map filter sort flatten directory/read-recursive base-dir path/ext?! "nuj" anonymous [path] #@[source: [[file/test/module path base-dir]]] #{##[file/test/module path base-dir]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
 04i 2
 01
 }]
-10s sum
-10s map
-10s filter
-10s sort
-10s flatten
-10s directory/read-recursive
-10s base-dir
-04i 1
-04i 1
-04i 1
-10s path/ext?!
 1Ai 0
-04i 1
-04i 2
-23s anonymous
+05
 1Ai 1
+05
 1Ai 2
+05
 1Ai 3
-17
-04i 2
-04i 1
-01
-} [filename] #@[source: [[try [fn [err] [display/error err] #f] [file/eval filename] [pfmtln "Loaded {filename}"] #t]]] #{##[[err] #@[source: [[display/error err] #f]] #{##[#f]
-10s display/error
-10s err
-04i 1
-0D
-1Ai 0
-01
-} "Loaded " #t]
-23s anonymous
-1Ai 0
-1Ai 1
-1Ai 2
-17
-19o 36
-10s file/eval
-10s filename
-04i 1
-0D
-10s println
-10s cat
-1Ai 3
-10s filename
-04i 2
-04i 1
-0D
+05
 1Ai 4
+05
+1Ai 5
+05
+1Ai 6
+05
+04i 1
+04i 1
+04i 1
+1Ai 7
+05
+1Ai 8
+04i 1
+04i 2
+1Ai 9
+1Ai 10
+1Ai 11
+1Ai 12
+17
+04i 2
+04i 1
+01
+} load [filename] #@[source: [[try [fn [err] [display/error err] #f] [file/eval filename] [pfmtln "Loaded {filename}"] #t]]] #{##[anonymous [err] #@[source: [[display/error err] #f]] #{##[display/error err #f]
+1Ai 0
+05
+1Ai 1
+05
+04i 1
+0D
+1Ai 2
+01
+} file/eval filename println cat "Loaded " #t]
+1Ai 0
+1Ai 1
+1Ai 2
+1Ai 3
+17
+19o 31
+1Ai 4
+05
+1Ai 5
+05
+04i 1
+0D
+1Ai 6
+05
+1Ai 7
+05
+1Ai 8
+1Ai 5
+05
+04i 2
+04i 1
+0D
+1Ai 9
 16
 01
-} [filename] #@[source: [[ref [file/stat filename] :regular-file?]]] #{##[:regular-file?]
-10s ref
-10s file/stat
-10s filename
-04i 1
+} file/file? [filename] #@[source: [[ref [file/stat filename] :regular-file?]]] #{##[ref file/stat filename :regular-file?]
 1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+04i 1
+1Ai 3
 04i 2
 01
-} [filename] #@[source: [[ref [file/stat filename] :directory?]]] #{##[:directory?]
-10s ref
-10s file/stat
-10s filename
-04i 1
+} file/dir? [filename] #@[source: [[ref [file/stat filename] :directory?]]] #{##[ref file/stat filename :directory?]
 1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+04i 1
+1Ai 3
 04i 2
 01
-} [path] #@[source: [[map [directory/read path] [fn [a] [cat path "/" a]]]]] #{##[[a] #@[source: [[cat path "/" a]]] #{##["/"]
-10s cat
-10s path
+} directory/read-relative [path] #@[source: [[map [directory/read path] [fn [a] [cat path "/" a]]]]] #{##[map directory/read path anonymous [a] #@[source: [[cat path "/" a]]] #{##[cat path "/" a]
 1Ai 0
-10s a
+05
+1Ai 1
+05
+1Ai 2
+1Ai 3
+05
 04i 3
 01
 }]
-10s map
-10s directory/read
-10s path
-04i 1
-23s anonymous
 1Ai 0
+05
 1Ai 1
+05
 1Ai 2
+05
+04i 1
+1Ai 3
+1Ai 4
+1Ai 5
+1Ai 6
 17
 04i 2
 01
-} [path] #@[source: [[flatten [map [directory/read-relative path] [fn [A] [if [file/dir? A] [directory/read-recursive A] A]]]]]] #{##[[A] #@[source: [[if [file/dir? A] [directory/read-recursive A] A]]] #{##[]
-10s file/dir?
-10s A
+} directory/read-recursive [path] #@[source: [[flatten [map [directory/read-relative path] [fn [A] [if [file/dir? A] [directory/read-recursive A] A]]]]]] #{##[flatten map directory/read-relative path anonymous [A] #@[source: [[if [file/dir? A] [directory/read-recursive A] A]]] #{##[file/dir? A directory/read-recursive]
+1Ai 0
+05
+1Ai 1
+05
 04i 1
-0Bo 16
-10s directory/read-recursive
-10s A
+0Bo 14
+1Ai 2
+05
+1Ai 1
+05
 04i 1
-09o 7
-10s A
+09o 6
+1Ai 1
+05
 01
 }]
-10s flatten
-10s map
-10s directory/read-relative
-10s path
-04i 1
-23s anonymous
 1Ai 0
+05
 1Ai 1
+05
 1Ai 2
+05
+1Ai 3
+05
+04i 1
+1Ai 4
+1Ai 5
+1Ai 6
+1Ai 7
 17
 04i 2
 04i 1
 01
-} [cmd] #@[documentation: "Run CMD using popen and return the trimmed stdout" source: ["Run CMD using popen and return the trimmed stdout" [trim [cdr [popen cmd]]]]] #{##[]
-10s trim
-10s popen
-10s cmd
+} popen/trim [cmd] #@[documentation: "Run CMD using popen and return the trimmed stdout" source: ["Run CMD using popen and return the trimmed stdout" [trim [cdr [popen cmd]]]]] #{##[trim popen cmd]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
 04i 1
 12
 04i 1
 01
-} [name] #@[source: [[def module-path [fmt "{+root-working-dir+}/modules/{}.nuj" [keyword->string name]]] [def source [file/read module-path]] [when-not source [return #nil]] [def expr [list 'module [cons do [read source]]]] [def mod [eval expr]] [return mod]]] #{##["/modules/" ".nuj"]
+} path/working-directory +root-working-dir+ file/module-loader [name] #@[source: [[def module-path [fmt "{+root-working-dir+}/modules/{}.nuj" [keyword->string name]]] [def source [file/read module-path]] [when-not source [return #nil]] [def expr [list 'module [cons do [read source]]]] [def mod [eval expr]] [return mod]]] #{##[keyword->string name fmt-arg-0 cat +root-working-dir+ "/modules/" ".nuj" module-path file/read source list module do read expr eval-in current-closure mod]
 15
-10s keyword->string
-10s name
-04i 1
-0Es fmt-arg-0
-0D
-10s cat
-10s +root-working-dir+
 1Ai 0
-10s fmt-arg-0
+05
 1Ai 1
+05
+04i 1
+1Ai 2
+07
+0D
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+1Ai 2
+05
+1Ai 6
 04i 4
 16
-0Es module-path
+1Ai 7
+07
 0D
-10s file/read
-10s module-path
+1Ai 8
+05
+1Ai 7
+05
 04i 1
-0Es source
+1Ai 9
+07
 0D
-10s source
+1Ai 9
+05
 0Bo 7
 24
 09o 5
 24
 01
 0D
-10s list
-23s module
-10s do
-10s read
-10s source
+1Ai 10
+05
+1Ai 11
+1Ai 12
+05
+1Ai 13
+05
+1Ai 9
+05
 04i 1
 14
 04i 2
-0Es expr
+1Ai 14
+07
 0D
-10s eval-in
-10s current-closure
+1Ai 15
+05
+1Ai 16
+05
 04i 0
-10s expr
+1Ai 14
+05
 04i 2
-0Es mod
+1Ai 17
+07
 0D
-10s mod
+1Ai 17
+05
 01
 01
-}]
+} module/add-loader]
 1Ai 0
-0Es test-context
-0D
-23s file/eval
 1Ai 1
+07
+0D
 1Ai 2
 1Ai 3
-17
-0Es file/eval
-0D
-23s file/compile
 1Ai 4
 1Ai 5
-1Ai 6
 17
-0Es file/compile
+1Ai 2
+07
 0D
-23s file/compile/module
+1Ai 6
 1Ai 7
 1Ai 8
 1Ai 9
 17
-0Es file/compile/module
+1Ai 6
+07
 0D
-23s file/compile/argv
 1Ai 10
 1Ai 11
 1Ai 12
-17
-0Es file/compile/argv
-0D
-23s file/test/module/run
 1Ai 13
+17
+1Ai 10
+07
+0D
 1Ai 14
 1Ai 15
-17
-0Es file/test/module/run
-0D
-23s valid-test-form?
 1Ai 16
 1Ai 17
-1Ai 18
 17
-0Es valid-test-form?
+1Ai 14
+07
 0D
-23s file/test/module
+1Ai 18
 1Ai 19
 1Ai 20
 1Ai 21
 17
-0Es file/test/module
-0D
-23s file/test/directory
-1Ai 22
-1Ai 23
-1Ai 24
-17
-0Es file/test/directory
-0D
-23s load
-1Ai 25
-1Ai 26
-1Ai 27
-17
-0Es load
-0D
-23s file/file?
-1Ai 28
-1Ai 29
-1Ai 30
-17
-0Es file/file?
-0D
-23s file/dir?
-1Ai 31
-1Ai 32
-1Ai 33
-17
-0Es file/dir?
-0D
-23s directory/read-relative
-1Ai 34
-1Ai 35
-1Ai 36
-17
-0Es directory/read-relative
-0D
-23s directory/read-recursive
-1Ai 37
-1Ai 38
-1Ai 39
-17
-0Es directory/read-recursive
-0D
-23s popen/trim
-1Ai 40
-1Ai 41
-1Ai 42
-17
-0Es popen/trim
-0D
-10s path/working-directory
-04i 0
-0Es +root-working-dir+
-0D
-23s file/module-loader
-1Ai 43
-1Ai 44
-1Ai 45
-17
-0Es file/module-loader
-0D
-10s module/add-loader
-10s file/module-loader
-04i 1
-01
-}#{##["nujel" #f #t [error] #@[source: [[display/error error]]] #{##[]
-10s display/error
-10s error
-04i 1
-01
-} [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##["Nujel" " is ready for business!"]
-10s println
-10s cat
-10s ansi-rainbow
-1Ai 0
-04i 1
-1Ai 1
-04i 2
-04i 1
-01
-} [] #@[documentation: ">" source: ["> "]] #{##["> "]
-1Ai 0
-01
-} [line] #@[documentation: "Evaluate LINE in the wasm context" source: ["Evaluate LINE in the wasm context" [try repl/exception-handler [eval-in root-closure [cons do [read line]]]]]] #{##[]
-10s repl/exception-handler
-19o 29
-10s eval-in
-10s root-closure
-10s do
-10s read
-10s line
-04i 1
-14
-04i 2
-16
-01
-} [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[[err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[:unmatched-opening-bracket "... "]
-10s err
-11
-1Ai 0
-20
-0Bo 34
-10s repl/cmd/raw
-10s ctx
-10s cat
-10s line
-10s readline
-1Ai 1
-04i 1
-04i 2
-04i 2
-09o 13
-10s throw
-10s err
-04i 1
-01
-} [] "\r" ""]
-23s anonymous
-1Ai 0
-1Ai 1
-1Ai 2
-17
-19o 119
-10s read
-10s line
-04i 1
-0Es expr
-0D
-10s equal?
-1Ai 3
-10s expr
-04i 2
-0Bo 17
-10s print
-1Ai 4
-04i 1
-0D
-24
-01
-09o 4
-24
-0D
-10s eval-in
-10s ctx
-10s do
-10s expr
-14
-04i 2
-0Es result
-0D
-10s repl/push-result
-10s result
-04i 1
-0D
-10s println
-10s nil?
-10s result
-04i 1
-0Bo 8
-1Ai 5
-09o 13
-10s string
-10s result
-04i 1
-04i 1
-16
-01
-} [result] #@[source: [[set! *3 *2] [set! *2 *1] [set! *1 result] [return result]]] #{##[]
-10s *2
-0Fs *3
-0D
-10s *1
-0Fs *2
-0D
-10s result
-0Fs *1
-0D
-10s result
-01
-01
-} [ctx] #@[source: [[def buf ""] [def line ""] [while [not= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [def result [eval-in ctx expr]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]] #{##["" "[/cmd]\n"]
-1Ai 0
-0Es buf
-0D
-1Ai 0
-0Es line
-0D
-24
-1B
-09o 34
-0D
-1C
-10s cat
-10s buf
-10s line
-04i 2
-0Fs buf
-0D
-10s readline
-04i 0
-0Fs line
-10s not=
-10s line
-1Ai 1
-04i 2
-0Ao -43
-0D
-10s do
-10s read
-10s buf
-04i 1
-14
-0Es expr
-0D
-10s eval-in
-10s ctx
-10s expr
-04i 2
-0Es result
-0D
-10s repl/push-result
-10s result
-04i 1
-0D
-10s println
-10s nil?
-10s result
-04i 1
-0Bo 8
-1Ai 0
-09o 13
-10s string
-10s result
-04i 1
-04i 1
-01
-} [ctx] #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] #{##["Adios, cowboy...\r\n" "[cmd]\n"]
-10s readline
-10s repl/prompt
-04i 0
-04i 1
-0Es line
-0D
-10s nil?
-10s line
-04i 1
-0Bo 23
-10s print
-1Ai 0
-04i 1
-0D
-10s exit
-02i 0
-04i 1
-09o 4
-24
-0D
-10s line
-1Ai 1
-20
-0Bo 16
-10s repl/cmd
-10s ctx
-04i 1
-09o 17
-10s repl/cmd/raw
-10s ctx
-10s line
-04i 2
-01
-} [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[#t]
-10s repl/welcome
-04i 0
-0D
-24
-1B
-09o 23
-0D
-1C
-10s repl/exception-handler
-19o 14
-10s repl/readline
-10s root-closure
-04i 1
-16
-1Ai 0
-0Ao -22
-01
-} [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##["Nujel" " - A Lisp dialect for games.\n" "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
-10s println
-10s cat
-10s ansi-rainbow
-1Ai 0
-04i 1
-1Ai 1
-04i 2
-04i 1
-0D
-10s println
-10s cat
-10s ansi-green
-1Ai 2
-04i 1
-1Ai 3
-04i 2
-04i 1
-0D
-10s println
-1Ai 4
-04i 1
-0D
-10s println
-10s cat
-1Ai 5
-10s ansi-yellow
-1Ai 6
-04i 1
-1Ai 7
-04i 3
-04i 1
-0D
-10s println
-1Ai 8
-04i 1
-0D
-10s println
-10s cat
-1Ai 5
-10s ansi-blue
-1Ai 9
-04i 1
-1Ai 10
-04i 3
-04i 1
-0D
-10s println
-10s cat
-1Ai 5
-10s ansi-blue
-1Ai 11
-04i 1
-1Ai 12
-04i 3
-04i 1
-0D
-10s println
-1Ai 13
-04i 1
-0D
-10s println
-10s cat
-1Ai 5
-10s ansi-blue
-1Ai 14
-04i 1
-1Ai 15
-04i 3
-04i 1
-0D
-10s println
-10s cat
-1Ai 5
-10s ansi-blue
-1Ai 16
-04i 1
-1Ai 17
-04i 3
-04i 1
-01
-} [option] #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] #{##[#f]
-10s repl/print-help
-04i 0
-0D
-1Ai 0
-0Fs repl/parse-args/run-repl
-01
-} [option] #@[source: [[set! ansi/disabled ""]]] #{##[""]
-1Ai 0
-0Fs ansi/disabled
-01
-} [option] #@[source: [[set! ansi/disabled #f]]] #{##[#f]
-1Ai 0
-0Fs ansi/disabled
-01
-} [option] #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] #{##[#t #f]
-1Ai 0
-0Fs repl/parse-args/eval-next
-0D
-1Ai 1
-0Fs repl/parse-args/run-repl
-01
-} :default [option] #@[source: [[tree/set! repl/options option #t]]] #{##[#t]
-10s tree/set!
-10s repl/options
-10s option
-1Ai 0
-04i 3
-01
-} [option] #@[source: [[[or [ref repl/option-map option] [ref repl/option-map :default]] option]]] #{##[:default #f]
-10s ref
-10s repl/option-map
-10s option
-04i 2
-0C
-0Ao 23
-0D
-10s ref
-10s repl/option-map
-1Ai 0
-04i 2
-0C
-0Ao 6
-0D
-1Ai 1
-10s option
-04i 1
-01
-} [options] #@[source: [[if [= [char-at options 0] 45] [repl/parse-option [string->keyword [cut options 1]]] [for-each [map [split options ""] string->symbol] repl/parse-option]]]] #{##[""]
-10s char-at
-10s options
-02i 0
-04i 2
-02i 45
-20
-0Bo 36
-10s repl/parse-option
-10s symbol->keyword
-10s string->symbol
-10s cut
-10s options
-02i 1
-04i 2
-04i 1
-04i 1
-04i 1
-09o 35
-10s for-each
-10s map
-10s split
-10s options
-1Ai 0
-04i 2
-10s string->symbol
-04i 2
-10s repl/parse-option
-04i 2
-01
-} [arg] #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[= [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]] #{##[#f #t]
-10s repl/parse-args/eval-next
-0Bo 46
-10s display/error
-19o 36
-10s eval-in
-10s root-closure
-10s do
-10s read
-10s arg
-04i 1
-14
-04i 2
-0D
-1Ai 0
-0Fs repl/parse-args/eval-next
-16
-09o 76
-10s char-at
-10s arg
-02i 0
-04i 2
-02i 45
-20
-0Bo 24
-10s repl/parse-options
-10s string/cut
-10s arg
-02i 1
-04i 2
-04i 1
-09o 37
-1Ai 1
-0Bo 31
-10s display/error
-19o 14
-10s file/eval
-10s arg
-04i 1
-16
-0D
-1Ai 0
-0Fs repl/parse-args/run-repl
-09o 4
-24
-01
-} [args] #@[source: [[if args [do [repl/parse-arg [car args]] [repl/parse-args [cdr args]]] repl/parse-args/run-repl]]] #{##[]
-10s args
-0Bo 29
-10s repl/parse-arg
-10s args
-11
-04i 1
-0D
-10s repl/parse-args
-10s args
-12
-04i 1
-09o 7
-10s repl/parse-args/run-repl
-01
-} [args] #@[source: [[repl/welcome]]] #{##[]
-10s repl/welcome
-04i 0
-01
-} [args] #@[source: [[try repl/exception-handler [set! repl/executable-name [car args]] [when [repl/parse-args [cdr args]] [repl]]]]] #{##[]
-10s repl/exception-handler
-19o 38
-10s args
-11
-0Fs repl/executable-name
-0D
-10s repl/parse-args
-10s args
-12
-04i 1
-0Bo 12
-10s repl
-04i 0
-09o 4
-24
-16
-01
-} #@[source: [[set! repl/args args] [if [= System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]] #{##[]
-10s args
-0Fs repl/args
-0D
-10s System/Architecture
-23s wasm
-20
-0Bo 16
-10s repl/init/wasm
-10s args
-04i 1
-09o 13
-10s repl/init/bin
-10s args
-04i 1
-01
-}]
-24
-0Es *1
-0D
-24
-0Es *2
-0D
-24
-0Es *3
-0D
-1Ai 0
-0Es repl/executable-name
-0D
-24
-0Es repl/args
-0D
-1Ai 1
-0Es repl/parse-args/eval-next
-0D
-1Ai 2
-0Es repl/parse-args/run-repl
-0D
-10s tree/new
-24
-04i 1
-0Es repl/options
-0D
-10s tree/new
-24
-04i 1
-0Es repl/option-map
-0D
-23s repl/exception-handler
-1Ai 3
-1Ai 4
-1Ai 5
-17
-0Es repl/exception-handler
-0D
-23s repl/welcome
-1Ai 6
-1Ai 7
-1Ai 8
-17
-0Es repl/welcome
-0D
-23s repl/prompt
-1Ai 9
-1Ai 10
-1Ai 11
-17
-0Es repl/prompt
-0D
-23s repl/wasm
-1Ai 12
-1Ai 13
-1Ai 14
-17
-0Es repl/wasm
-0D
-23s repl/cmd/raw
-1Ai 15
-1Ai 16
-1Ai 17
-17
-0Es repl/cmd/raw
-0D
-23s repl/push-result
 1Ai 18
-1Ai 19
-1Ai 20
-17
-0Es repl/push-result
+07
 0D
-23s repl/cmd
-1Ai 21
 1Ai 22
 1Ai 23
-17
-0Es repl/cmd
-0D
-23s repl/readline
 1Ai 24
 1Ai 25
-1Ai 26
 17
-0Es repl/readline
+1Ai 22
+07
 0D
-23s repl
+1Ai 26
 1Ai 27
 1Ai 28
 1Ai 29
 17
-0Es repl
+1Ai 26
+07
 0D
-23s repl/print-help
 1Ai 30
 1Ai 31
 1Ai 32
-17
-0Es repl/print-help
-0D
-10s tree/set!
-10s repl/option-map
-23s h
-23s anonymous
 1Ai 33
+17
+1Ai 30
+07
+0D
 1Ai 34
 1Ai 35
-17
-04i 3
-0D
-10s tree/set!
-10s repl/option-map
-23s no-color
-23s anonymous
 1Ai 36
 1Ai 37
-1Ai 38
 17
-04i 3
+1Ai 34
+07
 0D
-10s tree/set!
-10s repl/option-map
-23s color
-23s anonymous
+1Ai 38
 1Ai 39
 1Ai 40
 1Ai 41
 17
-04i 3
+1Ai 38
+07
 0D
-10s tree/set!
-10s repl/option-map
-23s x
-23s anonymous
 1Ai 42
 1Ai 43
 1Ai 44
-17
-04i 3
-0D
-10s tree/set!
-10s repl/option-map
 1Ai 45
-23s anonymous
+17
+1Ai 42
+07
+0D
 1Ai 46
 1Ai 47
 1Ai 48
-17
-04i 3
-0D
-23s repl/parse-option
 1Ai 49
+17
+1Ai 46
+07
+0D
 1Ai 50
 1Ai 51
-17
-0Es repl/parse-option
-0D
-23s repl/parse-options
 1Ai 52
 1Ai 53
-1Ai 54
 17
-0Es repl/parse-options
+1Ai 50
+07
 0D
-23s repl/parse-arg
+1Ai 54
 1Ai 55
 1Ai 56
 1Ai 57
 17
-0Es repl/parse-arg
+1Ai 54
+07
 0D
-23s repl/parse-args
 1Ai 58
+05
+04i 0
 1Ai 59
-1Ai 60
-17
-0Es repl/parse-args
+07
 0D
-23s repl/init/wasm
+1Ai 60
 1Ai 61
 1Ai 62
 1Ai 63
 17
-0Es repl/init/wasm
+1Ai 60
+07
 0D
-23s repl/init/bin
+1Ai 64
+05
+1Ai 60
+05
+04i 1
+01
+}#{##[*1 *2 *3 "nujel" repl/executable-name repl/args #f repl/parse-args/eval-next #t repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
+1Ai 0
+05
+1Ai 1
+05
+04i 1
+01
+} repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+04i 1
+1Ai 4
+04i 2
+04i 1
+01
+} repl/prompt [] #@[documentation: ">" source: ["> "]] #{##["> "]
+1Ai 0
+01
+} repl/wasm [line] #@[documentation: "Evaluate LINE in the wasm context" source: ["Evaluate LINE in the wasm context" [try repl/exception-handler [eval-in root-closure [cons do [read line]]]]]] #{##[repl/exception-handler eval-in root-closure do read line]
+1Ai 0
+05
+19o 24
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+05
+04i 1
+14
+04i 2
+16
+01
+} repl/cmd/raw [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[anonymous [err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[err :unmatched-opening-bracket repl/cmd/raw ctx cat line readline "... " throw]
+1Ai 0
+05
+11
+1Ai 1
+20
+0Bo 29
+1Ai 2
+05
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+05
+1Ai 6
+05
+1Ai 7
+04i 1
+04i 2
+04i 2
+09o 11
+1Ai 8
+05
+1Ai 0
+05
+04i 1
+01
+} read line expr equal? [] print "\r" eval-in ctx do result repl/push-result println nil? "" string]
+1Ai 0
+1Ai 1
+1Ai 2
+1Ai 3
+17
+19o 101
+1Ai 4
+05
+1Ai 5
+05
+04i 1
+1Ai 6
+07
+0D
+1Ai 7
+05
+1Ai 8
+1Ai 6
+05
+04i 2
+0Bo 16
+1Ai 9
+05
+1Ai 10
+04i 1
+0D
+24
+01
+09o 4
+24
+0D
+1Ai 11
+05
+1Ai 12
+05
+1Ai 13
+05
+1Ai 6
+05
+14
+04i 2
+1Ai 14
+07
+0D
+1Ai 15
+05
+1Ai 14
+05
+04i 1
+0D
+1Ai 16
+05
+1Ai 17
+05
+1Ai 14
+05
+04i 1
+0Bo 8
+1Ai 18
+09o 11
+1Ai 19
+05
+1Ai 14
+05
+04i 1
+04i 1
+16
+01
+} repl/push-result [result] #@[source: [[set! *3 *2] [set! *2 *1] [set! *1 result] [return result]]] #{##[*2 *3 *1 result]
+1Ai 0
+05
+1Ai 1
+08
+0D
+1Ai 2
+05
+1Ai 0
+08
+0D
+1Ai 3
+05
+1Ai 2
+08
+0D
+1Ai 3
+05
+01
+01
+} repl/cmd [ctx] #@[source: [[def buf ""] [def line ""] [while [not= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [def result [eval-in ctx expr]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]] #{##["" buf line cat readline not= "[/cmd]\n" do read expr eval-in ctx result repl/push-result println nil? string]
+1Ai 0
+1Ai 1
+07
+0D
+1Ai 0
+1Ai 2
+07
+0D
+24
+1B
+09o 28
+0D
+1C
+1Ai 3
+05
+1Ai 1
+05
+1Ai 2
+05
+04i 2
+1Ai 1
+08
+0D
+1Ai 4
+05
+04i 0
+1Ai 2
+08
+1Ai 5
+05
+1Ai 2
+05
+1Ai 6
+04i 2
+0Ao -35
+0D
+1Ai 7
+05
+1Ai 8
+05
+1Ai 1
+05
+04i 1
+14
+1Ai 9
+07
+0D
+1Ai 10
+05
+1Ai 11
+05
+1Ai 9
+05
+04i 2
+1Ai 12
+07
+0D
+1Ai 13
+05
+1Ai 12
+05
+04i 1
+0D
+1Ai 14
+05
+1Ai 15
+05
+1Ai 12
+05
+04i 1
+0Bo 8
+1Ai 0
+09o 11
+1Ai 16
+05
+1Ai 12
+05
+04i 1
+04i 1
+01
+} repl/readline [ctx] #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] #{##[readline repl/prompt line nil? print "Adios, cowboy...\r\n" exit "[cmd]\n" repl/cmd ctx repl/cmd/raw]
+1Ai 0
+05
+1Ai 1
+05
+04i 0
+04i 1
+1Ai 2
+07
+0D
+1Ai 3
+05
+1Ai 2
+05
+04i 1
+0Bo 21
+1Ai 4
+05
+1Ai 5
+04i 1
+0D
+1Ai 6
+05
+02i 0
+04i 1
+09o 4
+24
+0D
+1Ai 2
+05
+1Ai 7
+20
+0Bo 14
+1Ai 8
+05
+1Ai 9
+05
+04i 1
+09o 14
+1Ai 10
+05
+1Ai 9
+05
+1Ai 2
+05
+04i 2
+01
+} repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure #t]
+1Ai 0
+05
+04i 0
+0D
+24
+1B
+09o 20
+0D
+1C
+1Ai 1
+05
+19o 12
+1Ai 2
+05
+1Ai 3
+05
+04i 1
+16
+1Ai 4
+0Ao -19
+01
+} repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+04i 1
+1Ai 4
+04i 2
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 5
+05
+1Ai 6
+04i 1
+1Ai 7
+04i 2
+04i 1
+0D
+1Ai 0
+05
+1Ai 8
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 9
+1Ai 10
+05
+1Ai 11
+04i 1
+1Ai 12
+04i 3
+04i 1
+0D
+1Ai 0
+05
+1Ai 13
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 9
+1Ai 14
+05
+1Ai 15
+04i 1
+1Ai 16
+04i 3
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 9
+1Ai 14
+05
+1Ai 17
+04i 1
+1Ai 18
+04i 3
+04i 1
+0D
+1Ai 0
+05
+1Ai 19
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 9
+1Ai 14
+05
+1Ai 20
+04i 1
+1Ai 21
+04i 3
+04i 1
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 9
+1Ai 14
+05
+1Ai 22
+04i 1
+1Ai 23
+04i 3
+04i 1
+01
+} tree/set! h anonymous [option] #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] #{##[repl/print-help #f repl/parse-args/run-repl]
+1Ai 0
+05
+04i 0
+0D
+1Ai 1
+1Ai 2
+08
+01
+} no-color [option] #@[source: [[set! ansi/disabled ""]]] #{##["" ansi/disabled]
+1Ai 0
+1Ai 1
+08
+01
+} color [option] #@[source: [[set! ansi/disabled #f]]] #{##[#f ansi/disabled]
+1Ai 0
+1Ai 1
+08
+01
+} x [option] #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] #{##[#t repl/parse-args/eval-next #f repl/parse-args/run-repl]
+1Ai 0
+1Ai 1
+08
+0D
+1Ai 2
+1Ai 3
+08
+01
+} :default [option] #@[source: [[tree/set! repl/options option #t]]] #{##[tree/set! repl/options option #t]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+1Ai 3
+04i 3
+01
+} repl/parse-option [option] #@[source: [[[or [ref repl/option-map option] [ref repl/option-map :default]] option]]] #{##[ref repl/option-map option :default #f]
+1Ai 0
+05
+1Ai 1
+05
+1Ai 2
+05
+04i 2
+0C
+0Ao 21
+0D
+1Ai 0
+05
+1Ai 1
+05
+1Ai 3
+04i 2
+0C
+0Ao 6
+0D
+1Ai 4
+1Ai 2
+05
+04i 1
+01
+} repl/parse-options [options] #@[source: [[if [= [char-at options 0] 45] [repl/parse-option [string->keyword [cut options 1]]] [for-each [map [split options ""] string->symbol] repl/parse-option]]]] #{##[char-at options repl/parse-option symbol->keyword string->symbol cut for-each map split ""]
+1Ai 0
+05
+1Ai 1
+05
+02i 0
+04i 2
+02i 45
+20
+0Bo 31
+1Ai 2
+05
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+05
+1Ai 1
+05
+02i 1
+04i 2
+04i 1
+04i 1
+04i 1
+09o 29
+1Ai 6
+05
+1Ai 7
+05
+1Ai 8
+05
+1Ai 1
+05
+1Ai 9
+04i 2
+1Ai 4
+05
+04i 2
+1Ai 2
+05
+04i 2
+01
+} repl/parse-arg [arg] #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[= [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]] #{##[repl/parse-args/eval-next display/error eval-in root-closure do read arg #f char-at repl/parse-options string/cut #t file/eval repl/parse-args/run-repl]
+1Ai 0
+05
+0Bo 39
+1Ai 1
+05
+19o 30
+1Ai 2
+05
+1Ai 3
+05
+1Ai 4
+05
+1Ai 5
+05
+1Ai 6
+05
+04i 1
+14
+04i 2
+0D
+1Ai 7
+1Ai 0
+08
+16
+09o 67
+1Ai 8
+05
+1Ai 6
+05
+02i 0
+04i 2
+02i 45
+20
+0Bo 21
+1Ai 9
+05
+1Ai 10
+05
+1Ai 6
+05
+02i 1
+04i 2
+04i 1
+09o 33
+1Ai 11
+0Bo 27
+1Ai 1
+05
+19o 12
+1Ai 12
+05
+1Ai 6
+05
+04i 1
+16
+0D
+1Ai 7
+1Ai 13
+08
+09o 4
+24
+01
+} repl/parse-args [args] #@[source: [[if args [do [repl/parse-arg [car args]] [repl/parse-args [cdr args]]] repl/parse-args/run-repl]]] #{##[args repl/parse-arg repl/parse-args repl/parse-args/run-repl]
+1Ai 0
+05
+0Bo 25
+1Ai 1
+05
+1Ai 0
+05
+11
+04i 1
+0D
+1Ai 2
+05
+1Ai 0
+05
+12
+04i 1
+09o 6
+1Ai 3
+05
+01
+} repl/init/wasm [args] #@[source: [[repl/welcome]]] #{##[repl/welcome]
+1Ai 0
+05
+04i 0
+01
+} repl/init/bin [args] #@[source: [[try repl/exception-handler [set! repl/executable-name [car args]] [when [repl/parse-args [cdr args]] [repl]]]]] #{##[repl/exception-handler args repl/executable-name repl/parse-args repl]
+1Ai 0
+05
+19o 33
+1Ai 1
+05
+11
+1Ai 2
+08
+0D
+1Ai 3
+05
+1Ai 1
+05
+12
+04i 1
+0Bo 11
+1Ai 4
+05
+04i 0
+09o 4
+24
+16
+01
+} repl/init args #@[source: [[set! repl/args args] [if [= System/Architecture 'wasm] [repl/init/wasm args] [repl/init/bin args]]]] #{##[args repl/args System/Architecture wasm repl/init/wasm repl/init/bin]
+1Ai 0
+05
+1Ai 1
+08
+0D
+1Ai 2
+05
+1Ai 3
+20
+0Bo 14
+1Ai 4
+05
+1Ai 0
+05
+04i 1
+09o 11
+1Ai 5
+05
+1Ai 0
+05
+04i 1
+01
+}]
+24
+1Ai 0
+07
+0D
+24
+1Ai 1
+07
+0D
+24
+1Ai 2
+07
+0D
+1Ai 3
+1Ai 4
+07
+0D
+24
+1Ai 5
+07
+0D
+1Ai 6
+1Ai 7
+07
+0D
+1Ai 8
+1Ai 9
+07
+0D
+1Ai 10
+05
+24
+04i 1
+1Ai 11
+07
+0D
+1Ai 10
+05
+24
+04i 1
+1Ai 12
+07
+0D
+1Ai 13
+1Ai 14
+1Ai 15
+1Ai 16
+17
+1Ai 13
+07
+0D
+1Ai 17
+1Ai 18
+1Ai 19
+1Ai 20
+17
+1Ai 17
+07
+0D
+1Ai 21
+1Ai 22
+1Ai 23
+1Ai 24
+17
+1Ai 21
+07
+0D
+1Ai 25
+1Ai 26
+1Ai 27
+1Ai 28
+17
+1Ai 25
+07
+0D
+1Ai 29
+1Ai 30
+1Ai 31
+1Ai 32
+17
+1Ai 29
+07
+0D
+1Ai 33
+1Ai 34
+1Ai 35
+1Ai 36
+17
+1Ai 33
+07
+0D
+1Ai 37
+1Ai 38
+1Ai 39
+1Ai 40
+17
+1Ai 37
+07
+0D
+1Ai 41
+1Ai 42
+1Ai 43
+1Ai 44
+17
+1Ai 41
+07
+0D
+1Ai 45
+1Ai 46
+1Ai 47
+1Ai 48
+17
+1Ai 45
+07
+0D
+1Ai 49
+1Ai 50
+1Ai 51
+1Ai 52
+17
+1Ai 49
+07
+0D
+1Ai 53
+05
+1Ai 12
+05
+1Ai 54
+1Ai 55
+1Ai 56
+1Ai 57
+1Ai 58
+17
+04i 3
+0D
+1Ai 53
+05
+1Ai 12
+05
+1Ai 59
+1Ai 55
+1Ai 60
+1Ai 61
+1Ai 62
+17
+04i 3
+0D
+1Ai 53
+05
+1Ai 12
+05
+1Ai 63
+1Ai 55
 1Ai 64
 1Ai 65
 1Ai 66
 17
-0Es repl/init/bin
+04i 3
 0D
-23s repl/init
-23s args
+1Ai 53
+05
+1Ai 12
+05
 1Ai 67
+1Ai 55
 1Ai 68
+1Ai 69
+1Ai 70
 17
-0Es repl/init
+04i 3
+0D
+1Ai 53
+05
+1Ai 12
+05
+1Ai 71
+1Ai 55
+1Ai 72
+1Ai 73
+1Ai 74
+17
+04i 3
+0D
+1Ai 75
+1Ai 76
+1Ai 77
+1Ai 78
+17
+1Ai 75
+07
+0D
+1Ai 79
+1Ai 80
+1Ai 81
+1Ai 82
+17
+1Ai 79
+07
+0D
+1Ai 83
+1Ai 84
+1Ai 85
+1Ai 86
+17
+1Ai 83
+07
+0D
+1Ai 87
+1Ai 88
+1Ai 89
+1Ai 90
+17
+1Ai 87
+07
+0D
+1Ai 91
+1Ai 92
+1Ai 93
+1Ai 94
+17
+1Ai 91
+07
+0D
+1Ai 95
+1Ai 96
+1Ai 97
+1Ai 98
+17
+1Ai 95
+07
+0D
+1Ai 99
+1Ai 100
+1Ai 101
+1Ai 102
+17
+1Ai 99
+07
 01
 }
