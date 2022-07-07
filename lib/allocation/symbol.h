@@ -21,6 +21,8 @@ extern lSymbol *symUnquoteSplicing;
 extern lSymbol *symArr;
 extern lSymbol *symTreeNew;
 extern lSymbol *symDocumentation;
+extern lSymbol *symPure;
+extern lSymbol *symFold;
 
 void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);

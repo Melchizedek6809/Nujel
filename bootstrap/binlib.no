@@ -98,11 +98,11 @@
 ED01
 } repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
 1A00051A01051A02051A0304011A04040204010D1A00051A01051A05051A0604
-011A07040204010D1A00051A0804010D1A00051A01051A091A0A051A0B04011A
-0C040304010D1A00051A0D04010D1A00051A01051A091A0E051A0F04011A1004
-0304010D1A00051A01051A091A0E051A1104011A12040304010D1A00051A1304
-010D1A00051A01051A091A0E051A1404011A15040304010D1A00051A01051A09
-1A0E051A1604011A170403040101
+011A07040204010D1A00051A01051A08040104010D1A00051A01051A091A0A05
+1A0B04011A0C040304010D1A00051A01051A0D040104010D1A00051A01051A09
+1A0E051A0F04011A10040304010D1A00051A01051A091A0E051A1104011A1204
+0304010D1A00051A01051A13040104010D1A00051A01051A091A0E051A140401
+1A15040304010D1A00051A01051A091A0E051A1604011A170403040101
 } tree/set! h anonymous [option] #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] #{##[repl/print-help #f repl/parse-args/run-repl]
 1A000504000D1A011A020801
 } no-color [option] #@[source: [[set! ansi/disabled ""]]] #{##["" ansi/disabled]

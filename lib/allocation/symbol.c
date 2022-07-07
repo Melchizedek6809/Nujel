@@ -35,6 +35,8 @@ lSymbol *symUnquoteSplicing;
 lSymbol *symArr;
 lSymbol *symTreeNew;
 lSymbol *symDocumentation;
+lSymbol *symPure;
+lSymbol *symFold;
 
 lSymbol *symType;
 lSymbol *symArguments;
@@ -87,6 +89,8 @@ void lSymbolInit(){
 	symArr               = lSymSM("array/new");
 	symTreeNew           = lSymSM("tree/new");
 	symDocumentation     = lSymSM("documentation");
+	symPure              = lSymSM("pure");
+	symFold              = lSymSM("fold");
 
 	symType              = lSymSM("type");
 	symArguments         = lSymSM("arguments");

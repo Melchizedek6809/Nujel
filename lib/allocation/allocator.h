@@ -20,6 +20,7 @@ extern uint     lNFuncMax;
 
 lArray *         lArrayAlloc         (size_t len);
 lNFunc *         lNFuncAlloc         ();
+void             lNFuncFree          (lNFunc *n);
 lBytecodeArray * lBytecodeArrayAlloc (size_t len);
 lVal *           lValAlloc           (lType t);
 int              lBufferViewTypeSize (lBufferViewType T);

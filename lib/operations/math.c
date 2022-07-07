@@ -105,14 +105,14 @@ lVal *lnfAtanTwo(lClosure *c, lVal *v){
 }
 
 void lOperationsMath(lClosure *c){
-	lAddNativeFunc(c,"abs",  "[a]", "Return the absolute value of a", lnfAbs);
-	lAddNativeFunc(c,"sqrt", "[a]", "Return the square root of a",    lnfSqrt);
-	lAddNativeFunc(c,"cbrt", "[a]", "Return the cube root of a",      lnfCbrt);
-	lAddNativeFunc(c,"floor","[a]", "Round a down",                   lnfFloor);
-	lAddNativeFunc(c,"ceil", "[a]", "Round a up",                     lnfCeil);
-	lAddNativeFunc(c,"round","[a]", "Round a",                        lnfRound);
-	lAddNativeFunc(c,"sin",  "[a]", "Sin A",                          lnfSin);
-	lAddNativeFunc(c,"cos",  "[a]", "Cos A",                          lnfCos);
-	lAddNativeFunc(c,"tan",  "[a]", "Tan A",                          lnfTan);
-	lAddNativeFunc(c,"atan2","[y x]", "Arc tangent of y/x",           lnfAtanTwo);
+	lAddNativeFuncPure(c,"abs",  "[a]", "Return the absolute value of a", lnfAbs);
+	lAddNativeFuncPure(c,"sqrt", "[a]", "Return the square root of a",    lnfSqrt);
+	lAddNativeFuncPure(c,"cbrt", "[a]", "Return the cube root of a",      lnfCbrt);
+	lAddNativeFuncPure(c,"floor","[a]", "Round a down",                   lnfFloor);
+	lAddNativeFuncPure(c,"ceil", "[a]", "Round a up",                     lnfCeil);
+	lAddNativeFuncPure(c,"round","[a]", "Round a",                        lnfRound);
+	lAddNativeFuncPure(c,"sin",  "[a]", "Sin A",                          lnfSin);
+	lAddNativeFuncPure(c,"cos",  "[a]", "Cos A",                          lnfCos);
+	lAddNativeFuncPure(c,"tan",  "[a]", "Tan A",                          lnfTan);
+	lAddNativeFuncPure(c,"atan2","[y x]", "Arc tangent of y/x",           lnfAtanTwo);
 }

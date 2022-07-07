@@ -114,19 +114,19 @@ lVal *lnfVec(lClosure *c, lVal *v){
 }
 
 void lOperationsVector(lClosure *c){
-	lAddNativeFunc(c,"vec",           "[x y z w]", "Convert α into a vector value consisting of 4 floats x,y,z and w", lnfVec);
-	lAddNativeFunc(c,"vec/x",         "[vec]",     "Return x part of VEC", lnfVX);
-	lAddNativeFunc(c,"vec/y",         "[vec]",     "Return y part of VEC", lnfVY);
-	lAddNativeFunc(c,"vec/z",         "[vec]",     "Return z part of VEC", lnfVZ);
-	lAddNativeFunc(c,"vec/w",         "[vec]",     "Return z part of VEC", lnfVW);
-	lAddNativeFunc(c,"vec/dot",       "[a b]",     "Return the dot product of A and B", lnfVecDot);
-	lAddNativeFunc(c,"vec/magnitude", "[a]",       "Return the magnitude of vector A", lnfVecMagnitude);
-	lAddNativeFunc(c,"vec/sum",       "[a]",       "Return the sum of vector A", lnfVecSum);
-	lAddNativeFunc(c,"vec/sum/abs",   "[a]",       "Return the absolute sum of vector A", lnfVecSumAbs);
-	lAddNativeFunc(c,"vec/cross",     "[a b]",     "Return the cross of A and B", lnfVecCross);
-	lAddNativeFunc(c,"vec/rotate",    "[a b rad]", "Return A around axis B with RAD radians", lnfVecRotate);
-	lAddNativeFunc(c,"vec/normalize", "[a]",       "Return a normalized version of A", lnfVecNormalize);
-	lAddNativeFunc(c,"vec/reflect",   "[i n]",     "Calculate the reflection direction for an incident vector", lnfVecReflect);
-	lAddNativeFunc(c,"vec/vel->rot",  "[a]",       "Return a rotation vector for the velocity vector A", lnfVecVelToRot);
-	lAddNativeFunc(c,"vec/rot->vel",  "[a]",       "Return a velocity vector in the direction of rotation vector A", lnfVecRotToVel);
+	lAddNativeFuncPure(c,"vec",           "[x y z w]", "Convert α into a vector value consisting of 4 floats x,y,z and w", lnfVec);
+	lAddNativeFuncPure(c,"vec/x",         "[vec]",     "Return x part of VEC", lnfVX);
+	lAddNativeFuncPure(c,"vec/y",         "[vec]",     "Return y part of VEC", lnfVY);
+	lAddNativeFuncPure(c,"vec/z",         "[vec]",     "Return z part of VEC", lnfVZ);
+	lAddNativeFuncPure(c,"vec/w",         "[vec]",     "Return z part of VEC", lnfVW);
+	lAddNativeFuncPure(c,"vec/dot",       "[a b]",     "Return the dot product of A and B", lnfVecDot);
+	lAddNativeFuncPure(c,"vec/magnitude", "[a]",       "Return the magnitude of vector A", lnfVecMagnitude);
+	lAddNativeFuncPure(c,"vec/sum",       "[a]",       "Return the sum of vector A", lnfVecSum);
+	lAddNativeFuncPure(c,"vec/sum/abs",   "[a]",       "Return the absolute sum of vector A", lnfVecSumAbs);
+	lAddNativeFuncPure(c,"vec/cross",     "[a b]",     "Return the cross of A and B", lnfVecCross);
+	lAddNativeFuncPure(c,"vec/rotate",    "[a b rad]", "Return A around axis B with RAD radians", lnfVecRotate);
+	lAddNativeFuncPure(c,"vec/normalize", "[a]",       "Return a normalized version of A", lnfVecNormalize);
+	lAddNativeFuncPure(c,"vec/reflect",   "[i n]",     "Calculate the reflection direction for an incident vector", lnfVecReflect);
+	lAddNativeFuncPure(c,"vec/vel->rot",  "[a]",       "Return a rotation vector for the velocity vector A", lnfVecVelToRot);
+	lAddNativeFuncPure(c,"vec/rot->vel",  "[a]",       "Return a velocity vector in the direction of rotation vector A", lnfVecRotToVel);
 }

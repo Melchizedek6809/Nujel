@@ -160,9 +160,16 @@ static void lMarkFree(){
 	#undef defineAllocator
 }
 
+static void lMarkNFuncs(){
+	for(uint i=0;i<lNFuncMax;i++){
+		lNFuncGCMark(&lNFuncList[i]);
+	}
+}
+
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
 	lRootsMark();
+	lMarkNFuncs();
 	lMarkFree();
 }
 
@@ -179,6 +186,7 @@ static void lGCSweep(){
 	}
 	#include "allocator-types.h"
 	defineAllocator(lSymbol, SYM_MAX)
+	defineAllocator(lNFunc, NFN_MAX)
 	#undef defineAllocator
 	if(sweeperChain != NULL){sweeperChain();}
 }

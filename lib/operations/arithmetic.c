@@ -235,25 +235,25 @@ static lVal *lnfAsh(lClosure *c, lVal *v){
 }
 
 void lOperationsArithmetic(lClosure *c){
-	lAddNativeFunc(c,"+",   "[a b]", "Addition",      lnfAdd);
-	lAddNativeFunc(c,"-",   "[a b]", "Substraction",  lnfSub);
-	lAddNativeFunc(c,"*",   "[a b]", "Multiplication",lnfMul);
-	lAddNativeFunc(c,"/",   "[a b]", "Division",      lnfDiv);
-	lAddNativeFunc(c,"rem", "[a b]", "Remainder",     lnfRem);
-	lAddNativeFunc(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
+	lAddNativeFuncPureFold(c,"+",   "[a b]", "Addition",      lnfAdd);
+	lAddNativeFuncPureFold(c,"-",   "[a b]", "Substraction",  lnfSub);
+	lAddNativeFuncPureFold(c,"*",   "[a b]", "Multiplication",lnfMul);
+	lAddNativeFuncPureFold(c,"/",   "[a b]", "Division",      lnfDiv);
+	lAddNativeFuncPureFold(c,"rem", "[a b]", "Remainder",     lnfRem);
+	lAddNativeFuncPureFold(c,"pow", "[a b]", "Return A raised to the power of B",lnfPow);
 
-	lAddNativeFunc(c,"add/int", "[a b]", "Return a:int + b:int",  lnfAddAstI);
-	lAddNativeFunc(c,"sub/int", "[a b]", "Return a:int - b:int",  lnfSubAstI);
-	lAddNativeFunc(c,"mul/int", "[a b]", "Return a:int * b:int",  lnfMulAstI);
-	lAddNativeFunc(c,"div/int", "[a b]", "Return a:int / b:int",  lnfDivAstI);
-	lAddNativeFunc(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
-	lAddNativeFunc(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
+	lAddNativeFuncPureFold(c,"add/int", "[a b]", "Return a:int + b:int",  lnfAddAstI);
+	lAddNativeFuncPureFold(c,"sub/int", "[a b]", "Return a:int - b:int",  lnfSubAstI);
+	lAddNativeFuncPureFold(c,"mul/int", "[a b]", "Return a:int * b:int",  lnfMulAstI);
+	lAddNativeFuncPureFold(c,"div/int", "[a b]", "Return a:int / b:int",  lnfDivAstI);
+	lAddNativeFuncPureFold(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
+	lAddNativeFuncPureFold(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
 
-	lAddNativeFunc(c,"bit-and",  "[a b]", "Bitwise and",          lnfLogAnd);
-	lAddNativeFunc(c,"bit-or",   "[a b]", "Bitwise or",           lnfLogIor);
-	lAddNativeFunc(c,"bit-xor",  "[a b]", "Bitwise exclusive or", lnfLogXor);
-	lAddNativeFunc(c,"bit-not",  "[a]",   "Bitwise not",          lnfLogNot);
+	lAddNativeFuncPureFold(c,"bit-and",  "[a b]", "Bitwise and",          lnfLogAnd);
+	lAddNativeFuncPureFold(c,"bit-or",   "[a b]", "Bitwise or",           lnfLogIor);
+	lAddNativeFuncPureFold(c,"bit-xor",  "[a b]", "Bitwise exclusive or", lnfLogXor);
+	lAddNativeFuncPureFold(c,"bit-not",  "[a]",   "Bitwise not",          lnfLogNot);
 
-	lAddNativeFunc(c,"bit-shift-left",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
-	lAddNativeFunc(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
+	lAddNativeFuncPure(c,"bit-shift-left",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFuncPure(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
 }

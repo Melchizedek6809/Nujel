@@ -545,16 +545,16 @@ FF1A0405251A0105111A03051404040900042401
 00071A042414141A05051A0005121A02050402140900042401
 } bytecompile/do [source env] #@[source: [[list [bytecompile/do/form [cdr source] env]]]] #{##[list bytecompile/do/form source env]
 1A00051A01051A0205121A03050402040101
-} bytecompile/def [source env] #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[def] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$push/val [cadr source]] [$def]]]] #{##[symbol? source #f #t throw list :type-error "[def] needs a symbol name and a value as arguments" env bytecompile* caddr $push/val $def]
+} bytecompile/def [source env] #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[def] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$push/val [cadr source]] [$def]]]] #{##[symbol? source #f #t throw list :type-error "[def] needs a symbol name and a value as arguments" env bytecompile* caddr $push/val [#$7]]
 1A00051A0105121104010B00081A020900051A030C0A001A0D1A010512120B00
 081A020900051A030C0A00060D1A020B00181A04051A05051A061A07241A0805
 04040401090004240D1A05051A09051A0A051A010504011A080504021A0B051A
-0105121104011A0C050400040301
-} bytecompile/set! [source env] #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[set!] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$push/val [cadr source]] [$set]]]] #{##[symbol? source #f #t throw list :type-error "[set!] needs a symbol name and a value as arguments" env bytecompile* caddr $push/val $set]
+0105121104011A0C040301
+} bytecompile/set! [source env] #@[source: [[when [or [not [symbol? [cadr source]]] [not [cddr source]]] [throw [list :type-error "[set!] needs a symbol name and a value as arguments" #nil env]]] [list [bytecompile* [caddr source] env] [$push/val [cadr source]] [$set]]]] #{##[symbol? source #f #t throw list :type-error "[set!] needs a symbol name and a value as arguments" env bytecompile* caddr $push/val [#$8]]
 1A00051A0105121104010B00081A020900051A030C0A001A0D1A010512120B00
 081A020900051A030C0A00060D1A020B00181A04051A05051A061A07241A0805
 04040401090004240D1A05051A09051A0A051A010504011A080504021A0B051A
-0105121104011A0C050400040301
+0105121104011A0C040301
 } bytecompile/if [source env] #@[source: [[let [[sym-else [bytecompile/gen-label]] [sym-after [bytecompile/gen-label]]] [list [bytecompile* [cadr source] env] [$jf sym-else] [bytecompile* [caddr source] env] [$jmp sym-after] [list :label sym-else] [bytecompile* [cadddr source] env] [list :label sym-after]]]]] #{##[bytecompile/gen-label sym-else sym-after list bytecompile* source env $jf caddr $jmp :label cadddr]
 151A000504001A01070D1A000504001A02070D1A03051A04051A050512111A06
 0504021A07051A010504011A04051A08051A050504011A060504021A09051A02
@@ -804,25 +804,8 @@ A00D1A01051A10200C0A00950D1A01051A11200C0A008A0D1A01051A12200C0A
 }#{##[pure? [expr] #@[source: [[and [not [pair? expr]] [not [symbol? expr]] #t]]] #{##[pair? expr #f #t symbol?]
 1A00051A010504010B00081A020900051A030C0B001D0D1A04051A010504010B
 00081A020900051A030C0B00060D1A0301
-} constant-foldable? [fun] #@[source: [[case fun [[add/int bit-and bit-or bit-xor bit-not bit-shift-left bit-shift-right popcount abs sqrt pow rem + - * / cat trim string/length uppercase lowercase capitalize] #t] [['add/int 'bit-and 'bit-or 'bit-xor 'bit-not 'bit-shift-left 'bit-shift-right 'popcount 'abs 'sqrt 'pow 'rem '+ '- '* '/ 'cat 'trim 'string/length 'uppercase 'lowercase 'capitalize] #t] [#t #f]]]] #{##[fun ΓεnΣym-1 add/int bit-and bit-or bit-xor bit-not bit-shift-left bit-shift-right popcount abs sqrt pow rem + - * / cat trim string/length uppercase lowercase capitalize #f #t]
-151A00051A01070D1A01051A0205200C0A01020D1A01051A0305200C0A00F60D
-1A01051A0405200C0A00EA0D1A01051A0505200C0A00DE0D1A01051A0605200C
-0A00D20D1A01051A0705200C0A00C60D1A01051A0805200C0A00BA0D1A01051A
-0905200C0A00AE0D1A01051A0A05200C0A00A20D1A01051A0B05200C0A00960D
-1A01051A0C05200C0A008A0D1A01051A0D05200C0A007E0D1A01051A0E05200C
-0A00720D1A01051A0F05200C0A00660D1A01051A1005200C0A005A0D1A01051A
-1105200C0A004E0D1A01051A1205200C0A00420D1A01051A1305200C0A00360D
-1A01051A1405200C0A002A0D1A01051A1505200C0A001E0D1A01051A1605200C
-0A00120D1A01051A1705200C0A00060D1A180B00081A1909010E1A01051A0220
-0C0A00ED0D1A01051A03200C0A00E20D1A01051A04200C0A00D70D1A01051A05
-200C0A00CC0D1A01051A06200C0A00C10D1A01051A07200C0A00B60D1A01051A
-08200C0A00AB0D1A01051A09200C0A00A00D1A01051A0A200C0A00950D1A0105
-1A0B200C0A008A0D1A01051A0C200C0A007F0D1A01051A0D200C0A00740D1A01
-051A0E200C0A00690D1A01051A0F200C0A005E0D1A01051A10200C0A00530D1A
-01051A11200C0A00480D1A01051A12200C0A003D0D1A01051A13200C0A00320D
-1A01051A14200C0A00270D1A01051A15200C0A001C0D1A01051A16200C0A0011
-0D1A01051A17200C0A00060D1A180B00081A190900121A01051A19200B00081A
-18090004241601
+} constant-foldable? [fun] #@[source: [[meta fun :pure]]] #{##[meta fun :pure]
+1A00051A01051A02040201
 } constant-fold/resolve [sym] #@[source: [[when-not [symbol? sym] [return sym]] [resolve sym]]] #{##[symbol? sym resolve]
 1A00051A010504010B0007240900071A0105010D1A02051A0105040101
 } constant-fold/args [expr] #@[source: [[when-not expr [return expr]] [if [pair? [car expr]] [cons [constant-fold [car expr]] [constant-fold/args [cdr expr]]] [cons [car expr] [constant-fold/args [cdr expr]]]]]] #{##[expr pair? constant-fold constant-fold/args]
@@ -859,30 +842,27 @@ A00D1A01051A10200C0A00950D1A01051A11200C0A008A0D1A01051A12200C0A
 0504011A050504031A06051A07051A00050401111A0505040204030900241A01
 051A02051A06051A0005111A050504021A06051A000512111A05050402040309
 00171A01051A02051A06051A0005111A05050402040201
-} macroexpand* [source env] #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:native-function [case op [[+ - * / rem bit-and bit-or bit-xor] [macroexpand/fold op [cdr source]]] [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] 'source [otherwise [map source [fn [α] [macroexpand* α env]]]]]] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]] #{##[resolves? source env resolve op type-of ΓεnΣym-1 :nil :native-function ΓεnΣym-2 + - * / rem bit-and bit-or bit-xor #f macroexpand/fold do macroexpand/do return macroexpand/form try while #t def set! if fn* macro* let* environment* list quote map anonymous [α] #@[source: [[macroexpand* α env]]] #{##[macroexpand* α env]
+} macroexpand* [source env] #@[documentation: "Expand all macros within source" source: ["Expand all macros within source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [:nil source] [:macro [macroexpand* [macro-apply op [cdr source]] env]] [:native-function [case op 'source [do [macroexpand/do source env]] [return [macroexpand/form source env op 1 #f 0]] [[try while] [macroexpand/form source env op 1 #t 0]] [[def set!] [macroexpand/form source env op 2 #f 1]] [if [macroexpand/form source env op 3 #f 0]] [[fn* macro*] [macroexpand/form source env op 4 #t 7]] [[let* environment*] [list op [macroexpand/do [cdr source] env]]] [otherwise [if [meta op :fold] [macroexpand/fold op [cdr source]] [map source [fn [α] [macroexpand* α env]]]]]]] [otherwise [map source [fn [α] [macroexpand* α env]]]]]]] #{##[resolves? source env resolve op type-of ΓεnΣym-1 :nil :macro macroexpand* macro-apply :native-function ΓεnΣym-2 quote do macroexpand/do return macroexpand/form #f try while #t def set! if fn* macro* let* environment* list meta :fold macroexpand/fold map anonymous [α] #@[source: [[macroexpand* α env]]] #{##[macroexpand* α env]
 1A00051A01051A0205040201
-} :macro macroexpand* macro-apply [α] #{##[macroexpand* α env]
+} [α] #{##[macroexpand* α env]
 1A00051A01051A0205040201
 }]
 1A00051A0105111A020504020B00121A03051A0105111A020504020900071A01
 05111A04070D151A05051A040504011A06070D1A06051A07200B00091A010509
-02081A06051A08200B01CE151A04051A09070D1A09051A0A05200C0A005A0D1A
-09051A0B05200C0A004E0D1A09051A0C05200C0A00420D1A09051A0D05200C0A
-00360D1A09051A0E05200C0A002A0D1A09051A0F05200C0A001E0D1A09051A10
-05200C0A00120D1A09051A1105200C0A00060D1A120B00121A13051A04051A01
-0512040209014E1A09051A1405200B00111A15051A01051A020504020901361A
-09051A1605200B001A1A17051A01051A02051A040502011A1202000406090115
-1A09051A1805200C0A00120D1A09051A1905200C0A00060D1A120B001A1A1705
-1A01051A02051A040502011A1A020004060900E11A09051A1B05200C0A00120D
-1A09051A1C05200C0A00060D1A120B001A1A17051A01051A02051A040502021A
-12020104060900AD1A09051A1D05200B001A1A17051A01051A02051A04050203
-1A120200040609008C1A09051A1E05200C0A00120D1A09051A1F05200C0A0006
-0D1A120B001A1A17051A01051A02051A040502041A1A020704060900581A0905
-1A2005200C0A00120D1A09051A2105200C0A00060D1A120B001A1A22051A0405
-1A15051A0105121A0205040204020900241A09051A2305200B00091A01050900
-141A24051A01051A251A261A271A28170402160900341A06051A29200B001A1A
-2A051A2B051A04051A01051204021A020504020900141A24051A01051A251A2C
-1A271A2D1704021601
+01B01A06051A08200B001A1A09051A0A051A04051A01051204021A0205040209
+01901A06051A0B200B0176151A04051A0C070D1A0C051A0D05200B00091A0105
+09015A1A0C051A0E05200B00111A0F051A01051A020504020901421A0C051A10
+05200B001A1A11051A01051A02051A040502011A12020004060901211A0C051A
+1305200C0A00120D1A0C051A1405200C0A00060D1A120B001A1A11051A01051A
+02051A040502011A15020004060900ED1A0C051A1605200C0A00120D1A0C051A
+1705200C0A00060D1A120B001A1A11051A01051A02051A040502021A12020104
+060900B91A0C051A1805200B001A1A11051A01051A02051A040502031A120200
+04060900981A0C051A1905200C0A00120D1A0C051A1A05200C0A00060D1A120B
+001A1A11051A01051A02051A040502041A15020704060900641A0C051A1B0520
+0C0A00120D1A0C051A1C05200C0A00060D1A120B001A1A1D051A04051A0F051A
+0105121A0205040204020900301A1E051A04051A1F04020B00121A20051A0405
+1A01051204020900141A21051A01051A221A231A241A25170402160900141A21
+051A01051A221A261A241A271704021601
 } macroexpand [source env] #@[documentation: "Macroexpand the forms in source" source: ["Macroexpand the forms in source" [macroexpand* source [or env [current-closure]]]]] #{##[macroexpand* source env current-closure #f]
 1A00051A01051A02050C0A00100D1A030504000C0A00060D1A04040201
 }]

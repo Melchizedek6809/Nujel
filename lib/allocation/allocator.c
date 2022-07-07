@@ -135,6 +135,10 @@ lNFunc *lNFuncAlloc(){
 	return &lNFuncList[lNFuncMax++];
 }
 
+void lNFuncFree(lNFunc *n){
+	(void)n;
+}
+
 void lValFree(lVal *v){
 	v->type     = ltNoAlloc;
 	v->nextFree = lValFFree;

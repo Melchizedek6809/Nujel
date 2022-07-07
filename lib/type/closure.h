@@ -16,5 +16,8 @@ void      lClosureSetMeta    (lClosure *c, lVal *doc);
 
 lVal     *lLambdaNew         (lClosure *parent, lVal *name, lVal *args, lVal *body);
 lVal     *lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
+lVal     *lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
+lVal     *lAddNativeFuncPure (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
+lVal     *lAddNativeFuncPureFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
 
 #endif

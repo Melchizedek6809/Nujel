@@ -128,6 +128,24 @@ lVal *lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char 
 	return lDefineAliased(c,v,sym);
 }
 
+lVal *lAddNativeFuncFold(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
+	lVal *v = lAddNativeFunc(c, sym, args, doc, func);
+	v->vNFunc->meta = lTreeInsert(v->vNFunc->meta, symFold, lValBool(true));
+	return v;
+}
+
+lVal *lAddNativeFuncPure(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
+	lVal *v = lAddNativeFunc(c, sym, args, doc, func);
+	v->vNFunc->meta = lTreeInsert(v->vNFunc->meta, symPure, lValBool(true));
+	return v;
+}
+
+lVal *lAddNativeFuncPureFold(lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *)){
+	lVal *v = lAddNativeFuncFold(c, sym, args, doc, func);
+	v->vNFunc->meta = lTreeInsert(v->vNFunc->meta, symPure, lValBool(true));
+	return v;
+}
+
 /* Create a new Lambda Value */
 lVal *lLambdaNew(lClosure *parent, lVal *name, lVal *args, lVal *body){
 	const lSymbol *sym = (name && name->type == ltSymbol) ? name->vSymbol : NULL;
