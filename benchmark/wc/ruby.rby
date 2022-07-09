@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+
+nl = 0
+nw = 0
+nc = 0
+inWord = false
+
+file = File.open("benchmark/bib.txt")
+
+file.read.each_char { | c |
+    nc += 1
+    case c
+    when "\n"
+        inWord = false
+        nl += 1
+    when " "
+        inWord = false
+    else
+        if !inWord
+            nw += 1
+        end
+        inWord = true
+    end
+}
+
+file.close()
+
+puts "Lines: #{nl}"
+puts "Words: #{nw}"
+puts "Characters: #{nc}"

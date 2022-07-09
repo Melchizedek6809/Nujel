@@ -1,0 +1,29 @@
+;;; WC -- One of the Kernighan and Van Wyk benchmarks.
+;;; Rewritten by Will Clinger into more idiomatic (and correct!) Scheme.
+
+[defn word-count [str]
+      [def nl 0]
+      [def nw 0]
+      [def nc [string/length str]]
+      [def inword? #f]
+      [dotimes [i [string/length str] [list nl nw nc]]
+           [case [char-at str i]
+                 [#x20 [set! inword? #f]]
+                 [#x0A [set! inword? #f]
+                  [set! nl [+ 1 nl]]]
+                 [otherwise [when-not inword? [set! nw [+ 1 nw]]]
+                            [set! inword? #t]]]]]
+
+
+(let ((res (word-count [file/read "benchmark/bib.txt"])))
+     (display "Lines: ")
+     (display (car res))
+     (newline)
+
+     (display "Words: ")
+     (display (cadr res))
+     (newline)
+
+     (display "Characters: ")
+     (display (caddr res))
+     (newline))
