@@ -206,7 +206,6 @@ struct lClosure {
 	const lSymbol *name;
 	lClosure *caller;
 	int sp;
-	u16 rsp;
 	u8 type;
 };
 

@@ -651,3 +651,4 @@
 [test/add 7 [let [[+5 [+x 5]]] [int [ceil [apply +5 '[1.8]]]]]]
 [def +123 [+x 123]]
 [test/add 125 [+123 2]]
+[test/add '[:a :b] [let [[l '[:b]]] [cons! :a l] l]]

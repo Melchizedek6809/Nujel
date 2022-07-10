@@ -23,7 +23,6 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 		c->caller = parent->caller;
 		c->name = parent->name;
 	}
-	c->rsp = lRootsGet();
 	return c;
 }
 

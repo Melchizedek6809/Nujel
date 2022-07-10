@@ -29,8 +29,6 @@ const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopClosurePop:      return "closure/pop";
 	case lopTry:             return "try";
 	case lopApply:           return "apply/dynamic";
-	case lopRootsSave:       return "roots/save";
-	case lopRootsRestore:    return "roots/restore";
 	case lopLessPred:        return "<";
 	case lopLessEqPred:      return "<=";
 	case lopEqualPred:       return "==";

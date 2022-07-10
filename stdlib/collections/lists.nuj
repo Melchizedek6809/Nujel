@@ -3,6 +3,10 @@
 
 ;; Put all the LISt Processing stuff in here
 
+[defmacro cons! [v l]
+          "Cons V onto L and set! the value for L"
+          `[set! ~l [cons ~v ~l]]]
+
 [defn array->list [arr]
       [def i [- [array/length arr] 1]]
       [def ret #nil]

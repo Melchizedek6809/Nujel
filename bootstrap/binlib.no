@@ -17,10 +17,10 @@
 210B001F1A06051A0205241A07051A020502001A05050209250403040309000B
 1A08051A0205040101
 } file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure #t tests ΓεnΣym-1 expr test/run-test! eval-in do require module-name append]
-1A00051A011A020504001A0304030D151A04051A05070D1A05050B004E241B09
-00400D1C1A0505111A06070D1A07051A08051A020504001A0605121104021A09
-1A0A1A0B052414141A0C051A06051212240402141404020D1A0505121A05081A
-05050AFFC0090004241601
+1A00051A011A020504001A0304030D151A04051A05070D1A05050B004C240900
+3F0D1A0505111A06070D1A07051A08051A020504001A0605121104021A091A0A
+1A0B052414141A0C051A06051212240402141404020D1A0505121A05081A0505
+0AFFC1090004241601
 } valid-test-form? [form] #@[source: [[== [car form] 'deftest]]] #{##[form deftest]
 1A0005111A012001
 } file/test/module [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[string/cut path length base-dir rel-path char-at symbol->keyword string->symbol path/without-extension module-name require* :test current-closure #t test/init! file/test/module/run filter read file/read valid-test-form? test/finish! ansi-blue]
@@ -85,17 +85,16 @@
 } repl/push-result [result] #@[source: [[set! *3 *2] [set! *2 *1] [set! *1 result] [return result]]] #{##[*2 *3 *1 result]
 1A00051A01080D1A02051A00080D1A03051A02080D1A03050101
 } repl/cmd [ctx] #@[source: [[def buf ""] [def line ""] [while [not= line "[/cmd]\n"] [set! buf [cat buf line]] [set! line [readline]]] [def expr [cons do [read buf]]] [def result [eval-in ctx expr]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]] #{##["" buf line cat readline not= "[/cmd]\n" do read expr eval-in ctx result repl/push-result println nil? string]
-1A001A01070D1A001A02070D241B09001C0D1C1A03051A01051A020504021A01
-080D1A040504001A02081A05051A02051A0604020AFFDD0D1A07051A08051A01
-050401141A09070D1A0A051A0B051A090504021A0C070D1A0D051A0C0504010D
-1A0E051A0F051A0C0504010B00081A0009000B1A10051A0C050401040101
+1A001A01070D1A001A02070D2409001B0D1A03051A01051A020504021A01080D
+1A040504001A02081A05051A02051A0604020AFFDE0D1A07051A08051A010504
+01141A09070D1A0A051A0B051A090504021A0C070D1A0D051A0C0504010D1A0E
+051A0F051A0C0504010B00081A0009000B1A10051A0C050401040101
 } repl/readline [ctx] #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] #{##[readline repl/prompt line nil? print "Adios, cowboy...\r\n" exit "[cmd]\n" repl/cmd ctx repl/cmd/raw]
 1A00051A0105040004011A02070D1A03051A020504010B00151A04051A050401
 0D1A060502000401090004240D1A02051A07200B000E1A08051A090504010900
 0E1A0A051A09051A0205040201
 } repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure #t]
-1A000504000D241B0900140D1C1A010519000C1A02051A03050401161A040AFF
-ED01
+1A000504000D240900130D1A010519000C1A02051A03050401161A040AFFEE01
 } repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
 1A00051A01051A02051A0304011A04040204010D1A00051A01051A05051A0604
 011A07040204010D1A00051A01051A08040104010D1A00051A01051A091A0A05

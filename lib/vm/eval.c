@@ -203,12 +203,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		if(unlikely(ctx.valueStack[ctx.sp-1]->type != ltSymbol)){throwTypeError(c, ctx.valueStack[ctx.sp-1], ltSymbol);}
 		ctx.valueStack[ctx.sp-1] = lGetClosureSym(c, ctx.valueStack[ctx.sp-1]->vSymbol);
 		break;
-	case lopRootsSave:
-		c->rsp = lRootsGet();
-		break;
-	case lopRootsRestore:
-		lRootsRet(c->rsp);
-		break;
 	case lopZeroPred: {
 		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
 		lVal *a = ctx.valueStack[ctx.sp-1];
@@ -248,7 +242,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 
 		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
 		c->sp   = ctx.sp;
-		c->rsp  = lRootsGet();
 		c->text = ops;
 
 		c = lClosureNew(c, closureTry);

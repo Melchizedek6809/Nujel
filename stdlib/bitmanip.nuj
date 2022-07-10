@@ -6,7 +6,6 @@
 [defn bit-nand l
       "Returns the Nand of its arguments"
       [bit-not [apply bit-and l]]]
-[def lognand bit-nand]
 
 [defn bit-and-not [x y]
       "Bitwise and with complement"
