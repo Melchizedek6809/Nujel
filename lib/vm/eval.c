@@ -282,8 +282,20 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		lVal *res = lApply(c, cargs, fun);
-		ctx.valueStack[ctx.sp++] = res;
+
+		if(fun && (fun->type == ltLambda)){
+			c->ip   = ip;
+			c->sp   = ctx.sp;
+			c->text = ops;
+
+			ctx.csp++;
+			c   = ctx.closureStack[ctx.csp]       = lClosureNewFunCall(c, cargs, fun);
+			ops = ctx.closureStack[ctx.csp]->text = c->text;
+			ip  = ctx.closureStack[ctx.csp]->ip   = c->text->data;
+		}else{
+			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
+		}
+
 		break; }
 	case lopRet:
 		if(unlikely(ctx.sp < 1)){ throwStackUnderflowError(c, "Ret"); }

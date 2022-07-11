@@ -1,2 +1,6 @@
 #!/usr/bin/env nujel
+[pfmtln "Ready, now writing to test.bmp"]
+[require :image]
+[require :image/bmp]
+[image/bmp/init!]
 [image/save! [image/test] "test.bmp"]

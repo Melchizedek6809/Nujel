@@ -1,6 +1,0 @@
-#!/usr/bin/env nujel
-
-[def path "tests/compile-test.nuj"]
-
-[file/compile/new path #f [environment*]]
-[println [file/read [cat [path/without-extension path] ".no"]]]
