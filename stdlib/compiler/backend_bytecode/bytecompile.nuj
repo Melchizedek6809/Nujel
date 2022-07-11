@@ -12,6 +12,7 @@
       [case [type-of source]
             [:int      [$push/int source]]
             [:nil      [$push/nil]]
+            [:bool     [if source [$push/true] [$push/false]]]
             [:symbol   [list [$push/val source] [$get]]]
             [[:native-function :lambda] [bytecompile/literal [closure/name source]]]
             [otherwise [$push/val source]]]]

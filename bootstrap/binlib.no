@@ -16,29 +16,29 @@
 1A00051A01050401111A02070D1A03051A02051A0404021A05070D1A05050200
 210B001F1A06051A0205241A07051A020502001A05050209250403040309000B
 1A08051A0205040101
-} file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure #t tests ΓεnΣym-1 expr test/run-test! eval-in do require module-name append]
-1A00051A011A020504001A0304030D151A04051A05070D1A05050B004C240900
-3F0D1A0505111A06070D1A07051A08051A020504001A0605121104021A091A0A
-1A0B052414141A0C051A06051212240402141404020D1A0505121A05081A0505
-0AFFC1090004241601
+} file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure tests ΓεnΣym-1 expr test/run-test! eval-in do require module-name append]
+1A00051A011A020504001B04030D151A03051A04070D1A04050B004C2409003F
+0D1A0405111A05070D1A06051A07051A020504001A0505121104021A081A091A
+0A052414141A0B051A05051212240402141404020D1A0405121A04081A04050A
+FFC1090004241601
 } valid-test-form? [form] #@[source: [[== [car form] 'deftest]]] #{##[form deftest]
 1A0005111A012001
-} file/test/module [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[string/cut path length base-dir rel-path char-at symbol->keyword string->symbol path/without-extension module-name require* :test current-closure #t test/init! file/test/module/run filter read file/read valid-test-form? test/finish! ansi-blue]
+} file/test/module [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[string/cut path length base-dir rel-path char-at symbol->keyword string->symbol path/without-extension module-name require* :test current-closure test/init! file/test/module/run filter read file/read valid-test-form? test/finish! ansi-blue]
 1A00051A01051A02051A0305040104021A04070D1A05051A040502000402022F
 200B00131A00051A0405020104021A0408090004240D1A06051A07051A08051A
-04050401040104011A09070D1A0A051A0B1A0C0504001A0D04030D1A0E050400
-0D1A0F051A10051A11051A12051A0105040104011A130504021A090504020D1A
-14051A15051A09050401040101
+04050401040104011A09070D1A0A051A0B1A0C0504001B04030D1A0D0504000D
+1A0E051A0F051A10051A11051A0105040104011A120504021A090504020D1A13
+051A14051A09050401040101
 } file/test/directory [base-dir] #@[documentation: "Compile a Nujel source file into optimized object code" source: ["Compile a Nujel source file into optimized object code" [-> [directory/read-recursive base-dir] [flatten] [sort] [filter [path/ext?! "nuj"]] [map [fn [path] [file/test/module path base-dir]]] [sum]]]] #{##[sum map filter sort flatten directory/read-recursive base-dir path/ext?! "nuj" anonymous [path] #@[source: [[file/test/module path base-dir]]] #{##[file/test/module path base-dir]
 1A00051A01051A0205040201
 }]
 1A00051A01051A02051A03051A04051A05051A06050401040104011A07051A08
 040104021A091A0A1A0B1A0C170402040101
-} load [filename] #@[source: [[try [fn [err] [display/error err] #f] [file/eval filename] [pfmtln "Loaded {filename}"] #t]]] #{##[anonymous [err] #@[source: [[display/error err] #f]] #{##[display/error err #f]
-1A00051A010504010D1A0201
-} file/eval filename println cat "Loaded " #t]
-1A001A011A021A031719001F1A04051A050504010D1A06051A07051A081A0505
-040204010D1A091601
+} load [filename] #@[source: [[try [fn [err] [display/error err] #f] [file/eval filename] [pfmtln "Loaded {filename}"] #t]]] #{##[anonymous [err] #@[source: [[display/error err] #f]] #{##[display/error err]
+1A00051A010504010D1C01
+} file/eval filename println cat "Loaded "]
+1A001A011A021A031719001E1A04051A050504010D1A06051A07051A081A0505
+040204010D1B1601
 } file/file? [filename] #@[source: [[ref [file/stat filename] :regular-file?]]] #{##[ref file/stat filename :regular-file?]
 1A00051A01051A020504011A03040201
 } file/dir? [filename] #@[source: [[ref [file/stat filename] :directory?]]] #{##[ref file/stat filename :directory?]
@@ -66,7 +66,7 @@
 281A29171A26070D1A2A1A2B1A2C1A2D171A2A070D1A2E1A2F1A301A31171A2E
 070D1A321A331A341A35171A32070D1A361A371A381A39171A36070D1A3A0504
 001A3B070D1A3C1A3D1A3E1A3F171A3C070D1A40051A3C05040101
-}#{##[*1 *2 *3 "nujel" repl/executable-name repl/args #f repl/parse-args/eval-next #t repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
+}#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 1A00051A0105040101
 } repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
 1A00051A01051A02051A0304011A040402040101
@@ -93,8 +93,8 @@
 1A00051A0105040004011A02070D1A03051A020504010B00151A04051A050401
 0D1A060502000401090004240D1A02051A07200B000E1A08051A090504010900
 0E1A0A051A09051A0205040201
-} repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure #t]
-1A000504000D240900130D1A010519000C1A02051A03050401161A040AFFEE01
+} repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure]
+1A000504000D240900130D1A010519000C1A02051A03050401161B0AFFEF01
 } repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
 1A00051A01051A02051A0304011A04040204010D1A00051A01051A05051A0604
 011A07040204010D1A00051A01051A08040104010D1A00051A01051A091A0A05
@@ -102,16 +102,16 @@
 1A0E051A0F04011A10040304010D1A00051A01051A091A0E051A1104011A1204
 0304010D1A00051A01051A13040104010D1A00051A01051A091A0E051A140401
 1A15040304010D1A00051A01051A091A0E051A1604011A170403040101
-} tree/set! h anonymous [option] #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] #{##[repl/print-help #f repl/parse-args/run-repl]
-1A000504000D1A011A020801
+} tree/set! h anonymous [option] #@[source: [[repl/print-help] [set! repl/parse-args/run-repl #f]]] #{##[repl/print-help repl/parse-args/run-repl]
+1A000504000D1C1A010801
 } no-color [option] #@[source: [[set! ansi/disabled ""]]] #{##["" ansi/disabled]
 1A001A010801
-} color [option] #@[source: [[set! ansi/disabled #f]]] #{##[#f ansi/disabled]
-1A001A010801
-} x [option] #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] #{##[#t repl/parse-args/eval-next #f repl/parse-args/run-repl]
-1A001A01080D1A021A030801
-} :default [option] #@[source: [[tree/set! repl/options option #t]]] #{##[tree/set! repl/options option #t]
-1A00051A01051A02051A03040301
+} color [option] #@[source: [[set! ansi/disabled #f]]] #{##[ansi/disabled]
+1C1A000801
+} x [option] #@[source: [[set! repl/parse-args/eval-next #t] [set! repl/parse-args/run-repl #f]]] #{##[repl/parse-args/eval-next repl/parse-args/run-repl]
+1B1A00080D1C1A010801
+} :default [option] #@[source: [[tree/set! repl/options option #t]]] #{##[tree/set! repl/options option]
+1A00051A01051A02051B040301
 } repl/parse-option [option] #@[source: [[[or [ref repl/option-map option] [ref repl/option-map :default]] option]]] #{##[ref repl/option-map option :default #f]
 1A00051A01051A020504020C0A00150D1A00051A01051A0304020C0A00060D1A
 041A0205040101
@@ -119,11 +119,11 @@
 1A00051A010502000402022D200B001F1A02051A03051A04051A05051A010502
 01040204010401040109001D1A06051A07051A08051A01051A0904021A040504
 021A0205040201
-} repl/parse-arg [arg] #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[= [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]] #{##[repl/parse-args/eval-next display/error eval-in root-closure do read arg #f char-at repl/parse-options string/cut #t file/eval repl/parse-args/run-repl]
-1A00050B00271A010519001E1A02051A03051A04051A05051A06050401140402
-0D1A071A0008160900431A08051A060502000402022D200B00151A09051A0A05
-1A06050201040204010900211A0B0B001B1A010519000C1A0C051A0605040116
-0D1A071A0D080900042401
+} repl/parse-arg [arg] #@[source: [[cond [repl/parse-args/eval-next [try display/error [eval-in root-closure [cons do [read arg]]] [set! repl/parse-args/eval-next #f]]] [[= [char-at arg 0] 45] [repl/parse-options [string/cut arg 1]]] [#t [try display/error [file/eval arg]] [set! repl/parse-args/run-repl #f]]]]] #{##[repl/parse-args/eval-next display/error eval-in root-closure do read arg char-at repl/parse-options string/cut file/eval repl/parse-args/run-repl]
+1A00050B00261A010519001D1A02051A03051A04051A05051A06050401140402
+0D1C1A0008160900411A07051A060502000402022D200B00151A08051A09051A
+060502010402040109001F1B0B001A1A010519000C1A0A051A06050401160D1C
+1A0B080900042401
 } repl/parse-args [args] #@[source: [[if args [do [repl/parse-arg [car args]] [repl/parse-args [cdr args]]] repl/parse-args/run-repl]]] #{##[args repl/parse-arg repl/parse-args repl/parse-args/run-repl]
 1A00050B00191A01051A00051104010D1A02051A00051204010900061A030501
 } repl/init/wasm [args] #@[source: [[repl/welcome]]] #{##[repl/welcome]
@@ -135,16 +135,16 @@
 1A00051A01080D1A02051A03200B000E1A04051A0005040109000B1A05051A00
 05040101
 }]
-241A00070D241A01070D241A02070D1A031A04070D241A05070D1A061A07070D
-1A081A09070D1A0A052404011A0B070D1A0A052404011A0C070D1A0D1A0E1A0F
-1A10171A0D070D1A111A121A131A14171A11070D1A151A161A171A18171A1507
-0D1A191A1A1A1B1A1C171A19070D1A1D1A1E1A1F1A20171A1D070D1A211A221A
-231A24171A21070D1A251A261A271A28171A25070D1A291A2A1A2B1A2C171A29
-070D1A2D1A2E1A2F1A30171A2D070D1A311A321A331A34171A31070D1A35051A
-0C051A361A371A381A391A3A1704030D1A35051A0C051A3B1A371A3C1A3D1A3E
-1704030D1A35051A0C051A3F1A371A401A411A421704030D1A35051A0C051A43
-1A371A441A451A461704030D1A35051A0C051A471A371A481A491A4A1704030D
-1A4B1A4C1A4D1A4E171A4B070D1A4F1A501A511A52171A4F070D1A531A541A55
-1A56171A53070D1A571A581A591A5A171A57070D1A5B1A5C1A5D1A5E171A5B07
-0D1A5F1A601A611A62171A5F070D1A631A641A651A66171A630701
+241A00070D241A01070D241A02070D1A031A04070D241A05070D1C1A06070D1B
+1A07070D1A08052404011A09070D1A08052404011A0A070D1A0B1A0C1A0D1A0E
+171A0B070D1A0F1A101A111A12171A0F070D1A131A141A151A16171A13070D1A
+171A181A191A1A171A17070D1A1B1A1C1A1D1A1E171A1B070D1A1F1A201A211A
+22171A1F070D1A231A241A251A26171A23070D1A271A281A291A2A171A27070D
+1A2B1A2C1A2D1A2E171A2B070D1A2F1A301A311A32171A2F070D1A33051A0A05
+1A341A351A361A371A381704030D1A33051A0A051A391A351A3A1A3B1A3C1704
+030D1A33051A0A051A3D1A351A3E1A3F1A401704030D1A33051A0A051A411A35
+1A421A431A441704030D1A33051A0A051A451A351A461A471A481704030D1A49
+1A4A1A4B1A4C171A49070D1A4D1A4E1A4F1A50171A4D070D1A511A521A531A54
+171A51070D1A551A561A571A58171A55070D1A591A5A1A5B1A5C171A59070D1A
+5D1A5E1A5F1A60171A5D070D1A611A621A631A64171A610701
 }

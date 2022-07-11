@@ -155,6 +155,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopPushNil:
 		ctx.valueStack[ctx.sp++] = NULL;
 		break;
+	case lopPushTrue:
+		ctx.valueStack[ctx.sp++] = lValBool(true);
+		break;
+	case lopPushFalse:
+		ctx.valueStack[ctx.sp++] = lValBool(false);
+		break;
 	case lopPushValExt: {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
