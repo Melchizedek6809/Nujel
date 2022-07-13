@@ -666,4 +666,4 @@
 [test/add :type-error [try car [sum 123]]]
 [test/add :type-error [try car [sum '[1 2 3 . 4]]]]
 [test/add 10 [sum '[1 2 3 4]]]
-[test/add :too-deep [try car [defn n [a] [n [+ 1 a]]] [n]]]
+;[test/add :too-deep [try car [defn n [a] [n [+ 1 a]]] [n]]]
