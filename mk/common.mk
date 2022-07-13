@@ -18,6 +18,7 @@ PROG                  = $(NUJEL)
 
 CC_MUSL              := musl-gcc
 CFLAGS               := -g -D_GNU_SOURCE
+CINCLUDES            :=
 LDFLAGS              :=
 CSTD                 := -std=c99
 OPTIMIZATION         := -O2

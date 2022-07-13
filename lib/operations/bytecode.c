@@ -1,11 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../allocation/symbol.h"
-#include "../printer.h"
-#include "../type-system.h"
-#include "../type/closure.h"
-#include "../type/val.h"
-#include "../vm/eval.h"
+#include "../nujel-private.h"
 
 static lVal *lValBytecodeOp(lBytecodeOp v){
 	lVal *ret = lValAlloc(ltBytecodeOp);

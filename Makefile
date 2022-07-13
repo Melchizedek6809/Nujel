@@ -2,29 +2,20 @@
 .include "mk/common.mk"
 
 LIB_SRCS             != find lib -type f -name '*.c'
-LIB_HDRS             != find lib -type f -name '*.h'
 LIB_OBJS             := $(LIB_SRCS:.c=.o)
-LIB_DEPS             := ${LIB_SRCS:.c=.d}
 STDLIB_NUJS          != find stdlib -type f -name '*.nuj' | sort
 STDLIB_MODS          != find stdlib_modules -type f -name '*.nuj' | sort
 STDLIB_NOBS          := $(STDLIB_NUJS:.nuj=.no)
 STDLIB_MOBS          := $(STDLIB_MODS:.nuj=.no)
 
 BIN_SRCS             != find bin vendor -type f -name '*.c'
-BIN_HDRS             != find bin vendor -type f -name '*.h'
 BINLIB_NUJS          != find binlib -type f -name '*.nuj' | sort
 BINLIB_NOBS          := $(BINLIB_NUJS:.nuj=.no)
 
 BIN_OBJS             := $(BIN_SRCS:.c=.o)
-BIN_DEPS             := $(BIN_SRCS:.c=.d)
 
 all: $(NUJEL)
 .PHONY: clean distclean all release release.musl test check test.slow test.ridiculous run runl rnd runn install profile profile-when
-
-.if "${MAKECMDGOALS}" != "clean"
--include $(LIB_DEPS)
--include $(BIN_DEPS)
-.endif
 
 FILES_TO_CLEAN != find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps'
 NOBS_TO_CLEAN  != find binlib stdlib stdlib_modules -type f -name '*.no'
@@ -32,8 +23,11 @@ NOBS_TO_CLEAN  != find binlib stdlib stdlib_modules -type f -name '*.no'
 .SUFFIXES:
 .SUFFIXES: .c .o
 .c.o:
-	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) -MD > ${<:.c=.d}
+	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD)
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
+
+$(BIN_OBJS): nujel.h lib/nujel-private.h bin/private.h
+$(LIB_OBJS): nujel.h lib/nujel-private.h
 
 .SUFFIXES: .nuj .no
 .nuj.no: $(NUJEL_BOOTSTRAP)

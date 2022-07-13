@@ -1,9 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "reader.h"
-#include "printer.h"
-#include "allocation/symbol.h"
-#include "type/val.h"
+#include "nujel-private.h"
 
 #include <ctype.h>
 #include <math.h>

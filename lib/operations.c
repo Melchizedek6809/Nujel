@@ -1,6 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "operations.h"
+#include "nujel-private.h"
 
 /* These shouldn't be exported since we should only really call into
  | lOperationsBase and determine which operations need addition in there.

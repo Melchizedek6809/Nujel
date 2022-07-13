@@ -5,9 +5,7 @@
  * another, as well as code for determining which type would be most fitting when
  * you have to for example add two values together.
  */
-#include "type-system.h"
-#include "allocation/symbol.h"
-#include "printer.h"
+#include "nujel-private.h"
 
 NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
 	char buf[128];

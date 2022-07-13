@@ -5,20 +5,14 @@
  * Contains a terrible implementation of a mark-sweep garbage collector, but it
  * is good enough for now.
  */
-#include "garbage-collection.h"
-
-#include "allocator.h"
-#include "roots.h"
-#include "symbol.h"
-#include "../printer.h"
-#include "../compatibility/builtins.h"
+#include "../nujel-private.h"
 
 #include <stdlib.h>
 
 int lGCRuns = 0;
 
 #define defineAllocator(T, TMAX) u8 T##MarkMap[TMAX];
-#include "allocator-types.h"
+allocatorTypes()
 defineAllocator(lSymbol, SYM_MAX)
 defineAllocator(lNFunc, NFN_MAX)
 #undef defineAllocator
@@ -155,7 +149,7 @@ static void lMarkFree(){
 	for(T *v = T##FFree;v;v=v->nextFree){\
 		T##MarkMap[v - T##List] = 1;\
 	}
-	#include "allocator-types.h"
+	allocatorTypes()
 	defineAllocator(lSymbol, SYM_MAX)
 	#undef defineAllocator
 }
@@ -184,7 +178,7 @@ static void lGCSweep(){
 			T##Free(&T##List[i]);\
 		}\
 	}
-	#include "allocator-types.h"
+	allocatorTypes()
 	defineAllocator(lSymbol, SYM_MAX)
 	defineAllocator(lNFunc, NFN_MAX)
 	#undef defineAllocator

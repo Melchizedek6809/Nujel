@@ -1,9 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "bytecode.h"
-#include "../common.h"
-#include "../allocation/allocator.h"
-#include "../allocation/symbol.h"
+#include "../nujel-private.h"
 
 const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	switch(op){

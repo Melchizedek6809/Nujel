@@ -1,8 +1,6 @@
  /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "allocator.h"
-#include "../printer.h"
-#include "../type/val.h"
+#include "../nujel-private.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +31,7 @@ T * T##AllocRaw (){\
 	memset(ret, 0, sizeof(T));\
 	return ret;\
 }
-#include "allocator-types.h"
+allocatorTypes()
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncMax    = 0;

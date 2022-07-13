@@ -1,10 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "../lib/api.h"
-#include "misc.h"
-#include "operation/environment.h"
-#include "operation/io.h"
-#include "operation/readline.h"
+#include "private.h"
 
 #include <stdlib.h>
 
@@ -32,11 +28,10 @@ const char *run(const char *line){
 
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(){
-	lClosure *c = lRootsClosurePush(lNewRoot());
+	lClosure *c = lNewRoot();
 	lOperationsIO(c);
 	lOperationsReadline(c);
 	mainClosure = lLoad(c, (const char *)binlib_no_data);
-	lGarbageCollect();
 	return c;
 }
 
@@ -63,8 +58,6 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 		pf("sizeof(lArray): %u\n",  (i64)sizeof(lArray));
 		pf("sizeof(lString): %u\n", (i64)sizeof(lString));
 		pf("sizeof(lTree): %u\n",   (i64)sizeof(lTree));
-		pf("sizeof(jmp_buf): %u\n", (i64)sizeof(jmp_buf));
-		pf("Root Size: %u\n",       (i64)lTreeSize(c->data));
 	}
 	return c;
 }

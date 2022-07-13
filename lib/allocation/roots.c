@@ -5,8 +5,7 @@
  * Contains code for dealing with GC Roots, essential for determining which
  * objects on the heap are still reachable.
  */
-#include "roots.h"
-#include "../printer.h"
+#include "../nujel-private.h"
 
 #include <stdlib.h>
 

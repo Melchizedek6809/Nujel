@@ -1,8 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
-#include "platform.h"
-#include "../type/closure.h"
-#include "../type/val.h"
+#include "../nujel-private.h"
 
 /* Add all the platform specific constants to C */
 void lAddPlatformVars(lClosure *c){
