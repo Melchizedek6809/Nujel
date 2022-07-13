@@ -7,6 +7,8 @@
 
 #include <setjmp.h>
 
+#define RECURSION_DEPTH_MAX (1<<15)
+
 extern bool    lVerbose;
 extern jmp_buf exceptionTarget;
 extern lVal   *exceptionValue;

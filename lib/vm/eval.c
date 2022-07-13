@@ -69,13 +69,20 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lBytecodeArray * volatile ops = text;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
+
+	if(++exceptionTargetDepth > RECURSION_DEPTH_MAX){
+		exceptionTargetDepth--;
+		lExceptionThrowValClo("too-deep", "Recursing too deep", NULL, NULL);
+		return NULL;
+	}
+
 	ctx.closureStackSize = 4;
 	ctx.valueStackSize   = 8;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal *));
 	ctx.csp              = 0;
 	ctx.sp               = 0;
-	ctx.closureStack[ctx.csp] = c;
+	ctx.closureStack[0]  = c;
 	ctx.text             = text;
 
 	int exceptionCount = 0;
@@ -84,7 +91,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	lRootsThreadPush(&ctx);
 
 	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
-	exceptionTargetDepth++;
 	const int setjmpRet = setjmp(exceptionTarget);
 	if(unlikely(setjmpRet)){
 		while((ctx.csp > 0) && (c->type != closureTry)){
@@ -105,8 +111,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 			free(ctx.closureStack);
 			free(ctx.valueStack);
-			lExceptionThrowRaw(exceptionValue);
 			lRootsRet(RSP);
+			lExceptionThrowRaw(exceptionValue);
 			return NULL;
 		}
 	} else {

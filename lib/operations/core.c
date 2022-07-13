@@ -32,7 +32,7 @@ static lVal *lnfClosureParent(lClosure *c, lVal *v){
 
 static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 	lClosure *cc = requireClosure(c, lCar(v));
-	if(cc->caller == NULL){
+	if((cc == NULL) || (cc->caller == NULL)){
 		return NULL;
 	}else{
 		lVal *ret = lValAlloc(cc->caller->type == closureObject ? ltObject : ltLambda);
@@ -59,7 +59,7 @@ static lVal *lnfClosureCode(lClosure *c, lVal *v){
 
 static lVal *lnfClosureData(lClosure *c, lVal *v){
 	lClosure *clo = requireClosure(c, lCar(v));
-	return lValTree(clo->data);
+	return clo ? lValTree(clo->data) : NULL;
 }
 
 static lVal *lnfClosureName(lClosure *c, lVal *v){
