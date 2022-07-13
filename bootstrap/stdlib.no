@@ -998,7 +998,7 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 1E1A1F181A1C070D1A201A211A221A23181A20070D1A241A251A261A27171A24
 070D1A281A291A2A1A2B181A28070D1A2C1A2D1A2E1A2F171A2C070D1A301A31
 1A321A33181A300701
-}#{##[tree/new module/cache module/loader module/add-loader [f] #@[source: [[set! module/loader [cons f module/loader]]]] #{##[f module/loader]
+}#{##[tree/new module/cache module/store module/loader module/add-loader [f] #@[source: [[set! module/loader [cons f module/loader]]]] #{##[f module/loader]
 1A00051A0105141A010801
 } module/save-state [] #@[source: [[tree/new :cache module/cache :loader module/loader]]] #{##[tree/new :cache module/cache :loader module/loader]
 1A00051A011A02051A031A0405040401
@@ -1008,8 +1008,11 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 1A00051A01051A02051A030504011A041A05051A060504010403040101
 } module body #@[documentation: "Define a new module and return it" source: ["Define a new module and return it" [macroexpand [cons 'environment* [cons '[def exports [tree/new #nil]] body]]]]] #{##[macroexpand environment* [def exports [tree/new #nil]] body]
 1A00051A011A021A03051414040101
-} defmodule [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert [unquote name] [unquote [cons module body]]]]]] #{##[module/insert name module body]
-1A001A01051A02051A0305142414141401
+} defmodule [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert [unquote name] [module [def *module* [unquote name]] [unquote-splicing body]]]]]] #{##[module/insert name module def *module* append body]
+1A001A01051A021A031A041A0105241414141A05051A06052404021414241414
+1401
+} defmodule/defer [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert/defer [unquote name] [string/write [unquote [list 'quote body]]]]]]] #{##[module/insert/defer name string/write list quote body]
+1A001A01051A021A03051A041A050504022414142414141401
 } export [name value] #@[source: [[quasiquote [tree/set! exports '[unquote name] [unquote value]]]]] #{##[tree/set! exports quote name value]
 1A001A011A021A03052414141A0405241414141401
 } require* [module env qualify?] #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [if qualify? [module/qualify-symbol module [keyword->symbol k]] [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]] #{##[module/load module mod resolve exports tree/keys ΓεnΣym-1 k qualify? module/qualify-symbol keyword->symbol q def module/import quote expr apply env compile*]
@@ -1032,17 +1035,25 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 0512121A01080900211A021A0105111A031A04052414141A0105112414141414
 1A0505141A05080D1A0105121A01081A01050AFF9D0D1A08051A09051A050504
 011401
-} module/load/external [name] #@[source: [[doseq [loader module/loader] [def mod [loader name]] [when mod [return mod]]] [return #nil]]] #{##[module/loader ΓεnΣym-2 loader name mod]
-151A00051A01070D1A01050B003B2409002E0D1A0105111A02070D1A02051A03
-0504011A04070D1A04050B000A1A040501090004240D1A0105121A01081A0105
-0AFFD209000424160D240101
+} module/load/cache [name] #@[source: [[tree/ref module/cache name]]] #{##[tree/ref module/cache name]
+1A00051A01051A0205040201
+} module/load/store [name] #@[source: [[def source [tree/ref module/store name]] [when source [eval-in [environment*] [quasiquote [defmodule [unquote name] [unquote-splicing [read source]]]]] [module/load/cache name]]]] #{##[tree/ref module/store name source eval-in defmodule append read module/load/cache]
+1A00051A01051A020504021A03070D1A03050B002E1A040515240D13161A051A
+02051A06051A07051A03050401240402141404020D1A08051A02050401090004
+2401
+} module/load/external [name] #@[source: [[doseq [loader module/loader] [def mod [loader name]] [when mod [tree/set! module/cache name mod] [return mod]]] [return #nil]]] #{##[module/loader ΓεnΣym-2 loader name mod tree/set! module/cache]
+151A00051A01070D1A01050B004A2409003D0D1A0105111A02070D1A02051A03
+0504011A04070D1A04050B00191A05051A06051A03051A040504030D1A040501
+090004240D1A0105121A01081A01050AFFC309000424160D240101
+} module/insert/defer [name module-source] #@[source: [[tree/set! module/store name module-source]]] #{##[tree/set! module/store name module-source]
+1A00051A01051A02051A0305040301
 } module/insert [name module] #@[source: [[tree/set! module/cache name module]]] #{##[tree/set! module/cache name module]
 1A00051A01051A02051A0305040301
-} module/load [name] #@[source: [[case [type-of name] [:object name] [:keyword [or [tree/ref module/cache name] [do [def mod [module/load/external name]] [when mod [tree/set! module/cache name mod]] [return mod]]]]]]] #{##[type-of name ΓεnΣym-3 :object :keyword tree/ref module/cache module/load/external mod tree/set! #f]
-151A00051A010504011A02070D1A02051A03200B00091A01050900501A02051A
-04200B00461A05051A06051A010504020C0A00340D1A07051A010504011A0807
-0D1A08050B00141A09051A06051A01051A08050403090004240D1A0805010C0A
-00060D1A0A090004241601
+} module/load [name] #@[source: [[case [type-of name] [:object name] [:keyword [or [module/load/cache name] [module/load/store name] [module/load/external name]]] [otherwise [exception "Can't load that value as a module" name]]]]] #{##[type-of name ΓεnΣym-3 :object :keyword module/load/cache module/load/store module/load/external #f throw list "Can't load that value as a module" current-lambda]
+151A00051A010504011A02070D1A02051A03200B00091A010509004D1A02051A
+04200B002F1A05051A010504010C0A00200D1A06051A010504010C0A00130D1A
+07051A010504010C0A00060D1A080900181A09051A0A051A0B1A0105241A0C05
+0400040404011601
 } module/import-all [module symbol] #@[source: [[def exports [resolve 'exports module]] [typecheck/only exports :tree] [return exports]]] #{##[resolve exports module type-of :tree throw list :type-error "Expected a value of type :tree" current-lambda]
 1A00051A011A020504021A01070D1A03051A010504011A04200B000724090019
 1A05051A06051A071A081A01051A09050400040404010D1A01050101
@@ -1051,14 +1062,16 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 2A1A05051A06051A071A08051A02051A010504020B00081A090900051A0A241A
 0B050400040404010D1A0C051A03051A0205040201
 }]
-1A00052404011A01070D241A02070D1A031A041A051A06171A03070D1A071A08
-1A091A0A171A07070D1A0B1A0C1A0D1A0E171A0B070D1A0F1A101A111A12171A
-0F070D1A131A141A151A16181A13070D1A171A181A191A1A181A17070D1A1B1A
-1C1A1D1A1E181A1B070D1A1F1A201A211A22171A1F070D1A231A241A251A2618
-1A23070D1A271A281A291A2A181A27070D1A2B1A2C1A2D1A2E181A2B070D1A2F
-1A301A311A32181A2F070D1A331A341A351A36171A33070D1A371A381A391A3A
-171A37070D1A3B1A3C1A3D1A3E171A3B070D1A3F1A401A411A42171A3F070D1A
-431A441A451A46171A430701
+1A00052404011A01070D1A00052404011A02070D241A03070D1A041A051A061A
+07171A04070D1A081A091A0A1A0B171A08070D1A0C1A0D1A0E1A0F171A0C070D
+1A101A111A121A13171A10070D1A141A151A161A17181A14070D1A181A191A1A
+1A1B181A18070D1A1C1A1D1A1E1A1F181A1C070D1A201A211A221A23181A2007
+0D1A241A251A261A27171A24070D1A281A291A2A1A2B181A28070D1A2C1A2D1A
+2E1A2F181A2C070D1A301A311A321A33181A30070D1A341A351A361A37181A34
+070D1A381A391A3A1A3B171A38070D1A3C1A3D1A3E1A3F171A3C070D1A401A41
+1A421A43171A40070D1A441A451A461A47171A44070D1A481A491A4A1A4B171A
+48070D1A4C1A4D1A4E1A4F171A4C070D1A501A511A521A53171A50070D1A541A
+551A561A57171A540701
 }#{##[numeric? [a] #@[documentation: "Return #t if a is a number" source: ["Return #t if a is a number" [or [int? a] [float? a] [vec? a]]]] #{##[int? a float? vec? #f]
 1A00051A010504010C0A00200D1A02051A010504010C0A00130D1A03051A0105
 04010C0A00060D1A0401
@@ -1570,436 +1583,22 @@ FF570D24160D1A0B051A07051104010B001C1A02051A03051A0C1A0D1A01051A
 0D1A671A681A691A6A171A67070D1A6B1A6C1A6D1A6E171A6B070D1A6F1A701A
 711A72171A6F070D1A731A741A751A76171A73070D1A771A781A791A7A171A77
 070D1A7B1A7C1A7D1A7E171A7B070D1A7F1A801A811A82171A7F0701
-}#{##[module/insert :array/2d tree/new exports *module* tree/set! allocate array/2d/allocate [width height] #@[source: [[tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]] #{##[tree/new :data array/fill! array/allocate width height :width :height]
-1A00051A011A02051A03051A04051A0505270401020004021A061A04051A071A
-0505040601
-} fill! array/2d/fill! [data v] #@[source: [[array/fill! [tree/ref data :data] v] [return data]]] #{##[array/fill! tree/ref data :data v]
-1A00051A01051A02051A0304021A040504020D1A02050101
-} ref array/2d/ref [data x y oob-val] #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]] #{##[x tree/ref data :width y :height #f oob-val array/ref :data]
-1A00051A01051A02051A030402210C0A002F0D1A04051A01051A02051A050402
-210C0A001C0D1A000502001E0C0A00110D1A040502001E0C0A00060D1A060B00
-091A07050900241A08051A01051A02051A0904021A00051A04051A01051A0205
-1A0304022725040201
-} set! array/2d/set! [data x y val] #@[source: [[if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [exception :out-of-bounds "Trying to set an array out of bounds" data] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] [return data]]] #{##[x tree/ref data :width y :height #f throw list :out-of-bounds "Trying to set an array out of bounds" current-lambda array/set! :data val]
-1A00051A01051A02051A030402210C0A002F0D1A04051A01051A02051A050402
-210C0A001C0D1A000502001E0C0A00110D1A040502001E0C0A00060D1A060B00
-1C1A07051A08051A091A0A1A02051A0B050400040404010900271A0C051A0105
-1A02051A0D04021A00051A04051A01051A02051A03040227251A0E0504030D1A
-02050101
-} print array/2d/print [data] #@[source: [[dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] [return data]]] #{##[y x print cat array/2d/ref data " " tree/ref :width newline :height]
-1502001A00070D240900580D1502001A01070D240900280D1A02051A03051A04
-051A05051A01051A000504031A06040204010D02011A0105031A01081A01051A
-07051A05051A0804021E0AFFCD0D24160D1A090504000D02011A0005031A0008
-1A00051A07051A05051A0A04021E0AFF9D0D24160D1A05050101
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A05051A03051A061A07
-1A081A091A0A171A070704030D1A05051A03051A0B1A0C1A0D1A0E1A0F171A0C
-0704030D1A05051A03051A101A111A121A131A14171A110704030D1A05051A03
-051A151A161A171A181A19171A160704030D1A05051A03051A1A1A1B1A1C1A1D
-1A1E171A1B0704030D240D1316040201
-}#{##[module/insert :avl tree/new exports *module* :e avl/empty avl/empty? [n] #@[source: [[= :e n]]] #{##[:e n]
-1A001A01052001
-} tree/set! default-cmp avl/default-cmp [x y] #@[source: [[if [< x y] -1 [if [> x y] 1 0]]]] #{##[x y]
-1A00051A01051E0B000802FF0900141A00051A0105220B000802010900050200
-01
-} avl/typecheck [r k] #@[source: [[or [avl/empty? [avl/root r]] [= [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]]] #{##[avl/empty? avl/root r type-of k avl/key throw list :type-error "AVL trees can only contains keys of a single type" current-lambda #f]
-1A00051A01051A0205040104010C0A00410D1A03051A040504011A03051A0505
-1A01051A0205040104010401200C0A00210D1A06051A07051A081A091A04051A
-0A050400040404010C0A00060D1A0B01
-} tree avl/tree [cmp] #@[source: [[array/new avl/empty [or cmp avl/default-cmp]]]] #{##[array/new avl/empty cmp avl/default-cmp #f]
-1A00051A01051A02050C0A000E0D1A03050C0A00060D1A04040201
-} avl/height [n] #@[source: [[if [avl/empty? n] 0 [array/ref n 0]]]] #{##[avl/empty? n array/ref]
-1A00051A010504010B0008020009000D1A02051A01050200040201
-} avl/key [n] #@[source: [[array/ref n 1]]] #{##[array/ref n]
-1A00051A01050201040201
-} avl/left [n] #@[source: [[array/ref n 2]]] #{##[array/ref n]
-1A00051A01050202040201
-} avl/right [n] #@[source: [[array/ref n 3]]] #{##[array/ref n]
-1A00051A01050203040201
-} avl/root [r] #@[source: [[array/ref r 0]]] #{##[array/ref r]
-1A00051A01050200040201
-} avl/cmp [r] #@[source: [[array/ref r 1]]] #{##[array/ref r]
-1A00051A01050201040201
-} avl/min-node [n] #@[source: [[if [avl/empty? n] avl/empty [let [[l [avl/left n]]] [if [avl/empty? l] n [avl/min-mode l]]]]]] #{##[avl/empty? n avl/empty avl/left l avl/min-mode]
-1A00051A010504010B00091A020509002A151A03051A010504011A04070D1A00
-051A040504010B00091A010509000B1A05051A040504011601
-} avl/update-left [n l] #@[source: [[array/set! [array/dup n] 2 l]]] #{##[array/set! array/dup n l]
-1A00051A01051A0205040102021A0305040301
-} avl/update-right [n r] #@[source: [[array/set! [array/dup n] 3 r]]] #{##[array/set! array/dup n r]
-1A00051A01051A0205040102031A0305040301
-} avl/update-key [n k] #@[source: [[array/set! [array/dup n] 1 k]]] #{##[array/set! array/dup n k]
-1A00051A01051A0205040102011A0305040301
-} avl/update-root [t r] #@[source: [[array/set! [array/dup t] 0 r]]] #{##[array/set! array/dup t r]
-1A00051A01051A0205040102001A0305040301
-} avl/update-height [n] #@[source: [[array/set! [array/dup n] 0 [+ 1 [max [avl/height [avl/left n]] [avl/height [avl/right n]]]]]]] #{##[array/set! array/dup n max avl/height avl/left avl/right]
-1A00051A01051A02050401020002011A03051A04051A05051A0205040104011A
-04051A06051A020504010401040225040301
-} avl/rotate-right [y] #@[source: [[let [[x [avl/left y]]] [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]]] #{##[avl/left y x avl/update-height avl/update-right avl/update-left avl/right]
-151A00051A010504011A02070D1A03051A04051A02051A03051A05051A01051A
-06051A0205040104020401040204011601
-} avl/rotate-left [x] #@[source: [[let [[y [avl/right x]]] [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]]] #{##[avl/right x y avl/update-height avl/update-left avl/update-right avl/left]
-151A00051A010504011A02070D1A03051A04051A02051A03051A05051A01051A
-06051A0205040104020401040204011601
-} avl/balance [n] #@[source: [[if [avl/empty? n] 0 [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]]] #{##[avl/empty? n avl/height avl/left avl/right]
-1A00051A010504010B0008020009001E1A02051A03051A0105040104011A0205
-1A04051A0105040104012601
-} avl/insert-rebalance [n cmp v] #@[source: [[let [[b [avl/balance n]]] [cond [[> b 1] [case [cmp v [avl/key [avl/left n]]] [-1 [avl/rotate-right n]] [1 [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]] [0 n]]] [[< b -1] [case [cmp v [avl/key [avl/right n]]] [1 [avl/rotate-left n]] [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]] [0 n]]] [#t n]]]]] #{##[avl/balance n b cmp v avl/key avl/left ΓεnΣym-1 avl/rotate-right avl/update-left avl/rotate-left avl/right ΓεnΣym-2 avl/update-right]
-151A00051A010504011A02070D1A02050201220B006B151A03051A04051A0505
-1A06051A01050401040104021A07070D1A070502FF200B000E1A08051A010504
-010900391A07050201200B00201A08051A09051A01051A0A051A06051A010504
-010401040204010900131A07050200200B00091A0105090004241609007F1A02
-0502FF1E0B006B151A03051A04051A05051A0B051A01050401040104021A0C07
-0D1A0C050201200B000E1A0A051A010504010900391A0C0502FF200B00201A0A
-051A0D051A01051A08051A0B051A010504010401040204010900131A0C050200
-200B00091A0105090004241609000E1B0B00091A0105090004241601
-} avl/node-insert [n cmp v] #@[source: [[if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [case [cmp v [avl/key n]] [-1 [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v]] [1 [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]] [0 [avl/update-key n v]]]]]] #{##[avl/empty? n array/new v avl/empty cmp avl/key ΓεnΣym-3 avl/insert-rebalance avl/update-height avl/update-left avl/node-insert avl/left avl/update-right avl/right avl/update-key]
-1A00051A010504010B00161A020502011A03051A04051A0405040409009F151A
-05051A03051A06051A0105040104021A07070D1A070502FF200B00311A08051A
-09051A0A051A01051A0B051A0C051A010504011A05051A03050403040204011A
-05051A030504030900521A07050201200B00311A08051A09051A0D051A01051A
-0B051A0E051A010504011A05051A03050403040204011A05051A030504030900
-1B1A07050200200B00111A0F051A01051A03050402090004241601
-} insert avl/insert [t v] #@[documentation: "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" source: ["Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" [avl/typecheck t v] [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]] #{##[avl/typecheck t v avl/update-root avl/node-insert avl/root avl/cmp]
-1A00051A01051A020504020D1A03051A01051A04051A05051A010504011A0605
-1A010504011A02050403040201
-} avl/node-get [n cmp v] #@[source: [[if [avl/empty? n] #nil [case [cmp v [avl/key n]] [0 [avl/key n]] [-1 [avl/node-get [avl/left n] cmp v]] [1 [avl/node-get [avl/right n] cmp v]]]]]] #{##[avl/empty? n cmp v avl/key ΓεnΣym-4 avl/node-get avl/left avl/right]
-1A00051A010504010B00072409006C151A02051A03051A04051A010504010402
-1A05070D1A05050200200B000E1A04051A010504010900421A050502FF200B00
-191A06051A07051A010504011A02051A030504030900231A05050201200B0019
-1A06051A08051A010504011A02051A03050403090004241601
-} get avl/get [t v] #@[documentation: "Retrieve the key V from tree T, or #nil if V is not in it" source: ["Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [not= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]] #{##[avl/empty? avl/root t not= type-of v avl/key #f avl/node-get avl/cmp]
-1A00051A01051A0205040104010C0A002A0D1A03051A04051A050504011A0405
-1A06051A01051A020504010401040104020C0A00060D1A070B00072409001B1A
-08051A01051A020504011A09051A020504011A0505040301
-} from-list avl/from-list [l cmp] #@[documentation: "Create a new avl tree using the keys in L and the comparison function CMP" source: ["Create a new avl tree using the keys in L and the comparison function CMP" [list/reduce l avl/insert [avl/tree cmp]]]] #{##[list/reduce l avl/insert avl/tree cmp]
-1A00051A01051A02051A03051A04050401040301
-} avl/remove-rebalance [n] #@[source: [[if [avl/empty? n] n [let [[b [avl/balance n]] [l [avl/left n]] [r [avl/right n]]] [cond [[> b 1] [if [>= [avl/balance l] 0] [avl/rotate-right n] [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]] [[< b -1] [if [<= [avl/balance r] 0] [avl/rotate-left n] [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]] [#t n]]]]]] #{##[avl/empty? n avl/balance b avl/left l avl/right r avl/rotate-right avl/update-left avl/rotate-left avl/update-right]
-1A00051A010504010B00091A01050900A8151A02051A010504011A03070D1A04
-051A010504011A05070D1A06051A010504011A07070D1A03050201220B00341A
-02051A050504010200210B000E1A08051A010504010900181A08051A09051A01
-051A0A051A05050401040204010900481A030502FF1E0B00341A02051A070504
-0102001F0B000E1A0A051A010504010900181A0A051A0B051A01051A08051A07
-0504010402040109000E1B0B00091A0105090004241601
-} avl/node-remove [n cmp v] #@[source: [[if [avl/empty? n] n [let [[root [case [cmp v [avl/key n]] [-1 [avl/update-left n [avl/node-remove [avl/left n] cmp v]]] [1 [avl/update-right n [avl/node-remove [avl/right n] cmp v]]] [0 [cond [[avl/empty? [avl/left n]] [avl/right n]] [[avl/empty? [avl/right n]] [avl/left n]] [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]]] #{##[avl/empty? n cmp v avl/key ΓεnΣym-5 avl/update-left avl/node-remove avl/left avl/update-right avl/right avl/min-node k avl/update-key root avl/update-height avl/remove-rebalance]
-1A00051A010504010B00091A010509010C15151A02051A03051A04051A010504
-0104021A05070D1A050502FF200B00211A06051A01051A07051A08051A010504
-011A02051A0305040304020900B51A05050201200B00211A09051A01051A0705
-1A0A051A010504011A02051A03050403040209008E1A05050200200B00841A00
-051A08051A0105040104010B000E1A0A051A010504010900661A00051A0A051A
-0105040104010B000E1A08051A0105040109004B1B0B0046151A04051A0B051A
-0A051A01050401040104011A0C070D1A0D051A09051A0A051A010504011A0705
-1A0A051A010504011A02051A0305040304021A0C050402160900042409000424
-161A0E070D1A0F051A0E0504011A0E080D1A10051A0E0504011601
-} remove avl/remove [t v] #@[documentation: "Remove the key V from tree T if it is contained within it" source: ["Remove the key V from tree T if it is contained within it" [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]] #{##[avl/update-root t avl/node-remove avl/root avl/cmp v]
-1A00051A01051A02051A03051A010504011A04051A010504011A050504030402
-01
-} avl/equal-node? [a b] #@[source: [[if [avl/empty? a] [avl/empty? b] [and [equal? [avl/key a] [avl/key b]] [avl/equal-node? [avl/left a] [avl/left b]] [avl/equal-node? [avl/right a] [avl/right b]]]]]] #{##[avl/empty? a b equal? avl/key avl/equal-node? avl/left avl/right]
-1A00051A010504010B000E1A00051A0205040109004C1A03051A04051A010504
-011A04051A0205040104020C0B00330D1A05051A06051A010504011A06051A02
-05040104020C0B00190D1A05051A07051A010504011A07051A02050401040201
-} equal? avl/equal? [a b] #@[documentation: "Test if two avl trees are equal" source: ["Test if two avl trees are equal" [avl/equal-node? [avl/root a] [avl/root b]]]] #{##[avl/equal-node? avl/root a b]
-1A00051A01051A020504011A01051A03050401040201
-} avl/reduce-node [node o s] #@[source: [[if [avl/empty? node] s [o [avl/key node] [avl/reduce-node [avl/right node] o [avl/reduce-node [avl/left node] o s]]]]]] #{##[avl/empty? node s o avl/key avl/reduce-node avl/right avl/left]
-1A00051A010504010B00091A02050900331A03051A04051A010504011A05051A
-06051A010504011A03051A05051A07051A010504011A03051A02050403040304
-0201
-} reduce avl/reduce [t o s] #@[documentation: "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" source: ["Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" [avl/reduce-node [avl/root t] o s]]] #{##[avl/reduce-node avl/root t o s]
-1A00051A01051A020504011A03051A0405040301
-} avl/reduce-node-bin [n o s] #@[source: [[if [avl/empty? n] s [o [o [avl/key n] [avl/reduce-node-bin [avl/left n] o s]] [avl/reduce-node-bin [avl/right n] o s]]]]] #{##[avl/empty? n s o avl/key avl/reduce-node-bin avl/left avl/right]
-1A00051A010504010B00091A020509003B1A03051A03051A04051A010504011A
-05051A06051A010504011A03051A0205040304021A05051A07051A010504011A
-03051A02050403040201
-} reduce-bin avl/reduce-bin [t o s] #@[documentation: "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" source: ["Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" [avl/reduce-node-bin [avl/root t] o s]]] #{##[avl/reduce-node-bin avl/root t o s]
-1A00051A01051A020504011A03051A0405040301
-} map avl/map [t f] #@[documentation: "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" source: ["Create a new avl tree by mapping each key in T using F, using the same comparison function as T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]] #{##[avl/reduce t anonymous [x acc] #@[source: [[avl/insert acc [f x]]]] #{##[avl/insert acc f x]
-1A00051A01051A02051A03050401040201
-} avl/tree avl/cmp]
-1A00051A01051A021A031A041A05171A06051A07051A010504010401040301
-} map-to avl/map-to [t f cmp] #@[documentation: "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" source: ["Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]] #{##[avl/reduce t anonymous [x acc] #@[source: [[avl/insert acc [f x]]]] #{##[avl/insert acc f x]
-1A00051A01051A02051A03050401040201
-} avl/tree cmp]
-1A00051A01051A021A031A041A05171A06051A07050401040301
-} to-list avl/to-list [t] #@[source: [[avl/reduce t cons #nil]]] #{##[avl/reduce t cons]
-1A00051A01051A020524040301
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A051A06070D1A071A08
-1A091A0A171A07070D1A0B051A03051A0C1A0D1A0E1A0F1A10171A0D0704030D
-1A111A121A131A14171A11070D1A0B051A03051A151A161A171A181A19171A16
-0704030D1A1A1A1B1A1C1A1D171A1A070D1A1E1A1F1A201A21171A1E070D1A22
-1A231A241A25171A22070D1A261A271A281A29171A26070D1A2A1A2B1A2C1A2D
-171A2A070D1A2E1A2F1A301A31171A2E070D1A321A331A341A35171A32070D1A
-361A371A381A39171A36070D1A3A1A3B1A3C1A3D171A3A070D1A3E1A3F1A401A
-41171A3E070D1A421A431A441A45171A42070D1A461A471A481A49171A46070D
-1A4A1A4B1A4C1A4D171A4A070D1A4E1A4F1A501A51171A4E070D1A521A531A54
-1A55171A52070D1A561A571A581A59171A56070D1A5A1A5B1A5C1A5D171A5A07
-0D1A0B051A03051A5E1A5F1A601A611A62171A5F0704030D1A631A641A651A66
-171A63070D1A0B051A03051A671A681A691A6A1A6B171A680704030D1A0B051A
-03051A6C1A6D1A6E1A6F1A70171A6D0704030D1A711A721A731A74171A71070D
-1A751A761A771A78171A75070D1A0B051A03051A791A7A1A7B1A7C1A7D171A7A
-0704030D1A7E1A7F1A801A81171A7E070D1A0B051A03051A821A831A841A851A
-86171A830704030D1A871A881A891A8A171A87070D1A0B051A03051A8B1A8C1A
-8D1A8E1A8F171A8C0704030D1A901A911A921A93171A90070D1A0B051A03051A
-941A951A961A971A98171A950704030D1A0B051A03051A991A9A1A9B1A9C1A9D
-171A9A0704030D1A0B051A03051A9E1A9F1AA01AA11AA2171A9F0704030D1A0B
-051A03051AA31AA41AA51AA61AA7171AA40704030D240D1316040201
-}#{##[module/insert :crypto/adler32 tree/new exports *module* tree/set! hash [data] #@[source: [[def a 1] [def b 0] [when [string? data] [set! data [string->buffer data]]] [when [not= [type-of data] :buffer] [exception :type-error "Can only hash buffers or strings"]] [def v [buffer/view/u8* data]] [dotimes [i [buffer/length data]] [set! a [mod/int [add/int a [buffer/view/ref v i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [bit-or a [bit-shift-left b 16]]]] #{##[a b string? data string->buffer not= type-of :buffer throw list :type-error "Can only hash buffers or strings" current-lambda buffer/view/u8* v i mod/int buffer/view/ref 65521 buffer/length bit-or bit-shift-left]
-02011A00070D02001A01070D1A02051A030504010B00111A04051A030504011A
-0308090004240D1A05051A06051A030504011A0704020B001A1A08051A09051A
-0A1A0B241A0C05040004040401090004240D1A0D051A030504011A0E070D1502
-001A0F070D240900390D1A10051A00051A11051A0E051A0F050402031A120402
-1A00080D1A10051A00051A0105031A1204021A01080D02011A0F05031A0F081A
-0F051A13051A030504011E0AFFBE0D24160D1A14051A00051A15051A01050210
-0402040201
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A05051A03051A061A06
-1A071A081A09171A060704030D240D1316040201
-}#{##[module/insert :image tree/new exports *module* image/decoders image/encoders tree/set! add-encoder! image/add-encoder! [ext enc] #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/encoders ext enc]]] #{##[symbol->keyword string->symbol lowercase ext tree/set! image/encoders enc]
-1A00051A01051A02051A03050401040104011A03070D1A04051A05051A03051A
-0605040301
-} add-decoder! image/add-decoder! [ext dec] #@[source: [[def ext [string->keyword [lowercase ext]]] [tree/set! image/decoders ext dec]]] #{##[symbol->keyword string->symbol lowercase ext tree/set! image/decoders dec]
-1A00051A01051A02051A03050401040104011A03070D1A04051A05051A03051A
-0605040301
-} image/get-encoder [path] #@[source: [[def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/encoders ext]]] #{##[symbol->keyword string->symbol lowercase path/extension path ext tree/ref image/encoders]
-1A00051A01051A02051A03051A040504010401040104011A05070D1A06051A07
-051A0505040201
-} image/get-decoder [path] #@[source: [[def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/decoders ext]]] #{##[symbol->keyword string->symbol lowercase path/extension path ext tree/ref image/decoders]
-1A00051A01051A02051A03051A040504010401040104011A05070D1A06051A07
-051A0505040201
-} new image/new [width height] #@[source: [[def buffer [buffer/allocate [* width height 4]]] [tree/new :width width :height height :buffer buffer :pixels [buffer/view/u32* buffer]]]] #{##[buffer/allocate width height buffer tree/new :width :height :buffer :pixels buffer/view/u32*]
-1A00051A01051A02052702042704011A03070D1A04051A051A01051A061A0205
-1A071A03051A081A09051A03050401040801
-} ref image/ref [img x y] #@[source: [[def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/ref [tree/ref img :pixels] i]]] #{##[int x y tree/ref img :width i buffer/view/ref :pixels]
-1A00051A010504011A00051A020504011A03051A04051A05040227251A06070D
-1A07051A03051A04051A0804021A0605040201
-} set! image/set! [img x y value] #@[source: [[def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/set! [tree/ref img :pixels] i value]]] #{##[int x y tree/ref img :width i buffer/view/set! :pixels value]
-1A00051A010504011A00051A020504011A03051A04051A05040227251A06070D
-1A07051A03051A04051A0804021A06051A0905040301
-} fill! image/fill! [img value] #@[source: [[def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i value]] [return img]]] #{##[tree/ref img :pixels p i buffer/view/set! value :width :height]
-1A00051A01051A0204021A03070D1502001A04070D2409001C0D1A05051A0305
-1A04051A060504030D02011A0405031A04081A04051A00051A01051A0704021A
-00051A01051A080402271E0AFFCE0D24160D1A01050101
-} map! image/map! [img fun] #@[source: [[def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i [fun [buffer/view/ref p i]]]] [return img]]] #{##[tree/ref img :pixels p i buffer/view/set! fun buffer/view/ref :width :height]
-1A00051A01051A0204021A03070D1502001A04070D240900290D1A05051A0305
-1A04051A06051A07051A03051A04050402040104030D02011A0405031A04081A
-04051A00051A01051A0804021A00051A01051A090402271E0AFFC10D24160D1A
-01050101
-} dup image/dup [img] #@[source: [[def ret [image/new [tree/ref img :width] [tree/ref img :height]]] [def in [tree/ref img :pixels]] [def out [tree/ref ret :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! out i [buffer/view/ref in i]]] [return ret]]] #{##[image/new tree/ref img :width :height ret :pixels in out i buffer/view/set! buffer/view/ref]
-1A00051A01051A02051A0304021A01051A02051A04040204021A05070D1A0105
-1A02051A0604021A07070D1A01051A05051A0604021A08070D1502001A09070D
-240900240D1A0A051A08051A09051A0B051A07051A0905040204030D02011A09
-05031A09081A09051A01051A02051A0304021A01051A02051A040402271E0AFF
-C60D24160D1A05050101
-} save! image/save! [img path] #@[source: [[def enc [image/get-encoder path]] [if enc [file/write [enc img] path] [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]] #{##[image/get-encoder path enc file/write img throw list :missing-encoder "Currently there is no encoder loaded for that image format" current-lambda]
-1A00051A010504011A02070D1A02050B00161A03051A02051A040504011A0105
-04020900191A05051A06051A071A081A01051A090504000404040101
-} adler32 image/adler32 [img] #@[source: [[import [hash] :crypto/adler32] [hash [tree/ref img :buffer]]]] #{##[module/import module/load :crypto/adler32 hash tree/ref img :buffer]
-1A00051A01051A0204011A0304021A03070D1A03051A04051A05051A06040204
-0101
-} test-image-xor image/test-image-xor [] #@[source: [[def w 256] [def h 256] [def out [image/new w h]] [dotimes [x w] [dotimes [y h] [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]] [return out]]] #{##[256 w h image/new out x y image/set! bit-or bit-shift-left bit-xor]
-1A001A01070D1A001A02070D1A03051A01051A020504021A04070D1502001A05
-070D240900680D1502001A06070D240900450D1A07051A04051A05051A06051A
-08051A08051A05051A09051A06050208040204021A09051A0A051A05051A0605
-040202100402040204040D02011A0605031A06081A06051A02051E0AFFB70D24
-160D02011A0505031A05081A05051A01051E0AFF940D24160D1A04050101
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A02052404011A05070D
-1A02052404011A06070D1A07051A03051A081A091A0A1A0B1A0C171A09070403
-0D1A07051A03051A0D1A0E1A0F1A101A11171A0E0704030D1A121A131A141A15
-171A12070D1A161A171A181A19171A16070D1A07051A03051A1A1A1B1A1C1A1D
-1A1E171A1B0704030D1A07051A03051A1F1A201A211A221A23171A200704030D
-1A07051A03051A241A251A261A271A28171A250704030D1A07051A03051A291A
-2A1A2B1A2C1A2D171A2A0704030D1A07051A03051A2E1A2F1A301A311A32171A
-2F0704030D1A07051A03051A331A341A351A361A37171A340704030D1A07051A
-03051A381A391A3A1A3B1A3C171A390704030D1A07051A03051A3D1A3E1A3F1A
-401A41171A3E0704030D1A07051A03051A421A431A441A451A46171A43070403
-0D240D1316040201
-}#{##[module/insert :image/bmp tree/new exports *module* buffer/view/le/set! [u8v offset bytes val] #@[source: [[while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset]] #{##[buffer/view/set! u8v offset bit-and 255 val bytes bit-shift-right]
-240900370D1A00051A01051A02050201251A02081A03051A041A050504020403
-0D1A06050201261A06080D1A07051A0505020804021A05081A06050200220AFF
-C60D1A020501
-} image/bmp/row-padding [width pixel-length] #@[source: [[def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]]] #{##[bit-and width pixel-length ret]
-02041A00051A01051A02052702030402261A03070D1A03050204200B00080200
-0900061A030501
-} tree/set! encode image/bmp/encode [image] #@[source: [[require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] #{##[require* :image current-closure tree/ref image :height :width image/bmp/row-padding image-size header-size file-size buffer/allocate out buffer/view/u8* b i buffer/view/set! buffer/view/le/set! 8192 row-padding pixels y x image/ref]
-1A00051A011A020504001B04030D1A03051A04051A0504020203271A03051A04
-051A0604021A07051A03051A04051A0604020203040225271A08070D02361A09
-070D1A08051A0905251A0A070D1A0B051A0A0504011A0C070D1A0D051A0C0504
-011A0E070D02FF1A0F070D1A10051A0E051A0F050201251A0F08024204030D1A
-10051A0E051A0F050201251A0F08024D04030D1A11051A0E051A0F0502041A0A
-0504041A0F080D1A11051A0E051A0F050204020004041A0F080D1A11051A0E05
-1A0F0502041A090504041A0F080D1A11051A0E051A0F050204022804041A0F08
-0D1A11051A0E051A0F0502041A03051A04051A06040204041A0F080D1A11051A
-0E051A0F0502041A03051A04051A05040204041A0F080D1A11051A0E051A0F05
-0202020104041A0F080D1A11051A0E051A0F050202021804041A0F080D1A1105
-1A0E051A0F050204020004041A0F080D1A11051A0E051A0F0502041A08050404
-1A0F080D1A11051A0E051A0F0502041A1204041A0F080D1A11051A0E051A0F05
-02041A1204041A0F080D1A11051A0E051A0F050204020004041A0F080D1A1105
-1A0E051A0F050204020004041A0F080D1A07051A03051A04051A060402020304
-021A13070D1A09050201261A14070D151A03051A04051A0504020201261A1507
-0D240900610D1502001A16070D2409002C0D1A11051A0E051A140502031A1705
-1A04051A16051A1505040304041A14080D02011A1605031A16081A16051A0305
-1A04051A0604021E0AFFC90D24160D1A14051A1305251A14080D1A150502FF03
-1A15081A15050200210AFF9C160D1A0C050101
-} init! image/bmp/init! [] #@[source: [[require :image] [image/add-encoder! "bmp" image/bmp/encode]]] #{##[require* :image current-closure image/add-encoder! "bmp" image/bmp/encode]
-1A00051A011A020504001B04030D1A03051A041A0505040201
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A051A061A071A08171A
-05070D1A091A0A1A0B1A0C171A09070D1A0D051A03051A0E1A0F1A101A111A12
-171A0F0704030D1A0D051A03051A131A141A151A161A17171A140704030D240D
-1316040201
-}#{##[module/insert :io/ansi tree/new exports *module* disabled tree/set! disable! [v] #@[source: [[set! disabled [if [nil? v] #t v]]]] #{##[nil? v disabled]
-1A00051A010504010B00071B0900061A01051A020801
-} "\e[0m" reset "\e[0;39m" fg-reset "\e[49m" bg-reset array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m" ansi-fg "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m" ansi-bg wrap [code string] #@[documentation: "Wrap STRING in the ansi color CODE" source: ["Wrap STRING in the ansi color CODE" [cat [or disabled [array/ref ansi-fg code]] string [or disabled reset]]]] #{##[cat disabled array/ref ansi-fg code #f string reset]
-1A00051A01050C0A00160D1A02051A03051A040504020C0A00060D1A051A0605
-1A01050C0A000E0D1A07050C0A00060D1A05040301
-} black args #@[source: [[wrap 0 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502001A01051A02051A03050402040201
-} dark-red #@[source: [[wrap 1 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502011A01051A02051A03050402040201
-} dark-green #@[source: [[wrap 2 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502021A01051A02051A03050402040201
-} dark-brown brown #@[source: [[wrap 3 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502031A01051A02051A03050402040201
-} dark-blue #@[source: [[wrap 4 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502041A01051A02051A03050402040201
-} purple #@[source: [[wrap 5 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502051A01051A02051A03050402040201
-} teal #@[source: [[wrap 6 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502061A01051A02051A03050402040201
-} dark-gray #@[source: [[wrap 7 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502071A01051A02051A03050402040201
-} gray #@[source: [[wrap 8 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502081A01051A02051A03050402040201
-} red #@[source: [[wrap 9 [apply cat args]]]] #{##[wrap apply cat args]
-1A000502091A01051A02051A03050402040201
-} green #@[source: [[wrap 10 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020A1A01051A02051A03050402040201
-} yellow #@[source: [[wrap 11 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020B1A01051A02051A03050402040201
-} blue #@[source: [[wrap 12 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020C1A01051A02051A03050402040201
-} pink #@[source: [[wrap 13 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020D1A01051A02051A03050402040201
-} cyan #@[source: [[wrap 14 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020E1A01051A02051A03050402040201
-} white #@[source: [[wrap 15 [apply cat args]]]] #{##[wrap apply cat args]
-1A0005020F1A01051A02051A03050402040201
-} rainbow #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [let* [def count 0] [cat [join [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""] [or disabled fg-reset]]]]] #{##[count cat join map split apply args "" anonymous [a] #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] #{##[bit-and count cat disabled array/ref ansi-fg #f a]
-1A000502011A010525020704021A01080D1A02051A03050C0A00250D1A04051A
-05051A01052A0B000802070900091A010502082504020C0A00060D1A061A0705
-040201
-} disabled fg-reset #f]
-1502001A00070D1A01051A02051A03051A04051A05051A01051A060504021A07
-04021A081A091A0A1A0B1704021A0704021A0C050C0A000E0D1A0D050C0A0006
-0D1A0E04021601
-} rainbow-bg #@[documentation: "Wrap ARGS in the colors of the rainbow!" source: ["Wrap ARGS in the colors of the rainbow!" [def count 0] [def colored-list [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [bit-xor count 7]]] [or disabled [array/ref ansi-bg count]] a]]]] [cat [join colored-list ""] [or disabled reset]]]] #{##[count map split apply cat args "" anonymous [a] #@[source: [[set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [bit-xor count 7]]] [or disabled [array/ref ansi-bg count]] a]]] #{##[bit-and count cat disabled array/ref ansi-fg bit-xor #f ansi-bg a]
-1A000502011A010525020704021A01080D1A02051A03050C0A001D0D1A04051A
-05051A06051A01050207040204020C0A00060D1A071A03050C0A00160D1A0405
-1A08051A010504020C0A00060D1A071A0905040301
-} colored-list join disabled reset #f]
-02001A00070D1A01051A02051A03051A04051A050504021A0604021A071A081A
-091A0A1704021A0B070D1A04051A0C051A0B051A0604021A0D050C0A000E0D1A
-0E050C0A00060D1A0F040201
-} reprint-line [text width] #@[source: [[when-not width [set! width 20]] [print "\r"] [dotimes [i width] [print " "]] [print "\r"] [print text]]] #{##[width print "\r" i " " text]
-1A00050B00072409000802141A00080D1A01051A0204010D1502001A03070D24
-0900150D1A01051A0404010D02011A0305031A03081A03051A00051E0AFFE70D
-24160D1A01051A0204010D1A01051A0505040101
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1C1A05070D1A06051A03
-051A071A071A081A091A0A171A070704030D1A0B1A0C070D1A0D1A0E070D1A0F
-1A10070D1A11051A121A131A141A151A161A171A181A191A1A1A1B1A1C1A1D1A
-1E1A1F1A201A2104101A22070D1A11051A231A241A251A261A271A281A291A2A
-04081A2B070D1A06051A03051A2C1A2C1A2D1A2E1A2F171A2C0704030D1A0605
-1A03051A301A301A311A321A33171A300704030D1A06051A03051A341A341A31
-1A351A36171A340704030D1A06051A03051A371A371A311A381A39171A370704
-030D1A06051A03051A3A1A3B1A311A3C1A3D171A3B0704030D1A06051A03051A
-3E1A3E1A311A3F1A40171A3E0704030D1A06051A03051A411A411A311A421A43
-171A410704030D1A06051A03051A441A441A311A451A46171A440704030D1A06
-051A03051A471A471A311A481A49171A470704030D1A06051A03051A4A1A4A1A
-311A4B1A4C171A4A0704030D1A06051A03051A4D1A4D1A311A4E1A4F171A4D07
-04030D1A06051A03051A501A501A311A511A52171A500704030D1A06051A0305
-1A531A531A311A541A55171A530704030D1A06051A03051A561A561A311A571A
-58171A560704030D1A06051A03051A591A591A311A5A1A5B171A590704030D1A
-06051A03051A5C1A5C1A311A5D1A5E171A5C0704030D1A06051A03051A5F1A5F
-1A311A601A61171A5F0704030D1A06051A03051A621A621A311A631A64171A62
-0704030D1A06051A03051A651A651A311A661A67171A650704030D1A06051A03
-051A681A681A691A6A1A6B171A680704030D240D1316040201
-}#{##[module/insert :serialization/json tree/new exports *module* tree->json [v] #@[documentation: "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" source: ["Converts a tree into a JSON encoded string, you should prefer VAL->JSON" [cat "{" [join [map [tree/keys v] [fn [k] [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]] ",\n"] "}"]]] #{##[cat "{" join map tree/keys v anonymous [k] #@[source: [[cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]] #{##[cat "\"" keyword->string k "\": " val->json tree/ref v]
-1A00051A011A02051A030504011A041A05051A06051A07051A03050402040104
-0401
-} ",\n" "}"]
-1A00051A011A02051A03051A04051A050504011A061A071A081A091704021A0A
-04021A0B040301
-} tree/set! serialize val->json [v] #@[documentation: "Return V as a JSON encoded string" source: ["Return V as a JSON encoded string" [case [type-of v] [:nil "null"] [[:int :float] [string v]] [:bool [if v "true" "false"]] [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]] [:string [string/write v]] [:symbol [cat "\"" [symbol->string v] "\""]] [:keyword [cat "\"" [keyword->string v] "\""]] [:tree [tree->json v]] [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]] #{##[type-of v ΓεnΣym-1 :nil "null" :int :float #f string :bool "true" "false" :array :pair cat "[" join map val->json "," "]" :string string/write :symbol "\"" symbol->string :keyword keyword->string :tree tree->json throw list :type-error "Can't encode the value into JSON" current-lambda]
-151A00051A010504011A02070D1A02051A03200B00081A040900F31A02051A05
-200C0A00110D1A02051A06200C0A00060D1A070B000E1A08051A010504010900
-CD1A02051A09200B00131A01050B00081A0A0900051A0B0900B41A02051A0C20
-0C0A00110D1A02051A0D200C0A00060D1A070B00211A0E051A0F1A10051A1105
-1A01051A120504021A1304021A14040309007B1A02051A15200B000E1A16051A
-010504010900671A02051A17200B00171A0E051A181A19051A010504011A1804
-0309004A1A02051A1A200B00171A0E051A181A1B051A010504011A1804030900
-2D1A02051A1C200B000E1A1D051A010504010900191A1E051A1F051A201A211A
-01051A22050400040404011601
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A051A061A071A08171A
-05070D1A09051A03051A0A1A0B1A0C1A0D1A0E171A0B0704030D240D13160402
-01
-}#{##[module/insert :test tree/new exports *module* test-list test-count nujel-start success-count error-count print-errors print-passes tree/set! add* test/add* [result expr] #@[source: [[set! test-list [cons [cons result expr] test-list]] [set! test-count [+ test-count 1]]]] #{##[result expr test-list test-count]
-1A00051A0105141A0205141A02080D1A03050201251A030801
-} add test/add [result . expr] #@[documentation: "Add a test where EXPR must eval to RESULT" source: ["Add a test where EXPR must eval to RESULT" [quasiquote [[unquote test/add*] [unquote result] [unquote [list 'quote [cons 'do expr]]]]]]] #{##[test/add* result list quote do expr]
-1A00051A01051A02051A031A041A05051404022414141401
-} reset! [] #@[source: [[set! test-list [cons 4 '[+ 3 1]]] [set! test-count 1]]] #{##[[+ 3 1] test-list test-count]
-02041A00141A01080D02011A020801
-} display-results [description] #@[documentation: "Prints the result Message" source: ["Prints the result Message" [random/seed-initialize!] [efmtln "{} {} - [{} / {}] in {} ms" [if [and [zero? error-count] [> test-count 0]] [if [zero? success-count] [ansi-yellow "?"] [ansi-green "✓"]] [ansi-red "✗"]] description [if [zero? success-count] [ansi-yellow success-count] [ansi-green success-count]] [if [zero? error-count] [ansi-gray error-count] [ansi-red error-count]] [- [time/milliseconds] nujel-start]]]] #{##[random/seed-initialize! errorln error-count test-count success-count ansi-yellow "?" ansi-green "✓" ansi-red "✗" fmt-arg-0 description fmt-arg-1 fmt-arg-2 ansi-gray fmt-arg-3 time/milliseconds nujel-start fmt-arg-4 cat " " " - [" " / " "] in " " ms"]
-1A000504000D1A0105151A02052A0C0B000A0D1A03050200220B001E1A04052A
-0B000D1A05051A06040109000A1A07051A08040109000A1A09051A0A04011A0B
-070D1A0C051A0D070D1A04052A0B000E1A05051A0405040109000B1A07051A04
-0504011A0E070D1A02052A0B000E1A0F051A0205040109000B1A09051A020504
-011A10070D1A110504001A1205261A13070D1A14051A0B051A151A0D051A161A
-0E051A171A10051A181A13051A19040A16040101
-} test-success [res-should res-is expr] #@[documentation: "Should be called after a test has finished successfully" source: ["Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]]] #{##[print-passes errorln ansi-green string/write res-is fmt-arg-0 res-should fmt-arg-1 expr fmt-arg-2 cat " == " "\r\n" "\r\n\r\n" success-count]
-1A00050B004F1A0105151A02051A03051A0405040104011A05070D1A02051A03
-051A0605040104011A07070D1A03051A080504011A09070D1A0A051A05051A0B
-1A07051A0C1A09051A0D0406160401090004240D02011A0E05251A0E0801
-} test-failure [res-should res-is expr] #@[documentation: "Should be called if EXPR does not equal RES" source: ["Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]]] #{##[print-errors println ansi-red string/write res-is fmt-arg-0 ansi-green res-should fmt-arg-1 expr fmt-arg-2 cat " != " "\r\n" "\r\n\r\n" error-count]
-1A00050B004F1A0105151A02051A03051A0405040104011A05070D1A06051A03
-051A0705040104011A08070D1A03051A090504011A0A070D1A0B051A05051A0C
-1A08051A0D1A0A051A0E0406160401090004240D02011A0F05251A0F0801
-} run-test! [result rawexpr i] #@[documentation: "Tests that RAWEXPR evaluates to RESULT" source: ["Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr] [test-failure result expr rawexpr]]]]] #{##[anonymous [err] #@[source: [[display/error err] [test-failure result [list :exception-caught err] rawexpr]]] #{##[display/error err test-failure result list :exception-caught rawexpr]
-1A00051A010504010D1A02051A03051A04051A051A010504021A0605040301
-} eval-in current-closure rawexpr expr equal? result test-success test-failure]
-1A001A011A021A03171900421A04051A050504001A060504021A07070D1A0805
-1A09051A070504020B00141A0A051A09051A07051A060504030900111A0B051A
-09051A07051A060504031601
-} init! [output-passes hide-errors] #@[documentation: "Initialize the testing framework" source: ["Initialize the testing framework" [set! print-errors [not [boolean hide-errors]]] [set! print-passes [boolean output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0]]] #{##[hide-errors print-errors output-passes print-passes time/milliseconds nujel-start success-count error-count]
-1A00050B00071B0900041C0B00071C0900041B1A01080D1A02050B00071B0900
-041C1A03080D1A040504001A05080D02001A06080D02001A070801
-} finish! [description] #@[source: [[display-results description] [return error-count]]] #{##[display-results description error-count]
-1A00051A010504010D1A02050101
-} run [output-passes hide-errors] #@[documentation: "Run through all automated Tests" source: ["Run through all automated Tests" [init!] [doseq [cur-test test-list] [run-test! [car cur-test] [cdr cur-test]]] [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]] #{##[init! test-list ΓεnΣym-1 cur-test run-test! finish! ansi-blue ":core" fmt-arg-0 ansi-rainbow "Nujel" fmt-arg-1 cat " " " [" System/OS System/Architecture "]"]
-1A000504000D151A01051A02070D1A02050B002E240900210D1A0205111A0307
-0D1A04051A0305111A03051204020D1A0205121A02081A02050AFFDF09000424
-160D1A0505151A06051A0704011A08070D1A09051A0A04011A0B070D1A0C051A
-08051A0D1A0B051A0E1A0F051A0D1A10051A11040816040101
-}]
-1A00051A01151A02052404011A03070D1A011A04070D241A05070D02001A0607
-0D02001A07070D02001A08070D02001A09070D1B1A0A070D1C1A0B070D1A0C05
-1A03051A0D1A0E1A0F1A101A11171A0E0704030D1A0C051A03051A121A131A14
-1A151A16181A130704030D1A0C051A03051A171A171A181A191A1A171A170704
-030D1A1B1A1C1A1D1A1E171A1B070D1A1F1A201A211A22171A1F070D1A231A24
-1A251A26171A23070D1A0C051A03051A271A271A281A291A2A171A270704030D
-1A0C051A03051A2B1A2B1A2C1A2D1A2E171A2B0704030D1A0C051A03051A2F1A
-2F1A301A311A32171A2F0704030D1A0C051A03051A331A331A341A351A36171A
-330704030D1A170504000D240D1316040201
-}#{##[module/insert :time tree/new exports *module* tree/set! seconds [timestamp] #@[documentation: "Return the seconds part of TIMESTAMP, defaults to current time" source: ["Return the seconds part of TIMESTAMP, defaults to current time" [rem [or timestamp [time]] 60]]] #{##[timestamp time #f]
-1A00050C0A00100D1A010504000C0A00060D1A02023C2901
-} minutes [timestamp] #@[documentation: "Return the minutes part of TIMESTAMP, defaults to current time" source: ["Return the minutes part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 60] 60]]] #{##[timestamp time #f]
-1A00050C0A00100D1A010504000C0A00060D1A02023C28023C2901
-} hours [timestamp] #@[documentation: "Return the hours part of TIMESTAMP, defaults to current time" source: ["Return the hours part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 3600] 24]]] #{##[timestamp time #f 3600]
-1A00050C0A00100D1A010504000C0A00060D1A021A032802182901
-}]
-1A00051A01151A02052404011A03070D1A011A04070D1A05051A03051A061A06
-1A071A081A09171A060704030D1A05051A03051A0A1A0A1A0B1A0C1A0D171A0A
-0704030D1A05051A03051A0E1A0E1A0F1A101A11171A0E0704030D240D131604
-0201
+}#{##[module/insert/defer :array/2d string/write [do [def *module* :array/2d] [export allocate [defn array/2d/allocate [width height] [tree/new :data [-> [array/allocate [* width height]] [array/fill! 0]] :width width :height height]]] [export fill! [defn array/2d/fill! [data v] [array/fill! [tree/ref data :data] v] [return data]]] [export ref [defn array/2d/ref [data x y oob-val] [if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] oob-val [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]] [export set! [defn array/2d/set! [data x y val] [if [or [>= x [tree/ref data :width]] [>= y [tree/ref data :height]] [< x 0] [< y 0]] [exception :out-of-bounds "Trying to set an array out of bounds" data] [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]] [return data]]] [export print [defn array/2d/print [data] [dotimes [y [tree/ref data :height]] [dotimes [x [tree/ref data :width]] [display [cat [array/2d/ref data x y] " "]]] [newline]] [return data]]] [deftest #t [-> [array/2d/allocate 4 4] [array/2d/set! 1 1 #t] [array/2d/ref 1 1]]] [deftest #t [-> [array/2d/allocate 3 3] [array/2d/fill! #t] [array/2d/ref 1 1]]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :avl string/write [do [def *module* :avl] [def avl/empty :e] [defn avl/empty? [n] [= :e n]] [export default-cmp [defn avl/default-cmp [x y] [if [< x y] -1 [if [> x y] 1 0]]]] [defn avl/typecheck [r k] [or [avl/empty? [avl/root r]] [= [type-of k] [type-of [avl/key [avl/root r]]]] [throw [list :type-error "AVL trees can only contains keys of a single type" k [current-lambda]]]]] [export tree [defn avl/tree [cmp] [array/new avl/empty [or cmp avl/default-cmp]]]] [defn avl/height [n] [if [avl/empty? n] 0 [array/ref n 0]]] [defn avl/key [n] [array/ref n 1]] [defn avl/left [n] [array/ref n 2]] [defn avl/right [n] [array/ref n 3]] [defn avl/root [r] [array/ref r 0]] [defn avl/cmp [r] [array/ref r 1]] [defn avl/min-node [n] [if [avl/empty? n] avl/empty [let [[l [avl/left n]]] [if [avl/empty? l] n [avl/min-mode l]]]]] [defn avl/update-left [n l] [array/set! [array/dup n] 2 l]] [defn avl/update-right [n r] [array/set! [array/dup n] 3 r]] [defn avl/update-key [n k] [array/set! [array/dup n] 1 k]] [defn avl/update-root [t r] [array/set! [array/dup t] 0 r]] [defn avl/update-height [n] [array/set! [array/dup n] 0 [+ 1 [max [avl/height [avl/left n]] [avl/height [avl/right n]]]]]] [defn avl/rotate-right [y] [let [[x [avl/left y]]] [avl/update-height [avl/update-right x [avl/update-height [avl/update-left y [avl/right x]]]]]]] [defn avl/rotate-left [x] [let [[y [avl/right x]]] [avl/update-height [avl/update-left y [avl/update-height [avl/update-right x [avl/left y]]]]]]] [defn avl/balance [n] [if [avl/empty? n] 0 [- [avl/height [avl/left n]] [avl/height [avl/right n]]]]] [defn avl/insert-rebalance [n cmp v] [let [[b [avl/balance n]]] [cond [[> b 1] [case [cmp v [avl/key [avl/left n]]] [-1 [avl/rotate-right n]] [1 [avl/rotate-right [avl/update-left n [avl/rotate-left [avl/left n]]]]] [0 n]]] [[< b -1] [case [cmp v [avl/key [avl/right n]]] [1 [avl/rotate-left n]] [-1 [avl/rotate-left [avl/update-right n [avl/rotate-right [avl/right n]]]]] [0 n]]] [#t n]]]] [defn avl/node-insert [n cmp v] [if [avl/empty? n] [array/new 1 v avl/empty avl/empty] [case [cmp v [avl/key n]] [-1 [avl/insert-rebalance [avl/update-height [avl/update-left n [avl/node-insert [avl/left n] cmp v]]] cmp v]] [1 [avl/insert-rebalance [avl/update-height [avl/update-right n [avl/node-insert [avl/right n] cmp v]]] cmp v]] [0 [avl/update-key n v]]]]] [export insert [defn avl/insert [t v] "Insert key V into tree T.  If a node with an equivalent key already exists, its key is updated to V" [avl/typecheck t v] [avl/update-root t [avl/node-insert [avl/root t] [avl/cmp t] v]]]] [defn avl/node-get [n cmp v] [if [avl/empty? n] #nil [case [cmp v [avl/key n]] [0 [avl/key n]] [-1 [avl/node-get [avl/left n] cmp v]] [1 [avl/node-get [avl/right n] cmp v]]]]] [export get [defn avl/get [t v] "Retrieve the key V from tree T, or #nil if V is not in it" [if [or [avl/empty? [avl/root t]] [not= [type-of v] [type-of [avl/key [avl/root t]]]]] #nil [avl/node-get [avl/root t] [avl/cmp t] v]]]] [export from-list [defn avl/from-list [l cmp] "Create a new avl tree using the keys in L and the comparison function CMP" [list/reduce l avl/insert [avl/tree cmp]]]] [defn avl/remove-rebalance [n] [if [avl/empty? n] n [let [[b [avl/balance n]] [l [avl/left n]] [r [avl/right n]]] [cond [[> b 1] [if [>= [avl/balance l] 0] [avl/rotate-right n] [avl/rotate-right [avl/update-left n [avl/rotate-left l]]]]] [[< b -1] [if [<= [avl/balance r] 0] [avl/rotate-left n] [avl/rotate-left [avl/update-right n [avl/rotate-right r]]]]] [#t n]]]]] [defn avl/node-remove [n cmp v] [if [avl/empty? n] n [let [[root [case [cmp v [avl/key n]] [-1 [avl/update-left n [avl/node-remove [avl/left n] cmp v]]] [1 [avl/update-right n [avl/node-remove [avl/right n] cmp v]]] [0 [cond [[avl/empty? [avl/left n]] [avl/right n]] [[avl/empty? [avl/right n]] [avl/left n]] [#t [let [[k [avl/key [avl/min-node [avl/right n]]]]] [avl/update-key [avl/update-right [avl/right n] [avl/node-remove [avl/right n] cmp v]] k]]]]]]]] [set! root [avl/update-height root]] [avl/remove-rebalance root]]]] [export remove [defn avl/remove [t v] "Remove the key V from tree T if it is contained within it" [avl/update-root t [avl/node-remove [avl/root t] [avl/cmp t] v]]]] [defn avl/equal-node? [a b] [if [avl/empty? a] [avl/empty? b] [and [equal? [avl/key a] [avl/key b]] [avl/equal-node? [avl/left a] [avl/left b]] [avl/equal-node? [avl/right a] [avl/right b]]]]] [export equal? [defn avl/equal? [a b] "Test if two avl trees are equal" [avl/equal-node? [avl/root a] [avl/root b]]]] [defn avl/reduce-node [node o s] [if [avl/empty? node] s [o [avl/key node] [avl/reduce-node [avl/right node] o [avl/reduce-node [avl/left node] o s]]]]] [export reduce [defn avl/reduce [t o s] "Reduce T in-order with a reducer O taking a key and the result of the reductions of one subtree" [avl/reduce-node [avl/root t] o s]]] [defn avl/reduce-node-bin [n o s] [if [avl/empty? n] s [o [o [avl/key n] [avl/reduce-node-bin [avl/left n] o s]] [avl/reduce-node-bin [avl/right n] o s]]]] [export reduce-bin [defn avl/reduce-bin [t o s] "Reduce T with a reducer O taking a key and the result of the reductions of both subtrees" [avl/reduce-node-bin [avl/root t] o s]]] [export map [defn avl/map [t f] "Create a new avl tree by mapping each key in T using F, using the same comparison function as T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree [avl/cmp t]]]]] [export map-to [defn avl/map-to [t f cmp] "Create a new avl tree by mapping each key in in T using F, using the comparison function CMP, which may be different from the comparison used in T" [avl/reduce t [fn [x acc] [avl/insert acc [f x]]] [avl/tree cmp]]]] [export to-list [defn avl/to-list [t] [avl/reduce t cons #nil]]] [deftest 1 [avl/get [avl/from-list '[1 2 3]] 1]] [deftest 4 [avl/get [avl/from-list '[1 2 3 4 5]] 4]] [deftest 15 [avl/get [avl/from-list '[23 42 100 10 15 64 101]] 15]] [deftest 100 [avl/get [avl/from-list '[23 42 100 100 101 100]] 100]] [deftest 101 [avl/get [avl/from-list '[23 42 100 100 101 100]] 101]] [deftest 100 [avl/get [avl/remove [avl/from-list '[23 42 100 10 64 101]] 15] 100]] [deftest #nil [avl/get [avl/from-list '[1 2 3]] 4]] [deftest #nil [avl/get [avl/from-list #nil] 1]] [deftest #nil [avl/get [avl/remove [avl/from-list '[23 42 100 10 15 64 101]] 15] 15]] [deftest #nil [avl/get [avl/remove [avl/from-list '[23 42 100 10 64 101]] 15] 15]] [deftest 355 [avl/reduce [avl/from-list '[23 42 100 10 15 64 101]] + 0]] [deftest 355 [avl/reduce-bin [avl/from-list '[23 42 100 10 15 64 101]] + 0]] [deftest -19 [avl/reduce [avl/from-list '[23 42 100 10 15 64 101]] - 0]] [deftest 125 [avl/reduce-bin [avl/from-list '[23 42 100 10 15 64 101]] - 0]] [deftest '[42 100 101 64 15 23 10] [avl/to-list [avl/from-list '[23 42 100 10 15 64 101]]]] [deftest 200 [avl/get [avl/map [avl/from-list '[23 42 100 10 15 64 101]] [fn [x] [* x 2]]] 200]] [deftest #nil [avl/get [avl/map [avl/from-list '[23 42 100 10 15 64 101]] [fn [x] [* x 2]]] 100]] [deftest 100 [avl/get [avl/insert [avl/map [avl/remove [avl/from-list '[23 42 100 10 15 64 101]] 100] [fn [x] [* x 2]]] 100] 100]] [deftest "100" [avl/get [avl/map [avl/from-list '[23 42 100 10 15 64 101]] string] "100"]] [deftest "100" [avl/get [avl/map-to [avl/from-list '[23 42 100 10 15 64 101]] string [fn [x y] [if [< x y] -1 [if [> x y] 1 0]]]] "100"]] [deftest "a" [avl/get [avl/from-list '["a" "b" "c"]] "a"]] [deftest "ein" [avl/get [avl/from-list '["Dies" "ist" "ein" "Test"]] "ein"]] [deftest #nil [avl/get [avl/from-list '["a" "b" "c"]] "d"]] [deftest #nil [avl/get [avl/from-list '["a" "b" "c"]] :a]] [deftest :c [avl/get [avl/from-list '[:a :b :c]] :c]] [deftest #nil [avl/get [avl/from-list '[:a :b :c]] :d]] [deftest #nil [avl/get [avl/from-list '[:a :b :c]] "c"]] [deftest 'c [avl/get [avl/from-list '[c b a]] 'c]] [deftest 'c [avl/get [avl/from-list '[b c a]] 'c]] [deftest 'c [avl/get [avl/from-list '[b c b b b a]] 'c]] [deftest '[b c a] [avl/to-list [avl/from-list '[b c b b b a]] 'c]] [deftest #nil [avl/get [avl/from-list '[c b a]] 'd]] [deftest :type-error [try car [avl/from-list '[c :b a]]]] [deftest :type-error [try car [avl/from-list '["c" b a]]]] [deftest :type-error [try car [avl/from-list '[123 b a]]]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :crypto/adler32 string/write [do [def *module* :crypto/adler32] [export hash [defn hash [data] [def a 1] [def b 0] [when [string? data] [set! data [string->buffer data]]] [when [not= [type-of data] :buffer] [exception :type-error "Can only hash buffers or strings"]] [def v [buffer/view/u8* data]] [dotimes [i [buffer/length data]] [set! a [mod/int [add/int a [buffer/view/ref v i]] 65521]] [set! b [mod/int [add/int a b] 65521]]] [bit-or a [bit-shift-left b 16]]]] [deftest "00620062" [fmt "{:08X}" [crypto/adler32/hash "a"]]] [deftest "0F9D02BC" [fmt "{:08X}" [crypto/adler32/hash "asdQWE123"]]] [deftest "796B110D" [fmt "{:08X}" [crypto/adler32/hash "DiesIstEinTestDerNujelAdler32Implementierung"]]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :image string/write [do [def *module* :image] [def image/decoders [tree/new #nil]] [def image/encoders [tree/new #nil]] [export add-encoder! [defn image/add-encoder! [ext enc] [def ext [string->keyword [lowercase ext]]] [tree/set! image/encoders ext enc]]] [export add-decoder! [defn image/add-decoder! [ext dec] [def ext [string->keyword [lowercase ext]]] [tree/set! image/decoders ext dec]]] [defn image/get-encoder [path] [def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/encoders ext]] [defn image/get-decoder [path] [def ext [string->keyword [lowercase [path/extension path]]]] [tree/ref image/decoders ext]] [export new [defn image/new [width height] [def buffer [buffer/allocate [* width height 4]]] [tree/new :width width :height height :buffer buffer :pixels [buffer/view/u32* buffer]]]] [export ref [defn image/ref [img x y] [def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/ref [tree/ref img :pixels] i]]] [export set! [defn image/set! [img x y value] [def i [+ [int x] [* [int y] [tree/ref img :width]]]] [buffer/view/set! [tree/ref img :pixels] i value]]] [export fill! [defn image/fill! [img value] [def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i value]] [return img]]] [export map! [defn image/map! [img fun] [def p [tree/ref img :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! p i [fun [buffer/view/ref p i]]]] [return img]]] [export dup [defn image/dup [img] [def ret [image/new [tree/ref img :width] [tree/ref img :height]]] [def in [tree/ref img :pixels]] [def out [tree/ref ret :pixels]] [dotimes [i [* [tree/ref img :width] [tree/ref img :height]]] [buffer/view/set! out i [buffer/view/ref in i]]] [return ret]]] [export save! [defn image/save! [img path] [def enc [image/get-encoder path]] [if enc [file/write [enc img] path] [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]] [export adler32 [defn image/adler32 [img] [import [hash] :crypto/adler32] [hash [tree/ref img :buffer]]]] [export test-image-xor [defn image/test-image-xor [] [def w 256] [def h 256] [def out [image/new w h]] [dotimes [x w] [dotimes [y h] [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]] [return out]]] [deftest 4040398435 [image/adler32 [image/test-image-xor]]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :image/bmp string/write [do [def *module* :image/bmp] [defn buffer/view/le/set! [u8v offset bytes val] [while [> bytes 0] [buffer/view/set! u8v [inc! offset] [bit-and 255 val]] [dec! bytes] [set! val [bit-shift-right val 8]]] offset] [defn image/bmp/row-padding [width pixel-length] [def ret [- 4 [bit-and [* width pixel-length] 3]]] [if [= ret 4] 0 ret]] [export encode [defn image/bmp/encode [image] [require :image] [def image-size [* [tree/ref image :height] 3 [+ [tree/ref image :width] [image/bmp/row-padding [tree/ref image :width] 3]]]] [def header-size [+ 14 40]] [def file-size [+ image-size header-size]] [def out [buffer/allocate file-size]] [def b [buffer/view/u8* out]] [def i -1] [buffer/view/set! b [inc! i] 66] [buffer/view/set! b [inc! i] 77] [set! i [buffer/view/le/set! b i 4 file-size]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 header-size]] [set! i [buffer/view/le/set! b i 4 40]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]] [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]] [set! i [buffer/view/le/set! b i 2 1]] [set! i [buffer/view/le/set! b i 2 24]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 image-size]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 8192]] [set! i [buffer/view/le/set! b i 4 0]] [set! i [buffer/view/le/set! b i 4 0]] [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]] [def pixels [- header-size 1]] [let [[y [- [tree/ref image :height] 1]]] [while [>= y 0] [dotimes [x [tree/ref image :width]] [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]] [set! pixels [+ pixels row-padding]] [set! y [add/int y -1]]]] [return out]]] [export init! [defn image/bmp/init! [] [require :image] [image/add-encoder! "bmp" image/bmp/encode]]] [deftest 3149043687 [import hash :crypto/adler32] [import [test-image-xor] :image] [hash [image/bmp/encode [test-image-xor]]]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :io/ansi string/write [do [def *module* :io/ansi] [def disabled #f] [export disable! [defn disable! [v] [set! disabled [if [nil? v] #t v]]]] [def reset "\e[0m"] [def fg-reset "\e[0;39m"] [def bg-reset "\e[49m"] [def ansi-fg [array/new "\e[0;30m" "\e[0;31m" "\e[0;32m" "\e[0;33m" "\e[0;34m" "\e[0;35m" "\e[0;36m" "\e[0;37m" "\e[1;30m" "\e[1;31m" "\e[1;32m" "\e[1;33m" "\e[1;34m" "\e[1;35m" "\e[1;36m" "\e[1;37m"]] [def ansi-bg [array/new "\e[40m" "\e[41m" "\e[42m" "\e[43m" "\e[44m" "\e[45m" "\e[46m" "\e[47m"]] [export wrap [defn wrap [code string] "Wrap STRING in the ansi color CODE" [cat [or disabled [array/ref ansi-fg code]] string [or disabled reset]]]] [export black [defn black args [wrap 0 [apply cat args]]]] [export dark-red [defn dark-red args [wrap 1 [apply cat args]]]] [export dark-green [defn dark-green args [wrap 2 [apply cat args]]]] [export dark-brown [defn brown args [wrap 3 [apply cat args]]]] [export dark-blue [defn dark-blue args [wrap 4 [apply cat args]]]] [export purple [defn purple args [wrap 5 [apply cat args]]]] [export teal [defn teal args [wrap 6 [apply cat args]]]] [export dark-gray [defn dark-gray args [wrap 7 [apply cat args]]]] [export gray [defn gray args [wrap 8 [apply cat args]]]] [export red [defn red args [wrap 9 [apply cat args]]]] [export green [defn green args [wrap 10 [apply cat args]]]] [export yellow [defn yellow args [wrap 11 [apply cat args]]]] [export blue [defn blue args [wrap 12 [apply cat args]]]] [export pink [defn pink args [wrap 13 [apply cat args]]]] [export cyan [defn cyan args [wrap 14 [apply cat args]]]] [export white [defn white args [wrap 15 [apply cat args]]]] [export rainbow [defn rainbow args "Wrap ARGS in the colors of the rainbow!" [let* [def count 0] [cat [join [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""] [or disabled fg-reset]]]]] [export rainbow-bg [defn rainbow-bg args "Wrap ARGS in the colors of the rainbow!" [def count 0] [def colored-list [map [split [apply cat args] ""] [fn [a] [set! count [bit-and [+ 1 count] 7]] [cat [or disabled [array/ref ansi-fg [bit-xor count 7]]] [or disabled [array/ref ansi-bg count]] a]]]] [cat [join colored-list ""] [or disabled reset]]]] [export reprint-line [defn reprint-line [text width] [when-not width [set! width 20]] [print "\r"] [dotimes [i width] [print " "]] [print "\r"] [print text]]] [deftest "\e[0;33mabc\e[0m" [io/ansi/wrap 3 "abc"]] [deftest "\e[0;30m123\e[0m" [io/ansi/black "123"]] [deftest "\e[0;31m123\e[0m" [io/ansi/dark-red "123"]] [deftest "\e[0;32m123\e[0m" [io/ansi/dark-green "123"]] [deftest "\e[0;33m123\e[0m" [io/ansi/dark-brown "123"]] [deftest "\e[0;34m123\e[0m" [io/ansi/dark-blue "123"]] [deftest "\e[0;35m123\e[0m" [io/ansi/purple "123"]] [deftest "\e[0;36m123\e[0m" [io/ansi/teal "123"]] [deftest "\e[0;37m123\e[0m" [io/ansi/dark-gray "123"]] [deftest "\e[1;30m123\e[0m" [io/ansi/gray "123"]] [deftest "\e[1;31m123\e[0m" [io/ansi/red "123"]] [deftest "\e[1;32m123\e[0m" [io/ansi/green "123"]] [deftest "\e[1;33m123\e[0m" [io/ansi/yellow "123"]] [deftest "\e[1;34m123\e[0m" [io/ansi/blue "123"]] [deftest "\e[1;35m123\e[0m" [io/ansi/pink "123"]] [deftest "\e[1;36m123\e[0m" [io/ansi/cyan "123"]] [deftest "\e[1;37m123\e[0m" [io/ansi/white "123"]] [deftest "\e[1;31mt\e[1;32me\e[1;33ms\e[1;34mt\e[1;35me\e[1;36mr\e[1;37ml\e[0;37me\e[0;39m" [io/ansi/rainbow "testerle"]] [deftest "\e[0;36m\e[41mt\e[0;35m\e[42me\e[0;34m\e[43ms\e[0;33m\e[44mt\e[0;32m\e[45me\e[0;31m\e[46mr\e[0;30m\e[47ml\e[0;37m\e[40me\e[0m" [io/ansi/rainbow-bg "testerle"]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :serialization/json string/write [do [def *module* :serialization/json] [defn tree->json [v] "Converts a tree into a JSON encoded string, you should prefer VAL->JSON" [cat "{" [join [map [tree/keys v] [fn [k] [cat "\"" [keyword->string k] "\": " [val->json [tree/ref v k]]]]] ",\n"] "}"]] [export serialize [defn val->json [v] "Return V as a JSON encoded string" [case [type-of v] [:nil "null"] [[:int :float] [string v]] [:bool [if v "true" "false"]] [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]] [:string [string/write v]] [:symbol [cat "\"" [symbol->string v] "\""]] [:keyword [cat "\"" [keyword->string v] "\""]] [:tree [tree->json v]] [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]] [deftest "null" [serialization/json/serialize #nil]] [deftest "123" [serialization/json/serialize 123]] [deftest "123.123" [serialization/json/serialize 123.123]] [deftest "true" [serialization/json/serialize #t]] [deftest "false" [serialization/json/serialize #f]] [deftest "[1,2,3]" [serialization/json/serialize [array/new 1 2 3]]] [deftest "[1,true,3.0]" [serialization/json/serialize '[1 #t 3.0]]] [deftest "\"asd\"" [serialization/json/serialize 'asd]] [deftest "\"asd\"" [serialization/json/serialize :asd]] [deftest "\"asd\"" [serialization/json/serialize "asd"]] [deftest "\"asd\"" [serialization/json/serialize "asd"]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :test string/write [do [def *module* :test] [def test-list #nil] [def test-count 0] [def nujel-start 0] [def success-count 0] [def error-count 0] [def print-errors #t] [def print-passes #f] [export add* [defn test/add* [result expr] [set! test-list [cons [cons result expr] test-list]] [set! test-count [+ test-count 1]]]] [export add [defmacro test/add [result . expr] "Add a test where EXPR must eval to RESULT" [quasiquote [[unquote test/add*] [unquote result] [unquote [list 'quote [cons 'do expr]]]]]]] [export reset! [defn reset! [] [set! test-list [cons 4 '[+ 3 1]]] [set! test-count 1]]] [defn display-results [description] "Prints the result Message" [random/seed-initialize!] [efmtln "{} {} - [{} / {}] in {} ms" [if [and [zero? error-count] [> test-count 0]] [if [zero? success-count] [ansi-yellow "?"] [ansi-green "✓"]] [ansi-red "✗"]] description [if [zero? success-count] [ansi-yellow success-count] [ansi-green success-count]] [if [zero? error-count] [ansi-gray error-count] [ansi-red error-count]] [- [time/milliseconds] nujel-start]]] [defn test-success [res-should res-is expr] "Should be called after a test has finished successfully" [when print-passes [efmtln "{} == {}\r\n{}\r\n\r\n" [ansi-green [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! success-count [+ 1 success-count]]] [defn test-failure [res-should res-is expr] "Should be called if EXPR does not equal RES" [when print-errors [pfmtln "{} != {}\r\n{}\r\n\r\n" [ansi-red [string/write res-is]] [ansi-green [string/write res-should]] [string/write expr]]] [set! error-count [+ 1 error-count]]] [export run-test! [defn run-test! [result rawexpr i] "Tests that RAWEXPR evaluates to RESULT" [try [fn [err] [display/error err] [test-failure result [list :exception-caught err] rawexpr]] [def expr [eval rawexpr]] [if [equal? result expr] [test-success result expr rawexpr] [test-failure result expr rawexpr]]]]] [export init! [defn init! [output-passes hide-errors] "Initialize the testing framework" [set! print-errors [not [boolean hide-errors]]] [set! print-passes [boolean output-passes]] [set! nujel-start [time/milliseconds]] [set! success-count 0] [set! error-count 0]]] [export finish! [defn finish! [description] [display-results description] [return error-count]]] [export run [defn run [output-passes hide-errors] "Run through all automated Tests" [init!] [doseq [cur-test test-list] [run-test! [car cur-test] [cdr cur-test]]] [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]] [reset!] [deftest #t [lambda? test/run]]]]
+1A00051A011A02051A030401040201
+}#{##[module/insert/defer :time string/write [do [def *module* :time] [export seconds [defn seconds [timestamp] "Return the seconds part of TIMESTAMP, defaults to current time" [rem [or timestamp [time]] 60]]] [export minutes [defn minutes [timestamp] "Return the minutes part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 60] 60]]] [export hours [defn hours [timestamp] "Return the hours part of TIMESTAMP, defaults to current time" [rem [/ [or timestamp [time]] 3600] 24]]] [deftest 34 [time/seconds 1637755714]] [deftest 8 [time/minutes 1637755714]] [deftest 12 [time/hours 1637755714]] [deftest 59 [time/seconds 1637755739]] [deftest 0 [time/seconds 1637755740]]]]
+1A00051A011A02051A030401040201
 }

@@ -19,7 +19,7 @@
 [defn file/compile/module [path environment base-dir]
       "Compile a Nujel source file into optimized object code"
       [def module-name [string->keyword [path/without-extension [string/cut path [length base-dir]]]]]
-      [def source `[defmodule ~module-name [def *module* ~module-name] ~@[read [file/read path]]]]
+      [def source `[defmodule/defer ~module-name [def *module* ~module-name] ~@[read [file/read path]]]]
       [def object-code [compile* source [or environment [environment*]]]]
       [file/write [if object-code [string/write object-code] ""]
                   [cat [path/without-extension path] ".no"]]

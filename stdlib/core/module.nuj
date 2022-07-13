@@ -1,6 +1,7 @@
 ;; Contains the module system
 
 [def module/cache @[]]
+[def module/store @[]]
 [def module/loader #nil]
 
 [defn module/add-loader [f]
@@ -22,7 +23,11 @@
 
 [defmacro defmodule [name . body]
           "Define a new named module"
-          `[module/insert ~name ~[cons module body]]]
+          `[module/insert ~name [module [def *module* ~name] ~@body]]]
+
+[defmacro defmodule/defer [name . body]
+          "Define a new named module"
+          `[module/insert/defer ~name [string/write ~[list 'quote body]]]]
 
 [defmacro export [name value]
           `[tree/set! exports '~name ~value]]
@@ -58,11 +63,25 @@
                  [cdr! names]]
           [cons do [nreverse ret]]]
 
+[defn module/load/cache [name]
+      [tree/ref module/cache name]]
+
+[defn module/load/store [name]
+      [def source [tree/ref module/store name]]
+      [when source
+        [eval-in [environment*] `[defmodule ~name ~@[read source]]]
+        [module/load/cache name]]]
+
 [defn module/load/external [name]
       [doseq [loader module/loader]
              [def mod [loader name]]
-             [when mod [return mod]]]
+             [when mod
+               [tree/set! module/cache name mod]
+               [return mod]]]
       [return #nil]]
+
+[defn module/insert/defer [name module-source]
+      [tree/set! module/store name module-source]]
 
 [defn module/insert [name module]
       [tree/set! module/cache name module]]
@@ -70,10 +89,10 @@
 [defn module/load [name]
       [case [type-of name]
             [:object name]
-            [:keyword [or [tree/ref module/cache name]
-                          [do [def mod [module/load/external name]]
-                              [when mod [tree/set! module/cache name mod]]
-                            [return mod]]]]]]
+            [:keyword [or [module/load/cache name]
+                          [module/load/store name]
+                          [module/load/external name]]]
+            [otherwise [exception "Can't load that value as a module" name]]]]
 
 [defn module/import-all [module symbol]
       [def exports [resolve 'exports module]]
