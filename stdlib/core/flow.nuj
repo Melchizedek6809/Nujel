@@ -63,11 +63,12 @@
           "[doseq [l [list 1 2 3 4]] [println l]]"
           [def symbol-name [gensym]]
           `[let [[~symbol-name ~[cadr for-loop]]]
-                [when ~symbol-name
-                      [while ~symbol-name
-                        [def ~[car for-loop] [car ~symbol-name]]
-                        ~@body
-                        [cdr! ~symbol-name]]]]]
+                [while ~symbol-name
+                  [when-not [pair? ~symbol-name] [exception :type-error "Improper list detected, please provide a proper list instead" ~[cadr for-loop]]]
+                  [typecheck/only ~symbol-name :pair]
+                  [def ~[car for-loop] [car ~symbol-name]]
+                  ~@body
+                  [cdr! ~symbol-name]]]]
 
 [defn thread/-> [init fun]
       [if-not fun init

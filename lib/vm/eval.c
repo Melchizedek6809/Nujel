@@ -263,7 +263,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
 		lVal *cArgs = ctx.valueStack[--ctx.sp];
 		lVal *cName = ctx.valueStack[--ctx.sp];
-		if(unlikely(cBody->type == ltNoAlloc)){
+		if(unlikely(cBody && cBody->type == ltNoAlloc)){
 			pf("SP: %i CSP: %i\n", (i64)ctx.sp, (i64)ctx.csp);
 			pf("%V\n",cBody);
 			pf("%V\n",cDocs);

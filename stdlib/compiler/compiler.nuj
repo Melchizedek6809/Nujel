@@ -19,7 +19,9 @@
       [disassemble [compile expr]]]
 
 [defn compile/do* [source environment]
-      [compile* [cons do source] environment]]
+      [if [pair? source]
+          [compile* [cons do source] environment]
+          source]]
 
 [defmacro compile [source]
           "Compile SOURCE so it can be evaluated/applied"
@@ -47,8 +49,18 @@
                               ~[tree/set! [meta/parse/body :macro args body] :source body]
                               '~[compile/do* body [current-closure]]]]]
 
+[defn fn/check [args body]
+      [when-not args [exception :type-error "Every function needs an argument list" args]]
+      [while args
+        [when-not [or [symbol? args]
+                      [pair? args]]
+                  [exception :type-error "Wrong type for argument list" args]]
+        [cdr! args]]
+      [when-not body [exception :type-error "Every function needs a body" body]]]
+
 [defmacro fn [args . body]
           "Define an anonymous function"
+          [fn/check args body]
           `[fn* 'anonymous
                 '~args
                 ~[tree/set! [meta/parse/body :lambda args body] :source body]
@@ -56,6 +68,7 @@
 
 [defmacro defn [name args . body]
           "Define a new function"
+          [fn/check args body]
           `[def ~name [fn* '~name
                            '~args
                            ~[tree/set! [meta/parse/body :lambda args body] :source body]
@@ -65,9 +78,7 @@
       "Compile and the immediatly evaluate the result"
       ""
       "Mostly used by lRun()"
-      [try display/error
-           [apply closure
-                  [compile* expr closure]]]]
+      [apply closure [compile* expr closure]]]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"

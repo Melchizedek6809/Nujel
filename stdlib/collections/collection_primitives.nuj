@@ -11,7 +11,7 @@
             [:string [char-at   l i]]
             [:array  [array/ref l i]]
             [:pair   [list/ref  l i]]
-            [otherwise [throw [list :type-error "You can only use ref with a collection" l [current-lambda]]]]]]
+            [otherwise [throw [list :type-error "You can only ref a collection" l [current-lambda]]]]]]
 
 [defn filter [l p]
       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
@@ -20,7 +20,7 @@
             [:tree   [tree/filter  l p]]
             [:pair   [list/filter  l p]]
             [:array  [array/filter l p]]
-            [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]
+            [otherwise [throw [list :type-error "You can only filter collections" l [current-lambda]]]]]]
 
 [defn reduce [l f α]
       "Combine all elements in collection l using operation F and starting value α"
@@ -29,7 +29,7 @@
             [:tree   [tree/reduce  l f α]]
             [:pair   [list/reduce  l f α]]
             [:array  [array/reduce l f α]]
-            [otherwise [f α l]]]]
+            [otherwise [throw [list :type-error "You can only reduce collections" l [current-lambda]]]]]]
 
 [defn length [α]
       "Returns the length of collection α"

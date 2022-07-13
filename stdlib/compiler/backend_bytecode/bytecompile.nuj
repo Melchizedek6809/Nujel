@@ -80,9 +80,7 @@
                 [bytecompile/procedure/arg [cdr source] env]]]]
 
 [defn bytecompile/procedure/inline? [op]
-      [case [type-of op]
-            [:lambda [meta op :inline]]
-            [#t #f]]]
+      [meta op :inline]]
 
 [defn bytecompile/procedure/inline [op args env]
       [def arg-count [length args]]
@@ -100,6 +98,10 @@
           [bytecompile/procedure/default op args env op-raw]]]
 
 [defn bytecompile/procedure/default [op args env op-raw]
+      [when [and [not [procedure? op]]
+                 [not [symbol? op]]
+                 [not [pair? op]]]
+        [exception :type-error "Can't apply to that" op]]
       [def arg-count [length args]]
       [if [$apply/optimize? op arg-count]
           [list [when args [bytecompile/procedure/arg args]]
@@ -201,7 +203,9 @@
                    [return       [bytecompile/return       source env]]
                    [quote        [bytecompile/quote        [cadr source]]]
                    [otherwise    [bytecompile/procedure    op [cdr source] env [car source]]]]]
-            [otherwise       [bytecompile/literal source]]]]
+            [otherwise [if [pair? source]
+                           [exception :type-error "Can't evaluate that" source]
+                           [bytecompile/literal source]]]]]
 
 [defn bytecompile [form environment]
       [list [bytecompile* form environment]

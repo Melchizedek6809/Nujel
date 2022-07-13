@@ -16,11 +16,13 @@
 1A00051A01050401111A02070D1A03051A02051A0404021A05070D1A05050200
 210B001F1A06051A0205241A07051A020502001A05050209250403040309000B
 1A08051A0205040101
-} file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure tests ΓεnΣym-1 expr test/run-test! eval-in do require module-name append]
-1A00051A011A020504001B04030D151A03051A04070D1A04050B004C2409003F
-0D1A0405111A05070D1A06051A07051A020504001A0505121104021A081A091A
-0A052414141A0B051A05051212240402141404020D1A0405121A04081A04050A
-FFC1090004241601
+} file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure tests ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" expr test/run-test! eval-in do require module-name append]
+1A00051A011A020504001B04030D151A03051A04070D240900910D1A051A0605
+1A04050401200B0007240900191A07051A08051A091A0A1A03051A0B05040004
+0404010D1A06051A040504011A05200B0007240900191A07051A08051A091A0C
+1A04051A0B050400040404010D1A0405111A0D070D1A0E051A0F051A02050400
+1A0D05121104021A101A111A12052414141A13051A0D05121224040214140402
+0D1A0405121A04081A04050AFF6F1601
 } valid-test-form? [form] #@[source: [[== [car form] 'deftest]]] #{##[form deftest]
 1A0005111A012001
 } file/test/module [path base-dir] #@[documentation: "Test a module by running all contained tests" source: ["Test a module by running all contained tests" [def rel-path [string/cut path [length base-dir]]] [when [== [char-at rel-path 0] 47] [set! rel-path [string/cut rel-path 1]]] [def module-name [string->keyword [path/without-extension rel-path]]] [require :test] [test/init!] [-> [read [file/read path]] [filter valid-test-form?] [file/test/module/run module-name]] [test/finish! [ansi-blue module-name]]]] #{##[string/cut path length base-dir rel-path char-at symbol->keyword string->symbol path/without-extension module-name require* :test current-closure test/init! file/test/module/run filter read file/read valid-test-form? test/finish! ansi-blue]

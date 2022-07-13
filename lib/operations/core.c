@@ -230,24 +230,22 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 static lVal *lnfMetaGet(lClosure *c, lVal *v){
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
 	lVal *l = lCar(v);
-	if(l->type == ltNativeFunc){
+	typeswitch(l){
+	case ltNativeFunc:
 		return lTreeGet(l->vNFunc->meta, key, NULL);
-	}else if((l->type == ltLambda) || (l->type == ltObject)){
+	case ltLambda:
+	case ltObject:
 		return lTreeGet(l->vClosure->meta, key, NULL);
-	}else{
+	default:
 		return NULL;
 	}
 }
-
-#include "../printer.h"
 
 static lVal *lnfMetaSet(lClosure *c, lVal *v){
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
 	lVal *car = requireCallable(c, lCar(v));
 
 	if(car->type == ltNativeFunc){
-		pf(">> %m\n", car->vNFunc->meta);
-		return NULL;
 		lExceptionThrowValClo("type-error", "Can't add new metadata to native functions", car, c);
 	}else{
 		car->vClosure->meta = lTreeInsert(car->vClosure->meta, key, lCaddr(v));

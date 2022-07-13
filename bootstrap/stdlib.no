@@ -119,14 +119,14 @@ FFD80D24160D1A05050101
 }]
 1A00050B00191A01051A02051A031A041A051A0617020004030900161A01051A
 02051A031A071A081A09170200040301
-} min l #@[documentation: "Returns the minimum value of its arguments, or collection" source: ["Returns the minimum value of its arguments, or collection" [reduce [if [cdr l] l [car l]] [fn [a b] [if [< a b] a b]]]]] #{##[reduce l anonymous [a b] #@[source: [[if [< a b] a b]]] #{##[a b]
+} min l #@[documentation: "Returns the minimum value of its arguments" source: ["Returns the minimum value of its arguments" [reduce l [fn [a b] [if [< a b] a b]]]]] #{##[reduce l anonymous [a b] #@[source: [[if [< a b] a b]]] #{##[a b]
 1A00051A01051E0B00091A00050900061A010501
 }]
-1A00051A0105120B00091A01050900071A0105111A021A031A041A0517040201
-} max #@[documentation: "Returns the minimum value of its arguments, or collection" source: ["Returns the minimum value of its arguments, or collection" [reduce [if [cdr l] l [car l]] [fn [a b] [if [> a b] a b]]]]] #{##[reduce l anonymous [a b] #@[source: [[if [> a b] a b]]] #{##[a b]
+1A00051A01051A021A031A041A0517040201
+} max #@[documentation: "Returns the maximum value of its arguments" source: ["Returns the maximum value of its arguments" [reduce l [fn [a b] [if [> a b] a b]]]]] #{##[reduce l anonymous [a b] #@[source: [[if [> a b] a b]]] #{##[a b]
 1A00051A0105220B00091A00050900061A010501
 }]
-1A00051A0105120B00091A01050900071A0105111A021A031A041A0517040201
+1A00051A01051A021A031A041A0517040201
 } delete [l e] #@[documentation: "Returns a filtered list l with all elements equal to e omitted" source: ["Returns a filtered list l with all elements equal to e omitted" [filter l [fn [a] [not [= a e]]]]]] #{##[filter l anonymous [a] #@[source: [[not [= a e]]]] #{##[a e]
 1A00051A0105200B00071C0900041B01
 }]
@@ -147,22 +147,23 @@ FFD80D24160D1A05050101
 0D1A141A151A161A17171A14070D1A181A151A191A1A171A18070D1A1B1A1C1A
 1D1A1E171A1B070D1A1F1A201A211A22171A1F070D1A231A241A251A26171A23
 070D1A271A281A291A2A171A270701
-}#{##[ref [l i] #@[documentation: "Return whatver is at position I in L" source: ["Return whatver is at position I in L" [case [type-of l] [:nil #nil] [:tree [tree/ref l i]] [:string [char-at l i]] [:array [array/ref l i]] [:pair [list/ref l i]] [otherwise [throw [list :type-error "You can only use ref with a collection" l [current-lambda]]]]]]] #{##[type-of l ΓεnΣym-1 :nil :tree tree/ref i :string char-at :array array/ref :pair list/ref throw list :type-error "You can only use ref with a collection" current-lambda]
+}#{##[ref [l i] #@[documentation: "Return whatver is at position I in L" source: ["Return whatver is at position I in L" [case [type-of l] [:nil #nil] [:tree [tree/ref l i]] [:string [char-at l i]] [:array [array/ref l i]] [:pair [list/ref l i]] [otherwise [throw [list :type-error "You can only ref a collection" l [current-lambda]]]]]]] #{##[type-of l ΓεnΣym-1 :nil :tree tree/ref i :string char-at :array array/ref :pair list/ref throw list :type-error "You can only ref a collection" current-lambda]
 151A00051A010504011A02070D1A02051A03200B0007240900751A02051A0420
 0B00111A05051A01051A0605040209005E1A02051A07200B00111A08051A0105
 1A060504020900471A02051A09200B00111A0A051A01051A060504020900301A
 02051A0B200B00111A0C051A01051A060504020900191A0D051A0E051A0F1A10
 1A01051A11050400040404011601
-} filter [l p] #@[documentation: "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" [case [type-of l] [:nil #nil] [:tree [tree/filter l p]] [:pair [list/filter l p]] [:array [array/filter l p]] [otherwise [throw [list :type-error "You can only use filter with a collection" l [current-lambda]]]]]]] #{##[type-of l ΓεnΣym-2 :nil :tree tree/filter p :pair list/filter :array array/filter throw list :type-error "You can only use filter with a collection" current-lambda]
+} filter [l p] #@[documentation: "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true" [case [type-of l] [:nil #nil] [:tree [tree/filter l p]] [:pair [list/filter l p]] [:array [array/filter l p]] [otherwise [throw [list :type-error "You can only filter collections" l [current-lambda]]]]]]] #{##[type-of l ΓεnΣym-2 :nil :tree tree/filter p :pair list/filter :array array/filter throw list :type-error "You can only filter collections" current-lambda]
 151A00051A010504011A02070D1A02051A03200B00072409005E1A02051A0420
 0B00111A05051A01051A060504020900471A02051A07200B00111A08051A0105
 1A060504020900301A02051A09200B00111A0A051A01051A060504020900191A
 0B051A0C051A0D1A0E1A01051A0F050400040404011601
-} reduce [l f α] #@[documentation: "Combine all elements in collection l using operation F and starting value α" source: ["Combine all elements in collection l using operation F and starting value α" [case [type-of l] [:nil α] [:tree [tree/reduce l f α]] [:pair [list/reduce l f α]] [:array [array/reduce l f α]] [otherwise [f α l]]]]] #{##[type-of l ΓεnΣym-3 :nil α :tree tree/reduce f :pair list/reduce :array array/reduce]
-151A00051A010504011A02070D1A02051A03200B00091A040509005C1A02051A
-05200B00141A06051A01051A07051A040504030900421A02051A08200B00141A
-09051A01051A07051A040504030900281A02051A0A200B00141A0B051A01051A
-07051A0405040309000E1A07051A04051A010504021601
+} reduce [l f α] #@[documentation: "Combine all elements in collection l using operation F and starting value α" source: ["Combine all elements in collection l using operation F and starting value α" [case [type-of l] [:nil α] [:tree [tree/reduce l f α]] [:pair [list/reduce l f α]] [:array [array/reduce l f α]] [otherwise [throw [list :type-error "You can only reduce collections" l [current-lambda]]]]]]] #{##[type-of l ΓεnΣym-3 :nil α :tree tree/reduce f :pair list/reduce :array array/reduce throw list :type-error "You can only reduce collections" current-lambda]
+151A00051A010504011A02070D1A02051A03200B00091A04050900671A02051A
+05200B00141A06051A01051A07051A0405040309004D1A02051A08200B00141A
+09051A01051A07051A040504030900331A02051A0A200B00141A0B051A01051A
+07051A040504030900191A0C051A0D051A0E1A0F1A01051A1005040004040401
+1601
 } length [α] #@[documentation: "Returns the length of collection α" source: ["Returns the length of collection α" [case [type-of α] [:nil 0] [:array [array/length α]] [:pair [list/length α]] [:string [string/length α]] [:tree [tree/size α]] [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]] #{##[type-of α ΓεnΣym-4 :nil :array array/length :pair list/length :string string/length :tree tree/size throw list :type-error "You can only use length with a collection" current-lambda]
 151A00051A010504011A02070D1A02051A03200B000802000900691A02051A04
 200B000E1A05051A010504010900551A02051A06200B000E1A07051A01050401
@@ -215,33 +216,45 @@ FFD80D24160D1A05050101
 00091A08050900061A09051A0A070D241A0B070D240900190D1A05051A0B0514
 1A0B080D1A05051A0605251A05081A0A051A05051A000504020AFFDF0D1A0C05
 1A0B05040101
-} list/reduce [l o s] #@[documentation: "Combine all elements in l using operation o and starting value s" source: ["Combine all elements in l using operation o and starting value s" [doseq [e l] [set! s [o s e]]] s]] #{##[l ΓεnΣym-1 e o s]
-151A00051A01070D1A01050B002F240900220D1A0105111A02070D1A03051A04
-051A020504021A04080D1A0105121A01081A01050AFFDE09000424160D1A0405
-01
+} list/reduce [l o s] #@[documentation: "Combine all elements in l using operation o and starting value s" source: ["Combine all elements in l using operation o and starting value s" [doseq [e l] [set! s [o s e]]] s]] #{##[l ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e o s]
+151A00051A01070D240900740D1A021A03051A01050401200B0007240900191A
+04051A05051A061A071A00051A08050400040404010D1A03051A010504011A02
+200B0007240900191A04051A05051A061A091A01051A08050400040404010D1A
+0105111A0A070D1A0B051A0C051A0A0504021A0C080D1A0105121A01081A0105
+0AFF8C160D1A0C0501
 } list/ref [l i] #@[documentation: "Returns the the element of list l at location i" source: ["Returns the the element of list l at location i" [while [and l [> i 0]] [dec! i] [cdr! l]] [car l]]] #{##[i l]
 240900150D1A00050201261A00080D1A0105121A01081A01050C0B000A0D1A00
 050200220AFFE00D1A01051101
-} reverse [l] #@[documentation: "Return the list l in reverse order" source: ["Return the list l in reverse order" [def ret] [doseq [e l] [set! ret [cons e ret]]] ret]] #{##[ret l ΓεnΣym-2 e]
-241A00070D151A01051A02070D1A02050B002B2409001E0D1A0205111A03070D
-1A03051A0005141A00080D1A0205121A02081A02050AFFE209000424160D1A00
-0501
-} list/length [l] #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [doseq [e l] [inc! ret]] ret]] #{##[ret l ΓεnΣym-3 e]
-02001A00070D151A01051A02070D1A02050B002A2409001D0D1A0205111A0307
-0D1A00050201251A00080D1A0205121A02081A02050AFFE309000424160D1A00
-0501
-} list/filter [l p] #@[documentation: "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" [def ret #nil] [doseq [e l] [when [p e] [set! ret [cons e ret]]]] [nreverse ret]]] #{##[ret l ΓεnΣym-4 e p nreverse]
-241A00070D151A01051A02070D1A02050B003A2409002D0D1A0205111A03070D
-1A04051A030504010B00101A03051A0005141A0008090004240D1A0205121A02
-081A02050AFFD309000424160D1A05051A0005040101
-} list/map [l f] #@[documentation: "Runs f over every item in list l and returns the resulting list" source: ["Runs f over every item in list l and returns the resulting list" [def ret #nil] [doseq [e l] [set! ret [cons [f e] ret]]] [nreverse ret]]] #{##[ret l ΓεnΣym-5 e f nreverse]
-241A00070D151A01051A02070D1A02050B0030240900230D1A0205111A03070D
-1A04051A030504011A0005141A00080D1A0205121A02081A02050AFFDD090004
-24160D1A05051A0005040101
-} append [a b] #@[documentation: "Appends two lists A and B together" source: ["Appends two lists A and B together" [def ret b] [set! a [reverse a]] [doseq [t a] [set! ret [cons t ret]]] ret]] #{##[b ret reverse a ΓεnΣym-6 t]
-1A00051A01070D1A02051A030504011A03080D151A03051A04070D1A04050B00
-2B2409001E0D1A0405111A05070D1A05051A0105141A01080D1A0405121A0408
-1A04050AFFE209000424160D1A010501
+} reverse [l] #@[documentation: "Return the list l in reverse order" source: ["Return the list l in reverse order" [def ret] [doseq [e l] [set! ret [cons e ret]]] ret]] #{##[ret l ΓεnΣym-2 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e]
+241A00070D151A01051A02070D240900700D1A031A04051A02050401200B0007
+240900191A05051A06051A071A081A01051A09050400040404010D1A04051A02
+0504011A03200B0007240900191A05051A06051A071A0A1A02051A0905040004
+0404010D1A0205111A0B070D1A0B051A0005141A00080D1A0205121A02081A02
+050AFF90160D1A000501
+} list/length [l] #@[documentation: "Returns the length of list l" source: ["Returns the length of list l" [def ret 0] [doseq [e l] [inc! ret]] ret]] #{##[ret l ΓεnΣym-3 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e]
+02001A00070D151A01051A02070D2409006F0D1A031A04051A02050401200B00
+07240900191A05051A06051A071A081A01051A09050400040404010D1A04051A
+020504011A03200B0007240900191A05051A06051A071A0A1A02051A09050400
+040404010D1A0205111A0B070D1A00050201251A00080D1A0205121A02081A02
+050AFF91160D1A000501
+} list/filter [l p] #@[documentation: "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" source: ["Runs predicate p over every item in list l and returns a list consiting solely of items where p is true" [def ret #nil] [doseq [e l] [when [p e] [set! ret [cons e ret]]]] [nreverse ret]]] #{##[ret l ΓεnΣym-4 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e p nreverse]
+241A00070D151A01051A02070D2409007F0D1A031A04051A02050401200B0007
+240900191A05051A06051A071A081A01051A09050400040404010D1A04051A02
+0504011A03200B0007240900191A05051A06051A071A0A1A02051A0905040004
+0404010D1A0205111A0B070D1A0C051A0B0504010B00101A0B051A0005141A00
+08090004240D1A0205121A02081A02050AFF81160D1A0D051A0005040101
+} list/map [l f] #@[documentation: "Runs f over every item in list l and returns the resulting list" source: ["Runs f over every item in list l and returns the resulting list" [def ret #nil] [doseq [e l] [set! ret [cons [f e] ret]]] [nreverse ret]]] #{##[ret l ΓεnΣym-5 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e f nreverse]
+241A00070D151A01051A02070D240900750D1A031A04051A02050401200B0007
+240900191A05051A06051A071A081A01051A09050400040404010D1A04051A02
+0504011A03200B0007240900191A05051A06051A071A0A1A02051A0905040004
+0404010D1A0205111A0B070D1A0C051A0B0504011A0005141A00080D1A020512
+1A02081A02050AFF8B160D1A0D051A0005040101
+} append [a b] #@[documentation: "Appends two lists A and B together" source: ["Appends two lists A and B together" [def ret b] [set! a [reverse a]] [doseq [t a] [set! ret [cons t ret]]] ret]] #{##[b ret reverse a ΓεnΣym-6 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" t]
+1A00051A01070D1A02051A030504011A03080D151A03051A04070D240900700D
+1A051A06051A04050401200B0007240900191A07051A08051A091A0A1A03051A
+0B050400040404010D1A06051A040504011A05200B0007240900191A07051A08
+051A091A0C1A04051A0B050400040404010D1A0405111A0D070D1A0D051A0105
+141A01080D1A0405121A04081A04050AFF90160D1A010501
 } sublist [l start end ret] #@[documentation: "Returns a new list containing all elements of l from start to end" source: ["Returns a new list containing all elements of l from start to end" [cond [[nil? l] [reverse ret]] [[neg? end] [sublist l start [+ [length l] end]]] [[zero? end] [reverse ret]] [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]] [[> end 0] [sublist [cdr l] 0 [+ -1 end] [cons [car l] ret]]]]]] #{##[nil? l reverse ret end 0.0 sublist start length]
 1A00051A010504010B000E1A02051A030504010900801A04051A051E0B001D1A
 06051A01051A07051A08051A010504011A040525040309005D1A04052A0B000E
@@ -276,12 +289,12 @@ FF1A0405251A0105111A03051404040900042401
 } list/sort/merge [l] #@[documentation: "Sorts a list" source: ["Sorts a list" [if [nil? [cdr l]] l [do [def parts [list/split-half l]] [list/merge-sorted-lists [list/sort/merge [car parts]] [list/sort/merge [cdr parts]]]]]]] #{##[nil? l list/split-half parts list/merge-sorted-lists list/sort/merge]
 1A00051A01051204010B00091A01050900261A02051A010504011A03070D1A04
 051A05051A03051104011A05051A0305120401040201
-} list/sort list? [a] #@[documentation: "Return #t is A is a proper list" source: ["Return #t is A is a proper list" [when-not a [return #f]] [while a [when-not [pair? a] [return #f]] [cdr! a]] [return #t]]] #{##[a pair?]
-1A00050B0007240900051C010D2409001D0D1A01051A000504010B0007240900
-051C010D1A0005121A00081A00050AFFE30D1B0101
-} list/equal? [a b] #@[documentation: "#t if A and B are equal" source: ["#t if A and B are equal" [if [pair? a] [and [list/equal? [car a] [car b]] [list/equal? [cdr a] [cdr b]]] [equal? a b]]]] #{##[pair? a list/equal? b equal?]
-1A00051A010504010B00251A02051A0105111A03051104020C0B00110D1A0205
-1A0105121A030512040209000E1A04051A01051A0305040201
+} list/sort list? [a] #@[documentation: "Return #t is A is a proper list" source: ["Return #t is A is a proper list" [when-not a [return #f]] [while a [when-not [pair? a] [return #f]] [cdr! a]] [return #t]]] #{##[a :pair type-of]
+1A00050B0007240900051C010D240900200D1A011A02051A00050401200B0007
+240900051C010D1A0005121A00081A00050AFFE00D1B0101
+} list/equal? [a b] #@[documentation: "#t if A and B are equal" source: ["#t if A and B are equal" [if [pair? a] [and [list/equal? [car a] [car b]] [list/equal? [cdr a] [cdr b]]] [equal? a b]]]] #{##[:pair type-of a list/equal? b equal?]
+1A001A01051A02050401200B00251A03051A0205111A04051104020C0B00110D
+1A03051A0205121A040512040209000E1A05051A02051A0405040201
 } list/take [l count] #@[documentation: "Take the first COUNT elements from list L" source: ["Take the first COUNT elements from list L" [if [<= count 0] #nil [cons [car l] [list/take [cdr l] [- count 1]]]]]] #{##[count l list/take]
 1A000502001F0B0007240900171A0105111A02051A0105121A00050201260402
 1401
@@ -290,12 +303,12 @@ FF1A0405251A0105111A03051404040900042401
 } list/cut [l start end] #@[documentation: "Return a subsequence of L from START to END" source: ["Return a subsequence of L from START to END" [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]] #{##[list/take list/drop l max start end]
 1A00051A01051A02051A030502001A0405040204021A05051A030502001A0405
 040226040201
-} list/replace [l search-for replace-with] #@[documentation: "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH\nUses [equal?] so we can search/replace lists/trees and other complex data structures" source: ["Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH" "" "Uses [equal?] so we can search/replace lists/trees and other complex data structures" [cond [[not l] #nil] [[equal? l search-for] replace-with] [[equal? [car l] search-for] [cons replace-with [list/replace [cdr l] search-for replace-with]]] [#t [cons [if [pair? [car l]] [list/replace [car l] search-for replace-with] [car l]] [list/replace [cdr l] search-for replace-with]]]]]] #{##[l equal? search-for replace-with list/replace pair?]
-1A00050B00071C0900041B0B0007240900761A01051A00051A020504020B0009
-1A03050900621A01051A0005111A020504020B00191A03051A04051A0005121A
-02051A030504031409003D1B0B00381A05051A00051104010B00151A04051A00
-05111A02051A030504030900071A0005111A04051A0005121A02051A03050403
-140900042401
+} list/replace [l search-for replace-with] #@[documentation: "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH\nUses [equal?] so we can search/replace lists/trees and other complex data structures" source: ["Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH" "" "Uses [equal?] so we can search/replace lists/trees and other complex data structures" [cond [[not l] #nil] [[equal? l search-for] replace-with] [[equal? [car l] search-for] [cons replace-with [list/replace [cdr l] search-for replace-with]]] [#t [cons [if [pair? [car l]] [list/replace [car l] search-for replace-with] [car l]] [list/replace [cdr l] search-for replace-with]]]]]] #{##[l equal? search-for replace-with list/replace :pair type-of]
+1A00050B00071C0900041B0B0007240900791A01051A00051A020504020B0009
+1A03050900651A01051A0005111A020504020B00191A03051A04051A0005121A
+02051A03050403140900401B0B003B1A051A06051A0005110401200B00151A04
+051A0005111A02051A030504030900071A0005111A04051A0005121A02051A03
+050403140900042401
 }]
 1A001A011A021A03181A00070D1A041A051A061A07171A04070D1A081A091A0A
 1A0B171A08070D1A0C1A0D1A0E1A0F171A0C070D1A101A111A121A13171A1007
@@ -310,10 +323,12 @@ FF1A0405251A0105111A03051404040900042401
 611A621A631A64171A61070D1A651A661A671A68171A65070D1A691A6A1A6B1A
 6C171A69070D1A6D1A6E1A6F1A70171A6D070D1A711A721A731A74171A71070D
 1A751A761A771A78171A750701
-}#{##[tree/zip [keys values] #@[documentation: "Return a tree where KEYS point to VALUES" source: ["Return a tree where KEYS point to VALUES" [def ret [tree/new #nil]] [doseq [key keys] [tree/set! ret key [car values]] [cdr! values]] ret]] #{##[tree/new ret keys ΓεnΣym-1 key tree/set! values]
-1A00052404011A01070D151A02051A03070D1A03050B00382409002B0D1A0305
-111A04070D1A05051A01051A04051A06051104030D1A0605121A06080D1A0305
-121A03081A03050AFFD509000424160D1A010501
+}#{##[tree/zip [keys values] #@[documentation: "Return a tree where KEYS point to VALUES" source: ["Return a tree where KEYS point to VALUES" [def ret [tree/new #nil]] [doseq [key keys] [tree/set! ret key [car values]] [cdr! values]] ret]] #{##[tree/new ret keys ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" key tree/set! values]
+1A00052404011A01070D151A02051A03070D2409007D0D1A041A05051A030504
+01200B0007240900191A06051A07051A081A091A02051A0A050400040404010D
+1A05051A030504011A04200B0007240900191A06051A07051A081A0B1A03051A
+0A050400040404010D1A0305111A0C070D1A0D051A01051A0C051A0E05110403
+0D1A0E05121A0E080D1A0305121A03081A03050AFF83160D1A010501
 } tree/+= [t k v] #@[documentation: "Increment value at K in T by V" source: ["Increment value at K in T by V" [tree/set! t k [+ v [int [or [tree/ref t k] 0]]]]]] #{##[tree/set! t k v int tree/ref #f]
 1A00051A01051A02051A03051A04051A05051A01051A020504020C0A000D0D02
 000C0A00060D1A06040125040301
@@ -331,11 +346,13 @@ FF1A0405251A0105111A03051404040900042401
 1A0205040201
 } tree/reduce [l o s] #@[documentation: "Combine all elements in l using operation o and starting value s" source: ["Combine all elements in l using operation o and starting value s" [list/reduce [tree/values l] o s]]] #{##[list/reduce tree/values l o s]
 1A00051A01051A020504011A03051A0405040301
-} tree/filter [l f] #@[documentation: "Return a new tree with all elements from L where F retunrs true" source: ["Return a new tree with all elements from L where F retunrs true" [def ret [tree/new #nil]] [doseq [e [tree/keys l]] [def t [tree/ref l e]] [when [f t] [tree/set! ret e t]]] ret]] #{##[tree/new ret tree/keys l ΓεnΣym-2 e tree/ref t f tree/set!]
-1A00052404011A01070D151A02051A030504011A04070D1A04050B004D240900
-400D1A0405111A05070D1A06051A03051A050504021A07070D1A08051A070504
-010B00141A09051A01051A05051A07050403090004240D1A0405121A04081A04
-050AFFC009000424160D1A010501
+} tree/filter [l f] #@[documentation: "Return a new tree with all elements from L where F retunrs true" source: ["Return a new tree with all elements from L where F retunrs true" [def ret [tree/new #nil]] [doseq [e [tree/keys l]] [def t [tree/ref l e]] [when [f t] [tree/set! ret e t]]] ret]] #{##[tree/new ret tree/keys l ΓεnΣym-2 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" e tree/ref t f tree/set!]
+1A00052404011A01070D151A02051A030504011A04070D240900970D1A051A06
+051A04050401200B00072409001E1A07051A08051A091A0A1A02051A03050401
+1A0B050400040404010D1A06051A040504011A05200B0007240900191A07051A
+08051A091A0C1A04051A0B050400040404010D1A0405111A0D070D1A0E051A03
+051A0D0504021A0F070D1A10051A0F0504010B00141A11051A01051A0D051A0F
+050403090004240D1A0405121A04081A04050AFF69160D1A010501
 }]
 1A001A011A021A03171A00070D1A041A051A061A07171A04070D1A081A091A0A
 1A0B181A08070D1A0C1A0D1A0E1A0F181A0C070D1A101A111A121A13181A1007
@@ -492,13 +509,15 @@ FF1A0405251A0105111A03051404040900042401
 1A00051A01051A0205121104021A03070D1A03051A04051A02050401251A0505
 261A06070D1A07051A08051A05050201251A05081A09051A0A051A0B051A0605
 1A0C051A0205040104021A0D0402040104030D1A05050101
-} assemble/emit-relocated-ops [code sym-map pos out] #@[source: [[if [= [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [doseq [op code] [case [type-of op] [:bytecode-op [array/set! out [inc! pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]] #{##[code :relocate assemble/relocate-op sym-map pos out ΓεnΣym-7 op type-of ΓεnΣym-8 :bytecode-op array/set! :pair assemble/emit-relocated-ops]
+} assemble/emit-relocated-ops [code sym-map pos out] #@[source: [[if [= [car code] :relocate] [set! pos [assemble/relocate-op code sym-map pos out]] [doseq [op code] [case [type-of op] [:bytecode-op [array/set! out [inc! pos] op]] [:pair [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]] [return pos]]] #{##[code :relocate assemble/relocate-op sym-map pos out ΓεnΣym-7 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" op ΓεnΣym-8 :bytecode-op array/set! assemble/emit-relocated-ops]
 1A0005111A01200B001A1A02051A00051A03051A04051A050504041A04080900
-80151A00051A06070D1A06050B0070240900630D1A0605111A07070D151A0805
-1A070504011A09070D1A09051A0A200B001A1A0B051A05051A04050201251A04
-081A070504030900241A09051A0C200B001A1A0D051A07051A03051A04051A05
-0504041A040809000424160D1A0605121A06081A06050AFF9D09000424160D1A
-04050101
+C8151A00051A06070D240900B50D1A071A08051A06050401200B000724090019
+1A09051A0A051A0B1A0C1A00051A0D050400040404010D1A08051A060504011A
+07200B0007240900191A09051A0A051A0B1A0E1A06051A0D050400040404010D
+1A0605111A0F070D151A08051A0F0504011A10070D1A10051A11200B001A1A12
+051A05051A04050201251A04081A0F0504030900241A10051A07200B001A1A13
+051A0F051A03051A04051A050504041A040809000424160D1A0605121A06081A
+06050AFF4B160D1A04050101
 } literal-index->bytecode-op [i] #@[source: [[if [< i 256] [int->bytecode-op i] [list [int->bytecode-op [bit-and [bit-shift-right i 8] 255]] [int->bytecode-op [bit-and i 255]]]]]] #{##[i 256 int->bytecode-op list bit-and bit-shift-right 255]
 1A00051A011E0B000E1A02051A0005040109002D1A03051A02051A04051A0505
 1A0005020804021A06040204011A02051A04051A00051A0604020401040201
@@ -510,19 +529,19 @@ FF1A0405251A0105111A03051404040900042401
 0AFFC60D2416090004240D1A11051A010502011A00051A010504012504020D1A
 12051A01051A00051A010504010201261A0B0504030D1A10051A00051A010504
 01020126040101
-} assemble/build-lit-arr [code lit-arr] #@[source: [[when-not code [return #nil]] [cond [[pair? [car code]] [cons [assemble/build-lit-arr [car code] lit-arr] [assemble/build-lit-arr [cdr code] lit-arr]]] [[and [= [car code] #$1A] [= [car [cadr code]] :literal]] [cdr! code] [def index-op [assemble/add-literal [cadar code] lit-arr]] [cons [if [pair? index-op] #$6 #$1A] [cons index-op [assemble/build-lit-arr [cdr code] lit-arr]]]] [[= :literal [car code]] [cdr! code] [cons [assemble/add-literal [car code] lit-arr] [assemble/build-lit-arr [cdr code] lit-arr]]] [otherwise [cons [car code] [assemble/build-lit-arr [cdr code] lit-arr]]]]]] #{##[code pair? assemble/build-lit-arr lit-arr #$1A :literal assemble/add-literal cadar index-op #$6 otherwise]
-1A00050B00072409000524010D1A01051A00051104010B001F1A02051A000511
-1A030504021A02051A0005121A03050402140900A61A0005111A04200C0B000D
-0D1A00051211111A05200B00451A0005121A00080D1A06051A07051A00050401
-1A030504021A08070D1A01051A080504010B00081A090900051A041A08051A02
-051A0005121A03050402141409004C1A051A000511200B00271A0005121A0008
-0D1A06051A0005111A030504021A02051A0005121A030504021409001E1A0A05
-0B00171A0005111A02051A0005121A03050402140900042401
-} assemble/flatten [code ret] #@[source: [[when-not code [return ret]] [when-not [pair? code] [return ret]] [set! ret [assemble/flatten [cdr code] ret]] [if [and [pair? [car code]] [not [keyword? [caar code]]]] [assemble/flatten [car code] ret] [cons [car code] ret]]]] #{##[code ret pair? assemble/flatten keyword?]
-1A00050B0007240900071A0105010D1A02051A000504010B0007240900071A01
-05010D1A03051A0005121A010504021A01080D1A02051A00051104010C0B0016
-0D1A04051A0005111104010B00071C0900041B0B00121A03051A0005111A0105
-040209000B1A0005111A01051401
+} assemble/build-lit-arr [code lit-arr] #@[source: [[when-not code [return #nil]] [cond [[pair? [car code]] [cons [assemble/build-lit-arr [car code] lit-arr] [assemble/build-lit-arr [cdr code] lit-arr]]] [[and [= [car code] #$1A] [= [car [cadr code]] :literal]] [cdr! code] [def index-op [assemble/add-literal [cadar code] lit-arr]] [cons [if [pair? index-op] #$6 #$1A] [cons index-op [assemble/build-lit-arr [cdr code] lit-arr]]]] [[= :literal [car code]] [cdr! code] [cons [assemble/add-literal [car code] lit-arr] [assemble/build-lit-arr [cdr code] lit-arr]]] [otherwise [cons [car code] [assemble/build-lit-arr [cdr code] lit-arr]]]]]] #{##[code :pair type-of assemble/build-lit-arr lit-arr #$1A :literal assemble/add-literal cadar index-op #$6 otherwise]
+1A00050B00072409000524010D1A011A02051A0005110401200B001F1A03051A
+0005111A040504021A03051A0005121A04050402140900A91A0005111A05200C
+0B000D0D1A00051211111A06200B00481A0005121A00080D1A07051A08051A00
+0504011A040504021A09070D1A011A02051A09050401200B00081A0A0900051A
+051A09051A03051A0005121A04050402141409004C1A061A000511200B00271A
+0005121A00080D1A07051A0005111A040504021A03051A0005121A0405040214
+09001E1A0B050B00171A0005111A03051A0005121A04050402140900042401
+} assemble/flatten [code ret] #@[source: [[when-not code [return ret]] [when-not [pair? code] [return ret]] [set! ret [assemble/flatten [cdr code] ret]] [if [and [pair? [car code]] [not [keyword? [caar code]]]] [assemble/flatten [car code] ret] [cons [car code] ret]]]] #{##[code ret :pair type-of assemble/flatten keyword?]
+1A00050B0007240900071A0105010D1A021A03051A00050401200B0007240900
+071A0105010D1A04051A0005121A010504021A01080D1A021A03051A00051104
+01200C0B00160D1A05051A0005111104010B00071C0900041B0B00121A04051A
+0005111A0105040209000B1A0005111A01051401
 } assemble* [code] #@[documentation: "Assemble all arguments into a single :bytecode-array" source: ["Assemble all arguments into a single :bytecode-array" [def sym-map [tree/new #nil]] [def lit-arr [array/new #nil]] [def tmp [-> [assemble/flatten code] [assemble/build-lit-arr lit-arr]]] [assemble/build-sym-map tmp sym-map 0] [def out [array/allocate [tree/ref sym-map :last-op]]] [assemble/emit-relocated-ops tmp sym-map -1 out] [arr->bytecode-arr out lit-arr]]] #{##[tree/new sym-map array/new lit-arr assemble/build-lit-arr assemble/flatten code tmp assemble/build-sym-map array/allocate tree/ref :last-op out assemble/emit-relocated-ops arr->bytecode-arr]
 1A00052404011A01070D1A02052404011A03070D1A04051A05051A060504011A
 030504021A07070D1A08051A07051A0105020004030D1A09051A0A051A01051A
@@ -586,9 +605,8 @@ FF1A0405251A0105111A03051404040900042401
 } bytecompile/procedure/arg [source env] #@[source: [[if [last? source] [bytecompile* [car source] env] [cons [bytecompile* [car source] env] [bytecompile/procedure/arg [cdr source] env]]]]] #{##[nil? source bytecompile* env bytecompile/procedure/arg]
 1A00051A01051204010B00121A02051A0105111A0305040209001C1A02051A01
 05111A030504021A04051A0105121A030504021401
-} bytecompile/procedure/inline? [op] #@[source: [[case [type-of op] [:lambda [meta op :inline]] [#t #f]]]] #{##[type-of op ΓεnΣym-3 :lambda meta :inline]
-151A00051A010504011A02070D1A02051A03200B00101A04051A01051A050402
-0900101A02051B200B00071C090004241601
+} bytecompile/procedure/inline? [op] #@[source: [[meta op :inline]]] #{##[meta op :inline]
+1A00051A01051A02040201
 } bytecompile/procedure/inline [op args env] #@[source: [[def arg-count [length args]] [when [> arg-count 1] [throw [list :compiler-error "For now only monadic functions can be inlined" op [current-lambda]]]] [def form [macroexpand/do [meta op :source] env]] [def arg-name [car [closure/arguments op]]] [if args [bytecompile* [list/replace form arg-name [car args]] env] [bytecompile* form env]]]] #{##[length args arg-count throw list :compiler-error "For now only monadic functions can be inlined" op current-lambda macroexpand/do meta :source env form closure/arguments arg-name bytecompile* list/replace]
 1A00051A010504011A02070D1A02050201220B001C1A03051A04051A051A061A
 07051A0805040004040401090004240D1A09051A0A051A07051A0B04021A0C05
@@ -597,11 +615,14 @@ FF1A0405251A0105111A03051404040900042401
 } bytecompile/procedure [op args env op-raw] #@[source: [[if [bytecompile/procedure/inline? op] [bytecompile/procedure/inline op args env] [bytecompile/procedure/default op args env op-raw]]]] #{##[bytecompile/procedure/inline? op bytecompile/procedure/inline args env bytecompile/procedure/default op-raw]
 1A00051A010504010B00141A02051A01051A03051A040504030900141A05051A
 01051A03051A04051A0605040401
-} bytecompile/procedure/default [op args env op-raw] #@[source: [[def arg-count [length args]] [if [$apply/optimize? op arg-count] [list [when args [bytecompile/procedure/arg args]] [$apply arg-count op]] [list [bytecompile* op-raw env] [when args [bytecompile/procedure/arg args]] [$apply/dynamic arg-count]]]]] #{##[length args arg-count $apply/optimize? op list bytecompile/procedure/arg $apply bytecompile* op-raw env $apply/dynamic]
-1A00051A010504011A02070D1A03051A04051A020504020B00281A05051A0105
-0B000E1A06051A01050401090004241A07051A02051A04050402040209002D1A
-05051A08051A09051A0A0504021A01050B000E1A06051A01050401090004241A
-0B051A02050401040301
+} bytecompile/procedure/default [op args env op-raw] #@[source: [[when [and [not [procedure? op]] [not [symbol? op]] [not [pair? op]]] [exception :type-error "Can't apply to that" op]] [def arg-count [length args]] [if [$apply/optimize? op arg-count] [list [when args [bytecompile/procedure/arg args]] [$apply arg-count op]] [list [bytecompile* op-raw env] [when args [bytecompile/procedure/arg args]] [$apply/dynamic arg-count]]]]] #{##[procedure? op symbol? :pair type-of throw list :type-error "Can't apply to that" current-lambda length args arg-count $apply/optimize? bytecompile/procedure/arg $apply bytecompile* op-raw env $apply/dynamic]
+1A00051A010504010B00071C0900041B0C0B002C0D1A02051A010504010B0007
+1C0900041B0C0B00170D1A031A04051A01050401200B00071C0900041B0B001C
+1A05051A06051A071A081A01051A0905040004040401090004240D1A0A051A0B
+0504011A0C070D1A0D051A01051A0C0504020B00281A06051A0B050B000E1A0E
+051A0B050401090004241A0F051A0C051A01050402040209002D1A06051A1005
+1A11051A120504021A0B050B000E1A0E051A0B050401090004241A13051A0C05
+0401040301
 } bytecompile/and/rec [source env label-end] #@[source: [[list [bytecompile* [car source] env] [when [cdr source] [list [$dup] [$jf label-end] [$drop] [bytecompile/and/rec [cdr source] env label-end]]]]]] #{##[list bytecompile* source env [#$C] $jf label-end [#$D] bytecompile/and/rec]
 1A00051A01051A0205111A030504021A0205120B00261A00051A041A05051A06
 0504011A071A08051A0205121A03051A06050403040409000424040201
@@ -633,7 +654,7 @@ FF1A0405251A0105111A03051404040900042401
 } bytecompile/try [source env] #@[source: [[def end-sym [bytecompile/gen-label]] [list [bytecompile* [cadr source] env] [$try end-sym] [bytecompile/do/form [cddr source] env] [$closure/pop] [list :label end-sym]]]] #{##[bytecompile/gen-label end-sym list bytecompile* source env $try bytecompile/do/form [#$16] :label]
 1A000504001A01070D1A02051A03051A040512111A050504021A06051A010504
 011A07051A040512121A050504021A081A02051A091A01050402040501
-} bytecompile* [source env] #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function :pair :symbol] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [environment* [bytecompile/environment* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env [car source]]]]] [otherwise [bytecompile/literal source]]]]] #{##[resolves? source env resolve op type-of ΓεnΣym-4 :lambda :native-function :pair :symbol #f ΓεnΣym-5 do bytecompile/do let* bytecompile/let* def bytecompile/def set! bytecompile/set! if bytecompile/if while bytecompile/while and bytecompile/and or bytecompile/or fn* bytecompile/fn* macro* bytecompile/macro* environment* bytecompile/environment* try bytecompile/try return bytecompile/return quote bytecompile/quote bytecompile/procedure bytecompile/literal]
+} bytecompile* [source env] #@[documentation: "Compile the forms in source" source: ["Compile the forms in source" [def op [if [resolves? [car source] env] [resolve [car source] env] [car source]]] [case [type-of op] [[:lambda :native-function :pair :symbol] [case op [do [bytecompile/do source env]] [let* [bytecompile/let* source env]] [def [bytecompile/def source env]] [set! [bytecompile/set! source env]] [if [bytecompile/if source env]] [while [bytecompile/while source env]] [and [bytecompile/and source env]] [or [bytecompile/or source env]] [fn* [bytecompile/fn* source env]] [macro* [bytecompile/macro* source env]] [environment* [bytecompile/environment* source env]] [try [bytecompile/try source env]] [return [bytecompile/return source env]] '[bytecompile/quote [cadr source]] [otherwise [bytecompile/procedure op [cdr source] env [car source]]]]] [otherwise [if [pair? source] [exception :type-error "Can't evaluate that" source] [bytecompile/literal source]]]]]] #{##[resolves? source env resolve op type-of ΓεnΣym-3 :lambda :native-function :pair :symbol #f ΓεnΣym-4 do bytecompile/do let* bytecompile/let* def bytecompile/def set! bytecompile/set! if bytecompile/if while bytecompile/while and bytecompile/and or bytecompile/or fn* bytecompile/fn* macro* bytecompile/macro* environment* bytecompile/environment* try bytecompile/try return bytecompile/return quote bytecompile/quote bytecompile/procedure throw list :type-error "Can't evaluate that" current-lambda bytecompile/literal]
 1A00051A0105111A020504020B00121A03051A0105111A020504020900071A01
 05111A04070D151A05051A040504011A06070D1A06051A07200C0A00270D1A06
 051A08200C0A001C0D1A06051A09200C0A00110D1A06051A0A200C0A00060D1A
@@ -648,7 +669,9 @@ FF1A0405251A0105111A03051404040900042401
 2105200B00111A22051A01051A0205040209005D1A0C051A2305200B00111A24
 051A01051A020504020900451A0C051A2505200B00111A26051A01051A020504
 0209002D1A0C051A2705200B00101A28051A0105121104010900161A29051A04
-051A0105121A02051A01051104041609000B1A2A051A010504011601
+051A0105121A02051A0105110404160900321A091A05051A01050401200B001C
+1A2A051A2B051A2C1A2D1A01051A2E0504000404040109000B1A2F051A010504
+011601
 } bytecompile [form environment] #@[source: [[list [bytecompile* form environment] [$ret]]]] #{##[list bytecompile* form environment [#$1]]
 1A00051A01051A02051A030504021A04040201
 }]
@@ -724,10 +747,13 @@ C10D1A01051A10200C0A00B60D1A01051A11200C0A00AB0D1A01051A12200C0A
 051A030504011E0AFFC20D1A08051A0005040101
 } disassemble/bytecode-array [code] #@[documentation: "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," source: ["Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," [disassemble/array [bytecode-arr->arr code] 0 [bytecode-literals code]]]] #{##[disassemble/array bytecode-arr->arr code bytecode-literals]
 1A00051A01051A0205040102001A03051A02050401040301
-} disassemble/print [bc] #@[source: [[doseq [a [disassemble/bytecode-array bc]] [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]]]] #{##[disassemble/bytecode-array bc ΓεnΣym-3 a println cat ansi-blue string/pad-start string " - "]
-151A00051A010504011A02070D1A02050B0046240900390D1A0205111A03070D
-1A04051A05051A06051A07051A08051A03051104010206040204011A091A0305
-12040304010D1A0205121A02081A02050AFFC7090004241601
+} disassemble/print [bc] #@[source: [[doseq [a [disassemble/bytecode-array bc]] [println [cat [ansi-blue [string/pad-start [string [car a]] 6]] " - " [cdr a]]]]]] #{##[disassemble/bytecode-array bc ΓεnΣym-3 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" a println cat ansi-blue string/pad-start string " - "]
+151A00051A010504011A02070D240900900D1A031A04051A02050401200B0007
+2409001E1A05051A06051A071A081A00051A010504011A09050400040404010D
+1A04051A020504011A03200B0007240900191A05051A06051A071A0A1A02051A
+09050400040404010D1A0205111A0B070D1A0C051A0D051A0E051A0F051A1005
+1A0B051104010206040204011A111A0B0512040304010D1A0205121A02081A02
+050AFF701601
 } disassemble [bc] #@[documentation: "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," source: ["Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions," [case [type-of bc] [[:lambda :macro] [disassemble/print [closure/code bc]]] [:bytecode-array [disassemble/print bc]] [otherwise [throw [list :type-error "Can't disassemble that" bc [current-lambda]]]]]]] #{##[type-of bc ΓεnΣym-4 :lambda :macro #f disassemble/print closure/code :bytecode-array throw list :type-error "Can't disassemble that" current-lambda]
 151A00051A010504011A02070D1A02051A03200C0A00110D1A02051A04200C0A
 00060D1A050B00131A06051A07051A01050401040109002D1A02051A08200B00
@@ -739,10 +765,12 @@ C10D1A01051A10200C0A00B60D1A01051A11200C0A00AB0D1A01051A12200C0A
 0D1A141A151A161A17171A14070D1A181A191A1A1A1B171A18070D1A1C1A1D1A
 1E1A1F171A1C070D1A201A211A221A23171A20070D1A241A251A261A27171A24
 070D1A281A291A2A1A2B171A28070D1A2C1A2D1A2E1A2F171A2C0701
-}#{##[load/forms [source environment] #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]] #{##[source ΓεnΣym-1 form apply environment compile*]
-151A00051A01070D1A01050B0034240900270D1A0105111A02070D1A03051A04
-051A05051A00051A0405040204020D1A0105121A01081A01050AFFD909000424
-1601
+}#{##[load/forms [source environment] #@[documentation: "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" source: ["Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined" [doseq [form source] [apply environment [compile* source environment]]]]] #{##[source ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" form apply environment compile*]
+151A00051A01070D240900790D1A021A03051A01050401200B0007240900191A
+04051A05051A061A071A00051A08050400040404010D1A03051A010504011A02
+200B0007240900191A04051A05051A061A091A01051A08050400040404010D1A
+0105111A0A070D1A0B051A0C051A0D051A00051A0C05040204020D1A0105121A
+01081A01050AFF871601
 } macroexpand/forms [source-raw environment] #@[documentation: "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." source: ["Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined." [when-not environment [set! environment [environment*]]] [load/forms source-raw environment] [macroexpand source-raw environment]]] #{##[environment load/forms source-raw macroexpand]
 1A00050B00072409000B15240D13161A00080D1A01051A02051A000504020D1A
 03051A02051A0005040201
@@ -750,33 +778,42 @@ C10D1A01051A10200C0A00B60D1A01051A11200C0A00AB0D1A01051A12200C0A
 1A00051A01051A02051A03051A040504020401040101
 } compile/debug [expr] #@[source: [[disassemble [compile expr]]]] #{##[disassemble compile* expr current-closure]
 1A00051A01051A02051A030504000402040101
-} compile/do* [source environment] #@[source: [[compile* [cons do source] environment]]] #{##[compile* do source environment]
-1A00051A01051A0205141A0305040201
+} compile/do* [source environment] #@[source: [[if [pair? source] [compile* [cons do source] environment] source]]] #{##[:pair type-of source compile* do environment]
+1A001A01051A02050401200B00151A03051A04051A0205141A05050402090006
+1A020501
 } compile [source] #@[documentation: "Compile SOURCE so it can be evaluated/applied" source: ["Compile SOURCE so it can be evaluated/applied" [quasiquote [compile* [unquote source] [current-closure]]]]] #{##[compile* source current-closure]
 1A001A01051A0224142414141401
 } compile/do [source] #@[documentation: "Compile SOURCE so it can be evaluated/applied" source: ["Compile SOURCE so it can be evaluated/applied" [quasiquote [compile* [cons do [unquote source]] [current-closure]]]]] #{##[compile* cons do source current-closure]
 1A001A011A021A0305241414141A0424142414141401
-} meta/parse/body [type args body] #@[source: [[def meta [tree/new #nil]] [doseq [v body] [case [type-of v] [:pair [return meta]] [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]] "\n" v]]]] [:keyword [tree/set! meta v #t]]]] [return meta]]] #{##[tree/new meta body ΓεnΣym-2 v type-of ΓεnΣym-3 :pair :string tree/set! :documentation trim cat string tree/ref "\n" :keyword]
-1A00052404011A01070D151A02051A03070D1A03050B008C2409007F0D1A0305
-111A04070D151A05051A040504011A06070D1A06051A07200B000A1A01050109
-00501A06051A08200B002E1A09051A01051A0A1A0B051A0C051A0D051A0E051A
-01051A0A040204011A0F1A040504030401040309001C1A06051A10200B00121A
-09051A01051A04051B040309000424160D1A0305121A03081A03050AFF810900
-0424160D1A01050101
+} meta/parse/body [type args body] #@[source: [[def meta [tree/new #nil]] [doseq [v body] [case [type-of v] [:pair [return meta]] [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]] "\n" v]]]] [:keyword [tree/set! meta v #t]]]] [return meta]]] #{##[tree/new meta body ΓεnΣym-2 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" v ΓεnΣym-3 :string tree/set! :documentation trim cat string tree/ref "\n" :keyword]
+1A00052404011A01070D151A02051A03070D240900D10D1A041A05051A030504
+01200B0007240900191A06051A07051A081A091A02051A0A050400040404010D
+1A05051A030504011A04200B0007240900191A06051A07051A081A0B1A03051A
+0A050400040404010D1A0305111A0C070D151A05051A0C0504011A0D070D1A0D
+051A04200B000A1A0105010900501A0D051A0E200B002E1A0F051A01051A101A
+11051A12051A13051A14051A01051A10040204011A151A0C0504030401040309
+001C1A0D051A16200B00121A0F051A01051A0C051B040309000424160D1A0305
+121A03081A03050AFF2F160D1A01050101
 } defmacro [name args . body] #@[documentation: "Define a new macro" source: ["Define a new macro" [quasiquote [def [unquote name] [macro* '[unquote name] '[unquote args] [unquote [tree/set! [meta/parse/body :macro args body] :source body]] '[unquote [compile/do* body [current-closure]]]]]]]] #{##[def name macro* quote args tree/set! meta/parse/body :macro body :source compile/do* current-closure]
 1A001A01051A021A031A01052414141A031A04052414141A05051A06051A071A
 04051A080504031A091A080504031A031A0A051A08051A0B0504000402241414
 2414141414142414141401
-} fn [args . body] #@[documentation: "Define an anonymous function" source: ["Define an anonymous function" [quasiquote [fn* 'anonymous '[unquote args] [unquote [tree/set! [meta/parse/body :lambda args body] :source body]] '[unquote [compile/do* body [current-closure]]]]]]] #{##[fn* quote anonymous args tree/set! meta/parse/body :lambda body :source compile/do* current-closure]
-1A001A011A022414141A011A03052414141A04051A05051A061A03051A070504
-031A081A070504031A011A09051A07051A0A0504000402241414241414141414
-01
-} defn [name args . body] #@[documentation: "Define a new function" source: ["Define a new function" [quasiquote [def [unquote name] [fn* '[unquote name] '[unquote args] [unquote [tree/set! [meta/parse/body :lambda args body] :source body]] '[unquote [compile/do* body [current-closure]]]]]]]] #{##[def name fn* quote args tree/set! meta/parse/body :lambda body :source compile/do* current-closure]
-1A001A01051A021A031A01052414141A031A04052414141A05051A06051A071A
-04051A080504031A091A080504031A031A0A051A08051A0B0504000402241414
-2414141414142414141401
-} eval-in [closure expr] #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [try display/error [apply closure [compile* expr closure]]]]] #{##[display/error apply closure compile* expr]
-1A00051900171A01051A02051A03051A04051A0205040204021601
+} fn/check [args body] #@[source: [[when-not args [exception :type-error "Every function needs an argument list" args]] [while args [when-not [or [symbol? args] [pair? args]] [exception :type-error "Wrong type for argument list" args]] [cdr! args]] [when-not body [exception :type-error "Every function needs a body" body]]]] #{##[args throw list :type-error "Every function needs an argument list" current-lambda symbol? :pair type-of #f "Wrong type for argument list" body "Every function needs a body"]
+1A00050B0007240900191A01051A02051A031A041A00051A0505040004040401
+0D240900480D1A06051A000504010C0A00160D1A071A08051A00050401200C0A
+00060D1A090B0007240900191A01051A02051A031A0A1A00051A050504000404
+04010D1A0005121A00081A00050AFFB80D1A0B050B0007240900191A01051A02
+051A031A0C1A0B051A050504000404040101
+} fn [args . body] #@[documentation: "Define an anonymous function" source: ["Define an anonymous function" [fn/check args body] [quasiquote [fn* 'anonymous '[unquote args] [unquote [tree/set! [meta/parse/body :lambda args body] :source body]] '[unquote [compile/do* body [current-closure]]]]]]] #{##[fn/check args body fn* quote anonymous tree/set! meta/parse/body :lambda :source compile/do* current-closure]
+1A00051A01051A020504020D1A031A041A052414141A041A01052414141A0605
+1A07051A081A01051A020504031A091A020504031A041A0A051A02051A0B0504
+00040224141424141414141401
+} defn [name args . body] #@[documentation: "Define a new function" source: ["Define a new function" [fn/check args body] [quasiquote [def [unquote name] [fn* '[unquote name] '[unquote args] [unquote [tree/set! [meta/parse/body :lambda args body] :source body]] '[unquote [compile/do* body [current-closure]]]]]]]] #{##[fn/check args body def name fn* quote tree/set! meta/parse/body :lambda :source compile/do* current-closure]
+1A00051A01051A020504020D1A031A04051A051A061A04052414141A061A0105
+2414141A07051A08051A091A01051A020504031A0A1A020504031A061A0B051A
+02051A0C05040004022414142414141414142414141401
+} eval-in [closure expr] #@[documentation: "Compile and the immediatly evaluate the result\nMostly used by lRun()" source: ["Compile and the immediatly evaluate the result" "" "Mostly used by lRun()" [apply closure [compile* expr closure]]]] #{##[apply closure compile* expr]
+1A00051A01051A02051A03051A01050402040201
 } eval [expr] #@[documentation: "Compile, Evaluate and then return the result of EXPR" source: ["Compile, Evaluate and then return the result of EXPR" [quasiquote [eval-in [current-closure] [unquote expr]]]]] #{##[eval-in current-closure expr]
 1A001A0124141A02052414141401
 } typecheck/only [v t] #@[source: [[quasiquote [when-not [= [type-of [unquote v]] [unquote t]] [throw [list :type-error [unquote [fmt "Expected a value of type {t}"]] [unquote v] [current-lambda]]]]]]] #{##[when-not = type-of v t throw list :type-error cat "Expected a value of type " current-lambda]
@@ -799,37 +836,38 @@ C10D1A01051A10200C0A00B60D1A01051A11200C0A00AB0D1A01051A12200C0A
 1A001A011A021A03171A00070D1A041A051A061A07171A04070D1A081A091A0A
 1A0B171A08070D1A0C1A0D1A0E1A0F171A0C070D1A101A111A121A13171A1007
 0D1A141A151A161A17181A14070D1A181A191A1A1A1B181A18070D1A1C1A1D1A
-1E1A1F171A1C070D1A201A211A221A23181A20070D1A241A251A261A27181A24
-070D1A281A291A2A1A2B181A28070D1A2C1A2D1A2E1A2F171A2C070D1A301A31
-1A321A33181A30070D1A341A351A361A37181A34070D1A381A391A3A1A3B171A
-38070D1A3C1A3D1A3E1A3F181A3C070D1A401A411A421A43171A40070D1A441A
-451A461A47181A440701
-}#{##[pure? [expr] #@[source: [[and [not [pair? expr]] [not [symbol? expr]] #t]]] #{##[pair? expr symbol?]
-1A00051A010504010B00071C0900041B0C0B001A0D1A02051A010504010B0007
-1C0900041B0C0B00050D1B01
+1E1A1F171A1C070D1A201A211A221A23181A20070D1A241A251A261A27171A24
+070D1A281A291A2A1A2B181A28070D1A2C1A2D1A2E1A2F181A2C070D1A301A31
+1A321A33171A30070D1A341A351A361A37181A34070D1A381A391A3A1A3B181A
+38070D1A3C1A3D1A3E1A3F171A3C070D1A401A411A421A43181A40070D1A441A
+451A461A47171A44070D1A481A491A4A1A4B181A480701
+}#{##[pure? [expr] #@[source: [[and [not [pair? expr]] [not [symbol? expr]] #t]]] #{##[:pair type-of expr symbol?]
+1A001A01051A02050401200B00071C0900041B0C0B001A0D1A03051A02050401
+0B00071C0900041B0C0B00050D1B01
 } constant-foldable? [fun] #@[source: [[meta fun :pure]]] #{##[meta fun :pure]
 1A00051A01051A02040201
 } constant-fold/resolve [sym] #@[source: [[when-not [symbol? sym] [return sym]] [resolve sym]]] #{##[symbol? sym resolve]
 1A00051A010504010B0007240900071A0105010D1A02051A0105040101
-} constant-fold/args [expr] #@[source: [[when-not expr [return expr]] [if [pair? [car expr]] [cons [constant-fold [car expr]] [constant-fold/args [cdr expr]]] [cons [car expr] [constant-fold/args [cdr expr]]]]]] #{##[expr pair? constant-fold constant-fold/args]
-1A00050B0007240900071A0005010D1A01051A00051104010B00191A02051A00
-051104011A03051A0005120401140900111A0005111A03051A00051204011401
-} constant-fold [expr] #@[documentation: "Will try and evaluate as many constant as possible to make the expression simpler." source: ["Will try and evaluate as many constant as possible to make the expression simpler." [if-not [pair? expr] expr [do [def folded-fun [car expr]] [when [= 'quote folded-fun] [return expr]] [def folded-args [constant-fold/args [cdr expr]]] [if [and [constant-foldable? folded-fun] [every? folded-args pure?]] [try [fn [] [cons folded-fun folded-args]] [apply [constant-fold/resolve folded-fun] folded-args]] [cons folded-fun folded-args]]]]]] #{##[pair? expr folded-fun quote constant-fold/args folded-args constant-foldable? every? pure? anonymous [] #@[source: [[cons folded-fun folded-args]]] #{##[folded-fun folded-args]
+} constant-fold/args [expr] #@[source: [[when-not expr [return expr]] [if [pair? [car expr]] [cons [constant-fold [car expr]] [constant-fold/args [cdr expr]]] [cons [car expr] [constant-fold/args [cdr expr]]]]]] #{##[expr :pair type-of constant-fold constant-fold/args]
+1A00050B0007240900071A0005010D1A011A02051A0005110401200B00191A03
+051A00051104011A04051A0005120401140900111A0005111A04051A00051204
+011401
+} constant-fold [expr] #@[documentation: "Will try and evaluate as many constant as possible to make the expression simpler." source: ["Will try and evaluate as many constant as possible to make the expression simpler." [if-not [pair? expr] expr [do [def folded-fun [car expr]] [when [= 'quote folded-fun] [return expr]] [def folded-args [constant-fold/args [cdr expr]]] [if [and [constant-foldable? folded-fun] [every? folded-args pure?]] [try [fn [] [cons folded-fun folded-args]] [apply [constant-fold/resolve folded-fun] folded-args]] [cons folded-fun folded-args]]]]]] #{##[:pair type-of expr folded-fun quote constant-fold/args folded-args constant-foldable? every? pure? anonymous [] #@[source: [[cons folded-fun folded-args]]] #{##[folded-fun folded-args]
 1A00051A01051401
 } apply constant-fold/resolve]
-1A00051A010504010B006F1A0105111A02070D1A031A0205200B000A1A010501
-090004240D1A04051A01051204011A05070D1A06051A020504010C0B000F0D1A
-07051A05051A080504020B00231A091A0A1A0B1A0C171900141A0D051A0E051A
-020504011A050504021609000A1A02051A0505140900061A010501
+1A001A01051A02050401200B006F1A0205111A03070D1A041A0305200B000A1A
+020501090004240D1A05051A02051204011A06070D1A07051A030504010C0B00
+0F0D1A08051A06051A090504020B00231A0A1A0B1A0C1A0D171900141A0E051A
+0F051A030504011A060504021609000A1A03051A0605140900061A020501
 }]
 1A001A011A021A03171A00070D1A041A051A061A07171A04070D1A081A091A0A
 1A0B171A08070D1A0C1A0D1A0E1A0F171A0C070D1A101A111A121A13171A1007
 01
-}#{##[macroexpand/do/args [args env] #@[source: [[if [last? args] [cons [macroexpand* [car args] env] #nil] [if [pair? [car args]] [let* [def ocar [macroexpand* [car args] env]] [if [pair? ocar] [cons ocar [macroexpand/do/args [cdr args] env]] [macroexpand/do/args [cdr args] env]]] [macroexpand/do/args [cdr args] env]]]]] #{##[nil? args macroexpand* env pair? ocar macroexpand/do/args]
-1A00051A01051204010B00141A02051A0105111A03050402241409005A1A0405
-1A01051104010B0042151A02051A0105111A030504021A05070D1A04051A0505
-04010B00161A05051A06051A0105121A030504021409000F1A06051A0105121A
-030504021609000F1A06051A0105121A0305040201
+}#{##[macroexpand/do/args [args env] #@[source: [[if [last? args] [cons [macroexpand* [car args] env] #nil] [if [pair? [car args]] [let* [def ocar [macroexpand* [car args] env]] [if [pair? ocar] [cons ocar [macroexpand/do/args [cdr args] env]] [macroexpand/do/args [cdr args] env]]] [macroexpand/do/args [cdr args] env]]]]] #{##[nil? args macroexpand* env :pair type-of ocar macroexpand/do/args]
+1A00051A01051204010B00141A02051A0105111A0305040224140900601A041A
+05051A0105110401200B0045151A02051A0105111A030504021A06070D1A041A
+05051A06050401200B00161A06051A07051A0105121A030504021409000F1A07
+051A0105121A030504021609000F1A07051A0105121A0305040201
 } macroexpand/do [source env] #@[source: [[def args [macroexpand/do/args source env]] [if [last? args] [car args] [cons 'do args]]]] #{##[macroexpand/do/args source env args nil? do]
 1A00051A01051A020504021A03070D1A04051A03051204010B000A1A03051109
 00091A051A03051401
@@ -872,10 +910,11 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 1A001A011A021A03171A00070D1A041A051A061A07171A04070D1A081A091A0A
 1A0B171A08070D1A0C1A0D1A0E1A0F171A0C070D1A101A111A121A13171A1007
 0D1A141A151A161A17171A140701
-}#{##[let/arg [arg] #@[source: [[when arg [when [or [not [pair? arg]] [not [symbol? [car arg]]]] [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]] [quasiquote [def [unquote [car arg]] [unquote [cadr arg]]]]]]] #{##[arg pair? symbol? #f throw list :invalid-let-form "Please fix the structure of the let form" def]
-1A00050B005B1A01051A000504010B00071C0900041B0C0A001C0D1A02051A00
-051104010B00071C0900041B0C0A00060D1A030B00171A04051A05051A061A07
-1A000504030401090004240D1A081A0005111A00051211241414140900042401
+}#{##[let/arg [arg] #@[source: [[when arg [when [or [not [pair? arg]] [not [symbol? [car arg]]]] [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]] [quasiquote [def [unquote [car arg]] [unquote [cadr arg]]]]]]] #{##[arg :pair type-of symbol? #f throw list :invalid-let-form "Please fix the structure of the let form" def]
+1A00050B005E1A011A02051A00050401200B00071C0900041B0C0A001C0D1A03
+051A00051104010B00071C0900041B0C0A00060D1A040B00171A05051A06051A
+071A081A000504030401090004240D1A091A0005111A00051211241414140900
+042401
 } let/args [args] #@[source: [[if-not args #nil [cons [let/arg [car args]] [let/args [cdr args]]]]]] #{##[args let/arg let/args]
 1A00050B00191A01051A00051104011A02051A0005120401140900042401
 } let [bindings . body] #@[documentation: "Evalutes to BODY if PRED is true" source: ["Evalutes to BODY if PRED is true" [quasiquote [let* [do [unquote-splicing [let/args bindings]] [unquote-splicing body]]]]]] #{##[let* do append let/args bindings body]
@@ -957,13 +996,13 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 } case/clauses/multiple [key-sym cases] #@[source: [[when cases [cons [list '= key-sym [car cases]] [case/clauses/multiple key-sym [cdr cases]]]]]] #{##[cases list = key-sym case/clauses/multiple]
 1A00050B00211A01051A021A03051A00051104031A04051A03051A0005120402
 140900042401
-} case/clauses [key-sym clauses] #@[source: [[when clauses [if [= [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [= [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '= key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '= key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]]]] #{##[clauses otherwise do list if pair? quote nil? symbol? = key-sym or case/clauses/multiple case/clauses]
-1A00050B00A61A000511111A01200B000E1A021A000511121409008D1A03051A
-041A05051A0005111104010B00561A00051111111A06200C0B00210D1A07051A
-00051111121204010C0B00100D1A08051A00051111121104010B00151A03051A
-091A0A051A0005111104030900131A0B1A0C051A0A051A000511110402140900
-121A03051A091A0A051A0005111104031A021A00051112141A0D051A0A051A00
-0512040204040900042401
+} case/clauses [key-sym clauses] #@[source: [[when clauses [if [= [caar clauses] 'otherwise] [cons 'do [cdar clauses]] [list 'if [if [pair? [caar clauses]] [if [and [= [car [caar clauses]] 'quote] [last? [cdr [caar clauses]]] [symbol? [cadr [caar clauses]]]] [list '= key-sym [caar clauses]] [cons 'or [case/clauses/multiple key-sym [caar clauses]]]] [list '= key-sym [caar clauses]]] [cons 'do [cdar clauses]] [case/clauses key-sym [cdr clauses]]]]]]] #{##[clauses otherwise do list if :pair type-of quote nil? symbol? = key-sym or case/clauses/multiple case/clauses]
+1A00050B00A91A000511111A01200B000E1A021A00051112140900901A03051A
+041A051A06051A000511110401200B00561A00051111111A07200C0B00210D1A
+08051A00051111121204010C0B00100D1A09051A00051111121104010B00151A
+03051A0A1A0B051A0005111104030900131A0C1A0D051A0B051A000511110402
+140900121A03051A0A1A0B051A0005111104031A021A00051112141A0E051A0B
+051A000512040204040900042401
 } case [key-form . clauses] #@[source: [[def key-sym [gensym]] [list 'let* [list 'def key-sym key-form] [case/clauses key-sym clauses]]]] #{##[gensym key-sym list let* def key-form case/clauses clauses]
 1A000504001A01070D1A02051A031A02051A041A01051A050504031A06051A01
 051A07050402040301
@@ -976,14 +1015,15 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 04011A0B070D1A0C1A0105020024141424141A0D1A0E1A01051A090524141414
 1A0F051A10051A111A01051A1202011A01052414141424141414241404021414
 1A0B05241414141401
-} doseq [for-loop . body] #@[documentation: "[doseq [l [list 1 2 3 4]] [println l]]" source: ["[doseq [l [list 1 2 3 4]] [println l]]" [def symbol-name [gensym]] [quasiquote [let [[[unquote symbol-name] [unquote [cadr for-loop]]]] [when [unquote symbol-name] [while [unquote symbol-name] [def [unquote [car for-loop]] [car [unquote symbol-name]]] [unquote-splicing body] [cdr! [unquote symbol-name]]]]]]]] #{##[gensym symbol-name let for-loop when while def car append body cdr!]
+} doseq [for-loop . body] #@[documentation: "[doseq [l [list 1 2 3 4]] [println l]]" source: ["[doseq [l [list 1 2 3 4]] [println l]]" [def symbol-name [gensym]] [quasiquote [let [[[unquote symbol-name] [unquote [cadr for-loop]]]] [while [unquote symbol-name] [when-not [pair? [unquote symbol-name]] [exception :type-error "Improper list detected, please provide a proper list instead" [unquote [cadr for-loop]]]] [typecheck/only [unquote symbol-name] :pair] [def [unquote [car for-loop]] [car [unquote symbol-name]]] [unquote-splicing body] [cdr! [unquote symbol-name]]]]]]] #{##[gensym symbol-name let for-loop while when-not pair? exception :type-error "Improper list detected, please provide a proper list instead" typecheck/only :pair def car append body cdr!]
 1A000504001A01070D1A021A01051A0305121124141424141A041A01051A051A
-01051A061A0305111A071A0105241414241414141A08051A09051A0A1A010524
-141424140402141414241414142414141401
-} thread/-> [init fun] #@[source: [[if-not fun init [if [pair? [car fun]] [quasiquote [[unquote [caar fun]] [unquote [thread/-> init [cdr fun]]] [unquote-splicing [cdar fun]]]] [list [car fun] [thread/-> init [cdr fun]]]]]]] #{##[fun pair? thread/-> init append list]
-1A00050B00481A01051A00051104010B00241A000511111A02051A03051A0005
-1204021A04051A0005111224040214140900181A05051A0005111A02051A0305
-1A000512040204020900061A030501
+061A01052414141A071A081A091A030512112414141414241414141A0A1A0105
+1A0B241414141A0C1A0305111A0D1A0105241414241414141A0E051A0F051A10
+1A01052414142414040214141414142414141401
+} thread/-> [init fun] #@[source: [[if-not fun init [if [pair? [car fun]] [quasiquote [[unquote [caar fun]] [unquote [thread/-> init [cdr fun]]] [unquote-splicing [cdar fun]]]] [list [car fun] [thread/-> init [cdr fun]]]]]]] #{##[fun :pair type-of thread/-> init append list]
+1A00050B004B1A011A02051A0005110401200B00241A000511111A03051A0405
+1A00051204021A05051A0005111224040214140900181A06051A0005111A0305
+1A04051A000512040204020900061A040501
 } -> [init . fun] #@[documentation: "Thread init as the first argument through every function in fun" source: ["Thread init as the first argument through every function in fun" [thread/-> init [reverse fun]]]] #{##[thread/-> init reverse fun]
 1A00051A01051A02051A03050401040201
 } thread/->> [init fun] #@[source: [[if-not fun init [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]] #{##[fun append thread/->> init]
@@ -1011,17 +1051,19 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 } defmodule [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert [unquote name] [module [def *module* [unquote name]] [unquote-splicing body]]]]]] #{##[module/insert name module def *module* append body]
 1A001A01051A021A031A041A0105241414141A05051A06052404021414241414
 1401
-} defmodule/defer [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert/defer [unquote name] [string/write [unquote [list 'quote body]]]]]]] #{##[module/insert/defer name string/write list quote body]
-1A001A01051A021A03051A041A050504022414142414141401
+} defmodule/defer [name . body] #@[documentation: "Define a new named module" source: ["Define a new named module" [quasiquote [module/insert/defer [unquote name] [string/write [unquote [list 'quote [cons 'do body]]]]]]]] #{##[module/insert/defer name string/write list quote do body]
+1A001A01051A021A03051A041A051A06051404022414142414141401
 } export [name value] #@[source: [[quasiquote [tree/set! exports '[unquote name] [unquote value]]]]] #{##[tree/set! exports quote name value]
 1A001A011A021A03052414141A0405241414141401
-} require* [module env qualify?] #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [if qualify? [module/qualify-symbol module [keyword->symbol k]] [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]] #{##[module/load module mod resolve exports tree/keys ΓεnΣym-1 k qualify? module/qualify-symbol keyword->symbol q def module/import quote expr apply env compile*]
+} require* [module env qualify?] #@[source: [[def mod [module/load module]] [def exports [resolve 'exports mod]] [doseq [k [tree/keys exports]] [def q [if qualify? [module/qualify-symbol module [keyword->symbol k]] [keyword->symbol k]]] [def expr [quasiquote [def [unquote q] [module/import [unquote mod] '[unquote [keyword->symbol k]]]]]] [apply env [compile* expr env]]]]] #{##[module/load module mod resolve exports tree/keys ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" k qualify? module/qualify-symbol keyword->symbol q def module/import quote expr apply env compile*]
 1A00051A010504011A02070D1A03051A041A020504021A04070D151A05051A04
-0504011A06070D1A06050B007C2409006F0D1A0605111A07070D1A08050B0016
-1A09051A01051A0A051A07050401040209000B1A0A051A070504011A0B070D1A
-0C1A0B051A0D1A02051A0E1A0A051A0705040124141424141414241414141A0F
-070D1A10051A11051A12051A0F051A1105040204020D1A0605121A06081A0605
-0AFF91090004241601
+0504011A06070D240900C60D1A071A08051A06050401200B00072409001E1A09
+051A0A051A0B1A0C1A05051A040504011A0D050400040404010D1A08051A0605
+04011A07200B0007240900191A09051A0A051A0B1A0E1A06051A0D0504000404
+04010D1A0605111A0F070D1A10050B00161A11051A01051A12051A0F05040104
+0209000B1A12051A0F0504011A13070D1A141A13051A151A02051A161A12051A
+0F05040124141424141414241414141A17070D1A18051A19051A1A051A17051A
+1905040204020D1A0605121A06081A06050AFF3A1601
 } use [module] #@[source: [[quasiquote [require* [unquote module] [current-closure] #f]]]] #{##[require* module current-closure]
 1A001A01051A0224141C241414141401
 } require [module] #@[source: [[quasiquote [require* [unquote module] [current-closure] #t]]]] #{##[require* module current-closure]
@@ -1041,10 +1083,13 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 1A00051A01051A020504021A03070D1A03050B002E1A040515240D13161A051A
 02051A06051A07051A03050401240402141404020D1A08051A02050401090004
 2401
-} module/load/external [name] #@[source: [[doseq [loader module/loader] [def mod [loader name]] [when mod [tree/set! module/cache name mod] [return mod]]] [return #nil]]] #{##[module/loader ΓεnΣym-2 loader name mod tree/set! module/cache]
-151A00051A01070D1A01050B004A2409003D0D1A0105111A02070D1A02051A03
-0504011A04070D1A04050B00191A05051A06051A03051A040504030D1A040501
-090004240D1A0105121A01081A01050AFFC309000424160D240101
+} module/load/external [name] #@[source: [[doseq [loader module/loader] [def mod [loader name]] [when mod [tree/set! module/cache name mod] [return mod]]] [return #nil]]] #{##[module/loader ΓεnΣym-2 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" loader name mod tree/set! module/cache]
+151A00051A01070D2409008F0D1A021A03051A01050401200B0007240900191A
+04051A05051A061A071A00051A08050400040404010D1A03051A010504011A02
+200B0007240900191A04051A05051A061A091A01051A08050400040404010D1A
+0105111A0A070D1A0A051A0B0504011A0C070D1A0C050B00191A0D051A0E051A
+0B051A0C0504030D1A0C0501090004240D1A0105121A01081A01050AFF71160D
+240101
 } module/insert/defer [name module-source] #@[source: [[tree/set! module/store name module-source]]] #{##[tree/set! module/store name module-source]
 1A00051A01051A02051A0305040301
 } module/insert [name module] #@[source: [[tree/set! module/cache name module]]] #{##[tree/set! module/cache name module]
@@ -1104,7 +1149,7 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 1A001A01051A020504012001
 } boolean? [val] #@[source: [[= :bool [type-of val]]]] #{##[:bool type-of val]
 1A001A01051A020504012001
-} pair? [val] #@[source: [[= :pair [type-of val]]]] #{##[:pair type-of val]
+} pair? [val] #@[source: [:inline [= :pair [type-of val]]] inline: #t] #{##[:pair type-of val]
 1A001A01051A020504012001
 } array? [val] #@[source: [[= :array [type-of val]]]] #{##[:array type-of val]
 1A001A01051A020504012001
@@ -1150,17 +1195,17 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 171A60070D1A641A651A661A67171A64070D1A681A691A6A1A6B171A68070D1A
 6C1A6D1A6E1A6F171A6C070D1A701A711A721A73171A70070D1A741A751A761A
 77171A740701
-}#{##[quasiquote-real [l depth] #@[source: [[if [nil? l] #nil [if [pair? l] [if [= [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l #nil]] l]]]]] #{##[nil? l pair? unquote-splicing depth list append quasiquote-real unquote quasiquote cons symbol? quote]
-1A00051A010504010B0007240901151A02051A010504010B00E81A010511111A
-03200B00401A04052A0B001F1A05051A061A01051112111A07051A0105121A04
-050402040309001A1A05051A031A07051A0105121102FF1A0405250402040209
-009D1A0105111A08200B002C1A04052A0B000B1A0105121109001A1A05051A08
-1A07051A0105121102FF1A0405250402040209006A1A0105111A09200B001E1A
-07051A07051A0105121102011A04052504021A040504020900451A04052A0B00
-251A05051A0A1A07051A0105111A040504021A07051A0105121A040504020403
-09001C1A07051A0105111A040504021A07051A0105121A04050402140900251A
-04052A0C0B000C0D1A0B051A010504010B000E1A0C1A01052414140900061A01
-0501
+}#{##[quasiquote-real [l depth] #@[source: [[if [nil? l] #nil [if [pair? l] [if [= [caar l] 'unquote-splicing] [if [zero? depth] [list 'append [cadr [car l]] [quasiquote-real [cdr l] depth]] [list 'unquote-splicing [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'unquote] [if [zero? depth] [cadr l] [list 'unquote [quasiquote-real [cadr l] [+ -1 depth]]]] [if [= [car l] 'quasiquote] [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth] [if [zero? depth] [list 'cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]] [cons [quasiquote-real [car l] depth] [quasiquote-real [cdr l] depth]]]]]] [if [and [zero? depth] [symbol? l]] [cons 'quote [cons l #nil]] l]]]]] #{##[nil? l :pair type-of unquote-splicing depth list append quasiquote-real unquote quasiquote cons symbol? quote]
+1A00051A010504010B0007240901181A021A03051A01050401200B00E81A0105
+11111A04200B00401A05052A0B001F1A06051A071A01051112111A08051A0105
+121A05050402040309001A1A06051A041A08051A0105121102FF1A0505250402
+040209009D1A0105111A09200B002C1A05052A0B000B1A0105121109001A1A06
+051A091A08051A0105121102FF1A0505250402040209006A1A0105111A0A200B
+001E1A08051A08051A0105121102011A05052504021A050504020900451A0505
+2A0B00251A06051A0B1A08051A0105111A050504021A08051A0105121A050504
+02040309001C1A08051A0105111A050504021A08051A0105121A050504021409
+00251A05052A0C0B000C0D1A0C051A010504010B000E1A0D1A01052414140900
+061A010501
 } quasiquote [l] #@[source: [[quasiquote-real l 0]]] #{##[quasiquote-real l]
 1A00051A01050200040201
 } unquote [expr] #@[source: [[throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]] #{##[throw list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]
@@ -1409,7 +1454,7 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 0C0A00180D1A1705111A1C051A12050401210C0A00060D1A0C0B001C1A02051A
 03051A041A1D1A0A051A0605040004040401090004240D1A11051A12051A1705
 111B0403090004240D1A14051A0D051A15051A170511040104021601
-} fmt [format-string . args] #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [dotimes [i [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [dotimes [i [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]] #{##[string? format-string throw list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" current-lambda cuts i char-at ΓεnΣym-5 int? :format-error "fmt placeholders can't be nested" "fmt expects all brackets to be closed" string/length expr-list last-pos array/fill! array/allocate length args arguments-used tree/new :expr-count array/length opts ΓεnΣym-6 c string/cut lit "" fmt/expr expr array/ref "fmt expects all arguments to be used" list/ref cat string fmt/args/map-fun/count fmt/args/map-fun [arg] #@[source: [[def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]]] #{##[string->symbol cat "fmt-arg-" string fmt/args/map-fun/count s list def arg]
+} fmt [format-string . args] #@[documentation: "Return a formatted string" source: ["Return a formatted string" [when-not [string? format-string] [throw [list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string [current-lambda]]]] [def cuts #nil] [dotimes [i [string/length format-string]] [case [char-at format-string i] [123 [do [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [set! cuts [cons i cuts]]]] [125 [do [when-not [int? [car cuts]] [throw [list :format-error "fmt expects all brackets to be closed" format-string [current-lambda]]]] [set! cuts [cons [cons [car cuts] i] [cdr cuts]]]]]]] [when [int? [car cuts]] [throw [list :format-error "fmt placeholders can't be nested" format-string [current-lambda]]]] [def expr-list #nil] [def last-pos [string/length format-string]] [def arguments-used [-> [array/allocate [length args]] [array/fill! #f]]] [def opts [tree/new :expr-count [array/length arguments-used]]] [doseq [c cuts] [def lit [string/cut format-string [+ [cdr c] 1] last-pos]] [when-not [= "" lit] [set! expr-list [cons lit expr-list]]] [def expr [fmt/expr [string/cut format-string [+ 1 [car c]] [cdr c]] arguments-used opts]] [set! expr-list [cons expr expr-list]] [set! last-pos [car c]]] [when [> last-pos 0] [def lit [string/cut format-string 0 last-pos]] [set! expr-list [cons lit expr-list]]] [dotimes [i [array/length arguments-used]] [when-not [array/ref arguments-used i] [throw [list :format-error "fmt expects all arguments to be used" [list format-string [list/ref args i]] [current-lambda]]]]] [def expr [if [cdr expr-list] [cons 'cat expr-list] [if [string? [car expr-list]] [car expr-list] [cons 'string expr-list]]]] [def fmt/args/map-fun/count 0] [defn fmt/args/map-fun [arg] [def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]] [if args [quasiquote [let* [unquote-splicing [map args fmt/args/map-fun]] [unquote expr]]] expr]]] #{##[string? format-string throw list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" current-lambda cuts i char-at ΓεnΣym-5 int? :format-error "fmt placeholders can't be nested" "fmt expects all brackets to be closed" string/length expr-list last-pos array/fill! array/allocate length args arguments-used tree/new :expr-count array/length opts ΓεnΣym-6 :pair type-of "Improper list detected, please provide a proper list instead" "Expected a value of type :pair" c string/cut lit "" fmt/expr expr array/ref "fmt expects all arguments to be used" list/ref cat string fmt/args/map-fun/count fmt/args/map-fun [arg] #@[source: [[def s [string->symbol [cat "fmt-arg-" [string fmt/args/map-fun/count]]]] [inc! fmt/args/map-fun/count] [list 'def s arg]]] #{##[string->symbol cat "fmt-arg-" string fmt/args/map-fun/count s list def arg]
 1A00051A01051A021A03051A04050401040204011A05070D1A04050201251A04
 080D1A06051A071A05051A0805040301
 } let* append map]
@@ -1423,19 +1468,21 @@ B71A0C051A1705200B00191A11051A01051A02051A040502031C020004060900
 FF570D24160D1A0B051A07051104010B001C1A02051A03051A0C1A0D1A01051A
 0605040004040401090004240D241A10070D1A0F051A010504011A11070D1A12
 051A13051A14051A1505040104011C04021A16070D1A17051A181A19051A1605
-040104021A1A070D151A07051A1B070D1A1B050B0083240900760D1A1B05111A
-1C070D1A1D051A01051A1C05120201251A110504031A1E070D1A1F1A1E05200B
-00072409000D1A1E051A1005141A10080D1A20051A1D051A010502011A1C0511
-251A1C051204031A16051A1A0504031A21070D1A21051A1005141A10080D1A1C
-05111A11080D1A1B05121A1B081A1B050AFF8A09000424160D1A11050200220B
-00211A1D051A010502001A110504031A1E070D1A1E051A1005141A1008090004
-240D1502001A08070D240900460D1A22051A16051A080504020B000724090029
-1A02051A03051A0C1A231A03051A01051A24051A15051A0805040204021A0605
-0400040404010D02011A0805031A08081A08051A19051A160504011E0AFFB10D
-24160D1A1005120B000C1A251A10051409001C1A00051A10051104010B000A1A
-1005110900091A261A1005141A21070D02001A27070D1A281A291A2A1A2B171A
-28070D1A15050B001E1A2C1A2D051A2E051A15051A280504021A210524140402
-140900061A210501
+040104021A1A070D151A07051A1B070D240900C80D1A1C1A1D051A1B05040120
+0B0007240900191A02051A03051A041A1E1A07051A06050400040404010D1A1D
+051A1B0504011A1C200B0007240900191A02051A03051A041A1F1A1B051A0605
+0400040404010D1A1B05111A20070D1A21051A01051A2005120201251A110504
+031A22070D1A231A2205200B00072409000D1A22051A1005141A10080D1A2405
+1A21051A010502011A200511251A20051204031A16051A1A0504031A25070D1A
+25051A1005141A10080D1A2005111A11080D1A1B05121A1B081A1B050AFF3816
+0D1A11050200220B00211A21051A010502001A110504031A22070D1A22051A10
+05141A1008090004240D1502001A08070D240900460D1A26051A16051A080504
+020B0007240900291A02051A03051A0C1A271A03051A01051A28051A15051A08
+05040204021A06050400040404010D02011A0805031A08081A08051A19051A16
+0504011E0AFFB10D24160D1A1005120B000C1A291A10051409001C1A00051A10
+051104010B000A1A1005110900091A2A1A1005141A25070D02001A2B070D1A2C
+1A2D1A2E1A2F171A2C070D1A15050B001E1A301A31051A32051A15051A2C0504
+021A250524140402140900061A250501
 } pfmt [format-string . args] #@[documentation: "Print a formatted string" source: ["Print a formatted string" [quasiquote [print [fmt [unquote format-string] [unquote-splicing args]]]]]] #{##[print fmt format-string append args]
 1A001A011A02051A03051A0405240402141424141401
 } efmt [format-string . args] #@[documentation: "Print a formatted string" source: ["Print a formatted string" [quasiquote [error [fmt [unquote format-string] [unquote-splicing args]]]]]] #{##[error fmt format-string append args]

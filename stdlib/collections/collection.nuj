@@ -27,14 +27,12 @@
           [reduce l [fn [a b] [+ a 1]] 0]]]
 
 [defn min l
-      "Returns the minimum value of its arguments, or collection"
-      [reduce [if [cdr l] l [car l]]
-              [fn [a b] [if [< a b] a b]]]]
+      "Returns the minimum value of its arguments"
+      [reduce l [fn [a b] [if [< a b] a b]]]]
 
 [defn max l
-      "Returns the minimum value of its arguments, or collection"
-      [reduce [if [cdr l] l [car l]]
-              [fn [a b] [if [> a b] a b]]]]
+      "Returns the maximum value of its arguments"
+      [reduce l [fn [a b] [if [> a b] a b]]]]
 
 [defn delete [l e]
       "Returns a filtered list l with all elements equal to e omitted"

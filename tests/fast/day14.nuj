@@ -52,8 +52,8 @@
                           [- steps 1]]]]
 
 [defn result [state]
-      [- [max [tree/values [ref state :eles]]]
-         [min [tree/values [ref state :eles]]]]]
+      [- [apply max [tree/values [ref state :eles]]]
+         [apply min [tree/values [ref state :eles]]]]]
 
 [def state [state/read "tests/fast/day14.dat"]]
 [def p1-state [state/run/many state 10]]

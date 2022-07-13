@@ -62,7 +62,7 @@
 [defn boolean? [val]
       [= :bool [type-of val]]]
 
-[defn pair? [val]
+[defn pair? [val] :inline
       [= :pair [type-of val]]]
 
 [defn array? [val]

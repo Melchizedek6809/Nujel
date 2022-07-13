@@ -27,7 +27,7 @@
 
 [defmacro defmodule/defer [name . body]
           "Define a new named module"
-          `[module/insert/defer ~name [string/write ~[list 'quote body]]]]
+          `[module/insert/defer ~name [string/write ~[list 'quote [cons 'do body]]]]]
 
 [defmacro export [name value]
           `[tree/set! exports '~name ~value]]
