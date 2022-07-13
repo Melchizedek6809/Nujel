@@ -190,7 +190,7 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
-	char dispWriteBuf[1<<16];
+	char dispWriteBuf[1<<18];
 	spf(dispWriteBuf, &dispWriteBuf[sizeof(dispWriteBuf)], "%v", lCar(v));
 	return lValString(dispWriteBuf);
 }
