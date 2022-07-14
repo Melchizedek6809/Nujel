@@ -25,11 +25,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Compile bootstrap runtime
-      run: make -j2 nujel-bootstrap
+      run: make nujel-bootstrap
     - name: Test bootstrap runtime
       run: make test.bootstrap
     - name: Compile runtime
-      run: make -j2 nujel.exe
+      run: make nujel.exe
     - name: Test runtime
       run: make test.slow
   release-windows:
@@ -42,6 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        buildtype: [release, release.amalgamation]
         sys: [mingw32, mingw64, ucrt64, clang64]
     steps:
     - name: Setup MSYS2
@@ -53,17 +54,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Compile bootstrap runtime
-      run: make -j2 nujel-bootstrap
+      run: make nujel-bootstrap
     - name: Test bootstrap runtime
       run: make test.bootstrap
     - name: Compile release
-      run: make -j2 release
+      run: make ${{ matrix.buildtype }}
     - name: Run Tests
       run: make test
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
-        name: Nujel-windows-${{ matrix.sys }}-${{ github.ref_name }}
+        name: Nujel-windows-${{ matrix.sys }}-${{ matrix.buildtype }}-${{ github.ref_name }}
         path: "./nujel.exe"
         retention-days: 7
   build-macos:
@@ -77,31 +78,35 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Compile bootstrap runtime
-      run: make -j2 nujel-bootstrap
+      run: make nujel-bootstrap
     - name: Test bootstrap runtime
       run: make test.bootstrap
     - name: Compile runtime
-      run: make -j2 nujel
+      run: make nujel
     - name: Test runtime
       run: make test.slow
   release-macos:
     needs: build-macos
+    strategy:
+      fail-fast: false
+      matrix:
+        buildtype: [release, release.amalgamation]
     runs-on: macos-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Compile bootstrap runtime
-      run: make -j2 nujel-bootstrap
+      run: make nujel-bootstrap
     - name: Test bootstrap runtime
       run: make test.bootstrap
     - name: Build Release
-      run: make -j2 release
+      run: make ${{ matrix.buildtype }}
     - name: Test runtime
       run: make test
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
-        name: Nujel-macos-${{ github.ref_name }}
+        name: Nujel-macos-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
         retention-days: 7
   build-linux:
@@ -124,11 +129,11 @@ jobs:
       run: |
         sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
     - name: Compile bootstrap runtime
-      run: ${{matrix.make}} CC=${{ matrix.cc }} -j2 nujel-bootstrap
+      run: ${{matrix.make}} CC=${{ matrix.cc }} nujel-bootstrap
     - name: Test bootstrap runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} test.bootstrap
     - name: Compile runtime
-      run: ${{matrix.make}} CC=${{ matrix.cc }} -j2 nujel
+      run: ${{matrix.make}} CC=${{ matrix.cc }} nujel
     - name: Test runtime
       run: ${{matrix.make}} test.slow
   static-analysis-linux:
@@ -145,13 +150,17 @@ jobs:
   release-linux:
     runs-on: ubuntu-latest
     needs: build-linux
+    strategy:
+      fail-fast: false
+      matrix:
+        buildtype: [release, release.musl, release.amalgamation]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install Dependencies
       run: sudo apt-get install -y musl-dev musl-tools
     - name: Build bootstrap runtime
-      run: make -j2 nujel-bootstrap
+      run: make nujel-bootstrap
     - name: Test bootstrap runtime
       run: make test.bootstrap
     - name: Build release
@@ -161,7 +170,7 @@ jobs:
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
-        name: Nujel-linux-${{ github.ref_name }}
+        name: Nujel-linux-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
         retention-days: 7
   release-wasm:
@@ -171,7 +180,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Compile
-      run: make -j2
+      run: make
     - name: Compile WASM REPL
       run: bash tools/buildwasm
     - name: Upload release

@@ -26,9 +26,6 @@ NOBS_TO_CLEAN  != find binlib stdlib stdlib_modules -type f -name '*.no'
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD)
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-$(BIN_OBJS): nujel.h lib/nujel-private.h bin/private.h
-$(LIB_OBJS): nujel.h lib/nujel-private.h
-
 .SUFFIXES: .nuj .no
 .nuj.no: $(NUJEL_BOOTSTRAP)
 	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $<
