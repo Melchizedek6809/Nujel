@@ -31,9 +31,9 @@ jobs:
     - name: Compile runtime
       run: make nujel.exe
     - name: Test runtime
-      run: make test.slow
+      run: make test
   release-windows:
-    name: release-windows-${{ matrix.sys }}
+    name: release-${{ matrix.buildtype }}-${{ matrix.sys }}-windows
     needs: build-windows
     runs-on: windows-latest
     defaults:
@@ -60,7 +60,7 @@ jobs:
     - name: Compile release
       run: make ${{ matrix.buildtype }}
     - name: Run Tests
-      run: make test
+      run: make test.slow
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
@@ -84,8 +84,9 @@ jobs:
     - name: Compile runtime
       run: make nujel
     - name: Test runtime
-      run: make test.slow
+      run: make test
   release-macos:
+    name: ${{ matrix.buildtype }}-macos
     needs: build-macos
     strategy:
       fail-fast: false
@@ -102,7 +103,7 @@ jobs:
     - name: Build Release
       run: make ${{ matrix.buildtype }}
     - name: Test runtime
-      run: make test
+      run: make test.slow
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
@@ -119,7 +120,7 @@ jobs:
         cc: [clang, gcc]
         make: [make]
         include:
-        - os: ubuntu-20.04
+        - os: ubuntu-22.04
           cc: gcc
           make: bmake
     steps:
@@ -135,7 +136,7 @@ jobs:
     - name: Compile runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} nujel
     - name: Test runtime
-      run: ${{matrix.make}} test.slow
+      run: ${{matrix.make}} test
   static-analysis-linux:
     name: clang-static-analyzer
     runs-on: ubuntu-22.04
@@ -148,6 +149,7 @@ jobs:
     - name: Run static analyzer
       run: scan-build --status-bugs make nujel-bootstrap
   release-linux:
+    name: ${{ matrix.buildtype }}-linux
     runs-on: ubuntu-latest
     needs: build-linux
     strategy:
@@ -166,7 +168,7 @@ jobs:
     - name: Build release
       run: make release.musl
     - name: Test runtime
-      run: make test
+      run: make test.slow
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
