@@ -1,13 +1,14 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#ifndef NUJEL_AMALGAMATION
 #include "private.h"
+#endif
 
 #include <stdlib.h>
 
 #ifndef __WATCOMC__
   #include <signal.h>
 #endif
-#include "../vendor/getline/getline.h"
 
 extern u8 binlib_no_data[];
 lClosure *mainClosure;

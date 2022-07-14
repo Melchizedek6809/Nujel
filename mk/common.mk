@@ -3,6 +3,7 @@ exec_prefix           = $(prefix)
 bindir                = $(exec_prefix)/bin/
 
 CC                   := cc
+CAT                  := cat
 AR                   := ar
 INSTALL              := install
 STRIP                := strip

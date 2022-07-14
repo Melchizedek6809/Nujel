@@ -1,6 +1,8 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#ifndef NUJEL_AMALGAMATION
 #include "../private.h"
+#endif
 
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +11,8 @@
 	#include <windows.h>
 	#include <shlobj.h>
 #endif
-#include "../../vendor/getline/getline.h"
 
-#define BUF_SIZE (1 << 14)
+#define READLINE_BUF_SIZE (1 << 14)
 static char *bestline(const char *prompt){
 	char *buf = NULL;
 	size_t bufsize = 0;
@@ -38,7 +39,7 @@ static lVal *lnfReadline(lClosure *c, lVal *v){
 	}
 	char *line = bestline(prompt);
 	if(line == NULL){return NULL;}
-	return lValStringNoCopy(line, strnlen(line, BUF_SIZE));
+	return lValStringNoCopy(line, strnlen(line, READLINE_BUF_SIZE));
 }
 
 void lOperationsReadline(lClosure *c){

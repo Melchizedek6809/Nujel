@@ -49,6 +49,9 @@ gmon.out
 *.tar.xz
 *.tar.gz
 
+/nujel.c
+/nujel.h
+
 /bootstrap/stdlib.c
 /bootstrap/stdlib.h
 /bootstrap/binlib.c

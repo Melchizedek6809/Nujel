@@ -48,7 +48,7 @@ ifeq ($(shell uname -s),Darwin)
 endif
 
 all: $(NUJEL)
-.PHONY: all release release.musl
+.PHONY: all release release.musl release.amalgamation
 .PHONY: rund runn install install.musl profile web
 .PHONY: test.bootstrap check test test.verbose test.debug test.slow test.slow.debug test.ridiculous
 
@@ -59,8 +59,8 @@ endif
 FILES_TO_CLEAN := $(shell find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
 NOBS_TO_CLEAN  := $(shell find binlib stdlib stdlib_modules -type f -name '*.no')
 
-$(BIN_OBJS): nujel.h lib/nujel-private.h bin/private.h
-$(LIB_OBJS): nujel.h lib/nujel-private.h
+$(BIN_OBJS): lib/nujel.h lib/nujel-private.h bin/private.h
+$(LIB_OBJS): lib/nujel.h lib/nujel-private.h
 
 %.no: %.nuj | $(NUJEL_BOOTSTRAP)
 	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $^
@@ -120,5 +120,18 @@ bootstrap.san: $(BOOTSTRAP_SRCS)
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
 	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@
+
+nujel.h: lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamation/header-suffix.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) tmp/stdlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+	@$(CAT) $^ > nujel.h
+	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
+
+nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/header-suffix.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+	@$(CAT) $^ > nujel.c
+	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
+
+release.amalgamation: nujel.c
+	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(STRIP) -xS $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 include mk/targets.mk

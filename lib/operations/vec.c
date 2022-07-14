@@ -1,7 +1,9 @@
 /* Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE
  */
+#ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
+#endif
 
 static lVal *lnfVX(lClosure *c, lVal *v){
 	return lValFloat(requireVec(c, lCar(v)).x);

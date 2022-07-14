@@ -1,9 +1,52 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
+#endif
 
 #include <stdlib.h>
 #include <string.h>
+
+const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
+	switch(op){
+	case lopNOP:             return "nop";
+	case lopRet:             return "ret";
+	case lopIntByte:         return "push/int/byte";
+	case lopIntAdd:          return "add/int";
+	case lopPushVal:         return "push/val";
+	case lopPushValExt:      return "push/val/ext";
+	case lopJmp:             return "jmp";
+	case lopJt:              return "jt";
+	case lopJf:              return "jf";
+	case lopDup:             return "dup";
+	case lopDrop:            return "drop";
+	case lopDef:             return "def";
+	case lopSet:             return "set";
+	case lopGet:             return "get";
+	case lopCar:             return "car";
+	case lopCdr:             return "cdr";
+	case lopClosurePush:     return "closure/push";
+	case lopCons:            return "cons";
+	case lopLet:             return "let";
+	case lopClosurePop:      return "closure/pop";
+	case lopTry:             return "try";
+	case lopApply:           return "apply/dynamic";
+	case lopLessPred:        return "<";
+	case lopLessEqPred:      return "<=";
+	case lopEqualPred:       return "==";
+	case lopGreaterPred:     return ">";
+	case lopGreaterEqPred:   return ">=";
+	case lopPushNil:         return "push/nil";
+	case lopFnDynamic:       return "fn";
+	case lopMacroDynamic:    return "macro";
+	case lopAdd:             return "+";
+	case lopSub:             return "-";
+	case lopMul:             return "*";
+	case lopDiv:             return "/";
+	case lopRem:             return "rem";
+	default:                 return ":UNKNOWN-OP";
+	}
+}
 
 const char *getIndent(int d){
 	static char *buf = NULL;

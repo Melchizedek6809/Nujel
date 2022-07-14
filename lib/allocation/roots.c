@@ -5,7 +5,9 @@
  * Contains code for dealing with GC Roots, essential for determining which
  * objects on the heap are still reachable.
  */
+#ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
+#endif
 
 #include <stdlib.h>
 

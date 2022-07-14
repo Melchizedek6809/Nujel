@@ -9,7 +9,9 @@
 #ifndef NUJEL_LIB_NUJEL_PRIVATE
 #define NUJEL_LIB_NUJEL_PRIVATE
 
-#include "../nujel.h"
+#ifndef NUJEL_AMALGAMATION
+#include "nujel.h"
+#endif
 #include <setjmp.h>
 
 
@@ -103,7 +105,6 @@ typedef enum lOpcode {
 } lOpcode;
 
 const char *lBytecodeGetOpcodeName(const lBytecodeOp op);
-lBytecodeOp *lBytecodeReadOPSym(lBytecodeOp *ip, lSymbol **ret);
 int lBytecodeGetOffset16(const lBytecodeOp *ip);
 
 lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops, bool trace);

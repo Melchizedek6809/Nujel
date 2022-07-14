@@ -5,7 +5,9 @@
  * Contains a terrible implementation of a mark-sweep garbage collector, but it
  * is good enough for now.
  */
+#ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
+#endif
 
 #include <stdlib.h>
 

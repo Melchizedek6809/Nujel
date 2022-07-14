@@ -59,4 +59,15 @@ release: $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
+nujel.h: lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamation/header-suffix.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) tmp/stdlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+	$(CAT) $> > nujel.h
+
+nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/header-suffix.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+	$(CAT) $> > nujel.c
+
+release.amalgamation: nujel.c
+	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(STRIP) -xS $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
 .include "mk/targets.mk"

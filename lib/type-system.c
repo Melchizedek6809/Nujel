@@ -5,7 +5,9 @@
  * another, as well as code for determining which type would be most fitting when
  * you have to for example add two values together.
  */
+#ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
+#endif
 
 NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
 	char buf[128];

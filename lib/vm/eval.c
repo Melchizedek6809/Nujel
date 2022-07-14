@@ -1,6 +1,8 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -10,6 +12,12 @@ NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 	char buf[128];
 	spf(buf, &buf[sizeof(buf)], "Stack underflow at during lop%s", opcode);
 	lExceptionThrowValClo("stack-underflow", buf, NULL, c);
+}
+
+/* Read an encoded signed 16-bit offset at ip */
+int lBytecodeGetOffset16(const lBytecodeOp *ip){
+	const int x = (ip[0] << 8) | ip[1];
+	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
 
 /* Build a list of length len in stack starting at sp */
