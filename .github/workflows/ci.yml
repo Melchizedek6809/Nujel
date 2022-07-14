@@ -42,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        buildtype: [release, release.amalgamation]
+        buildtype: [release]
         sys: [mingw32, mingw64, ucrt64, clang64]
     steps:
     - name: Setup MSYS2
@@ -91,7 +91,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        buildtype: [release, release.amalgamation]
+        buildtype: [release]
     runs-on: macos-latest
     steps:
     - name: Checkout
@@ -155,7 +155,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        buildtype: [release, release.musl, release.amalgamation]
+        buildtype: [release, release.musl]
     steps:
     - name: Checkout
       uses: actions/checkout@v2

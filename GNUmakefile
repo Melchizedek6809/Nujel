@@ -96,19 +96,19 @@ nujel-bootstrap: $(BOOTSTRAP_OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-release: $(RUNTIME_SRCS)
+release: nujel.c
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-release.musl: $(RUNTIME_SRCS)
+release.musl: nujel.c
 	@rm -f $(NUJEL)
 	@musl-gcc -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-release.san: $(RUNTIME_SRCS)
+release.san: nujel.c
 	@rm -f $(NUJEL)
 	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
@@ -128,10 +128,5 @@ nujel.h: lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h 
 nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/amalgamation/header-prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/header-suffix.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.c
 	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
-
-release.amalgamation: nujel.c
-	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
-	@$(STRIP) -xS $(NUJEL)
-	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 include mk/targets.mk
