@@ -4,7 +4,9 @@
 #include "../private.h"
 #endif
 
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 /* Add environment key/value pair to tree T */
 static lTree *addVar(const char *e, lTree *t){
@@ -16,7 +18,7 @@ static lTree *addVar(const char *e, lTree *t){
 	return lTreeInsert(t, sym, v);
 }
 
-#if (defined(__MSYS__)) || (defined(__MINGW32__))
+#if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
 
 #include <windows.h>
 

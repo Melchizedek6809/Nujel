@@ -30,9 +30,14 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
+
+#ifdef _MSC_VER
+typedef long long int ssize_t;
+#else
+#include <unistd.h>
+#endif
 
 ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp){
 	char *ptr, *eptr;

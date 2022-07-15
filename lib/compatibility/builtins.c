@@ -23,4 +23,6 @@ uint32_t __builtin_popcount(uint32_t x){
 }
 
 void __sync_synchronize(){}
+#elif defined(_MSC_VER)
+void __sync_synchronize() {}
 #endif

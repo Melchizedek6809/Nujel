@@ -18,6 +18,8 @@
 	}
 
 	#define CLOCK_MONOTONIC 123
+#elif defined(_MSC_VER)
+	#include "windows.h"
 #else
 	#include <sys/time.h>
 #endif
@@ -28,7 +30,11 @@
 
 /* Return monotonic time in milliseconds */
 u64 getMSecs(){
+#ifdef _MSC_VER
+	return GetTickCount();
+#else
 	struct timespec tv;
 	clock_gettime(CLOCK_MONOTONIC,&tv);
 	return (tv.tv_nsec / 1000000) + (tv.tv_sec * 1000);
+#endif
 }

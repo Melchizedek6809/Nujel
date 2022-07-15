@@ -7,14 +7,16 @@
 #ifdef __WATCOMC__
 	#include <direct.h>
 	#include <process.h>
+#elif defined(_MSC_VER)
+	#include <windows.h>
 #else
 	#include <dirent.h>
+	#include <unistd.h>
 #endif
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/stat.h>
 
 #ifdef __MINGW32__
@@ -91,10 +93,15 @@ void saveFile(const char *filename,const void *buf, size_t len){
 
 /* Return true if name is a directory */
 int isDir(const char *name){
+#ifdef _MSC_VER
+	DWORD ftyp = GetFileAttributesA(name);
+	return (ftyp != INVALID_FILE_ATTRIBUTES) && (ftyp & FILE_ATTRIBUTE_DIRECTORY);
+#else
 	DIR *dp = opendir(name);
 	if(dp == NULL){return 0;}
 	closedir(dp);
 	return 1;
+#endif
 }
 
 /* Create a new directory in a portable manner */

@@ -66,3 +66,10 @@ gmon.out
 /web/filesystem.json
 /web/benchmark-results/
 /web/report-data.js
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

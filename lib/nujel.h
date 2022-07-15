@@ -15,7 +15,7 @@
 
 #define PI    (3.1415926535897932384626433832795)
 
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__) || defined(_MSC_VER)
 #define NORETURN
 #define likely(x)   x
 #define unlikely(x) x
@@ -45,6 +45,17 @@ typedef  int64_t          i64;
 typedef  int32_t          i32;
 typedef  int16_t          i16;
 typedef  int8_t            i8;
+
+/*
+ | And some Windows workarounds
+ */
+#ifdef _MSC_VER
+typedef  int64_t ssize_t;
+
+#define __builtin_popcountll(x) __popcnt64(x)
+#define __builtin_popcount(x) __popcnt(x)
+
+#endif
 
 struct vec {
 	union {

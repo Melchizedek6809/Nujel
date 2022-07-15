@@ -6,24 +6,26 @@
 
 #ifdef __WATCOMC__
 	#include <direct.h>
+#elif defined(_MSC_VER)
+
 #else
 	#include <dirent.h>
+	#include <unistd.h>
 #endif
 
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 
-#if (defined(__WATCOMC__)) || (defined(__EMSCRIPTEN__))
+#if defined(__WATCOMC__) || defined(__EMSCRIPTEN__) || defined(_MSC_VER)
 	#define NO_POPEN
 #else
 	#define ENABLE_POPEN
 #endif
 
-#if (!defined(__MINGW32__)) && (!defined(__WATCOMC__))
+#if (!defined(__WATCOMC__)) && (!defined(_WIN32))
 	#include <sys/wait.h>
 #endif
 
@@ -166,6 +168,10 @@ static lVal *lnfFileRemove(lClosure *c, lVal *v){
 }
 
 static lVal *lnfFileStat(lClosure *c, lVal *v){
+#ifdef _MSC_VER
+	lString* filename = requireString(c, lCar(v));
+	return NULL;
+#else
 	lString *filename = requireString(c, lCar(v));
 	struct stat statbuf;
 	int err = stat(filename->data, &statbuf);
@@ -189,6 +195,7 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
 	}
 	return ret;
+#endif
 }
 
 
@@ -268,6 +275,14 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 }
 #endif
 
+#ifdef _MSC_VER
+static lVal* lnfDirectoryRead(lClosure* c, lVal* v) {
+	lString* path = requireString(c, lCar(v));
+	const bool showHidden = castToBool(lCadr(v));
+	/* ToDo: write native windows version */
+	return NULL;
+}
+#else
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
 	const bool showHidden = castToBool(lCadr(v));
@@ -293,6 +308,7 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	closedir(dp);
 	return ret;
 }
+#endif
 
 static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
