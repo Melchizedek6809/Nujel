@@ -263,8 +263,6 @@ struct lNFunc {
 /*
  | Some pretty core Nujel procedures
  */
-#define RECURSION_DEPTH_MAX (1<<15)
-
 extern bool    lVerbose;
 
 void      lInit    ();

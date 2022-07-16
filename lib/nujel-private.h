@@ -18,6 +18,7 @@
 /*
  | Core/Exception handling
  */
+#define RECURSION_DEPTH_MAX (1<<14)
 extern jmp_buf exceptionTarget;
 extern lVal   *exceptionValue;
 extern int     exceptionTargetDepth;
