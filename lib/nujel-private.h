@@ -14,11 +14,15 @@
 #endif
 #include <setjmp.h>
 
+#include <stdio.h>
 
 /*
  | Core/Exception handling
  */
 #define RECURSION_DEPTH_MAX (1<<14)
+#define PI    (3.1415926535897932384626433832795)
+#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
+
 extern jmp_buf exceptionTarget;
 extern lVal   *exceptionValue;
 extern int     exceptionTargetDepth;
@@ -26,6 +30,129 @@ extern int     exceptionTargetDepth;
 static inline bool isComment(lVal *v){return v && v->type == ltComment;}
 static inline lVal *lValComment(){return lValAlloc(ltComment);}
 lType lTypecast(const lType a, const lType b);
+
+void vfpf(FILE *fp, const char *format, va_list va);
+void fpf(FILE *f, const char *format, ...);
+
+struct lArray {
+	lVal **data;
+	union {
+		lArray *nextFree;
+		struct {
+			i32 length;
+			u8 flags;
+		};
+	};
+};
+#define ARRAY_IMMUTABLE 1
+
+typedef enum {
+	lbvtUndefined = 0,
+	lbvtS8,
+	lbvtU8,
+	lbvtS16,
+	lbvtU16,
+	lbvtS32,
+	lbvtU32,
+	lbvtS64,
+	lbvtF32,
+	lbvtF64
+} lBufferViewType;
+
+struct lBufferView {
+	union {
+		lBuffer *buf;
+		lBufferView *nextFree;
+	};
+	size_t offset;
+	size_t length;
+	lBufferViewType type;
+	u8 flags;
+};
+#define BUFFER_VIEW_IMMUTABLE 1
+
+struct lBuffer {
+	union {
+		void *buf;
+		const char *data;
+		lBuffer *nextFree;
+	};
+	i32 length;
+	u8 flags;
+};
+#define BUFFER_IMMUTABLE 1
+
+struct lSymbol {
+	union {
+		char c[32];
+		struct lSymbol *nextFree;
+	};
+};
+
+struct lBytecodeArray{
+	lBytecodeOp *data;
+	lArray *literals;
+	union {
+		lBytecodeOp *dataEnd;
+		struct lBytecodeArray *nextFree;
+	};
+	u8 flags;
+};
+
+typedef enum closureType {
+	closureDefault = 0,
+	closureObject = 1,
+	closureCall = 2,
+	closureLet = 3,
+	closureTry = 4,
+	closureRoot = 5,
+} closureType;
+
+struct lNFunc {
+	lVal *(*fp)(lClosure *, lVal *);
+	lTree *meta;
+	lVal *args;
+	lSymbol *name;
+};
+
+struct lTree {
+	lTree *left;
+	lTree *right;
+	union {
+		const lSymbol *key;
+		lTree *nextFree;
+	};
+	lVal *value;
+	i16 height;
+	u8 flags;
+};
+#define TREE_IMMUTABLE 1
+
+struct lClosure {
+	lClosure *parent;
+	lClosure *nextFree;
+	lTree *data, *meta;
+	lBytecodeArray *text;
+	lBytecodeOp *ip;
+	union {
+		lVal *args;
+		lVal *exceptionHandler;
+	};
+	const lSymbol *name;
+	lClosure *caller;
+	int sp;
+	u8 type;
+};
+
+struct lThread {
+	lVal **valueStack;
+	lClosure **closureStack;
+	lBytecodeArray *text;
+	int valueStackSize;
+	int closureStackSize;
+	int sp;
+	int csp;
+};
 
 
 /*
@@ -110,6 +237,7 @@ int lBytecodeGetOffset16(const lBytecodeOp *ip);
 
 lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops, bool trace);
 void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *ops);
+lVal     *lLambda  (lClosure *c, lVal *args, lVal *lambda);
 
 
 /*
@@ -127,6 +255,13 @@ void __sync_synchronize();
  */
 u64 getMSecs();
 void lAddPlatformVars(lClosure *c);
+
+#ifdef _MSC_VER
+
+#define __builtin_popcountll(x) __popcnt64(x)
+#define __builtin_popcount(x) __popcnt(x)
+
+#endif
 
 
 /*
@@ -252,6 +387,22 @@ static inline int lSymIndex(const lSymbol *s){
 static inline lSymbol *lIndexSym(uint i){
 	return (i >= lSymbolMax) ? NULL : &lSymbolList[i];
 }
+
+lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal *v);
+lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal *v);
+lClosure       *requireClosure          (lClosure *c, lVal *v);
+lVal           *requireEnvironment      (lClosure *c, lVal *v);
+
+lNFunc *         lNFuncAlloc         ();
+void             lNFuncFree          (lNFunc *n);
+lBytecodeArray * lBytecodeArrayAlloc (size_t len);
+lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
+int              lBufferViewTypeSize (lBufferViewType T);
+
+lVal *lnfCat     (lClosure *c, lVal *v);
+lVal *lnfArrNew  (lClosure *c, lVal *v);
+lVal *lnfTreeNew (lClosure *c, lVal *v);
+lVal *lnfVec     (lClosure *c, lVal *v);
 
 
 /*

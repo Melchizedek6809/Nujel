@@ -5,6 +5,8 @@
 #include "../lib/nujel.h"
 #endif
 
+#include <stdio.h>
+
 void initEnvironmentMap(lClosure *c);
 void lOperationsIO(lClosure *c);
 void setIOSymbols();

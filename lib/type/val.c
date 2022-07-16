@@ -181,13 +181,8 @@ lString *lStringNew(const char *str, uint len){
 }
 
 /* Return a duplicate of OS */
-lString *lStringDup(lString *os){
+lString *lStringDup(const lString *os){
 	return lStringNew(os->data, os->length);
-}
-
-/* Return the length of the String S */
-int lStringLength(const lString *s){
-	return s->length;
 }
 
 /* Create a new string value out of S */

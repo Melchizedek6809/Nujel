@@ -7,6 +7,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+void *lBufferData (lBuffer *v){
+	return v == NULL ? NULL : v->buf;
+}
+
+const char *lStringData(const lString *v){
+	return v == NULL ? NULL : v->data;
+}
+
+size_t lBufferLength(const lBuffer *v){
+	return v == NULL ? 0 : v->length;
+}
+
+void *lBufferViewData(lBufferView *v){
+	return &((u8 *)v->buf->buf)[v->offset * lBufferViewTypeSize(v->type)];
+}
+
+size_t lBufferViewLength(const lBufferView *v){
+	return v->length * lBufferViewTypeSize(v->type);
+}
+
 static lVal *lnfBufferAllocate(lClosure *c, lVal *v) {
 	const i64 size = requireNaturalInt(c, lCar(v));
 	lBuffer *buf = lBufferAlloc(size, false);

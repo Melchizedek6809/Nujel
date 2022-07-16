@@ -11,9 +11,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-
-#define PI    (3.1415926535897932384626433832795)
 
 #if defined(__WATCOMC__) || defined(_MSC_VER)
 #define NORETURN
@@ -28,7 +25,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
-#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
 
 /*
  | Now for some type/struct definitions
@@ -51,10 +47,6 @@ typedef  int8_t            i8;
  */
 #ifdef _MSC_VER
 typedef  int64_t ssize_t;
-
-#define __builtin_popcountll(x) __popcnt64(x)
-#define __builtin_popcount(x) __popcnt(x)
-
 #endif
 
 struct vec {
@@ -112,72 +104,6 @@ typedef uint8_t lBytecodeOp;
 typedef lBuffer lString;
 
 
-typedef enum {
-	lbvtUndefined = 0,
-	lbvtS8,
-	lbvtU8,
-	lbvtS16,
-	lbvtU16,
-	lbvtS32,
-	lbvtU32,
-	lbvtS64,
-	lbvtF32,
-	lbvtF64
-} lBufferViewType;
-
-struct lBufferView {
-	union {
-		lBuffer *buf;
-		lBufferView *nextFree;
-	};
-	size_t offset;
-	size_t length;
-	lBufferViewType type;
-	u8 flags;
-};
-#define BUFFER_VIEW_IMMUTABLE 1
-
-struct lBytecodeArray{
-	lBytecodeOp *data;
-	lArray *literals;
-	union {
-		lBytecodeOp *dataEnd;
-		struct lBytecodeArray *nextFree;
-	};
-	u8 flags;
-};
-
-struct lBuffer {
-	union {
-		void *buf;
-		const char *data;
-		lBuffer *nextFree;
-	};
-	i32 length;
-	u8 flags;
-};
-#define BUFFER_IMMUTABLE 1
-
-struct lArray {
-	lVal **data;
-	union {
-		lArray *nextFree;
-		struct {
-			i32 length;
-			u8 flags;
-		};
-	};
-};
-#define ARRAY_IMMUTABLE 1
-
-
-struct lSymbol {
-	union {
-		char c[32];
-		struct lSymbol *nextFree;
-	};
-};
-
 typedef struct {
 	lVal *car,*cdr;
 } lPair;
@@ -205,77 +131,25 @@ struct lVal {
 	};
 };
 
-typedef enum closureType {
-	closureDefault = 0,
-	closureObject = 1,
-	closureCall = 2,
-	closureLet = 3,
-	closureTry = 4,
-	closureRoot = 5,
-} closureType;
-
-struct lClosure {
-	lClosure *parent;
-	lClosure *nextFree;
-	lTree *data, *meta;
-	lBytecodeArray *text;
-	lBytecodeOp *ip;
-	union {
-		lVal *args;
-		lVal *exceptionHandler;
-	};
-	const lSymbol *name;
-	lClosure *caller;
-	int sp;
-	u8 type;
-};
-
-struct lThread {
-	lVal **valueStack;
-	lClosure **closureStack;
-	lBytecodeArray *text;
-	int valueStackSize;
-	int closureStackSize;
-	int sp;
-	int csp;
-};
-
-struct lTree {
-	lTree *left;
-	lTree *right;
-	union {
-		const lSymbol *key;
-		lTree *nextFree;
-	};
-	lVal *value;
-	i16 height;
-	u8 flags;
-};
-#define TREE_IMMUTABLE 1
-
-struct lNFunc {
-	lVal *(*fp)(lClosure *, lVal *);
-	lTree *meta;
-	lVal *args;
-	lSymbol *name;
-};
-
 /*
  | Some pretty core Nujel procedures
  */
-extern bool    lVerbose;
+extern bool lVerbose;
 
 void      lInit    ();
 lClosure *lNewRoot ();
-lVal     *lLambda  (lClosure *c, lVal *args, lVal *lambda);
 lVal     *lApply   (lClosure *c, lVal *args, lVal *fun);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
-int       lListLength (lVal *v);
-lVal *lCons(lVal *car, lVal *cdr);
+int         lListLength   (lVal *v);
+const char *lStringData   (const lString *v);
+void *      lBufferData   (lBuffer *v);
+size_t      lBufferLength (const lBuffer *v);
+static inline size_t lStringLength(const lString *v){return lBufferLength(v);}
+void *               lBufferViewData(lBufferView *v);
+size_t               lBufferViewLength(const lBufferView *v);
 
-void  lExceptionThrowRaw    (lVal *v) NORETURN;
-void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
+lVal *lCons(lVal *car, lVal *cdr);
 
 static inline lVal *lCar(lVal *v){
 	return (v != NULL) && (v->type == ltPair) ? v->vList.car : NULL;
@@ -291,6 +165,9 @@ static inline lVal *lCdar  (lVal *v){return lCdr(lCar(v));}
 static inline lVal *lCddr  (lVal *v){return lCdr(lCdr(v));}
 static inline lVal *lCaddr (lVal *v){return lCar(lCdr(lCdr(v)));}
 
+void  lExceptionThrowRaw    (lVal *v) NORETURN;
+void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
+
 /*
  | Reader/Printer
  */
@@ -298,8 +175,6 @@ lVal *lRead(lClosure *c, const char *str);
 
 char *vspf(char *buf, char *bufEnd, const char *format, va_list va);
 char *spf(char *buf, char *bufEnd, const char *format, ...);
-void vfpf(FILE *fp, const char *format, va_list va);
-void fpf(FILE *f, const char *format, ...);
 void epf(const char *format, ...);
 void pf(const char *format, ...);
 
@@ -324,11 +199,7 @@ const lSymbol * requireSymbolic         (lClosure *c, lVal *v);
 lString *       requireString           (lClosure *c, lVal *v);
 lTree *         requireTree             (lClosure *c, lVal *v);
 lTree *         requireMutableTree      (lClosure *c, lVal *v);
-lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal *v);
-lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal *v);
-lClosure       *requireClosure          (lClosure *c, lVal *v);
 lVal           *requireCallable         (lClosure *c, lVal *v);
-lVal           *requireEnvironment      (lClosure *c, lVal *v);
 lBuffer        *requireBuffer           (lClosure *c, lVal *v);
 lBuffer        *requireMutableBuffer    (lClosure *c, lVal *v);
 lBufferView    *requireBufferView       (lClosure *c, lVal *v);
@@ -388,10 +259,6 @@ static inline const lSymbol *lGetSymbol(const lVal *v){
 		: v->vSymbol;
 }
 
-lString  *lStringNew       (const char *str, uint len);
-lString  *lStringDup       (      lString *s);
-int       lStringLength    (const lString *s);
-
 /*
  | vec related functions
  */
@@ -440,15 +307,11 @@ extern int lGCRuns;
 /*
  | Allocator related procedures
  */
-lArray *         lArrayAlloc         (size_t len);
-lNFunc *         lNFuncAlloc         ();
-void             lNFuncFree          (lNFunc *n);
-lBytecodeArray * lBytecodeArrayAlloc (size_t len);
-lVal *           lValAlloc           (lType t);
-int              lBufferViewTypeSize (lBufferViewType T);
-lBuffer *        lBufferAlloc        (size_t length, bool immutable);
-lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
-
+lVal *           lValAlloc    (lType t);
+lArray *         lArrayAlloc  (size_t len);
+lBuffer *        lBufferAlloc (size_t length, bool immutable);
+lString *        lStringNew   (const char *str, uint len);
+lString *        lStringDup   (const lString *s);
 
 /*
  | Symbolic routines
@@ -456,10 +319,5 @@ lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t
 lSymbol  *lSymS         (const char *s);
 lSymbol  *lSymSM        (const char *s);
 lSymbol  *lSymSL        (const char *s, uint len);
-
-lVal *lnfCat     (lClosure *c, lVal *v);
-lVal *lnfArrNew  (lClosure *c, lVal *v);
-lVal *lnfTreeNew (lClosure *c, lVal *v);
-lVal *lnfVec     (lClosure *c, lVal *v);
 
 #endif

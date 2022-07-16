@@ -128,14 +128,14 @@ static lVal *lnfPrint(lClosure *c, lVal *v){
 static lVal *lnfFileRead(lClosure *c, lVal *v){
 	size_t len       = 0;
 	lString *str     = requireString(c, lCar(v));
-	const char *data = loadFile(str->data,&len);
+	const char *data = loadFile(lStringData(str), &len);
 	return lValStringNoCopy(data, len);
 }
 
 static lVal *lnfFileReadBuffer(lClosure *c, lVal *v){
 	size_t len       = 0;
 	lString *str     = requireString(c, lCar(v));
-	void *data = loadFile(str->data,&len);
+	void *data = loadFile(lStringData(str), &len);
 	return lValBufferNoCopy(data, len, false);
 }
 
@@ -146,15 +146,15 @@ static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	default:
 		lExceptionThrowValClo("type-error", "Can't save that", contentV, c);
 	case ltString:
-		saveFile(filename->data, contentV->vString->data, contentV->vString->length);
+		saveFile(lStringData(filename), lStringData(contentV->vString), lStringLength(contentV->vString));
 		break;
 	case ltBuffer:
-		saveFile(filename->data, contentV->vBuffer->buf, contentV->vBuffer->length);
+		saveFile(lStringData(filename), lBufferData(contentV->vBuffer), lBufferLength(contentV->vBuffer));
 		break;
 	case ltBufferView:{
-		void *data = &((u8 *)contentV->vBufferView->buf->buf)[contentV->vBufferView->offset * lBufferViewTypeSize(contentV->vBufferView->type)];
-		size_t length = contentV->vBufferView->length * lBufferViewTypeSize(contentV->vBufferView->type);
-		saveFile(filename->data, data, length);
+		void *data = lBufferViewData(contentV->vBufferView);
+		size_t length = lBufferViewLength(contentV->vBufferView);
+		saveFile(lStringData(filename), data, length);
 		break;
 	}}
 	return contentV;
@@ -163,7 +163,7 @@ static lVal *lnfFileWrite(lClosure *c, lVal *v){
 static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	lString *filename = requireString(c, car);
-	unlink(filename->data);
+	unlink(lStringData(filename));
 	return car;
 }
 
@@ -174,7 +174,7 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 #else
 	lString *filename = requireString(c, lCar(v));
 	struct stat statbuf;
-	int err = stat(filename->data, &statbuf);
+	int err = stat(lStringData(filename), &statbuf);
 	lVal *ret = lValTree(NULL);
 	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(err));
 	if(err){
@@ -208,10 +208,10 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	const int len = lStringLength(content);
 	int written = 0;
 	while(written < len){
-		int r = fwrite(&content->data[written], 1, len - written, fd);
+		int r = fwrite(&lStringData(content)[written], 1, len - written, fd);
 		if(r <= 0){
 			if(ferror(fd)){
-				fpf(stderr, "Error while writing to temporary file: %s\n", ret);
+				epf("Error while writing to temporary file: %s\n", ret);
 				break;
 			}
 		}else{
@@ -232,10 +232,10 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	int bufSize = readSize;
 	char *buf = malloc(readSize);
 
-	FILE *child = popen(command->data, "r");
+	FILE *child = popen(lStringData(command), "r");
 	if(child == NULL){
 		free(buf);
-		fpf(stderr,"Error opening %s\n", command);
+		epf("Error opening %s\n", lStringData(command));
 		return NULL;
 	}
 	while(1){
@@ -287,7 +287,7 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
 	const bool showHidden = castToBool(lCadr(v));
 
-	DIR *dp = opendir(path->data);
+	DIR *dp = opendir(lStringData(path));
 	if(dp == NULL){return NULL;}
 	lVal *ret = NULL;
 	lVal *cur = NULL;
@@ -312,17 +312,17 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 
 static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(makeDir(path->data) == 0);
+	return lValBool(makeDir(lStringData(path)) == 0);
 }
 
 static lVal *lnfDirectoryRemove(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(rmdir(path->data) == 0);
+	return lValBool(rmdir(lStringData(path)) == 0);
 }
 
 static lVal *lnfChangeDirectory(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(chdir(path->data) == 0);
+	return lValBool(chdir(lStringData(path)) == 0);
 }
 
 static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){

@@ -4,6 +4,7 @@
 #include "private.h"
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifndef __WATCOMC__
@@ -52,14 +53,6 @@ static lClosure *parsePreOptions(int argc, char *argv[]){
 		}
 	}
 	if(c == NULL){c = createRootClosure();}
-	if(lVerbose){
-		pf("sizeof(vec): %u\n",     (i64)sizeof(vec));
-		pf("sizeof(lClosure): %u\n",(i64)sizeof(lClosure));
-		pf("sizeof(lVal): %u\n",    (i64)sizeof(lVal));
-		pf("sizeof(lArray): %u\n",  (i64)sizeof(lArray));
-		pf("sizeof(lString): %u\n", (i64)sizeof(lString));
-		pf("sizeof(lTree): %u\n",   (i64)sizeof(lTree));
-	}
 	return c;
 }
 

@@ -35,7 +35,7 @@ static lVal *lnfReadline(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if(car){
 		lString *promptS = requireString(c, lCar(v));
-		prompt = promptS->data;
+		prompt = lStringData(promptS);
 	}
 	char *line = bestline(prompt);
 	if(line == NULL){return NULL;}
