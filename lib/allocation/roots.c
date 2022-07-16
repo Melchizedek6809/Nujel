@@ -32,11 +32,13 @@ void (*rootsMarkerChain)() = NULL;
 static void *lRootsPush(const lType t, void *ptr){
 	if(unlikely(rootSP >= rootMax)){
 		rootMax = MAX(rootMax * 2, 256);
-		rootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
-		if(unlikely(rootStack == NULL)){
-			fpf(stderr,"Can't grow rootsStack\n");
+		rootEntry *newRootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
+		if(unlikely(newRootStack == NULL)){
+			free(rootStack);
+			epf("Can't grow rootStack\n");
 			exit(123);
 		}
+		rootStack = newRootStack;
 	}
 	rootStack[rootSP].t = t;
 	rootStack[rootSP].vPointer = ptr;

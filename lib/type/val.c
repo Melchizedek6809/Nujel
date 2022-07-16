@@ -170,7 +170,7 @@ static lString *lStringNewNoCopy(const char *str, uint len){
 /* Create a new string containing a copy of STR[0] - STR[LEN] */
 lString *lStringNew(const char *str, uint len){
 	if(unlikely(str == NULL)){return NULL;}
-	char *nbuf = malloc(len+1);
+	char *nbuf = malloc(((i64)len)+1);
 	if(unlikely(nbuf == NULL)){
 		fpf(stderr,"lStringNew OOM");
 		exit(2);
@@ -224,6 +224,9 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	const char *msgEnd   = MAX(msgStart, MIN(lineEnd, (errEnd + 30)));
 	const size_t bufSize = (msgEnd - msgStart) + 3 + 3 + 1;
 	char *outbuf    = malloc(bufSize);
+	if (unlikely(outbuf == NULL)) {
+		return NULL;
+	}
 	char *outbufEnd = &outbuf[bufSize];
 	char *data      = outbuf;
 

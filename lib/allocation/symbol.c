@@ -159,7 +159,11 @@ static u32 lHashSymStr(const char *str){
 	while (*str) {
 		res = (res << 4) | ((res & 0xF0000000) >> 28);
 		res ^= *str++;
+#ifdef _MSC_VER
+		res ^= hashLookupTable[__popcnt(res) & 0x7];
+#else
 		res ^= hashLookupTable[__builtin_popcount(res)&0x7];
+#endif
 	}
 	return res;
 }

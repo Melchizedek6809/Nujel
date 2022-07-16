@@ -233,7 +233,7 @@ typedef enum lOpcode {
 } lOpcode;
 
 const char *lBytecodeGetOpcodeName(const lBytecodeOp op);
-int lBytecodeGetOffset16(const lBytecodeOp *ip);
+i64 lBytecodeGetOffset16(const lBytecodeOp *ip);
 
 lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops, bool trace);
 void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *ops);
@@ -255,14 +255,6 @@ void __sync_synchronize();
  */
 u64 getMSecs();
 void lAddPlatformVars(lClosure *c);
-
-#ifdef _MSC_VER
-
-#define __builtin_popcountll(x) __popcnt64(x)
-#define __builtin_popcount(x) __popcnt(x)
-
-#endif
-
 
 /*
  | GC related procedures

@@ -101,8 +101,15 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 #endif
 
 static void lWriteVal(lVal *v, FILE *fp){
-	char dispWriteBuf[1<<16];
-	char *end = spf(dispWriteBuf,&dispWriteBuf[sizeof(dispWriteBuf)-1],"%V",v);
+	static char* dispWriteBuf;
+	if (unlikely(dispWriteBuf == NULL)) {
+		dispWriteBuf = malloc(1 << 16);
+		if (dispWriteBuf == NULL) {
+			epf("lWriteVal OOM\n");
+			exit(124);
+		}
+	}
+	char *end = spf(dispWriteBuf,&dispWriteBuf[(1 << 16) - 1],"%V",v);
 	#ifdef __EMSCRIPTEN__
 	if(fp == stderr){
 		wasmConsoleError(dispWriteBuf);
@@ -208,7 +215,7 @@ static lVal *lnfFileTemp(lClosure *c, lVal *v){
 	const int len = lStringLength(content);
 	int written = 0;
 	while(written < len){
-		int r = fwrite(&lStringData(content)[written], 1, len - written, fd);
+		int r = fwrite(&lStringData(content)[written], 1, ((size_t)len) - written, fd);
 		if(r <= 0){
 			if(ferror(fd)){
 				epf("Error while writing to temporary file: %s\n", ret);
@@ -328,7 +335,7 @@ static lVal *lnfChangeDirectory(lClosure *c, lVal *v){
 static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 	(void)c;(void)v;
 	char path[512];
-	if(getcwd(path, sizeof(path)) == NULL){
+	if(!getcwd(path, sizeof(path))){
 		return NULL;
 	}
 	return lValString(path);

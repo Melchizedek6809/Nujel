@@ -168,43 +168,43 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 
 static lVal *lnfAddAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(a + b);
 }
 
 static lVal *lnfSubAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(a - b);
 }
 
 static lVal *lnfMulAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(a * b);
 }
 
 static lVal *lnfDivAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(a / b);
 }
 
 static lVal *lnfModAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(a % b);
 }
 
 static lVal *lnfPowAstI(lClosure *c, lVal *v){
 	(void)c;
-	const int a = v->vList.car->vInt;
-	const int b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList.car->vInt;
+	const i64 b = v->vList.cdr->vList.car->vInt;
 	return lValInt(pow(a,b));
 }
 
@@ -225,7 +225,12 @@ static lVal *lnfLogNot(lClosure *c, lVal *v){
 }
 
 static lVal *lnfPopCount(lClosure *c, lVal *v){
-	return lValInt(__builtin_popcountll(requireInt(c, lCar(v))));
+	const i64 iv = requireInt(c, lCar(v));
+#ifdef _MSC_VER
+	return lValInt(__popcnt64(iv));
+#else
+	return lValInt(__builtin_popcountll(iv));
+#endif
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){

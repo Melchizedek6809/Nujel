@@ -47,7 +47,12 @@ static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 	if(length < buf->length){
 		lExceptionThrowValClo("error", "Buffers can only grow, not shrink.", v, c);
 	}
-	buf->buf = realloc(buf->buf, length);
+	void *nBuf = realloc(buf->buf, length);
+	if (unlikely(nBuf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "[buffer/length!] couldn't allocate its buffer", v, c);
+		return NULL;
+	}
+	buf->buf = nBuf;
 	buf->length = length;
 	return bufv;
 }
@@ -63,6 +68,10 @@ static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, si
 	retBuf->length = length;
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	retBuf->buf = malloc(length);
+	if (unlikely(retBuf->buf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "[buffer/length!] couldn't allocate its buffer", NULL, c);
+		return NULL;
+	}
 	memcpy(retBuf->buf, data, length);
 
 	lVal *retV = lValAlloc(ltBuffer);

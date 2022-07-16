@@ -31,7 +31,7 @@
 /* Return monotonic time in milliseconds */
 u64 getMSecs(){
 #ifdef _MSC_VER
-	return GetTickCount();
+	return GetTickCount64();
 #else
 	struct timespec tv;
 	clock_gettime(CLOCK_MONOTONIC,&tv);

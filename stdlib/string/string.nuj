@@ -196,3 +196,7 @@
 [defn contains-all? [str chars]
       [apply and [map [split chars ""]
                       [fn [a] [>= [index-of str a] 0]]]]]
+
+[defn from-char-codes l
+      "Turn the provided char codes into a string and return it"
+      [apply cat [map l from-char-code]]]

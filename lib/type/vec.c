@@ -66,8 +66,8 @@ vec vecRotate(const vec a, const vec b, const float rad){
 
 vec vecVecToDeg(const vec a){
 	vec ret;
-	ret.x = atan2f( a.z,a.x)*180/PI + 90.f;
-	ret.y = atan2f(-a.y,a.z)*180/PI;
+	ret.x = atan2f( a.z,a.x)*180.f/((float)PI) + 90.f;
+	ret.y = atan2f(-a.y,a.z)*180.f/((float)PI);
 	ret.z = 0.f;
 	ret.w = 0.f;
 	return ret;
@@ -75,9 +75,9 @@ vec vecVecToDeg(const vec a){
 
 vec vecDegToVec(const vec a){
 	vec ret;
-	ret.x = cosf((a.x-90.f)*PI/180) * cosf((-a.y)*PI/180);
-	ret.y = sinf((-a.y)*PI/180);
-	ret.z = sinf((a.x-90.f)*PI/180) * cosf((-a.y)*PI/180);
+	ret.x = cosf((a.x-90.f)*((float)PI)/180.f) * cosf((-a.y)*((float)PI)/180.f);
+	ret.y = sinf((-a.y)*PI/180.f);
+	ret.z = sinf((a.x-90.f)*((float)PI)/180.f) * cosf((-a.y)*((float)PI)/180.f);
 	ret.w = 0.f;
 	return ret;
 }

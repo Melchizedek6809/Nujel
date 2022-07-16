@@ -19,9 +19,15 @@ static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	lArray *arr = requireArray(c, car);
 	const int length = requireNaturalInt(c, lCadr(v));
-	arr->data = realloc(arr->data,length * sizeof(lVal *));
+	lVal **newData = realloc(arr->data,length * sizeof(lVal *));
+	if (unlikely(newData == NULL)) {
+		free(newData);
+		lExceptionThrowValClo("out-of-memory", "[array/allocate] couldn't allocate its array", v, c);
+		return NULL;
+	}
+	arr->data = newData;
 	if(length > arr->length){
-		memset(&arr->data[arr->length], 0, (length - arr->length) * sizeof(lVal *));
+		memset(&arr->data[arr->length], 0, (((size_t)length) - arr->length) * sizeof(lVal *));
 	}
 	arr->length = length;
 	return car;

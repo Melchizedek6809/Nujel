@@ -53,6 +53,9 @@ const char *getIndent(int d){
 	static char *bufEnd = NULL;
 	if(buf == NULL){
 		buf = malloc(128);
+		if (unlikely(buf == NULL)) {
+			return "";
+		}
 		bufEnd = &buf[127];
 		if(buf == NULL){exit(1);}
 		memset(buf, ' ', 128);

@@ -36,11 +36,14 @@ static lVal *lnfStrDown(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len+1);
+	char *buf = malloc(len);
+	if (unlikely(buf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [downcase]", v, c);
+		return NULL;
+	}
 	for(int i=0;i<len;i++){
 		buf[i] = tolower((u8)str->data[i]);
 	}
-
 	buf[len] = 0;
 	return lValStringNoCopy(buf, len);
 }
@@ -49,11 +52,14 @@ static lVal *lnfStrUp(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len+1);
+	char *buf = malloc(len);
+	if (unlikely(buf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [upcase]", v, c);
+		return NULL;
+	}
 	for(int i=0;i<len;i++){
 		buf[i] = toupper((u8)str->data[i]);
 	}
-
 	buf[len] = 0;
 	return lValStringNoCopy(buf, len);
 }
@@ -62,7 +68,11 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len+1);
+	char *buf = malloc(len);
+	if (unlikely(buf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [capitalize]", v, c);
+		return NULL;
+	}
 	int cap = 1;
 	for(int i=0;i<len;i++){
 		if(isspace((u8)str->data[i])){
@@ -84,7 +94,7 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 
 static lVal *lnfStringCut(lClosure *c, lVal *v){
 	(void)c;
-	int start, slen, len;
+	i64 start, slen, len;
 	lVal *str = lCar(v);
 	if((str == NULL) || (str->type != ltString)){
 		lExceptionThrowValClo("type-error","[string/cut] expects a string as its first and only argument", v, c);
@@ -122,12 +132,14 @@ lVal *lnfCat(lClosure *c, lVal *v){
 		if(new >= (bufEnd-1)){ // Doesn't Work right now!!!!!
 			tmpStringBufSize *= 2;
 			const int i = cur - tmpStringBuf;
-			tmpStringBuf = realloc(tmpStringBuf,tmpStringBufSize);
-			bufEnd = &tmpStringBuf[tmpStringBufSize];
-			if(tmpStringBuf == NULL){
-				fpf(stderr, "lnfCat2 OOM\n");
+			char* newBuf = realloc(tmpStringBuf, tmpStringBufSize);
+			if (unlikely(newBuf == NULL)) {
+				free(tmpStringBuf);
+				lExceptionThrowValClo("out-of-memory", "OOM during string concatenation", car, c);
 				return NULL;
 			}
+			tmpStringBuf = newBuf;
+			bufEnd = &tmpStringBuf[tmpStringBufSize];
 			cur = &tmpStringBuf[i];
 			goto restart;
 		}
@@ -167,11 +179,11 @@ static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 	if(haystack == NULL) {return lValInt(-1);}
 	const char *needle   = castToString(lCadr(v),NULL);
 	if(needle   == NULL) {return lValInt(-2);}
-	const int haystackLength = strlen(haystack);
-	const int needleLength   = strlen(needle);
+	const i64 haystackLength = strlen(haystack);
+	const i64 needleLength   = strlen(needle);
 
 	if(needleLength <= 0){return lValInt(-3);}
-	const int pos = castToInt(lCaddr(v),haystackLength - needleLength - 1);
+	const i64 pos = castToInt(lCaddr(v),haystackLength - needleLength - 1);
 
 	for(const char *s = &haystack[pos]; s > haystack; s--){
 		if(strncmp(s,needle,needleLength)){continue;}
@@ -190,9 +202,15 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
-	char dispWriteBuf[1<<18];
-	spf(dispWriteBuf, &dispWriteBuf[sizeof(dispWriteBuf)], "%v", lCar(v));
-	return lValString(dispWriteBuf);
+	char* dispWriteBuf = malloc(1 << 22);
+	if (unlikely(dispWriteBuf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "OOM during [string/write]", v, c);
+		return NULL;
+	}
+	spf(dispWriteBuf, &dispWriteBuf[(1 << 22)], "%v", lCar(v));
+	lVal *ret = lValString(dispWriteBuf);
+	free(dispWriteBuf);
+	return ret;
 }
 
 static lVal *lnfCharAt(lClosure *c,lVal *v){
@@ -209,19 +227,13 @@ static lVal *lnfCharAt(lClosure *c,lVal *v){
 }
 
 static lVal *lnfFromCharCode(lClosure *c,lVal *v){
-	(void)c;
-	int len = lListLength(v)+1;
-	char *buf = malloc(len);
-	int i=0;
-
-	while(v != NULL){
-		buf[i++] = requireInt(c,lCar(v));
-		v = lCdr(v);
-		if(i >= len){break;}
+	const i64 code = requireInt(c, lCar(v));
+	if(unlikely(code > 255)){
+		lExceptionThrowValClo("out-of-bounds", "Char codes need to be in between 0 and 255", v, c);
+		return NULL;
 	}
-	buf[i] = 0;
-
-	return lValStringNoCopy(buf, len);
+	char buf[2] = {code, 0};
+	return lValStringLen(buf, 1);
 }
 
 void lOperationsString(lClosure *c){

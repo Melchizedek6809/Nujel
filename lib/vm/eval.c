@@ -15,7 +15,7 @@ NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 }
 
 /* Read an encoded signed 16-bit offset at ip */
-int lBytecodeGetOffset16(const lBytecodeOp *ip){
+i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 	const int x = (ip[0] << 8) | ip[1];
 	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
@@ -124,11 +124,19 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lGarbageCollectIfNecessary();
 		if(unlikely(ctx.csp >= ctx.closureStackSize-1)){
 			ctx.closureStackSize *= 2;
-			ctx.closureStack = realloc(ctx.closureStack,ctx.closureStackSize * sizeof(lClosure *));
+			lClosure **newStack = realloc(ctx.closureStack, ctx.closureStackSize * sizeof(lClosure*));
+			if (unlikely(newStack == NULL)) {
+				goto topLevelNoReturn;
+			}
+			ctx.closureStack = newStack;
 		}
 		if(unlikely(ctx.sp >= ctx.valueStackSize-1)){
 			ctx.valueStackSize *= 2;
-			ctx.valueStack = realloc(ctx.valueStack,ctx.valueStackSize * sizeof(lVal *));
+			lVal **newStack = realloc(ctx.valueStack, ctx.valueStackSize * sizeof(lVal*));
+			if (unlikely(newStack == NULL)) {
+				goto topLevelNoReturn;
+			}
+			ctx.valueStack = newStack;
 		}
 		if(unlikely(trace)){lBytecodeTrace(&ctx, ip, ops);}
 	switch(*ip++){
@@ -316,6 +324,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lRootsRet(RSP);
 		return ret;
 	}}
+	topLevelNoReturn:
 	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
 	exceptionTargetDepth--;
 	free(ctx.closureStack);

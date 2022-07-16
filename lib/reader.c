@@ -93,7 +93,7 @@ static lVal *lParseString(lReadContext *s){
 	char *b = buf;
 	uint i=0;
 	while(s->data < s->bufEnd){
-		if(unlikely(++i == bufSize)){
+		if(unlikely(++i >= bufSize)){
 			bufSize *= 2;
 			buf = realloc(buf,bufSize);
 			if(buf == NULL){
@@ -149,13 +149,18 @@ static lVal *lParseString(lReadContext *s){
 			v->vString = lStringNew(buf,b-buf);
 			return v;
 		}else if(unlikely(*s->data == 0)){
-			buf[i] = 0;
+			if (likely(i < bufSize)) {
+				buf[i] = 0;
+			}
 			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
+			return NULL;
 		}else{
 			*b++ = *s->data++;
 		}
 	}
-	buf[i] = 0;
+	if (likely(i < bufSize)) {
+		buf[i] = 0;
+	}
 	lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
 	return NULL;
 }
@@ -309,7 +314,13 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 	while(s->data < s->bufEnd){
 		if((len+4) >= size){
 			size = MAX(size,128) * 2;
-			d = realloc(d, size);
+			u8 *newD = realloc(d, size);
+			if (unlikely(newD == NULL)) {
+				free(d);
+				lExceptionThrowValClo("out-of-memory", "OOM during BC Arr Parse", NULL, s->c);
+				return NULL;
+			}
+			d = newD;
 		}
 		lStringAdvanceToNextCharacter(s);
 		char c = *s->data++;
@@ -366,30 +377,38 @@ static lVal *lParseBuffer(lReadContext *s){
 
 		s->data++;
 		if(s->data >= s->bufEnd){
+			free(buf);
 			lExceptionThrowReaderStartEnd(s, "Unexpected end of buffer");
 		}
 		c = *s->data++;
 		if(isspace(c)){
+			free(buf);
 			lExceptionThrowReaderStartEnd(s, "Unexpected end of literal");
 		}
 		curByte |= lReadNibble(s, c);
 
 		if(len >= bufSize){
 			bufSize = MAX(bufSize*2, 256);
-			buf = realloc(buf, bufSize);
-			if(buf == NULL){
-				epf("OOM during buffer literal reading");
-				exit(2);
+			u8 *newBuf = realloc(buf, bufSize);
+			if(unlikely(newBuf == NULL)){
+				free(buf);
+				lExceptionThrowValClo("out-of-memory", "OOM during buffer parse", NULL, s->c);
+				return NULL;
 			}
+			buf = newBuf;
 		}
 		buf[len++] = curByte;
 	}
 	lStringAdvanceToNextCharacter(s);
 
-	buf = realloc(buf, len);
+	u8* newBuf = realloc(buf, len);
+	if (unlikely(newBuf == NULL)) {
+		lExceptionThrowValClo("out-of-memory", "OOM during buffer parse outtro", NULL, s->c);
+		return NULL;
+	}
 	lVal *ret = lValAlloc(ltBuffer);
 	ret->vBuffer = lBufferAlloc(len, true);
-	ret->vBuffer->buf = buf;
+	ret->vBuffer->buf = newBuf;
 	return ret;
 }
 
