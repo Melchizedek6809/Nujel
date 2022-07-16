@@ -20,6 +20,14 @@ all: $(NUJEL)
 FILES_TO_CLEAN != find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps'
 NOBS_TO_CLEAN  != find binlib stdlib stdlib_modules -type f -name '*.no'
 
+.for LIB_OBJ in $(LIB_OBJS)
+$(LIB_OBJ): lib/nujel.h lib/nujel-private.h
+.endfor
+
+.for BIN_OBJ in $(BIN_OBJS)
+$(BIN_OBJ): lib/nujel.h lib/nujel-private.h bin/private.h
+.endfor
+
 .SUFFIXES:
 .SUFFIXES: .c .o
 .c.o:

@@ -58,7 +58,6 @@ struct vec {
 };
 typedef struct vec vec;
 
-
 typedef enum {
 	ltNoAlloc = 0,
 	ltComment = 1,
