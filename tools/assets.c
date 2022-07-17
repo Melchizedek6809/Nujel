@@ -21,22 +21,14 @@ char *fileSlug(char *path){
 }
 
 int main(int argc,char *argv[]){
-	char fn[512];
-	snprintf(fn,sizeof(fn)-1,"%s.c",argv[1]);
-	fn[sizeof(fn)-1] = 0;
-	FILE *cfp = fopen(fn,"w");
-	snprintf(fn,sizeof(fn)-1,"%s.h",argv[1]);
-	fn[sizeof(fn)-1] = 0;
-	FILE *hfp = fopen(fn,"w");
+	FILE *cfp = fopen(argv[1],"w");
 	static unsigned char buffer[1024*1024*32];
 	size_t filelen=0,readlen=0,ii;
 	int lc=0,i;
-	if((cfp == NULL) || (hfp == NULL)){
+	if(cfp == NULL){
 		fprintf(stderr,"Error opening src/tmp/assets*");
 		return 1;
 	}
-	fprintf(hfp,"#pragma once\n#include <stddef.h>\n\n");
-	fprintf(cfp,"#include <stddef.h>\n\n");
 	for(i=2;i<argc;i++){
 		FILE *afp = fopen(argv[i],"rb");
 		if(afp == NULL){
@@ -53,9 +45,6 @@ int main(int argc,char *argv[]){
 		}
 		fclose(afp);
 
-		fprintf(hfp,"extern unsigned  int %s_len;\n",fileSlug(argv[i]));
-		fprintf(hfp,"extern unsigned char %s_data[];\n\n",fileSlug(argv[i]));
-
 		fprintf(cfp,"unsigned  int %s_len    = %u;\n",fileSlug(argv[i]),(int)filelen);
 		fprintf(cfp,"unsigned char %s_data[] = {\n ",fileSlug(argv[i]));
 		lc=0;
@@ -67,11 +56,7 @@ int main(int argc,char *argv[]){
 			}
 		}
 		fprintf(cfp,"0\n};\n\n");
-
-
 	}
-
 	fclose(cfp);
-	fclose(hfp);
 	return 0;
 }

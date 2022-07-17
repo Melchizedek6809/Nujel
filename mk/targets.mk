@@ -16,11 +16,11 @@ DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
 release.wasm: web/index.html
 
 bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
-	@./$(ASSET) bootstrap/stdlib bootstrap/stdlib.no
+	@./$(ASSET) bootstrap/stdlib.c bootstrap/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
-	@./$(ASSET) bootstrap/binlib bootstrap/binlib.no
+	@./$(ASSET) bootstrap/binlib.c bootstrap/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/stdlib.no: $(STDLIB_NOBS) $(STDLIB_MOBS)
@@ -35,17 +35,13 @@ tmp/binlib.no: $(BINLIB_NOBS)
 
 tmp/stdlib.c: tmp/stdlib.no $(ASSET)
 	@mkdir -p tmp/
-	@./$(ASSET) tmp/stdlib tmp/stdlib.no
+	@./$(ASSET) tmp/stdlib.c tmp/stdlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-tmp/stdlib.h: tmp/stdlib.c
-	@true
 
 tmp/binlib.c: tmp/binlib.no $(ASSET)
 	@mkdir -p tmp/
-	@./$(ASSET) tmp/binlib tmp/binlib.no
+	@./$(ASSET) tmp/binlib.c tmp/binlib.no
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-tmp/binlib.h: tmp/binlib.c
-	@true
 
 run: $(NUJEL)
 	@./$(NUJEL) --only-test-suite tools/tests.nuj
