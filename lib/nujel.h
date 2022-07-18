@@ -49,43 +49,31 @@ typedef  int8_t            i8;
 typedef  int64_t ssize_t;
 #endif
 
-struct vec {
-	union {
-		struct { float x,y,z,w; };
-		struct { float v[4]; };
-		struct { float yaw,pitch,roll,_w; };
-	};
-};
-typedef struct vec vec;
-
 typedef enum {
 	ltNoAlloc = 0,
 	ltComment = 1,
 
 	ltSymbol = 2,
-	ltKeyword = 3,
-	ltBool = 4,
-	ltInt = 5,
-	ltFloat = 6,
-	ltVec = 7,
+	ltKeyword,
+	ltBool,
+	ltInt,
+	ltFloat,
 
-	ltPair = 8,
-	ltString = 9,
-	ltArray = 10,
-	ltTree = 11,
+	ltPair,
+	ltString,
+	ltArray,
+	ltTree,
 
-	ltLambda = 12,
-	ltObject = 13,
-	ltMacro = 14,
-	ltThread = 15,
-	ltNativeFunc = 16,
-	ltBytecodeOp = 17,
-	ltBytecodeArr = 18,
+	ltLambda,
+	ltObject,
+	ltMacro,
+	ltThread,
+	ltNativeFunc,
+	ltBytecodeOp,
+	ltBytecodeArr,
 
-	ltBuffer = 19,
-	ltBufferView = 20,
-
-	ltGUIWidget
+	ltBuffer,
+	ltBufferView
 } lType;
 
 typedef struct lBuffer lBuffer;
@@ -114,7 +102,6 @@ struct lVal {
 		lPair           vList;
 		i64             vInt;
 		double          vFloat;
-		vec             vVec;
 		lBytecodeOp     vBytecodeOp;
 		lBytecodeArray *vBytecodeArr;
 		lArray         *vArray;
@@ -186,8 +173,6 @@ const char *    castToString(const lVal *v, const char *fallback);
 
 NORETURN void   throwTypeError          (lClosure *c, lVal *v, lType T);
 NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
-vec             requireVec              (lClosure *c, lVal *v);
-vec             requireVecCompatible    (lClosure *c, lVal *v);
 i64             requireInt              (lClosure *c, lVal *v);
 i64             requireNaturalInt       (lClosure *c, lVal *v);
 double          requireFloat            (lClosure *c, lVal *v);
@@ -242,7 +227,6 @@ lVal     *lValKeyword   (const char    *s);
 lVal     *lValBool         (bool v);
 lVal     *lValInt          (i64 v);
 lVal     *lValFloat        (double v);
-lVal     *lValVec          (const vec v);
 lVal     *lValTree         (lTree *v);
 lVal     *lValObject       (lClosure *v);
 lVal     *lValLambda       (lClosure *v);
@@ -259,47 +243,8 @@ static inline const lSymbol *lGetSymbol(const lVal *v){
 }
 
 /*
- | vec related functions
- */
-vec   vecNew      (float x, float y, float z, float w);
-vec   vecNewP     (const float *p);
-vec   vecNOne     ();
-vec   vecZero     ();
-vec   vecOne      ();
-vec   vecInvert   (const vec a);
-vec   vecAdd      (const vec a, const vec   b);
-vec   vecAddS     (const vec a, const float b);
-vec   vecSub      (const vec a, const vec   b);
-vec   vecSubS     (const vec a, const float b);
-vec   vecMul      (const vec a, const vec   b);
-vec   vecMulS     (const vec a, const float b);
-vec   vecDiv      (const vec a, const vec   b);
-vec   vecDivS     (const vec a, const float b);
-vec   vecMod      (const vec a, const vec   b);
-vec   vecAbs      (const vec a);
-vec   vecFloor    (const vec a);
-vec   vecPow      (const vec a, const vec b);
-float vecDot      (const vec a, const vec b);
-float vecMag      (const vec a);
-float vecSum      (const vec a);
-float vecAbsSum   (const vec a);
-vec   vecSqrt     (const vec a);
-vec   vecCross    (const vec a, const vec b);
-vec   vecRotate   (const vec a, const vec b, const float rad);
-vec   vecNorm     (const vec a);
-vec   vecVecToDeg (const vec a);
-vec   vecDegToVec (const vec a);
-vec   vecCeil     (const vec a);
-vec   vecRound    (const vec a);
-vec   vecReflect  (const vec i, const vec n);
-vec   vecCbrt     (const vec a);
-
-
-/*
  | GC related procedures
  */
-extern void (*rootsMarkerChain)();
-extern void (*sweeperChain)();
 extern int lGCRuns;
 
 

@@ -27,8 +27,6 @@ rootEntry *rootStack = NULL;
 int rootSP  = 0;
 int rootMax = 0;
 
-void (*rootsMarkerChain)() = NULL;
-
 static void *lRootsPush(const lType t, void *ptr){
 	if(unlikely(rootSP >= rootMax)){
 		rootMax = MAX(rootMax * 2, 256);
@@ -80,5 +78,4 @@ void lRootsMark(){
 			break;
 		}
 	}
-	if(rootsMarkerChain){rootsMarkerChain();}
 }

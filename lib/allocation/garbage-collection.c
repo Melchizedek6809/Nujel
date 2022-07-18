@@ -89,9 +89,6 @@ void lValGCMark(lVal *v){
 	case ltTree:
 		lTreeGCMark(v->vTree);
 		break;
-	case ltGUIWidget:
-		lWidgetMarkI(v->vInt);
-		break;
 	case ltBytecodeArr:
 		lBytecodeArrayMark(v->vBytecodeArr);
 		break;
@@ -169,7 +166,6 @@ static void lGCMark(){
 	lMarkFree();
 }
 
-void (*sweeperChain)() = NULL;
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
 	#define defineAllocator(T, TMAX) \
@@ -184,7 +180,6 @@ static void lGCSweep(){
 	defineAllocator(lSymbol, SYM_MAX)
 	defineAllocator(lNFunc, NFN_MAX)
 	#undef defineAllocator
-	if(sweeperChain != NULL){sweeperChain();}
 }
 
 /* Force a garbage collection cycle, shouldn't need to be called manually since

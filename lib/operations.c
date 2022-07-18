@@ -15,7 +15,6 @@ void lOperationsCore       (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
 void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
-void lOperationsVector     (lClosure *c);
 
 void lOperationsBase(lClosure *c){
 	lOperationsArithmetic(c);
@@ -26,5 +25,4 @@ void lOperationsBase(lClosure *c){
 	lOperationsSpecial(c);
 	lOperationsString(c);
 	lOperationsTree(c);
-	lOperationsVector(c);
 }

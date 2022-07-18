@@ -394,7 +394,6 @@ int              lBufferViewTypeSize (lBufferViewType T);
 lVal *lnfCat     (lClosure *c, lVal *v);
 lVal *lnfArrNew  (lClosure *c, lVal *v);
 lVal *lnfTreeNew (lClosure *c, lVal *v);
-lVal *lnfVec     (lClosure *c, lVal *v);
 
 
 /*

@@ -169,8 +169,6 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		return spf(cur , bufEnd, "%i" ,v->vInt);
 	case ltFloat:
 		return spf(cur , bufEnd, "%f" ,v->vFloat);
-	case ltVec:
-		return spf(cur, bufEnd, "#v[%f %f %f %f]", v->vVec.x, v->vVec.y, v->vVec.z, v->vVec.w);
 	case ltString:
 		return spf(cur, bufEnd, display ? "%s" : "%S", v->vString->data);
 	case ltSymbol:
@@ -187,8 +185,6 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		}else{
 			return spf(cur, bufEnd, "#%s_%u",v->type == ltNativeFunc ? "nfn" : "sfo", lNFuncID(v->vNFunc));
 		}
-	case ltGUIWidget:
-		return spf(cur, bufEnd, "#gui_%p", v->vPointer);
 	}
 }
 

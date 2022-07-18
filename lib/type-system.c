@@ -49,7 +49,6 @@ const char *castToString(const lVal *v, const char *fallback){
 /* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a, const lType b){
 	if (a == b){ return a;}
-	if((a == ltVec)   || (b == ltVec))  {return ltVec;}
 	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
 	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
 	return ltNoAlloc;
@@ -78,19 +77,6 @@ double requireFloat(lClosure *c, lVal *v){
 	default:      throwTypeError(c, v, ltFloat);
 	case ltFloat: return v->vFloat;
 	case ltInt:   return v->vInt;
-	}
-}
-
-vec requireVec(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltVec)->vVec;
-}
-
-vec requireVecCompatible(lClosure *c, lVal *v){
-	typeswitch(v){
-	default:      throwTypeError(c, v, ltVec);
-	case ltVec:   return v->vVec;
-	case ltFloat: return vecNew(v->vFloat, v->vFloat, v->vFloat, v->vFloat);
-	case ltInt:   return vecNew(v->vInt, v->vInt, v->vInt, v->vInt);
 	}
 }
 

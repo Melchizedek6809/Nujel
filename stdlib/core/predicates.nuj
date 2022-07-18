@@ -5,7 +5,7 @@
 
 [defn numeric? [a]
       "Return #t if a is a number"
-      [or [int? a] [float? a] [vec? a]]]
+      [or [int? a] [float? a]]]
 
 [defn last? [a] :inline
       "Return #t if a is the last pair in a list"
@@ -55,9 +55,6 @@
 
 [defn float? [val]
       [= :float [type-of val]]]
-
-[defn vec? [val]
-      [= :vec [type-of val]]]
 
 [defn boolean? [val]
       [= :bool [type-of val]]]

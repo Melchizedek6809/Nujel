@@ -25,12 +25,6 @@ lVal *lValFloat(double v){
 	return ret;
 }
 
-lVal *lValVec(const vec v){
-	lVal *ret = lValAlloc(ltVec);
-	ret->vVec = v;
-	return ret;
-}
-
 lVal *lValBool(bool v){
 	lVal *ret = lValAlloc(ltBool);
 	ret->vBool = v;
@@ -145,8 +139,6 @@ bool lValEqual(const lVal *a, const lVal *b){
 		return a->vBufferView == b->vBufferView;
 	case ltBool:
 		return a->vBool == b->vBool;
-        case ltGUIWidget:
-		return b->vPointer == a->vPointer;
 	case ltInt:
 		return a->vInt == b->vInt;
 	case ltFloat:

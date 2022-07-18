@@ -30,7 +30,6 @@
 [test/add :out-of-bounds [try car [def testerle #[1 2 3]] [array/ref testerle 40000]]]
 [test/add #[1 2 3] [def testerle #[1 2 3]] testerle]
 [test/add :type-error [try car [def testerle #[1 2 3]] [array/ref testerle #t]]]
-[test/add :type-error [try car [def testerle #[1 2 3]] [array/ref testerle [vec 1 2 3]]]]
 [test/add 1 [array/ref #[1 2 3] 0]]
 [test/add 2 [def arr #[1 2 3]] [array/length! arr 2] [length arr]]
 [test/add 3 [def arr #[1 2 3]] [array/length! arr 2] [reduce arr + 0]]

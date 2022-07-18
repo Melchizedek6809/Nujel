@@ -439,9 +439,6 @@ static lVal *lParseSpecial(lReadContext *s){
 	case '#':
 		s->data++;
 		return lnfArrNew(s->c, lReadList(s, false));
-	case 'v':
-		s->data++;
-		return lnfVec(s->c, lReadList(s, false));
 	case '[':
 		return lCons(lValSymS(symArr), lReadList(s,false));
 	case '@':{

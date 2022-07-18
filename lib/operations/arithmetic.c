@@ -31,7 +31,6 @@ lVal *lAdd(lClosure *c, lVal *a, lVal *b){
 		default:      return exceptionThrow(c, a,"addition");
 		case ltInt:   return lValInt(requireInt(c,a) + requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) + requireFloat(c,b));
-		case ltVec:   return lValVec(vecAdd(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
@@ -52,7 +51,6 @@ lVal *lSub(lClosure *c, lVal *a, lVal *b){
 		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(-a->vInt);
 		case ltFloat: return lValFloat(-a->vFloat);
-		case ltVec:   return lValVec(vecInvert(a->vVec));
 		}
 	}
 	lType t = lTypecast(a->type, b->type);
@@ -60,7 +58,6 @@ lVal *lSub(lClosure *c, lVal *a, lVal *b){
 		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(requireInt(c,a) - requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) - requireFloat(c,b));
-		case ltVec:   return lValVec(vecSub(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
@@ -84,7 +81,6 @@ lVal *lMul(lClosure *c, lVal *a, lVal *b){
 		default:      return exceptionThrow(c, a,"multiplication");
 		case ltInt:   return lValInt(requireInt(c,a) * requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) * requireFloat(c,b));
-		case ltVec:   return lValVec(vecMul(requireVecCompatible(c,a), requireVecCompatible(c,b)));\
 	}
 }
 
@@ -109,7 +105,6 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b){
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
 		case ltFloat: return lValFloat(requireFloat(c,a) / requireFloat(c,b));
-		case ltVec:   return lValVec(vecDiv(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
@@ -135,7 +130,6 @@ lVal *lRem(lClosure *c, lVal *a, lVal *b){
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av % bv);}
 		case ltFloat: return lValFloat(fmod(requireFloat(c,a), requireFloat(c,b)));
-		case ltVec:   return lValVec(vecMod(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
@@ -161,7 +155,6 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 		default:      return exceptionThrowFloat(c, v,"power");
 		case ltInt:   return lValInt(pow(requireInt(c,a),  requireInt(c,b)));
 		case ltFloat: return lValFloat(pow(requireFloat(c,a), requireFloat(c,b)));
-		case ltVec:   return lValVec(vecPow(requireVecCompatible(c,a), requireVecCompatible(c,b)));
 	}
 }
 
@@ -245,7 +238,6 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 		default:      return exceptionThrow(c, v,"absolute");
 		case ltFloat: return lValFloat(fabs(t->vFloat));
 		case ltInt:   return lValInt(llabs(t->vInt));
-		case ltVec:   return lValVec(vecAbs(t->vVec));
 	}
 }
 
@@ -255,7 +247,6 @@ lVal *lnfCbrt(lClosure *c, lVal *v){
 		default:      return exceptionThrow(c, v,"squareroot");
 		case ltFloat: return lValFloat(cbrt(t->vFloat));
 		case ltInt:   return lValFloat(cbrt(t->vInt));
-		case ltVec:   return lValVec(vecCbrt(t->vVec));
 	}
 }
 
@@ -265,7 +256,6 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 		default:      return exceptionThrow(c, v,"squareroot");
 		case ltFloat: return lValFloat(sqrt(t->vFloat));
 		case ltInt:   return lValFloat(sqrt(t->vInt));
-		case ltVec:   return lValVec(vecSqrt(t->vVec));
 	}
 }
 
@@ -274,7 +264,6 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"ceil");
 		case ltFloat: return lValFloat(ceil(t->vFloat));
-		case ltVec:   return lValVec(vecCeil(t->vVec));
 	}
 }
 
@@ -283,7 +272,6 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"floor");
 		case ltFloat: return lValFloat(floor(t->vFloat));
-		case ltVec:   return lValVec(vecFloor(t->vVec));
 	}
 }
 
@@ -292,7 +280,6 @@ lVal *lnfRound(lClosure *c, lVal *v){
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"round");
 		case ltFloat: return lValFloat(round(t->vFloat));
-		case ltVec:   return lValVec(vecRound(t->vVec));
 	}
 }
 
