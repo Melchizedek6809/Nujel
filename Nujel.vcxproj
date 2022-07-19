@@ -94,6 +94,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <StackReserveSize>67108864</StackReserveSize>
+      <HeapReserveSize>134217728</HeapReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,6 +112,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <StackReserveSize>67108864</StackReserveSize>
+      <HeapReserveSize>134217728</HeapReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,6 +121,10 @@
       <Optimization>Disabled</Optimization>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
+    <Link>
+      <StackReserveSize>67108864</StackReserveSize>
+      <HeapReserveSize>134217728</HeapReserveSize>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -128,6 +136,10 @@
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
+    <Link>
+      <StackReserveSize>67108864</StackReserveSize>
+      <HeapReserveSize>134217728</HeapReserveSize>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bin\main.c" />
@@ -139,11 +151,8 @@
     <ClCompile Include="bootstrap\stdlib.c" />
     <ClCompile Include="lib\allocation\allocator.c" />
     <ClCompile Include="lib\allocation\garbage-collection.c" />
-    <ClCompile Include="lib\allocation\roots.c" />
     <ClCompile Include="lib\allocation\symbol.c" />
-    <ClCompile Include="lib\compatibility\builtins.c" />
-    <ClCompile Include="lib\compatibility\getmsecs.c" />
-    <ClCompile Include="lib\compatibility\platform.c" />
+    <ClCompile Include="lib\compatibility.c" />
     <ClCompile Include="lib\nujel.c" />
     <ClCompile Include="lib\operations.c" />
     <ClCompile Include="lib\operations\arithmetic.c" />
@@ -153,25 +162,18 @@
     <ClCompile Include="lib\operations\core.c" />
     <ClCompile Include="lib\operations\special.c" />
     <ClCompile Include="lib\operations\string.c" />
-    <ClCompile Include="lib\operations\vec-ops.c" />
     <ClCompile Include="lib\printer.c" />
     <ClCompile Include="lib\reader.c" />
     <ClCompile Include="lib\type-system.c" />
     <ClCompile Include="lib\type\closure.c" />
     <ClCompile Include="lib\type\tree.c" />
     <ClCompile Include="lib\type\val.c" />
-    <ClCompile Include="lib\type\vec.c" />
-    <ClCompile Include="lib\vm\eval.c" />
-    <ClCompile Include="lib\vm\tracing.c" />
+    <ClCompile Include="lib\vm.c" />
     <ClCompile Include="vendor\getline\getline.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bin\private.h" />
-    <ClInclude Include="bootstrap\binlib.h" />
-    <ClInclude Include="bootstrap\stdlib.h" />
     <ClInclude Include="lib\amalgamation\bin-prefix.h" />
-    <ClInclude Include="lib\amalgamation\header-prefix.h" />
-    <ClInclude Include="lib\amalgamation\header-suffix.h" />
     <ClInclude Include="lib\amalgamation\implementation-prefix.h" />
     <ClInclude Include="lib\amalgamation\implementation-suffix.h" />
     <ClInclude Include="lib\amalgamation\prefix.h" />

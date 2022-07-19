@@ -57,19 +57,7 @@
     <ClCompile Include="lib\allocation\garbage-collection.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\allocation\roots.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lib\allocation\symbol.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\compatibility\builtins.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\compatibility\getmsecs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\compatibility\platform.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\operations\arithmetic.c">
@@ -93,9 +81,6 @@
     <ClCompile Include="lib\operations\string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\operations\vec-ops.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lib\type\closure.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,27 +90,18 @@
     <ClCompile Include="lib\type\val.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\type\vec.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vm\eval.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\vm\tracing.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vendor\getline\getline.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\compatibility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\vm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bin\private.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bootstrap\binlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bootstrap\stdlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\nujel-private.h">
@@ -135,12 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\amalgamation\bin-prefix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\amalgamation\header-prefix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\amalgamation\header-suffix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\amalgamation\implementation-prefix.h">

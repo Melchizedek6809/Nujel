@@ -7,7 +7,10 @@
 #ifdef __WATCOMC__
 	#include <direct.h>
 #elif defined(_MSC_VER)
-
+	#include <windows.h>
+	#include <tchar.h> 
+	#include <stdio.h>
+	#include <strsafe.h>
 #else
 	#include <dirent.h>
 	#include <unistd.h>
@@ -37,6 +40,7 @@ lSymbol *lsSize;
 lSymbol *lsUserID;
 lSymbol *lsGroupID;
 lSymbol *lsAccessTime;
+lSymbol* lsCreationTime;
 lSymbol *lsModificationTime;
 
 lSymbol *lsRegularFile;
@@ -54,6 +58,7 @@ void setIOSymbols(){
 	lsUserID           = lSymSM("user-id");
 	lsGroupID          = lSymSM("group-id");
 	lsAccessTime       = lSymSM("access-time");
+	lsCreationTime     = lSymSM("creation-time");
 	lsModificationTime = lSymSM("modification-time");
 
 	lsRegularFile      = lSymSM("regular-file?");
@@ -174,12 +179,57 @@ static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	return car;
 }
 
-static lVal *lnfFileStat(lClosure *c, lVal *v){
+
+
 #ifdef _MSC_VER
+LONGLONG FileTime_to_POSIX(FILETIME ft) {
+	LARGE_INTEGER date, adjust;
+	date.HighPart = ft.dwHighDateTime;
+	date.LowPart = ft.dwLowDateTime;
+	adjust.QuadPart = 11644473600000 * 10000;
+	date.QuadPart -= adjust.QuadPart;
+	return date.QuadPart / 10000000;
+}
+#endif
+
+static lVal *lnfFileStat(lClosure *c, lVal *v){
 	lString* filename = requireString(c, lCar(v));
-	return NULL;
+#ifdef _MSC_VER
+	WIN32_FIND_DATA ffd;
+	LARGE_INTEGER filesize;
+	size_t length_of_arg = 0;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	DWORD dwError = 0;
+
+	if (lStringLength(filename) >= MAX_PATH) {
+		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
+		return NULL;
+	}
+
+	hFind = FindFirstFile(lStringData(filename), &ffd);
+
+	
+	lVal* ret = lValTree(NULL);
+	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
+	if (INVALID_HANDLE_VALUE != hFind) {
+		LARGE_INTEGER filesize;
+		filesize.LowPart = ffd.nFileSizeLow;
+		filesize.HighPart = ffd.nFileSizeHigh;
+		ret->vTree = lTreeInsert(ret->vTree, lsSize, lValInt(filesize.QuadPart));
+		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
+		ret->vTree = lTreeInsert(ret->vTree, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
+		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
+		ret->vTree = lTreeInsert(ret->vTree, lsUserID, lValInt(1000));
+		ret->vTree = lTreeInsert(ret->vTree, lsGroupID, lValInt(1000));
+
+		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
+		ret->vTree = lTreeInsert(ret->vTree, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice, lValBool(false));
+		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice, lValBool(false));
+		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe, lValBool(false));
+	}
+	return ret;
 #else
-	lString *filename = requireString(c, lCar(v));
 	struct stat statbuf;
 	int err = stat(lStringData(filename), &statbuf);
 	lVal *ret = lValTree(NULL);
@@ -188,7 +238,6 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 		ret->vTree = lTreeInsert(ret->vTree, lsErrorNumber,      lValInt(errno));
 		ret->vTree = lTreeInsert(ret->vTree, lsErrorText,        lValString(strerror(errno)));
 	}else{
-		ret->vTree = lTreeInsert(ret->vTree, lsMode,             lValInt(statbuf.st_mode));
 		ret->vTree = lTreeInsert(ret->vTree, lsUserID,           lValInt(statbuf.st_uid));
 		ret->vTree = lTreeInsert(ret->vTree, lsGroupID,          lValInt(statbuf.st_gid));
 		ret->vTree = lTreeInsert(ret->vTree, lsSize,             lValInt(statbuf.st_size));
@@ -282,18 +331,45 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 }
 #endif
 
-#ifdef _MSC_VER
-static lVal* lnfDirectoryRead(lClosure* c, lVal* v) {
-	lString* path = requireString(c, lCar(v));
-	const bool showHidden = castToBool(lCadr(v));
-	/* ToDo: write native windows version */
-	return NULL;
-}
-#else
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
 	const bool showHidden = castToBool(lCadr(v));
 
+#ifdef _MSC_VER
+	WIN32_FIND_DATA ffd;
+	LARGE_INTEGER filesize;
+	TCHAR szDir[MAX_PATH];
+	size_t length_of_arg = 0;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	DWORD dwError = 0;
+
+	StringCchLength(lStringData(path), MAX_PATH, &length_of_arg);
+	if (length_of_arg > (MAX_PATH - 3)){
+		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
+		return NULL;
+	}
+
+	StringCchCopy(szDir, MAX_PATH, lStringData(path));
+	StringCchCat(szDir, MAX_PATH, TEXT("\\*"));
+
+	hFind = FindFirstFile(szDir, &ffd);
+
+	if (INVALID_HANDLE_VALUE == hFind) {
+		lExceptionThrowValClo("invalid-call", "FindFirstFile failed", lCar(v), c);
+		return NULL;
+	}
+
+	lVal* ret = NULL;
+	do {
+		if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && !showHidden){
+			continue;
+		}
+		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == 0)) { continue; }
+		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == '.') && (ffd.cFileName[2] == 0)) { continue; }
+		ret = lCons(lValString(ffd.cFileName), ret);
+   } while (FindNextFile(hFind, &ffd) != 0);
+   return ret;
+#else
 	DIR *dp = opendir(lStringData(path));
 	if(dp == NULL){return NULL;}
 	lVal *ret = NULL;
@@ -314,8 +390,8 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 
 	closedir(dp);
 	return ret;
-}
 #endif
+}
 
 static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
 	lString *path = requireString(c, lCar(v));
@@ -355,9 +431,9 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
 	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
 
-	lAddNativeFunc(c,"directory/read",   "[path show-hidden]",   "Return all files within $PATH",               lnfDirectoryRead);
-	lAddNativeFunc(c,"directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
-	lAddNativeFunc(c,"directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
+	lAddNativeFunc(c,"ls directory/read",   "[path show-hidden]",   "Return all files within $PATH",               lnfDirectoryRead);
+	lAddNativeFunc(c,"rmdir directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
+	lAddNativeFunc(c,"mkdir directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
 
 	lAddNativeFunc(c,"cd path/change",      "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
 	lAddNativeFunc(c,"cwd path/working-directory","[]",        "Return the current working directory",              lnfGetCurrentWorkingDirectory);
