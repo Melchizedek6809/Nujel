@@ -11,6 +11,19 @@
 
 #include <stdlib.h>
 
+typedef struct {
+	lType t;
+	union {
+		lClosure *vClosure;
+		lSymbol  *vSymbol;
+		void     *vPointer;
+		lThread  *vThread;
+	};
+} rootEntry;
+
+rootEntry *rootStack = NULL;
+int rootSP  = 0;
+int rootMax = 0;
 int lGCRuns = 0;
 
 #define defineAllocator(T, TMAX) u8 T##MarkMap[TMAX];
@@ -58,9 +71,9 @@ void lSymbolGCMark(const lSymbol *v){
 void lNFuncGCMark(const lNFunc *v){
 	markerPrefix(lNFunc);
 
-	lTreeGCMark(v->meta);
-	lValGCMark(v->args);
 	lSymbolGCMark(v->name);
+	lValGCMark(v->args);
+	lTreeGCMark(v->meta);
 }
 
 void lValGCMark(lVal *v){
@@ -159,6 +172,52 @@ static void lMarkNFuncs(){
 	}
 }
 
+/* Mark every single root and everything they point to */
+static void lRootsMark(){
+	for(int i=0;i<rootSP;i++){
+		switch(rootStack[i].t){
+		case ltSymbol:
+			lSymbolGCMark(rootStack[i].vSymbol);
+			break;
+		case ltLambda:
+			lClosureGCMark(rootStack[i].vClosure);
+			break;
+		case ltThread:
+			lThreadGCMark(rootStack[i].vThread);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+static void *lRootsPush(const lType t, void *ptr){
+	if(unlikely(rootSP >= rootMax)){
+		rootMax = MAX(rootMax * 2, 256);
+		rootEntry *newRootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
+		if(unlikely(newRootStack == NULL)){
+			free(rootStack);
+			epf("Can't grow rootStack\n");
+			exit(123);
+		}
+		rootStack = newRootStack;
+	}
+	rootStack[rootSP].t = t;
+	rootStack[rootSP].vPointer = ptr;
+	rootSP++;
+	return ptr;
+}
+
+lClosure *lRootsClosurePush(lClosure *v){
+	return lRootsPush(ltLambda, v);
+}
+lSymbol *lRootsSymbolPush(lSymbol *v){
+	return lRootsPush(ltSymbol, v);
+}
+lThread *lRootsThreadPush(lThread *v){
+	return lRootsPush(ltThread, v);
+}
+
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
 	lRootsMark();
@@ -185,8 +244,6 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
-	//pf("GC!\n");
-	lGCRuns++;
 	lGCMark();
 	lGCSweep();
 	lGCShouldRunSoon = false;

@@ -49,13 +49,13 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	switch(fun ? fun->type : ltNoAlloc){
+	case ltLambda:     return lLambda(c,args,fun);
+	case ltNativeFunc: return fun->vNFunc->fp(c,args);
 	case ltObject:
 		if(args && args->type == ltBytecodeArr){
 			return lBytecodeEval(fun->vClosure, args->vBytecodeArr, false);
 		} /* fall-through */
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
-	case ltLambda:     return lLambda(c,args,fun);
-	case ltNativeFunc: return fun->vNFunc->fp(c,args);
 	}
 }
 
@@ -66,15 +66,15 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	lVal *v = lRead(c, expr);
 	const int RSP = lRootsGet();
 	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
+		c->args = n; // We need a reference to make sure that n won't be collected by the GC
 		lVal *car = n->vList.car;
-		lRootsValPush(n);
 		if(unlikely((car == NULL) || (car->type != ltBytecodeArr))){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}else{
 			lBytecodeEval(c, car->vBytecodeArr, false);
 		}
-		lRootsRet(RSP);
 	}
+	c->args = NULL;
 	lRootsRet(RSP);
 	return c;
 }

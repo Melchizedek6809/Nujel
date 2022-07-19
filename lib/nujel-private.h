@@ -232,11 +232,8 @@ typedef enum lOpcode {
 	lopZeroPred        = 0x2A
 } lOpcode;
 
-const char *lBytecodeGetOpcodeName(const lBytecodeOp op);
 i64 lBytecodeGetOffset16(const lBytecodeOp *ip);
-
 lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops, bool trace);
-void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeArray *ops);
 lVal     *lLambda  (lClosure *c, lVal *args, lVal *lambda);
 
 
@@ -259,20 +256,15 @@ void lAddPlatformVars(lClosure *c);
 /*
  | GC related procedures
  */
-lVal     *lRootsValPush    (lVal *c);
 lClosure *lRootsClosurePush(lClosure *v);
 lSymbol  *lRootsSymbolPush (lSymbol *v);
 lThread  *lRootsThreadPush (lThread *v);
-void      lRootsMark       ();
-
 extern int rootSP;
 
 static inline void lRootsRet(const int i){ rootSP = i; }
 static inline int  lRootsGet(){ return rootSP; }
 
 extern bool lGCShouldRunSoon;
-
-void lWidgetMarkI       (uint i);
 
 void lValGCMark         (lVal *v);
 void lBufferGCMark      (const lBuffer *v);
@@ -335,13 +327,6 @@ static inline int lClosureID(const lClosure *n){
 static inline int lNFuncID(const lNFunc *n){
 	return n - lNFuncList;
 }
-static inline int lValIndex(const lVal *v){
-	return v - lValList;
-}
-static inline lVal *lIndexVal(uint i){
-	return (i >= lValMax) ? NULL : &lValList[i];
-}
-
 
 /*
  | Symbolic procedures

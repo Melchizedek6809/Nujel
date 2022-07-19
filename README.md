@@ -34,10 +34,10 @@ Here is a collection of features already implemented, or about to be finished.
 - [ ] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [ ] Tail-call optimization
 - [ ] Continuations
-- [ ] Value Types
-- [ ] Fibers (preemtible!)
-- [ ] NaN Boxing
-- [ ] Serializable fibers
+- [ ] Value types
+- [ ] Printer written in Nujel itself
+- [ ] Reader written in Nujel
+- [ ] Reader macros
 
 ## Current Limitations
 These will be addressed in later versions

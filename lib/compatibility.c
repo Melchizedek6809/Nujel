@@ -1,8 +1,71 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#include <time.h>
+
 #ifndef NUJEL_AMALGAMATION
-#include "../nujel-private.h"
+#include "nujel-private.h"
 #endif
+
+#if defined(__TINYC__) || defined(__WATCOMC__)
+#include <stdint.h>
+/* Classic binary divide-and-conquer popcount.
+   This is popcount_2() from
+   http://en.wikipedia.org/wiki/Hamming_weight */
+uint32_t popcount_2(uint32_t x){
+    uint32_t m1 = 0x55555555;
+    uint32_t m2 = 0x33333333;
+    uint32_t m4 = 0x0f0f0f0f;
+    x -= (x >> 1) & m1;
+    x = (x & m2) + ((x >> 2) & m2);
+    x = (x + (x >> 4)) & m4;
+    x += x >>  8;
+    return (x + (x >> 16)) & 0x3f;
+}
+uint64_t __builtin_popcountll(uint64_t x){
+	return popcount_2(x) + popcount_2(x >> 32);
+}
+uint32_t __builtin_popcount(uint32_t x){
+	return popcount_2(x);
+}
+
+void __sync_synchronize(){}
+#elif defined(_MSC_VER)
+void __sync_synchronize() {}
+#endif
+
+#ifdef __WATCOMC__
+	#include <dos.h>
+	#include "../misc/pf.h"
+
+	static void clock_gettime(int type, struct timespec *tv){
+		struct dostime_t dtime;
+		_dos_gettime( &dtime );
+
+		tv->tv_nsec =  dtime.hsecond * 10000000l;
+		tv->tv_sec  = time(NULL);
+	}
+
+	#define CLOCK_MONOTONIC 123
+#elif defined(_MSC_VER)
+	#include "windows.h"
+#else
+	#include <sys/time.h>
+#endif
+
+#ifdef __MINGW32__
+	#include <pthread_time.h>
+#endif
+
+/* Return monotonic time in milliseconds */
+u64 getMSecs(){
+#ifdef _MSC_VER
+	return GetTickCount64();
+#else
+	struct timespec tv;
+	clock_gettime(CLOCK_MONOTONIC,&tv);
+	return (tv.tv_nsec / 1000000) + (tv.tv_sec * 1000);
+#endif
+}
 
 /* Add all the platform specific constants to C */
 void lAddPlatformVars(lClosure *c){
