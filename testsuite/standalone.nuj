@@ -13,7 +13,6 @@
   [test/add #t [> [ref [file/stat "GNUmakefile"] :size] 1024]]
   [test/add #t [int? [ref [file/stat "GNUmakefile"] :modification-time]]]
   [test/add #t [int? [ref [file/stat "GNUmakefile"] :access-time]]]
-  [test/add #t [int? [ref [file/stat "GNUmakefile"] :mode]]]
   [test/add #t [boolean? [ref [file/stat "GNUmakefile"] :regular-file?]]]
   [test/add #t [boolean? [ref [file/stat "GNUmakefile"] :directory?]]]
   [test/add #t [boolean? [ref [file/stat "GNUmakefile"] :character-device?]]]
