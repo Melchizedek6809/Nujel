@@ -7,7 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-void *lBufferData (lBuffer *v){
+const void *lBufferData (lBuffer *v){
+	return v == NULL ? NULL : v->buf;
+}
+
+void *lBufferDataMutable(lBuffer *v){
+	if(v->flags & BUFFER_IMMUTABLE){return NULL;}
 	return v == NULL ? NULL : v->buf;
 }
 
@@ -19,7 +24,13 @@ size_t lBufferLength(const lBuffer *v){
 	return v == NULL ? 0 : v->length;
 }
 
-void *lBufferViewData(lBufferView *v){
+const void *lBufferViewData(lBufferView *v){
+	if(v == NULL){return NULL;}
+	if(v->buf->flags & BUFFER_IMMUTABLE){return NULL;}
+	return &((u8 *)v->buf->buf)[v->offset * lBufferViewTypeSize(v->type)];
+}
+
+void *lBufferViewDataMutable(lBufferView *v){
 	return &((u8 *)v->buf->buf)[v->offset * lBufferViewTypeSize(v->type)];
 }
 

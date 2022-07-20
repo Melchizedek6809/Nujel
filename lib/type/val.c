@@ -265,3 +265,9 @@ lVal *lValBufferNoCopy(void *data, size_t length, bool immutable){
 	ret->vBuffer = buf;
 	return ret;
 }
+
+lVal *lValFileHandle(FILE *fh){
+	lVal *ret = lValAlloc(ltFileHandle);
+	ret->vFileHandle = fh;
+	return ret;
+}

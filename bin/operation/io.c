@@ -8,7 +8,7 @@
 	#include <direct.h>
 #elif defined(_MSC_VER)
 	#include <windows.h>
-	#include <tchar.h> 
+	#include <tchar.h>
 	#include <stdio.h>
 	#include <strsafe.h>
 #else
@@ -154,7 +154,7 @@ static lVal *lnfFileReadBuffer(lClosure *c, lVal *v){
 static lVal *lnfFileWrite(lClosure *c, lVal *v){
 	lVal *contentV    = lCar(v);
 	lString *filename = requireString(c, lCadr(v));
-	switch(contentV ? contentV->type : ltNoAlloc){
+	typeswitch(contentV){
 	default:
 		lExceptionThrowValClo("type-error", "Can't save that", contentV, c);
 	case ltString:
@@ -164,7 +164,7 @@ static lVal *lnfFileWrite(lClosure *c, lVal *v){
 		saveFile(lStringData(filename), lBufferData(contentV->vBuffer), lBufferLength(contentV->vBuffer));
 		break;
 	case ltBufferView:{
-		void *data = lBufferViewData(contentV->vBufferView);
+		const void *data = lBufferViewData(contentV->vBufferView);
 		size_t length = lBufferViewLength(contentV->vBufferView);
 		saveFile(lStringData(filename), data, length);
 		break;
@@ -208,7 +208,7 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 
 	hFind = FindFirstFile(lStringData(filename), &ffd);
 
-	
+
 	lVal* ret = lValTree(NULL);
 	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
 	if (INVALID_HANDLE_VALUE != hFind) {

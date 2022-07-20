@@ -157,3 +157,8 @@ lVal *requireCallable(lClosure *c, lVal *v){
 lVal *requireEnvironment(lClosure *c, lVal *v){
 	return requireCertainType(c, v, ltObject);
 }
+
+FILE *requireFileHandle(lClosure *c, lVal *v){
+	requireCertainType(c, v, ltFileHandle);
+	return v->vFileHandle;
+}

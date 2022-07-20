@@ -26,6 +26,8 @@ int rootSP  = 0;
 int rootMax = 0;
 int lGCRuns = 0;
 
+u8 fileDescriptorMarkMap[MAX_OPEN_FILE_DESCRIPTORS];
+
 #define defineAllocator(T, TMAX) u8 T##MarkMap[TMAX];
 allocatorTypes()
 defineAllocator(lSymbol, SYM_MAX)

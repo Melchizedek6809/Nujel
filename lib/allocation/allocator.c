@@ -9,7 +9,6 @@
 
 bool lGCShouldRunSoon = false;
 
-#undef defineAllocator
 #define defineAllocator(T, typeMax) \
 T T##List[typeMax]; \
 uint T##Max = 0; \
@@ -34,6 +33,7 @@ T * T##AllocRaw (){\
 	return ret;\
 }
 allocatorTypes()
+#undef defineAllocator
 
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncMax    = 0;

@@ -20,8 +20,8 @@
  | Core/Exception handling
  */
 #define RECURSION_DEPTH_MAX (1<<14)
+#define MAX_OPEN_FILE_DESCRIPTORS 256
 #define PI    (3.1415926535897932384626433832795)
-#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
 
 extern jmp_buf exceptionTarget;
 extern lVal   *exceptionValue;

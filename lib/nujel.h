@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #if defined(__WATCOMC__) || defined(_MSC_VER)
 #define NORETURN
@@ -25,6 +26,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
+#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
 
 /*
  | Now for some type/struct definitions
@@ -73,7 +75,9 @@ typedef enum {
 	ltBytecodeArr,
 
 	ltBuffer,
-	ltBufferView
+	ltBufferView,
+
+	ltFileHandle
 } lType;
 
 typedef struct lBuffer lBuffer;
@@ -103,17 +107,18 @@ struct lVal {
 		i64             vInt;
 		double          vFloat;
 		lBytecodeOp     vBytecodeOp;
+		FILE *          vFileHandle;
 		lBytecodeArray *vBytecodeArr;
-		lArray         *vArray;
-		lTree          *vTree;
-		lString        *vString;
-		const lSymbol  *vSymbol;
-		lClosure       *vClosure;
-		lNFunc         *vNFunc;
-		void           *vPointer;
-		lVal           *nextFree;
-		lBuffer        *vBuffer;
-		lBufferView    *vBufferView;
+		lArray *        vArray;
+		lTree *         vTree;
+		lString *       vString;
+		const lSymbol * vSymbol;
+		lClosure *      vClosure;
+		lNFunc *        vNFunc;
+		void *          vPointer;
+		lVal *          nextFree;
+		lBuffer *       vBuffer;
+		lBufferView *   vBufferView;
 	};
 };
 
@@ -129,10 +134,12 @@ lClosure *lLoad    (lClosure *c, const char *expr);
 
 int         lListLength   (lVal *v);
 const char *lStringData   (const lString *v);
-void *      lBufferData   (lBuffer *v);
+const void *lBufferData   (lBuffer *v);
+void *      lBufferDataMutable(lBuffer *v);
 size_t      lBufferLength (const lBuffer *v);
 static inline size_t lStringLength(const lString *v){return lBufferLength(v);}
-void *               lBufferViewData(lBufferView *v);
+const void *         lBufferViewData(lBufferView *v);
+void *               lBufferViewDataMutable(lBufferView *v);
 size_t               lBufferViewLength(const lBufferView *v);
 
 lVal *lCons(lVal *car, lVal *cdr);
@@ -150,6 +157,7 @@ static inline lVal *lCadr  (lVal *v){return lCar(lCdr(v));}
 static inline lVal *lCdar  (lVal *v){return lCdr(lCar(v));}
 static inline lVal *lCddr  (lVal *v){return lCdr(lCdr(v));}
 static inline lVal *lCaddr (lVal *v){return lCar(lCdr(lCdr(v)));}
+static inline lVal *lCadddr(lVal *v){return lCar(lCdr(lCdr(lCdr(v))));}
 
 void  lExceptionThrowRaw    (lVal *v) NORETURN;
 void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
@@ -175,6 +183,7 @@ NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
 i64             requireInt              (lClosure *c, lVal *v);
 i64             requireNaturalInt       (lClosure *c, lVal *v);
 double          requireFloat            (lClosure *c, lVal *v);
+FILE           *requireFileHandle       (lClosure *c, lVal *v);
 lArray *        requireArray            (lClosure *c, lVal *v);
 const lSymbol * requireSymbol           (lClosure *c, lVal *v);
 const lSymbol * requireKeyword          (lClosure *c, lVal *v);
@@ -233,6 +242,7 @@ lVal     *lValString       (const char *s);
 lVal     *lValStringLen    (const char *s, int len);
 lVal     *lValStringNoCopy (const char *s, int len);
 lVal     *lValBufferNoCopy (void *s, size_t len, bool immutable);
+lVal     *lValFileHandle   (FILE *fh);
 
 extern lSymbol *symNull;
 static inline const lSymbol *lGetSymbol(const lVal *v){

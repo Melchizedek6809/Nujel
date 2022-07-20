@@ -179,6 +179,8 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		return writeBuffer(cur, bufEnd, v->vBuffer, display);
 	case ltBufferView:
 		return spf(cur, bufEnd, "#<buffer-view %x>", v->vBufferView - lBufferViewList);
+	case ltFileHandle:
+		return spf(cur, bufEnd, "#<file-handle %u>", (i64)fileno(v->vFileHandle));
 	case ltNativeFunc:
 		if(v->vNFunc->name){
 			return spf(cur, bufEnd, "%s",v->vNFunc->name->c);
