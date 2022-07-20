@@ -57,6 +57,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 		} /* fall-through */
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
 	}
+	return NULL;
 }
 
 /* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
