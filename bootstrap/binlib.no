@@ -68,6 +68,80 @@
 281A29171A26070D1A2A1A2B1A2C1A2D171A2A070D1A2E1A2F1A301A31171A2E
 070D1A321A331A341A35171A32070D1A361A371A381A39171A36070D1A3A0504
 001A3B070D1A3C1A3D1A3E1A3F171A3C070D1A40051A3C05040101
+}#{##[slurp [pathname] #@[documentation: "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil." source: ["Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil." [def fh [file/open* pathname "r"]] [when-not fh [return #nil]] [try [fn [] [file/close* fh] [return #nil]] [file/seek* fh 0 2] [def size [file/tell* fh]] [file/seek* fh 0 0] [def buf [buffer/allocate [+ 1 size]]] [file/read* fh buf size] [buffer/view/set! [buffer/view/u8* buf] size 0] [file/close* fh] [buffer->string buf]]]] #{##[file/open* pathname "r" fh anonymous [] #@[source: [[file/close* fh] [return #nil]]] #{##[file/close* fh]
+1A00051A010504010D240101
+} file/seek* file/tell* size buffer/allocate buf file/read* buffer/view/set! buffer/view/u8* file/close* buffer->string]
+1A00051A01051A0204021A03070D1A03050B00072409000524010D1A041A051A
+061A071719006C1A08051A03050200020204030D1A09051A030504011A0A070D
+1A08051A03050200020004030D1A0B0502011A0A052504011A0C070D1A0D051A
+03051A0C051A0A0504030D1A0E051A0F051A0C0504011A0A05020004030D1A10
+051A030504010D1A11051A0C0504011601
+} spit [pathname content] #@[documentation: "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil." source: ["Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil." [def fh [file/open* pathname "w"]] [when-not fh [return #f]] [try [fn [] [file/close* fh] [return #f]] [file/write* fh content] [file/close* fh]] [return #t]]] #{##[file/open* pathname "w" fh anonymous [] #@[source: [[file/close* fh] [return #f]]] #{##[file/close* fh]
+1A00051A010504010D1C0101
+} file/write* content file/close*]
+1A00051A01051A0204021A03070D1A03050B0007240900051C010D1A041A051A
+061A07171900181A08051A03051A090504020D1A0A051A03050401160D1B0101
+} make-output-port make-input-port make-input/output-port tree/new output-port-method-table input-port-method-table buffer/allocate temporary-buffer buffer/view/u8* temporary-buffer-view tree/set! :file-handle anonymous [handle] #@[source: [handle]] #{##[handle]
+1A000501
+} :write-char [handle char] #@[source: [[buffer/view/set! output-port-temporary-buffer-vi 0 char] [file/write* handle output-port-temporary-buffer-vi]]] #{##[buffer/view/set! output-port-temporary-buffer-vi char file/write* handle]
+1A00051A010502001A020504030D1A03051A04051A0105040201
+} :flush-output-port [handle] #@[source: [[file/flush* handle]]] #{##[file/flush* handle]
+1A00051A0105040101
+} :block-write [handle buffer size] #@[source: [[file/write* handle buffer size]]] #{##[file/write* handle buffer size]
+1A00051A01051A02051A0305040301
+} :block-read [handle buffer size] #@[source: [[exception :type-error "Can't read from an output port" handle]]] #{##[throw list :type-error "Can't read from an output port" handle current-lambda]
+1A00051A01051A021A031A04051A050504000404040101
+} :read-char tree/ref :close-port [handle] #@[source: [[file/close* handle]]] #{##[file/close* handle]
+1A00051A0105040101
+} :file-position [handle] #@[source: [[file/tell* handle]]] #{##[file/tell* handle]
+1A00051A0105040101
+} :file-position! [handle new-position] #@[source: [[file/seek* handle new-position 0]]] #{##[file/seek* handle new-position]
+1A00051A01051A02050200040301
+} [handle char] #@[source: [[file/read* handle temporary-buffer-view 1] [buffer/view/ref temporary-buffer-view 0 char]]] #{##[file/read* handle temporary-buffer-view buffer/view/ref char]
+1A00051A01051A0205020104030D1A03051A020502001A0405040301
+} [handle buffer size] #@[source: [[file/read* handle buffer size]]] #{##[file/read* handle buffer size]
+1A00051A01051A02051A0305040301
+} [handle buffer size] #@[source: [[exception :type-error "Can't write to an input port" handle]]] #{##[throw list :type-error "Can't write to an input port" handle current-lambda]
+1A00051A01051A021A031A04051A050504000404040101
+} [handle] #@[documentation: "\n" source: ["" [fn [method . args] [apply [tree/ref output-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref output-port-method-table method] [cons handle args]]]] #{##[apply tree/ref output-port-method-table method handle args]
+1A00051A01051A02051A030504021A04051A050514040201
+}]
+1A001A011A021A031701
+} [handle] #@[documentation: "\n" source: ["" [fn [method . args] [apply [tree/ref input-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref input-port-method-table method] [cons handle args]]]] #{##[apply tree/ref input-port-method-table method handle args]
+1A00051A01051A02051A030504021A04051A050514040201
+}]
+1A001A011A021A031701
+} stdin* stdin current-input-port [] #@[source: [stdin]] #{##[stdin]
+1A000501
+} current-input-port! [nport] #@[source: [[set! stdin nport]]] #{##[nport stdin]
+1A00051A010801
+} stdout* stdout current-output-port [] #@[source: [stdout]] #{##[stdout]
+1A000501
+} current-output-port! [nport] #@[source: [[set! stdout nport]]] #{##[nport stdout]
+1A00051A010801
+} stderr* stderr current-error-port [] #@[source: [stderr]] #{##[stderr]
+1A000501
+} current-error-port! [nport] #@[source: [[set! stderr nport]]] #{##[nport stderr]
+1A00051A010801
+}]
+1A001A011A021A03171A00070D1A041A051A061A07171A04070D241A08070D24
+1A09070D241A0A070D151A0B052404011A0C070D1A0B052404011A0D070D1A0E
+05020104011A0F070D1A10051A0F0504011A11070D1A12051A0C051A131A141A
+151A161A171704030D1A12051A0C051A181A141A191A1A1A1B1704030D1A1205
+1A0C051A1C1A141A1D1A1E1A1F1704030D1A12051A0C051A201A141A211A221A
+231704030D1A12051A0C051A241A141A251A261A271704030D1A12051A0C051A
+281A29051A0C051A24040204030D1A12051A0C051A2A1A141A2B1A2C1A2D1704
+030D1A12051A0C051A2E1A141A2F1A301A311704030D1A12051A0C051A321A14
+1A331A341A351704030D1A12051A0D051A281A141A361A371A381704030D1A12
+051A0D051A241A141A391A3A1A3B1704030D1A12051A0D051A201A141A3C1A3D
+1A3E1704030D1A12051A0D051A181A29051A0C051A20040204030D1A12051A0D
+051A2A1A29051A0C051A2A040204030D1A12051A0D051A131A29051A0C051A13
+040204030D1A12051A0D051A2E1A29051A0C051A2E040204030D1A12051A0D05
+1A321A29051A0C051A32040204030D1A141A3F1A401A41171A08080D1A141A42
+1A431A44171A0908160D1A09051A450504011A46070D1A471A481A491A4A171A
+47070D1A4B1A4C1A4D1A4E171A4B070D1A08051A4F0504011A50070D1A511A52
+1A531A54171A51070D1A551A561A571A58171A55070D1A08051A590504011A5A
+070D1A5B1A5C1A5D1A5E171A5B070D1A5F1A601A611A62171A5F0701
 }#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 1A00051A0105040101
 } repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]

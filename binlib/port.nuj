@@ -84,5 +84,13 @@
 
 
 [def stdin [make-input-port stdin*]]
+[defn current-input-port [] stdin]
+[defn current-input-port! [nport] [set! stdin nport]]
+
 [def stdout [make-output-port stdout*]]
+[defn current-output-port [] stdout]
+[defn current-output-port! [nport] [set! stdout nport]]
+
 [def stderr [make-output-port stderr*]]
+[defn current-error-port [] stderr]
+[defn current-error-port! [nport] [set! stderr nport]]
