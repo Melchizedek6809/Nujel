@@ -125,6 +125,4 @@ void lAddPlatformVars(lClosure *c){
 	valArch = lValSym("unknown");
 	#endif
 	lDefineVal(c, "System/Architecture", valArch);
-	lDefineVal(c, "exports", lValTree(NULL));
-	lDefineVal(c, "*module*", lValKeyword("core"));
 }

@@ -76,14 +76,6 @@ static void lBytecodeTrace(const lThread *ctx, lBytecodeOp *ip, const lBytecodeA
 		pf("%V%s", ctx->valueStack[i], i>0?" ":"");
 	}
 	pf("]\n");
-	if(ctx->csp < 0){
-		epf("CSP Error!");
-		exit(1);
-	}
-	if(ctx->sp < 0){
-		epf("SP Error!");
-		exit(1);
-	}
 }
 
 
@@ -357,14 +349,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
 		lVal *cArgs = ctx.valueStack[--ctx.sp];
 		lVal *cName = ctx.valueStack[--ctx.sp];
-		if(unlikely(cBody && cBody->type == ltNoAlloc)){
-			pf("SP: %i CSP: %i\n", (i64)ctx.sp, (i64)ctx.csp);
-			pf("%V\n",cBody);
-			pf("%V\n",cDocs);
-			pf("%V\n",cArgs);
-			pf("%V\n",cName);
-			//*((u8 *)NULL)=0;
-		}
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;

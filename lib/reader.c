@@ -315,7 +315,7 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 		if((len+4) >= size){
 			size = MAX(size,128) * 2;
 			u8 *newD = realloc(d, size);
-			if (unlikely(newD == NULL)) {
+			if(unlikely(newD == NULL)){
 				free(d);
 				lExceptionThrowValClo("out-of-memory", "OOM during BC Arr Parse", NULL, s->c);
 				return NULL;
@@ -354,7 +354,7 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 }
 
 static u8 lReadNibble(lReadContext *s, const u8 c){
-	if(c < '0'){lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");}
+	if(c <  '0'){lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");}
 	if(c <= '9'){
 		return c - '0';
 	}else{

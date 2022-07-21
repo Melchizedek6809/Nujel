@@ -365,12 +365,6 @@ char *spf(char *cur, char *bufEnd, const char *format, ...){
 	return ret;
 }
 
-void vfpf(FILE *fp, const char *format, va_list va){
-	char buf[BUF_SIZE];
-	char *ret = vspf(buf,buf + sizeof(buf), format, va);
-	fwrite(buf, ret - buf, 1, fp);
-}
-
 void fpf(FILE *fp, const char *format, ...){
 	char buf[BUF_SIZE];
 	va_list va;

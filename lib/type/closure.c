@@ -90,6 +90,10 @@ lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
 	return NULL;
 }
 
+lVal *lResolveVal(lClosure *c, const char *str){
+	return lGetClosureSym(c, lSymS(str));
+}
+
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */
 void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 	c->data = lTreeInsert(c->data,s,v);

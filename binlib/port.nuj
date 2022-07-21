@@ -66,9 +66,13 @@
 
 
   [tree/set! input-port-method-table :read-char [fn [handle char]
+                                                    [when [file/eof*? handle]
+                                                          [return :end-of-file]]
                                                     [file/read* handle temporary-buffer-view 1]
                                                   [buffer/view/ref temporary-buffer-view 0 char]]]
   [tree/set! input-port-method-table :block-read [fn [handle buffer size]
+                                                     [when [file/eof*? handle]
+                                                          [return :end-of-file]]
                                                        [file/read* handle buffer size]]]
   [tree/set! input-port-method-table :block-write [fn [handle buffer size]
                                                       [exception :type-error "Can't write to an input port" handle]]]
@@ -79,15 +83,16 @@
   [tree/set! input-port-method-table :file-position! [tree/ref output-port-method-table :file-position!]]
 
 
+
   [set! make-output-port [fn [handle]
                              ""
-                           [fn [method . args]
-                               [apply [tree/ref output-port-method-table method] [cons handle args]]]]]
+                           [def self [fn [method . args]
+                                         [apply [tree/ref output-port-method-table method] [cons handle args]]]]]]
 
   [set! make-input-port [fn [handle]
                              ""
-                           [fn [method . args]
-                               [apply [tree/ref input-port-method-table method] [cons handle args]]]]]
+                           [def self [fn [method . args]
+                                         [apply [tree/ref input-port-method-table method] [cons handle args]]]]]]
 ]
 
 
@@ -110,3 +115,24 @@
 [defn error [v]
       "Prints v on the standard error port"
       [stderr 'block-write [string v]]]
+
+[defn read-line/raw [port buf]
+      "Reads in a line of user input and returns it"
+      [def i 0]
+      [def c 0]
+      [def view [buffer/view/u8* buf]]
+      [while #t
+             [while [>= i [buffer/length buf]]
+                    [buffer/length! [+ 128 [buffer/length buf]]]]
+             [set! c [port 'read-char]]
+             [when [or [== c #\lf]
+                       [== c :end-of-file]]
+                   [return i]]
+             [buffer/view/set! view i c]
+             [set! i [inc i]]]]
+
+[defn read-line []
+      "Reads in a line of user input and returns it"
+      [def buf [buffer/allocate 128]]
+      [buffer->string buf [read-line/raw stdin buf]]]
+[def input read-line]

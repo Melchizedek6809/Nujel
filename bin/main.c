@@ -39,27 +39,6 @@ static lClosure *createRootClosure(){
 	return c;
 }
 
-/* Parse options that might radically alter runtime behaviour, like running
- * without the stdlib (probably for using an alternative build of the stdlib ) */
-static lClosure *parsePreOptions(int argc, char *argv[]){
-	lClosure *c = NULL;
-	for(int i=1;i<argc;i++){
-		if(argv[i][0] == '-'){
-			for(const char *opts = &argv[i][1];*opts && (*opts != '-');opts++){
-				switch(*opts){
-				case 'v':
-					lVerbose = true;
-					break;
-				}
-			}
-		}
-	}
-	if(c == NULL){c = createRootClosure();}
-	return c;
-}
-
-lVal *replInitSym;
-
 /* Initialize the Nujel context with an stdlib as well
  * as parsing arguments passed to the runtime */
 int initNujel(int argc, char *argv[], lClosure *c){
@@ -68,9 +47,7 @@ int initNujel(int argc, char *argv[], lClosure *c){
 	for(int i = argc-1; i >= 0; i--){
 		ret = lCons(lValString(argv[i]), ret);
 	}
-	replInitSym = lValSym("repl/init");
-	lVal *fun = lGetClosureSym(c, replInitSym->vSymbol);
-	lApply(c, ret, fun);
+	lApply(c, ret, lResolveVal(c, "repl/init"));
 	return 0;
 }
 
@@ -83,5 +60,5 @@ int main(int argc, char *argv[]){
 	lInit();
 	setIOSymbols();
 
-	return initNujel(argc,argv,parsePreOptions(argc,argv));
+	return initNujel(argc,argv,createRootClosure());
 }

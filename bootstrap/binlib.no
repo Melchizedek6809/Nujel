@@ -100,20 +100,22 @@
 1A00051A0105040101
 } :file-position! [handle new-position] #@[source: [[file/seek* handle new-position 0]]] #{##[file/seek* handle new-position]
 1A00051A01051A02050200040301
-} [handle char] #@[source: [[file/read* handle temporary-buffer-view 1] [buffer/view/ref temporary-buffer-view 0 char]]] #{##[file/read* handle temporary-buffer-view buffer/view/ref char]
-1A00051A01051A0205020104030D1A03051A020502001A0405040301
-} [handle buffer size] #@[source: [[file/read* handle buffer size]]] #{##[file/read* handle buffer size]
-1A00051A01051A02051A0305040301
+} [handle char] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle temporary-buffer-view 1] [buffer/view/ref temporary-buffer-view 0 char]]] #{##[file/eof*? handle :end-of-file file/read* temporary-buffer-view buffer/view/ref char]
+1A00051A010504010B00091A0201090004240D1A03051A01051A040502010403
+0D1A05051A040502001A0605040301
+} [handle buffer size] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle buffer size]]] #{##[file/eof*? handle :end-of-file file/read* buffer size]
+1A00051A010504010B00091A0201090004240D1A03051A01051A04051A050504
+0301
 } [handle buffer size] #@[source: [[exception :type-error "Can't write to an input port" handle]]] #{##[throw list :type-error "Can't write to an input port" handle current-lambda]
 1A00051A01051A021A031A04051A050504000404040101
-} [handle] #@[documentation: "\n" source: ["" [fn [method . args] [apply [tree/ref output-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref output-port-method-table method] [cons handle args]]]] #{##[apply tree/ref output-port-method-table method handle args]
+} [handle] #@[documentation: "\n" source: ["" [def self [fn [method . args] [apply [tree/ref output-port-method-table method] [cons handle args]]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref output-port-method-table method] [cons handle args]]]] #{##[apply tree/ref output-port-method-table method handle args]
 1A00051A01051A02051A030504021A04051A050514040201
-}]
-1A001A011A021A031701
-} [handle] #@[documentation: "\n" source: ["" [fn [method . args] [apply [tree/ref input-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref input-port-method-table method] [cons handle args]]]] #{##[apply tree/ref input-port-method-table method handle args]
+} self]
+1A001A011A021A03171A040701
+} [handle] #@[documentation: "\n" source: ["" [def self [fn [method . args] [apply [tree/ref input-port-method-table method] [cons handle args]]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref input-port-method-table method] [cons handle args]]]] #{##[apply tree/ref input-port-method-table method handle args]
 1A00051A01051A02051A030504021A04051A050514040201
-}]
-1A001A011A021A031701
+} self]
+1A001A011A021A03171A040701
 } stdin* stdin current-input-port [] #@[source: [stdin]] #{##[stdin]
 1A000501
 } current-input-port! [nport] #@[source: [[set! stdin nport]]] #{##[nport stdin]
@@ -130,7 +132,15 @@
 1A00051A011A02051A03050401040201
 } error [v] #@[documentation: "Prints v on the standard error port" source: ["Prints v on the standard error port" [stderr 'block-write [string v]]]] #{##[stderr block-write string v]
 1A00051A011A02051A03050401040201
-}]
+} read-line/raw [port buf] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def i 0] [def c 0] [def view [buffer/view/u8* buf]] [while #t [while [>= i [buffer/length buf]] [buffer/length! [+ 128 [buffer/length buf]]]] [set! c [port 'read-char]] [when [or [== c 10] [== c :end-of-file]] [return i]] [buffer/view/set! view i c] [set! i [inc i]]]]] #{##[i c buffer/view/u8* buf view buffer/length! 128 buffer/length port read-char :end-of-file #f buffer/view/set!]
+02001A00070D02001A01070D1A02051A030504011A04070D240900700D240900
+140D1A05051A061A07051A030504012504011A00051A07051A03050401210AFF
+E30D1A08051A0904011A01080D1A0105020A200C0A00110D1A01051A0A200C0A
+00060D1A0B0B000A1A000501090004240D1A0C051A04051A00051A010504030D
+02011A0005251A00081B0AFF9201
+} read-line [] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def buf [buffer/allocate 128]] [buffer->string buf [read-line/raw stdin buf]]]] #{##[buffer/allocate 128 buf buffer->string read-line/raw stdin]
+1A00051A0104011A02070D1A03051A02051A04051A05051A02050402040201
+} input]
 1A001A011A021A03171A00070D1A00051A04070D1A051A061A071A08171A0507
 0D1A05051A09070D1A0A1A0B1A0C1A0D171A0A070D1A0E1A0F1A101A11171A0E
 070D241A12070D241A13070D241A14070D151A15052404011A16070D1A150524
@@ -150,7 +160,8 @@
 1A521A531A54171A51070D1A551A561A571A58171A55070D1A12051A59050401
 1A5A070D1A5B1A5C1A5D1A5E171A5B070D1A5F1A601A611A62171A5F070D1A12
 051A630504011A64070D1A651A661A671A68171A65070D1A691A6A1A6B1A6C17
-1A69070D1A6D1A6E1A6F1A70171A6D070D1A711A721A731A74171A710701
+1A69070D1A6D1A6E1A6F1A70171A6D070D1A711A721A731A74171A71070D1A75
+1A761A771A78171A75070D1A791A7A1A7B1A7C171A79070D1A79051A7D0701
 }#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 1A00051A0105040101
 } repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]

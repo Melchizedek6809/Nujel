@@ -333,8 +333,8 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFuncPureFold(c,"bit-xor",  "[a b]", "Bitwise exclusive or", lnfLogXor);
 	lAddNativeFuncPureFold(c,"bit-not",  "[a]",   "Bitwise not",          lnfLogNot);
 
-	lAddNativeFuncPure(c,"bit-shift-left",     "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
-	lAddNativeFuncPure(c,"popcount","[val]",       "Return amount of bits set in VAL",lnfPopCount);
+	lAddNativeFuncPure(c,"bit-shift-left", "[val amount]","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFuncPure(c,"popcount",       "[val]",       "Return amount of bits set in VAL",lnfPopCount);
 
 	lAddNativeFuncPure(c,"abs",  "[a]", "Return the absolute value of a", lnfAbs);
 	lAddNativeFuncPure(c,"sqrt", "[a]", "Return the square root of a",    lnfSqrt);

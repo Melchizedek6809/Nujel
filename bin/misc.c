@@ -24,8 +24,6 @@
 #include <shlobj.h>
 #endif
 
-void lWidgetMarkI(uint i){(void)i;}
-
 /* Return true if name is a directory */
 int isDir(const char *name){
 #ifdef _MSC_VER

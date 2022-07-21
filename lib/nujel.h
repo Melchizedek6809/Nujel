@@ -125,8 +125,6 @@ struct lVal {
 /*
  | Some pretty core Nujel procedures
  */
-extern bool lVerbose;
-
 void      lInit    ();
 lClosure *lNewRoot ();
 lVal     *lApply   (lClosure *c, lVal *args, lVal *fun);
@@ -206,6 +204,7 @@ lVal     *lGetClosureSym     (lClosure *c, const lSymbol *s);
 void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal *v);
 bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 void      lDefineVal         (lClosure *c, const char *str,  lVal *v);
+lVal     *lResolveVal        (lClosure *c, const char *str);
 
 lVal     *lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
 lVal     *lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));

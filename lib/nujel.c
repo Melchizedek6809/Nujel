@@ -13,8 +13,6 @@ jmp_buf exceptionTarget;
 lVal *exceptionValue;
 int exceptionTargetDepth = 0;
 
-bool lVerbose    = false;
-
 /* Initialize the allocator and symbol table, needs to be called before as
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
@@ -86,6 +84,8 @@ lClosure *lNewRoot(){
 	c->type = closureRoot;
 	lOperationsBase(c);
 	lAddPlatformVars(c);
+	lDefineVal(c,"exports",  lValTree(NULL));
+	lDefineVal(c,"*module*", lValKeyword("core"));
 	return lLoad(c, (const char *)stdlib_no_data);
 }
 

@@ -282,9 +282,9 @@ static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
 }
 
 void lOperationsCore(lClosure *c){
-	lAddNativeFuncPure(c,"quote",   "[v]",   "Return v as is without evaluating", lnfQuote);
-	lAddNativeFuncPure(c,"read",    "[str]", "Read and Parses STR as an S-Expression", lnfRead);
-	lAddNativeFunc(c,"throw",   "[v]",   "Throw V to the closest exception handler", lnfThrow);
+	lAddNativeFuncPure(c,"quote", "[v]",   "Return v as is without evaluating", lnfQuote);
+	lAddNativeFuncPure(c,"read",  "[str]", "Read and Parses STR as an S-Expression", lnfRead);
+	lAddNativeFunc    (c,"throw", "[v]",   "Throw V to the closest exception handler", lnfThrow);
 
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
@@ -307,10 +307,10 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
 	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
 
-	lAddNativeFuncPure(c,"car",  "[list]",     "Returs the head of LIST",          lnfCar);
-	lAddNativeFuncPure(c,"cdr",  "[list]",     "Return the rest of LIST",          lnfCdr);
-	lAddNativeFuncPure(c,"cons", "[car cdr]",  "Return a new pair of CAR and CDR", lnfCons);
-	lAddNativeFunc(c,"nreverse","[list]",  "Return LIST in reverse order, fast but mutates", lnfNReverse);
+	lAddNativeFuncPure(c,"car",     "[list]",    "Returs the head of LIST",          lnfCar);
+	lAddNativeFuncPure(c,"cdr",     "[list]",    "Return the rest of LIST",          lnfCdr);
+	lAddNativeFuncPure(c,"cons",    "[car cdr]", "Return a new pair of CAR and CDR", lnfCons);
+	lAddNativeFuncPure(c,"nreverse","[list]",    "Return LIST in reverse order, fast but mutates", lnfNReverse);
 
 	lAddNativeFunc(c,"time",   "          []", "Return the current unix time",lnfTime);
 	lAddNativeFunc(c,"time/milliseconds","[]", "Return monotonic msecs",lnfTimeMsecs);

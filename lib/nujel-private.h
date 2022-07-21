@@ -382,9 +382,17 @@ lVal *lnfTreeNew (lClosure *c, lVal *v);
 
 
 /*
- | Some operations
+ | Operations
  */
-void lOperationsBase(lClosure *c);
+void lOperationsBase       (lClosure *c);
+void lOperationsArithmetic (lClosure *c);
+void lOperationsArray      (lClosure *c);
+void lOperationsBuffer     (lClosure *c);
+void lOperationsBytecode   (lClosure *c);
+void lOperationsCore       (lClosure *c);
+void lOperationsSpecial    (lClosure *c);
+void lOperationsString     (lClosure *c);
+void lOperationsTree       (lClosure *c);
 
 lVal *lAdd(lClosure *c, lVal *a, lVal *b);
 lVal *lSub(lClosure *c, lVal *a, lVal *b);

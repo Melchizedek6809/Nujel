@@ -5,7 +5,7 @@
 #endif
 
 
-lVal *lnfFileOpen(lClosure *c, lVal *v){
+static lVal *lnfFileOpen(lClosure *c, lVal *v){
 	lString *pathname = requireString(c, lCar(v));
 	lString *mode     = requireString(c, lCadr(v));
 
@@ -13,13 +13,13 @@ lVal *lnfFileOpen(lClosure *c, lVal *v){
 	return fh ? lValFileHandle(fh) : NULL;
 }
 
-lVal *lnfFileClose(lClosure *c, lVal *v){
+static lVal *lnfFileClose(lClosure *c, lVal *v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	fclose(fh);
 	return NULL;
 }
 
-lVal *lnfFileReadAst(lClosure *c, lVal *v){
+static lVal *lnfFileReadAst(lClosure *c, lVal *v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	lVal *contentV = lCadr(v);
 	const i64 size = requireNaturalInt(c, lCaddr(v));
@@ -57,7 +57,7 @@ lVal *lnfFileReadAst(lClosure *c, lVal *v){
 	return lCar(v);
 }
 
-lVal *lnfFileWriteAst(lClosure *c, lVal *v){
+static lVal *lnfFileWriteAst(lClosure *c, lVal *v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	lVal *contentV = lCadr(v);
 	i64 size = castToInt(lCaddr(v), -1);
@@ -103,20 +103,20 @@ lVal *lnfFileWriteAst(lClosure *c, lVal *v){
 	return lCar(v);
 }
 
-lVal *lnfFileFlush(lClosure *c, lVal *v){
+static lVal *lnfFileFlush(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	FILE *fh = requireFileHandle(c, car);
 	fflush(fh);
 	return car;
 }
 
-lVal *lnfFileTell(lClosure *c, lVal *v){
+static lVal *lnfFileTell(lClosure *c, lVal *v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	const i64 pos = ftell(fh);
 	return lValInt(pos);
 }
 
-lVal *lnfFileSeek(lClosure *c, lVal *v){
+static lVal *lnfFileSeek(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	FILE *fh = requireFileHandle(c, car);
 	const i64 offset = requireInt(c, lCadr(v));
@@ -129,6 +129,14 @@ lVal *lnfFileSeek(lClosure *c, lVal *v){
 	return car;
 }
 
+static lVal *lnfFileEof(lClosure *c, lVal *v){
+	return lValBool(feof(requireFileHandle(c, lCar(v))));
+}
+
+static lVal *lnfFileError(lClosure *c, lVal *v){
+	return lValBool(ferror(requireFileHandle(c, lCar(v))));
+}
+
 void lOperationsPort(lClosure *c){
 	lAddNativeFunc(c,"file/open*",  "[pathname mode]",             "Try to open PATHNAME for MODE",        lnfFileOpen);
 	lAddNativeFunc(c,"file/close*", "[handle]",                    "Close the open HANDLE",                lnfFileClose);
@@ -137,6 +145,8 @@ void lOperationsPort(lClosure *c){
 	lAddNativeFunc(c,"file/flush*", "[handle]",                    "Flush stream of HANDLE",               lnfFileFlush);
 	lAddNativeFunc(c,"file/tell*",  "[handle]",                    "Return the stream position of HANDLE", lnfFileTell);
 	lAddNativeFunc(c,"file/seek*",  "[handle offset whence]",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
+	lAddNativeFunc(c,"file/eof*?",  "[handle]",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
+	lAddNativeFunc(c,"file/error*?","[handle]",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
 }
 
 void lOperationsInit(lClosure *c){

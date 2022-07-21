@@ -68,30 +68,11 @@ void setIOSymbols(){
 	lsNamedPipe        = lSymSM("named-pipe?");
 }
 
-extern uint symbolLookups;
-extern uint tombLookups;
-
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	(void)c;
-	if(lVerbose){
-		pf("\nLookups %u/%u == %f\n", (i64)symbolLookups, (i64)tombLookups, (double)tombLookups / (double)symbolLookups);
-	}
 	lVal *car = lCar(v);
 	exit((car && (car->type == ltInt)) ? car->vInt : 0);
 	return NULL;
-}
-
-static lVal *lnfInput(lClosure *c, lVal *v){
-	(void)c;
-	const char *prompt = castToString(lCar(v),NULL);
-	if(prompt != NULL){
-		pf("%s",prompt);
-	}
-	char buf[4096];
-	if(fgets(buf,sizeof(buf),stdin) == NULL){
-		return NULL;
-	}
-	return lValString(buf);
 }
 
 #ifdef __EMSCRIPTEN__
@@ -265,7 +246,8 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 #endif
 
 static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
-	lString *path = requireString(c, lCar(v));
+	(void)c;
+	const char *path = castToString(lCar(v), "./");
 	const bool showHidden = castToBool(lCadr(v));
 
 #ifdef _MSC_VER
@@ -276,13 +258,13 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 	HANDLE hFind = INVALID_HANDLE_VALUE;
 	DWORD dwError = 0;
 
-	StringCchLength(lStringData(path), MAX_PATH, &length_of_arg);
+	StringCchLength(path, MAX_PATH, &length_of_arg);
 	if (length_of_arg > (MAX_PATH - 3)){
 		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
 		return NULL;
 	}
 
-	StringCchCopy(szDir, MAX_PATH, lStringData(path));
+	StringCchCopy(szDir, MAX_PATH, path);
 	StringCchCat(szDir, MAX_PATH, TEXT("\\*"));
 
 	hFind = FindFirstFile(szDir, &ffd);
@@ -303,7 +285,7 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
    } while (FindNextFile(hFind, &ffd) != 0);
    return ret;
 #else
-	DIR *dp = opendir(lStringData(path));
+	DIR *dp = opendir(path);
 	if(dp == NULL){return NULL;}
 	lVal *ret = NULL;
 	lVal *cur = NULL;
@@ -351,18 +333,17 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
-	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
-	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
+	lAddNativeFunc(c,"exit",                       "[a]",            "Quits with code a",                                 lnfQuit);
+	lAddNativeFunc(c,"popen",                      "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 
-	lAddNativeFunc(c,"file/remove",      "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
-	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
-	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
+	lAddNativeFunc(c,"file/remove",                "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
+	lAddNativeFunc(c,"file/stat",                  "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
+	lAddNativeFunc(c,"file/temp",                  "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
 
-	lAddNativeFunc(c,"ls directory/read",   "[path show-hidden]",   "Return all files within $PATH",               lnfDirectoryRead);
-	lAddNativeFunc(c,"rmdir directory/remove", "[path]",               "Remove empty directory at PATH",              lnfDirectoryRemove);
-	lAddNativeFunc(c,"mkdir directory/make",   "[path]",               "Create a new empty directory at PATH",        lnfDirectoryMake);
+	lAddNativeFunc(c,"ls directory/read",          "[path show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
+	lAddNativeFunc(c,"rmdir directory/remove",     "[path]",             "Remove empty directory at PATH",              lnfDirectoryRemove);
+	lAddNativeFunc(c,"mkdir directory/make",       "[path]",             "Create a new empty directory at PATH",        lnfDirectoryMake);
 
-	lAddNativeFunc(c,"cd path/change",      "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
-	lAddNativeFunc(c,"cwd path/working-directory","[]",        "Return the current working directory",              lnfGetCurrentWorkingDirectory);
+	lAddNativeFunc(c,"cd path/change",             "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
+	lAddNativeFunc(c,"cwd path/working-directory", "[]",             "Return the current working directory",              lnfGetCurrentWorkingDirectory);
 }

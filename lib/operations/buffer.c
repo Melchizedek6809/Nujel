@@ -102,7 +102,11 @@ static lVal *lnfStringToBuffer(lClosure *c, lVal *v){
 
 static lVal *lnfBufferToString(lClosure *c, lVal *v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
-	return lValStringLen(buf->buf, buf->length);
+	const i64 length = castToInt(lCadr(v), buf->length);
+	if(length < 0){
+		lExceptionThrowValClo("type-error", "Length has to be greater than 0", lCadr(v), c);
+	}
+	return lValStringLen(buf->buf, length);
 }
 
 static lVal *bufferView(lClosure *c, lVal *v, lBufferViewType T){
@@ -222,7 +226,7 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeFunc(c, "buffer/copy",            "[buf immutable?]", "Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy);
 
 	lAddNativeFunc(c, "string->buffer",         "[str immutable?]", "Copy STR into a buffer and return it", lnfStringToBuffer);
-	lAddNativeFunc(c, "buffer->string",         "[buf]",            "Turn BUF into a string", lnfBufferToString);
+	lAddNativeFunc(c, "buffer->string",         "[buf length]",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString);
 
 	lAddNativeFunc(c, "buffer/view/u8*",        "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewU8);
 	lAddNativeFunc(c, "buffer/view/s8*",        "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewS8);
