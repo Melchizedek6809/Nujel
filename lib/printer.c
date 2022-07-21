@@ -84,7 +84,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 
 static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 	const lVal *carSym = v->vList.car;
-	if((carSym != NULL) && (carSym->type == ltSymbol))		{
+	if((carSym != NULL) && (carSym->type == ltSymbol)){
 		if((carSym->vSymbol == symQuote)
 		   && (v->vList.cdr != NULL)
 		   && (v->vList.cdr->type == ltPair)
@@ -94,17 +94,14 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 		}
 	}
 	char *openingBracket = cur;
-	if(v && (v->type == ltPair) && (v->vList.car == NULL) && (v->vList.cdr == NULL)){
-		cur++;
-	}else{
-		for(const lVal *n = v;n != NULL; n = n->vList.cdr){
-			if(n->type == ltPair){
-				const lVal *cv = n->vList.car;
-				cur = spf(cur, bufEnd, display ? " %V" : " %v", cv);
-			}else{
-				cur = spf(cur, bufEnd, display ? " . %V" : " . %v", n);
-				break;
-			}
+
+	for(const lVal *n = v;n != NULL; n = n->vList.cdr){
+		if(n->type == ltPair){
+			const lVal *cv = n->vList.car;
+			cur = spf(cur, bufEnd, display ? " %V" : " %v", cv);
+		}else{
+			cur = spf(cur, bufEnd, display ? " . %V" : " . %v", n);
+			break;
 		}
 	}
 	*openingBracket = '[';
