@@ -22,7 +22,8 @@ static const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopDrop:            return "drop";
 	case lopDef:             return "def";
 	case lopSet:             return "set";
-	case lopGet:             return "get";
+	case lopGetVal:          return "get/val";
+	case lopGetValExt:       return "get/val/ext";
 	case lopCar:             return "car";
 	case lopCdr:             return "cdr";
 	case lopClosurePush:     return "closure/push";
@@ -290,11 +291,21 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lDefineClosureSym(c, sym, ctx.valueStack[ctx.sp - 2]);
 		ctx.sp--;
 		break; }
-	case lopGet:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "get");}
-		if(unlikely(ctx.valueStack[ctx.sp-1]->type != ltSymbol)){throwTypeError(c, ctx.valueStack[ctx.sp-1], ltSymbol);}
-		ctx.valueStack[ctx.sp-1] = lGetClosureSym(c, ctx.valueStack[ctx.sp-1]->vSymbol);
-		break;
+	case lopGetVal: {
+		const uint v = *ip++;
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "GetVal");}
+		lVal *s = ops->literals->data[v];
+		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
+		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, s->vSymbol);;
+		break; }
+	case lopGetValExt: {
+		const uint v = (ip[0] << 8) | (ip[1]);
+		ip += 2;
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "GetVal");}
+		lVal *s = ops->literals->data[v];
+		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
+		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, s->vSymbol);;
+		break; }
 	case lopZeroPred: {
 		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
 		lVal *a = ctx.valueStack[ctx.sp-1];
