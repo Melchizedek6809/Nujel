@@ -84,6 +84,22 @@
       [list #$E
             [list :literal v]]]
 
+[defn $set/val [v]
+      "[v] -> [v]"
+      "Resolve V and get the associated value on the stack"
+      [when-not [symbol? v]
+            [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
+      [list #$5
+            [list :literal v]]]
+
+[defn $def/val [v]
+      "[v] -> [v]"
+      "Resolve V and get the associated value on the stack"
+      [when-not [symbol? v]
+            [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
+      [list #$7
+            [list :literal v]]]
+
 [defn $jt [target]
       [list #$A
             [list :relocate target 8 0 [int->bytecode-op 0]]
@@ -178,6 +194,24 @@
              [cons [if [pair? index-op]
                        #$F
                        #$E]
+                   [cons index-op
+                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
+            [[and [= [car code] #$5]
+                  [= [car [cadr code]] :literal]]
+             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+             [def index-op [assemble/add-literal [cadar code] lit-arr]]
+             [cons [if [pair? index-op]
+                       #$10
+                       #$5]
+                   [cons index-op
+                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
+           [[and [= [car code] #$7]
+                  [= [car [cadr code]] :literal]]
+             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+             [def index-op [assemble/add-literal [cadar code] lit-arr]]
+             [cons [if [pair? index-op]
+                       #$8
+                       #$7]
                    [cons index-op
                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
             [[= :literal [car code]]

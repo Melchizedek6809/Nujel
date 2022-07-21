@@ -20,8 +20,11 @@ static const char *lBytecodeGetOpcodeName(const lBytecodeOp op){
 	case lopJf:              return "jf";
 	case lopDup:             return "dup";
 	case lopDrop:            return "drop";
-	case lopDef:             return "def";
-	case lopSet:             return "set";
+	case lopDefOld:          return "def";
+	case lopDefVal:          return "def/val";
+	case lopDefValExt:       return "def/val/ext";
+	case lopSetVal:          return "set/val";
+	case lopSetValExt:       return "set/val/ext";
 	case lopGetVal:          return "get/val";
 	case lopGetValExt:       return "get/val/ext";
 	case lopCar:             return "car";
@@ -274,37 +277,56 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopJt:
 		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
-	case lopJf:
+	case lopJf: {
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
-	case lopSet: {
-		if(unlikely(ctx.sp < 2)){throwStackUnderflowError(c, "def");}
-		if(unlikely(ctx.valueStack[ctx.sp-1]->type != ltSymbol)){throwTypeError(c, ctx.valueStack[ctx.sp-1], ltSymbol);}
-		const lSymbol *sym = ctx.valueStack[ctx.sp - 1]->vSymbol;
-		lSetClosureSym(c, sym, ctx.valueStack[ctx.sp - 2]);
-		ctx.sp--;
-		break; }
-	case lopDef: {
-		if(unlikely(ctx.sp < 2)){throwStackUnderflowError(c, "def");}
-		if(unlikely(ctx.valueStack[ctx.sp-1]->type != ltSymbol)){throwTypeError(c, ctx.valueStack[ctx.sp-1], ltSymbol);}
-		const lSymbol *sym = ctx.valueStack[ctx.sp - 1]->vSymbol;
-		lDefineClosureSym(c, sym, ctx.valueStack[ctx.sp - 2]);
-		ctx.sp--;
-		break; }
-	case lopGetVal: {
+
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "def/val");}
 		const uint v = *ip++;
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "GetVal");}
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "def/val");}
 		lVal *s = ops->literals->data[v];
 		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
-		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, s->vSymbol);;
+		lDefineClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
+		break; }
+	case lopDefValExt: {
+		uint v;
+		v = (ip[0] << 8) | (ip[1]);
+		ip += 2;
+		goto defValBody;
+	case lopDefVal:
+		v = *ip++;
+		defValBody:
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "def/val/ext");}
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "def/val/ext");}
+		lVal *s = ops->literals->data[v];
+		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
+		lDefineClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
 		break; }
 	case lopGetValExt: {
-		const uint v = (ip[0] << 8) | (ip[1]);
+		uint v;
+		v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
+		goto getValBody;
+	case lopGetVal:
+		v = *ip++;
+		getValBody:
 		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "GetVal");}
 		lVal *s = ops->literals->data[v];
 		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, s->vSymbol);;
+		break; }
+	case lopSetValExt: {
+		uint v = (ip[0] << 8) | (ip[1]);
+		ip += 2;
+		goto setValBody;
+	case lopSetVal:
+		v = *ip++;
+		setValBody:
+		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "set/val");}
+		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "set/val");}
+		lVal *s = ops->literals->data[v];
+		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
+		lSetClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
 		break; }
 	case lopZeroPred: {
 		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
