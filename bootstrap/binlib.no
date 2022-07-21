@@ -123,6 +123,10 @@
 1A000501
 } current-error-port! [nport] #@[source: [[set! stderr nport]]] #{##[nport stderr]
 1A00051A010801
+} print [v] #@[documentation: "Display V on the standard output port" source: ["Display V on the standard output port" [stdout 'block-write [string v]]]] #{##[stdout block-write string v]
+1A00051A011A02051A03050401040201
+} error [v] #@[documentation: "Prints v on the standard error port" source: ["Prints v on the standard error port" [stderr 'block-write [string v]]]] #{##[stderr block-write string v]
+1A00051A011A02051A03050401040201
 }]
 1A001A011A021A03171A00070D1A041A051A061A07171A04070D241A08070D24
 1A09070D241A0A070D151A0B052404011A0C070D1A0B052404011A0D070D1A0E
@@ -141,7 +145,8 @@
 1A431A44171A0908160D1A09051A450504011A46070D1A471A481A491A4A171A
 47070D1A4B1A4C1A4D1A4E171A4B070D1A08051A4F0504011A50070D1A511A52
 1A531A54171A51070D1A551A561A571A58171A55070D1A08051A590504011A5A
-070D1A5B1A5C1A5D1A5E171A5B070D1A5F1A601A611A62171A5F0701
+070D1A5B1A5C1A5D1A5E171A5B070D1A5F1A601A611A62171A5F070D1A631A64
+1A651A66171A63070D1A671A681A691A6A171A670701
 }#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 1A00051A0105040101
 } repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]

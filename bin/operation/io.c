@@ -105,38 +105,6 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 	});
 #endif
 
-static void lWriteVal(lVal *v, FILE *fp){
-	static char* dispWriteBuf;
-	if (unlikely(dispWriteBuf == NULL)) {
-		dispWriteBuf = malloc(1 << 16);
-		if (dispWriteBuf == NULL) {
-			epf("lWriteVal OOM\n");
-			exit(124);
-		}
-	}
-	char *end = spf(dispWriteBuf,&dispWriteBuf[(1 << 16) - 1],"%V",v);
-	#ifdef __EMSCRIPTEN__
-	if(fp == stderr){
-		wasmConsoleError(dispWriteBuf);
-	}else{
-		wasmConsoleLog(dispWriteBuf);
-	}
-	#endif
-	fwrite(dispWriteBuf, end - dispWriteBuf, 1, fp);
-}
-
-static lVal *lnfError(lClosure *c, lVal *v){
-	(void)c;
-	lWriteVal(lCar(v), stderr);
-	return NULL;
-}
-
-static lVal *lnfPrint(lClosure *c, lVal *v){
-	(void)c;
-	lWriteVal(lCar(v), stdout);
-	return NULL;
-}
-
 static lVal *lnfFileRead(lClosure *c, lVal *v){
 	size_t len       = 0;
 	lString *str     = requireString(c, lCar(v));
@@ -418,8 +386,6 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"error",            "[v]",            "Prints v to stderr",                                lnfError);
-	lAddNativeFunc(c,"print",            "[v]",            "Displays v",                                        lnfPrint);
 	lAddNativeFunc(c,"input",            "[]",             "Reads in a line of user input and returns it",      lnfInput);
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);

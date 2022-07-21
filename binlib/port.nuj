@@ -94,3 +94,11 @@
 [def stderr [make-output-port stderr*]]
 [defn current-error-port [] stderr]
 [defn current-error-port! [nport] [set! stderr nport]]
+
+[defn print [v]
+      "Display V on the standard output port"
+      [stdout 'block-write [string v]]]
+
+[defn error [v]
+      "Prints v on the standard error port"
+      [stderr 'block-write [string v]]]
