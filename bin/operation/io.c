@@ -105,41 +105,6 @@ static lVal *lnfInput(lClosure *c, lVal *v){
 	});
 #endif
 
-static lVal *lnfFileRead(lClosure *c, lVal *v){
-	size_t len       = 0;
-	lString *str     = requireString(c, lCar(v));
-	const char *data = loadFile(lStringData(str), &len);
-	return lValStringNoCopy(data, len);
-}
-
-static lVal *lnfFileReadBuffer(lClosure *c, lVal *v){
-	size_t len       = 0;
-	lString *str     = requireString(c, lCar(v));
-	void *data = loadFile(lStringData(str), &len);
-	return lValBufferNoCopy(data, len, false);
-}
-
-static lVal *lnfFileWrite(lClosure *c, lVal *v){
-	lVal *contentV    = lCar(v);
-	lString *filename = requireString(c, lCadr(v));
-	typeswitch(contentV){
-	default:
-		lExceptionThrowValClo("type-error", "Can't save that", contentV, c);
-	case ltString:
-		saveFile(lStringData(filename), lStringData(contentV->vString), lStringLength(contentV->vString));
-		break;
-	case ltBuffer:
-		saveFile(lStringData(filename), lBufferData(contentV->vBuffer), lBufferLength(contentV->vBuffer));
-		break;
-	case ltBufferView:{
-		const void *data = lBufferViewData(contentV->vBufferView);
-		size_t length = lBufferViewLength(contentV->vBufferView);
-		saveFile(lStringData(filename), data, length);
-		break;
-	}}
-	return contentV;
-}
-
 static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	lString *filename = requireString(c, car);
@@ -390,9 +355,6 @@ void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"exit",             "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",            "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 
-	lAddNativeFunc(c,"file/read",        "[path]",         "Load FILENAME and return the contents as a string", lnfFileRead);
-	lAddNativeFunc(c,"file/read/buffer", "[path]",         "Load FILENAME and return the contents as a buffer", lnfFileReadBuffer);
-	lAddNativeFunc(c,"file/write",       "[content path]", "Writes CONTENT into FILENAME",                      lnfFileWrite);
 	lAddNativeFunc(c,"file/remove",      "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"file/temp",        "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
 	lAddNativeFunc(c,"file/stat",        "[path]",         "Return some stats about FILENAME",                  lnfFileStat);

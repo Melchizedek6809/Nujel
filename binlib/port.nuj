@@ -1,4 +1,4 @@
-[defn slurp [pathname]
+[defn slurp/buffer [pathname]
       "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil."
       [def fh [file/open* pathname "r"]]
       [when-not fh [return #nil]]
@@ -8,11 +8,16 @@
            [file/seek* fh 0 2]
            [def size [file/tell* fh]]
            [file/seek* fh 0 0]
-           [def buf [buffer/allocate [+ 1 size]]]
+           [def buf [buffer/allocate size]]
            [file/read* fh buf size]
-           [buffer/view/set! [buffer/view/u8* buf] size 0]
            [file/close* fh]
-           [buffer->string buf]]]
+           [return buf]]]
+[def file/read/buffer slurp/buffer]
+
+[defn slurp [pathname]
+      "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil."
+      [buffer->string [slurp/buffer pathname]]]
+[def file/read slurp]
 
 [defn spit [pathname content]
       "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil."
@@ -25,6 +30,9 @@
            [file/write* fh content]
            [file/close* fh]]
       [return #t]]
+[defn file/write [content pathname]
+      "Writes CONTENT into PATHNAME"
+      [spit pathname content]]
 
 
 [def make-output-port #nil]
