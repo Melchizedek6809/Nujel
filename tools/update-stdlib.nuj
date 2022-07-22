@@ -14,5 +14,5 @@
                      [out 'block-write "\n"]]
                [def c [char-at raw i]]
                [out 'block-write [fmt "0x{c:02X}, "]]]
-      [out 'block-write "0\n};"]
+      [out 'block-write "0\n};\n"]
       [out 'close!]]

@@ -26,11 +26,11 @@ BIN_WASM_OBJS := $(BIN_SRCS:.c=.wo)
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
-RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
-RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+FUTURE_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
+FUTURE_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 
-BOOTSTRAP_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
-BOOTSTRAP_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
+RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 
 ifeq ($(OS),Windows_NT)
 	NUJEL   := nujel.exe
@@ -46,7 +46,7 @@ endif
 all: $(NUJEL)
 .PHONY: all release release.musl release.amalgamation
 .PHONY: rund runn install install.musl profile web
-.PHONY: test.bootstrap check test test.verbose test.debug test.slow test.slow.debug test.ridiculous
+.PHONY: test.future check test test.verbose test.debug test.slow test.slow.debug test.ridiculous
 
 ifdef EMSDK
 all: nujel.wa
@@ -58,8 +58,8 @@ NOBS_TO_CLEAN  := $(shell find binlib stdlib stdlib_modules -type f -name '*.no'
 $(BIN_OBJS): lib/nujel.h lib/nujel-private.h bin/private.h
 $(LIB_OBJS): lib/nujel.h lib/nujel-private.h
 
-%.no: %.nuj | $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $^
+%.no: %.nuj | $(NUJEL)
+	@./$(NUJEL) -x "[file/compile/argv]" $^
 	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.o: %.c
@@ -84,30 +84,31 @@ $(NUJEL): $(RUNTIME_OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-nujel-bootstrap: $(BOOTSTRAP_OBJS)
+$(FUTURE_NUJEL): $(FUTURE_OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
 
-release: nujel.c
+release: $(RUNTIME_SRCS)
 	@rm -f $(NUJEL)
 	@$(CC) -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-release.musl: nujel.c
+release.musl: $(RUNTIME_SRCS)
 	@rm -f $(NUJEL)
 	@musl-gcc -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-release.san: nujel.c
+release.san: $(RUNTIME_SRCS)
 	@rm -f $(NUJEL)
 	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-bootstrap.san: $(BOOTSTRAP_SRCS)
-	@rm -f $(NUJEL)
-	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o nujel-bootstrap $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
+release.amalgamation: nujel.c
+	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)
+	@$(STRIP) -xS $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
@@ -115,10 +116,10 @@ web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 
 nujel.h: lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) tmp/stdlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.h
-	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" nujel.h
 
-nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) bootstrap/stdlib.c bootstrap/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.c
-	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" nujel.c
 
 include mk/targets.mk

@@ -1,5 +1,5 @@
 clean:
-	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe DOSNUJEL.EXE
+	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe future-nujel future-nujel.exe nujel.c nujel.h nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe DOSNUJEL.EXE
 	@rm -f -- $(FILES_TO_CLEAN)
 	@rm -f -- $(NOBS_TO_CLEAN)
 	@rm -f ./callgrind.out.*
@@ -24,16 +24,16 @@ tmp/binlib.no: $(BINLIB_NOBS)
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
 
-tmp/stdlib.c: tmp/stdlib.no tools/build-bootstrap.nuj $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) "tools/build-bootstrap.nuj" -x "[create-c-asset \"./tmp/stdlib.no\" \"./tmp/stdlib.c\" \"stdlib_no_data\"]"
+tmp/stdlib.c: tmp/stdlib.no tools/update-stdlib.nuj $(NUJEL)
+	@./$(NUJEL) "tools/update-stdlib.nuj" -x "[create-c-asset \"./tmp/stdlib.no\" \"./tmp/stdlib.c\" \"stdlib_no_data\"]"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/binlib.c: tmp/binlib.no tools/build-bootstrap.nuj $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) "tools/build-bootstrap.nuj" -x "[create-c-asset \"./tmp/binlib.no\" \"./tmp/binlib.c\" \"binlib_no_data\"]"
+tmp/binlib.c: tmp/binlib.no tools/update-stdlib.nuj $(NUJEL)
+	@./$(NUJEL) "tools/update-stdlib.nuj" -x "[create-c-asset \"./tmp/binlib.no\" \"./tmp/binlib.c\" \"binlib_no_data\"]"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-run: $(NUJEL)
-	@./$(NUJEL) --only-test-suite tools/tests.nuj
+run: $(FUTURE_NUJEL)
+	@./$(FUTURE_NUJEL) --only-test-suite tools/tests.nuj
 
 test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj
@@ -44,11 +44,11 @@ test.v: $(NUJEL)
 test.verbose: $(NUJEL)
 	@./$(NUJEL) --verbose --only-test-suite tools/tests.nuj
 
-test.bootstrap: $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) --only-test-suite tools/tests.nuj
+test.future: $(FUTURE_NUJEL)
+	@./$(FUTURE_NUJEL) tools/tests.nuj
 
-test.bootstrap.verbose: $(NUJEL_BOOTSTRAP)
-	@./$(NUJEL_BOOTSTRAP) --verbose --only-test-suite tools/tests.nuj
+test.future.slow: $(FUTURE_NUJEL)
+	@./$(FUTURE_NUJEL) --slow-test tools/tests.nuj
 
 test.slow: $(NUJEL)
 	@./$(NUJEL) --slow-test tools/tests.nuj
@@ -91,6 +91,6 @@ benchmark-nujel: release
 	cp -f $(NUJEL) ~/bin/
 	./$(NUJEL) --no-overwrite --only-nujel ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
 
-update-bootstrap: tmp/stdlib.c tmp/binlib.c
+update-stdlib: tmp/stdlib.c tmp/binlib.c
 	cp -f tmp/stdlib.c bootstrap/stdlib.c
 	cp -f tmp/binlib.c bootstrap/binlib.c

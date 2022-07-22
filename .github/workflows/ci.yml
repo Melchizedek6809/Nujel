@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+  pull_request:
+
 
 jobs:
   build-windows:
@@ -24,16 +26,12 @@ jobs:
         pacboy: toolchain:p
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Compile bootstrap runtime
-      run: make nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: make test.bootstrap
     - name: Compile runtime
       run: make nujel.exe
     - name: Test runtime
       run: make test
   release-windows:
-    name: release-${{ matrix.buildtype }}-${{ matrix.sys }}-windows
+    name: release-${{ matrix.sys }}-windows
     needs: build-windows
     runs-on: windows-latest
     defaults:
@@ -42,7 +40,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        buildtype: [release]
         sys: [mingw32, mingw64, ucrt64, clang64]
     steps:
     - name: Setup MSYS2
@@ -53,18 +50,14 @@ jobs:
         pacboy: toolchain:p
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Compile bootstrap runtime
-      run: make nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: make test.bootstrap
     - name: Compile release
-      run: make ${{ matrix.buildtype }}
+      run: make release
     - name: Run Tests
-      run: make test.slow
+      run: ./nujel.exe --slow-test tools/tests.nuj
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
-        name: Nujel-windows-${{ matrix.sys }}-${{ matrix.buildtype }}-${{ github.ref_name }}
+        name: Nujel-windows-${{ matrix.sys }}-release-${{ github.ref_name }}
         path: "./nujel.exe"
         retention-days: 7
   build-macos:
@@ -77,10 +70,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Compile bootstrap runtime
-      run: make nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: make test.bootstrap
     - name: Compile runtime
       run: make nujel
     - name: Test runtime
@@ -96,14 +85,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Compile bootstrap runtime
-      run: make nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: make test.bootstrap
     - name: Build Release
       run: make ${{ matrix.buildtype }}
     - name: Test runtime
-      run: make test.slow
+      run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:
@@ -129,14 +114,22 @@ jobs:
     - name: Install compiler
       run: |
         sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
-    - name: Compile bootstrap runtime
-      run: ${{matrix.make}} CC=${{ matrix.cc }} nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: ${{matrix.make}} CC=${{ matrix.cc }} test.bootstrap
     - name: Compile runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} nujel
     - name: Test runtime
       run: ${{matrix.make}} test
+  build-stdlib:
+    name: Build stdlib from source
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Compile runtime
+      run: make nujel
+    - name: Compile future runtime
+      run: make future-nujel
+    - name: Test runtime
+      run: make test.future.slow
   static-analysis-linux:
     name: clang-static-analyzer
     runs-on: ubuntu-22.04
@@ -147,7 +140,7 @@ jobs:
       run: |
         sudo apt-get -y install clang clang-tools make
     - name: Run static analyzer
-      run: scan-build --status-bugs make nujel-bootstrap
+      run: scan-build --status-bugs make nujel
   release-linux:
     name: ${{ matrix.buildtype }}-linux
     runs-on: ubuntu-latest
@@ -161,14 +154,10 @@ jobs:
       uses: actions/checkout@v2
     - name: Install Dependencies
       run: sudo apt-get install -y musl-dev musl-tools
-    - name: Build bootstrap runtime
-      run: make nujel-bootstrap
-    - name: Test bootstrap runtime
-      run: make test.bootstrap
     - name: Build release
       run: make release.musl
     - name: Test runtime
-      run: make test.slow
+      run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
       uses: actions/upload-artifact@v2
       with:

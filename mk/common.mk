@@ -13,8 +13,7 @@ EMAR                 := emar
 EMMEM                := -s TOTAL_MEMORY=96MB -s ALLOW_MEMORY_GROWTH=1
 
 NUJEL                := nujel
-NUJEL_BOOTSTRAP      := nujel-bootstrap
-ASSET                := tools/assets
+FUTURE_NUJEL         := future-nujel
 PROG                  = $(NUJEL)
 
 CC_MUSL              := musl-gcc
@@ -27,5 +26,5 @@ WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing
 
 LIBS                 := -lm
 
-RELEASE_OPTIMIZATION := -O3
+RELEASE_OPTIMIZATION := -O2
 VERSION_ARCH         := $(shell uname -m)

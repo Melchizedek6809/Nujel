@@ -4,12 +4,6 @@ packages:
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
-  - compile-bootstrap: |
-      cd Nujel
-      bmake -j2 nujel-bootstrap
-  - test-bootstrap: |
-      cd Nujel
-      bmake test.bootstrap
   - compile-runtime: |
       cd Nujel
       bmake -j2 nujel

@@ -4,12 +4,6 @@ packages:
 sources:
   - https://git.sr.ht/~melchizedek6809/Nujel
 tasks:
-  - compile-bootstrap: |
-      cd Nujel
-      make -j2 nujel-bootstrap CC=clang
-  - test-bootstrap: |
-      cd Nujel
-      make -j test.bootstrap CC=clang
   - compile-runtime: |
       cd Nujel
       make -j2 nujel CC=clang
