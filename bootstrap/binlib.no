@@ -10,7 +10,7 @@
 091A0A0E07241414140E0B0E0C0E0D0E0404010401240402141414070E0D0E0F
 0E0E0E100C0A00100D15240D13160C0A00060D1A11040207120D0E130E120B00
 0C0E140E1204010900051A150E160E020E0404011A17040204020D0E120101
-} file/compile/argv [#nil] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##[last-pair repl/args path index-of "_modules/" module file/compile/module string/cut file/compile]
+} file/compile/argv [] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##[last-pair repl/args path index-of "_modules/" module file/compile/module string/cut file/compile]
 0E000E0104011107020D0E030E021A04040207050D0E050200210B001A0E060E
 02240E070E0202000E05020925040304030900090E080E02040101
 } file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure tests ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" expr test/run-test! eval-in do require module-name append]
@@ -78,37 +78,43 @@
 1900130E080E030E0904020D0E0A0E030401160D1B0101
 } file/write [content pathname] #@[documentation: "Writes CONTENT into PATHNAME" source: ["Writes CONTENT into PATHNAME" [spit pathname content]]] #{##[spit pathname content]
 0E000E010E02040201
-} make-output-port make-input-port make-input/output-port tree/new output-port-method-table input-port-method-table buffer/allocate temporary-buffer buffer/view/u8* temporary-buffer-view tree/set! :file-handle anonymous [handle] #@[source: [handle]] #{##[handle]
-0E0001
-} :write-char [handle char] #@[source: [[buffer/view/set! output-port-temporary-buffer-vi 0 char] [file/write* handle output-port-temporary-buffer-vi]]] #{##[buffer/view/set! output-port-temporary-buffer-vi char file/write* handle]
-0E000E0102000E0204030D0E030E040E01040201
-} :flush-output-port [handle] #@[source: [[file/flush* handle]]] #{##[file/flush* handle]
+} make-output-port make-input-port buffer/allocate temporary-buffer buffer/view/u8* temporary-buffer-view tree/new :flush-output anonymous [handle] #@[source: [[file/flush* handle]]] #{##[file/flush* handle]
 0E000E01040101
 } :block-write [handle buffer size] #@[source: [[file/write* handle buffer size]]] #{##[file/write* handle buffer size]
 0E000E010E020E03040301
+} :char-write [handle char] #@[source: [[buffer/view/set! output-port-temporary-buffer-vi 0 char] [file/write* handle output-port-temporary-buffer-vi]]] #{##[buffer/view/set! output-port-temporary-buffer-vi char file/write* handle]
+0E000E0102000E0204030D0E030E040E01040201
 } :block-read [handle buffer size] #@[source: [[exception :type-error "Can't read from an output port" handle]]] #{##[throw list :type-error "Can't read from an output port" handle current-lambda]
 0E000E011A021A030E040E0504000404040101
-} :read-char tree/ref :close-port [handle] #@[source: [[file/close* handle]]] #{##[file/close* handle]
+} :char-read [handle buffer size] #{##[throw list :type-error "Can't read from an output port" handle current-lambda]
+0E000E011A021A030E040E0504000404040101
+} :close! [handle] #@[source: [[file/close* handle]]] #{##[file/close* handle]
 0E000E01040101
-} :file-position [handle] #@[source: [[file/tell* handle]]] #{##[file/tell* handle]
+} :position [handle] #@[source: [[file/tell* handle]]] #{##[file/tell* handle]
 0E000E01040101
-} :file-position! [handle new-position] #@[source: [[file/seek* handle new-position 0]]] #{##[file/seek* handle new-position]
+} :position! [handle new-position] #@[source: [[file/seek* handle new-position 0]]] #{##[file/seek* handle new-position]
 0E000E010E020200040301
-} [handle char] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle temporary-buffer-view 1] [buffer/view/ref temporary-buffer-view 0 char]]] #{##[file/eof*? handle :end-of-file file/read* temporary-buffer-view buffer/view/ref char]
-0E000E0104010B00091A0201090004240D0E030E010E04020104030D0E050E04
-02000E06040301
-} [handle buffer size] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle buffer size]]] #{##[file/eof*? handle :end-of-file file/read* buffer size]
+} :file-handle [handle] #@[source: [handle]] #{##[handle]
+0E0001
+} :methods [handle] #@[source: [output-port-method-table]] #{##[output-port-method-table]
+0E0001
+} output-port-method-table [handle buffer size] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle buffer size]]] #{##[file/eof*? handle :end-of-file file/read* buffer size]
 0E000E0104010B00091A0201090004240D0E030E010E040E05040301
 } [handle buffer size] #@[source: [[exception :type-error "Can't write to an input port" handle]]] #{##[throw list :type-error "Can't write to an input port" handle current-lambda]
 0E000E011A021A030E040E0504000404040101
-} [handle] #@[documentation: "\n" source: ["" [def self [fn [method . args] [apply [tree/ref output-port-method-table method] [cons handle args]]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref output-port-method-table method] [cons handle args]]]] #{##[apply tree/ref output-port-method-table method handle args]
+} [handle char] #@[source: [[when [file/eof*? handle] [return :end-of-file]] [file/read* handle temporary-buffer-view 1] [buffer/view/ref temporary-buffer-view 0 char]]] #{##[file/eof*? handle :end-of-file file/read* temporary-buffer-view buffer/view/ref char]
+0E000E0104010B00091A0201090004240D0E030E010E04020104030D0E050E04
+02000E06040301
+} tree/ref [handle] #@[source: [input-port-method-table]] #{##[input-port-method-table]
+0E0001
+} input-port-method-table [handle] #@[documentation: "Create a new output port for HANDLE" source: ["Create a new output port for HANDLE" [fn [method . args] [apply [tree/ref output-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref output-port-method-table method] [cons handle args]]]] #{##[apply tree/ref output-port-method-table method handle args]
 0E000E010E020E0304020E040E0514040201
-} self]
-1A001A011A021A0317070401
-} [handle] #@[documentation: "\n" source: ["" [def self [fn [method . args] [apply [tree/ref input-port-method-table method] [cons handle args]]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref input-port-method-table method] [cons handle args]]]] #{##[apply tree/ref input-port-method-table method handle args]
+}]
+1A001A011A021A031701
+} [handle] #@[documentation: "Create a new input port for HANDLE" source: ["Create a new input port for HANDLE" [fn [method . args] [apply [tree/ref input-port-method-table method] [cons handle args]]]]] #{##[anonymous [method . args] #@[source: [[apply [tree/ref input-port-method-table method] [cons handle args]]]] #{##[apply tree/ref input-port-method-table method handle args]
 0E000E010E020E0304020E040E0514040201
-} self]
-1A001A011A021A0317070401
+}]
+1A001A011A021A031701
 } stdin* stdin current-input-port [#nil] #@[source: [stdin]] #{##[stdin]
 0E0001
 } current-input-port! [nport] #@[source: [[set! stdin nport]]] #{##[nport stdin]
@@ -121,10 +127,10 @@
 0E0001
 } current-error-port! [nport] #@[source: [[set! stderr nport]]] #{##[nport stderr]
 0E00050101
-} print [v] #@[documentation: "Display V on the standard output port" source: ["Display V on the standard output port" [stdout 'block-write [string v]]]] #{##[stdout block-write string v]
-0E001A010E020E030401040201
-} error [v] #@[documentation: "Prints v on the standard error port" source: ["Prints v on the standard error port" [stderr 'block-write [string v]]]] #{##[stderr block-write string v]
-0E001A010E020E030401040201
+} print [v port] #@[documentation: "Display V on the standard output port" source: ["Display V on the standard output port" [[or port stdout] 'block-write [string v]]]] #{##[port stdout #f block-write string v]
+0E000C0A000D0D0E010C0A00060D1A021A030E040E050401040201
+} error [v port] #@[documentation: "Prints v on the standard error port" source: ["Prints v on the standard error port" [print v stderr]]] #{##[print v stderr]
+0E000E010E02040201
 } read-line/raw [port buf] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def i 0] [def c 0] [def view [buffer/view/u8* buf]] [while #t [while [>= i [buffer/length buf]] [buffer/length! [+ 128 [buffer/length buf]]]] [set! c [port 'read-char]] [when [or [== c 10] [== c :end-of-file]] [return i]] [buffer/view/set! view i c] [set! i [inc i]]]]] #{##[i c buffer/view/u8* buf view buffer/length! 128 buffer/length port read-char :end-of-file #f buffer/view/set!]
 020007000D020007010D0E020E03040107040D2409005F0D240900110D0E051A
 060E070E0304012504010E000E070E030401210AFFE90D0E081A09040105010D
@@ -135,35 +141,31 @@
 } input]
 1A001A011A021A031707000D0E0007040D1A051A061A071A081707050D0E0507
 090D1A0A1A0B1A0C1A0D17070A0D1A0E1A0F1A101A1117070E0D2407120D2407
-130D2407140D150E1524040107160D0E1524040107170D0E180201040107190D
-0E1A0E190401071B0D0E1C0E161A1D1A1E1A1F1A201A211704030D0E1C0E161A
-221A1E1A231A241A251704030D0E1C0E161A261A1E1A271A281A291704030D0E
-1C0E161A2A1A1E1A2B1A2C1A2D1704030D0E1C0E161A2E1A1E1A2F1A301A3117
-04030D0E1C0E161A320E330E161A2E040204030D0E1C0E161A341A1E1A351A36
-1A371704030D0E1C0E161A381A1E1A391A3A1A3B1704030D0E1C0E161A3C1A1E
-1A3D1A3E1A3F1704030D0E1C0E171A321A1E1A401A411A421704030D0E1C0E17
-1A2E1A1E1A431A441A451704030D0E1C0E171A2A1A1E1A461A471A481704030D
-0E1C0E171A220E330E161A2A040204030D0E1C0E171A340E330E161A34040204
-030D0E1C0E171A1D0E330E161A1D040204030D0E1C0E171A380E330E161A3804
-0204030D0E1C0E171A3C0E330E161A3C040204030D1A1E1A491A4A1A4B170512
-0D1A1E1A4C1A4D1A4E170513160D0E130E4F040107500D1A511A521A531A5417
-07510D1A551A561A571A581707550D0E120E590401075A0D1A5B1A5C1A5D1A5E
-17075B0D1A5F1A601A611A6217075F0D0E120E63040107640D1A651A661A671A
-681707650D1A691A6A1A6B1A6C1707690D1A6D1A6E1A6F1A7017076D0D1A711A
-721A731A741707710D1A751A761A771A781707750D1A791A7A1A7B1A7C170779
-0D0E79077D01
+130D150E140201040107150D0E160E15040107170D0E181A191A1A1A1B1A1C1A
+1D171A1E1A1A1A1F1A201A21171A221A1A1A231A241A25171A261A1A1A271A28
+1A29171A2A1A1A1A2B1A281A2C171A2D1A1A1A2E1A2F1A30171A311A1A1A321A
+331A34171A351A1A1A361A371A38171A391A1A1A3A1A3B1A3C171A3D1A1A1A3E
+1A3F1A4017041407410D0E181A261A1A1A421A431A44171A1E1A1A1A451A461A
+47171A2A1A1A1A481A491A4A171A220E4B0E411A1E04021A2D0E4B0E411A2D04
+021A310E4B0E411A3104021A350E4B0E411A3504021A390E4B0E411A3904021A
+3D1A1A1A4C1A4D1A4E170412074F0D1A1A1A501A511A521705120D1A1A1A531A
+541A55170513160D0E130E56040107570D1A581A591A5A1A5B1707580D1A5C1A
+5D1A5E1A5F17075C0D0E120E60040107610D1A621A631A641A651707620D1A66
+1A671A681A691707660D0E120E6A0401076B0D1A6C1A6D1A6E1A6F17076C0D1A
+701A711A721A731707700D1A741A751A761A771707740D1A781A791A7A1A7B17
+07780D1A7C1A7D1A7E1A7F17077C0D1A801A811A821A831707800D0E80078401
 }#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 0E000E01040101
-} repl/welcome [#nil] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
+} repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
 0E000E010E021A0304011A040402040101
-} repl/prompt [#nil] #@[documentation: ">" source: ["> "]] #{##["> "]
+} repl/prompt [] #@[documentation: ">" source: ["> "]] #{##["> "]
 1A0001
 } repl/wasm [line] #@[documentation: "Evaluate LINE in the wasm context" source: ["Evaluate LINE in the wasm context" [try repl/exception-handler [eval-in root-closure [cons do [read line]]]]]] #{##[repl/exception-handler eval-in root-closure do read line]
 0E001900130E010E020E030E040E0504011404021601
-} repl/cmd/raw [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[#nil] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[anonymous [err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[err :unmatched-opening-bracket repl/cmd/raw ctx cat line readline "... " throw]
+} repl/cmd/raw [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[anonymous [err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[err :unmatched-opening-bracket repl/cmd/raw ctx cat line readline "... " throw]
 0E00111A01200B00180E020E030E040E050E061A070401040204020900090E08
 0E00040101
-} read line expr equal? [#nil] print "\r" eval-in ctx do result repl/push-result println nil? "" string]
+} read line expr equal? [] print "\r" eval-in ctx do result repl/push-result println nil? "" string]
 1A001A011A021A03171900530E040E05040107060D0E071A080E0604020B000F
 0E091A0A04010D2401090004240D0E0B0E0C0E0D0E06140402070E0D0E0F0E0E
 04010D0E100E110E0E04010B00081A120900090E130E0E040104011601
@@ -177,9 +179,9 @@
 } repl/readline [ctx] #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] #{##[readline repl/prompt line nil? print "Adios, cowboy...\r\n" exit "[cmd]\n" repl/cmd ctx repl/cmd/raw]
 0E000E010400040107020D0E030E0204010B00130E041A0504010D0E06020004
 01090004240D0E021A07200B000C0E080E09040109000B0E0A0E090E02040201
-} repl [#nil] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure]
+} repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure]
 0E0004000D240900100D0E0119000A0E020E030401161B0AFFF201
-} repl/print-help [#nil] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
+} repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
 0E000E010E021A0304011A04040204010D0E000E010E051A0604011A07040204
 010D0E000E011A08040104010D0E000E011A090E0A1A0B04011A0C040304010D
 0E000E011A0D040104010D0E000E011A090E0E1A0F04011A10040304010D0E00

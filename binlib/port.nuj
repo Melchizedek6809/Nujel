@@ -37,63 +37,57 @@
 
 [def make-output-port #nil]
 [def make-input-port #nil]
-[def make-input/output-port #nil]
-
 [let*
-  [def output-port-method-table @[]]
-  [def input-port-method-table @[]]
   [def temporary-buffer [buffer/allocate 1]]
   [def temporary-buffer-view [buffer/view/u8* temporary-buffer]]
 
-  [tree/set! output-port-method-table :file-handle [fn [handle] handle]]
-  [tree/set! output-port-method-table :write-char [fn [handle char]
-                                                      [buffer/view/set! output-port-temporary-buffer-view 0 char]
-                                                    [file/write* handle output-port-temporary-buffer-view]]]
-  [tree/set! output-port-method-table :flush-output-port [fn [handle]
-                                                             [file/flush* handle]]]
-  [tree/set! output-port-method-table :block-write [fn [handle buffer size]
-                                                       [file/write* handle buffer size]]]
-  [tree/set! output-port-method-table :block-read [fn [handle buffer size]
-                                                      [exception :type-error "Can't read from an output port" handle]]]
-  [tree/set! output-port-method-table :read-char [tree/ref output-port-method-table :block-read]]
-  [tree/set! output-port-method-table :close-port [fn [handle]
-                                                      [file/close* handle]]]
-  [tree/set! output-port-method-table :file-position [fn [handle]
-                                                         [file/tell* handle]]]
-  [tree/set! output-port-method-table :file-position! [fn [handle new-position]
-                                                         [file/seek* handle new-position 0]]]
+  [def output-port-method-table @[ :flush-output [fn [handle]
+                                                     [file/flush* handle]]
+                                   :block-write [fn [handle buffer size]
+                                                    [file/write* handle buffer size]]
+                                   :char-write [fn [handle char]
+                                                   [buffer/view/set! output-port-temporary-buffer-view 0 char]
+                                                 [file/write* handle output-port-temporary-buffer-view]]
+                                   :block-read [fn [handle buffer size]
+                                                   [exception :type-error "Can't read from an output port" handle]]
+                                   :char-read [fn [handle buffer size]
+                                                  [exception :type-error "Can't read from an output port" handle]]
+                                   :close! [fn [handle]
+                                               [file/close* handle]]
+                                   :position [fn [handle]
+                                                 [file/tell* handle]]
+                                   :position! [fn [handle new-position]
+                                                  [file/seek* handle new-position 0]]
+                                   :file-handle [fn [handle] handle]
+                                   :methods [fn [handle] output-port-method-table]]]
 
-
-
-  [tree/set! input-port-method-table :read-char [fn [handle char]
-                                                    [when [file/eof*? handle]
-                                                          [return :end-of-file]]
-                                                    [file/read* handle temporary-buffer-view 1]
-                                                  [buffer/view/ref temporary-buffer-view 0 char]]]
-  [tree/set! input-port-method-table :block-read [fn [handle buffer size]
-                                                     [when [file/eof*? handle]
-                                                          [return :end-of-file]]
-                                                       [file/read* handle buffer size]]]
-  [tree/set! input-port-method-table :block-write [fn [handle buffer size]
-                                                      [exception :type-error "Can't write to an input port" handle]]]
-  [tree/set! input-port-method-table :write-char [tree/ref output-port-method-table :block-write]]
-  [tree/set! input-port-method-table :close-port [tree/ref output-port-method-table :close-port]]
-  [tree/set! input-port-method-table :file-handle [tree/ref output-port-method-table :file-handle]]
-  [tree/set! input-port-method-table :file-position [tree/ref output-port-method-table :file-position]]
-  [tree/set! input-port-method-table :file-position! [tree/ref output-port-method-table :file-position!]]
-
-
+  [def input-port-method-table @[ :block-read [fn [handle buffer size]
+                                                  [when [file/eof*? handle]
+                                                    [return :end-of-file]]
+                                                [file/read* handle buffer size]]
+                                  :block-write [fn [handle buffer size]
+                                                   [exception :type-error "Can't write to an input port" handle]]
+                                  :char-read [fn [handle char]
+                                                 [when [file/eof*? handle]
+                                                   [return :end-of-file]]
+                                               [file/read* handle temporary-buffer-view 1]
+                                               [buffer/view/ref temporary-buffer-view 0 char]]
+                                  :char-write [tree/ref output-port-method-table :block-write]
+                                  :close! [tree/ref output-port-method-table :close!]
+                                  :position [tree/ref output-port-method-table :position]
+                                  :position! [tree/ref output-port-method-table :position!]
+                                  :file-handle [tree/ref output-port-method-table :file-handle]
+                                  :methods [fn [handle] input-port-method-table]]]
 
   [set! make-output-port [fn [handle]
-                             ""
-                           [def self [fn [method . args]
-                                         [apply [tree/ref output-port-method-table method] [cons handle args]]]]]]
+                             "Create a new output port for HANDLE"
+                           [fn [method . args]
+                               [apply [tree/ref output-port-method-table method] [cons handle args]]]]]
 
   [set! make-input-port [fn [handle]
-                             ""
-                           [def self [fn [method . args]
-                                         [apply [tree/ref input-port-method-table method] [cons handle args]]]]]]
-]
+                            "Create a new input port for HANDLE"
+                          [fn [method . args]
+                              [apply [tree/ref input-port-method-table method] [cons handle args]]]]]]
 
 
 [def stdin [make-input-port stdin*]]
@@ -108,13 +102,13 @@
 [defn current-error-port [] stderr]
 [defn current-error-port! [nport] [set! stderr nport]]
 
-[defn print [v]
+[defn print [v port]
       "Display V on the standard output port"
-      [stdout 'block-write [string v]]]
+      [[or port stdout] 'block-write [string v]]]
 
-[defn error [v]
+[defn error [v port]
       "Prints v on the standard error port"
-      [stderr 'block-write [string v]]]
+      [print v stderr]]
 
 [defn read-line/raw [port buf]
       "Reads in a line of user input and returns it"
