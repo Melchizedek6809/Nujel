@@ -32,7 +32,6 @@ const char *run(const char *line){
 static lClosure *createRootClosure(){
 	lClosure *c = lNewRoot();
 	lOperationsIO(c);
-	lOperationsReadline(c);
 	lOperationsPort(c);
 	lOperationsInit(c);
 	mainClosure = lLoad(c, (const char *)binlib_no_data);

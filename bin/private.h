@@ -10,7 +10,6 @@
 void initEnvironmentMap(lClosure *c);
 void setIOSymbols();
 void lOperationsIO(lClosure *c);
-void lOperationsReadline(lClosure *c);
 void lOperationsPort(lClosure *c);
 void lOperationsInit(lClosure *c);
 

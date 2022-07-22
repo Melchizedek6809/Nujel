@@ -20,20 +20,17 @@ ifeq (, $(shell which $(CC)))
 CC                   := tcc
 endif
 
-VENDOR_SRCS := $(shell find vendor -type f -name '*.c')
-VENDOR_OBJS := $(VENDOR_SRCS:.c=.o)
-
-BIN_SRCS    := $(shell find bin -type f -name '*.c') vendor/getline/getline.c
+BIN_SRCS    := $(shell find bin -type f -name '*.c')
 BIN_OBJS    := $(BIN_SRCS:.c=.o)
 BIN_WASM_OBJS := $(BIN_SRCS:.c=.wo)
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
-RUNTIME_SRCS = $(VENDOR_SRCS) $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
-RUNTIME_OBJS = $(VENDOR_OBJS) $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
+RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
 
-BOOTSTRAP_SRCS = $(VENDOR_SRCS) $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
-BOOTSTRAP_OBJS = $(VENDOR_OBJS) $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+BOOTSTRAP_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
+BOOTSTRAP_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 
 ifeq ($(OS),Windows_NT)
 	NUJEL   := nujel.exe
@@ -56,7 +53,7 @@ ifdef EMSDK
 all: nujel.wa
 endif
 
-FILES_TO_CLEAN := $(shell find bin lib vendor bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
+FILES_TO_CLEAN := $(shell find bin lib bootstrap binlib stdlib -type f -name '*.o' -o -name '*.wo' -o -name '*.obj' -o -name '*.d' -o -name '*.wd' -o -name '*.deps')
 NOBS_TO_CLEAN  := $(shell find binlib stdlib stdlib_modules -type f -name '*.no')
 
 $(BIN_OBJS): lib/nujel.h lib/nujel-private.h bin/private.h
@@ -125,7 +122,7 @@ nujel.h: lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamat
 	@$(CAT) $^ > nujel.h
 	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
 
-nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) tmp/stdlib.c tmp/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.c
 	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" $(NUJEL)
 

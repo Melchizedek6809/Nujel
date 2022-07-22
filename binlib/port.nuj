@@ -118,7 +118,7 @@
       [while #t
              [while [>= i [buffer/length buf]]
                     [buffer/length! [+ 128 [buffer/length buf]]]]
-             [set! c [port 'read-char]]
+             [set! c [port 'char-read]]
              [when [or [== c #\lf]
                        [== c :end-of-file]]
                    [return i]]
@@ -130,3 +130,9 @@
       [def buf [buffer/allocate 128]]
       [buffer->string buf [read-line/raw stdin buf]]]
 [def input read-line]
+
+[defn readline [prompt]
+      "Read a line of input in a user friendly way after writing PROMPT"
+      [stdout 'block-write [or prompt ""]]
+      [stdout 'flush-output]
+      [read-line]]

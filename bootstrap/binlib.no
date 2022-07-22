@@ -10,7 +10,7 @@
 091A0A0E07241414140E0B0E0C0E0D0E0404010401240402141414070E0D0E0F
 0E0E0E100C0A00100D15240D13160C0A00060D1A11040207120D0E130E120B00
 0C0E140E1204010900051A150E160E020E0404011A17040204020D0E120101
-} file/compile/argv [] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##[last-pair repl/args path index-of "_modules/" module file/compile/module string/cut file/compile]
+} file/compile/argv [#nil] #@[source: [[def path [car [last-pair repl/args]]] [def module [index-of path "_modules/"]] [if [>= module 0] [file/compile/module path #nil [string/cut path 0 [+ module 9]]] [file/compile path]]]] #{##[last-pair repl/args path index-of "_modules/" module file/compile/module string/cut file/compile]
 0E000E0104011107020D0E030E021A04040207050D0E050200210B001A0E060E
 02240E070E0202000E05020925040304030900090E080E02040101
 } file/test/module/run [tests module-name] #@[source: [[require :test] [doseq [expr tests] [test/run-test! [eval [cadr expr]] [quasiquote [do [require [unquote module-name]] [unquote-splicing [cddr expr]]]]]]]] #{##[require* :test current-closure tests ΓεnΣym-1 :pair type-of throw list :type-error "Improper list detected, please provide a proper list instead" current-lambda "Expected a value of type :pair" expr test/run-test! eval-in do require module-name append]
@@ -131,14 +131,16 @@
 0E000C0A000D0D0E010C0A00060D1A021A030E040E050401040201
 } error [v port] #@[documentation: "Prints v on the standard error port" source: ["Prints v on the standard error port" [print v stderr]]] #{##[print v stderr]
 0E000E010E02040201
-} read-line/raw [port buf] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def i 0] [def c 0] [def view [buffer/view/u8* buf]] [while #t [while [>= i [buffer/length buf]] [buffer/length! [+ 128 [buffer/length buf]]]] [set! c [port 'read-char]] [when [or [== c 10] [== c :end-of-file]] [return i]] [buffer/view/set! view i c] [set! i [inc i]]]]] #{##[i c buffer/view/u8* buf view buffer/length! 128 buffer/length port read-char :end-of-file #f buffer/view/set!]
+} read-line/raw [port buf] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def i 0] [def c 0] [def view [buffer/view/u8* buf]] [while #t [while [>= i [buffer/length buf]] [buffer/length! [+ 128 [buffer/length buf]]]] [set! c [port 'char-read]] [when [or [== c 10] [== c :end-of-file]] [return i]] [buffer/view/set! view i c] [set! i [inc i]]]]] #{##[i c buffer/view/u8* buf view buffer/length! 128 buffer/length port char-read :end-of-file #f buffer/view/set!]
 020007000D020007010D0E020E03040107040D2409005F0D240900110D0E051A
 060E070E0304012504010E000E070E030401210AFFE90D0E081A09040105010D
 0E01020A200C0A00100D0E011A0A200C0A00060D1A0B0B00090E000109000424
 0D0E0C0E040E000E0104030D02010E002505001B0AFFA301
 } read-line [#nil] #@[documentation: "Reads in a line of user input and returns it" source: ["Reads in a line of user input and returns it" [def buf [buffer/allocate 128]] [buffer->string buf [read-line/raw stdin buf]]]] #{##[buffer/allocate 128 buf buffer->string read-line/raw stdin]
 0E001A01040107020D0E030E020E040E050E020402040201
-} input]
+} input readline [prompt] #@[documentation: "Read a line of input in a user friendly way after writing PROMPT" source: ["Read a line of input in a user friendly way after writing PROMPT" [stdout 'block-write [or prompt ""]] [read-line]]] #{##[stdout block-write prompt "" #f read-line]
+0E001A010E020C0A000D0D1A030C0A00060D1A0404020D0E05040001
+}]
 1A001A011A021A031707000D0E0007040D1A051A061A071A081707050D0E0507
 090D1A0A1A0B1A0C1A0D17070A0D1A0E1A0F1A101A1117070E0D2407120D2407
 130D150E140201040107150D0E160E15040107170D0E181A191A1A1A1B1A1C1A
@@ -153,19 +155,20 @@
 5D1A5E1A5F17075C0D0E120E60040107610D1A621A631A641A651707620D1A66
 1A671A681A691707660D0E120E6A0401076B0D1A6C1A6D1A6E1A6F17076C0D1A
 701A711A721A731707700D1A741A751A761A771707740D1A781A791A7A1A7B17
-07780D1A7C1A7D1A7E1A7F17077C0D1A801A811A821A831707800D0E80078401
+07780D1A7C1A7D1A7E1A7F17077C0D1A801A811A821A831707800D0E8007840D
+1A851A861A871A8817078501
 }#{##[*1 *2 *3 "nujel" repl/executable-name repl/args repl/parse-args/eval-next repl/parse-args/run-repl tree/new repl/options repl/option-map repl/exception-handler [error] #@[source: [[display/error error]]] #{##[display/error error]
 0E000E01040101
-} repl/welcome [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
+} repl/welcome [#nil] #@[source: [[println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]] #{##[println cat ansi-rainbow "Nujel" " is ready for business!"]
 0E000E010E021A0304011A040402040101
-} repl/prompt [] #@[documentation: ">" source: ["> "]] #{##["> "]
+} repl/prompt [#nil] #@[documentation: ">" source: ["> "]] #{##["> "]
 1A0001
 } repl/wasm [line] #@[documentation: "Evaluate LINE in the wasm context" source: ["Evaluate LINE in the wasm context" [try repl/exception-handler [eval-in root-closure [cons do [read line]]]]]] #{##[repl/exception-handler eval-in root-closure do read line]
 0E001900130E010E020E030E040E0504011404021601
-} repl/cmd/raw [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[anonymous [err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[err :unmatched-opening-bracket repl/cmd/raw ctx cat line readline "... " throw]
+} repl/cmd/raw [ctx line] #@[source: [[try [fn [err] [if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]] [def expr [read line]] [when [equal? '[#nil] expr] [print "\r"] [return]] [def result [eval-in ctx [cons do expr]]] [repl/push-result result] [println [if [nil? result] "" [string result]]]]]] #{##[anonymous [err] #@[source: [[if [= [car err] :unmatched-opening-bracket] [repl/cmd/raw ctx [cat line [readline "... "]]] [throw err]]]] #{##[err :unmatched-opening-bracket repl/cmd/raw ctx cat line readline "... " throw]
 0E00111A01200B00180E020E030E040E050E061A070401040204020900090E08
 0E00040101
-} read line expr equal? [] print "\r" eval-in ctx do result repl/push-result println nil? "" string]
+} read line expr equal? [#nil] print "\r" eval-in ctx do result repl/push-result println nil? "" string]
 1A001A011A021A03171900530E040E05040107060D0E071A080E0604020B000F
 0E091A0A04010D2401090004240D0E0B0E0C0E0D0E06140402070E0D0E0F0E0E
 04010D0E100E110E0E04010B00081A120900090E130E0E040104011601
@@ -179,9 +182,9 @@
 } repl/readline [ctx] #@[source: [[def line [readline [repl/prompt]]] [when [nil? line] [display "Adios, cowboy...\r\n"] [exit 0]] [if [= line "[cmd]\n"] [repl/cmd ctx] [repl/cmd/raw ctx line]]]] #{##[readline repl/prompt line nil? print "Adios, cowboy...\r\n" exit "[cmd]\n" repl/cmd ctx repl/cmd/raw]
 0E000E010400040107020D0E030E0204010B00130E041A0504010D0E06020004
 01090004240D0E021A07200B000C0E080E09040109000B0E0A0E090E02040201
-} repl [] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure]
+} repl [#nil] #@[source: [[repl/welcome] [while #t [try repl/exception-handler [repl/readline root-closure]]]]] #{##[repl/welcome repl/exception-handler repl/readline root-closure]
 0E0004000D240900100D0E0119000A0E020E030401161B0AFFF201
-} repl/print-help [] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
+} repl/print-help [#nil] #@[source: [[println [cat [ansi-rainbow "Nujel"] " - A Lisp dialect for games.\n"]] [println [cat [ansi-green "Usage:"] " nujel [options] [command_string | file]"]] [println [cat "\nLow-level options - for work on the runtime itself"]] [println [cat "  " [ansi-yellow "v"] " - be verbose"]] [println [cat "\nHigh-level options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "x"] " - Run the expression following this argument directly"]] [println [cat "  " [ansi-blue "h"] " - Print this help screen"]] [println [cat "\nLong options - for working with/on Nujel code"]] [println [cat "  " [ansi-blue "no-color"] " - Disable ANSI color"]] [println [cat "  " [ansi-blue "color   "] " - Enable ANSI color"]]]] #{##[println cat ansi-rainbow "Nujel" " - A Lisp dialect for games.\n" ansi-green "Usage:" " nujel [options] [command_string | file]" "\nLow-level options - for work on the runtime itself" "  " ansi-yellow "v" " - be verbose" "\nHigh-level options - for working with/on Nujel code" ansi-blue "x" " - Run the expression following this argument directly" "h" " - Print this help screen" "\nLong options - for working with/on Nujel code" "no-color" " - Disable ANSI color" "color   " " - Enable ANSI color"]
 0E000E010E021A0304011A04040204010D0E000E010E051A0604011A07040204
 010D0E000E011A08040104010D0E000E011A090E0A1A0B04011A0C040304010D
 0E000E011A0D040104010D0E000E011A090E0E1A0F04011A10040304010D0E00

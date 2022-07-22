@@ -8,7 +8,7 @@ STDLIB_MODS          != find stdlib_modules -type f -name '*.nuj' | sort
 STDLIB_NOBS          := $(STDLIB_NUJS:.nuj=.no)
 STDLIB_MOBS          := $(STDLIB_MODS:.nuj=.no)
 
-BIN_SRCS             != find bin vendor -type f -name '*.c'
+BIN_SRCS             != find bin -type f -name '*.c'
 BINLIB_NUJS          != find binlib -type f -name '*.nuj' | sort
 BINLIB_NOBS          := $(BINLIB_NUJS:.nuj=.no)
 
