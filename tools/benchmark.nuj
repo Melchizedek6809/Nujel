@@ -116,7 +116,7 @@
       [pfmt "{i} "]
       [when-not [file/file? filename]
                 [exception :io-error "Can't open the following file to benchmark it:" filename]]
-      [def result-file [file/temp ""]]
+      [def result-file [file/tempname]]
       [def measurements #nil]
       [def testcase [cadr [split filename "/"]]]
       [popen "sleep 1"]

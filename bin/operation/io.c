@@ -70,21 +70,9 @@ void setIOSymbols(){
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
 	(void)c;
-	lVal *car = lCar(v);
-	exit((car && (car->type == ltInt)) ? car->vInt : 0);
+	exit(castToInt(lCar(v), 0));
 	return NULL;
 }
-
-#ifdef __EMSCRIPTEN__
-	#include <emscripten.h>
-	EM_JS(void, wasmConsoleLog, (const char *str), {
-		console.log(UTF8ToString(str));
-	});
-
-	EM_JS(void, wasmConsoleError, (const char *str), {
-		console.error(UTF8ToString(str));
-	});
-#endif
 
 static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
@@ -92,8 +80,6 @@ static lVal *lnfFileRemove(lClosure *c, lVal *v){
 	unlink(lStringData(filename));
 	return car;
 }
-
-
 
 #ifdef _MSC_VER
 LONGLONG FileTime_to_POSIX(FILETIME ft) {
@@ -168,31 +154,6 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 #endif
 }
 
-
-static lVal *lnfFileTemp(lClosure *c, lVal *v){
-	lString *content = requireString(c, lCar(v));
-
-	const char *ret = tempFilename();
-	FILE *fd = fopen(ret,"w");
-
-	const int len = lStringLength(content);
-	int written = 0;
-	while(written < len){
-		int r = fwrite(&lStringData(content)[written], 1, ((size_t)len) - written, fd);
-		if(r <= 0){
-			if(ferror(fd)){
-				epf("Error while writing to temporary file: %s\n", ret);
-				break;
-			}
-		}else{
-			written += r;
-		}
-	}
-
-	fclose(fd);
-	return lValString(ret);
-}
-
 #ifdef ENABLE_POPEN
 static lVal *lnfPopen(lClosure *c, lVal *v){
 	lString *command = requireString(c, lCar(v));
@@ -227,10 +188,10 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 		}
 	}
 	#ifdef __MINGW32__
-	int exitCode = pclose(child);
+	const int exitCode = pclose(child);
 	#else
-	int exitStatus = pclose(child);
-	int exitCode = WEXITSTATUS(exitStatus);
+	const int exitStatus = pclose(child);
+	const int exitCode = WEXITSTATUS(exitStatus);
 	#endif
 
 	buf = realloc(buf,len+1);
@@ -332,13 +293,18 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 	return lValString(path);
 }
 
+static lVal *lnfFileTempName(lClosure *c, lVal *v){
+	(void)c;(void)v;
+	return lValString(tempFilename());
+}
+
 void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"exit",                       "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",                      "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 
-	lAddNativeFunc(c,"file/remove",                "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
+	lAddNativeFunc(c,"rm file/remove",             "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"file/stat",                  "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
-	lAddNativeFunc(c,"file/temp",                  "[content]",      "Write CONTENT to a temp file and return its path",  lnfFileTemp);
+	lAddNativeFunc(c,"file/tempname",              "[]",             "Return a temporary filename",                       lnfFileTempName);
 
 	lAddNativeFunc(c,"ls directory/read",          "[path show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
 	lAddNativeFunc(c,"rmdir directory/remove",     "[path]",             "Remove empty directory at PATH",              lnfDirectoryRemove);
