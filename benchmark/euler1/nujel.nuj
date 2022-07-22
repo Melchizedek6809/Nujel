@@ -9,4 +9,4 @@
                   [zero? [rem i 5]]]
           [set! ret [+ ret i]]]]]
 
-[pfmtln "The sum is: {}" [bench-run]]
+[pfmtln "The sum is: {}\nGC Runs: {}" [bench-run] [garbage-collection-runs]]

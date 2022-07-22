@@ -224,6 +224,11 @@ static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
 	return NULL;
 }
 
+static lVal *lnfGarbageCollectRuns(lClosure *c, lVal *v){
+	(void)c; (void)v;
+	return lValInt(lGCRuns);
+}
+
 static lVal *lnfMetaGet(lClosure *c, lVal *v){
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
 	lVal *l = lCar(v);
@@ -324,7 +329,8 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
 	lAddNativeFuncPure(c,"zero?",    "[α]",   "Return true if α is 0",                       lnfZeroPred);
 
-	lAddNativeFunc(c,"garbage-collect", "[]", "Force the garbage collector to run", lnfGarbageCollect);
+	lAddNativeFunc(c,"garbage-collect",         "[]", "Force the garbage collector to run", lnfGarbageCollect);
+	lAddNativeFunc(c,"garbage-collection-runs", "[]", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns);
 
 	lAddNativeFuncPure(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
 	lAddNativeFuncPure(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);

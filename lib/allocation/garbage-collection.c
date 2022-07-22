@@ -246,6 +246,7 @@ static void lGCSweep(){
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
 void lGarbageCollect(){
+	lGCRuns++;
 	lGCMark();
 	lGCSweep();
 	lGCShouldRunSoon = false;

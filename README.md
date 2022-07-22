@@ -1,13 +1,12 @@
 Nujel
 --------------------------------------------------------
-A tiny, easy to embed Lisp dialect.
+A fast, tiny and easy to embed Lisp dialect.
 While providing a scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/)
 was what started the development effort for Nujel, it is now trying to become
-useful for other scripting tasks as well.
+useful for general scripting tasks as well.
 
 ## Performance
-While Nujel is still quite slow, it is definitely not the slowest runtime out there.
-To make sure that there are no performance regression benchmarks are regularly
+To make sure that there are no performance regressions, benchmarks are regularly
 run which are also used to compare Nujel against other runtimes, if you like
 colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
 
@@ -23,8 +22,8 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Garbage collection (simple Mark-and-Sweep for now)
 - [X] Extensive test suite
 - [X] Lexical scoping
-- [X] Exceptions
-- [X] WASM support
+- [X] Exceptions (using setjmp/longjmp)
+- [X] WASM support (only via Emscripten)
 - [X] Formatted output (inspired by Python/Rust/Zig)
 - [X] Maps (using binary trees)
 - [X] Macros (expander written in Nujel itself)
@@ -41,8 +40,9 @@ Here is a collection of features already implemented, or about to be finished.
 
 ## Current Limitations
 These will be addressed in later versions
+- [X] No file streams (can only read/write files in their entirety)
+- [ ] No networking support
 - [ ] Static Heap (works far better than expected)
-- [ ] No file streams/sockets (can only read/write files in their entirety)
 
 ## Try it out
 You can try out a current [WASM Build over here](https://wolkenwelten.net/nujel/).

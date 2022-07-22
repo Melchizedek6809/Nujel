@@ -260,6 +260,7 @@ lClosure *lRootsClosurePush(lClosure *v);
 lSymbol  *lRootsSymbolPush (lSymbol *v);
 lThread  *lRootsThreadPush (lThread *v);
 extern int rootSP;
+extern int lGCRuns;
 
 static inline void lRootsRet(const int i){ rootSP = i; }
 static inline int  lRootsGet(){ return rootSP; }
