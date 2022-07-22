@@ -6,4 +6,4 @@ def testCalc():
       ret = ret + i
   return ret
 
-print('The sum is: {}'.format(testCalc()))
+print('The sum is: ', (testCalc()))

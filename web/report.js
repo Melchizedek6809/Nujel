@@ -95,7 +95,7 @@ const getData = (key, filterP, name) => {
 const goodCatFilter = v => {
 	if(!({"scheme": true, "mal": true, "franz-lisp": true}[v.language])){return false;}
 	if(v.language == 'scheme'){
-		if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true}[v.runtime])){return false;}
+	    if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true}[v.runtime])){return false;}
 	}
 	return true;
 };
