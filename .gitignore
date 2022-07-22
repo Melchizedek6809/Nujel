@@ -52,11 +52,6 @@ gmon.out
 /nujel.c
 /nujel.h
 
-/bootstrap/stdlib.c
-/bootstrap/stdlib.h
-/bootstrap/binlib.c
-/bootstrap/binlib.h
-
 /web/index.js
 /web/index.html
 /web/index.wasm

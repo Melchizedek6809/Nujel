@@ -4,7 +4,6 @@ clean:
 	@rm -f -- $(NOBS_TO_CLEAN)
 	@rm -f ./callgrind.out.*
 	@rm -f ./web/index.html ./web/index.js ./web/index.wasm
-	@rm -f ./bootstrap/*.h ./bootstrap/*.c
 	@rm -rf tmp
 	@echo "$(ANSI_BG_RED)" "[CLEAN]" "$(ANSI_RESET)" "nujel"
 distclean:
@@ -14,14 +13,6 @@ DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
 	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
 
 release.wasm: web/index.html
-
-bootstrap/stdlib.c: bootstrap/stdlib.no $(ASSET)
-	@./$(ASSET) bootstrap/stdlib.c bootstrap/stdlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-
-bootstrap/binlib.c: bootstrap/binlib.no $(ASSET)
-	@./$(ASSET) bootstrap/binlib.c bootstrap/binlib.no
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/stdlib.no: $(STDLIB_NOBS) $(STDLIB_MOBS)
 	@mkdir -p tmp/
@@ -33,14 +24,12 @@ tmp/binlib.no: $(BINLIB_NOBS)
 	@cat $(BINLIB_NOBS) > tmp/binlib.no
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
 
-tmp/stdlib.c: tmp/stdlib.no $(ASSET)
-	@mkdir -p tmp/
-	@./$(ASSET) tmp/stdlib.c tmp/stdlib.no
+tmp/stdlib.c: tmp/stdlib.no tools/build-bootstrap.nuj $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) "tools/build-bootstrap.nuj" -x "[create-c-asset \"./tmp/stdlib.no\" \"./tmp/stdlib.c\" \"stdlib_no_data\"]"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/binlib.c: tmp/binlib.no $(ASSET)
-	@mkdir -p tmp/
-	@./$(ASSET) tmp/binlib.c tmp/binlib.no
+tmp/binlib.c: tmp/binlib.no tools/build-bootstrap.nuj $(NUJEL_BOOTSTRAP)
+	@./$(NUJEL_BOOTSTRAP) "tools/build-bootstrap.nuj" -x "[create-c-asset \"./tmp/binlib.no\" \"./tmp/binlib.c\" \"binlib_no_data\"]"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 run: $(NUJEL)
@@ -102,7 +91,6 @@ benchmark-nujel: release
 	cp -f $(NUJEL) ~/bin/
 	./$(NUJEL) --no-overwrite --only-nujel ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
 
-update-bootstrap: tmp/stdlib.no tmp/binlib.no
-	cp -f tmp/stdlib.no bootstrap/stdlib.no
-	cp -f tmp/binlib.no bootstrap/binlib.no
-	sed -i 's/\[def test-context \"Nujel Standalone\"\]/\[def test-context \"Nujel Bootstrap\"\]/g' bootstrap/binlib.no
+update-bootstrap: tmp/stdlib.c tmp/binlib.c
+	cp -f tmp/stdlib.c bootstrap/stdlib.c
+	cp -f tmp/binlib.c bootstrap/binlib.c

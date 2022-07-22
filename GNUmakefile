@@ -34,7 +34,6 @@ BOOTSTRAP_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
 
 ifeq ($(OS),Windows_NT)
 	NUJEL   := nujel.exe
-	ASSET   := tools/assets.exe
 	LIBS    += -lpthread
 	STATIC_LIBS := -static -lpthread
 	LDFLAGS := -Wl,--stack,16777216
@@ -75,10 +74,6 @@ nujel.wa: $(LIB_WASM_OBJS) tmp/stdlib.wo
 	@rm -rf $@
 	@$(EMAR) cq $@ $^
 	@echo "$(ANSI_BG_CYAN)" "[WAR]" "$(ANSI_RESET)" $@
-
-$(ASSET): tools/assets.c
-	@$(CC) -o $@ $^ $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
-	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
 
 nujel.a: $(LIB_OBJS)
 	@rm -rf $@

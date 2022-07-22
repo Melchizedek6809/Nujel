@@ -39,10 +39,6 @@ $(BIN_OBJ): lib/nujel.h lib/nujel-private.h bin/private.h
 	@./$(NUJEL_BOOTSTRAP) -x "[file/compile/argv]" $<
 	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
-tools/assets: tools/assets.c
-	@$(CC) -o $@ $> $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
-	@echo "$(ANSI_BG_GREY)" "[CC] " "$(ANSI_RESET)" $@
-
 nujel.a: $(LIB_OBJS)
 	@rm -rf $@
 	$(AR) cq $@ $>

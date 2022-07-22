@@ -1,0 +1,18 @@
+#!/usr/bin/env nujel
+
+[defn create-c-asset [filename output-file symbol-name]
+      [typecheck/only filename :string]
+      [typecheck/only output-file :string]
+      [typecheck/only symbol-name :string]
+      [def raw [slurp filename]]
+      [def out [make-output-port [file/open* output-file "w"]]]
+      [out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n"]
+      [out 'block-write [fmt "unsigned char {symbol-name}[] = "]]
+      [out 'block-write "{"]
+      [dotimes [i [string/length raw]]
+               [when [zero? [rem i 32]]
+                     [out 'block-write "\n"]]
+               [def c [char-at raw i]]
+               [out 'block-write [fmt "0x{c:02X}, "]]]
+      [out 'block-write "0\n};"]
+      [out 'close!]]

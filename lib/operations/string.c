@@ -223,7 +223,7 @@ static lVal *lnfCharAt(lClosure *c,lVal *v){
 		return NULL;
 	}
 
-	return lValInt(str->data[pos]);
+	return lValInt(((u8 *)str->data)[pos]);
 }
 
 static lVal *lnfFromCharCode(lClosure *c,lVal *v){
