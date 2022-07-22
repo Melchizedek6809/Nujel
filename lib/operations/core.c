@@ -286,6 +286,30 @@ static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
 	return lValSymS(requireKeyword(c, lCar(v)));
 }
 
+static i64 lValToId(lVal *v){
+	typeswitch(v){
+	default:      return 0;
+	case ltObject:
+	case ltMacro:
+	case ltLambda: return v->vClosure - lClosureList;
+	case ltBufferView: return v->vBufferView - lBufferViewList;
+	case ltString:
+	case ltBuffer: return v->vBuffer - lBufferList;
+	case ltArray: return v->vArray - lArrayList;
+	case ltTree: return v->vTree - lTreeList;
+	case ltBytecodeArr: return v->vBytecodeArr - lBytecodeArrayList;
+	case ltKeyword:
+	case ltSymbol: return v->vSymbol - lSymbolList;
+	case ltFileHandle: return fileno(v->vFileHandle);
+	case ltNativeFunc: return v->vNFunc - lNFuncList;
+	}
+}
+
+static lVal *lnfValToId(lClosure *c, lVal *v){
+	(void)c;
+	return lValInt(lValToId(lCar(v)));
+}
+
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"quote", "[v]",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFuncPure(c,"read",  "[str]", "Read and Parses STR as an S-Expression", lnfRead);
@@ -294,8 +318,9 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
 
-	lAddNativeFunc(c,"meta",  "[v key]",      "Retrieve KEY from V's metadata", lnfMetaGet);
-	lAddNativeFunc(c,"meta!", "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
+	lAddNativeFunc(c,"val->id", "[v]",                "Generate some sort of ID value for V, mainly used in [write]", lnfValToId);
+	lAddNativeFunc(c,"meta",    "[v key]",            "Retrieve KEY from V's metadata", lnfMetaGet);
+	lAddNativeFunc(c,"meta!",   "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
 
 	lAddNativeFunc(c,"closure/data",     "[clo]", "Return the data of CLO",                     lnfClosureData);
 	lAddNativeFunc(c,"closure/code",     "[clo]", "Return the code of CLO",                     lnfClosureCode);

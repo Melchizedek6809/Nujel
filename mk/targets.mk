@@ -65,8 +65,8 @@ test.ridiculous: $(NUJEL)
 rund: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r"
 
-runn: $(NUJEL)
-	@rlwrap ./$(NUJEL)
+runn: $(FUTURE_NUJEL)
+	@rlwrap ./$(FUTURE_NUJEL)
 
 install: release
 	mkdir -p $(bindir)
