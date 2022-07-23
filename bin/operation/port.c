@@ -52,6 +52,9 @@ static lVal *lnfFileReadAst(lClosure *c, lVal *v){
 		if(ferror(fh)){
 			lExceptionThrowValClo("io-error", "IO Error occured during read", lCar(v), c);
 		}
+		if(feof(fh)){
+			return NULL;
+		}
 		if(r > 0){ bytesRead += r; }
 	}
 	return lCar(v);
