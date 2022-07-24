@@ -3,6 +3,14 @@
 
 [def test-context "Nujel Standalone"]
 
+[defn file/read [path]
+      "Read in a file using the Nujel reader"
+      [read [file/load path]]]
+
+[defn file/read/single [path]
+      "Read a single value from a file"
+      [car [file/read path]]]
+
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]

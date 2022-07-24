@@ -227,7 +227,7 @@ static lVal *lnfPopCount(lClosure *c, lVal *v){
 }
 
 static lVal *lnfAsh(lClosure *c, lVal *v){
-	const i64 iv = requireInt(c, lCar(v));
+	const u64 iv = requireInt(c, lCar(v));
 	const i64 sv = requireInt(c, lCadr(v));
 	return lValInt((sv > 0) ? (iv <<  sv) : (iv >> -sv));
 }

@@ -1,7 +1,12 @@
 #!/usr/bin/env nujel
 
-[try car
-     [def data [file/read "tests/fast/reader-tests/reader-test-001.bin"]]
-     [read data]]
+[for-each [-> [directory/read-relative "tests/fast/reader-tests"] sort]
+          [fn [file]
+              [try car [file/read file]]]]
+
+#;[for-each [-> [directory/read-relative "tests/fast/reader-tests"] sort]
+          [fn [file]
+              [efmtln ">> Running: {file}"]
+            [load file]]]
 
 [return :success]

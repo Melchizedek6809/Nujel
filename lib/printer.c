@@ -115,6 +115,9 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 		if(writeValStack[i] != v){continue;}
 		return spf(cur, bufEnd, " -+- Loop detected -+- ");
 	}
+	if(writeValSP >= (int)(countof(writeValStack)-1)){
+		return spf(cur, bufEnd, " -+- Loop very likely -+- ");
+	}
 
 	switch(v->type){
 	default:
