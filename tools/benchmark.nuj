@@ -116,7 +116,6 @@
       [def result-file [file/tempname]]
       [def measurements #nil]
       [def testcase [cadr [split filename "/"]]]
-      [popen "sleep 10"]
       [try [fn [err]
                [file/remove result-file]
              [display/error err]
@@ -161,6 +160,7 @@
              [when [> cur-runs 0]
                    [dotimes [i cur-runs]
                             [set! ret [cons [bench/single filename runtime i] ret]]]
+                   [popen "sleep 10"]
                    [println ""]]]
       ret]
 
