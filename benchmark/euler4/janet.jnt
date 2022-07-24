@@ -1,0 +1,23 @@
+(defn reverse-num [real-a]
+      (var ret 0)
+      (var a real-a)
+      (while (> a 0)
+             (set ret (+ (* ret 10) (% a 10)))
+             (set a (math/floor (/ a 10))))
+      ret)
+
+(defn palindrome? [a]
+      (= a (reverse-num a)))
+
+(defn startSeach []
+      (var max 0)
+      (loop [a :range [0 1000]]
+            (loop [b :range [0 1000]]
+                  (var p (* a b))
+                  (when (and (palindrome? p)
+                             (> p max))
+                        (set max p))))
+      max)
+
+
+(print "The biggest product of 2 3-digit numbers that is a palindrome is: " (startSeach))

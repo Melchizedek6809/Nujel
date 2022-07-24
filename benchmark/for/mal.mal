@@ -1,6 +1,0 @@
-(def! test-run (fn* [i ret]
-                    (if (> i 9999999)
-                        ret
-                        (test-run (+ 1 i)
-                                  (+ ret i)))))
-(println (test-run 0 0))

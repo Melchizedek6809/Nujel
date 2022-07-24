@@ -1,0 +1,28 @@
+def reverseNum(a)
+    ret = 0
+    while (a > 0) do
+          ret = (ret * 10) + (a % 10);
+          a = (a / 10).floor;
+    end
+    return ret
+end
+
+def palindromeP(a)
+    a == reverseNum(a)
+end
+
+def startSearch
+    ret = 0
+    for a in 0..999 do
+        for b in 0..999 do
+            p = a * b
+            if (palindromeP(p) && (p > ret)) then
+               ret = p
+            end
+        end
+    end
+    return ret
+end
+
+ret = startSearch
+puts "The biggest product of 2 3-digit numbers that is a palindrome is: #{ret}"
