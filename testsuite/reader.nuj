@@ -71,3 +71,8 @@
 [test/add 16 [eval [cons 'do [read "(#;sqrt abs -16)"]]]]
 [test/add '[a . c] [eval [cons 'do [read "'(a . #;b c)"]]]]
 [test/add '[a . b] [eval [cons 'do [read "'(a . b #;c)"]]]]
+[test/add :read-error [try car [read "#{#nil 01}"]]]
+[test/add :read-error [try car [read "#{123 01}"]]]
+[test/add :read-error [try car [read "#{:asd 01}"]]]
+[test/add :read-error [try car [read "#{#[] 01}"]]]
+[test/add #t [not= :read-error [try car [read "#{##[] 01}"]]]]

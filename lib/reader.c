@@ -302,14 +302,12 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 	int len  = 0;
 	lArray *literals = NULL;
 
-	if(*s->data == '#'){
-		lVal *v = lReadValue(s);
-		if(v->type != ltArray){
-			throwBCReadError(s, v, "Invalid literal array in BCA");
-		}
-		literals = v->vArray;
-		literals->flags = ARRAY_IMMUTABLE;
+	lVal *v = lReadValue(s);
+	if(!v || (v->type != ltArray)){
+		throwBCReadError(s, v, "Invalid literal array in BCA");
 	}
+	literals = v->vArray;
+	literals->flags = ARRAY_IMMUTABLE;
 
 	while(s->data < s->bufEnd){
 		if((len+4) >= size){
