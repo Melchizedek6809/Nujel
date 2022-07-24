@@ -93,11 +93,17 @@ const getData = (key, filterP, name) => {
 };
 
 const goodCatFilter = v => {
-	if(!({"scheme": true, "mal": true, "franz-lisp": true}[v.language])){return false;}
-	if(v.language == 'scheme'){
-	    if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true}[v.runtime])){return false;}
-	}
-	return true;
+    if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "janet": true, "common-lisp": true, "javascript":true}[v.language])){return false;}
+    if(v.language == 'scheme'){
+	if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true}[v.runtime])){return false;}
+    }
+    if(v.language == 'common-lisp'){
+        if(!({"ecl --shell": true}[v.runtime])){return false;}
+    }
+    if(v.language == 'javascript'){
+        if(!({"mujs": true}[v.runtime])){return false;}
+    }
+    return true;
 };
 
 const uglyCatFilter = v => {
