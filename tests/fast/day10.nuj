@@ -27,8 +27,8 @@
       [try [fn [ε] [if [= [car ε] :return]
                        [cons :part1 [char-to-score [cadr ε]]]
                        [throw ε]]]
-           [dotimes [i [string/length line]]
-                    [def cc [char-at line i]]
+           [dotimes [i [buffer/length line]]
+                    [def cc [buffer/ref line i]]
                     [case cc
                           [[#\(] [set! stack [cons #\) stack]]]
                           [[#\{] [set! stack [cons #\} stack]]]

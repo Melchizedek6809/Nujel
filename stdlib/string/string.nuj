@@ -9,9 +9,9 @@
 
 [defn string->byte-array [a]
       "Turn a string into an UTF-8 encoded byte array"
-      [def ret [array/allocate [string/length a]]]
-      [dotimes [i [string/length a]]
-               [array/set! ret i [char-at a i]]]
+      [def ret [array/allocate [buffer/length a]]]
+      [dotimes [i [buffer/length a]]
+               [array/set! ret i [buffer/ref a i]]]
       ret]
 
 [defn println [str]
@@ -51,7 +51,7 @@
       "Return the extension of PATH"
       [def last-period [last-index-of path "."]]
       [if [>= last-period 0]
-          [string/cut path [+ 1 last-period] [string/length path]]
+          [string/cut path [+ 1 last-period] [buffer/length path]]
           path]]
 
 [defn path/without-extension [path]
@@ -108,10 +108,10 @@
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
                 [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
-      [while [< [string/length text] goal-length]
+      [while [< [buffer/length text] goal-length]
              [set! text [cat char text]]]
-      [if [> [string/length text] goal-length]
-          [string/cut text [- [string/length text] goal-length] [string/length text]]
+      [if [> [buffer/length text] goal-length]
+          [string/cut text [- [buffer/length text] goal-length] [buffer/length text]]
           text]]
 
 [defn string/pad-end [text goal-length char]
@@ -120,9 +120,9 @@
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
                 [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
-      [while [< [string/length text] goal-length]
+      [while [< [buffer/length text] goal-length]
              [set! text [cat text char]]]
-      [if [> [string/length text] goal-length]
+      [if [> [buffer/length text] goal-length]
           [string/cut text 0 goal-length]
           text]]
 
@@ -132,11 +132,11 @@
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
                 [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
-      [while [< [string/length text] goal-length]
+      [while [< [buffer/length text] goal-length]
              [set! text [cat char text char]]]
-      [if [> [string/length text] goal-length]
-          [let [[end-overflow [/ [- [string/length text] goal-length] 2]]
-                [start-overflow [- [- [string/length text] goal-length] end-overflow]]]
+      [if [> [buffer/length text] goal-length]
+          [let [[end-overflow [/ [- [buffer/length text] goal-length] 2]]
+                [start-overflow [- [- [buffer/length text] goal-length] end-overflow]]]
                [string/cut text start-overflow [+ start-overflow goal-length]]]
           text]]
 
@@ -148,7 +148,7 @@
           text]]
 
 [defn split/empty [str separator]
-      [def slen [string/length str]]
+      [def slen [buffer/length str]]
       [def start 0]
       [def ret #nil]
       [while [< start slen]
@@ -161,15 +161,15 @@
       [def pos-found [index-of str separator start]]
       [if [>= pos-found 0]
           [cons [string/cut str start pos-found]
-                [split/string str separator [+ pos-found [string/length separator]]]]
-          [cons [string/cut str start [string/length str]]
+                [split/string str separator [+ pos-found [buffer/length separator]]]]
+          [cons [string/cut str start [buffer/length str]]
                 #nil]]]
 
 [defn split [str separator]
       "Splits STR into a list at every occurunse of SEPARATOR"
       [typecheck/only str :string]
       [typecheck/only separator :string]
-      [case [string/length separator]
+      [case [buffer/length separator]
             [0 [split/empty str]]
             [otherwise [split/string str separator 0]]]]
 
@@ -186,8 +186,8 @@
       "Reads the first float from TEXT"
       [float [read/single text]]]
 
-[defn string/length?! [chars]
-      [fn [a] [= chars [string/length a]]]]
+[defn buffer/length?! [chars]
+      [fn [a] [= chars [buffer/length a]]]]
 
 [defn contains-any? [str chars]
       [apply or [map [split chars ""]
@@ -197,6 +197,13 @@
       [apply and [map [split chars ""]
                       [fn [a] [>= [index-of str a] 0]]]]]
 
-[defn from-char-codes l
+[defn from-char-code l
       "Turn the provided char codes into a string and return it"
-      [apply cat [map l from-char-code]]]
+      [def buf [buffer/allocate [list/length l]]]
+      [dotimes [i [buffer/length buf] [buffer->string buf]]
+               [when [or [not [int? [car l]]]
+                         [> [car l] 255]
+                         [< [car l] 0]]
+                     [exception :type-error "[from-char-code] expects :int arguments from 0 to 255, not: " [car l]]]
+               [buffer/set! buf i [car l]]
+               [cdr! l]]]

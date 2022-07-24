@@ -48,14 +48,14 @@
       [cons off p]]
 
 [defn packet/operator [p s offset]
-      [if [= [char-at s offset] #\1]
+      [if [= [buffer/ref s offset] #\1]
           [packet/operator/packets p s [+ offset 12] [bits/read-value s [+ 1 offset] 11]]
           [packet/operator/bits p s [+ offset 16] [bits/read-value s [+ 1 offset] 15]]]]
 
 [defn packet/literal [p s offset]
       [def parts #nil]
       [def off offset]
-      [while [= [char-at s off] #\1]
+      [while [= [buffer/ref s off] #\1]
 	     [inc! off]
 	     [set! parts [cons [string/cut s off [+ 4 off]] parts]]
 	     [+= off 4]]

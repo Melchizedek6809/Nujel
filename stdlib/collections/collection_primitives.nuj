@@ -7,10 +7,10 @@
       "Return whatver is at position I in L"
       [case [type-of l]
             [:nil               #nil]
-            [:tree   [tree/ref  l i]]
-            [:string [char-at   l i]]
-            [:array  [array/ref l i]]
-            [:pair   [list/ref  l i]]
+            [:tree   [tree/ref   l i]]
+            [[:buffer :string :buffer-view] [buffer/ref l i]]
+            [:array  [array/ref  l i]]
+            [:pair   [list/ref   l i]]
             [otherwise [throw [list :type-error "You can only ref a collection" l [current-lambda]]]]]]
 
 [defn filter [l p]
@@ -37,7 +37,7 @@
             [:nil                    0]
             [:array  [array/length  α]]
             [:pair   [list/length   α]]
-            [:string [string/length α]]
+            [[:buffer :string :buffer-view] [buffer/length α]]
             [:tree   [tree/size     α]]
             [otherwise [throw [list :type-error "You can only use length with a collection" α [current-lambda]]]]]]
 

@@ -10,9 +10,9 @@
       [if hr?
           [port 'block-write [fmt "#<buffer :id {} :size {:x}>" [val->id v] [buffer/length v]]]
           [do [port 'block-write "#m"]
-              [def view [buffer/view/u8* v]]
+              [def view [buffer/u8* v]]
               [dotimes [i [buffer/length v]]
-                       [port 'block-write [int->string/HEX [buffer/view/ref view i]]]]]]]
+                       [port 'block-write [int->string/HEX [buffer/ref view i]]]]]]]
 
 [defn write/raw/bytecode-array [v port hr?]
       [port 'block-write "#{"]

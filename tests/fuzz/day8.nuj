@@ -4,7 +4,7 @@
 [def counts [-> [array/allocate 10] [array/fill! 0]]]
 
 [defn output/count [entry]
-       [def len [string/length entry]]
+       [def len [buffer/length entry]]
        [case len
              [2 [array/++ counts 1]]
              [3 [array/++ counts 7]]

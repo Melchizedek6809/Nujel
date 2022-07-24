@@ -106,7 +106,7 @@
            [ref repl/option-map :default]] option]]
 
 [defn repl/parse-options [options]
-      [if [= [char-at options 0] #\-]
+      [if [= [buffer/ref options 0] #\-]
           [repl/parse-option [string->keyword [cut options 1]]]
           [for-each [map [split options ""] string->symbol] repl/parse-option]]]
 
@@ -114,7 +114,7 @@
       [cond [repl/parse-args/eval-next [try display/error
                                             [eval-in root-closure [cons do [read arg]]]
                                             [set! repl/parse-args/eval-next #f]]]
-            [[= [char-at arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
+            [[= [buffer/ref arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
             [#t [try display/error
                      [file/eval arg]]
                 [set! repl/parse-args/run-repl #f]]]]

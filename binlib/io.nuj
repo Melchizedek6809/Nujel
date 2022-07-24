@@ -44,7 +44,7 @@
 [defn file/test/module [path base-dir]
       "Test a module by running all contained tests"
       [def rel-path [string/cut path [length base-dir]]]
-      [when [== [char-at rel-path 0] #\/]
+      [when [== [buffer/ref rel-path 0] #\/]
             [set! rel-path [string/cut rel-path 1]]]
       [def module-name [string->keyword [path/without-extension rel-path]]]
       [require :test]

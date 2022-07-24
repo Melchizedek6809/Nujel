@@ -8,10 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static lVal *lnfStrlen(lClosure *c, lVal *v){
-	return lValInt(lStringLength(requireString(c, lCar(v))));
-}
-
 static lVal *lnfTrim(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 
@@ -215,41 +211,15 @@ static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfCharAt(lClosure *c,lVal *v){
-	const lString *str = requireString(c, lCar(v));
-	const int pos = requireInt(c, lCadr(v));
-	const int len = lStringLength(str);
-
-	if((pos < 0) || (pos >= len)){
-		lExceptionThrowValClo("bounds-error","[char-at] index bigger that string", v, c);
-		return NULL;
-	}
-
-	return lValInt(((u8 *)str->data)[pos]);
-}
-
-static lVal *lnfFromCharCode(lClosure *c,lVal *v){
-	const i64 code = requireInt(c, lCar(v));
-	if(unlikely(code > 255)){
-		lExceptionThrowValClo("out-of-bounds", "Char codes need to be in between 0 and 255", v, c);
-		return NULL;
-	}
-	char buf[2] = {code, 0};
-	return lValStringLen(buf, 1);
-}
-
 void lOperationsString(lClosure *c){
 	lAddNativeFuncPure(c,"cat",           "args",                     "ConCATenates ARGS into a single string",                     lnfCat);
 	lAddNativeFuncPure(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
-	lAddNativeFuncPure(c,"string/length", "[str]",                    "Return length of STR",                                       lnfStrlen);
 	lAddNativeFuncPure(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
 	lAddNativeFuncPure(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
 	lAddNativeFuncPure(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
 	lAddNativeFuncPure(c,"string/cut",    "[str start &stop]",        "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
 	lAddNativeFuncPure(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
 	lAddNativeFuncPure(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
-	lAddNativeFuncPure(c,"char-at",       "[str pos]",                "Return the character at position POS in STR",                lnfCharAt);
-	lAddNativeFuncPure(c,"from-char-code","codes",                    "Construct a string out of ...CODE codepoints and return it", lnfFromCharCode);
 
 	lAddNativeFuncPure(c,"string->symbol","[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
 	lAddNativeFuncPure(c,"symbol->string","[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
