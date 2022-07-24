@@ -455,16 +455,15 @@ static lVal *lReadList(lReadContext *s, bool rootForm){
 		lStringAdvanceToNextCharacter(s);
 
 		const char c = *s->data;
-		if(c == ';'){
-			lStringAdvanceToNextLine(s);
-			continue;
-		}
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
 				lExceptionThrowReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
+		}else if(c == ';'){
+			lStringAdvanceToNextLine(s);
+			continue;
 		}else if(iscloseparen(c)){
 			if(rootForm){
 				lExceptionThrowReader(s, "Unmatched closing bracket");
