@@ -4,6 +4,7 @@ bindir                = $(exec_prefix)/bin/
 
 AFL_CC               := afl-gcc
 AFL_FUZZ             := afl-fuzz
+FUZZ_NUJEL           := fuzz-nujel
 CC                   := cc
 CAT                  := cat
 AR                   := ar

@@ -76,9 +76,11 @@ install.musl: release.musl
 	mkdir -p $(bindir)
 	$(INSTALL) ./$(NUJEL) $(bindir)
 
-fuzz: $(RUNTIME_SRCS)
+$(FUZZ_NUJEL): $(RUNTIME_SRCS)
 	@$(AFL_CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
-	@$(AFL_FUZZ) -i tests/fuzz/ -o /tmp/wwfuzz -m 128 -t 10000 -d -- ./fuzz @@
+
+fuzz: $(FUZZ_NUJEL)
+	@$(AFL_FUZZ) -i tests/fuzz/ -o /tmp/wwfuzz -m 128 -t 10000 -d -- ./$(FUZZ_NUJEL) @@
 
 valgrind: $(NUJEL)
 	valgrind --error-exitcode=1 ./$(NUJEL) tools/tests.nuj

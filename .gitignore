@@ -15,6 +15,7 @@ gmon.out
 
 # Executables/Object/Temporary files
 /tmp
+/fuzz-nujel
 /nujel
 /nujel-bootstrap
 /future-nujel
