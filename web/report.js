@@ -95,7 +95,7 @@ const getData = (key, filterP, name) => {
 const goodCatFilter = v => {
     if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "janet": true, "common-lisp": true, "javascript":true}[v.language])){return false;}
     if(v.language == 'scheme'){
-	if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true}[v.runtime])){return false;}
+	if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true, "gosh": true}[v.runtime])){return false;}
     }
     if(v.language == 'common-lisp'){
         if(!({"ecl --shell": true}[v.runtime])){return false;}
@@ -107,9 +107,9 @@ const goodCatFilter = v => {
 };
 
 const uglyCatFilter = v => {
-	if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true}[v.language])){return false;}
+	if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true, "racket": true}[v.language])){return false;}
 	if(v.language == 'scheme'){
-		if((v.runtime != 'chez --script') && (v.runtime != 'guile') && (v.runtime != 'gosh')){return false;}
+		if(v.runtime != 'chez --script'){return false;}
 	}
 	if(v.language == 'common-lisp'){
 		if(v.runtime != 'sbcl --script'){return false;}

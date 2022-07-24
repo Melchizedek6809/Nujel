@@ -1,0 +1,66 @@
+#!/usr/bin/env nujel
+
+[defn polymer/read [line]
+      [def eles @[]]
+      [def pairs @[]]
+      [dotimes [i [string/length line]]
+               [def key-a [string->symbol [string/cut line i [+ i 1]]]]
+               [if [tree/has? eles key-a]
+                   [tree/++ eles key-a]
+                   [tree/set! eles key-a 1]]
+               [when [< i [- [string/length line] 1]]
+                     [def key-b [string->symbol [string/cut line i [+ i 2]]]]
+                     [if [tree/has? pairs key-b]
+                         [tree/++ pairs key-b]
+                         [tree/set! pairs key-b 1]]]]
+      @[:pairs pairs :eles eles :combinations '[]]]
+
+[defn combination/parse [recipe last-recipe]
+      [def source [string->symbol [car recipe]]]
+      [def new    [string->symbol [cadr recipe]]]
+      [def new-α [string->symbol [cat [string/cut [car recipe] 0 1] [cadr recipe]]]]
+      [def new-β [string->symbol [cat [cadr recipe] [string/cut [car recipe] 1 2]]]]
+      [fn [α Ω]
+          [def count [int [or [ref [ref α :pairs] source] 0]]]
+        [tree/+= [ref Ω :eles] new count]
+        [tree/+= [ref Ω :pairs] source [- count]]
+        [tree/+= [ref Ω :pairs] new-α count]
+        [tree/+= [ref Ω :pairs] new-β count]
+        [if [lambda? last-recipe] [last-recipe α Ω] Ω]]]
+
+[defn combination/add [state recipe]
+      [tree/set! state :combinations [combination/parse recipe [ref state :combinations]]]]
+
+[defn combinations/read [state lines]
+      [for-each lines [fn [line] [combination/add state [split line " -> "]]]]
+      state]
+
+[defn state/read [fn]
+      [def input-raw [split [file/read fn] "\n"]]
+      [def state [polymer/read [car input-raw]]]
+      [combinations/read state [cddr input-raw]]]
+
+[defn state/dup [α]
+      @[:combinations [ref α :combinations] :pairs [tree/dup [ref α :pairs]] :eles [tree/dup [ref α :eles]]]]
+
+[defn state/run/once [α]
+      [[ref α :combinations] α [state/dup α]]]
+
+[defn state/run/many [α steps]
+      [if [<= steps 0] α
+          [state/run/many [state/run/once α]
+                          [- steps 1]]]]
+
+[defn result [state]
+      [- [apply max [tree/values [ref state :eles]]]
+         [apply min [tree/values [ref state :eles]]]]]
+
+[def state [state/read "tests/fast/day14.dat"]]
+[def p1-state [state/run/many state 10]]
+[def res-p1 [result p1-state]]
+[when [not= res-p1 2010]
+      [throw [list :wrong-result "Wrong Part 1 result" res-p1]]]
+[def res-p2 [result [state/run/many p1-state 30]]]
+[when [not= res-p2 2437698971143]
+      [throw [list :wrong-result "Wrong Part 2 result" res-p2]]]
+[return :success]

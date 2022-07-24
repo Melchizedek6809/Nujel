@@ -1,0 +1,33 @@
+#!/usr/bin/env nujel
+;; Just stressing the AVL tree, we count how often each word appears in the CoC
+;; and then sum all words which appear at list 5 times.
+;; This not only tests the AVL implementation but is also a very nice benchmark
+;; for allocating a lot of small arrays.
+
+[require :avl]
+
+[defn wordfreq-cmp [a b]
+       [avl/default-cmp [array/ref a 0]
+                        [array/ref b 0]]]
+
+[defn count-words [text]
+       [-> [split text "\n"]
+           [map [fn [v] [split v " "]]]
+           [flatten]
+           [map trim]
+           [filter [fn [a] [not= a ""]]]
+           [reduce [fn [freq word]
+                      [let [[old-entry [avl/get freq #[word 1]]]
+                            [new-entry #[word [if old-entry
+                                                  [+ 1 [array/ref old-entry 1]]
+                                                  1]]]]
+                           [avl/insert freq new-entry]]]
+                   [avl/tree wordfreq-cmp]]
+           [avl/reduce [fn [e sum]
+                          [+ sum [max 0 [- [array/ref e 1] 5]]]]]]]
+
+[def words [count-words [string [or [file/read "CODE_OF_CONDUCT.md"] ""]]]]
+[when [not= words 122]
+      [throw [list :wrong-result "CoC Words Wrong" words]]]
+
+[return :success]

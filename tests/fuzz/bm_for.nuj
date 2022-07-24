@@ -1,0 +1,8 @@
+#!/usr/bin/env nujel
+
+[defn bench-run []
+      [def ret 0]
+      [dotimes [i 10,000,000 ret]
+        [set! ret [+ ret i]]]]
+
+[pfmtln "The result is: {}" [bench-run]]

@@ -22,7 +22,7 @@ static lVal *lnfTrim(lClosure *c, lVal *v){
 	}
 
 	const char *lastNonWhitespace = bufEnd;
-	while(lastNonWhitespace[-1] && (lastNonWhitespace > (firstNonWhitespace+1)) && isspace((u8)lastNonWhitespace[-1])){
+	while((&lastNonWhitespace[-1] > firstNonWhitespace) && lastNonWhitespace[-1] && isspace((u8)lastNonWhitespace[-1])){
 		lastNonWhitespace--;
 	}
 	lastNonWhitespace = MAX(firstNonWhitespace, MIN(bufEnd, lastNonWhitespace));
@@ -36,7 +36,7 @@ static lVal *lnfStrDown(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len);
+	char *buf = malloc(len+1);
 	if (unlikely(buf == NULL)) {
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [downcase]", v, c);
 		return NULL;
@@ -52,7 +52,7 @@ static lVal *lnfStrUp(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len);
+	char *buf = malloc(len+1);
 	if (unlikely(buf == NULL)) {
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [upcase]", v, c);
 		return NULL;
@@ -68,7 +68,7 @@ static lVal *lnfStrCap(lClosure *c, lVal *v){
 	lString *str = requireString(c, lCar(v));
 	const int len = lStringLength(str);
 
-	char *buf = malloc(len);
+	char *buf = malloc(len+1);
 	if (unlikely(buf == NULL)) {
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [capitalize]", v, c);
 		return NULL;
@@ -202,14 +202,16 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 
 static lVal *lnfWriteStr(lClosure *c, lVal *v){
 	(void)c;
-	char* dispWriteBuf = malloc(1 << 22);
+	static char* dispWriteBuf = NULL;
+	if (unlikely(dispWriteBuf == NULL)) {
+		dispWriteBuf = malloc(1 << 20);
+	}
 	if (unlikely(dispWriteBuf == NULL)) {
 		lExceptionThrowValClo("out-of-memory", "OOM during [string/write]", v, c);
 		return NULL;
 	}
-	spf(dispWriteBuf, &dispWriteBuf[(1 << 22)], "%v", lCar(v));
-	lVal *ret = lValString(dispWriteBuf);
-	free(dispWriteBuf);
+	char *len = spf(dispWriteBuf, &dispWriteBuf[(1 << 20)], "%v", lCar(v));
+	lVal *ret = lValStringLen(dispWriteBuf,len - dispWriteBuf);
 	return ret;
 }
 

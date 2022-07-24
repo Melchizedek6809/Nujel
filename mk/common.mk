@@ -2,6 +2,8 @@ prefix               := /usr/local
 exec_prefix           = $(prefix)
 bindir                = $(exec_prefix)/bin/
 
+AFL_CC               := afl-gcc
+AFL_FUZZ             := afl-fuzz
 CC                   := cc
 CAT                  := cat
 AR                   := ar
