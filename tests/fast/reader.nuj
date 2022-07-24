@@ -1,0 +1,7 @@
+#!/usr/bin/env nujel
+
+[try car
+     [def data [file/read "tests/fast/reader-tests/reader-test-001.bin"]]
+     [read data]]
+
+[return :success]
