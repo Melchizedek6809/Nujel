@@ -131,7 +131,7 @@ jobs:
     - name: Test runtime
       run: make test.future.slow
   static-analysis-linux:
-    name: clang-static-analyzer
+    name: Clang - static analaysis
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
@@ -141,6 +141,17 @@ jobs:
         sudo apt-get -y install clang clang-tools make
     - name: Run static analyzer
       run: scan-build --status-bugs make nujel
+  valgrind-linux:
+    name: Valgrind - memory leak check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install compiler
+      run: |
+        sudo apt-get -y install valgrind
+    - name: Run static analyzer
+      run: make valgrind
   release-linux:
     name: ${{ matrix.buildtype }}-linux
     runs-on: ubuntu-latest

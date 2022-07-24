@@ -80,6 +80,9 @@ fuzz: $(RUNTIME_SRCS)
 	@$(AFL_CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@$(AFL_FUZZ) -i tests/fuzz/ -o /tmp/wwfuzz -m 128 -t 10000 -d -- ./fuzz @@
 
+valgrind: $(NUJEL)
+	valgrind --error-exitcode=1 ./$(NUJEL) tools/tests.nuj
+
 profile: $(NUJEL)
 	valgrind --tool=callgrind --dump-instr=yes ./$(NUJEL) --only-test-suite tools/tests.nuj
 
