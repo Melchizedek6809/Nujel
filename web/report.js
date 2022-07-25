@@ -111,6 +111,9 @@ const uglyCatFilter = v => {
 	if(v.language == 'scheme'){
 		if(v.runtime != 'chez --script'){return false;}
 	}
+        if(v.language == 'racket'){
+		return true;
+	}
 	if(v.language == 'common-lisp'){
 		if(v.runtime != 'sbcl --script'){return false;}
 	}
