@@ -71,8 +71,6 @@
 [test/add -16 [bit-shift-left -1 4]]
 [test/add -16 [bit-nand #b1111 #b1111]]
 [test/add 6 [eval [read/single "[+ 1 2 3]"]]]
-[test/add #[72 97 108 108 111 44 32 87 101 108 116 33] [string->byte-array "Hallo, Welt!"]]
-[test/add ##[72 97 108 108 111 44 32 87 101 108 116 33] [string->byte-array "Hallo, Welt!"]]
 [test/add "" [string/cut "\n" 1 1]]
 [test/add "" [string/cut "\n" 1 -1]]
 [test/add "" [string/cut "Hallo, Welt!" 0 -5]]

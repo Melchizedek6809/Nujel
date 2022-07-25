@@ -118,7 +118,7 @@
       [def testcase [cadr [split filename "/"]]]
       [try [fn [err]
                [file/remove result-file]
-             [display/error err]
+             [print/error err]
              [throw err]]
            [def ret [popen [fmt "time -o {result-file} --format=\"{time-template}\" {runtime} {filename}"]]]
            [when-not [zero? [car ret]]

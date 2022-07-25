@@ -7,13 +7,6 @@
       "Return string α as a keyword"
       [symbol->keyword [string->symbol α]]]
 
-[defn string->byte-array [a]
-      "Turn a string into an UTF-8 encoded byte array"
-      [def ret [array/allocate [buffer/length a]]]
-      [dotimes [i [buffer/length a]]
-               [array/set! ret i [buffer/ref a i]]]
-      ret]
-
 [defn println [str]
       "Print STR on a single line"
       [print [cat str "\r\n"]]]
@@ -21,14 +14,6 @@
 [defn errorln [str]
       "Print to stderr STR on a single line"
       [error [cat str "\r\n"]]]
-
-[defn display [value] :inline
-      "Display VALUE"
-      [print value]]
-
-[defn newline []
-      "Print a single line feed character"
-      [print "\r\n"]]
 
 [defn br [num]
       "Return NUM=1 linebreaks"

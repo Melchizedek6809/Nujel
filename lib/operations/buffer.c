@@ -25,8 +25,8 @@ size_t lBufferLength(const lBuffer *v){
 }
 
 const void *lBufferViewData(lBufferView *v){
-	if(v == NULL){return NULL;}
-	if(v->buf->flags & BUFFER_IMMUTABLE){return NULL;}
+	if(unlikely(v == NULL)){return NULL;}
+	if(unlikely(v->buf->flags & BUFFER_IMMUTABLE)){return NULL;}
 	return &((u8 *)v->buf->buf)[v->offset * lBufferViewTypeSize(v->type)];
 }
 
@@ -108,9 +108,37 @@ static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, si
 	return retV;
 }
 
-static lVal *lnfBufferCopy(lClosure *c, lVal *v){
+static lVal *lnfBufferDup(lClosure *c, lVal *v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
 	return bufferFromPointer(c, castToBool(lCadr(v)), buf->buf, buf->length);
+}
+
+static lVal *lnfBufferCopy(lClosure *c, lVal *v){
+	lVal *car = lCar(v);
+	lBuffer *dest = requireMutableBuffer(c, car);
+	lVal *vSrc = lCadr(v);
+	const int destOffset = requireNaturalInt(c, lCaddr(v));
+	const void *buf = NULL;
+	int length = 0;
+
+	typeswitch(vSrc){
+	case ltString:
+	case ltBuffer:
+		buf = vSrc->vBuffer->data;
+		length = castToInt(lCadddr(v), vSrc->vBuffer->length);
+		break;
+	}
+
+	if(unlikely((buf == NULL) || (length < 0))){
+		lExceptionThrowValClo("type-error", "Can't copy from that", vSrc, c);
+		return NULL;
+	}
+	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc->vBuffer->length))){
+		lExceptionThrowValClo("out-of-bounds", "Can't fit everything in that buffer", v, c);
+		return NULL;
+	}
+	memcpy(&((u8*)dest->buf)[destOffset], buf, length);
+	return car;
 }
 
 static lVal *lnfStringToBuffer(lClosure *c, lVal *v){
@@ -121,7 +149,7 @@ static lVal *lnfStringToBuffer(lClosure *c, lVal *v){
 static lVal *lnfBufferToString(lClosure *c, lVal *v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
 	const i64 length = castToInt(lCadr(v), buf->length);
-	if(length < 0){
+	if(unlikely(length < 0)){
 		lExceptionThrowValClo("type-error", "Length has to be greater than 0", lCadr(v), c);
 	}
 	return lValStringLen(buf->buf, length);
@@ -130,7 +158,7 @@ static lVal *lnfBufferToString(lClosure *c, lVal *v){
 static lVal *bufferView(lClosure *c, lVal *v, lBufferViewType T){
 	lBuffer *buf = requireBuffer(c, lCar(v));
 	const bool immutable = lCdr(v) ? castToBool(lCadr(v)) : buf->flags & BUFFER_IMMUTABLE;
-	if(!immutable && (buf->flags & BUFFER_IMMUTABLE)){
+	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
 		lExceptionThrowValClo("type-error", "Can't create a mutable view for an immutable buffer", v, c);
 	}
 	const size_t length = buf->length / lBufferViewTypeSize(T);
@@ -274,7 +302,8 @@ static lVal *lnfBufferViewBuffer(lClosure *c, lVal *v){
 void lOperationsBuffer(lClosure *c){
 	lAddNativeFunc(c, "buffer/allocate",        "[length]",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate);
 	lAddNativeFunc(c, "buffer/length!",         "[buf new-length]", "Set the size of BUF to NEW-LENGTH", lnfBufferLengthSet);
-	lAddNativeFunc(c, "buffer/copy",            "[buf immutable?]", "Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy);
+	lAddNativeFunc(c, "buffer/dup",             "[buf immutable?]", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup);
+	lAddNativeFunc(c, "buffer/copy",            "[dest src dest-offset length]","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy);
 
 	lAddNativeFunc(c, "string->buffer",         "[str immutable?]", "Copy STR into a buffer and return it", lnfStringToBuffer);
 	lAddNativeFunc(c, "buffer->string",         "[buf length]",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString);

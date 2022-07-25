@@ -13,7 +13,7 @@
 [def repl/option-map @[]]
 
 [defn repl/exception-handler [error]
-      [display/error error]]
+      [print/error error]]
 
 [defn repl/welcome []
       [println [cat [ansi-rainbow "Nujel"] " is ready for business!"]]]
@@ -59,7 +59,7 @@
 [defn repl/readline [ctx]
       [def line [readline [repl/prompt]]]
       [when [nil? line]
-            [display "Adios, cowboy...\r\n"]
+            [println "Adios, cowboy..."]
             [exit 0]]
       [if [= line "[cmd]\n"]
           [repl/cmd ctx]
@@ -111,11 +111,11 @@
           [for-each [map [split options ""] string->symbol] repl/parse-option]]]
 
 [defn repl/parse-arg [arg]
-      [cond [repl/parse-args/eval-next [try display/error
+      [cond [repl/parse-args/eval-next [try print/error
                                             [eval-in root-closure [cons do [read arg]]]
                                             [set! repl/parse-args/eval-next #f]]]
             [[= [buffer/ref arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
-            [#t [try display/error
+            [#t [try print/error
                      [file/eval arg]]
                 [set! repl/parse-args/run-repl #f]]]]
 

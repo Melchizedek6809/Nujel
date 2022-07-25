@@ -1,8 +1,6 @@
 ; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
-[def test-context "Nujel Standalone"]
-
 [defn file/read [path]
       "Read in a file using the Nujel reader"
       [read [file/load path]]]
@@ -46,7 +44,7 @@
              [test/run-test! [eval [cadr expr]]
                              `[do [require ~module-name] ~@[cddr expr]]]]]
 
-[defn valid-test-form? [form]
+[defn file/test/valid-test-form? [form]
       [== [car form] 'deftest]]
 
 [defn file/test/module [path base-dir]
@@ -58,7 +56,7 @@
       [require :test]
       [test/init!]
       [-> [read [file/read path]]
-          [filter valid-test-form?]
+          [filter file/test/valid-test-form?]
           [file/test/module/run module-name]]
       [test/finish! [ansi-blue module-name]]]
 
@@ -70,14 +68,6 @@
           [filter [path/ext?! "nuj"]]
           [map [fn [path] [file/test/module path base-dir]]]
           [sum]]]
-
-[defn load [filename]
-  [try [fn [err]
-         [display/error err]
-         #f]
-       [file/eval filename]
-       [pfmtln "Loaded {filename}"]
-       #t]]
 
 [defn file/file? [filename]
        [ref [file/stat filename] :regular-file?]]
@@ -95,6 +85,14 @@
                      [fn [A] [if [file/dir? A]
                                  [directory/read-recursive A]
                                  A]]]]]
+
+[defn load [filename]
+  [try [fn [err]
+         [print/error err]
+         #f]
+       [file/eval filename]
+       [pfmtln "Loaded {filename}"]
+       #t]]
 
 [defn popen/trim [cmd]
   "Run CMD using popen and return the trimmed stdout"

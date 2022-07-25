@@ -53,4 +53,4 @@
 [test/add "00620062" [fmt "{:08X}" [do [require :crypto/adler32] [crypto/adler32/hash "a"]]]] ; These can be left in to test the require form
 [test/add "0F9D02BC" [fmt "{:08X}" [do [require :crypto/adler32] [crypto/adler32/hash "asdQWE123"]]]]
 [test/add "796B110D" [fmt "{:08X}" [do [import [hash :as adler32] :crypto/adler32] [adler32 "DiesIstEinTestDerNujelAdler32Implementierung"]]]] ; These can be left in to test the import form
-[test/add #t [= [cat test-context " " System/OS " " System/Architecture " " 5] [fmt "{test-context} {System/OS} {System/Architecture} {}" [if #t 5 0]]]]
+[test/add #t [= [cat System/OS " " System/Architecture " " 5] [fmt "{System/OS} {System/Architecture} {}" [if #t 5 0]]]]

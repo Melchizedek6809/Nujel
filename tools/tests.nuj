@@ -40,7 +40,7 @@
            [print "\r"]
            [println [prog-str ansi-red i path test/start/file]]
            [inc! test/errors]
-           [display/error err]
+           [print/error err]
            [newline]]
        [print [prog-str ansi-yellow i path #nil]]
        [def ret [file/eval path [environment*]]]

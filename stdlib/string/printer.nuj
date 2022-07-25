@@ -28,8 +28,8 @@
       [when [or [write/raw/tree/rec [tree/left* v] port hr?]
                 always-space?]
             [port 'block-write " "]]
-      [write/raw [tree/key* v] port hr? always-space?]
-      [port 'block-write " "]
+      [port 'block-write [keyword->string [tree/key* v]]]
+      [port 'block-write ": "]
       [write/raw [tree/value* v] port hr?]
       [write/raw/tree/rec [tree/right* v] port hr? #t]
       #t]
@@ -67,10 +67,10 @@
             [[:lambda :macro] [port 'block-write [symbol->string [or [closure/name v] 'anonymous]]]]
             [:int             [port 'block-write [int->string/decimal v]]]
             [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
-            [:string          [port 'block-write [if hr? v v]]]
+            [:string          [port 'block-write [if hr? v [string/write v]]]]
             [:keyword         [port 'block-write [fmt ":{}" [keyword->string v]]]]
             [:symbol          [port 'block-write [symbol->string v]]]
-            [:bytecode-op     [port 'block-write [fmt "#${:02X}" [bytecode-op->int v]]]]
+            [:bytecode-op     [port 'block-write [fmt "#${:X}" [bytecode-op->int v]]]]
             [:array           [write/raw/array v port hr?]]
             [:buffer          [write/raw/buffer v port hr?]]
             [:bytecode-array  [write/raw/bytecode-array v port hr?]]
@@ -83,3 +83,8 @@
 
 [defn display/new [v port]
       [write/raw v [or port stdout] #t]]
+
+[defn string/write/new [v]
+      [def p [make-string-output-port]]
+      [write v p]
+      [p :return-string]]
