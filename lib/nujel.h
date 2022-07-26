@@ -53,9 +53,8 @@ typedef  int64_t ssize_t;
 
 typedef enum {
 	ltNoAlloc = 0,
-	ltComment = 1,
 
-	ltSymbol = 2,
+	ltSymbol,
 	ltKeyword,
 	ltBool,
 	ltInt,
@@ -67,17 +66,18 @@ typedef enum {
 	ltTree,
 
 	ltLambda,
-	ltObject,
 	ltMacro,
-	ltThread,
+	ltObject,
 	ltNativeFunc,
 	ltBytecodeOp,
-	ltBytecodeArr,
 
 	ltBuffer,
 	ltBufferView,
 
-	ltFileHandle
+	ltBytecodeArr,
+	ltFileHandle,
+	ltThread,
+	ltComment
 } lType;
 
 typedef struct lBuffer lBuffer;

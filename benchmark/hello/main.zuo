@@ -1,0 +1,3 @@
+#lang zuo
+
+(alert "Hello")

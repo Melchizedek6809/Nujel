@@ -1,0 +1,22 @@
+#lang zuo
+
+(define (max a b)
+  (if (> a b) a b))
+
+(define (reverse-num a ret)
+  (if (< a 1)
+      ret
+      (reverse-num (quotient a 10)
+                   (+ (* ret 10) (modulo a 10)))))
+
+(define (palindrome? a)
+  (= a (reverse-num a 0)))
+
+(define (search a b ret)
+  (cond ((>= a 1000) ret)
+        ((>= b 1000) (search (+ a 1) 0 ret))
+        (else (search a (+ 1 b) (if (palindrome? (* a b))
+                                    (max ret (* a b))
+                                    ret)))))
+
+(alert "The biggest product of 2 3-digit numbers that is a palindrome is" (search 0 0 0))

@@ -21,6 +21,7 @@ const getLanguageColor = lang => {
 	case "dart": return "#04599c";
 	case "janet": return "#aa87de";
 	case "python": return "#ffda4c";
+	case "zuo":
 	case "racket": return "#9f1d20";
 	case "nujel": return "#000";
 	default: return "#88AAee";
@@ -93,7 +94,7 @@ const getData = (key, filterP, name) => {
 };
 
 const goodCatFilter = v => {
-    if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "janet": true, "common-lisp": true, "javascript":true}[v.language])){return false;}
+    if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "janet": true, "common-lisp": true, "javascript":true, "zuo":true}[v.language])){return false;}
     if(v.language == 'scheme'){
 	if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true, "gosh": true}[v.runtime])){return false;}
     }
