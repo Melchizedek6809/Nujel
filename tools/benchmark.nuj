@@ -115,7 +115,7 @@
       [pfmt "{i} "]
       [when-not [file/file? filename]
                 [exception :io-error "Can't open the following file to benchmark it:" filename]]
-      [def result-file [file/tempname]]
+      [def result-file "nujel-benchmark.tmp"]
       [def measurements #nil]
       [def testcase [cadr [split filename "/"]]]
       [try [fn [err]
