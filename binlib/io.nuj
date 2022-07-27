@@ -77,14 +77,14 @@
 
 [defn directory/read-relative [path]
       [map [directory/read path]
-           [fn [a]
-               [cat path "/" a]]]]
+           [fn [a] [cat path "/" a]]]]
 
 [defn directory/read-recursive [path]
-       [flatten [map [directory/read-relative path]
-                     [fn [A] [if [file/dir? A]
-                                 [directory/read-recursive A]
-                                 A]]]]]
+       [flatten [filter [map [directory/read-relative path]
+                             [fn [A] [if [file/dir? A]
+                                         [directory/read-recursive A]
+                                         A]]]
+                        [fn [A] A]]]]
 
 [defn load [filename]
   [try [fn [err]
