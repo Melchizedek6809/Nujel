@@ -86,13 +86,13 @@
 
 [defn string/write [v]
       [case [type-of v]
-            [[:bytecode-array :pair] [return [string/write/c v]]]]
+            [:pair [return [string/write/c v]]]]
       [def p [make-string-output-port]]
-      [write v p]
+      [write/raw v p #f]
       [p :return-string]]
 
 [defn string/write/test [v]
-      [def old [string/write v]]
-      [def new [string/write/new v]]
+      [def old [string/write/c v]]
+      [def new [string/write v]]
       [pfmtln "{old}\n---\n{new}\n -> {}" [if [== old new] [ansi-green "#t"] [ansi-red "#f"]]]
       #nil]

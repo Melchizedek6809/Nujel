@@ -31,6 +31,8 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	lArray *literals = NULL;
 	if(litv){
 		literals = requireArray(c, litv);
+	}else{
+		literals = lArrayAlloc(0);
 	}
 
 	lVal *ret = lValAlloc(ltBytecodeArr);
@@ -61,7 +63,7 @@ static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
 
 static lVal *lnfBytecodeLiterals(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-
+	if(arr->literals == NULL){return NULL;}
 	lVal *ret = lValAlloc(ltArray);
 	ret->vArray = arr->literals;
 

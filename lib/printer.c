@@ -68,11 +68,9 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 	}
 	cur = spf(cur, bufEnd, "#{");
 	cur = writeArray(cur, bufEnd, v->literals, false);
-	cur = spf(cur, bufEnd, " ");
 	if(v && v->data != NULL){
 		int i = 0;
 		for(const lBytecodeOp *c = v->data; c < v->dataEnd; c++){
-			if(cur[-1] == ' '){--cur;}
 			if((i++ & 0x1F) == 0){
 				cur = spf(cur, bufEnd, "\n");
 			}
