@@ -1,0 +1,20 @@
+#!/usr/bin/env nujel
+
+[def out-contents "This is a short test paragraph\nIt even contains a linebreak!"]
+[def path "test-file.tmp"]
+[when [file/file? path]
+  [throw [list :port-error "The temporary filepath already contains a file" path]]]
+
+[file/write out-contents path]
+[when [not [file/file? path]]
+  [throw [list :port-error "The temporary filepath doesn't contain a file after it should have been written too"]]]
+
+[def in-contents [slurp path]]
+[when [not= in-contents out-contents]
+  [throw [list :port-error "The contents we've written and read back don't match, something isn't working"]]]
+
+[rm path]
+[when [file/file? path]
+  [throw [list :port-error "The temporary filepath still exists"]]]
+
+[return :success]

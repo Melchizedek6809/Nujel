@@ -49,11 +49,3 @@ int makeDir(const char *name){
 	return mkdir(name,0755);
 	#endif
 }
-
-/* Generate a temporary filename in a portable manner */
-const char *tempFilename(){
-	static uint counter = 0;
-	static char buf[32];
-	spf(buf,&buf[sizeof(buf)], "/tmp/nujel-%x-%x", getpid(),++counter);
-	return buf;
-}

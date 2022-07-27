@@ -1,6 +1,6 @@
 [defn slurp/buffer [pathname]
       "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil."
-      [def fh [file/open* pathname "rb"]]
+      [def fh [file/open-input* pathname]]
       [when-not fh [return #nil]]
       [try [fn []
                [file/close* fh]
@@ -21,7 +21,7 @@
 
 [defn spit [pathname content]
       "Read the entirety of PATHNAME and return it as a string if possible, otherwise return #nil."
-      [def fh [file/open* pathname "wb"]]
+      [def fh [file/open-output* pathname :replace]]
       [when-not fh [return #f]]
 
       [try [fn []

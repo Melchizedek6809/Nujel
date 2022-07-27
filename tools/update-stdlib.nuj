@@ -5,7 +5,7 @@
       [typecheck/only output-file :string]
       [typecheck/only symbol-name :string]
       [def raw [slurp filename]]
-      [def out [make-output-port [file/open* output-file "wb"]]]
+      [def out [make-output-port [file/open-output* output-file :replace]]]
       [out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n"]
       [out 'block-write [fmt "unsigned char {symbol-name}[] = "]]
       [out 'block-write "{"]

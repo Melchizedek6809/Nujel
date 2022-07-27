@@ -133,6 +133,16 @@ const lSymbol *requireSymbolic(lClosure *c, lVal *v){
 	return v->vSymbol;
 }
 
+const lSymbol *optionalSymbolic(lClosure *c, lVal *v, const lSymbol *fallback){
+	if(likely(v == NULL)){
+		return fallback;
+	}
+	if(unlikely(((v->type != ltSymbol) && (v->type != ltKeyword)))){
+		throwTypeError(c, v, ltSymbol);
+	}
+	return v->vSymbol;
+}
+
 lClosure *requireClosure(lClosure *c, lVal *v){
 	if((v == NULL)
 		|| !((v->type == ltLambda)

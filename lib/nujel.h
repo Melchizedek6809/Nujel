@@ -186,6 +186,7 @@ lArray *        requireArray            (lClosure *c, lVal *v);
 const lSymbol * requireSymbol           (lClosure *c, lVal *v);
 const lSymbol * requireKeyword          (lClosure *c, lVal *v);
 const lSymbol * requireSymbolic         (lClosure *c, lVal *v);
+const lSymbol * optionalSymbolic        (lClosure *c, lVal *v, const lSymbol *fallback);
 lString *       requireString           (lClosure *c, lVal *v);
 lTree *         requireTree             (lClosure *c, lVal *v);
 lTree *         requireMutableTree      (lClosure *c, lVal *v);

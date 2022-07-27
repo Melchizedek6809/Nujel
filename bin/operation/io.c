@@ -49,6 +49,10 @@ lSymbol *lsCharacterDevice;
 lSymbol *lsBlockDevice;
 lSymbol *lsNamedPipe;
 
+lSymbol *lSymError;
+lSymbol *lSymReplace;
+lSymbol *lSymAppend;
+
 void setIOSymbols(){
 	lsError            = lSymSM("error?");
 	lsErrorNumber      = lSymSM("error-number");
@@ -66,6 +70,10 @@ void setIOSymbols(){
 	lsCharacterDevice  = lSymSM("character-device?");
 	lsBlockDevice      = lSymSM("block-device?");
 	lsNamedPipe        = lSymSM("named-pipe?");
+
+	lSymError           = lSymSM("error");
+	lSymReplace         = lSymSM("replace");
+	lSymAppend          = lSymSM("append");
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){
@@ -293,23 +301,15 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 	return lValString(path);
 }
 
-static lVal *lnfFileTempName(lClosure *c, lVal *v){
-	(void)c;(void)v;
-	return lValString(tempFilename());
-}
-
 void lOperationsIO(lClosure *c){
 	lAddNativeFunc(c,"exit",                       "[a]",            "Quits with code a",                                 lnfQuit);
 	lAddNativeFunc(c,"popen",                      "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
 
-	lAddNativeFunc(c,"rm file/remove",             "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"file/stat",                  "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
-	lAddNativeFunc(c,"file/tempname",              "[]",             "Return a temporary filename",                       lnfFileTempName);
-
+	lAddNativeFunc(c,"rm file/remove",             "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
 	lAddNativeFunc(c,"ls directory/read",          "[path show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
 	lAddNativeFunc(c,"rmdir directory/remove",     "[path]",             "Remove empty directory at PATH",              lnfDirectoryRemove);
 	lAddNativeFunc(c,"mkdir directory/make",       "[path]",             "Create a new empty directory at PATH",        lnfDirectoryMake);
-
 	lAddNativeFunc(c,"cd path/change",             "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
 	lAddNativeFunc(c,"cwd path/working-directory", "[]",             "Return the current working directory",              lnfGetCurrentWorkingDirectory);
 }

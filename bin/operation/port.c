@@ -5,13 +5,32 @@
 #endif
 
 
-static lVal *lnfFileOpen(lClosure *c, lVal *v){
+static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
 	lString *pathname = requireString(c, lCar(v));
-	lString *mode     = requireString(c, lCadr(v));
+	const char *path = lStringData(pathname);
+	const lSymbol *mode = optionalSymbolic(c, lCadr(v), lSymError);
 
-	const char *modes = lStringData(mode);
+	FILE *fh = NULL;
+	if(mode == lSymError){
+		if(access(path, F_OK) == 0){lValBool(false);}
+		fh = fopen(path, "wb");
+	}else if(mode == lSymReplace){
+		fh = fopen(path, "wb");
+	}else if(mode == lSymAppend){
+		fh = fopen(path, "ab");
+	}else{
+		lExceptionThrowValClo("type-error", "Don't know that particular behaviour: ", lCadr(v), c);
+	}
+	if(fh == NULL){
+		pf("%s\n", strerror(errno));
+	}
 
-	FILE *fh = fopen(lStringData(pathname), modes);
+	return fh ? lValFileHandle(fh) : NULL;
+}
+
+static lVal *lnfFileOpenInput(lClosure *c, lVal *v){
+	lString *pathname = requireString(c, lCar(v));
+	FILE *fh = fopen(lStringData(pathname), "rb");
 	return fh ? lValFileHandle(fh) : NULL;
 }
 
@@ -143,7 +162,8 @@ static lVal *lnfFileError(lClosure *c, lVal *v){
 }
 
 void lOperationsPort(lClosure *c){
-	lAddNativeFunc(c,"file/open*",  "[pathname mode]",             "Try to open PATHNAME for MODE",        lnfFileOpen);
+	lAddNativeFunc(c,"file/open-output*", "[pathname if-exists]",  "Try to open PATHNAME for MODE",        lnfFileOpenOutput);
+	lAddNativeFunc(c,"file/open-input*",  "[pathname]",            "Try to open PATHNAME for MODE",        lnfFileOpenInput);
 	lAddNativeFunc(c,"file/close*", "[handle]",                    "Close the open HANDLE",                lnfFileClose);
 	lAddNativeFunc(c,"file/read*",  "[handle buffer size offset]", "Reader from HANDLE into BUFFER",       lnfFileReadAst);
 	lAddNativeFunc(c,"file/write*", "[handle buffer size offset]", "Write BUFFER into HANDLE",             lnfFileWriteAst);
