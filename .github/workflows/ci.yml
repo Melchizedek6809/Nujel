@@ -150,7 +150,7 @@ jobs:
     - name: Install compiler
       run: |
         sudo apt-get -y install valgrind
-    - name: Run static analyzer
+    - name: Check for leaks
       run: make valgrind
   static-checks:
     name: Static checks
