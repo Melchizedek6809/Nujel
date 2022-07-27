@@ -1,5 +1,7 @@
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+;;
 ;; Contains the module system
-
 [def module/cache @[]]
 [def module/store @[]]
 [def module/loader #nil]
@@ -77,8 +79,7 @@
              [def mod [loader name]]
              [when mod
                [tree/set! module/cache name mod]
-               [return mod]]]
-      [return #nil]]
+               [return mod]]]]
 
 [defn module/insert/defer [name module-source]
       [tree/set! module/store name module-source]]

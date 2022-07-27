@@ -52,9 +52,8 @@
 
 [defn list/reduce [l o s]
       "Combine all elements in l using operation o and starting value s"
-      [doseq [e l]
-             [set! s [o s e]]]
-      s]
+      [doseq [e l s]
+             [set! s [o s e]]]]
 
 [defn list/ref [l i]
       "Returns the the element of list l at location i"
@@ -66,39 +65,33 @@
 [defn reverse [l]
       "Return the list l in reverse order"
       [def ret]
-      [doseq [e l]
-             [set! ret [cons e ret]]]
-      ret]
+      [doseq [e l ret]
+             [set! ret [cons e ret]]]]
 
 [defn list/length [l]
       "Returns the length of list l"
       [def ret 0]
-      [doseq [e l]
-             [inc! ret]]
-      ret]
+      [doseq [e l ret]
+             [inc! ret]]]
 
 [defn list/filter [l p]
       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
       [def ret #nil]
-      [doseq [e l]
-             [when [p e]
-                   [set! ret [cons e ret]]]]
-      [nreverse ret]]
+      [doseq [e l [nreverse ret]]
+             [when [p e] [set! ret [cons e ret]]]]]
 
 [defn list/map [l f]
       "Runs f over every item in list l and returns the resulting list"
       [def ret #nil]
-      [doseq [e l]
-             [set! ret [cons [f e] ret]]]
-      [nreverse ret]]
+      [doseq [e l [nreverse ret]]
+             [set! ret [cons [f e] ret]]]]
 
 [defn append [a b]
       "Appends two lists A and B together"
       [def ret b]
       [set! a [reverse a]]
-      [doseq [t a]
-             [set! ret [cons t ret]]]
-      ret]
+      [doseq [t a ret]
+             [set! ret [cons t ret]]]]
 
 [defn sublist [l start end ret]
       "Returns a new list containing all elements of l from start to end"

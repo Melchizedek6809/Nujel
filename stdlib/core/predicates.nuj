@@ -50,59 +50,59 @@
       "High level inequality comparator"
       [not [equal? a b]]]
 
-[defn int? [val]
+[defn int? [val] :inline
       [= :int [type-of val]]]
 
-[defn float? [val]
+[defn float? [val] :inline
       [= :float [type-of val]]]
 
-[defn boolean? [val]
+[defn boolean? [val] :inline
       [= :bool [type-of val]]]
 
 [defn pair? [val] :inline
       [= :pair [type-of val]]]
 
-[defn array? [val]
+[defn array? [val] :inline
       [= :array [type-of val]]]
 
-[defn string? [val]
+[defn string? [val] :inline
       [= :string [type-of val]]]
 
-[defn symbol? [val]
+[defn symbol? [val] :inline
       [= :symbol [type-of val]]]
 
-[defn object? [val]
+[defn object? [val] :inline
       [= :object [type-of val]]]
 
-[defn tree? [val]
+[defn tree? [val] :inline
       [= :tree [type-of val]]]
 
-[defn keyword? [v]
+[defn keyword? [v] :inline
       [= :keyword [type-of v]]]
 
-[defn macro? [val]
+[defn macro? [val] :inline
       [= :macro [type-of val]]]
 
-[defn lambda? [val]
+[defn lambda? [val] :inline
       [or [= :lambda [type-of val]]]]
 
-[defn native? [val]
+[defn native? [val] :inline
       [= :native-function [type-of val]]]
+
+[defn buffer? [v] :inline
+      [= :buffer [type-of v]]]
+
+[defn buffer-view? [v] :inline
+      [= :buffer-view [type-of v]]]
+
+[defn bytecode-array? [v] :inline
+      [= :bytecode-array [type-of v]]]
+
+[defn bytecode-op? [v] :inline
+      [= :bytecode-op [type-of v]]]
 
 [defn procedure? [val]
       [or [lambda? val] [native? val]]]
-
-[defn buffer? [v]
-      [= :buffer [type-of v]]]
-
-[defn buffer-view? [v]
-      [= :buffer-view [type-of v]]]
-
-[defn bytecode-array? [v]
-      [= :bytecode-array [type-of v]]]
-
-[defn bytecode-op? [v]
-      [= :bytecode-op [type-of v]]]
 
 [defn in-range? [v min max]
       [and [>= v min] [<= v max]]]

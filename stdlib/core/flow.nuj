@@ -2,6 +2,12 @@
 ;; This project uses the MIT license, a copy should be included under /LICENSE
 ;;
 ;; Mostly macros implementing different control flow constructs
+[defmacro if-let [binding then else]
+          `[let* [def ~[car binding] ~[cadr binding]]
+                 [if ~[car binding] ~then ~else]]]
+
+[defmacro when-let [binding . body]
+          `[if-let ~binding ~[cons 'do body] #nil]]
 
 [defmacro if-not [pred then else]
           `[if ~pred ~else ~then]]
@@ -60,7 +66,7 @@
                 ~result-form]]
 
 [defmacro doseq [for-loop . body]
-          "[doseq [l [list 1 2 3 4]] [println l]]"
+          "[doseq [l [list 1 2 3 4] result-form] [println l]]"
           [def symbol-name [gensym]]
           `[let [[~symbol-name ~[cadr for-loop]]]
                 [while ~symbol-name
@@ -68,7 +74,8 @@
                   [typecheck/only ~symbol-name :pair]
                   [def ~[car for-loop] [car ~symbol-name]]
                   ~@body
-                  [cdr! ~symbol-name]]]]
+                  [cdr! ~symbol-name]]
+                ~[caddr for-loop]]]
 
 [defn thread/-> [init fun]
       [if-not fun init

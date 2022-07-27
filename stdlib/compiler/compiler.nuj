@@ -33,14 +33,13 @@
 
 [defn meta/parse/body [type args body]
       [def meta @[]]
-      [doseq [v body]
+      [doseq [v body meta]
              [case [type-of v]
                    [:pair [return meta]]
                    [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
                                                                       "\n"
                                                                       v]]]]
-                   [:keyword [tree/set! meta v #t]]]]
-      [return meta]]
+                   [:keyword [tree/set! meta v #t]]]]]
 
 [defmacro defmacro [name args . body]
           "Define a new macro"

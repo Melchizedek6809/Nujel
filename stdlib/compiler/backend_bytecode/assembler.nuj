@@ -145,12 +145,10 @@
 [defn assemble/emit-relocated-ops [code sym-map pos out]
       [if [= [car code] :relocate]
           [set! pos [assemble/relocate-op code sym-map pos out]]
-          [doseq [op code]
+          [doseq [op code pos]
                  [case [type-of op]
                        [:bytecode-op [array/set! out [inc! pos] op]]
-                       [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]
-      [return pos]]
-
+                       [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]]
 
 [defn literal-index->bytecode-op [i]
       [if [< i 256]

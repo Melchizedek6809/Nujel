@@ -19,6 +19,21 @@
           "[set! l [cdr l]]"
           `[set! ~l [cdr ~l]]]
 
+[defn let/arg [arg]
+      [when arg
+            [when [or [not [pair? arg]]
+                      [not [symbol? [car arg]]]]
+                  [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]]
+            `[def ~[car arg] ~[cadr arg]]]]
+
+[defn let/args [args]
+      [if-not args #nil
+              [cons [let/arg [car args]]
+                    [let/args [cdr args]]]]]
+[defmacro let [bindings . body]
+          "Evalutes to BODY if PRED is true"
+          `[let* [do ~@[let/args bindings] ~@body]]]
+
 [defn boolean [v] :inline
       "Coerce to boolean"
       [if v #t #f]]

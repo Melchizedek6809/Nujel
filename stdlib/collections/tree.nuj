@@ -6,10 +6,9 @@
 [defn tree/zip [keys values]
       "Return a tree where KEYS point to VALUES"
       [def ret @[]]
-      [doseq [key keys]
+      [doseq [key keys ret]
 	     [tree/set! ret key [car values]]
-	     [cdr! values]]
-      ret]
+	     [cdr! values]]]
 
 [defn tree/+= [t k v]
       "Increment value at K in T by V"
@@ -48,8 +47,7 @@
 [defn tree/filter [l f]
       "Return a new tree with all elements from L where F retunrs true"
       [def ret @[]]
-      [doseq [e [tree/keys l]]
+      [doseq [e [tree/keys l] ret]
              [def t [tree/ref l e]]
              [when [f t]
-                   [tree/set! ret e t]]]
-      ret]
+                   [tree/set! ret e t]]]]
