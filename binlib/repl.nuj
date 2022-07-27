@@ -35,9 +35,10 @@
            [when [equal? '[] expr]
                  [print "\r"]
                  [return]]
-           [def result [eval-in ctx [cons do expr]]]
-           [repl/push-result result]
-           [println [if [nil? result] "" [string result]]]]]
+           [try repl/exception-handler
+                [def result [eval-in ctx [cons do expr]]]
+                [repl/push-result result]
+                [println [if [nil? result] "" [string result]]]]]]
 
 [defn repl/push-result [result]
       [set! *3 *2]
