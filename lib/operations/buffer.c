@@ -72,6 +72,7 @@ static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 		lExceptionThrowValClo("out-of-memory", "[buffer/length!] couldn't allocate its buffer", v, c);
 		return NULL;
 	}
+	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
 	buf->buf = nBuf;
 	buf->length = length;
 	return bufv;
