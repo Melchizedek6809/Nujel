@@ -9,7 +9,9 @@ static lVal *lnfFileOpen(lClosure *c, lVal *v){
 	lString *pathname = requireString(c, lCar(v));
 	lString *mode     = requireString(c, lCadr(v));
 
-	FILE *fh = fopen(lStringData(pathname), lStringData(mode));
+	const char *modes = lStringData(mode);
+
+	FILE *fh = fopen(lStringData(pathname), modes);
 	return fh ? lValFileHandle(fh) : NULL;
 }
 
