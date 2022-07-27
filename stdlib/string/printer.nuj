@@ -12,7 +12,7 @@
           [do [port 'block-write "#m"]
               [def view [buffer/u8* v]]
               [dotimes [i [buffer/length v]]
-                       [port 'block-write [int->string/HEX [buffer/ref view i]]]]]]]
+                       [port 'block-write [fmt "{:02X}" [buffer/ref view i]]]]]]]
 
 [defn write/raw/bytecode-array [v port hr?]
       [port 'block-write "#{"]
@@ -24,15 +24,15 @@
       [port 'block-write "\n}"]]
 
 [defn write/raw/tree/rec [v port hr? always-space?]
-      [when-not v [return #nil]]
-      [when [or [write/raw/tree/rec [tree/left* v] port hr?]
-                always-space?]
+      [when [or [not v]
+                [not [tree/key* v]]]
+        [return always-space?]]
+      [when [write/raw/tree/rec [tree/left* v] port hr? always-space?]
             [port 'block-write " "]]
       [port 'block-write [keyword->string [tree/key* v]]]
       [port 'block-write ": "]
       [write/raw [tree/value* v] port hr?]
-      [write/raw/tree/rec [tree/right* v] port hr? #t]
-      #t]
+      [write/raw/tree/rec [tree/right* v] port hr? #t]]
 
 [defn write/raw/tree [v port hr?]
       [port 'block-write "#@["]
@@ -67,7 +67,7 @@
             [[:lambda :macro] [port 'block-write [symbol->string [or [closure/name v] 'anonymous]]]]
             [:int             [port 'block-write [int->string/decimal v]]]
             [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
-            [:string          [port 'block-write [if hr? v [string/write v]]]]
+            [:string          [port 'block-write [if hr? v [string/write/c v]]]] ;; This one is actually cheating
             [:keyword         [port 'block-write [fmt ":{}" [keyword->string v]]]]
             [:symbol          [port 'block-write [symbol->string v]]]
             [:bytecode-op     [port 'block-write [fmt "#${:X}" [bytecode-op->int v]]]]
@@ -84,7 +84,15 @@
 [defn display/new [v port]
       [write/raw v [or port stdout] #t]]
 
-[defn string/write/new [v]
+[defn string/write [v]
+      [case [type-of v]
+            [[:bytecode-array :pair] [return [string/write/c v]]]]
       [def p [make-string-output-port]]
       [write v p]
       [p :return-string]]
+
+[defn string/write/test [v]
+      [def old [string/write v]]
+      [def new [string/write/new v]]
+      [pfmtln "{old}\n---\n{new}\n -> {}" [if [== old new] [ansi-green "#t"] [ansi-red "#f"]]]
+      #nil]

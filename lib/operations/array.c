@@ -12,7 +12,8 @@
 #include <string.h>
 
 static lVal *lnfArrLength(lClosure *c, lVal *v){
-	return lValInt(requireArray(c, lCar(v))->length);
+	lArray *arr = requireArray(c, lCar(v));
+	return lValInt(arr->length);
 }
 
 static lVal *lnfArrLengthSet(lClosure *c, lVal *v){

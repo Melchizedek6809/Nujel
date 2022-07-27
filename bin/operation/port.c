@@ -21,9 +21,6 @@ static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
 	}else{
 		lExceptionThrowValClo("type-error", "Don't know that particular behaviour: ", lCadr(v), c);
 	}
-	if(fh == NULL){
-		pf("%s\n", strerror(errno));
-	}
 
 	return fh ? lValFileHandle(fh) : NULL;
 }
@@ -162,16 +159,16 @@ static lVal *lnfFileError(lClosure *c, lVal *v){
 }
 
 void lOperationsPort(lClosure *c){
-	lAddNativeFunc(c,"file/open-output*", "[pathname if-exists]",  "Try to open PATHNAME for MODE",        lnfFileOpenOutput);
-	lAddNativeFunc(c,"file/open-input*",  "[pathname]",            "Try to open PATHNAME for MODE",        lnfFileOpenInput);
-	lAddNativeFunc(c,"file/close*", "[handle]",                    "Close the open HANDLE",                lnfFileClose);
-	lAddNativeFunc(c,"file/read*",  "[handle buffer size offset]", "Reader from HANDLE into BUFFER",       lnfFileReadAst);
-	lAddNativeFunc(c,"file/write*", "[handle buffer size offset]", "Write BUFFER into HANDLE",             lnfFileWriteAst);
-	lAddNativeFunc(c,"file/flush*", "[handle]",                    "Flush stream of HANDLE",               lnfFileFlush);
-	lAddNativeFunc(c,"file/tell*",  "[handle]",                    "Return the stream position of HANDLE", lnfFileTell);
-	lAddNativeFunc(c,"file/seek*",  "[handle offset whence]",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
-	lAddNativeFunc(c,"file/eof*?",  "[handle]",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
-	lAddNativeFunc(c,"file/error*?","[handle]",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
+	lAddNativeFunc(c,"file/open-output*", "[pathname if-exists]",   "Try to open PATHNAME for MODE",        lnfFileOpenOutput);
+	lAddNativeFunc(c,"file/open-input*",  "[pathname]",             "Try to open PATHNAME for MODE",        lnfFileOpenInput);
+	lAddNativeFunc(c,"file/close*",  "[handle]",                    "Close the open HANDLE",                lnfFileClose);
+	lAddNativeFunc(c,"file/read*",   "[handle buffer size offset]", "Reader from HANDLE into BUFFER",       lnfFileReadAst);
+	lAddNativeFunc(c,"file/write*",  "[handle buffer size offset]", "Write BUFFER into HANDLE",             lnfFileWriteAst);
+	lAddNativeFunc(c,"file/flush*",  "[handle]",                    "Flush stream of HANDLE",               lnfFileFlush);
+	lAddNativeFunc(c,"file/tell*",   "[handle]",                    "Return the stream position of HANDLE", lnfFileTell);
+	lAddNativeFunc(c,"file/seek*",   "[handle offset whence]",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
+	lAddNativeFunc(c,"file/eof*?",   "[handle]",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
+	lAddNativeFunc(c,"file/error*?", "[handle]",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
 }
 
 void lOperationsInit(lClosure *c){

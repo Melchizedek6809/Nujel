@@ -223,5 +223,5 @@ void lOperationsString(lClosure *c){
 
 	lAddNativeFuncPure(c,"string->symbol","[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
 	lAddNativeFuncPure(c,"symbol->string","[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
-	lAddNativeFuncPure(c,"string/write",  "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
+	lAddNativeFuncPure(c,"string/write string/write/c",  "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
 }
