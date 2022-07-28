@@ -78,6 +78,17 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	return c;
 }
 
+void lOperationsBase(lClosure *c){
+	lOperationsArithmetic(c);
+	lOperationsBuffer(c);
+	lOperationsArray(c);
+	lOperationsBytecode(c);
+	lOperationsCore(c);
+	lOperationsSpecial(c);
+	lOperationsString(c);
+	lOperationsTree(c);
+}
+
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
 	lClosure *c = lClosureAllocRaw();

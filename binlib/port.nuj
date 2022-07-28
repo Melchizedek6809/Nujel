@@ -58,23 +58,23 @@
                                    :file-handle [fn [handle] handle]
                                    :methods [fn [handle] output-port-method-table]]]
 
-  [def string-out-methods @[ :block-write [fn [handle buffer size]
-                                              [def buf [tree/ref handle :buffer]]
+  [def string-out-methods @[ :block-write [fn [self buffer size]
+                                              [def buf [meta self :buffer]]
                                             [when-not size [set! size [buffer/length buffer]]]
                                               [when [> size
                                                        [- [buffer/length buf]
-                                                          [tree/ref handle :position]]]
+                                                          [meta self :position]]]
                                                     [buffer/length! buf
                                                                     [+ #x80 [bit-and [+ [buffer/length buf] size] [bit-not #x7F]]]]]
-                                              [buffer/copy buf buffer [tree/ref handle :position] size]
-                                              [tree/set! handle :position [+ [tree/ref handle :position] size]]]
-                             :char-write [fn [handle char]
-                                             [buffer/set! temporary-buffer-view 0 char]
-                                           [file/write* handle temporary-buffer-view]]
-                             :return-string [fn [handle]
-                                                [buffer->string [tree/ref handle :buffer]
-                                                                [tree/ref handle :position]]]
-                             :methods [fn [handle] string-out-methods]]]
+                                              [buffer/copy buf buffer [meta self :position] size]
+                                              [meta! self :position [+ [meta self :position] size]]]
+                             :write [fn [self . buffers]
+                                        [doseq [buf buffers self]
+                                               [self :block-write buf]]]
+                             :return-string [fn [self]
+                                                [buffer->string [meta self :buffer]
+                                                                [meta self :position]]]
+                             :methods [fn [self] string-out-methods]]]
 
   [def input-port-method-table @[ :block-read [fn [handle buffer size]
                                                   [when [file/eof*? handle]
@@ -99,9 +99,12 @@
 
   [set! make-string-output-port [fn []
                                     "Create a new string output port"
-                                  [def handle @[:buffer [buffer/allocate #x80] :position 0]]
-                                  [fn [method . args]
-                                      [apply [tree/ref string-out-methods method] [cons handle args]]]]]
+                                  [def self #nil]
+                                  [set! self [fn [method . args]
+                                                 [apply [tree/ref string-out-methods method]
+                                                        [cons self args]]]]
+                                  [meta! self :buffer [buffer/allocate #x80]]
+                                  [meta! self :position 0]]]
 
   [set! make-input-port [fn [handle]
                             "Create a new input port for HANDLE"
@@ -111,7 +114,7 @@
 
 [def stdin [make-input-port stdin*]]
 [defn current-input-port [] stdin]
-[defn current-input-port! [nport] [set! stdin nport]]
+ [defn current-input-port! [nport] [set! stdin nport]]
 
 [def stdout [make-output-port stdout*]]
 [defn current-output-port [] stdout]

@@ -1,3 +1,44 @@
+[defn int->string/binary [α]
+      "Turn α into a its **binary** string representation"
+      [def ret ""]
+      [when-not α [def α 0]]
+      [when [zero? α] [set! ret "0"]]
+      [while [not-zero? α]
+             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b1]]] ret]]
+             [set! α [bit-shift-right α 1]]]
+      ret]
+
+[defn int->string/octal [α]
+      "Turn α into a its **octal** string representation"
+      [def ret ""]
+      [when-not α [def α 0]]
+      [when [zero? α] [set! ret "0"]]
+      [while [not-zero? α]
+             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b111]]] ret]]
+             [set! α [bit-shift-right α 3]]]
+      ret]
+
+[def int->string/hex/conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
+[defn int->string/HEX [α]
+      "Turn α into a its **hexadecimal** string representation"
+      [def ret ""]
+      [when-not α [def α 0]]
+      [when [zero? α] [set! ret "0"]]
+      [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
+      [while [not-zero? α]
+             [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
+             [set! α [bit-shift-right α 4]]]
+      ret]
+
+[defn int->string/hex [α]
+      "Turn α into a its **hexadecimal** string representation"
+      [lowercase [int->string/HEX α]]]
+
+[defn int->string/decimal [α]
+      "Turn α into a its **decimal** string representation"
+      [string α]]
+[def int->string int->string/decimal]
+
 [defn write/raw/array [v port hr?]
       [port 'block-write "##["]
       [dotimes [i [array/length v]]
@@ -8,11 +49,11 @@
 
 [defn write/raw/buffer [v port hr?]
       [if hr?
-          [port 'block-write [fmt "#<buffer :id {} :size {:x}>" [val->id v] [buffer/length v]]]
+          [port 'write "#<buffer :id " [int->string/decimal [val->id v]] " :size " [int->string/hex [buffer/length v]] ">"]
           [do [port 'block-write "#m"]
               [def view [buffer/u8* v]]
               [dotimes [i [buffer/length v]]
-                       [port 'block-write [fmt "{:02X}" [buffer/ref view i]]]]]]]
+                       [port 'block-write [string/pad-start [int->string/HEX [buffer/ref view i]] 2 "0"]]]]]]
 
 [defn write/raw/bytecode-array [v port hr?]
       [port 'block-write "#{"]
@@ -20,7 +61,7 @@
       [dotimes [i [bytecode-array/length v]]
                [when [zero? [bit-and i #x1F]]
                      [port 'block-write "\n"]]
-               [port 'block-write [fmt "{:02X}" [bytecode-op->int [bytecode-array/ref v i]]]]]
+               [port 'block-write [string/pad-start [int->string/HEX [bytecode-op->int [bytecode-array/ref v i]]] 2 "0"]]]
       [port 'block-write "\n}"]]
 
 [defn write/raw/tree/rec [v port hr? always-space?]
@@ -41,7 +82,8 @@
 
 [defn write/raw/pair [v port hr?]
       [when [and [== 'quote [car v]]
-                 [nil? [cddr v]]]
+                 [nil? [cddr v]]
+                 [pair? [cdr v]]]
             [port 'block-write "'"]
             [return [write/raw [cadr v] port hr?]]]
       [port 'block-write "["]
@@ -61,16 +103,16 @@
       [case [type-of v]
             [:nil             [port 'block-write "#nil"]]
             [:bool            [port 'block-write [if v "#t" "#f"]]]
-            [:object          [port 'block-write [fmt "#<environment {}>" [val->id v]]]]
-            [:file-handle     [port 'block-write [fmt "#<file-handle {}>" [val->id v]]]]
-            [:buffer-view     [port 'block-write [fmt "#<buffer-view {}>" [val->id v]]]]
+            [:object          [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
+            [:file-handle     [port 'write "#<file-handle " [int->string/hex [val->id v]] ">"]]
+            [:buffer-view     [port 'write "#<buffer-view " [int->string/hex [val->id v]] ">"]]
             [[:lambda :macro] [port 'block-write [symbol->string [or [closure/name v] 'anonymous]]]]
             [:int             [port 'block-write [int->string/decimal v]]]
-            [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
+            [:float           [port 'block-write [string/write/c v]]] ;; This one is kinda cheating
             [:string          [port 'block-write [if hr? v [string/write/c v]]]] ;; This one is actually cheating
-            [:keyword         [port 'block-write [fmt ":{}" [keyword->string v]]]]
+            [:keyword         [port 'write ":" [keyword->string v]]]
             [:symbol          [port 'block-write [symbol->string v]]]
-            [:bytecode-op     [port 'block-write [fmt "#${:X}" [bytecode-op->int v]]]]
+            [:bytecode-op     [port 'write "#$" [int->string/HEX [bytecode-op->int v]]]]
             [:array           [write/raw/array v port hr?]]
             [:buffer          [write/raw/buffer v port hr?]]
             [:bytecode-array  [write/raw/bytecode-array v port hr?]]
@@ -91,8 +133,13 @@
       [write/raw v p #f]
       [p :return-string]]
 
+[defn string/write/new [v]
+      [def p [make-string-output-port]]
+      [write/raw v p #f]
+      [p :return-string]]
+
 [defn string/write/test [v]
       [def old [string/write/c v]]
-      [def new [string/write v]]
+      [def new [string/write/new v]]
       [pfmtln "{old}\n---\n{new}\n -> {}" [if [== old new] [ansi-green "#t"] [ansi-red "#f"]]]
       #nil]

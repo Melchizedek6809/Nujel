@@ -105,6 +105,11 @@ release.san: $(RUNTIME_SRCS)
 	$(CC) -fsanitize=address -fsanitize=undefined -fsanitize-undefined-trap-on-error -g  -Og -fno-lto -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
+release.san.future: $(FUTURE_SRCS)
+	@rm -f $(FUTURE_NUJEL)
+	$(CC) -g  -Og -fno-lto -o $(FUTURE_NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(CSTD) $(LIBS)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(FUTURE_NUJEL)
+
 release.amalgamation: nujel.c
 	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)  $(LDFLAGS)
 	@$(STRIP) -xS $(NUJEL)

@@ -46,47 +46,6 @@
           [string/cut path 0 last-period]
           path]]
 
-[defn int->string/binary [α]
-      "Turn α into a its **binary** string representation"
-      [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
-      [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b1]]] ret]]
-             [set! α [bit-shift-right α 1]]]
-      ret]
-
-[defn int->string/octal [α]
-      "Turn α into a its **octal** string representation"
-      [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
-      [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b111]]] ret]]
-             [set! α [bit-shift-right α 3]]]
-      ret]
-
-[def int->string/hex/conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
-[defn int->string/HEX [α]
-      "Turn α into a its **hexadecimal** string representation"
-      [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
-      [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
-      [while [not-zero? α]
-             [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
-             [set! α [bit-shift-right α 4]]]
-      ret]
-
-[defn int->string/hex [α]
-      "Turn α into a its **hexadecimal** string representation"
-      [lowercase [int->string/HEX α]]]
-
-[defn int->string/decimal [α]
-      "Turn α into a its **decimal** string representation"
-      [string α]]
-[def int->string int->string/decimal]
-
 [defn string/pad-start [text goal-length char]
       "Pad out TEXT with CHAR at the start until it is GOAL-LENGTH chars long, may also truncate the string"
       [when-not char [set! char " "]]

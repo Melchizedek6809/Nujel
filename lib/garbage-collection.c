@@ -6,7 +6,7 @@
  * is good enough for now.
  */
 #ifndef NUJEL_AMALGAMATION
-#include "../nujel-private.h"
+#include "nujel-private.h"
 #endif
 
 #include <stdlib.h>

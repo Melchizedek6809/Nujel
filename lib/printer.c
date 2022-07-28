@@ -7,6 +7,7 @@
 #include <float.h>
 #include <limits.h>
 #include <math.h>
+#include <string.h>
 
 #define BUF_SIZE 8192
 
@@ -34,7 +35,7 @@ static char *writeTree(char *cur, char *bufEnd, const lTree *v, bool display){
 /* Write an entire array including #[] wrapper */
 static char *writeArray(char *cur, char *bufEnd, const lArray *v, bool display){
 	cur = spf(cur, bufEnd, "##[");
-	if(v && v->data != NULL){
+	if(likely(v && v->data != NULL)){
 		for(int i=0;i<v->length;i++){
 			cur = spf(cur, bufEnd, display ? "%V%s" : "%v%s", v->data[i], (i < (v->length-1)) ? " " : "");
 		}
@@ -62,7 +63,7 @@ static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display
 
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
-	if((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax)){
+	if(unlikely((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax))){
 		epf("ERROR writing BCA\n");
 		exit(52);
 	}
@@ -82,7 +83,7 @@ static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v
 
 static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 	const lVal *carSym = v->vList.car;
-	if((carSym != NULL) && (carSym->type == ltSymbol)){
+	if(unlikely((carSym != NULL) && (carSym->type == ltSymbol))){
 		if((carSym->vSymbol == symQuote)
 		   && (v->vList.cdr != NULL)
 		   && (v->vList.cdr->type == ltPair)
@@ -94,7 +95,7 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 	char *openingBracket = cur;
 
 	for(const lVal *n = v;n != NULL; n = n->vList.cdr){
-		if(n->type == ltPair){
+		if(likely(n->type == ltPair)){
 			const lVal *cv = n->vList.car;
 			cur = spf(cur, bufEnd, display ? " %V" : " %v", cv);
 		}else{
@@ -108,12 +109,12 @@ static char *writePair(char *cur, char *bufEnd, const lVal *v, bool display){
 
 /* Write boxed value V, display determines if it should be machine- or human-readable */
 static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
-	if(v == NULL){return spf(cur,bufEnd,"#nil");}
+	if(unlikely(v == NULL)){return spf(cur,bufEnd,"#nil");}
 	for(int i=0;i<writeValSP;i++){
 		if(writeValStack[i] != v){continue;}
 		return spf(cur, bufEnd, " -+- Loop detected -+- ");
 	}
-	if(writeValSP >= (int)(countof(writeValStack)-1)){
+	if(unlikely(writeValSP >= (int)(countof(writeValStack)-1))){
 		return spf(cur, bufEnd, " -+- Loop very likely -+- ");
 	}
 
@@ -190,20 +191,18 @@ static char *writeVal(char *cur, char *bufEnd, const lVal *v, bool display){
 
 /* Write the string S into the buffer */
 static char *writeString(char *buf, char *bufEnd, const char *s){
-	if(s == NULL){return NULL;}
-	while((buf < bufEnd) && *s){
-		*buf++ = *s++;
-	}
-	return buf;
+	if(unlikely(s == NULL)){return NULL;}
+	const size_t cpylen = MIN((size_t)(bufEnd - buf), strlen(s));
+	return memcpy(buf,s,cpylen) + cpylen;
 }
 
 /* Write the string S into the buffer while escaping all characters and wrapping
  * everything in quotes */
 static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 	char *cur = buf;
-	if((cur+1) >= bufEnd){return buf;}
+	if(unlikely((cur+1) >= bufEnd)){return buf;}
 	*cur++ = '\"';
-	while(cur < (bufEnd-1)){
+	while(likely(cur < (bufEnd-1))){
 		const u8 c = *s++;
 		switch(c){
 		case 0:
@@ -244,25 +243,25 @@ static char *writeStringEscaped(char *buf, char *bufEnd, const char *s){
 		}
 	}
 	bufWriteStringExit:
-	if(cur < bufEnd){*cur++ = '\"';}
+	if(likely(cur < bufEnd)){*cur++ = '\"';}
 	return cur;
 }
 
 static char *writeUint(char *buf, char *bufEnd, u64 v){
 	if(v >= 10){ buf = writeUint(buf, bufEnd, v / 10); }
-	if(buf < bufEnd){ *buf++ = '0' + (v % 10);}
+	if(likely(buf < bufEnd)){ *buf++ = '0' + (v % 10);}
 	return buf;
 }
 
 static char *writeXint(char *buf, char *bufEnd, u64 v){
 	if(v >= 16){ buf = writeXint(buf, bufEnd, v >> 4); }
-	if(buf < bufEnd){ *buf++ = getHexChar(v); }
+	if(likely(buf < bufEnd)){ *buf++ = getHexChar(v); }
 	return buf;
 }
 
 /* Write the integer V into BUF */
 static char *writeInt(char *buf, char *bufEnd, i64 v){
-	if((v < 0) && (buf < bufEnd)){
+	if(unlikely((v < 0) && (buf < bufEnd))){
 		*buf++ = '-';
 		v = -v;
 	}
@@ -303,8 +302,8 @@ static char *writeFloat(char *buf, char *bufEnd, double v){
 char *vspf(char *buf, char *bufEnd, const char *format, va_list va){
 	char *cur = buf;
 	(void)va;
-	while((cur < bufEnd) && (*format)){
-		if(*format == '%'){
+	while(likely((cur < bufEnd) && (*format))){
+		if(unlikely(*format == '%')){
 			format++;
 			switch(*format){
 			default:
