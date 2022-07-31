@@ -341,13 +341,8 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 		storeOP:
 		d[len++] = (u8)t;
 	}
-	lVal *ret = lValAlloc(ltBytecodeArr);
-	ret->vBytecodeArr = lBytecodeArrayAlloc(len);
-	ret->vBytecodeArr->literals = literals;
-	if(d){
-		memcpy(ret->vBytecodeArr->data, d, len);
-		free(d);
-	}
+	lVal *ret = lValBytecodeArray(d,len,literals,s->c);
+	free(d);
 	return ret;
 }
 

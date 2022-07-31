@@ -119,11 +119,11 @@ web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/
 	$(EMCC) $^ -D_GNU_SOURCE $(CSTD) -O3 -s EXPORTED_FUNCTIONS="['_main','_run']" -s EXPORTED_RUNTIME_METHODS=["ccall","cwrap"] -fno-rtti --closure 0 $(EMMEM) --shell-file web/shell.html -o $@
 
-nujel.h: lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) tmp/stdlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.h: mk/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h mk/amalgamation/implementation-prefix.h $(LIB_SRCS) tmp/stdlib.c mk/amalgamation/implementation-suffix.h mk/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.h
 	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" nujel.h
 
-nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) bootstrap/stdlib.c bootstrap/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.c: mk/amalgamation/bin-prefix.h mk/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h mk/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) bootstrap/stdlib.c bootstrap/binlib.c mk/amalgamation/implementation-suffix.h mk/amalgamation/suffix.h
 	@$(CAT) $^ > nujel.c
 	@echo "$(ANSI_BG_GREEN)" "[CAT]" "$(ANSI_RESET)" nujel.c
 

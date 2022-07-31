@@ -83,6 +83,13 @@ double requireFloat(lClosure *c, lVal *v){
 lArray *requireArray(lClosure *c, lVal *v){
 	return requireCertainType(c, v, ltArray)->vArray;
 }
+lArray *requireMutableArray(lClosure *c, lVal *v){
+	lArray *ret = requireCertainType(c, v, ltArray)->vArray;
+	if((v->vArray->flags & ARRAY_IMMUTABLE)){
+		lExceptionThrowValClo("type-error", "The provided array is immutable", v, c);
+	}
+	return ret;
+}
 
 lString *requireString(lClosure *c, lVal *v){
 	return requireCertainType(c, v, ltString)->vString;

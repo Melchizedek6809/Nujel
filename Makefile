@@ -66,10 +66,10 @@ release: $(RUNTIME_SRCS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
 
-nujel.h: lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) bootstrap/stdlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.h: mk/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h mk/amalgamation/implementation-prefix.h $(LIB_SRCS) bootstrap/stdlib.c mk/amalgamation/implementation-suffix.h mk/amalgamation/suffix.h
 	$(CAT) $> > nujel.h
 
-nujel.c: lib/amalgamation/bin-prefix.h lib/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h lib/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) bootstrap/stdlib.c bootstrap/binlib.c lib/amalgamation/implementation-suffix.h lib/amalgamation/suffix.h
+nujel.c: mk/amalgamation/bin-prefix.h mk/amalgamation/prefix.h lib/nujel.h lib/nujel-private.h bin/private.h mk/amalgamation/implementation-prefix.h $(LIB_SRCS) $(BIN_SRCS) $(VENDOR_SRCS) bootstrap/stdlib.c bootstrap/binlib.c mk/amalgamation/implementation-suffix.h mk/amalgamation/suffix.h
 	$(CAT) $> > nujel.c
 
 release.amalgamation: nujel.c

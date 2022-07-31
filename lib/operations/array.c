@@ -36,7 +36,7 @@ static lVal *lnfArrLengthSet(lClosure *c, lVal *v){
 
 static lVal *lnfArrSet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
-	lArray *arr = requireArray(c, car);
+	lArray *arr = requireMutableArray(c, car);
 	const int key = requireInt(c, lCadr(v));
 	if((key < 0) || (key >= arr->length)){
 		lExceptionThrowValClo("out-of-bounds","[array/set!] index provided is out of bounds", v, c);

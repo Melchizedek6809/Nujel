@@ -152,8 +152,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		return NULL;
 	}
 
-	ctx.closureStackSize = 4;
-	ctx.valueStackSize   = 8;
+	ctx.closureStackSize = 16;
+	ctx.valueStackSize   = 128;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal *));
 	ctx.csp              = 0;
@@ -195,14 +195,16 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ip = ops->data;
 	}
 
-	while(likely(ip >= ops->data) && likely(ip < ops->dataEnd)){
+	while(true){
 		lGarbageCollectIfNecessary();
+		#ifdef VM_RUNTIME_CHECKS
 		if(unlikely(ctx.csp >= ctx.closureStackSize-1)){
 			ctx.closureStackSize *= 2;
 			lClosure **newStack = realloc(ctx.closureStack, ctx.closureStackSize * sizeof(lClosure*));
 			if (unlikely(newStack == NULL)) {
 				goto topLevelNoReturn;
 			}
+			pf("Grown CSP: %u\n", (i64) ctx.closureStackSize);
 			ctx.closureStack = newStack;
 		}
 		if(unlikely(ctx.sp >= ctx.valueStackSize-1)){
@@ -211,8 +213,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 			if (unlikely(newStack == NULL)) {
 				goto topLevelNoReturn;
 			}
+			pf("Grown SP: %u\n", (i64) ctx.valueStackSize);
 			ctx.valueStack = newStack;
 		}
+		#endif
 		if(unlikely(trace)){lBytecodeTrace(&ctx, ip, ops);}
 	switch(*ip++){
 	default:
@@ -236,7 +240,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopEqualPred:
 	case lopGreaterEqPred:
 	case lopGreaterPred: {
-		if(unlikely(ctx.sp < 2)){throwStackUnderflowError(c, lBytecodeGetOpcodeName(ip[-1]));}
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
@@ -254,21 +257,17 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopPushValExt: {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "PushValExt");}
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
 		break; }
 	case lopPushVal: {
 		const uint v = *ip++;
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "PushVal");}
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
 		break; }
 	case lopDup:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Dup");}
 		ctx.sp++;
 		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
 		break;
 	case lopDrop:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Drop");}
 		ctx.sp--;
 		break;
 	case lopJmp:
@@ -277,17 +276,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopJt:
 		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
-	case lopJf: {
+	case lopJf:
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
-
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "def/val");}
-		const uint v = *ip++;
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "def/val");}
-		lVal *s = ops->literals->data[v];
-		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
-		lDefineClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
-		break; }
 	case lopDefValExt: {
 		uint v;
 		v = (ip[0] << 8) | (ip[1]);
@@ -296,11 +287,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopDefVal:
 		v = *ip++;
 		defValBody:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "def/val/ext");}
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "def/val/ext");}
-		lVal *s = ops->literals->data[v];
-		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
-		lDefineClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
+		lDefineClosureSym(c, ops->literals->data[v]->vSymbol, ctx.valueStack[ctx.sp-1]);
 		break; }
 	case lopGetValExt: {
 		uint v;
@@ -310,10 +297,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopGetVal:
 		v = *ip++;
 		getValBody:
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "GetVal");}
-		lVal *s = ops->literals->data[v];
-		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
-		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, s->vSymbol);;
+		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, ops->literals->data[v]->vSymbol);
 		break; }
 	case lopSetValExt: {
 		uint v = (ip[0] << 8) | (ip[1]);
@@ -322,14 +306,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 	case lopSetVal:
 		v = *ip++;
 		setValBody:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "set/val");}
-		if(unlikely(v >= (uint)ops->literals->length)){throwStackUnderflowError(c, "set/val");}
-		lVal *s = ops->literals->data[v];
-		if(unlikely((s == NULL) || (s->type != ltSymbol))){throwTypeError(c, s, ltSymbol);}
-		lSetClosureSym(c, s->vSymbol, ctx.valueStack[ctx.sp-1]);
+		lSetClosureSym(c, ops->literals->data[v]->vSymbol, ctx.valueStack[ctx.sp-1]);
 		break; }
 	case lopZeroPred: {
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "zero?");}
 		lVal *a = ctx.valueStack[ctx.sp-1];
 		bool p = false;
 		if(a){
@@ -342,11 +321,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp-1] = lValBool(p);
 		break; }
 	case lopCar:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Car");}
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
 		break;
 	case lopCdr:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Cdr");}
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
 		break;
 	case lopClosurePush:
@@ -357,14 +334,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		c->type = closureLet;
 		ctx.closureStack[++ctx.csp] = c;
 		break;
-	case lopClosurePop: {
-		lClosure *nclo = ctx.closureStack[--ctx.csp];
-		c = nclo;
-		if(ctx.csp < 0){throwStackUnderflowError(c, "ClosurePop");}
-		break; }
+	case lopClosurePop:
+		c = ctx.closureStack[--ctx.csp];
+		break;
 	case lopTry:
-		if(unlikely(ctx.sp < 1)){throwStackUnderflowError(c, "Try");}
-
 		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
 		c->sp   = ctx.sp;
 		c->text = ops;
@@ -376,7 +349,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		break;
 	case lopMacroDynamic:
 	case lopFnDynamic: {
-		if(unlikely(ctx.sp < 4)){throwStackUnderflowError(c, "Fn");}
 		const lBytecodeOp curOp = ip[-1];
 		lVal *cBody = ctx.valueStack[--ctx.sp];
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
@@ -385,11 +357,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lVal *fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
-		if(curOp == lopMacroDynamic){ fun->type = ltMacro; }
+		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
 		break;}
 	case lopApply: {
 		int len = *ip++;
-		if(unlikely(len >= ctx.sp)){throwStackUnderflowError(c, "Apply");}
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
@@ -397,7 +368,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		ctx.valueStack[ctx.sp++] = res;
 		break; }
 	case lopRet:
-		if(unlikely(ctx.sp < 1)){ throwStackUnderflowError(c, "Ret"); }
 		if(ctx.csp > 0){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
 				if(--ctx.csp <= 0){goto topLevelReturn;}
@@ -420,13 +390,4 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text, bool trace){
 		lRootsRet(RSP);
 		return ret;
 	}}
-	topLevelNoReturn:
-	memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
-	exceptionTargetDepth--;
-	free(ctx.closureStack);
-	free(ctx.valueStack);
-	lExceptionThrowValClo("no-return", "The bytecode evaluator needs an explicit return", NULL, c);
-	memset(&ctx, 0, sizeof(lThread));
-	lRootsRet(RSP);
-	return NULL;
 }

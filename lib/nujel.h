@@ -183,6 +183,7 @@ i64             requireNaturalInt       (lClosure *c, lVal *v);
 double          requireFloat            (lClosure *c, lVal *v);
 FILE           *requireFileHandle       (lClosure *c, lVal *v);
 lArray *        requireArray            (lClosure *c, lVal *v);
+lArray *        requireMutableArray     (lClosure *c, lVal *v);
 const lSymbol * requireSymbol           (lClosure *c, lVal *v);
 const lSymbol * requireKeyword          (lClosure *c, lVal *v);
 const lSymbol * requireSymbolic         (lClosure *c, lVal *v);

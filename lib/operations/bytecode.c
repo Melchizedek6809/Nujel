@@ -4,6 +4,35 @@
 #include "../nujel-private.h"
 #endif
 
+#include <string.h>
+
+static bool lBytecodeArrayCheckIfValid(const lBytecodeOp *ops, int opsLength, lArray *literals){
+	(void)ops;
+	(void)opsLength;
+	(void)literals;
+	// ToDo: check that all literal accesses are in bounds
+	// ToDo: check that IP is always within bounds
+	// ToDo: check that SP is always within bounds
+	// ToDo: check that all bytecodes are valid
+	// ToDo: check maximum (C)SP size
+	// ToDo: check that the last opcode is always a return
+	// ToDo: check get/def/set symbol literal types
+	return true;
+}
+
+lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure){
+	if(!lBytecodeArrayCheckIfValid(ops, opsLength, literals)){
+		lExceptionThrowValClo("invalid-bc-array", "Invalid bytecode array", NULL, errorClosure);
+		return NULL;
+	}
+	lVal *ret = lValAlloc(ltBytecodeArr);
+	ret->vBytecodeArr = lBytecodeArrayAlloc(opsLength);
+	ret->vBytecodeArr->literals = literals;
+	ret->vBytecodeArr->literals->flags |= ARRAY_IMMUTABLE;
+	memcpy(ret->vBytecodeArr->data, ops, opsLength);
+	return ret;
+}
+
 static lVal *lValBytecodeOp(lBytecodeOp v){
 	lVal *ret = lValAlloc(ltBytecodeOp);
 	ret->vBytecodeOp = v;
@@ -26,24 +55,17 @@ static lVal *lnfBytecodeOpInt(lClosure *c, lVal *v){
 static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	lArray *arr = requireArray(c, lCar(v));
 	const int len = arr->length;
-
-	lVal *litv = lCadr(v);
-	lArray *literals = NULL;
-	if(litv){
-		literals = requireArray(c, litv);
-	}else{
-		literals = lArrayAlloc(0);
-	}
-
-	lVal *ret = lValAlloc(ltBytecodeArr);
-	lBytecodeArray *bca = lBytecodeArrayAlloc(len);
-	ret->vBytecodeArr = bca;
-	bca->literals = literals;
-
+	lArray *literals = requireArray(c, lCadr(v));
+	lBytecodeOp *ops = malloc(sizeof(lBytecodeOp) * len);
 	for(int i=0;i<len;i++){
-		bca->data[i] = requireBytecodeOp(c, arr->data[i]);
+		ops[i] = requireBytecodeOp(c, arr->data[i]);
 	}
-
+	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
+		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
+		return NULL;
+	}
+	lVal *ret = lValBytecodeArray(ops,len,literals,c);
+	free(ops);
 	return ret;
 }
 
