@@ -174,7 +174,6 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	FILE *child = popen(lStringData(command), "r");
 	if(child == NULL){
 		free(buf);
-		epf("Error opening %s\n", lStringData(command));
 		return NULL;
 	}
 	while(1){

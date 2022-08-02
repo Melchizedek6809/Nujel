@@ -61,7 +61,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 		}
 		cur += len;
 	}
-	fpf(stderr, "Quite the amount of aliases we have there (%s)\n",sym);
+	exit(125);
 	return NULL;
 }
 

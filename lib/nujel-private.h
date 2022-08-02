@@ -234,7 +234,7 @@ typedef enum lOpcode {
 } lOpcode;
 
 i64 lBytecodeGetOffset16(const lBytecodeOp *ip);
-lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops, bool trace);
+lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops);
 lVal     *lLambda  (lClosure *c, lVal *args, lVal *lambda);
 lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
 

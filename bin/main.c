@@ -23,8 +23,8 @@ const char *run(const char *line){
 	lVal *funSym = lValSym("repl/wasm");
 	lVal *fun = lGetClosureSym(mainClosure, funSym->vSymbol);
 	lVal *v = lApply(mainClosure, lCons(lValString(line),NULL), fun);
-	spf(buf, &buf[sizeof(buf)], "%v", v);
-	return buf;
+	if(!v || v->type != ltString){return NULL;}
+	return lStringData(v->vString);
 }
 #endif
 

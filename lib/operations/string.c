@@ -22,8 +22,7 @@ lString *lStringNew(const char *str, uint len){
 	if(unlikely(str == NULL)){return NULL;}
 	char *nbuf = malloc(((i64)len)+1);
 	if(unlikely(nbuf == NULL)){
-		fpf(stderr,"lStringNew OOM");
-		exit(2);
+		exit(23);
 	}
 	memcpy(nbuf,str,len);
 	nbuf[len] = 0;
@@ -193,8 +192,7 @@ lVal *lnfCat(lClosure *c, lVal *v){
 	static int tmpStringBufSize = 1<<12; // Start with 4K
 	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
 	if(tmpStringBuf == NULL){
-		fpf(stderr,"lnfCat OOM\n");
-		return NULL;
+		exit(24);
 	}
 	char *new, *cur = tmpStringBuf;
 	char *bufEnd = &tmpStringBuf[tmpStringBufSize];

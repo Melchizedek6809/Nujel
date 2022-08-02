@@ -87,7 +87,6 @@ static lVal *lParseString(lReadContext *s){
 	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
 	if(buf == NULL){
-		fpf(stderr, "Can't alloc parse buf\n");
 		exit(20);
 	}
 	char *b = buf;
@@ -97,7 +96,6 @@ static lVal *lParseString(lReadContext *s){
 			bufSize *= 2;
 			buf = realloc(buf,bufSize);
 			if(buf == NULL){
-				fpf(stderr, "Can't grow parse buf\n");
 				exit(21);
 			}
 			b = &buf[i];
@@ -292,7 +290,8 @@ static lVal *lParseBytecodeOp(lReadContext *s){
 
 static NORETURN void throwBCReadError(lReadContext *s, lVal *v, const char *msg){
 	char buf[128];
-	spf(buf, &buf[sizeof(buf)], "invalid %s in Bytecoded Array", msg);
+	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
+	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), s->c);
 }
 

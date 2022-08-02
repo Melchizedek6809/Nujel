@@ -206,7 +206,6 @@ static lVal *lnfBufferViewRef(lClosure *c, lVal *v){
 	}
 	switch(viewType){
 	default:
-		epf("Unknown buffer-view type\n");
 		exit(5);
 		return NULL;
 	case lbvtU8:
@@ -260,8 +259,7 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 
 	switch(viewType){
 	default:
-		epf("Unknown buffer-view type\n");
-		exit(5);
+		exit(6);
 	case lbvtU8:
 		((u8 *)buf)[i] = requireInt(c, lCaddr(v));
 		break;

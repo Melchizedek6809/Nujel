@@ -23,8 +23,8 @@
 
 [defn repl/wasm [line]
       "Evaluate LINE in the wasm context"
-      [try repl/exception-handler
-           [eval-in root-closure [cons do [read line]]]]]
+      [string/write [try repl/exception-handler
+                         [eval-in root-closure [cons do [read line]]]]]]
 
 [defn repl/cmd/raw [ctx line]
       [try [fn [err]

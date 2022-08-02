@@ -18,7 +18,6 @@ T * T##AllocRaw (){\
 	T *ret;\
 	if((T##FFree) == NULL){			\
 		if(unlikely(T##Max >= typeMax-1)){	\
-			fpf(stderr, "%S", #T " OOM");\
 			exit(123);\
 		}else{\
 			ret = &(T##List)[(T##Max)++];	\
@@ -128,8 +127,7 @@ lArray *lArrayAlloc(size_t len){
 
 lNFunc *lNFuncAlloc(){
 	if(unlikely(lNFuncMax >= NFN_MAX-1)){
-		fpf(stderr, "lNFunc OOM ");
-		exit(123);
+		exit(124);
 	}
 	memset(&lNFuncList[lNFuncMax++], 0, sizeof(ltNativeFunc));
 	return &lNFuncList[lNFuncMax++];

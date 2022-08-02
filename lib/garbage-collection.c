@@ -44,7 +44,7 @@ T##MarkMap[ci] = 1						\
 void lThreadGCMark(lThread *c){
 	if(unlikely(c == NULL)){return;}
 	if(unlikely((c->csp > 8192) || (c->csp < 0))){
-		epf("Ignoring closure due to strangely sized CSP: %i\n", (i64)c->csp);
+		exit(125);
 		return;
 	}
 	lBytecodeArrayMark(c->text);
@@ -199,8 +199,7 @@ static void *lRootsPush(const lType t, void *ptr){
 		rootEntry *newRootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
 		if(unlikely(newRootStack == NULL)){
 			free(rootStack);
-			epf("Can't grow rootStack\n");
-			exit(123);
+			exit(126);
 		}
 		rootStack = newRootStack;
 	}

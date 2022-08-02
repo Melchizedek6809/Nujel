@@ -21,7 +21,7 @@ void lInit(){
 
 /* Cause an exception, passing V directly to the closest exception handler */
 NORETURN void lExceptionThrowRaw(lVal *v){
-	if(exceptionTargetDepth < 0){
+	if(exceptionTargetDepth < 1){
 		fpf(stderr,"%V\n",v);
 		exit(201);
 	}
@@ -41,7 +41,7 @@ NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal 
 
 /* Evaluate the Nujel Lambda expression and return the results */
 lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
-	return lBytecodeEval(lClosureNewFunCall(c, args, lambda), lambda->vClosure->text, false);
+	return lBytecodeEval(lClosureNewFunCall(c, args, lambda), lambda->vClosure->text);
 }
 
 /* Run fun with args, evaluating args if necessary  */
@@ -51,7 +51,7 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 	case ltNativeFunc: return fun->vNFunc->fp(c,args);
 	case ltObject:
 		if(args && args->type == ltBytecodeArr){
-			return lBytecodeEval(fun->vClosure, args->vBytecodeArr, false);
+			return lBytecodeEval(fun->vClosure, args->vBytecodeArr);
 		} /* fall-through */
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
 	}
@@ -70,7 +70,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		if(unlikely((car == NULL) || (car->type != ltBytecodeArr))){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}else{
-			lBytecodeEval(c, car->vBytecodeArr, false);
+			lBytecodeEval(c, car->vBytecodeArr);
 		}
 	}
 	c->args = NULL;

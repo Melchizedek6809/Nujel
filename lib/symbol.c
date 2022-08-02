@@ -75,8 +75,7 @@ void lSymbolInit(){
 	lSymbolList[0].nextFree = NULL;
 	lSymbolList[0].c[sizeof(lSymbolList[0].c) - 1] = 0xFF;
 	if(lSymbolList[0].nextFree != NULL){
-		fpf(stderr, "Overlapping zero byte and nextFree Pointer in symbol table, exiting immediatly\n");
-		exit(123);
+		exit(110);
 	}
 
 	symNull              = lSymSM("");
@@ -194,8 +193,7 @@ uint lSymbolIndexSlot(const char *str){
 			h = 0;
 		}
 	} while (h != hInitial);
-	fpf(stderr, "lSymbolIndexSlot Overflow\n");
-	exit(123);
+	exit(111);
 	return 0;
 }
 
@@ -211,14 +209,13 @@ lSymbol *lSymS(const char *str){
 		lSymbolFFree = lSymbolFFree->nextFree;
 	}else{
 		if(unlikely(lSymbolMax >= SYM_MAX)){
-			fpf(stderr, "lSym Overflow\n");
-			exit(123);
+			exit(112);
 		}else{
 			ret = &lSymbolList[lSymbolMax++];
 		}
 	}
 	lSymbolActive++;
-	spf(ret->c, &ret->c[sizeof(ret->c)], "%s", str);
+	strncpy(ret->c, str, sizeof(ret->c));
 	ret->c[sizeof(ret->c)-1] = 0;
 	symIndex = lSymIndex(ret);
 	lSymbolIndex[slot] = symIndex + 1;

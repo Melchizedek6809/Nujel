@@ -11,13 +11,15 @@
 
 NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
 	char buf[128];
-	spf(buf, &buf[sizeof(buf)], "expected argument of type %s, not: ", getTypeSymbolT(T)->c);
+	snprintf(buf, sizeof(buf), "expected argument of type %s, not: ", getTypeSymbolT(T)->c);
+	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("type-error", buf, v, c);
 }
 
 NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
 	char buf[128];
-	spf(buf, &buf[sizeof(buf)], "This subroutine needs %i arguments", (i64)arity);
+	snprintf(buf, sizeof(buf), "This subroutine needs %i arguments", arity);
+	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("arity-error", buf, v, c);
 }
 
