@@ -23,6 +23,7 @@
             ["lisp" :common-lisp]
             ["newlisp" :newlisp]
             ["el" :emacs-lisp]
+            ["be" :berry]
             ["c" :c]
             ["dart" :dart]
             ["erl" :erlang]
@@ -44,6 +45,7 @@
 [defn bench/get-language-runtimes [language]
       [case language
             [:c '["tcc -run"]]
+            [:berry '["berry"]]
             [:common-lisp '["ecl --shell" "clisp" "sbcl --script"]]
             [:newlisp '["newlisp"]]
             [:emacs-lisp '["emacs -Q --script"]]
@@ -85,6 +87,7 @@
             ["guile" [popen/trim "bash -c \"guile --version 2>&1\""]]
             ["chibi-scheme" [popen/trim "bash -c \"chibi-scheme --version 2>&1\""]]
             ["gosh" [popen/trim "bash -c \"gosh -V 2>&1\""]]
+            ["berry" [popen/trim "bash -c \"berry - 2>&1\""]]
             [otherwise [fmt "{runtime}-unknown"]]]]
 
 [defn runtime/available? [runtime]
