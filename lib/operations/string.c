@@ -76,13 +76,10 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	if (unlikely(outbuf == NULL)) {
 		return NULL;
 	}
-	char *outbufEnd = &outbuf[bufSize];
 	char *data      = outbuf;
 
-	if(msgStart != lineStart){data = spf(data, outbufEnd, "...");}
 	memcpy(data, msgStart, msgEnd - msgStart);
 	data += (msgEnd - msgStart);
-	if(msgEnd != lineEnd){data = spf(data, outbufEnd, "...");}
 	*data = 0;
 	return lValStringNoCopy(outbuf, data - outbuf);
 }

@@ -64,7 +64,6 @@ static char *writeBuffer(char *cur, char *bufEnd, const lBuffer *v, bool display
 /* Write a bytecode array including #{} wrapper */
 static char *writeBytecodeArray(char *cur, char *bufEnd, const lBytecodeArray *v){
 	if(unlikely((v < lBytecodeArrayList) || ((v - lBytecodeArrayList) >= (i64)lBytecodeArrayMax))){
-		epf("ERROR writing BCA\n");
 		exit(52);
 	}
 	cur = spf(cur, bufEnd, "#{");
@@ -360,31 +359,4 @@ char *spf(char *cur, char *bufEnd, const char *format, ...){
 	char *ret = vspf(cur, bufEnd, format, va);
 	va_end(va);
 	return ret;
-}
-
-void fpf(FILE *fp, const char *format, ...){
-	char buf[BUF_SIZE];
-	va_list va;
-	va_start(va ,format);
-	char *ret = vspf(buf,buf + sizeof(buf), format, va);
-	va_end(va);
-	fwrite(buf, ret - buf, 1, fp);
-}
-
-void epf(const char *format, ...){
-	char buf[BUF_SIZE];
-	va_list va;
-	va_start(va,format);
-	char *ret = vspf(buf,buf + sizeof(buf), format, va);
-	va_end(va);
-	fwrite(buf, ret - buf, 1, stderr);
-}
-
-void pf(const char *format, ...){
-	char buf[BUF_SIZE];
-	va_list va;
-	va_start(va ,format);
-	char *ret = vspf(buf,buf + sizeof(buf), format, va);
-	va_end(va);
-	fwrite(buf, ret - buf, 1, stdout);
 }

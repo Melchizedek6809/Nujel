@@ -164,10 +164,7 @@ void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lCl
  | Reader/Printer
  */
 lVal *lRead(lClosure *c, const char *str);
-char *vspf(char *buf, char *bufEnd, const char *format, va_list va);
 char *spf(char *buf, char *bufEnd, const char *format, ...);
-void epf(const char *format, ...);
-void pf(const char *format, ...);
 
 /*
  | Type related procedores

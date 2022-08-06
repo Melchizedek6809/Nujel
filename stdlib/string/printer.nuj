@@ -1,8 +1,9 @@
+
 [defn int->string/binary [α]
       "Turn α into a its **binary** string representation"
       [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
+      [when [or [not α] [zero? α]]
+        [return "0"]]
       [while [not-zero? α]
              [set! ret [cat [from-char-code [+ #\0 [bit-and α #b1]]] ret]]
              [set! α [bit-shift-right α 1]]]
@@ -11,19 +12,19 @@
 [defn int->string/octal [α]
       "Turn α into a its **octal** string representation"
       [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
+      [when [or [not α] [zero? α]]
+        [return "0"]]
       [while [not-zero? α]
              [set! ret [cat [from-char-code [+ #\0 [bit-and α #b111]]] ret]]
              [set! α [bit-shift-right α 3]]]
       ret]
 
-[def int->string/hex/conversion-arr #["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
+[def int->string/hex/conversion-arr ##["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
 [defn int->string/HEX [α]
       "Turn α into a its **hexadecimal** string representation"
       [def ret ""]
-      [when-not α [def α 0]]
-      [when [zero? α] [set! ret "0"]]
+      [when [or [not α] [zero? α]]
+        [return "0"]]
       [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
       [while [not-zero? α]
              [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
@@ -99,6 +100,30 @@
              [cdr! v]]
       [port 'block-write "]"]]
 
+[defn write/raw/string [v port hr?]
+      [when hr? [return [port 'block-write v]]]
+      [port 'block-write [string/write/c v]]]
+
+[defn write/raw/string/new [v port hr?]
+      [when hr? [return [port 'block-write v]]]
+      [port 'block-write "\""]
+      [dotimes [i [buffer/length v]]
+        [def c [buffer/ref v i]]
+        [case c
+              [0 [return [port 'block-write "\""]]]
+              [#x07 [port 'block-write "\\a"]]
+              [#x08 [port 'block-write "\\b"]]
+              [#x09 [port 'block-write "\\t"]]
+              [#x0A [port 'block-write "\\n"]]
+              [#x0B [port 'block-write "\\v"]]
+              [#x0C [port 'block-write "\\f"]]
+              [#x0D [port 'block-write "\\r"]]
+              [#x1B [port 'block-write "\\e"]]
+              [#x22 [port 'block-write "\\\""]]
+              [#x5C [port 'block-write "\\\\"]]
+              [otherwise [port 'char-write c]]]]
+      [port 'block-write "\""]]
+
 [defn write/raw [v port hr?]
       [case [type-of v]
             [:nil             [port 'block-write "#nil"]]
@@ -108,14 +133,14 @@
             [:buffer-view     [port 'write "#<buffer-view " [int->string/hex [val->id v]] ">"]]
             [[:lambda :macro] [port 'block-write [symbol->string [or [closure/name v] 'anonymous]]]]
             [:int             [port 'block-write [int->string/decimal v]]]
-            [:float           [port 'block-write [string/write/c v]]] ;; This one is kinda cheating
-            [:string          [port 'block-write [if hr? v [string/write/c v]]]] ;; This one is actually cheating
+            [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
             [:keyword         [port 'write ":" [keyword->string v]]]
             [:symbol          [port 'block-write [symbol->string v]]]
             [:bytecode-op     [port 'write "#$" [int->string/HEX [bytecode-op->int v]]]]
             [:array           [write/raw/array v port hr?]]
             [:buffer          [write/raw/buffer v port hr?]]
             [:bytecode-array  [write/raw/bytecode-array v port hr?]]
+            [:string          [write/raw/string v port hr?]]
             [:tree            [write/raw/tree v port hr?]]
             [:pair            [write/raw/pair v port hr?]]
             [otherwise [exception :type-error "Don't know how to write that" v]]]]
@@ -129,4 +154,10 @@
 [defn string/write [v]
       [def p [make-string-output-port]]
       [write/raw v p #f]
+      [p :return-string]]
+
+[defn cat/new vals
+      [def p [make-string-output-port]]
+      [doseq [v vals]
+             [write/raw v p #t]]
       [p :return-string]]

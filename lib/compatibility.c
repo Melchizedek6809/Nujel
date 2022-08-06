@@ -35,7 +35,6 @@ void __sync_synchronize() {}
 
 #ifdef __WATCOMC__
 	#include <dos.h>
-	#include "../misc/pf.h"
 
 	static void clock_gettime(int type, struct timespec *tv){
 		struct dostime_t dtime;

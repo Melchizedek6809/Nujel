@@ -19,10 +19,63 @@ void lInit(){
 	lSymbolInit();
 }
 
+/* Super simple printer, not meant for production use, but only as a tool of last resort, for example when
+ * we throw past the root exception handler.
+ */
+static void simplePrintVal(lVal *v){
+	typeswitch(v){
+	default:
+		fprintf(stderr, "#<not-printable-from-c %i> ", v->type);
+		break;
+	case ltLambda:
+		fprintf(stderr, "#<fn> ");
+		break;
+	case ltMacro:
+		fprintf(stderr, "#<macro> ");
+		break;
+	case ltNativeFunc:
+		fprintf(stderr, "#<NFn> ");
+		break;
+	case ltTree:
+		fprintf(stderr, "#<tree> ");
+		break;
+	case ltNoAlloc:
+		fprintf(stderr, "#nil ");
+		break;
+	case ltBool:
+		fprintf(stderr, "%s ", v->vBool ? "#t" : "#f");
+		break;
+	case ltInt:
+		fprintf(stderr, "%lli ", (long long int)v->vInt);
+		break;
+	case ltFloat:
+		fprintf(stderr, "%f ", v->vFloat);
+		break;
+	case ltString:
+		fprintf(stderr, "%s ", lStringData(v->vString));
+		break;
+	case ltKeyword:
+		fprintf(stderr, ":"); // fall-through
+	case ltSymbol:
+		fprintf(stderr, "%s ", v->vSymbol->c);
+		break;
+	case ltPair:
+		simplePrintVal(v->vList.car);
+		simplePrintVal(v->vList.cdr);
+		break;
+	case ltArray:
+		fprintf(stderr, "##[");
+		for(int i=0;i<v->vArray->length;i++){
+			simplePrintVal(v->vArray->data[i]);
+		}
+		fprintf(stderr, "] ");
+	}
+}
+
 /* Cause an exception, passing V directly to the closest exception handler */
 NORETURN void lExceptionThrowRaw(lVal *v){
 	if(exceptionTargetDepth < 1){
-		fpf(stderr,"%V\n",v);
+		simplePrintVal(v);
 		exit(201);
 	}
 	exceptionValue = v;

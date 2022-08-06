@@ -32,8 +32,6 @@ static inline bool isComment(lVal *v){return v && v->type == ltComment;}
 static inline lVal *lValComment(){return lValAlloc(ltComment);}
 lType lTypecast(const lType a, const lType b);
 
-void vfpf(FILE *fp, const char *format, va_list va);
-void fpf(FILE *f, const char *format, ...);
 
 struct lArray {
 	lVal **data;
