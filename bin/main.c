@@ -19,7 +19,6 @@ lClosure *mainClosure;
 
 /* To be used for the WASM REPL, since we don't run continuously there */
 const char *run(const char *line){
-	static char buf[1<<16];
 	lVal *funSym = lValSym("repl/wasm");
 	lVal *fun = lGetClosureSym(mainClosure, funSym->vSymbol);
 	lVal *v = lApply(mainClosure, lCons(lValString(line),NULL), fun);
