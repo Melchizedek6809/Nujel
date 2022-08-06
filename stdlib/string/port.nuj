@@ -1,3 +1,6 @@
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
+
 [def make-output-port #nil]
 [def make-string-output-port #nil]
 [def make-input-port #nil]
@@ -31,6 +34,15 @@
                                                                     [+ #x80 [bit-and [+ [buffer/length buf] size] [bit-not #x7F]]]]]
                                               [buffer/copy buf buffer [meta self :position] size]
                                               [meta! self :position [+ [meta self :position] size]]]
+                             :char-write [fn [self char]
+                                             [def buf [meta self :buffer]]
+                                           [when [< [- [buffer/length buf]
+                                                       [meta self :position]]
+                                                    1]
+                                             [buffer/length! buf
+                                                             [+ #x80 [buffer/length buf]]]]
+                                           [buffer/set! buf [meta self :position] char]
+                                           [meta! self :position [+ [meta self :position] 1]]]
                              :write [fn [self . buffers]
                                         [doseq [buf buffers self]
                                                [self :block-write buf]]]
@@ -73,3 +85,8 @@
                             "Create a new input port for HANDLE"
                           [fn [method . args]
                               [apply [tree/ref input-port-method-table method] [cons handle args]]]]]]
+
+[defmacro with-string-port [name . body]
+          `[let [[~name [make-string-output-port]]]
+                ~@body
+                [~name 'return-string]]]

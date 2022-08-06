@@ -271,21 +271,6 @@ static lVal *lnfSymStr(lClosure *c, lVal *v){
 	return lValString(requireSymbol(c, lCar(v))->c);
 }
 
-static lVal *lnfWriteStr(lClosure *c, lVal *v){
-	(void)c;
-	static char* dispWriteBuf = NULL;
-	if (unlikely(dispWriteBuf == NULL)) {
-		dispWriteBuf = malloc(1 << 20);
-	}
-	if (unlikely(dispWriteBuf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "OOM during [string/write]", v, c);
-		return NULL;
-	}
-	char *len = spf(dispWriteBuf, &dispWriteBuf[(1 << 20)], "%v", lCar(v));
-	lVal *ret = lValStringLen(dispWriteBuf,len - dispWriteBuf);
-	return ret;
-}
-
 void lOperationsString(lClosure *c){
 	lAddNativeFuncPure(c,"cat",           "args",                     "ConCATenates ARGS into a single string",                     lnfCat);
 	lAddNativeFuncPure(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
@@ -298,5 +283,4 @@ void lOperationsString(lClosure *c){
 
 	lAddNativeFuncPure(c,"string->symbol","[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
 	lAddNativeFuncPure(c,"symbol->string","[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
-	lAddNativeFuncPure(c,"string/write/c",  "[val]",                    "Write V into a string and return it",                        lnfWriteStr);
 }

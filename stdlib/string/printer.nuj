@@ -1,3 +1,5 @@
+;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;; This project uses the MIT license, a copy should be included under /LICENSE
 
 [defn int->string/binary [α]
       "Turn α into a its **binary** string representation"
@@ -101,10 +103,6 @@
       [port 'block-write "]"]]
 
 [defn write/raw/string [v port hr?]
-      [when hr? [return [port 'block-write v]]]
-      [port 'block-write [string/write/c v]]]
-
-[defn write/raw/string/new [v port hr?]
       [when hr? [return [port 'block-write v]]]
       [port 'block-write "\""]
       [dotimes [i [buffer/length v]]

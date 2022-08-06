@@ -1,0 +1,7 @@
+[test/add "asd" [with-string-port p [p 'block-write "asd"]]]
+[test/add "asd" [with-string-port p [p 'write "a" "s" "d"]]]
+[test/add "asd" [with-string-port p [p 'write "a" "sd"]]]
+[test/add "asd" [with-string-port p [p 'write "as" "d"]]]
+[test/add "asd" [with-string-port p [p 'write "as"] [p 'char-write #x64]]]
+[test/add "abc" [with-string-port p [p 'char-write #x61] [p 'char-write #x62] [p 'char-write #x63]]]
+[test/add "abcdef" [with-string-port p [p 'char-write #x61] [p 'char-write #x62] [p 'char-write #x63] [p 'write "def"]]]
