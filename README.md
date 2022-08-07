@@ -12,10 +12,10 @@ colorful charts you can see the results [here](https://wolkenwelten.net/nujel/re
 
 ## Syntax
 A lot of the language is still undocumented, this is because I want to preserve
-myself the ability to fine-tune those parts of the language as I develop a
-better feeling for what works and what doesn't. To read about parts of Nujel
-that are very unlikely to change you can look at the
-[LANGUAGE.md](./LANGUAGE.md) document in this repository.
+myself the ability to change those parts of the language as I develop a
+better feeling for what works and what doesn't. To read about the (few) parts of
+Nujel that are pretty much final you can look at the [LANGUAGE.md](./LANGUAGE.md)
+document in this repository.
 
 ## Current status
 Here is a collection of features already implemented, or about to be finished.
@@ -30,13 +30,14 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Bytecoded (compiler/assembler/disassembler all written in Nujel)
 - [X] Constant Folding
 - [X] Module system
+- [X] Printer written in Nujel
 - [ ] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [ ] Tail-call optimization
 - [ ] Continuations
 - [ ] Value types
-- [ ] Printer written in Nujel itself
+- [ ] Binary data format with C reader/writer
 - [ ] Reader written in Nujel
-- [ ] Reader macros
+- [ ] Simple HTTP 1.1 client/server
 
 ## Current Limitations
 These will be addressed in later versions
