@@ -183,44 +183,6 @@ static lVal *lnfStringCut(lClosure *c, lVal *v){
 	return lValStringLen(&buf[start], len);
 }
 
-lVal *lnfCat(lClosure *c, lVal *v){
-	(void)c;
-	static char *tmpStringBuf = NULL;
-	static int tmpStringBufSize = 1<<12; // Start with 4K
-	if(tmpStringBuf == NULL){tmpStringBuf = malloc(tmpStringBufSize);}
-	if(tmpStringBuf == NULL){
-		exit(24);
-	}
-	char *new, *cur = tmpStringBuf;
-	char *bufEnd = &tmpStringBuf[tmpStringBufSize];
-	for(lVal *sexpr = v; sexpr; sexpr = sexpr->vList.cdr){
-		lVal *car;
-		restart:
-		car = sexpr;
-		if(car->type == ltPair){car = sexpr->vList.car;}
-		if(car == NULL){continue;}
-		new = spf(cur, bufEnd, "%V", car);
-		if(new >= (bufEnd-1)){ // Doesn't Work right now!!!!!
-			tmpStringBufSize *= 2;
-			const int i = cur - tmpStringBuf;
-			char* newBuf = realloc(tmpStringBuf, tmpStringBufSize);
-			if (unlikely(newBuf == NULL)) {
-				free(tmpStringBuf);
-				lExceptionThrowValClo("out-of-memory", "OOM during string concatenation", car, c);
-				return NULL;
-			}
-			tmpStringBuf = newBuf;
-			bufEnd = &tmpStringBuf[tmpStringBufSize];
-			cur = &tmpStringBuf[i];
-			goto restart;
-		}
-		cur = new;
-		if(sexpr->type != ltPair){break;}
-	}
-	if(cur < bufEnd){*cur = 0;}
-	return lValString(tmpStringBuf);
-}
-
 static lVal *lnfIndexOf(lClosure *c, lVal *v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
@@ -267,12 +229,7 @@ static lVal *lnfStrSym(lClosure *c, lVal *v){
 	return lValSym(requireString(c, lCar(v))->data);
 }
 
-static lVal *lnfSymStr(lClosure *c, lVal *v){
-	return lValString(requireSymbol(c, lCar(v))->c);
-}
-
 void lOperationsString(lClosure *c){
-	lAddNativeFuncPure(c,"cat",           "args",                     "ConCATenates ARGS into a single string",                     lnfCat);
 	lAddNativeFuncPure(c,"trim",          "[str]",                    "Trim STR of any excessive whitespace",                       lnfTrim);
 	lAddNativeFuncPure(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
 	lAddNativeFuncPure(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
@@ -282,5 +239,4 @@ void lOperationsString(lClosure *c){
 	lAddNativeFuncPure(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 
 	lAddNativeFuncPure(c,"string->symbol","[str]",                    "Convert STR to a symbol",                                    lnfStrSym);
-	lAddNativeFuncPure(c,"symbol->string","[sym]",                    "Convert SYM to a string",                                    lnfSymStr);
 }

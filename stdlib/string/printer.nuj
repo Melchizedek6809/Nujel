@@ -129,11 +129,11 @@
             [:object          [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
             [:file-handle     [port 'write "#<file-handle " [int->string/hex [val->id v]] ">"]]
             [:buffer-view     [port 'write "#<buffer-view " [int->string/hex [val->id v]] ">"]]
-            [[:lambda :macro] [port 'block-write [symbol->string [or [closure/name v] 'anonymous]]]]
+            [[:lambda :macro :native-function] [port 'block-write [string [or [closure/name v] 'anonymous]]]]
             [:int             [port 'block-write [int->string/decimal v]]]
             [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
             [:keyword         [port 'write ":" [keyword->string v]]]
-            [:symbol          [port 'block-write [symbol->string v]]]
+            [:symbol          [port 'block-write [string v]]]
             [:bytecode-op     [port 'write "#$" [int->string/HEX [bytecode-op->int v]]]]
             [:array           [write/raw/array v port hr?]]
             [:buffer          [write/raw/buffer v port hr?]]

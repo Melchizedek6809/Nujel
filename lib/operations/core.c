@@ -5,6 +5,7 @@
 #endif
 
 #include <time.h>
+#include <inttypes.h>
 
 static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	(void)v;
@@ -310,6 +311,43 @@ static lVal *lnfValToId(lClosure *c, lVal *v){
 	return lValInt(lValToId(lCar(v)));
 }
 
+static lVal *lnfString(lClosure *c, lVal *v){
+	char buf[64];
+	int snret;
+	lVal *a = lCar(v);
+	typeswitch(a){
+	default:
+		lExceptionThrowValClo("type-error", "Can't convert that into a string", a, c);
+		return NULL;
+	case ltNoAlloc:
+		return lValString("");
+	case ltBuffer:
+		return lValStringLen(a->vBuffer->data, a->vBuffer->length);
+	case ltString:
+		return a;
+	case ltKeyword:
+		snret = snprintf(buf,sizeof(buf),":%s",a->vSymbol->c);
+		break;
+	case ltSymbol:
+		snret = snprintf(buf,sizeof(buf),"%s",a->vSymbol->c);
+		break;
+	case ltInt:
+		snret = snprintf(buf,sizeof(buf),"%" PRId64, a->vInt);
+		break;
+	case ltFloat: {
+		snret = snprintf(buf,sizeof(buf),"%f", a->vFloat);
+		if(snret < 0){exit(5);}
+		buf[snret--] = 0;
+		for(;(snret > 0) && (buf[snret] == '0');snret--){}
+		if(buf[snret] == '.'){snret++;}
+		snret++;
+		break; }
+	}
+	if(snret < 0){exit(5);}
+	buf[snret] = 0;
+	return lValStringLen(buf,snret);
+}
+
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"quote", "[v]",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFuncPure(c,"read",  "[str]", "Read and Parses STR as an S-Expression", lnfRead);
@@ -360,7 +398,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
 	lAddNativeFuncPure(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
 	lAddNativeFuncPure(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
-	lAddNativeFuncPure(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfCat);
+	lAddNativeFuncPure(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfString);
 	lAddNativeFuncPure(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
 	lAddNativeFuncPure(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
 }

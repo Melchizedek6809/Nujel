@@ -96,7 +96,7 @@
 
 [defn keyword->string [α]
       [when-not [keyword? α] [throw [list :type-error "[keyword->string] can only be called on keywords" α [current-lambda]]]]
-      [symbol->string [keyword->symbol α]]]
+      [string [keyword->symbol α]]]
 
 [defn string->keyword [α]
       [when-not [string? α] [throw [list :type-error "[string->keyword] can only be called on strings" α [current-lambda]]]]

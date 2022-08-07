@@ -109,4 +109,3 @@
 [test/add "10.1" [string/write #d10.1]]
 [test/add "-10.1" [string/write #d-10.1]]
 [test/add "[a . b]" [string/write [cons 'a 'b]]]
-[test/add "[a . b]" [string [cons 'a 'b]]]

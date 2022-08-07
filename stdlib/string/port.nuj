@@ -90,3 +90,9 @@
           `[let [[~name [make-string-output-port]]]
                 ~@body
                 [~name 'return-string]]]
+
+[defn cat l
+      "ConCATenates all arguments into a single string"
+      [def p [make-string-output-port]]
+      [doseq [c l [p 'return-string]]
+             [p 'block-write [string c]]]]
