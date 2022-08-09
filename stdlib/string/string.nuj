@@ -151,3 +151,16 @@
                      [exception :type-error "[from-char-code] expects :int arguments from 0 to 255, not: " [car l]]]
                [buffer/set! buf i [car l]]
                [cdr! l]]]
+
+[defn char/whitespace? [c]
+      "Return #t if C is a whitespace char"
+      :inline
+      [<= c 33]]
+
+[defn trim [s]
+      "Trim all whitespace off the beginning and end of S"
+      [def start 0]
+      [def end [buffer/length s]]
+      [while [and [< start end] [char/whitespace? [buffer/ref s start]]] [set! start [+ start 1]]]
+      [while [and [> end 0] [char/whitespace? [buffer/ref s [- end 1]]]] [set! end [- end 1]]]
+      [string/cut s start end]]
