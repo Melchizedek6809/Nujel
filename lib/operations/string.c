@@ -84,66 +84,6 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	return lValStringNoCopy(outbuf, data - outbuf);
 }
 
-static lVal *lnfStrDown(lClosure *c, lVal *v){
-	lString *str = requireString(c, lCar(v));
-	const int len = lStringLength(str);
-
-	char *buf = malloc(len+1);
-	if (unlikely(buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [downcase]", v, c);
-		return NULL;
-	}
-	for(int i=0;i<len;i++){
-		buf[i] = tolower((u8)str->data[i]);
-	}
-	buf[len] = 0;
-	return lValStringNoCopy(buf, len);
-}
-
-static lVal *lnfStrUp(lClosure *c, lVal *v){
-	lString *str = requireString(c, lCar(v));
-	const int len = lStringLength(str);
-
-	char *buf = malloc(len+1);
-	if (unlikely(buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [upcase]", v, c);
-		return NULL;
-	}
-	for(int i=0;i<len;i++){
-		buf[i] = toupper((u8)str->data[i]);
-	}
-	buf[len] = 0;
-	return lValStringNoCopy(buf, len);
-}
-
-static lVal *lnfStrCap(lClosure *c, lVal *v){
-	lString *str = requireString(c, lCar(v));
-	const int len = lStringLength(str);
-
-	char *buf = malloc(len+1);
-	if (unlikely(buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a buffer for [capitalize]", v, c);
-		return NULL;
-	}
-	int cap = 1;
-	for(int i=0;i<len;i++){
-		if(isspace((u8)str->data[i])){
-			cap = 1;
-			buf[i] = str->data[i];
-		}else{
-			if(cap){
-				buf[i] = toupper((u8)str->data[i]);
-				cap = 0;
-			}else{
-				buf[i] = tolower((u8)str->data[i]);
-			}
-		}
-	}
-
-	buf[len] = 0;
-	return lValStringNoCopy(buf, len);
-}
-
 static lVal *lnfStringCut(lClosure *c, lVal *v){
 	(void)c;
 	i64 start, slen, len;
@@ -210,9 +150,6 @@ static lVal *lnfStrSym(lClosure *c, lVal *v){
 }
 
 void lOperationsString(lClosure *c){
-	lAddNativeFuncPure(c,"uppercase",     "[str]",                    "Return STR uppercased",                                      lnfStrUp);
-	lAddNativeFuncPure(c,"lowercase",     "[str]",                    "Return STR lowercased",                                      lnfStrDown);
-	lAddNativeFuncPure(c,"capitalize",    "[str]",                    "Return STR capitalized",                                     lnfStrCap);
 	lAddNativeFuncPure(c,"string/cut",    "[str start &stop]",        "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
 	lAddNativeFuncPure(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
 	lAddNativeFuncPure(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);

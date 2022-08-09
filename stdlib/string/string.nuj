@@ -164,3 +164,37 @@
       [while [and [< start end] [char/whitespace? [buffer/ref s start]]] [set! start [+ start 1]]]
       [while [and [> end 0] [char/whitespace? [buffer/ref s [- end 1]]]] [set! end [- end 1]]]
       [string/cut s start end]]
+
+[defn lowercase/char [c]
+      [if [< c 65]
+          c
+          [if [> c 90]
+              c
+              [+ c 32]]]]
+
+[defn uppercase/char [c]
+      [if [< c 97]
+          c
+          [if [> c 122]
+              c
+              [+ c -32]]]]
+
+[defn uppercase [s]
+      "Uppercase a string S"
+      [def ret [buffer/allocate [buffer/length s]]]
+      [dotimes [i [buffer/length s] [buffer->string ret]]
+        [buffer/set! ret i [uppercase/char [buffer/ref s i]]]]]
+
+[defn lowercase [s]
+      "Lowercase a string S"
+      [def ret [buffer/allocate [buffer/length s]]]
+      [dotimes [i [buffer/length s] [buffer->string ret]]
+        [buffer/set! ret i [lowercase/char [buffer/ref s i]]]]]
+
+[defn capitalize [s]
+      "Capitalize a string S"
+      [def ret [buffer/allocate [buffer/length s]]]
+      [def caps? #t]
+      [dotimes [i [buffer/length s] [buffer->string ret]]
+        [buffer/set! ret i [[if caps? uppercase/char lowercase/char] [buffer/ref s i]]]
+        [set! caps? [if [char/whitespace? [buffer/ref s i]] #t #f]]]]
