@@ -38,7 +38,7 @@
            [try repl/exception-handler
                 [def result [eval-in ctx [cons do expr]]]
                 [repl/push-result result]
-                [println [if [nil? result] "" [string result]]]]]]
+                [println [if [nil? result] "" [string/display result]]]]]]
 
 [defn repl/push-result [result]
       [set! *3 *2]
@@ -55,7 +55,7 @@
       [def expr [cons do [read buf]]]
       [def result [eval-in ctx expr]]
       [repl/push-result result]
-      [println [if [nil? result] "" [string result]]]]
+      [println [if [nil? result] "" [string/display result]]]]
 
 [defn repl/readline [ctx]
       [def line [readline [repl/prompt]]]

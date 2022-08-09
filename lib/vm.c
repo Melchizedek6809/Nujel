@@ -22,7 +22,7 @@ i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 
 /* Build a list of length len in stack starting at sp */
 static lVal *lStackBuildList(lVal **stack, int sp, int len){
-	if(unlikely(len == 0)){return lCons(NULL, NULL);}
+	if(unlikely(len == 0)){return NULL;}
 	const int nsp = sp - len;
 	lVal *t = stack[nsp] = lCons(stack[nsp], NULL);
 	for(int i = len-1; i > 0; i--){
@@ -121,7 +121,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	}
 
 	while(true){
-		lGarbageCollectIfNecessary();
 		#ifdef VM_RUNTIME_CHECKS
 		if(unlikely(ctx.csp >= ctx.closureStackSize-1)){
 			ctx.closureStackSize *= 2;
@@ -193,12 +192,15 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp--;
 		break;
 	case lopJmp:
+		lGarbageCollectIfNecessary();
 		ip += lBytecodeGetOffset16(ip)-1;
 		break;
 	case lopJt:
+		lGarbageCollectIfNecessary();
 		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
 	case lopJf:
+		lGarbageCollectIfNecessary();
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		break;
 	case lopDefValExt: {

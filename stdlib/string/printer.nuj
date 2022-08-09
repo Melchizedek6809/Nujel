@@ -124,7 +124,7 @@
 
 [defn write/raw [v port hr?]
       [case [type-of v]
-            [:nil             [port 'block-write "#nil"]]
+            [:nil             [when-not hr? [port 'block-write "#nil"]]]
             [:bool            [port 'block-write [if v "#t" "#f"]]]
             [:object          [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
             [:file-handle     [port 'write "#<file-handle " [int->string/hex [val->id v]] ">"]]
@@ -154,8 +154,7 @@
       [write/raw v p #f]
       [p :return-string]]
 
-[defn cat/new vals
+[defn string/display [v]
       [def p [make-string-output-port]]
-      [doseq [v vals]
-             [write/raw v p #t]]
+      [write/raw v p #t]
       [p :return-string]]

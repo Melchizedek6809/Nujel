@@ -27,10 +27,12 @@ lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
 	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
 		if(likely(n->type == ltPair)){
 			lVal *car = lCar(n);
-			if(likely(car)){lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));}
+			if(likely(car)){
+				lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));
+			}
 			args = lCdr(args);
 		}else if(n->type == ltSymbol){
-			if(n){lDefineClosureSym(tmpc, lGetSymbol(n), args);}
+			lDefineClosureSym(tmpc, lGetSymbol(n), args);
 		}else{
 			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, parent);
 		}

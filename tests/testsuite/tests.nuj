@@ -650,3 +650,4 @@
 [test/add :type-error [try car [sum 123]]]
 [test/add :type-error [try car [sum '[1 2 3 . 4]]]]
 [test/add 10 [sum '[1 2 3 4]]]
+[test/add 0 [length [let* [defn a l l] [a]]]]

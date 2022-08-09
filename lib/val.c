@@ -176,16 +176,6 @@ lVal *lValKeyword(const char *s){
 	return lValKeywordS(lSymS(s));
 }
 
-lVal *lValBufferNoCopy(void *data, size_t length, bool immutable){
-	lVal *ret = lValAlloc(ltBuffer);
-	lBuffer *buf = lBufferAllocRaw();
-	buf->buf = data;
-	buf->length = length;
-	buf->flags = immutable ? BUFFER_IMMUTABLE : 0;
-	ret->vBuffer = buf;
-	return ret;
-}
-
 lVal *lValFileHandle(FILE *fh){
 	lVal *ret = lValAlloc(ltFileHandle);
 	ret->vFileHandle = fh;

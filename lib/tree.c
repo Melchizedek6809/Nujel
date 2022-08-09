@@ -228,7 +228,7 @@ static lVal* lnfTreeHas(lClosure* c, lVal* v) {
 
 static lVal* lnfTreeSet(lClosure* c, lVal* v) {
 	lVal* car = lCar(v);
-	if (car == NULL) { car = lValTree(NULL); }
+	if(unlikely(car == NULL)){ car = lValTree(NULL); }
 	lTree* tre = requireMutableTree(c, car);
 	const lSymbol* key = requireSymbolic(c, lCadr(v));
 	car->vTree = lTreeInsert(tre, key, lCaddr(v));

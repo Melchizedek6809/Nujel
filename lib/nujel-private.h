@@ -153,7 +153,6 @@ struct lThread {
 	int csp;
 };
 
-
 /*
  | Tree related procedures
  */
@@ -161,7 +160,6 @@ uint   lTreeSize            (const lTree *t);
 lVal  *lTreeToList          (const lTree *t);
 lVal  *lTreeKeysToList      (const lTree *t);
 lVal  *lTreeValuesToList    (const lTree *t);
-
 
 /*
  | Closure related procedures
@@ -172,7 +170,6 @@ void      lClosureSetMeta    (lClosure *c, lVal *doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal **v);
 lVal     *lLambdaNew         (lClosure *parent, lVal *name, lVal *args, lVal *body);
 
-
 /*
  | lVal related procedures
  */
@@ -180,7 +177,6 @@ int       lValCompare      (const lVal *a, const lVal *b);
 bool      lValEqual        (const lVal *a, const lVal *b);
 i64       lValGreater      (const lVal *a, const lVal *b);
 lVal     *lValStringError  (const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd);
-
 
 /*
  | Bytecode related definitions
@@ -380,7 +376,6 @@ int              lBufferViewTypeSize (lBufferViewType T);
 lVal *lnfCat     (lClosure *c, lVal *v);
 lVal *lnfArrNew  (lClosure *c, lVal *v);
 lVal *lnfTreeNew (lClosure *c, lVal *v);
-
 
 /*
  | Operations

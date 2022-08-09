@@ -171,6 +171,7 @@ lVal *lRead(lClosure *c, const char *str);
 i64             castToInt   (const lVal *v, i64 fallback);
 bool            castToBool  (const lVal *v);
 const char *    castToString(const lVal *v, const char *fallback);
+const lSymbol * optionalSymbolic(lClosure *c, lVal *v, const lSymbol *fallback);
 
 NORETURN void   throwTypeError          (lClosure *c, lVal *v, lType T);
 NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
@@ -183,7 +184,6 @@ lArray *        requireMutableArray     (lClosure *c, lVal *v);
 const lSymbol * requireSymbol           (lClosure *c, lVal *v);
 const lSymbol * requireKeyword          (lClosure *c, lVal *v);
 const lSymbol * requireSymbolic         (lClosure *c, lVal *v);
-const lSymbol * optionalSymbolic        (lClosure *c, lVal *v, const lSymbol *fallback);
 lString *       requireString           (lClosure *c, lVal *v);
 lTree *         requireTree             (lClosure *c, lVal *v);
 lTree *         requireMutableTree      (lClosure *c, lVal *v);
@@ -238,7 +238,6 @@ lVal     *lValLambda       (lClosure *v);
 lVal     *lValString       (const char *s);
 lVal     *lValStringLen    (const char *s, int len);
 lVal     *lValStringNoCopy (const char *s, int len);
-lVal     *lValBufferNoCopy (void *s, size_t len, bool immutable);
 lVal     *lValFileHandle   (FILE *fh);
 
 extern lSymbol *symNull;
