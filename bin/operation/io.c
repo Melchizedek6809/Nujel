@@ -71,9 +71,9 @@ void setIOSymbols(){
 	lsBlockDevice      = lSymSM("block-device?");
 	lsNamedPipe        = lSymSM("named-pipe?");
 
-	lSymError           = lSymSM("error");
-	lSymReplace         = lSymSM("replace");
-	lSymAppend          = lSymSM("append");
+	lSymError          = lSymSM("error");
+	lSymReplace        = lSymSM("replace");
+	lSymAppend         = lSymSM("append");
 }
 
 static lVal *lnfQuit(lClosure *c, lVal *v){

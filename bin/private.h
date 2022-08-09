@@ -18,11 +18,6 @@
 
 extern lSymbol *lSymError;
 extern lSymbol *lSymReplace;
-extern lSymbol *lSymTruncate;
-extern lSymbol *lSymMustTruncat;
-extern lSymbol *lSymTruncateReplace;
-extern lSymbol *lSymUpdate;
-extern lSymbol *lSymCanUpdate;
 extern lSymbol *lSymAppend;
 
 void initEnvironmentMap(lClosure *c);
@@ -32,7 +27,5 @@ void lOperationsPort(lClosure *c);
 void lOperationsInit(lClosure *c);
 
 int  makeDir   (const char *name);
-ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp);
-ssize_t getline(char **buf, size_t *bufsiz, FILE *fp);
 
 #endif

@@ -100,7 +100,7 @@ lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
 	ret->data = calloc(len, sizeof(lBytecodeOp));
 	if(unlikely(ret->data == NULL)){
-		lExceptionThrowValClo("out-of-memory","Couldn't allocate a new BC array", lValInt(len), NULL);
+		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a new BC array", lValInt(len), NULL);
 	}
 	ret->dataEnd = &ret->data[len];
 	return ret;
@@ -119,7 +119,7 @@ lArray *lArrayAlloc(size_t len){
 	lArray *ret = lArrayAllocRaw();
 	ret->data = calloc(len, sizeof(lVal *));
 	if(unlikely(ret->data == NULL)){
-		lExceptionThrowValClo("out-of-memory","Couldn't allocate a new array", lValInt(len), NULL);
+		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a new array", lValInt(len), NULL);
 	}
 	ret->length = len;
 	return ret;

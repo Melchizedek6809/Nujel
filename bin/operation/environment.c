@@ -19,7 +19,6 @@ static lTree *addVar(const char *e, lTree *t){
 }
 
 #if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
-
 #include <windows.h>
 
 /* Windows specific - add Environment args to `environment/variables` */
@@ -30,20 +29,17 @@ void initEnvironmentMap(lClosure *c){
 		t = addVar(env,t);
 		while(*env++){}
 	}
-	lVal *et = lValTree(t);
-	lDefineClosureSym(c,lSymS("System/Environment"),et);
+	lDefineClosureSym(c,lSymS("System/Environment"), lValTree(t));
 }
 
 #else
 extern char **environ;
-
 /* Add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
 	lTree *t = NULL;
 	for(int i=0;environ[i];i++){
 		t = addVar(environ[i],t);
 	}
-	lVal *env = lValTree(t);
-	lDefineClosureSym(c,lSymS("System/Environment"),env);
+	lDefineClosureSym(c,lSymS("System/Environment"), lValTree(t));
 }
 #endif

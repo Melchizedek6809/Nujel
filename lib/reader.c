@@ -515,9 +515,8 @@ static lVal *lReadValue(lReadContext *s){
 		if(*s->data == '@'){
 			s->data++;
 			return lReadQuote(s, symUnquoteSplicing);
-		}else{
-			return lReadQuote(s, symUnquote);
 		}
+		return lReadQuote(s, symUnquote);
 	case '`':
 		s->data++;
 		return lReadQuote(s, symQuasiquote);
@@ -541,9 +540,8 @@ static lVal *lReadValue(lReadContext *s){
 				lReadValue(s);
 				return lValComment();
 			}
-		}else{
-			return lParseSpecial(s);
 		}
+		return lParseSpecial(s);
 	case ';':
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
@@ -551,16 +549,14 @@ static lVal *lReadValue(lReadContext *s){
 		if(isopenparen(s->data[1])){
 			s->data+=2;
 			return lCons(lValSymS(symTreeNew), lReadList(s,false));
-		}
-		// fall through
+		} // fall through
 	default: {
 		const u8 n = s->data[1];
 		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
 			return lParseNumber(s, 10, 18);
-		}else{
-			return lParseSymbol(s);
 		}
-		return 0; }
+		return lParseSymbol(s);
+		}
 	}
 }
 

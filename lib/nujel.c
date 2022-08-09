@@ -30,9 +30,6 @@ static void simplePrintVal(lVal *v){
 	case ltLambda:
 		fprintf(stderr, "#<fn> ");
 		break;
-	case ltMacro:
-		fprintf(stderr, "#<macro> ");
-		break;
 	case ltNativeFunc:
 		fprintf(stderr, "#<NFn> ");
 		break;
