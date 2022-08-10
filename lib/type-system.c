@@ -181,3 +181,7 @@ FILE *requireFileHandle(lClosure *c, lVal *v){
 	requireCertainType(c, v, ltFileHandle);
 	return v->vFileHandle;
 }
+
+lVal *requirePair(lClosure *c, lVal *v){
+	return requireCertainType(c, v, ltPair);
+}

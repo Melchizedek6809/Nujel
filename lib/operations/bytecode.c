@@ -107,13 +107,21 @@ static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
 	return lValInt(arr->dataEnd - arr->data);
 }
 
-void lOperationsBytecode(lClosure *c){
-	lAddNativeFuncPure(c,"int->bytecode-op",  "[a]", "Turns an integer into a bytecode operation with the same value", lnfIntBytecodeOp);
-	lAddNativeFuncPure(c,"bytecode-op->int",  "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
-	lAddNativeFunc(c,"arr->bytecode-arr", "[a]", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
-	lAddNativeFunc(c,"bytecode-arr->arr", "[a]", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
-	lAddNativeFunc(c,"bytecode-literals", "[a]", "Return the literal section of a BCA", lnfBytecodeLiterals);
+static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
+	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
+	lClosure *env = requireClosure(c, lCadr(v));
+	return lBytecodeEval(env, arr);
+}
 
-	lAddNativeFunc(c,"bytecode-array/ref", "[a i]", "Return the bytecode-op in A at position I", lnfBytecodeArrRef);
-	lAddNativeFunc(c,"bytecode-array/length", "[a]", "Return the length of the bytecode-array A", lnfBytecodeArrLength);
+void lOperationsBytecode(lClosure *c){
+	lAddNativeFuncPure(c,"int->bytecode-op", "[a]", "Turns an integer into a bytecode operation with the same value", lnfIntBytecodeOp);
+	lAddNativeFuncPure(c,"bytecode-op->int", "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
+	lAddNativeFunc(c,"arr->bytecode-arr",    "[a]", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
+	lAddNativeFunc(c,"bytecode-arr->arr",    "[a]", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
+	lAddNativeFunc(c,"bytecode-literals",    "[a]", "Return the literal section of a BCA", lnfBytecodeLiterals);
+
+	lAddNativeFunc(c,"bytecode-array/ref",   "[a i]", "Return the bytecode-op in A at position I", lnfBytecodeArrRef);
+	lAddNativeFunc(c,"bytecode-array/length","[a]", "Return the length of the bytecode-array A", lnfBytecodeArrLength);
+
+	lAddNativeFunc(c,"bytecode-eval*","[bc-arr env]", "Evaluate BC-ARR in ENV", lnfBytecodeEval);
 }

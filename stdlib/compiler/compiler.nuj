@@ -1,7 +1,7 @@
 [defn load/forms [source environment]
       "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
       [doseq [form source]
-             [apply environment [compile* source environment]]]]
+             [bytecode-eval* [compile* source environment] environment]]]
 
 [defn macroexpand/forms [source-raw environment]
       "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
@@ -76,8 +76,8 @@
 [defn eval-in [closure expr]
       "Compile and the immediatly evaluate the result"
       ""
-      "Mostly used by lRun()"
-      [apply closure [compile* expr closure]]]
+      "Mostly used by lRun() and [eval]"
+      [bytecode-eval* [compile* expr closure] closure]]
 
 [defmacro eval [expr]
           "Compile, Evaluate and then return the result of EXPR"

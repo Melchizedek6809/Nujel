@@ -245,12 +245,11 @@
 
 [defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
-          `[apply [current-closure]
-                  [assemble ~@ops]]]
+          `[bytecode-eval* [assemble ~@ops] [current-closure]]]
 
 [defn asmdebug ops
       "Assemble and evaluate all bytecode arguments"
       [def bc [apply assemble ops]]
       [disassemble bc]
-      [def v [apply [current-closure] bc #t]]
+      [def v [bytecode-eval* bc [current-closure]]]
       [pfmtln "Result: {:?}{}" v [type-of v]]]

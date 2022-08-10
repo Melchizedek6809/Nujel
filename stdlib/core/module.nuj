@@ -42,7 +42,7 @@
                         [module/qualify-symbol module [keyword->symbol k]]
                         [keyword->symbol k]]]
              [def expr `[def ~q [module/import ~mod '~[keyword->symbol k]]]]
-             [apply env [compile* expr env]]]]
+             [bytecode-eval* [compile* expr env] env]]]
 
 [defmacro use [module]
           `[require* ~module [current-closure] #f]]

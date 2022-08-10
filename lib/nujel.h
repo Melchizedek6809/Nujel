@@ -178,7 +178,7 @@ NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
 i64             requireInt              (lClosure *c, lVal *v);
 i64             requireNaturalInt       (lClosure *c, lVal *v);
 double          requireFloat            (lClosure *c, lVal *v);
-FILE           *requireFileHandle       (lClosure *c, lVal *v);
+FILE *          requireFileHandle       (lClosure *c, lVal *v);
 lArray *        requireArray            (lClosure *c, lVal *v);
 lArray *        requireMutableArray     (lClosure *c, lVal *v);
 const lSymbol * requireSymbol           (lClosure *c, lVal *v);
@@ -187,11 +187,12 @@ const lSymbol * requireSymbolic         (lClosure *c, lVal *v);
 lString *       requireString           (lClosure *c, lVal *v);
 lTree *         requireTree             (lClosure *c, lVal *v);
 lTree *         requireMutableTree      (lClosure *c, lVal *v);
-lVal           *requireCallable         (lClosure *c, lVal *v);
-lBuffer        *requireBuffer           (lClosure *c, lVal *v);
-lBuffer        *requireMutableBuffer    (lClosure *c, lVal *v);
-lBufferView    *requireBufferView       (lClosure *c, lVal *v);
-lBufferView    *requireMutableBufferView(lClosure *c, lVal *v);
+lVal *          requireCallable         (lClosure *c, lVal *v);
+lVal *          requirePair             (lClosure *c, lVal *v);
+lBuffer *       requireBuffer           (lClosure *c, lVal *v);
+lBuffer *       requireMutableBuffer    (lClosure *c, lVal *v);
+lBufferView *   requireBufferView       (lClosure *c, lVal *v);
+lBufferView *   requireMutableBufferView(lClosure *c, lVal *v);
 
 /*
  | Closure related procedores

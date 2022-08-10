@@ -283,14 +283,13 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
 		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
-		break;}
+		break; }
 	case lopApply: {
 		int len = *ip++;
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		lVal *res = lApply(c, cargs, fun);
-		ctx.valueStack[ctx.sp++] = res;
+		ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
 		break; }
 	case lopRet:
 		if(ctx.csp > 0){

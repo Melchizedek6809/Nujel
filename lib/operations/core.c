@@ -100,7 +100,7 @@ static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
 }
 
 static lVal *lnfApply(lClosure *c, lVal *v){
-	return lApply(c, lCadr(v), lCar(v));
+	return lApply(c, requirePair(c, lCadr(v)), lCar(v));
 }
 
 static lVal *lnfMacroApply(lClosure *c, lVal *v){
