@@ -51,7 +51,7 @@
 ;;[test/add '[1 . 2] [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$ret]]]
 ;;[test/add 1 [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]
 ;;[test/add 1 [apply [environment*] [apply assemble [list [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]]]
-[test/add 37 [asmrun [$push/val +] [$push/int 12] [$push/int 25] [$apply/dynamic 2] [$ret]]]
+[test/add 37 [asmrun [$push/val +] [$push/int 12] [$push/int 25] [$apply 2] [$ret]]]
 [test/add 3 [bytecode-eval* [arr->bytecode-arr [apply array/new [flatten [list [$push/int 1] [$push/int 2] [$add/int] [$ret]]]] #[]] [environment*]]]
 [test/add 3 [bytecode-eval* #{##[] 020102020301} [environment*]]]
 [test/add "#{##[]\n020102020301\n}" [string/write #{##[] 020102020301}]]
