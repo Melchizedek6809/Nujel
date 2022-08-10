@@ -25,7 +25,7 @@
             [[+ - * / rem] [= arg-count 2]]
             [[zero? car cdr add/int cons < <= = >= >] #t]]]
 
-[defn $apply [arg-count fun]
+[defn $apply/optimized [arg-count fun]
       "arguments -> [result]"
       "Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       [case arg-count
@@ -50,7 +50,13 @@
                      [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
             [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 
-[defn $apply/dynamic [arg-count fun]
+[defn $apply/new [arg-count fun]
+      [when [> arg-count 255]
+        [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
+      [list #$1D
+            [int->bytecode-op arg-count]]]
+
+[defn $apply [arg-count fun]
       [when [> arg-count 255]
         [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
       [list #$4

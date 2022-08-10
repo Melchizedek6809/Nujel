@@ -96,6 +96,8 @@ struct lBytecodeArray{
 		struct lBytecodeArray *nextFree;
 	};
 	u8 flags;
+	u8 closureStackUsage;
+	u8 valueStackUsage;
 };
 
 typedef enum closureType {
@@ -211,7 +213,7 @@ typedef enum lOpcode {
 	lopPushVal         = 0x1A,
 	lopPushTrue        = 0x1B,
 	lopPushFalse       = 0x1C,
-	lopDefOld          = 0x1D,
+	lopApplyNew        = 0x1D,
 	lopLessPred        = 0x1E,
 	lopLessEqPred      = 0x1F,
 	lopEqualPred       = 0x20,

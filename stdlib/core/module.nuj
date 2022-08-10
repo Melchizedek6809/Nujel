@@ -38,11 +38,11 @@
       [def mod [module/load module]]
       [def exports [resolve 'exports mod]]
       [doseq [k [tree/keys exports]]
-             [def q [if qualify?
-                        [module/qualify-symbol module [keyword->symbol k]]
-                        [keyword->symbol k]]]
-             [def expr `[def ~q [module/import ~mod '~[keyword->symbol k]]]]
-             [bytecode-eval* [compile* expr env] env]]]
+             [def-in! env
+               [if qualify?
+                   [module/qualify-symbol module [keyword->symbol k]]
+                   [keyword->symbol k]]
+               [tree/ref exports k]]]]
 
 [defmacro use [module]
           `[require* ~module [current-closure] #f]]

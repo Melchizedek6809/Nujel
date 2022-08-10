@@ -103,6 +103,8 @@ lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a new BC array", lValInt(len), NULL);
 	}
 	ret->dataEnd = &ret->data[len];
+	ret->closureStackUsage = 16;
+	ret->valueStackUsage = 128;
 	return ret;
 }
 

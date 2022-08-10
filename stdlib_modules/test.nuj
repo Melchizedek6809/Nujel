@@ -59,8 +59,10 @@
 [export run-test! [defn run-test! [result rawexpr i]
                         "Tests that RAWEXPR evaluates to RESULT"
                         [try [fn [err]
-                                 [test-failure result [list :exception-caught err] rawexpr]]
+                                 [set! +bytecompile/apply-new+ #f]
+                               [test-failure result [list :exception-caught err] rawexpr]]
                              [def expr [eval rawexpr]]
+                             [set! +bytecompile/apply-new+ #f]
                              [if [equal? result expr]
                                  [test-success result expr rawexpr]
                                  [test-failure result expr rawexpr]]]]]
@@ -84,6 +86,10 @@
                          [run-test! [car cur-test]
                                     [cdr cur-test]]]
                   [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]]
+
+[export load-file [defn load-file [filename]
+                        [doseq [t [file/read filename] test-list]
+                               [test/add* [car t] [cadr t]]]]]
 
 [reset!]
 

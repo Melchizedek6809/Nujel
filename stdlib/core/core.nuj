@@ -104,3 +104,6 @@
 
 [defmacro exception [type description value]
           `[throw [list ~type ~description ~value [current-lambda]]]]
+
+[defn min/simple [a b] [if [< a b] a b]]
+[defn max/simple [a b] [if [> a b] a b]]

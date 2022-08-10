@@ -63,6 +63,24 @@ static lVal *lDyadicFun(lBytecodeOp op, lClosure *c, lVal *a, lVal *b){
 	}
 }
 
+static void lBytecodeEnsureSufficientStack(lThread *ctx){
+	const int closureSizeLeft = (ctx->closureStackSize - ctx->csp) - 1;
+	if(unlikely(closureSizeLeft < ctx->text->closureStackUsage)){
+		ctx->closureStackSize += (((ctx->text->closureStackUsage >> 8) | 1) << 8);
+		lClosure **t = realloc(ctx->closureStack, ctx->closureStackSize * sizeof(lClosure *));
+		if(t == NULL){ exit(56); }
+		ctx->closureStack = t;
+	}
+
+	const int valueSizeLeft = ctx->valueStackSize - ctx->sp;
+	if(unlikely(valueSizeLeft < ctx->text->valueStackUsage)){
+		ctx->valueStackSize += (((ctx->text->valueStackUsage >> 8) | 1) << 8);
+		lVal **t = realloc(ctx->valueStack, ctx->valueStackSize * sizeof(lVal *));
+		if(t == NULL){ exit(57); }
+		ctx->valueStack = t;
+	}
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	jmp_buf oldExceptionTarget;
@@ -77,8 +95,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		return NULL;
 	}
 
-	ctx.closureStackSize = 16;
-	ctx.valueStackSize   = 128;
+	ctx.closureStackSize = text->closureStackUsage;
+	ctx.valueStackSize   = text->valueStackUsage;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal *));
 	ctx.csp              = 0;
@@ -284,12 +302,25 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = fun;
 		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
 		break; }
+	case lopApplyNew:
 	case lopApply: {
 		int len = *ip++;
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
+		if(false && fun && (fun->type == ltLambda)){
+			c->sp   = ctx.sp;
+			c->ip   = ip;
+			c->text = ops;
+
+			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(c, cargs, fun);
+			c = ctx.closureStack[ctx.csp];
+			ip = c->ip;
+			ctx.text = ops = c->text;
+			lBytecodeEnsureSufficientStack(&ctx);
+		}else{
+			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
+		}
 		break; }
 	case lopRet:
 		if(ctx.csp > 0){
