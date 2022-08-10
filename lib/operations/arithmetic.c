@@ -34,16 +34,6 @@ lVal *lAdd(lClosure *c, lVal *a, lVal *b){
 	}
 }
 
-static lVal *lnfAdd(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		return lnfAdd(c, lCons(lAdd(c, a, b), lCddr(v)));
-	} else {
-		return lAdd(c, a, b);
-	}
-}
-
 lVal *lSub(lClosure *c, lVal *a, lVal *b){
 	if(unlikely(a == NULL)){ throwArityError(c, a, 2); }
 	if(unlikely(b == NULL)){
@@ -61,16 +51,6 @@ lVal *lSub(lClosure *c, lVal *a, lVal *b){
 	}
 }
 
-static lVal *lnfSub(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		return lnfSub(c, lCons(lSub(c, a, b), lCddr(v)));
-	} else {
-		return lSub(c, a, b);
-	}
-}
-
 lVal *lMul(lClosure *c, lVal *a, lVal *b){
 	if(unlikely(a == NULL)){return lValInt(1);}
 	if(unlikely(b == NULL)){
@@ -81,16 +61,6 @@ lVal *lMul(lClosure *c, lVal *a, lVal *b){
 		default:      return exceptionThrow(c, a,"multiplication");
 		case ltInt:   return lValInt(requireInt(c,a) * requireInt(c,b));
 		case ltFloat: return lValFloat(requireFloat(c,a) * requireFloat(c,b));
-	}
-}
-
-static lVal *lnfMul(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		return lnfMul(c, lCons(lMul(c, a, b), lCddr(v)));
-	} else {
-		return lMul(c, a, b);
 	}
 }
 
@@ -105,16 +75,6 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b){
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
 		case ltFloat: return lValFloat(requireFloat(c,a) / requireFloat(c,b));
-	}
-}
-
-static lVal *lnfDiv(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		return lnfDiv(c, lCons(lDiv(c, a, b), lCddr(v)));
-	} else {
-		return lDiv(c, a, b);
 	}
 }
 
@@ -133,14 +93,24 @@ lVal *lRem(lClosure *c, lVal *a, lVal *b){
 	}
 }
 
+static lVal *lnfAdd(lClosure *c, lVal *v){
+	return lAdd(c, lCar(v), lCadr(v));
+}
+
+static lVal *lnfSub(lClosure *c, lVal *v){
+	return lSub(c, lCar(v), lCadr(v));
+}
+
+static lVal *lnfMul(lClosure *c, lVal *v){
+	return lMul(c, lCar(v), lCadr(v));
+}
+
+static lVal *lnfDiv(lClosure *c, lVal *v){
+	return lDiv(c, lCar(v), lCadr(v));
+}
+
 static lVal *lnfRem(lClosure *c, lVal *v){
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
-	if(lCddr(v)){
-		return lnfRem(c, lCons(lRem(c, a, b), lCddr(v)));
-	} else {
-		return lRem(c, a, b);
-	}
+	return lRem(c, lCar(v), lCadr(v));
 }
 
 static lVal *lnfPow(lClosure *c, lVal *v){

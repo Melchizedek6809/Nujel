@@ -118,6 +118,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 	} else {
 		ip = ops->data;
+		lGarbageCollectIfNecessary();
 	}
 
 	while(true){
@@ -141,7 +142,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		#endif
 	switch(*ip++){
 	default:
-		lExceptionThrowValClo("unknown-opcode", "Stubmbled upon an unknown opcode", NULL, c);
+		lExceptionThrowValClo("unknown-opcode", "Stumbled upon an unknown opcode", NULL, c);
 		break;
 	case lopNOP:
 		break;

@@ -40,9 +40,9 @@
 [test/add 20 [reduce [make-list 10 2] + 0]]
 [test/add 4 [let [[a 10]] [when [when #t [set! a [+ 2 2]] #f] [set! a -1]] a]]
 [test/add 6 [eval '[+ 1 2 3]]]
-[test/add 10 [try car [+ [apply + '[1 2 3]] [apply [fn [α] [+ 1 α]] '[3]]]]]
+[test/add 10 [try car [+ [sum '[1 2 3]] [apply [fn [α] [+ 1 α]] '[3]]]]]
 [test/add 7 [+ [apply + '[1 2]] [apply [fn [α] [+ 1 α]] '[3]]]]
-[test/add 0 [apply +]]                  ;
+[test/add 0 [apply +]]
 [test/add 0 [def cb +] [apply cb]]
 [test/add 2 [apply [fn [α] [+ 1 α]] '[1]]]
 [test/add 1 [def cb [fn [α] [+ 1 α]]] [apply cb '[0]]]
