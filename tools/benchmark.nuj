@@ -63,7 +63,7 @@
             [:racket '["racket"]]
             [:zuo '["zuo"]]
             [:ruby '["ruby" "mruby"]]
-            [:scheme '["guile" "stklos -f" "chibi-scheme -q" "gosh" "chez --script" "scheme48" "mit-scheme-script"]]
+            [:scheme '["guile" "stklos -f" "chibi-scheme -q" "gosh" "chez --script" "scheme48" "s7" "mit-scheme-script"]]
             [otherwise '[]]]]
 
 [defn bench/get-runtime-version [runtime]
