@@ -6,7 +6,7 @@
 #include "nujel-private.h"
 #endif
 
-#if defined(__TINYC__) || defined(__WATCOMC__)
+#if defined(__TINYC__)
 #include <stdint.h>
 /* Classic binary divide-and-conquer popcount.
    This is popcount_2() from
@@ -33,19 +33,7 @@ void __sync_synchronize(){}
 void __sync_synchronize() {}
 #endif
 
-#ifdef __WATCOMC__
-	#include <dos.h>
-
-	static void clock_gettime(int type, struct timespec *tv){
-		struct dostime_t dtime;
-		_dos_gettime( &dtime );
-
-		tv->tv_nsec =  dtime.hsecond * 10000000l;
-		tv->tv_sec  = time(NULL);
-	}
-
-	#define CLOCK_MONOTONIC 123
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 	#include "windows.h"
 #else
 	#include <sys/time.h>
@@ -99,8 +87,6 @@ void lAddPlatformVars(lClosure *c){
 	valOS = lValSym("NetBSD");
 	#elif defined(__DragonFly__)
 	valOS = lValSym("DragonFlyBSD");
-	#elif defined(__WATCOMC__)
-	valOS = lValSym("DOS");
 	#else
 	valOS = lValSym("Unknown");
 	#endif
@@ -118,8 +104,6 @@ void lAddPlatformVars(lClosure *c){
 	valArch = lValSym("wasm");
 	#elif defined(__powerpc__)
 	valArch = lValSym("powerpc");
-	#elif defined(__WATCOMC__)
-	valArch = lValSym("x86");
 	#else
 	valArch = lValSym("unknown");
 	#endif

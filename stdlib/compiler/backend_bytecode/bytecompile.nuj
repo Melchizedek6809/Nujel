@@ -8,8 +8,6 @@
       [inc! bytecompile/gen-label/counter]
       [string->symbol [cat prefix "label-" bytecompile/gen-label/counter]]]
 
-[def +bytecompile/apply-new+ #f]
-
 [defn bytecompile/literal [source]
       [case [type-of source]
             [:int      [$push/int source]]
@@ -110,9 +108,7 @@
                 [$apply/optimized arg-count op]]
           [list [bytecompile* op-raw env]
                 [when args [bytecompile/procedure/arg args]]
-                [if +bytecompile/apply-new+
-                    [$apply/new arg-count]
-                    [$apply arg-count]]]]]
+                [$apply arg-count]]]]
 
 [defn bytecompile/and/rec [source env label-end]
       [list [bytecompile* [car source] env]

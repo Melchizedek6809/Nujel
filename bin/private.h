@@ -7,9 +7,7 @@
 
 #include <stdio.h>
 
-#ifdef __WATCOMC__
-	#include  <io.h>
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 	#include  <io.h>
 	#define access(path,mode) _access(path,mode)
 #else

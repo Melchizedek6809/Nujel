@@ -50,12 +50,6 @@
                      [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
             [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 
-[defn $apply/new [arg-count fun]
-      [when [> arg-count 255]
-        [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
-      [list #$1D
-            [int->bytecode-op arg-count]]]
-
 [defn $apply [arg-count fun]
       [when [> arg-count 255]
         [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]

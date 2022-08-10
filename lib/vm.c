@@ -302,7 +302,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = fun;
 		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
 		break; }
-	case lopApplyNew:
 	case lopApply: {
 		int len = *ip++;
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);

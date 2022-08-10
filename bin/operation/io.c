@@ -4,9 +4,7 @@
 #include "../private.h"
 #endif
 
-#ifdef __WATCOMC__
-	#include <direct.h>
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 	#include <windows.h>
 	#include <tchar.h>
 	#include <stdio.h>
@@ -22,13 +20,13 @@
 #include <sys/stat.h>
 
 
-#if defined(__WATCOMC__) || defined(__EMSCRIPTEN__) || defined(_MSC_VER)
+#if defined(__EMSCRIPTEN__) || defined(_MSC_VER)
 	#define NO_POPEN
 #else
 	#define ENABLE_POPEN
 #endif
 
-#if (!defined(__WATCOMC__)) && (!defined(_WIN32))
+#if (!defined(_WIN32))
 	#include <sys/wait.h>
 #endif
 

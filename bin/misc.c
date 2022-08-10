@@ -4,10 +4,7 @@
 #include "private.h"
 #endif
 
-#ifdef __WATCOMC__
-	#include <direct.h>
-	#include <process.h>
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 	#include <windows.h>
 #else
 	#include <dirent.h>
@@ -40,7 +37,7 @@ int isDir(const char *name){
 /* Create a new directory in a portable manner */
 int makeDir(const char *name){
 	if(isDir(name)){return 1;}
-	#if defined(__MINGW32__) || defined(__WATCOMC__)
+	#if defined(__MINGW32__)
 	return mkdir(name);
 	#elif defined (__EMSCRIPTEN__)
 	(void)name;

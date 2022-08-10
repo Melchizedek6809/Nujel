@@ -213,7 +213,7 @@ typedef enum lOpcode {
 	lopPushVal         = 0x1A,
 	lopPushTrue        = 0x1B,
 	lopPushFalse       = 0x1C,
-	lopApplyNew        = 0x1D,
+	lopUNUSEDX1D       = 0x1D,
 	lopLessPred        = 0x1E,
 	lopLessEqPred      = 0x1F,
 	lopEqualPred       = 0x20,
@@ -238,7 +238,7 @@ lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals,
 /*
  | Workarounds for missing builtins
  */
-#if defined(__TINYC__) || defined(__WATCOMC__)
+#if defined(__TINYC__)
 uint32_t __builtin_popcount(uint32_t x);
 uint64_t __builtin_popcountll(uint64_t x);
 void __sync_synchronize();

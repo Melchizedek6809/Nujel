@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#if defined(__WATCOMC__) || defined(_MSC_VER)
+#if defined(_MSC_VER)
 #define NORETURN
 #define likely(x)   x
 #define unlikely(x) x

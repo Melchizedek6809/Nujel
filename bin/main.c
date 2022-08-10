@@ -7,10 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef __WATCOMC__
-  #include <signal.h>
-#endif
-
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
 
@@ -51,10 +47,8 @@ int initNujel(int argc, char *argv[], lClosure *c){
 
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
-	#ifndef __WATCOMC__
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
-	#endif
 	lInit();
 	setIOSymbols();
 
