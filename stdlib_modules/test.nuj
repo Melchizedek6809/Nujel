@@ -88,8 +88,10 @@
                   [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]]
 
 [export load-file [defn load-file [filename]
-                        [doseq [t [file/read filename] test-list]
-                               [test/add* [car t] [cadr t]]]]]
+                        [doseq [t [read [slurp filename]] test-list]
+                               [when [== [car t] 'test/add]
+                                 [cdr! t]]
+                               [test/add* [eval [car t]] [cons 'do [cdr t]]]]]]
 
 [reset!]
 
