@@ -68,7 +68,7 @@ static lVal *lnfClosureName(lClosure *c, lVal *v){
 static lVal *lnfDefIn(lClosure *c, lVal *v){
 	const lSymbol *sym = requireSymbol(c, lCadr(v));
 	lVal *env = lCar(v);
-	if(env && (env->type != ltLambda) && (env->type != ltObject)){
+	if(!env || ((env->type != ltLambda) && (env->type != ltObject))){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	lDefineClosureSym(env->vClosure, sym, lCaddr(v));
