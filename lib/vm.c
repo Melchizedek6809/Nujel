@@ -7,6 +7,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if !defined(NUJEL_USE_JUMPTABLE)
+#if defined(__GNUC__)
+#define NUJEL_USE_JUMPTABLE 1
+#else
+#define NUJEL_USE_JUMPTABLE 0
+#endif
+#endif
+
 NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "Stack underflow at during lop%s", opcode);
@@ -81,6 +89,10 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	}
 }
 
+#define vmdispatch(o)	switch(o)
+#define vmcase(l)	case l:
+#define vmbreak	break
+
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	jmp_buf oldExceptionTarget;
@@ -88,6 +100,62 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	lBytecodeArray * volatile ops = text;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
+
+	#ifdef NUJEL_USE_JUMPTABLE
+	#undef vmdispatch
+	#undef vmcase
+	#undef vmbreak
+
+	#define vmdispatch(x)	goto *vmJumptable[x];
+	#define vmcase(label)	l##label:
+	#define vmbreak	vmdispatch(*ip++);
+
+	static const void *const vmJumptable[256] = {
+		&&llopNOP,
+		&&llopRet,
+		&&llopIntByte,
+		&&llopIntAdd,
+		&&llopApply,
+		&&llopSetVal,
+		&&llopPushValExt,
+		&&llopDefVal,
+		&&llopDefValExt,
+		&&llopJmp,
+		&&llopJt,
+		&&llopJf,
+		&&llopDup,
+		&&llopDrop,
+		&&llopGetVal,
+		&&llopGetValExt,
+		&&llopSetValExt,
+		&&llopCar,
+		&&llopCdr,
+		&&llopClosurePush,
+		&&llopCons,
+		&&llopLet,
+		&&llopClosurePop,
+		&&llopFnDynamic,
+		&&llopMacroDynamic,
+		&&llopTry,
+		&&llopPushVal,
+		&&llopPushTrue,
+		&&llopPushFalse,
+		&&llopUNUSEDX1D,
+		&&llopLessPred,
+		&&llopLessEqPred,
+		&&llopEqualPred,
+		&&llopGreaterEqPred,
+		&&llopGreaterPred,
+		&&llopUNUSEDX23,
+		&&llopPushNil,
+		&&llopAdd,
+		&&llopSub,
+		&&llopMul,
+		&&llopDiv,
+		&&llopRem,
+		&&llopZeroPred
+	};
+	#endif
 
 	if(++exceptionTargetDepth > RECURSION_DEPTH_MAX){
 		exceptionTargetDepth--;
@@ -158,100 +226,99 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack = newStack;
 		}
 		#endif
-	switch(*ip++){
-	default:
-		lExceptionThrowValClo("unknown-opcode", "Stumbled upon an unknown opcode", NULL, c);
-		break;
-	case lopNOP:
-		break;
-	case lopIntByte: {
+	vmdispatch(*ip++){
+	vmcase(lopUNUSEDX1D)
+	vmcase(lopUNUSEDX23)
+	vmcase(lopNOP)
+		vmbreak;
+	vmcase(lopIntByte) {
 		const i8 v = *ip++;
 		ctx.valueStack[ctx.sp++] = lValInt(v);
-		break;}
-	case lopAdd:
-	case lopSub:
-	case lopMul:
-	case lopDiv:
-	case lopRem:
-	case lopIntAdd:
-	case lopCons:
-	case lopLessEqPred:
-	case lopLessPred:
-	case lopEqualPred:
-	case lopGreaterEqPred:
-	case lopGreaterPred: {
+		vmbreak;}
+	vmcase(lopAdd)
+	vmcase(lopSub)
+	vmcase(lopMul)
+	vmcase(lopDiv)
+	vmcase(lopRem)
+	vmcase(lopIntAdd)
+	vmcase(lopCons)
+	vmcase(lopLessEqPred)
+	vmcase(lopLessPred)
+	vmcase(lopEqualPred)
+	vmcase(lopGreaterEqPred)
+		vmcase(lopGreaterPred) {
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
 		ctx.sp--;
-		break; }
-	case lopPushNil:
+		vmbreak; }
+	vmcase(lopPushNil)
 		ctx.valueStack[ctx.sp++] = NULL;
-		break;
-	case lopPushTrue:
+		vmbreak;
+	vmcase(lopPushTrue)
 		ctx.valueStack[ctx.sp++] = lValBool(true);
-		break;
-	case lopPushFalse:
+		vmbreak;
+	vmcase(lopPushFalse)
 		ctx.valueStack[ctx.sp++] = lValBool(false);
-		break;
-	case lopPushValExt: {
+		vmbreak;
+	vmcase(lopPushValExt) {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
-		break; }
-	case lopPushVal: {
+		vmbreak; }
+	vmcase(lopPushVal) {
 		const uint v = *ip++;
 		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
-		break; }
-	case lopDup:
+		vmbreak; }
+	vmcase(lopDup)
 		ctx.sp++;
 		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
-		break;
-	case lopDrop:
+		vmbreak;
+	vmcase(lopDrop)
 		ctx.sp--;
-		break;
-	case lopJmp:
+		vmbreak;
+	vmcase(lopJmp)
 		lGarbageCollectIfNecessary();
 		ip += lBytecodeGetOffset16(ip)-1;
-		break;
-	case lopJt:
+		vmbreak;
+	vmcase(lopJt)
 		lGarbageCollectIfNecessary();
 		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
-		break;
-	case lopJf:
+		vmbreak;
+	vmcase(lopJf)
 		lGarbageCollectIfNecessary();
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
-		break;
-	case lopDefValExt: {
+		vmbreak;
+	vmcase(lopDefValExt) {
 		uint v;
 		v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		goto defValBody;
-	case lopDefVal:
+	vmcase(lopDefVal)
 		v = *ip++;
 		defValBody:
 		lDefineClosureSym(c, ops->literals->data[v]->vSymbol, ctx.valueStack[ctx.sp-1]);
-		break; }
-	case lopGetValExt: {
+		vmbreak; }
+	vmcase(lopGetValExt) {
 		uint v;
 		v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		goto getValBody;
-	case lopGetVal:
+	vmcase(lopGetVal)
 		v = *ip++;
 		getValBody:
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, ops->literals->data[v]->vSymbol);
-		break; }
-	case lopSetValExt: {
+		vmbreak; }
+	vmcase(lopSetValExt) {
 		uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		goto setValBody;
-	case lopSetVal:
+	vmcase(lopSetVal)
 		v = *ip++;
 		setValBody:
 		lSetClosureSym(c, ops->literals->data[v]->vSymbol, ctx.valueStack[ctx.sp-1]);
-		break; }
-	case lopZeroPred: {
+		vmbreak; }
+	vmcase(lopZeroPred) {
 		lVal *a = ctx.valueStack[ctx.sp-1];
 		bool p = false;
 		if(a){
@@ -262,25 +329,25 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		}
 		ctx.valueStack[ctx.sp-1] = lValBool(p);
-		break; }
-	case lopCar:
+		vmbreak; }
+	vmcase(lopCar)
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
-		break;
-	case lopCdr:
+		vmbreak;
+	vmcase(lopCdr)
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
-		break;
-	case lopClosurePush:
+		vmbreak;
+	vmcase(lopClosurePush)
 		ctx.valueStack[ctx.sp++] = lValObject(c);
-		break;
-	case lopLet:
+		vmbreak;
+	vmcase(lopLet)
 		c = lClosureNew(c, closureLet);
 		c->type = closureLet;
 		ctx.closureStack[++ctx.csp] = c;
-		break;
-	case lopClosurePop:
+		vmbreak;
+	vmcase(lopClosurePop)
 		c = ctx.closureStack[--ctx.csp];
-		break;
-	case lopTry:
+		vmbreak;
+	vmcase(lopTry)
 		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
 		c->sp   = ctx.sp;
 		c->text = ops;
@@ -289,9 +356,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		c->exceptionHandler = ctx.valueStack[--ctx.sp];
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=2;
-		break;
-	case lopMacroDynamic:
-	case lopFnDynamic: {
+		vmbreak;
+	vmcase(lopMacroDynamic)
+	vmcase(lopFnDynamic) {
 		const lBytecodeOp curOp = ip[-1];
 		lVal *cBody = ctx.valueStack[--ctx.sp];
 		lVal *cDocs = ctx.valueStack[--ctx.sp];
@@ -301,8 +368,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
 		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
-		break; }
-	case lopApply: {
+		vmbreak; }
+	vmcase(lopApply) {
 		int len = *ip++;
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
@@ -320,8 +387,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}else{
 			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
 		}
-		break; }
-	case lopRet:
+		vmbreak; }
+	vmcase(lopRet)
 		if(ctx.csp > 0){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
 				if(--ctx.csp <= 0){goto topLevelReturn;}
@@ -333,7 +400,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.text = ops;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = ret;
-			break;
+			vmbreak;
 		}
 		topLevelReturn:
 		memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
