@@ -11,6 +11,7 @@
 [def repl/parse-args/run-repl #t]
 [def repl/options @[]]
 [def repl/option-map @[]]
+[def repl/line-history #nil]
 
 [defn repl/exception-handler [error]
       [print/error error]]
@@ -49,7 +50,7 @@
 [defn repl/cmd [ctx]
       [def buf ""]
       [def line ""]
-      [while [not= line "[/cmd]\n"]
+      [while [not= [trim line] "[/cmd]"]
              [set! buf [cat buf line]]
              [set! line [readline]]]
       [def expr [cons do [read buf]]]
@@ -59,10 +60,11 @@
 
 [defn repl/readline [ctx]
       [def line [readline [repl/prompt]]]
+      [set! repl/line-history [cons line repl/line-history]]
       [when [nil? line]
             [println "Adios, cowboy..."]
             [exit 0]]
-      [if [= line "[cmd]\n"]
+      [if [= [trim line] "[cmd]"]
           [repl/cmd ctx]
           [repl/cmd/raw ctx line]]]
 

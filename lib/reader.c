@@ -258,7 +258,7 @@ static lVal *lParseNumber(lReadContext *s, int base, int maxDigits){
 			lExceptionThrowReaderEnd(s, start, "Period at end of number");
 		}else{
 			const double valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
-			return lValFloat(negative ? -valf : valf);
+			return lValFloat(s->c, negative ? -valf : valf);
 		}
 	}
 	return lValInt(negative ? -val : val);

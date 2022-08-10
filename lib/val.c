@@ -14,11 +14,11 @@ lVal *lValInt(i64 v){
 	return ret;
 }
 
-lVal *lValFloat(double v){
+lVal *lValFloat(lClosure *c, double v){
 	if(unlikely(isnan(v))){
-		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NULL, NULL);
+		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NULL, c);
 	}else if(unlikely(isinf(v))){
-		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NULL, NULL);
+		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NULL, c);
 	}
 	lVal *ret   = lValAlloc(ltFloat);
 	ret->vFloat = v;

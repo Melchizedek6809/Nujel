@@ -30,7 +30,7 @@ lVal *lAdd(lClosure *c, lVal *a, lVal *b){
 	switch(t){
 		default:      return exceptionThrow(c, a,"addition");
 		case ltInt:   return lValInt(requireInt(c,a) + requireInt(c,b));
-		case ltFloat: return lValFloat(requireFloat(c,a) + requireFloat(c,b));
+		case ltFloat: return lValFloat(c, requireFloat(c,a) + requireFloat(c,b));
 	}
 }
 
@@ -40,14 +40,14 @@ lVal *lSub(lClosure *c, lVal *a, lVal *b){
 		switch(a->type){
 		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(-a->vInt);
-		case ltFloat: return lValFloat(-a->vFloat);
+		case ltFloat: return lValFloat(c, -a->vFloat);
 		}
 	}
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default:      return exceptionThrow(c, a,"subtraction");
 		case ltInt:   return lValInt(requireInt(c,a) - requireInt(c,b));
-		case ltFloat: return lValFloat(requireFloat(c,a) - requireFloat(c,b));
+		case ltFloat: return lValFloat(c, requireFloat(c,a) - requireFloat(c,b));
 	}
 }
 
@@ -60,7 +60,7 @@ lVal *lMul(lClosure *c, lVal *a, lVal *b){
 	switch(t){
 		default:      return exceptionThrow(c, a,"multiplication");
 		case ltInt:   return lValInt(requireInt(c,a) * requireInt(c,b));
-		case ltFloat: return lValFloat(requireFloat(c,a) * requireFloat(c,b));
+		case ltFloat: return lValFloat(c, requireFloat(c,a) * requireFloat(c,b));
 	}
 }
 
@@ -74,7 +74,7 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b){
 			const i64 bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av / bv);}
-		case ltFloat: return lValFloat(requireFloat(c,a) / requireFloat(c,b));
+		case ltFloat: return lValFloat(c,requireFloat(c,a) / requireFloat(c,b));
 	}
 }
 
@@ -89,7 +89,7 @@ lVal *lRem(lClosure *c, lVal *a, lVal *b){
 			const i64 bv = requireInt(c,b);
 			if(bv == 0){lExceptionThrowValClo("division-by-zero","Module/Dividing by zero is probably not what you wanted", NULL, c);}
 			return lValInt(av % bv);}
-		case ltFloat: return lValFloat(fmod(requireFloat(c,a), requireFloat(c,b)));
+		case ltFloat: return lValFloat(c, fmod(requireFloat(c,a), requireFloat(c,b)));
 	}
 }
 
@@ -124,7 +124,7 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 	switch(t){
 		default:      return exceptionThrowFloat(c, v,"power");
 		case ltInt:   return lValInt(pow(requireInt(c,a),  requireInt(c,b)));
-		case ltFloat: return lValFloat(pow(requireFloat(c,a), requireFloat(c,b)));
+		case ltFloat: return lValFloat(c, pow(requireFloat(c,a), requireFloat(c,b)));
 	}
 }
 
@@ -206,7 +206,7 @@ lVal *lnfAbs(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"absolute");
-		case ltFloat: return lValFloat(fabs(t->vFloat));
+		case ltFloat: return lValFloat(c,fabs(t->vFloat));
 		case ltInt:   return lValInt(llabs(t->vInt));
 	}
 }
@@ -215,8 +215,8 @@ lVal *lnfCbrt(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"squareroot");
-		case ltFloat: return lValFloat(cbrt(t->vFloat));
-		case ltInt:   return lValFloat(cbrt(t->vInt));
+		case ltFloat: return lValFloat(c, cbrt(t->vFloat));
+		case ltInt:   return lValFloat(c, cbrt(t->vInt));
 	}
 }
 
@@ -224,8 +224,8 @@ lVal *lnfSqrt(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"squareroot");
-		case ltFloat: return lValFloat(sqrt(t->vFloat));
-		case ltInt:   return lValFloat(sqrt(t->vInt));
+		case ltFloat: return lValFloat(c, sqrt(t->vFloat));
+		case ltInt:   return lValFloat(c, sqrt(t->vInt));
 	}
 }
 
@@ -233,7 +233,7 @@ lVal *lnfCeil(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"ceil");
-		case ltFloat: return lValFloat(ceil(t->vFloat));
+		case ltFloat: return lValFloat(c, ceil(t->vFloat));
 	}
 }
 
@@ -241,7 +241,7 @@ lVal *lnfFloor(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"floor");
-		case ltFloat: return lValFloat(floor(t->vFloat));
+		case ltFloat: return lValFloat(c, floor(t->vFloat));
 	}
 }
 
@@ -249,7 +249,7 @@ lVal *lnfRound(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrow(c, v,"round");
-		case ltFloat: return lValFloat(round(t->vFloat));
+		case ltFloat: return lValFloat(c, round(t->vFloat));
 	}
 }
 
@@ -257,7 +257,7 @@ lVal *lnfSin(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"sin");
-		case ltFloat: return lValFloat(sin(t->vFloat));
+		case ltFloat: return lValFloat(c, sin(t->vFloat));
 	}
 }
 
@@ -265,7 +265,7 @@ lVal *lnfCos(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"cos");
-		case ltFloat: return lValFloat(cos(t->vFloat));
+		case ltFloat: return lValFloat(c, cos(t->vFloat));
 	}
 }
 
@@ -273,14 +273,14 @@ lVal *lnfTan(lClosure *c, lVal *v){
 	lVal *t = lCar(v);
 	typeswitch(t){
 		default:      return exceptionThrowFloat(c, v,"tan");
-		case ltFloat: return lValFloat(tan(t->vFloat));
+		case ltFloat: return lValFloat(c, tan(t->vFloat));
 	}
 }
 
 lVal *lnfAtanTwo(lClosure *c, lVal *v){
 	const double y = requireFloat(c,  lCar(v));
 	const double x = requireFloat(c, lCadr(v));
-	return lValFloat(atan2(y, x));
+	return lValFloat(c, atan2(y, x));
 }
 
 void lOperationsArithmetic(lClosure *c){

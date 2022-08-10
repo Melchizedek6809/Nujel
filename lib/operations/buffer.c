@@ -223,9 +223,9 @@ static lVal *lnfBufferViewRef(lClosure *c, lVal *v){
 	case lbvtS64:
 		return lValInt(((i64 *)buf)[i]);
 	case lbvtF32:
-		return lValFloat(((float *)buf)[i]);
+		return lValFloat(c, ((float *)buf)[i]);
 	case lbvtF64:
-		return lValFloat(((double *)buf)[i]);
+		return lValFloat(c, ((double *)buf)[i]);
 	}
 }
 

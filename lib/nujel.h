@@ -231,7 +231,7 @@ lVal     *lValKeyword   (const char    *s);
 
 lVal     *lValBool         (bool v);
 lVal     *lValInt          (i64 v);
-lVal     *lValFloat        (double v);
+lVal     *lValFloat        (lClosure *c, double v);
 lVal     *lValTree         (lTree *v);
 lVal     *lValObject       (lClosure *v);
 lVal     *lValLambda       (lClosure *v);

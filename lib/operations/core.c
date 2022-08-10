@@ -261,7 +261,7 @@ static lVal *lCastFloat(lClosure *c, lVal *v){
 	typeswitch(v){
 	default:      throwTypeError(c, v, ltFloat);
 	case ltFloat: return v;
-	case ltInt:   return lValFloat(v->vInt);
+	case ltInt:   return lValFloat(c, v->vInt);
 	}
 }
 static lVal *lnfFloat(lClosure *c, lVal *v){
