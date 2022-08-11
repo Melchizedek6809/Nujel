@@ -110,7 +110,7 @@ const goodCatFilter = v => {
 const uglyCatFilter = v => {
 	if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true, "racket": true}[v.language])){return false;}
 	if(v.language == 'scheme'){
-		if(v.runtime != 'chez --script'){return false;}
+		if((v.runtime != 'chez --script') && (v.runtime != 's7')){return false;}
 	}
         if(v.language == 'racket'){
 		return true;
