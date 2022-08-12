@@ -1,5 +1,10 @@
 #!/usr/bin/env nujel
 
+[defn get-hex-cache []
+      [def ret [array/allocate 256]]
+      [dotimes [i 256 ret]
+        [array/set! ret i [fmt "0x{i:02X}, "]]]]
+
 [defn create-c-asset [filename output-file symbol-name]
       [typecheck/only filename :string]
       [typecheck/only output-file :string]
@@ -9,10 +14,10 @@
       [out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n"]
       [out 'block-write [fmt "unsigned char {symbol-name}[] = "]]
       [out 'block-write "{"]
+      [def hex-cache [get-hex-cache]]
       [dotimes [i [buffer/length raw]]
                [when [zero? [rem i 32]]
                      [out 'block-write "\n"]]
-               [def c [buffer/ref raw i]]
-               [out 'block-write [fmt "0x{c:02X}, "]]]
+               [out 'block-write [array/ref hex-cache [buffer/ref raw i]]]]
       [out 'block-write "0\n};\n"]
       [out 'close!]]
