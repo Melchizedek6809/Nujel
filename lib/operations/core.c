@@ -358,6 +358,10 @@ static lVal *lnfString(lClosure *c, lVal *v){
 	return lValStringLen(buf,snret);
 }
 
+static lVal *lnfStrSym(lClosure *c, lVal *v){
+	return lValSym(requireString(c, lCar(v))->data);
+}
+
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"quote", "[v]",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFuncPure(c,"read",  "[str]", "Read and Parses STR as an S-Expression", lnfRead);
@@ -412,4 +416,5 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfString);
 	lAddNativeFuncPure(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
 	lAddNativeFuncPure(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
+	lAddNativeFuncPure(c,"string->symbol",  "[str]",   "Convert STR to a symbol",         lnfStrSym);
 }

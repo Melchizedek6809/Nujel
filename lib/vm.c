@@ -321,8 +321,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopZeroPred) {
 		lVal *a = ctx.valueStack[ctx.sp-1];
 		bool p = false;
-		if(a){
-			if(a->type == ltInt){
+		if(likely(a)){
+			if(likely(a->type == ltInt)){
 				p = a->vInt == 0;
 			}else if(a->type == ltFloat){
 				p = a->vFloat == 0.0;
@@ -389,7 +389,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopRet)
-		if(ctx.csp > 0){
+		if(likely(ctx.csp > 0)){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
 				if(--ctx.csp <= 0){goto topLevelReturn;}
 			}
