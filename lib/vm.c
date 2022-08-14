@@ -375,9 +375,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
 		if(false && fun && (fun->type == ltLambda)){
+			c->text = ops;
 			c->sp   = ctx.sp;
 			c->ip   = ip;
-			c->text = ops;
 
 			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(c, cargs, fun);
 			c = ctx.closureStack[ctx.csp];

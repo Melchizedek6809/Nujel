@@ -22,3 +22,18 @@
 [4 [eval [read/single "[do [defn double [α] [* α α]] [double 2]]"]]]
 ['[2 4 6] [eval [read/single "[do [defn multiply-vals [val . l] [map l [fn [v] [* v val]]]] [multiply-vals 2 1 2 3]]"]]]
 ['[1 2 3 4] [eval [read/single "[do [defn my-list l l] [my-list 1 2 3 4]]"]]]
+;; Variables
+[:unbound-variable [try car [eval [read/single "my-temp"]]]]
+[123 [eval [read/single "[do [def my-temp 123] my-temp]"]]]
+[234 [eval [read/single "[do [def my-temp 123]\n my-temp [set! my-temp 234]]"]]]
+[16 [eval [read/single "[do [def double [fn [a] [* a a]]] [double 4]]"]]]
+;; Arithmetic
+[10 [+ 1 2 3 4]]
+[10 [+ 1 2 [+ 3 4]]]
+[10 [+ [+ 1 2] [+ 3 4]]]
+[-1 [+ 1 -2]]
+[-1 [+ 1 [- 2]]]
+[-1 [+ 1 [- [+ 1 1]]]]
+[:type-error [try car [eval [read/single "[+ 1 :two \"drei\"]"]]]]
+[246 [def my-var 123] [* 2 my-var]]
+[:type-error [try car [eval [read/single "[do [def my-string \"tausend\"] [* 2 my-string]]"]]]]

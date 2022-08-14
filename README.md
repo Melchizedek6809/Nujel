@@ -11,11 +11,7 @@ run which are also used to compare Nujel against other runtimes, if you like
 colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
 
 ## Syntax
-A lot of the language is still undocumented, this is because I want to preserve
-myself the ability to change those parts of the language as I develop a
-better feeling for what works and what doesn't. To read about the (few) parts of
-Nujel that are pretty much final you can look at the [LANGUAGE.md](./LANGUAGE.md)
-document in this repository.
+A lot of the language is still undocumented, this is because I want to preserve myself the ability to change those parts of the language as I develop a better feeling for what works and what doesn't. You can look in the [docs](./docs/README.md) directory for documentation about the various parts of the Nujel language as well as how likely that part is to change.
 
 ## Current status
 Here is a collection of features already implemented, or about to be finished.

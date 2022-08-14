@@ -110,7 +110,8 @@ static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	lClosure *env = requireClosure(c, lCadr(v));
-	return lBytecodeEval(env, arr);
+	lVal *ret = lBytecodeEval(env, arr);
+	return ret;
 }
 
 void lOperationsBytecode(lClosure *c){
