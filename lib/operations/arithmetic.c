@@ -124,6 +124,13 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 	}
 }
 
+static lVal *lnfIncAstI(lClosure *c, lVal *v){
+	if(unlikely(v == NULL) || unlikely(v->vList.car == NULL)){
+		return exceptionThrow(c, v, "inc/int");
+	}
+	const i64 a = v->vList.car->vInt;
+	return lValInt(a + 1);
+}
 
 static lVal *lnfAddAstI(lClosure *c, lVal *v){
 	(void)c;
@@ -293,6 +300,7 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFuncPureFold(c,"div/int", "[a b]", "Return a:int / b:int",  lnfDivAstI);
 	lAddNativeFuncPureFold(c,"mod/int", "[a b]", "Return a:int % b:int",  lnfModAstI);
 	lAddNativeFuncPureFold(c,"pow/int", "[a b]", "Return a:int ** b:int", lnfPowAstI);
+	lAddNativeFuncPureFold(c,"inc/int", "[a]",   "Return a:int + 1",      lnfIncAstI);
 
 	lAddNativeFuncPureFold(c,"bit-and",  "[a b]", "Bitwise and",          lnfLogAnd);
 	lAddNativeFuncPureFold(c,"bit-or",   "[a b]", "Bitwise or",           lnfLogIor);

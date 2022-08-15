@@ -219,7 +219,7 @@ typedef enum lOpcode {
 	lopEqualPred       = 0x20,
 	lopGreaterEqPred   = 0x21,
 	lopGreaterPred     = 0x22,
-	lopUNUSEDX23       = 0x23,
+	lopIncInt          = 0x23,
 	lopPushNil         = 0x24,
 	lopAdd             = 0x25,
 	lopSub             = 0x26,

@@ -62,7 +62,7 @@
           `[let [[~sym 0]]
                 [while [< ~sym ~times]
                        ~@body
-                       [set! ~sym [add/int 1 ~sym]]]
+                       [set! ~sym [inc/int ~sym]]]
                 ~result-form]]
 
 [defmacro doseq [for-loop . body]

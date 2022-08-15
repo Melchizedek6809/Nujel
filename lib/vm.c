@@ -146,7 +146,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopEqualPred,
 		&&llopGreaterEqPred,
 		&&llopGreaterPred,
-		&&llopUNUSEDX23,
+		&&llopIncInt,
 		&&llopPushNil,
 		&&llopAdd,
 		&&llopSub,
@@ -228,7 +228,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		#endif
 	vmdispatch(*ip++){
 	vmcase(lopUNUSEDX1D)
-	vmcase(lopUNUSEDX23)
 	vmcase(lopNOP)
 		vmbreak;
 	vmcase(lopIntByte) {
@@ -330,6 +329,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		ctx.valueStack[ctx.sp-1] = lValBool(p);
 		vmbreak; }
+	vmcase(lopIncInt)
+		ctx.valueStack[ctx.sp-1] = lValInt(ctx.valueStack[ctx.sp-1]->vInt + 1);
+		vmbreak;
 	vmcase(lopCar)
 		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
 		vmbreak;

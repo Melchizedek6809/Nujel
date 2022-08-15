@@ -149,3 +149,9 @@
       "[a] -> [result]"
       :inline
       '[#$2A]]
+
+[defn $inc/int []
+      "[a] -> [result]"
+      "Adds 1 to the topmost int"
+      :inline
+      '[#$23]]
