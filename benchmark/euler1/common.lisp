@@ -8,3 +8,4 @@
 
 (compile 'test)
 (format T "THE SUM IS ~a~%" (test))
+(quit)

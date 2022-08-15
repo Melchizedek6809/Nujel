@@ -30,5 +30,5 @@
 (compile 'reverse-num)
 (compile 'palindrome?)
 (compile 'start-search)
-
 (format T "The biggest product of 2 3-digit numbers that is a palindrome is: ~a~%" (start-search))
+(quit)

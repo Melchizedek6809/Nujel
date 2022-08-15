@@ -1,1 +1,2 @@
 (format T "Hello")
+(quit)

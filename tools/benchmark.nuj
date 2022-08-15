@@ -46,7 +46,7 @@
       [case language
             [:c '["tcc -run"]]
             [:berry '["berry"]]
-            [:common-lisp '["ecl --shell" "clisp" "sbcl --script"]]
+            [:common-lisp '["ecl --shell" "clisp" "sbcl --script" "ccl -n -l"]]
             [:newlisp '["newlisp"]]
             [:emacs-lisp '["emacs -Q --script"]]
             [:dart '["dart"]]

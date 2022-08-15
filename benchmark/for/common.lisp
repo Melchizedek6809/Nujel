@@ -6,3 +6,4 @@
 
 (compile 'test)
 (format T "THE RESULT IS ~a~%" (test))
+(quit)
