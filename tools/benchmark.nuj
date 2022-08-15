@@ -9,8 +9,8 @@
 
 [import [serialize :as val->json] :serialization/json]
 
-[def single-runs 4]
-[def nujel-runs  4]
+[def single-runs 8]
+[def nujel-runs  8]
 [def git-head [popen/trim "git rev-parse HEAD"]]
 [def git-branch [popen/trim "git rev-parse --abbrev-ref HEAD"]]
 [def uname-a [popen/trim "uname -a"]]
@@ -115,7 +115,7 @@
             [pfmt "{} {} "
                   [ansi-blue [string/pad-end language 14]]
                   [ansi-green [string/pad-end runtime 20]]]]
-      [pfmt "{i} "]
+      [when [>= i 0] [pfmt "{i} "]]
       [when-not [file/file? filename]
                 [exception :io-error "Can't open the following file to benchmark it:" filename]]
       [def result-file "nujel-benchmark.tmp"]
@@ -163,9 +163,9 @@
       [doseq [runtime [bench/get-language-runtimes language]]
              [when-not runtime [return ret]]
              [when [> cur-runs 0]
+                   [bench/single filename runtime -1] ; Ignore the first run as a warm-up
                    [dotimes [i cur-runs]
                             [set! ret [cons [bench/single filename runtime i] ret]]]
-                   [popen "sleep 10"]
                    [println ""]]]
       ret]
 

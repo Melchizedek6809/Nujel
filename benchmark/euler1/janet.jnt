@@ -1,8 +1,8 @@
 (defn test-run []
   (var ret 0)
   (loop [i :range [0 10000000]
-        :when (or (zero? (% i 3))
-                  (zero? (% i 5)))]
+        :when (or (= 0 (% i 3))
+                  (= 0 (% i 5)))]
     (+= ret i))
   ret)
 
