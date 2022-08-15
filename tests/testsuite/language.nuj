@@ -1,17 +1,28 @@
-;; Contains test cases for (hopefully) all examples from the LANGUAGE.md file, to make sure that these examples never break
+;;; Contains test cases for (hopefully) all examples from the LANGUAGE.md file, to make sure that these examples never break
+
+;; Parentheses
 [3 [eval [read/single "[+ 1 2]"]]]
 [3 [eval [read/single "(+ 1 2)"]]]
+['a [eval [read/single "[car '[a . b]]"]]]
 ['b [eval [read/single "[cdr '[a . b]]"]]]
+[1 [eval [read/single "[car [cons 1 2]]"]]]
+[2 [eval [read/single "[cdr [cons 1 2]]"]]]
+
+;; Comments
 [4 [eval [read/single "(+ 1 #;2 3)"]]]
 [4 [eval [read/single "(+ 1 #| 2 |# 3)"]]]
 [#nil [eval [read/single "[comment [exit 2]]"]]]
+
+;; Numbers
 [9 [eval [read/single "9"]]]
 [1000 [eval [read/single "100,0"]]]
 [1000 [eval [read/single "1,000"]]]
 [16 [eval [read/single "#b10000"]]]
 [16 [eval [read/single "#b0001_0000"]]]
 [4660 [eval [read/single "#x12_34"]]]
+[8 [eval [read/single "#o10"]]]
 [:read-error [try car [read/single "0x123"]]]
+[-100 [try car [read/single "-100"]]]
 ['a [eval [read/single "'a"]]]
 ['[1 2 3] [eval [read/single "'[1 2 3]"]]]
 ['[1 2 3] [eval [read/single "`[1 2 ~[+ 1 1 1]]"]]]
@@ -22,11 +33,13 @@
 [4 [eval [read/single "[do [defn double [α] [* α α]] [double 2]]"]]]
 ['[2 4 6] [eval [read/single "[do [defn multiply-vals [val . l] [map l [fn [v] [* v val]]]] [multiply-vals 2 1 2 3]]"]]]
 ['[1 2 3 4] [eval [read/single "[do [defn my-list l l] [my-list 1 2 3 4]]"]]]
+
 ;; Variables
 [:unbound-variable [try car [eval [read/single "my-temp"]]]]
 [123 [eval [read/single "[do [def my-temp 123] my-temp]"]]]
 [234 [eval [read/single "[do [def my-temp 123]\n my-temp [set! my-temp 234]]"]]]
 [16 [eval [read/single "[do [def double [fn [a] [* a a]]] [double 4]]"]]]
+
 ;; Arithmetic
 [10 [+ 1 2 3 4]]
 [10 [+ 1 2 [+ 3 4]]]
