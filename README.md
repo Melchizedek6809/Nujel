@@ -7,8 +7,8 @@ useful for general scripting tasks as well.
 
 ## Performance
 To make sure that there are no performance regressions, benchmarks are regularly
-run which are also used to compare Nujel against other runtimes, if you like
-colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here.
+run which are also used to compare Nujel with other runtimes, if you like
+colorful charts you can see the results [here](https://wolkenwelten.net/nujel/report.html) here. Beware however that these benchmarks only test a tiny part of the language.
 
 ## Syntax
 A lot of the language is still undocumented, this is because I want to preserve myself the ability to change those parts of the language as I develop a better feeling for what works and what doesn't. You can look in the [docs](./docs/README.md) directory for documentation about the various parts of the Nujel language as well as how likely that part is to change.
@@ -31,7 +31,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [ ] Tail-call optimization
 - [ ] Continuations
 - [ ] Value types
-- [ ] Binary data format with C reader/writer
+- [ ] Binary FASL format with C reader/writer
 - [ ] Reader written in Nujel
 - [ ] Simple HTTP 1.1 client/server
 
