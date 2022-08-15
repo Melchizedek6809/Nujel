@@ -21,7 +21,7 @@
        [tree/set! γ :folds [reverse [ref γ :folds]]]]
 
 [defn fold-y [data y]
-       [def ret [array/2d/allocate [ref data :width] [/ [ref data :height] 2]]]
+       [def ret [array/2d/allocate [ref data :width] [div/int [ref data :height] 2]]]
        [def dh [ref data :height]]
        [def rw [ref ret :width]]
        [def rh [ref ret :height]]
@@ -33,7 +33,7 @@
        [tree/set! ret :folds [cdr [ref data :folds]]]]
 
 [defn fold-x [data y]
-       [def ret [array/2d/allocate [/ [ref data :width] 2] [ref data :height]]]
+       [def ret [array/2d/allocate [div/int [ref data :width] 2] [ref data :height]]]
        [def dw [ref data :width]]
        [def rw [ref ret :width]]
        [def rh [ref ret :height]]

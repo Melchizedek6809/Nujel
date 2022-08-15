@@ -113,7 +113,7 @@
 
 [defn array/make-heap [arr]
       [def l [array/length arr]]
-      [def l2 [/ l 2]]
+      [def l2 [div/int l 2]]
       [while [>= l2 0]
              [array/heapify arr l l2]
              [dec! l2]]

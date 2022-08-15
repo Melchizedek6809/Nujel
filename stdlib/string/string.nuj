@@ -79,7 +79,7 @@
       [while [< [buffer/length text] goal-length]
              [set! text [cat char text char]]]
       [if [> [buffer/length text] goal-length]
-          [let [[end-overflow [/ [- [buffer/length text] goal-length] 2]]
+          [let [[end-overflow [div/int [- [buffer/length text] goal-length] 2]]
                 [start-overflow [- [- [buffer/length text] goal-length] end-overflow]]]
                [string/cut text start-overflow [+ start-overflow goal-length]]]
           text]]

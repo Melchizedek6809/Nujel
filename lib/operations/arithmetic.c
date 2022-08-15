@@ -65,11 +65,7 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b){
 	lType t = lTypecast(a->type, b->type);
 	switch(t){
 		default: return exceptionThrow(c, a,"division");
-		case ltInt: {
-			const i64 av = requireInt(c,a);
-			const i64 bv = requireInt(c,b);
-			if(bv == 0){lExceptionThrowValClo("division-by-zero","Dividing by zero is probably not what you wanted", NULL, c);}
-			return lValInt(av / bv);}
+		case ltInt:
 		case ltFloat: return lValFloat(c,requireFloat(c,a) / requireFloat(c,b));
 	}
 }

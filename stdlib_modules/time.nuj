@@ -8,11 +8,11 @@
 
 [export minutes [defn minutes [timestamp]
       "Return the minutes part of TIMESTAMP, defaults to current time"
-      [rem [/ [or timestamp [time]] 60] 60]]]
+      [rem [div/int [or timestamp [time]] 60] 60]]]
 
 [export hours [defn hours [timestamp]
       "Return the hours part of TIMESTAMP, defaults to current time"
-      [rem [/ [or timestamp [time]] 3600] 24]]]
+      [rem [div/int [or timestamp [time]] 3600] 24]]]
 
 [deftest 34 [time/seconds 1637755714]]
 [deftest  8 [time/minutes 1637755714]]

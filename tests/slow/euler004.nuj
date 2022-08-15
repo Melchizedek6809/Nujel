@@ -5,7 +5,7 @@
       [while [> a 0]
              [set! ret [* ret 10]]
              [set! ret [+ ret [rem a 10]]]
-             [set! a [/ a 10]]]
+             [set! a [div/int a 10]]]
       [return ret]]
 
 [defn palindrome? [a]

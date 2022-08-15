@@ -1,4 +1,4 @@
-[:division-by-zero [try car [/ 3 0]]]
+[:float-inf [try car [/ 3 0]]]
 [:test [try [fn [e] :test] [/ 3 0]]]
 [:test [try car [try [fn [e] :test] [/ 3 0]]]]
 [:inner [try [fn [e] :outer] [try [fn [e] :inner] [throw :asd]]]]

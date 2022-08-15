@@ -45,7 +45,7 @@
           [tree/set! :r #nil]]]
 
 [defn snail/split [t root]
-      [def lv [/ [ref t :v] 2]]
+      [def lv [div/int [ref t :v] 2]]
       [-> t
           [tree/set! :l @[:v lv]]
           [tree/set! :r @[:v [- [ref t :v] lv]]]
