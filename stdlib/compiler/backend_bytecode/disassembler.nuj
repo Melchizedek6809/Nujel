@@ -103,7 +103,7 @@
 
 [defn disassemble/print [bc]
       [doseq [a [disassemble/bytecode-array bc]]
-             [println [cat [ansi-blue [string/pad-start [string [car a]] 6]]
+             [println [cat [string/pad-start [string [car a]] 6]
                            " - "
                            [cdr a]]]]]
 

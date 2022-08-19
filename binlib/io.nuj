@@ -53,12 +53,13 @@
       [when [== [buffer/ref rel-path 0] #\/]
             [set! rel-path [string/cut rel-path 1]]]
       [def module-name [string->keyword [path/without-extension rel-path]]]
+      [require :ansi]
       [require :test]
       [test/init!]
       [-> [read [file/read path]]
           [filter file/test/valid-test-form?]
           [file/test/module/run module-name]]
-      [test/finish! [ansi-blue module-name]]]
+      [test/finish! [ansi/blue module-name]]]
 
 [defn file/test/directory [base-dir]
       "Compile a Nujel source file into optimized object code"

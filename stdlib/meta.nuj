@@ -6,11 +6,11 @@
 [defn describe/closure [c i]
       [when c
             [if [= c root-closure]
-                [cat [ansi-blue [cat [int [or i 0]] "# <root environment>"]]
+                [cat [cat [int [or i 0]] "# <root environment>"]
                      "\r\n"]
                 [do [def data [closure/data c]]
                     [def l [length data]]
-                  [cat [ansi-blue [cat [int [or i 0]] "# " [string/write c]]]
+                  [cat [int [or i 0]] "# " [string/write c]
                        " - "
                        [if [< l 16]
                            [string/write data]
@@ -21,13 +21,11 @@
 [defn stacktrace []
       [print [describe/closure [closure/caller [current-lambda]]]]]
 
-[defn print/error/wrap [i text]
+[defn print/error/wrap [i v]
       [case i
-            [0 [ansi-red text]]
-            [1 [string text]]
-            [2 [ansi-yellow [string/write text]]]
-            [3 [describe/closure text]]
-            [otherwise text]]]
+            [2 [string/write v]]
+            [3 [describe/closure v]]
+            [otherwise [string v]]]]
 
 [defn print/error/iter [error i]
       [if error

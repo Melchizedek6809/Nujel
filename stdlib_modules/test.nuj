@@ -1,5 +1,7 @@
 ;;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ;;;; This project uses the MIT license, a copy should be included under /LICENSE
+[require :ansi]
+
 [def test-list   #nil]
 [def test-count     0]
 [def nujel-start    0]
@@ -26,24 +28,24 @@
       [efmtln "{} {} - [{} / {}] in {} ms"
               [if [and [zero? error-count] [> test-count 0]]
                   [if [zero? success-count]
-                      [ansi-yellow "?"]
-                      [ansi-green "✓"]]
-                  [ansi-red "✗"]]
+                      [ansi/yellow "?"]
+                      [ansi/green "✓"]]
+                  [ansi/red "✗"]]
               description
               [if [zero? success-count]
-                  [ansi-yellow success-count]
-                  [ansi-green success-count]]
+                  [ansi/yellow success-count]
+                  [ansi/green success-count]]
               [if [zero? error-count]
-                  [ansi-gray error-count]
-                  [ansi-red error-count]]
+                  [ansi/gray error-count]
+                  [ansi/red error-count]]
               [- [time/milliseconds] nujel-start]]]
 
 [defn test-success [res-should res-is expr]
       "Should be called after a test has finished successfully"
       [when print-passes
             [efmtln "{} == {}\r\n{}\r\n\r\n"
-                    [ansi-green [string/write res-is]]
-                    [ansi-green [string/write res-should]]
+                    [ansi/green [string/write res-is]]
+                    [ansi/green [string/write res-should]]
                     [string/write expr]]]
       [set! success-count [+ 1 success-count]]]
 
@@ -51,8 +53,8 @@
       "Should be called if EXPR does not equal RES"
       [when print-errors
             [pfmtln "{} != {}\r\n{}\r\n\r\n"
-                    [ansi-red [string/write res-is]]
-                    [ansi-green [string/write res-should]]
+                    [ansi/red [string/write res-is]]
+                    [ansi/green [string/write res-should]]
                     [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
@@ -85,7 +87,7 @@
                   [doseq [cur-test test-list]
                          [run-test! [car cur-test]
                                     [cdr cur-test]]]
-                  [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi-blue ":core"] [ansi-rainbow "Nujel"]]]]]
+                  [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi/blue ":core"] [ansi/rainbow "Nujel"]]]]]
 
 [export load-file [defn load-file [filename]
                         [doseq [t [read [slurp filename]] test-list]
