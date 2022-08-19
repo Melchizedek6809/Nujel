@@ -1,5 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; The REPL implementation, also parses command line arguments and determines
+;;; which files to load and whether to start a interactive session.
 
 [def *1 #nil]
 [def *2 #nil]

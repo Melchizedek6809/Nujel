@@ -1,11 +1,11 @@
-;; An avl tree is a balanced binary tree that stores a set of ordered keys.
-;; It is represented as an array #[root-node compare-func]
-;; An avl node with a key is represented as an array #[height key left-child right-child]
-;; An empty avl node is represented as just the symbol :e.
-;; The comparison function is called with two keys [cmp a b] and is expected to return
-;;  -1 if a < b
-;;  +1 if a > b
-;;   0 if a = b.
+;;; An avl tree is a balanced binary tree that stores a set of ordered keys.
+;;; It is represented as an array #[root-node compare-func]
+;;; An avl node with a key is represented as an array #[height key left-child right-child]
+;;; An empty avl node is represented as just the symbol :e.
+;;; The comparison function is called with two keys [cmp a b] and is expected to return
+;;;  -1 if a < b
+;;;  +1 if a > b
+;;;   0 if a = b.
 
 [def avl/empty :e]
 

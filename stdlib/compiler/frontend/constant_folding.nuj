@@ -1,11 +1,22 @@
-;; Contains an optimization pass that does constant folding
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains an optimization pass that does some simple constant folding
+;;;
+;;; To accomplish this we walk an expression tree, searching for pure functions
+;;; with constant arguments, since these should be safe to replace with their
+;;; respective results.
+;;;
+;;; Pure functions are those whose :pure meta value is #t, meaning we trust
+;;; the developer to determine which functions are safe to constant fold, in
+;;; future versions we might be able to infer if a given fn is pure.
 
-[defn pure? [expr]
+[defn constant-fold/constant? [expr]
       [and [not [pair? expr]]
            [not [symbol? expr]]
            #t]]
 
-[defn constant-foldable? [fun]
+[defn constant-fold/pure? [fun]
       [meta fun :pure]]
 
 [defn constant-fold/resolve [sym]
@@ -22,13 +33,12 @@
 
 [defn constant-fold [expr]
       "Will try and evaluate as many constant as possible to make the expression simpler."
-      [if-not [pair? expr] expr
-              [do
-                  [def folded-fun  [car expr]]
-                  [when [= 'quote folded-fun] [return expr]]
-                  [def folded-args [constant-fold/args [cdr expr]]]
-                  [if [and [constant-foldable? folded-fun]
-                           [every? folded-args pure?]]
-                      [try [fn [] [cons folded-fun folded-args]]
-                           [apply [constant-fold/resolve folded-fun] folded-args]]
-                      [cons folded-fun folded-args]]]]]
+      [when-not [pair? expr] [return expr]]
+      [def folded-fun  [car expr]]
+      [when [= 'quote folded-fun] [return expr]]
+      [def folded-args [constant-fold/args [cdr expr]]]
+      [if [and [constant-fold/pure? folded-fun]
+               [every? folded-args constant-fold/constant?]]
+          [try [fn [] [cons folded-fun folded-args]]
+               [apply [constant-fold/resolve folded-fun] folded-args]]
+          [cons folded-fun folded-args]]]

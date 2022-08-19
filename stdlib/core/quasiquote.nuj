@@ -1,5 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; The Nujel implementation for quasiquote, it is important to note that it is
+;;; a macro, not a special form.
 
 [defn quasiquote-real [l depth]
       [when-not l [return #nil]]

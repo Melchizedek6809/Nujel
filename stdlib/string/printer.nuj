@@ -1,5 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the printer, which is used pretty much everywhere a Nujel value needs
+;;; a text representation.
 
 [defn int->string/binary [α]
       "Turn α into a its **binary** string representation"

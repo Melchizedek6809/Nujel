@@ -1,7 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Time related λs
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Time related λs
+
 [export seconds [defn seconds [timestamp]
       "Return the seconds part of TIMESTAMP, defaults to current time"
       [rem [or timestamp [time]] 60]]]

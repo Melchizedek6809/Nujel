@@ -1,4 +1,6 @@
-#!/usr/bin/env
+#!/usr/bin/env nujel
+
+[require :random]
 
 [defn test-sort [times sort-func]
        [def l #nil]

@@ -1,5 +1,7 @@
-; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-; This project uses the MIT license, a copy should be included under /LICENSE
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains various io routines for standalone Nujel runtimes
 
 [defn file/read [path]
       "Read in a file using the Nujel reader"

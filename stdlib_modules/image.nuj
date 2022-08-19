@@ -1,12 +1,15 @@
-;; Contains some functions for working with image data
-;;
-;; Should only contain some basic functions, as well as some
-;; functions which can then be extended via modules, like the
-;; generic functions image/save! and image/load! which by default
-;; will probably only every support BMP files.
-;;
-;; Some simple drawing routines (line/box/circle) and some simple
-;; filters (scale/blur) would also be good to have here.
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains some functions for working with image data
+;;;
+;;; Should only contain some basic functions, as well as some
+;;; functions which can then be extended via modules, like the
+;;; generic functions image/save! and image/load! which by default
+;;; will probably only every support BMP files.
+;;;
+;;; Some simple drawing routines (line/box/circle) and some simple
+;;; filters (scale/blur) would also be good to have here.
 
 [def image/decoders @[]]
 [def image/encoders @[]]

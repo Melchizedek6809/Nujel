@@ -1,7 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Contains the module system
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the module system
+
 [def module/cache @[]]
 [def module/store @[]]
 [def module/loader #nil]

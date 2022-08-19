@@ -1,8 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Contains the disassembler, which is probably not that important to most
-;; people, but invaluable when working on compiler internals
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the disassembler, which is probably not that important to most
+;;; people, but invaluable when working on compiler internals
 
 [defn disassemble/length [op]
       "Return the length in bytes of a bytecode operation and all its arguments"

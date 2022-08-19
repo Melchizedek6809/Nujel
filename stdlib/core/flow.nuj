@@ -1,7 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Mostly macros implementing different control flow constructs
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Mostly macros implementing different control flow constructs
+
 [defmacro if-let [binding then else]
           `[let* [def ~[car binding] ~[cadr binding]]
                  [if ~[car binding] ~then ~else]]]

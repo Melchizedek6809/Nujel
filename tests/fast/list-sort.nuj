@@ -1,5 +1,7 @@
 #!/usr/bin/env nujel
 
+[require :random]
+
 [defn test-sort [times sort-func]
        [def l #nil]
        [dotimes [i times]

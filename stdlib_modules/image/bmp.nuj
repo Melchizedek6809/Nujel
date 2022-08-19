@@ -1,7 +1,10 @@
-;; Contains a simple BMP en-/decoder
-;;
-;; Since Nujel is still quite small we can leave this in the stdlib, would
-;; be put into a separate module though as soon as it becomes necessary.
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains a simple BMP en-/decoder
+;;;
+;;; Since Nujel is still quite small we can leave this in the stdlib, would
+;;; be put into a separate module though as soon as it becomes necessary.
 
 [defn buffer/view/le/set! [u8v offset bytes val]
       [while [> bytes 0]

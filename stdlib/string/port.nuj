@@ -1,5 +1,8 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; The port system for Nujel which provides an object oriented abstraction over
+;;; low-level file streams
 
 [def make-output-port #nil]
 [def make-string-output-port #nil]

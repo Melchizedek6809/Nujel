@@ -1,8 +1,9 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Contains the Bytecode compiler that takes macroexpanded Nujel code and emits
-;; Bytecode assembly
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the Bytecode compiler that takes macroexpanded/lowered  Nujel code
+;;; and emits bytecode assembly
+
 [def bytecompile/gen-label/counter 0]
 [defn bytecompile/gen-label [prefix]
       [inc! bytecompile/gen-label/counter]

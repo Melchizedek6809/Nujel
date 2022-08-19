@@ -1,4 +1,8 @@
-;; Contains functions abstracting over different backends
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains an abstraction that allows for multiple backends, right now we only
+;;; support :bytecode and :none (:none is lowered Nujel, with most of the sugar removed).
 
 [defn compile/backend/none [expr] expr]
 [defn compile/backend/bytecode [expr]

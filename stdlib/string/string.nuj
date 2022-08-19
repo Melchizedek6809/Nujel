@@ -1,7 +1,7 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Some nujel string λs
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Various functions dealing with strings of all sorts
 
 [defn string->keyword [α] :inline
       "Return string α as a keyword"
@@ -132,14 +132,6 @@
 
 [defn buffer/length?! [chars]
       [fn [a] [= chars [buffer/length a]]]]
-
-[defn contains-any? [str chars]
-      [apply or [map [split chars ""]
-                     [fn [a] [>= [index-of str a] 0]]]]]
-
-[defn contains-all? [str chars]
-      [apply and [map [split chars ""]
-                      [fn [a] [>= [index-of str a] 0]]]]]
 
 [defn from-char-code l
       "Turn the provided char codes into a string and return it"

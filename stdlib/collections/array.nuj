@@ -1,7 +1,7 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-
-;; Some functions dealing with arrays
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Some functions dealing with arrays
 
 [defn array/n l
       "Create a new array from ...ARGS"

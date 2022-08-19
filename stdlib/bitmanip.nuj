@@ -1,11 +1,11 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Some functions manipulating binary date
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Some functions manipulating binary date
 
-[defn bit-nand l
-      "Returns the Nand of its arguments"
-      [bit-not [apply bit-and l]]]
+[defn bit-nand [a b]
+      "Returns the Nand of A and B"
+      [bit-not [bit-and a b]]]
 
 [defn bit-and-not [x y]
       "Bitwise and with complement"

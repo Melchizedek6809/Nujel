@@ -1,7 +1,7 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Subroutines and macros for formatted text output
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Subroutines and macros for formatted text output
 
 [def fmt/format-arg/default @[ :align :right
                                :debug #f

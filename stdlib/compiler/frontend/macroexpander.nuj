@@ -1,10 +1,11 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Contains the Nujel macroexpander
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the Nujel macroexpander
+;;;
+;;; Expands a do for, leaving out sub-expressions in the middle that are without
+;;; side effects, which is simplified to mean anything that is not a pair.
 
-;; Expands a do for, leaving out sub-expressions in the middle that are without
-;; side effects, which is simplified to mean anything that is not a pair.
 [defn macroexpand/do/args [args env]
       [if [last? args]
           [cons [macroexpand* [car args] env] #nil]

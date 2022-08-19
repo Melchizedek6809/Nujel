@@ -1,7 +1,166 @@
-;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;; This project uses the MIT license, a copy should be included under /LICENSE
-;;
-;; Contains the bytecode assembler, so we don't have to write opcodes directly
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains the bytecode assembler, so we don't have to write opcode literals
+;;; and emits. Additionally it calculates branch offsets using the labels provided.
+
+[defn $nop []
+      "[] -> []"
+      "Do nothing"
+      :inline
+      '[#$00]]
+
+[defn $ret []
+      "[a] -> []"
+      "Return top of value stack"
+      :inline
+      '[#$01]]
+
+[defn $add/int []
+      "[a b] -> [result]"
+      "Adds the two topmost values and pushes the result"
+      :inline
+      '[#$03]]
+
+[defn $dup []
+      "[a] -> [a a]"
+      "Duplicates the value that is on the top of the stack"
+      :inline
+      '[#$0C]]
+
+[defn $drop []
+      "[a] -> []"
+      "Drop whatever is on top of the stack"
+      :inline
+      '[#$0D]]
+
+[defn $closure/push []
+      "[] -> [closure]"
+      "Push the current closure as a λ on the stack"
+      :inline
+      '[#$13]]
+
+[defn $let []
+      "[] -> []"
+      "Create a new let closure and switch to it"
+      :inline
+      '[#$15]]
+
+[defn $closure/pop []
+      "[] -> []"
+      "Leave the current closure and return to the parent one"
+      :inline
+      '[#$16]]
+
+[defn $< []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$1E]]
+
+[defn $<= []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$1F]]
+
+[defn $= []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$20]]
+
+[defn $>= []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$21]]
+
+[defn $> []
+      "[a b] -> [bool]"
+      "Compare A and B and push the result on the stack"
+      :inline
+      '[#$22]]
+
+[defn $push/nil []
+      "[] -> [nil]"
+      "Push a #nil on the stack"
+      :inline
+      '[#$24]]
+
+[defn $car []
+      "[l] -> [car]"
+      "Replace L with its car"
+      :inline
+      '[#$11]]
+
+[defn $cdr []
+      "[l] -> [cdr]"
+      "Replace L with its cdr"
+      :inline
+      '[#$12]]
+
+[defn $cons []
+      "[car cdr] -> [pair]"
+      "Cons CAR and CDR together and put it on the stack"
+      :inline
+      '[#$14]]
+
+[defn $fn/dynamic []
+      "[name args docs body] -> [λ]"
+      "Create a new λ"
+      :inline
+      '[#$17]]
+
+[defn $macro/dynamic []
+      "[name args docs body] -> [μ]"
+      "Create a new μ"
+      :inline
+      '[#$18]]
+
+[defn $add []
+      "[a b] -> [result]"
+      :inline
+      '[#$25]]
+
+[defn $sub []
+      "[a b] -> [result]"
+      :inline
+      '[#$26]]
+
+[defn $mul []
+      "[a b] -> [result]"
+      :inline
+      '[#$27]]
+
+[defn $div []
+      "[a b] -> [result]"
+      :inline
+      '[#$28]]
+
+[defn $rem []
+      "[a b] -> [result]"
+      :inline
+      '[#$29]]
+
+[defn $push/true []
+      "[] -> [#t]"
+      '[#$1B]]
+
+[defn $push/false []
+      "[] -> [#f]"
+      '[#$1C]]
+
+[defn $zero? []
+      "[a] -> [result]"
+      :inline
+      '[#$2A]]
+
+[defn $inc/int []
+      "[a] -> [result]"
+      "Adds 1 to the topmost int"
+      :inline
+      '[#$23]]
 
 [defn int-fit-in-byte? [a]
       [and [<= a 127] [>= a -128]]]
@@ -250,7 +409,7 @@
 
 [defn asmdebug ops
       "Assemble and evaluate all bytecode arguments"
-      [def bc [apply assemble ops]]
+      [def bc [assemble* ops]]
       [disassemble bc]
       [def v [bytecode-eval* bc [current-closure]]]
       [pfmtln "Result: {:?}{}" v [type-of v]]]
