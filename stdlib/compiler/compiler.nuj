@@ -74,10 +74,14 @@
 [defmacro defn [name args . body]
           "Define a new function"
           [fn/check args body]
-          `[def ~name [fn* '~name
+          [def fn-meta [tree/set! [meta/parse/body :lambda args body] :source body]]
+          [def def-form `[def ~name [fn* '~name
                            '~args
-                           ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                           ~fn-meta
                            '~[compile/do* body [current-closure]]]]]
+          [if [tree/ref fn-meta :export]
+              [list 'export name def-form]
+              def-form]]
 
 [defn eval-in [closure expr]
       "Compile and the immediatly evaluate the result"
