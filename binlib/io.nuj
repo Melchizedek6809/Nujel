@@ -3,6 +3,10 @@
 ;;;
 ;;; Contains various io routines for standalone Nujel runtimes
 
+[defn file/copy [source-path destination-path]
+      "Copy a file from SOURCE-PATH to DESTINATION-PATH"
+      [spit destination-path [slurp source-path]]]
+
 [defn file/read [path]
       "Read in a file using the Nujel reader"
       [read [file/load path]]]
