@@ -14,6 +14,9 @@
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
        [when-not environment [set! environment root-closure]]
+       [def dirname [path/dirname path]]
+       [when [not= dirname ""]
+         [set! +root-working-dir+ [cat [cwd] "/" dirname]]]
        [eval-in environment [cons 'do [read [file/read path]]]]]
 
 [defn file/compile [path environment]
@@ -195,7 +198,7 @@
 [def +root-working-dir+ [path/working-directory]]
 
 [defn file/module-loader [name]
-      [def module-path [fmt "{+root-working-dir+}/modules/{}.nuj" [keyword->string name]]]
+      [def module-path [fmt "{+root-working-dir+}/{}.nuj" [keyword->string name]]]
       [def source [file/read module-path]]
       [when-not source [return #nil]]
       [def expr [list 'module [cons do [read source]]]]
