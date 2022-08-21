@@ -34,3 +34,10 @@
       [if [>= last-slash 0]
           [string/cut path 0 last-slash]
           ""]]
+
+[defn path/basename [path]
+      "Return the path without the directory part"
+      [def last-slash [last-index-of path "/"]]
+      [if [>= last-slash 0]
+          [string/cut path [inc last-slash]]
+          path]]

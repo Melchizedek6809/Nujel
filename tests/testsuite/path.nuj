@@ -6,3 +6,7 @@
 ["" [path/dirname "test.nuj"]]
 ["Another" [path/dirname "Another/test.nuj"]]
 ["asd" [path/dirname "asd/test.nuj.no"]]
+
+["test.nuj" [path/basename "test.nuj"]]
+["test.nuj" [path/basename "Another/test.nuj"]]
+["test.nuj.no" [path/basename "asd/test.nuj.no"]]
