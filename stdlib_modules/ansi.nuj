@@ -5,7 +5,9 @@
 
 
 [def disabled #f]
-[export disable! [defn disable! [v] [set! disabled [if [nil? v] #t v]]]]
+[defn disable! [v]
+      :export
+      [set! disabled [if [nil? v] #t v]]]
 
 [def reset "\e[0m"]
 [def fg-reset "\e[0;39m"]
@@ -42,61 +44,65 @@
                ]]
 
 
-[export wrap [defn wrap [code string]
-                   "Wrap STRING in the ansi color CODE"
-                   [cat [or disabled [array/ref ansi-fg code]]
-                        string
-                        [or disabled reset]]]]
+[defn wrap [code string]
+      "Wrap STRING in the ansi color CODE"
+      :export
+      [cat [or disabled [array/ref ansi-fg code]]
+           string
+           [or disabled reset]]]
 
-[export black      [defn black      args [wrap  0 [apply cat args]]]]
-[export dark-red   [defn dark-red   args [wrap  1 [apply cat args]]]]
-[export dark-green [defn dark-green args [wrap  2 [apply cat args]]]]
-[export dark-brown [defn brown      args [wrap  3 [apply cat args]]]]
-[export dark-blue  [defn dark-blue  args [wrap  4 [apply cat args]]]]
-[export purple     [defn purple     args [wrap  5 [apply cat args]]]]
-[export teal       [defn teal       args [wrap  6 [apply cat args]]]]
-[export dark-gray  [defn dark-gray  args [wrap  7 [apply cat args]]]]
-[export gray       [defn gray       args [wrap  8 [apply cat args]]]]
-[export red        [defn red        args [wrap  9 [apply cat args]]]]
-[export green      [defn green      args [wrap 10 [apply cat args]]]]
-[export yellow     [defn yellow     args [wrap 11 [apply cat args]]]]
-[export blue       [defn blue       args [wrap 12 [apply cat args]]]]
-[export pink       [defn pink       args [wrap 13 [apply cat args]]]]
-[export cyan       [defn cyan       args [wrap 14 [apply cat args]]]]
-[export white      [defn white      args [wrap 15 [apply cat args]]]]
+[defn black      args :export [wrap  0 [apply cat args]]]
+[defn dark-red   args :export [wrap  1 [apply cat args]]]
+[defn dark-green args :export [wrap  2 [apply cat args]]]
+[defn brown      args :export [wrap  3 [apply cat args]]]
+[defn dark-blue  args :export [wrap  4 [apply cat args]]]
+[defn purple     args :export [wrap  5 [apply cat args]]]
+[defn teal       args :export [wrap  6 [apply cat args]]]
+[defn dark-gray  args :export [wrap  7 [apply cat args]]]
+[defn gray       args :export [wrap  8 [apply cat args]]]
+[defn red        args :export [wrap  9 [apply cat args]]]
+[defn green      args :export [wrap 10 [apply cat args]]]
+[defn yellow     args :export [wrap 11 [apply cat args]]]
+[defn blue       args :export [wrap 12 [apply cat args]]]
+[defn pink       args :export [wrap 13 [apply cat args]]]
+[defn cyan       args :export [wrap 14 [apply cat args]]]
+[defn white      args :export [wrap 15 [apply cat args]]]
 
-[export rainbow [defn rainbow args
-                      "Wrap ARGS in the colors of the rainbow!"
-                      [let* [def count 0]
-                            [cat [join [map [split [apply cat args] ""]
-                                            [fn [a]
-                                                [set! count [bit-and [+ 1 count] #x7]]
-                                              [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
-                                 [or disabled fg-reset]]]]]
+[defn rainbow args
+      "Wrap ARGS in the colors of the rainbow!"
+      :export
+      [let* [def count 0]
+            [cat [join [map [split [apply cat args] ""]
+                            [fn [a]
+                                [set! count [bit-and [+ 1 count] #x7]]
+                              [cat [or disabled [array/ref ansi-fg [if [zero? count] 7 [+ count 8]]]] a]]] ""]
+                 [or disabled fg-reset]]]]
 
-[export rainbow-bg [defn rainbow-bg args
-                         "Wrap ARGS in the colors of the rainbow!"
-                         [def count 0]
-                         [def colored-list [map [split [apply cat args] ""]
-                                                [fn [a]
-                                                    [set! count [bit-and [+ 1 count] #x7]]
-                                                  [cat [or disabled [array/ref ansi-fg [bit-xor count #x7]]] [or disabled [array/ref ansi-bg count]] a]]]]
-                         [cat [join colored-list ""]
-                              [or disabled reset]]]]
+[defn rainbow-bg args
+      "Wrap ARGS in the colors of the rainbow!"
+      :export
+      [def count 0]
+      [def colored-list [map [split [apply cat args] ""]
+                             [fn [a]
+                                 [set! count [bit-and [+ 1 count] #x7]]
+                               [cat [or disabled [array/ref ansi-fg [bit-xor count #x7]]] [or disabled [array/ref ansi-bg count]] a]]]]
+      [cat [join colored-list ""]
+           [or disabled reset]]]
 
-[export reprint-line [defn reprint-line [text width]
-                           [when-not width [set! width 20]]
-                           [print "\r"]
-                           [dotimes [i width]
-                                    [print " "]]
-                           [print "\r"]
-                           [print text]]]
+[defn reprint-line [text width]
+      :export
+      [when-not width [set! width 20]]
+      [print "\r"]
+      [dotimes [i width]
+        [print " "]]
+      [print "\r"]
+      [print text]]
 
 [deftest "\e[0;33mabc\e[0m" [ansi/wrap 3 "abc"]]
 [deftest "\e[0;30m123\e[0m" [ansi/black "123"]]
 [deftest "\e[0;31m123\e[0m" [ansi/dark-red "123"]]
 [deftest "\e[0;32m123\e[0m" [ansi/dark-green "123"]]
-[deftest "\e[0;33m123\e[0m" [ansi/dark-brown "123"]]
+[deftest "\e[0;33m123\e[0m" [ansi/brown "123"]]
 [deftest "\e[0;34m123\e[0m" [ansi/dark-blue "123"]]
 [deftest "\e[0;35m123\e[0m" [ansi/purple "123"]]
 [deftest "\e[0;36m123\e[0m" [ansi/teal "123"]]

@@ -13,18 +13,19 @@
                  ",\n"]
            "}"]]
 
-[export serialize [defn val->json [v]
-                        "Return V as a JSON encoded string"
-                        [case [type-of v]
-                              [:nil "null"]
-                              [[:int :float] [string v]]
-                              [:bool [if v "true" "false"]]
-                              [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]]
-                              [:string [string/write v]]
-                              [:symbol [cat "\"" [string v] "\""]]
-                              [:keyword [cat "\"" [keyword->string v] "\""]]
-                              [:tree [tree->json v]]
-                              [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]]
+[defn val->json [v]
+      :export-as serialize
+      "Return V as a JSON encoded string"
+      [case [type-of v]
+            [:nil "null"]
+            [[:int :float] [string v]]
+            [:bool [if v "true" "false"]]
+            [[:array :pair] [cat "[" [join [map v val->json] ","] "]"]]
+            [:string [string/write v]]
+            [:symbol [cat "\"" [string v] "\""]]
+            [:keyword [cat "\"" [keyword->string v] "\""]]
+            [:tree [tree->json v]]
+            [otherwise [throw [list :type-error "Can't encode the value into JSON" v [current-lambda]]]]]]
 
 [deftest "null" [serialization/json/serialize #nil]]
 [deftest "123" [serialization/json/serialize 123]]

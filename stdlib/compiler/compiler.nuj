@@ -39,13 +39,19 @@
 
 [defn meta/parse/body [type args body]
       [def meta @[]]
-      [doseq [v body meta]
-             [case [type-of v]
-                   [:pair [return meta]]
-                   [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
-                                                                      "\n"
-                                                                      v]]]]
-                   [:keyword [tree/set! meta v #t]]]]]
+      [while body
+        [def v [car body]]
+        [case [type-of v]
+              [:pair [return meta]]
+              [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
+                                                                 "\n"
+                                                                 v]]]]
+              [:keyword [case v
+                              [:export-as [tree/set! meta :export [cadr body]]
+                                          [cdr! body]]
+                              [otherwise [tree/set! meta v #t]]]]]
+        [cdr! body]]
+      [return meta]]
 
 [defmacro defmacro [name args . body]
           "Define a new macro"
@@ -80,7 +86,9 @@
                            ~fn-meta
                            '~[compile/do* body [current-closure]]]]]
           [if [tree/ref fn-meta :export]
-              [list 'export name def-form]
+              [list 'export [if [symbol? [tree/ref fn-meta :export]]
+                                [tree/ref fn-meta :export]
+                                name] def-form]
               def-form]]
 
 [defn eval-in [closure expr]

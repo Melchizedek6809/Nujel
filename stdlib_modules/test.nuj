@@ -13,17 +13,19 @@
 [def print-errors  #t]
 [def print-passes  #f]
 
-[export add* [defn test/add* [result expr]
-                   [set! test-list [cons [cons result expr] test-list]]
-                   [set! test-count [+ test-count 1]]]]
+[defn add* [result expr]
+      :export
+      [set! test-list [cons [cons result expr] test-list]]
+      [set! test-count [+ test-count 1]]]
 
 [export add [defmacro test/add [result . expr]
                       "Add a test where EXPR must eval to RESULT"
                       `[~test/add* ~result ~[list 'quote [cons 'do expr]]]]]
 
-[export reset! [defn reset! []
-                     [set! test-list [cons 4 '[+ 3 1]]]
-                     [set! test-count 1]]]
+[defn reset! []
+      :export
+      [set! test-list [cons 4 '[+ 3 1]]]
+      [set! test-count 1]]
 
 [defn display-results [description]
       "Prints the result Message"
@@ -60,43 +62,47 @@
                     [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
-[export run-test! [defn run-test! [result rawexpr i]
-                        "Tests that RAWEXPR evaluates to RESULT"
-                        [try [fn [err]
-                                 [set! +bytecompile/apply-new+ #f]
-                               [test-failure result [list :exception-caught err] rawexpr]]
-                             [def expr [eval rawexpr]]
-                             [set! +bytecompile/apply-new+ #f]
-                             [if [equal? result expr]
-                                 [test-success result expr rawexpr]
-                                 [test-failure result expr rawexpr]]]]]
+[defn run-test! [result rawexpr i]
+      :export
+      "Tests that RAWEXPR evaluates to RESULT"
+      [try [fn [err]
+               [set! +bytecompile/apply-new+ #f]
+             [test-failure result [list :exception-caught err] rawexpr]]
+           [def expr [eval rawexpr]]
+           [set! +bytecompile/apply-new+ #f]
+           [if [equal? result expr]
+               [test-success result expr rawexpr]
+               [test-failure result expr rawexpr]]]]
 
-[export init! [defn init! [output-passes hide-errors]
-                   "Initialize the testing framework"
-                   [set! print-errors   [not [boolean hide-errors]]]
-                   [set! print-passes   [boolean output-passes]]
-                   [set! nujel-start    [time/milliseconds]]
-                   [set! success-count  0]
-                   [set! error-count    0]]]
+[defn init! [output-passes hide-errors]
+      :export
+      "Initialize the testing framework"
+      [set! print-errors   [not [boolean hide-errors]]]
+      [set! print-passes   [boolean output-passes]]
+      [set! nujel-start    [time/milliseconds]]
+      [set! success-count  0]
+      [set! error-count    0]]
 
-[export finish! [defn finish! [description]
-                      [display-results description]
-                      [return error-count]]]
+[defn finish! [description]
+      :export
+      [display-results description]
+      [return error-count]]
 
-[export run [defn run [output-passes hide-errors]
-                  "Run through all automated Tests"
-                  [init!]
-                  [doseq [cur-test test-list]
-                         [run-test! [car cur-test]
-                                    [cdr cur-test]]]
-                  [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi/blue ":core"] [ansi/rainbow "Nujel"]]]]]
+[defn run [output-passes hide-errors]
+      :export
+      "Run through all automated Tests"
+      [init!]
+      [doseq [cur-test test-list]
+             [run-test! [car cur-test]
+                        [cdr cur-test]]]
+      [finish! [fmt "{} {} [{System/OS} {System/Architecture}]" [ansi/blue ":core"] [ansi/rainbow "Nujel"]]]]
 
-[export load-file [defn load-file [filename]
-                        [doseq [t [read [slurp filename]] test-list]
-                               [when [== [car t] 'test/add]
-                                 [cdr! t]]
-                               [test/add* [eval [car t]] [cons 'do [cdr t]]]]]]
-
+[defn load-file [filename]
+      :export
+      [doseq [t [read [slurp filename]] test-list]
+             [when [== [car t] 'test/add]
+               [cdr! t]]
+             [test/add* [eval [car t]] [cons 'do [cdr t]]]]]
 [reset!]
 
 [deftest #t [lambda? test/run]]

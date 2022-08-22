@@ -14,79 +14,83 @@
 [def image/decoders @[]]
 [def image/encoders @[]]
 
-[export add-encoder! [defn image/add-encoder! [ext enc]
-                           [def ext [string->keyword [lowercase ext]]]
-                           [tree/set! image/encoders ext enc]]]
+[defn add-encoder! [ext enc]
+      :export
+      [def ext [string->keyword [lowercase ext]]]
+      [tree/set! image/encoders ext enc]]
 
-[export add-decoder! [defn image/add-decoder! [ext dec]
-                           [def ext [string->keyword [lowercase ext]]]
-                           [tree/set! image/decoders ext dec]]]
+[defn add-decoder! [ext dec]
+      :export
+      [def ext [string->keyword [lowercase ext]]]
+      [tree/set! image/decoders ext dec]]
 
-[defn image/get-encoder [path]
+[defn get-encoder [path]
       [def ext [string->keyword [lowercase [path/extension path]]]]
       [tree/ref image/encoders ext]]
 
-[defn image/get-decoder [path]
+[defn get-decoder [path]
       [def ext [string->keyword [lowercase [path/extension path]]]]
       [tree/ref image/decoders ext]]
 
 
-[export new [defn image/new [width height]
-                  [def buffer [buffer/allocate [* width height 4]]]
-                  @[ :width width
-                     :height height
-                     :buffer buffer
-                     :pixels [buffer/u32* buffer]]]]
+[defn new [width height]
+      :export
+      [def buffer [buffer/allocate [* width height 4]]]
+      @[ :width width
+         :height height
+         :buffer buffer
+         :pixels [buffer/u32* buffer]]]
 
-[export ref [defn image/ref [img x y]
-                  [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
-                  [buffer/ref [tree/ref img :pixels] i]]]
+[defn image/ref [img x y]
+      :export-as ref
+      [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
+      [buffer/ref [tree/ref img :pixels] i]]
 
-[export set! [defn image/set! [img x y value]
-                   [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
-                   [buffer/set! [tree/ref img :pixels] i value]]]
+[defn image/set! [img x y value]
+      :export-as set!
+      [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
+      [buffer/set! [tree/ref img :pixels] i value]]
 
-[export fill! [defn image/fill! [img value]
-                    [def p [tree/ref img :pixels]]
-                    [dotimes [i [* [tree/ref img :width]
-                                   [tree/ref img :height]]]
-                             [buffer/set! p i value]]
-                    [return img]]]
+[defn fill! [img value]
+      :export
+      [def p [tree/ref img :pixels]]
+      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
+        [buffer/set! p i value]]]
 
-[export map! [defn image/map! [img fun]
-                   [def p [tree/ref img :pixels]]
-                   [dotimes [i [* [tree/ref img :width]
-                                  [tree/ref img :height]]]
-                            [buffer/set! p i [fun [buffer/ref p i]]]]
-                   [return img]]]
+[defn map! [img fun]
+      :export
+      [def p [tree/ref img :pixels]]
+      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
+        [buffer/set! p i [fun [buffer/ref p i]]]]]
 
-[export dup [defn image/dup [img]
-                  [def ret [image/new [tree/ref img :width]
-                                      [tree/ref img :height]]]
-                  [def in [tree/ref img :pixels]]
-                  [def out [tree/ref ret :pixels]]
-                  [dotimes [i [* [tree/ref img :width]
-                                 [tree/ref img :height]]]
-                           [buffer/set! out i [buffer/ref in i]]]
-                  [return ret]]]
+[defn dup [img]
+      :export
+      [def ret [image/new [tree/ref img :width]
+                          [tree/ref img :height]]]
+      [def in [tree/ref img :pixels]]
+      [def out [tree/ref ret :pixels]]
+      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
+        [buffer/set! out i [buffer/ref in i]]]]
 
-[export save! [defn image/save! [img path]
-                    [def enc [image/get-encoder path]]
-                    [if enc
-                        [file/write [enc img] path]
-                        [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]]
+[defn save! [img path]
+      :export
+      [def enc [get-encoder path]]
+      [if enc
+          [file/write [enc img] path]
+          [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]
 
-[export adler32 [defn image/adler32 [img]
-                      [import [hash] :crypto/adler32]
-                      [hash [tree/ref img :buffer]]]]
+[defn adler32 [img]
+      :export
+      [import [hash] :crypto/adler32]
+      [hash [tree/ref img :buffer]]]
 
-[export test-image-xor [defn image/test-image-xor []
-                   [def w 256]
-                   [def h 256]
-                   [def out [image/new w h]]
-                   [dotimes [x w]
-                            [dotimes [y h]
-                                     [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]]
-                   [return out]]]
+[defn test-image-xor []
+      :export
+      [def w 256]
+      [def h 256]
+      [def out [new w h]]
+      [dotimes [x w out]
+        [dotimes [y h]
+          [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]]]
 
 [deftest 4040398435 [image/adler32 [image/test-image-xor]]]

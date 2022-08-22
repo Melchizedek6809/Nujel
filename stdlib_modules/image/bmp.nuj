@@ -13,52 +13,54 @@
              [set! val [bit-shift-right val 8]]]
       offset]
 
-[defn image/bmp/row-padding [width pixel-length]
+[defn calc-row-padding [width pixel-length]
       [def ret [- 4 [bit-and [* width pixel-length] 3]]]
       [if [= ret 4] 0 ret]]
 
-[export encode [defn image/bmp/encode [image]
-                     [require :image]
-                     [def image-size [* [tree/ref image :height]
-                                        3
-                                        [+ [tree/ref image :width]
-                                           [image/bmp/row-padding [tree/ref image :width] 3]]]]
-                     [def header-size [+ 14 40]]
-                     [def file-size [+ image-size header-size]]
+[defn encode [image]
+      :export
+      [require :image]
+      [def image-size [* [tree/ref image :height]
+                         3
+                         [+ [tree/ref image :width]
+                            [calc-row-padding [tree/ref image :width] 3]]]]
+      [def header-size [+ 14 40]]
+      [def file-size [+ image-size header-size]]
 
-                     [def out [buffer/allocate file-size]]
-                     [def b [buffer/u8* out]]
-                     [def i -1]
-                     [buffer/set! b [inc! i] #\B]
-                     [buffer/set! b [inc! i] #\M]
-                     [set! i [buffer/view/le/set! b i 4 file-size]]
-                     [set! i [buffer/view/le/set! b i 4 0]]
-                     [set! i [buffer/view/le/set! b i 4 header-size]]
-                     [set! i [buffer/view/le/set! b i 4 40]] ; BITMAPINFOHEADER
-                     [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]]
-                     [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]]
-                     [set! i [buffer/view/le/set! b i 2 1]] ; Planes
-                     [set! i [buffer/view/le/set! b i 2 24]] ; BPP
-                     [set! i [buffer/view/le/set! b i 4 0]] ; Compression method
-                     [set! i [buffer/view/le/set! b i 4 image-size]]
-                     [set! i [buffer/view/le/set! b i 4 8192]] ; h. resolution
-                     [set! i [buffer/view/le/set! b i 4 8192]] ; v. resolution
-                     [set! i [buffer/view/le/set! b i 4 0]] ; Palette size, 0 for [^ 2 n]
-                     [set! i [buffer/view/le/set! b i 4 0]] ; Important colors, 0 for all
+      [def out [buffer/allocate file-size]]
+      [def b [buffer/u8* out]]
+      [def i -1]
+      [buffer/set! b [inc! i] #\B]
+      [buffer/set! b [inc! i] #\M]
+      [set! i [buffer/view/le/set! b i 4 file-size]]
+      [set! i [buffer/view/le/set! b i 4 0]]
+      [set! i [buffer/view/le/set! b i 4 header-size]]
+      [set! i [buffer/view/le/set! b i 4 40]] ; BITMAPINFOHEADER
+      [set! i [buffer/view/le/set! b i 4 [tree/ref image :width]]]
+      [set! i [buffer/view/le/set! b i 4 [tree/ref image :height]]]
+      [set! i [buffer/view/le/set! b i 2 1]] ; Planes
+      [set! i [buffer/view/le/set! b i 2 24]] ; BPP
+      [set! i [buffer/view/le/set! b i 4 0]] ; Compression method
+      [set! i [buffer/view/le/set! b i 4 image-size]]
+      [set! i [buffer/view/le/set! b i 4 8192]] ; h. resolution
+      [set! i [buffer/view/le/set! b i 4 8192]] ; v. resolution
+      [set! i [buffer/view/le/set! b i 4 0]] ; Palette size, 0 for [^ 2 n]
+      [set! i [buffer/view/le/set! b i 4 0]] ; Important colors, 0 for all
 
-                     [def row-padding [image/bmp/row-padding [tree/ref image :width] 3]]
-                     [def pixels [- header-size 1]] ; Pixel data comes immediatly after the header
-                     [let [[y [- [tree/ref image :height] 1]]]
-                          [while [>= y 0]
-                                 [dotimes [x [tree/ref image :width]]
-                                          [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]]
-                                 [set! pixels [+ pixels row-padding]]
-                                 [set! y [add/int y -1]]]]
-                     [return out]]]
+      [def row-padding [calc-row-padding [tree/ref image :width] 3]]
+      [def pixels [- header-size 1]] ; Pixel data comes immediatly after the header
+      [let [[y [- [tree/ref image :height] 1]]]
+           [while [>= y 0]
+             [dotimes [x [tree/ref image :width]]
+               [set! pixels [buffer/view/le/set! b pixels 3 [image/ref image x y]]]]
+             [set! pixels [+ pixels row-padding]]
+             [set! y [add/int y -1]]]]
+      [return out]]
 
-[export init! [defn image/bmp/init! []
-                    [require :image]
-                    [image/add-encoder! "bmp" image/bmp/encode]]]
+[defn init! []
+      :export
+      [require :image]
+      [image/add-encoder! "bmp" image/bmp/encode]]
 
 [deftest 3149043687
   [import hash :crypto/adler32]
