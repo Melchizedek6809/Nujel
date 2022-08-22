@@ -4,13 +4,17 @@
 ;;; Introspection and procedures returning info about the runtime
 
 [defn describe/closure [c i]
+      [require :ansi]
       [when c
             [if [= c root-closure]
                 [cat [cat [int [or i 0]] "# <root environment>"]
                      "\r\n"]
                 [do [def data [closure/data c]]
                     [def l [length data]]
-                  [cat [int [or i 0]] "# " [string/write c]
+                  [cat [ansi/blue [int [or i 0]] "# "]
+                       [ansi/green [string/write c]]
+                       " - "
+                       [ansi/yellow [resolve '*module* c]]
                        " - "
                        [if [< l 16]
                            [string/write data]
@@ -22,7 +26,9 @@
       [print [describe/closure [closure/caller [current-lambda]]]]]
 
 [defn print/error/wrap [i v]
+      [require :ansi]
       [case i
+            [0 [ansi/red v]]
             [2 [string/write v]]
             [3 [describe/closure v]]
             [otherwise [string v]]]]

@@ -135,12 +135,12 @@
                        [cdr! l]]
                 [cons top [list/sort/bubble next]]]]]
 
-[defn list/merge-sorted-lists [l1 l2]
+[defn list/merge-sorted-lists [l1 l2 pred]
       [cond [[nil? l1] l2]
             [[nil? l2] l1]
-            [#t [if [< [car l1] [car l2]]
-                    [cons [car l1] [list/merge-sorted-lists [cdr l1] l2]]
-                    [cons [car l2] [list/merge-sorted-lists l1 [cdr l2]]]]]]]
+            [#t [if [pred [car l1] [car l2]]
+                    [cons [car l1] [list/merge-sorted-lists [cdr l1] l2 pred]]
+                    [cons [car l2] [list/merge-sorted-lists l1 [cdr l2] pred]]]]]]
 
 [defn list/split-half-rec [l acc1 acc2]
       [cond [[nil? l] [cons acc1 acc2]]
@@ -149,14 +149,16 @@
 
 [defn list/split-half [l] [list/split-half-rec l #nil #nil]]
 
-[defn list/sort/merge [l]
+[defn list/sort/merge [l pred]
       "Sorts a list"
+      [when-not pred [set! pred <]]
       [if [nil? [cdr l]]
           l
           [do [def parts [list/split-half l]]
               [list/merge-sorted-lists
                [list/sort/merge [car parts]]
-               [list/sort/merge [cdr parts]]]]]]
+               [list/sort/merge [cdr parts]]
+               pred]]]]
 
                                         ; Set default sort to merge-sort
 [def list/sort list/sort/merge]
