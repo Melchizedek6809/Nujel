@@ -10,6 +10,7 @@
 
 [def repl/executable-name "nujel"]
 [def repl/args #nil]
+[def repl/parse-args/eval-next-module #f]
 [def repl/parse-args/eval-next #f]
 [def repl/parse-args/run-repl #t]
 [def repl/options @[]]
@@ -78,29 +79,22 @@
              [try repl/exception-handler
                   [repl/readline root-closure]]]]
 
-[defn repl/print-help []
-      [require :ansi]
-      [println [cat [ansi/rainbow "Nujel"] " - A Lisp dialect for games.\n"]]
-      [println [cat [ansi/green "Usage:"] " nujel [options] [command_string | file]"]]
-      [println [cat "\nLow-level options - for work on the runtime itself"]]
-      [println [cat "  " [ansi/yellow "v"] " - be verbose"]]
-      [println [cat "\nHigh-level options - for working with/on Nujel code"]]
-      [println [cat "  " [ansi/blue "x"] " - Run the expression following this argument directly"]]
-      [println [cat "  " [ansi/blue "h"] " - Print this help screen"]]
-      [println [cat "\nLong options - for working with/on Nujel code"]]
-      [println [cat "  " [ansi/blue "no-color"] " - Disable ANSI color"]]
-      [println [cat "  " [ansi/blue "color   "] " - Enable ANSI color"]]]
-
+[tree/set! repl/option-map 'm
+           [fn [option]
+               [set! repl/parse-args/eval-next-module #t]]]
 [tree/set! repl/option-map 'h
            [fn [option]
-               [repl/print-help]
-             [set! repl/parse-args/run-repl #f]]]
+               [import [main] :help]
+               [main #nil]
+               [exit 0]]]
 [tree/set! repl/option-map 'no-color
            [fn [option]
-               [set! ansi/disabled ""]]]
+               [require :ansi]
+               [set! ansi/disable! #t]]]
 [tree/set! repl/option-map 'color
            [fn [option]
-               [set! ansi/disabled #f]]]
+               [require :ansi]
+               [set! ansi/disable! #f]]]
 [tree/set! repl/option-map 'x
            [fn [option]
                [set! repl/parse-args/eval-next #t]
@@ -118,18 +112,29 @@
           [repl/parse-option [string->keyword [cut options 1]]]
           [for-each [map [split options ""] string->symbol] repl/parse-option]]]
 
-[defn repl/parse-arg [arg]
+[defn repl/parse-arg [arg args]
       [cond [repl/parse-args/eval-next [try print/error
                                             [eval-in root-closure [cons do [read arg]]]
                                             [set! repl/parse-args/eval-next #f]]]
+            [repl/parse-args/eval-next-module [try [fn [e]
+                                                       [print/error e]
+                                                     [exit 1]]
+                                                   [when [= [buffer/ref arg 0] #\:]
+                                                     [set! arg [string/cut 1]]]
+                                                   [import [main] [string->keyword arg]]
+                                                   [main [cdr args]]
+                                                   [exit 0]]]
             [[= [buffer/ref arg 0] #\-] [repl/parse-options [string/cut arg 1]]]
-            [#t [try print/error
-                     [file/eval arg]]
+            [#t [try [fn [e]
+                         [print/error e]
+                         [exit 1]]
+                     [file/eval-module arg [cdr args]]
+                     [exit 0]]
                 [set! repl/parse-args/run-repl #f]]]]
 
 [defn repl/parse-args [args]
       [if args
-          [do [repl/parse-arg [car args]]
+          [do [repl/parse-arg [car args] args]
               [repl/parse-args [cdr args]]]
           repl/parse-args/run-repl]]
 

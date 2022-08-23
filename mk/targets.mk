@@ -25,11 +25,11 @@ tmp/binlib.no: $(BINLIB_NOBS)
 	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
 
 tmp/stdlib.c: tmp/stdlib.no tools/update-stdlib.nuj $(NUJEL)
-	@./$(NUJEL) "tools/update-stdlib.nuj" -x "[create-c-asset \"./tmp/stdlib.no\" \"./tmp/stdlib.c\" \"stdlib_no_data\"]"
+	@./$(NUJEL) "tools/update-stdlib.nuj" "./tmp/stdlib.no" "./tmp/stdlib.c" "stdlib_no_data"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 tmp/binlib.c: tmp/binlib.no tools/update-stdlib.nuj $(NUJEL)
-	@./$(NUJEL) "tools/update-stdlib.nuj" -x "[create-c-asset \"./tmp/binlib.no\" \"./tmp/binlib.c\" \"binlib_no_data\"]"
+	@./$(NUJEL) "tools/update-stdlib.nuj" "./tmp/binlib.no" "./tmp/binlib.c" "binlib_no_data"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 run: $(FUTURE_NUJEL)

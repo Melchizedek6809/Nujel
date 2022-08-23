@@ -189,7 +189,7 @@
 [#f [= :int [type-of 123.123]]]
 [#t [= :float [type-of 123.123]]]
 [#t [= :native-function [type-of +]]]
-[#t [= :lambda [type-of test/add*]]]
+[#t [= :lambda [type-of describe]]]
 [#t [= :string [type-of "asd"]]]
 [#t [nil? #nil]]
 [#f [nil? "NotNil"]]

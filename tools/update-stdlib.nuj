@@ -21,3 +21,13 @@
                [out 'block-write [array/ref hex-cache [buffer/ref raw i]]]]
       [out 'block-write "0\n};\n"]
       [out 'close!]]
+
+[defn main [args]
+      :export
+      [def filename [car args]]
+      [def output-file [cadr args]]
+      [def symbol-name [caddr args]]
+      [typecheck/only filename :string]
+      [typecheck/only output-file :string]
+      [typecheck/only symbol-name :string]
+      [create-c-asset filename output-file symbol-name]]

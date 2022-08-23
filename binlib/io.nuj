@@ -23,6 +23,19 @@
          [set! +root-working-dir+ [cat [cwd] "/" dirname]]]
        [eval-in environment [cons 'do [read [file/read path]]]]]
 
+[defn file/eval-module [path args]
+       "Evaluate a Nujel source file in the current context"
+       [def dirname [path/dirname path]]
+       [when [not= dirname ""]
+         [set! +root-working-dir+ [cat [cwd] "/" dirname]]]
+       [def mod [module/load [string->keyword [path/without-extension [path/basename path]]]]]
+       [when-not [= :object [type-of mod]]
+                 [return mod]]
+       [def exports [resolve 'exports mod]]
+       [when-not exports [exception [fmt "Couldn't load {path} as a module since it has no exports"]]]
+       [when [tree/has? exports :main]
+         [[tree/ref exports :main] args]]]
+
 [defn file/compile [path environment]
       "Compile a Nujel source file into optimized object code"
       [def source [cons 'do [read [file/read path]]]]
@@ -45,7 +58,8 @@
       [def module [index-of path "_modules/"]]
       [if [>= module 0]
           [file/compile/module path #nil [string/cut path 0 [+ module 9]]]
-          [file/compile path]]]
+          [file/compile path]]
+      [exit 0]]
 
 [defn file/test/module/run [tests module-name]
       [require :test]
@@ -63,12 +77,12 @@
             [set! rel-path [string/cut rel-path 1]]]
       [def module-name [string->keyword [path/without-extension rel-path]]]
       [require :ansi]
-      [require :test]
-      [test/init!]
+      [import [init! finish!] :test]
+      [init!]
       [-> [read [file/read path]]
           [filter file/test/valid-test-form?]
           [file/test/module/run module-name]]
-      [test/finish! [ansi/blue module-name]]]
+      [finish! [ansi/blue module-name]]]
 
 [defn file/test/directory [base-dir]
       "Compile a Nujel source file into optimized object code"

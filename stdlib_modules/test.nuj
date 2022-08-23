@@ -18,10 +18,6 @@
       [set! test-list [cons [cons result expr] test-list]]
       [set! test-count [+ test-count 1]]]
 
-[export add [defmacro test/add [result . expr]
-                      "Add a test where EXPR must eval to RESULT"
-                      `[~test/add* ~result ~[list 'quote [cons 'do expr]]]]]
-
 [defn reset! []
       :export
       [set! test-list [cons 4 '[+ 3 1]]]
@@ -102,7 +98,7 @@
       [doseq [t [read [slurp filename]] test-list]
              [when [== [car t] 'test/add]
                [cdr! t]]
-             [test/add* [eval [car t]] [cons 'do [cdr t]]]]]
+             [add* [eval [car t]] [cons 'do [cdr t]]]]]
 [reset!]
 
 [deftest #t [lambda? test/run]]
