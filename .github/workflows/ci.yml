@@ -60,6 +60,38 @@ jobs:
         name: Nujel-windows-${{ matrix.sys }}-release-${{ github.ref_name }}
         path: "./nujel.exe"
         retention-days: 7
+  release-windows-tiny:
+    name: release-tiny-windows
+    needs: static-checks
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        sys: [clang64]
+    steps:
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.sys }}
+        install: base-devel upx
+        pacboy: toolchain:p
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Compile release
+      run: make release
+    - name: UPX release
+      run: upx -9 ./nujel.exe
+    - name: Run Tests
+      run: ./nujel.exe --slow-test tools/tests.nuj
+    - name: Upload release
+      uses: actions/upload-artifact@v2
+      with:
+        name: Nujel-windows-tiny-release-${{ github.ref_name }}
+        path: "./nujel.exe"
+        retention-days: 7
   build-macos:
     name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
