@@ -20,14 +20,14 @@
        [when-not environment [set! environment root-closure]]
        [def dirname [path/dirname path]]
        [when [not= dirname ""]
-         [set! +root-working-dir+ [cat [cwd] "/" dirname]]]
+         [file/add-module-loader [cat [cwd] "/" dirname]]]
        [eval-in environment [cons 'do [read [file/read path]]]]]
 
 [defn file/eval-module [path args]
        "Evaluate a Nujel source file in the current context"
        [def dirname [path/dirname path]]
        [when [not= dirname ""]
-         [set! +root-working-dir+ [cat [cwd] "/" dirname]]]
+         [file/add-module-loader [cat [cwd] "/" dirname]]]
        [def mod [module/load [string->keyword [path/without-extension [path/basename path]]]]]
        [when-not [= :object [type-of mod]]
                  [return mod]]
@@ -215,14 +215,13 @@
 
 [def +root-working-dir+ [path/working-directory]]
 
-[defn file/module-loader [name]
-      [def module-path [fmt "{+root-working-dir+}/{}.nuj" [keyword->string name]]]
-      [def source [file/read module-path]]
-      [when-not source [return #nil]]
-      [def expr [list 'module
-                      `[def *module* ~name]
-                      [cons do [read source]]]]
-      [def mod [eval expr]]
-      [return mod]]
-
-[module/add-loader file/module-loader]
+[defn file/add-module-loader [module-root]
+      [module/add-loader [fn [name]
+                             [def module-path [fmt "{module-root}/{}.nuj" [keyword->string name]]]
+                           [def source [file/read module-path]]
+                           [when-not source [return #nil]]
+                           [def expr [list 'module
+                                           `[def *module* ~name]
+                                           [cons do [read source]]]]
+                           [def mod [eval expr]]
+                           [return mod]]]]

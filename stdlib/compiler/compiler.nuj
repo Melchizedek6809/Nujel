@@ -38,7 +38,7 @@
           `[compile* [cons do ~source] [current-closure]]]
 
 [defn meta/parse/body [type args body]
-      [def meta @[]]
+      [def meta @[:source body]]
       [while body
         [def v [car body]]
         [case [type-of v]
@@ -57,7 +57,7 @@
           "Define a new macro"
           `[def ~name [macro* '~name
                               '~args
-                              ~[tree/set! [meta/parse/body :macro args body] :source body]
+                              ~[meta/parse/body :macro args body]
                               '~[compile/do* body [current-closure]]]]]
 
 [defn fn/check [args body]
@@ -74,13 +74,13 @@
           [fn/check args body]
           `[fn* 'anonymous
                 '~args
-                ~[tree/set! [meta/parse/body :lambda args body] :source body]
+                ~[meta/parse/body :lambda args body]
                 '~[compile/do* body [current-closure]]]]
 
 [defmacro defn [name args . body]
           "Define a new function"
           [fn/check args body]
-          [def fn-meta [tree/set! [meta/parse/body :lambda args body] :source body]]
+          [def fn-meta [meta/parse/body :lambda args body]]
           [def def-form `[def ~name [fn* '~name
                            '~args
                            ~fn-meta
