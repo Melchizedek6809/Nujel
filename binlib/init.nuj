@@ -1,0 +1,84 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Initializes the runtime, parses command line arguments and chooses which
+;;; module to run.  Essential for a standalone Nujel version, but not needed in
+;;; embedded mode.
+
+[def init/executable-name "nujel"]
+[def init/args #nil]
+[def init/parse-args/eval-next-module #f]
+[def init/parse-args/eval-next #f]
+[def init/parse-args/run-repl #t]
+[def init/options @[]]
+[def init/option-map @[]]
+
+[tree/set! init/option-map 'm
+           [fn [option]
+               [set! init/parse-args/eval-next-module #t]]]
+[tree/set! init/option-map 'h
+           [fn [option]
+               [import [main] :help]
+               [main #nil]
+               [exit 0]]]
+[tree/set! init/option-map 'no-color
+           [fn [option]
+               [require :ansi]
+               [set! ansi/disable! #t]]]
+[tree/set! init/option-map 'color
+           [fn [option]
+               [require :ansi]
+               [set! ansi/disable! #f]]]
+[tree/set! init/option-map 'x
+           [fn [option]
+               [set! init/parse-args/eval-next #t]
+             [set! init/parse-args/run-repl #f]]]
+[tree/set! init/option-map :default
+           [fn [option]
+               [tree/set! init/options option #t]]]
+
+[defn init/parse-option [option]
+      [[or [ref init/option-map option]
+           [ref init/option-map :default]] option]]
+
+[defn init/parse-options [options]
+      [if [= [buffer/ref options 0] #\-]
+          [init/parse-option [string->keyword [cut options 1]]]
+          [for-each [map [split options ""] string->symbol] init/parse-option]]]
+
+[defn init/parse-arg [arg args]
+      [cond [init/parse-args/eval-next [try print/error
+                                            [eval-in root-closure [cons do [read arg]]]
+                                            [set! init/parse-args/eval-next #f]]]
+            [init/parse-args/eval-next-module [try [fn [e]
+                                                       [print/error e]
+                                                     [exit 1]]
+                                                   [when [= [buffer/ref arg 0] #\:]
+                                                     [set! arg [string/cut arg 1]]]
+                                                   [module/main [string->keyword arg] args]
+                                                   [exit 0]]]
+            [[= [buffer/ref arg 0] #\-] [init/parse-options [string/cut arg 1]]]
+            [#t [try [fn [e]
+                         [print/error e]
+                         [exit 1]]
+                     [file/eval-module arg [cdr args]]
+                     [exit 0]]
+                [set! init/parse-args/run-repl #f]]]]
+
+[defn init/parse-args [args]
+      [if args
+          [do [init/parse-arg [car args] args]
+              [init/parse-args [cdr args]]]
+          init/parse-args/run-repl]]
+
+[defn init/bin [args]
+      [try print/error
+           [set! init/executable-name [car args]]
+           [when [init/parse-args [cdr args]]
+             [module/main :repl #nil]]]]
+
+[defn init args
+      [set! init/args args]
+      [if [= System/Architecture 'wasm]
+          [init/wasm args]
+          [init/bin args]]]

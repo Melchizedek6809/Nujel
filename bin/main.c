@@ -41,7 +41,7 @@ int initNujel(int argc, char *argv[], lClosure *c){
 	for(int i = argc-1; i >= 0; i--){
 		ret = lCons(lValString(argv[i]), ret);
 	}
-	lApply(c, ret, lResolveVal(c, "repl/init"));
+	lApply(c, ret, lResolveVal(c, "init"));
 	return 0;
 }
 

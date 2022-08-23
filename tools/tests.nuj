@@ -12,24 +12,24 @@
        "] " [string/pad-end [cut path 2 [length path]] 48]
        [if start [cat " " [ansi/blue [string/pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
 
-[when [not [tree/has? repl/options :only-test-suite]]
+[when [not [tree/has? init/options :only-test-suite]]
   [println [ansi/purple "First we test the basic functions of the runtime."]]]
 [for-each [-> [directory/read-relative "tests/testsuite"] sort] test/load-file]
 
 [def output-passes #f]
-[when [tree/has? repl/options :verbose]
+[when [tree/has? init/options :verbose]
   [set! output-passes #t]]
 
 [set! test/testsuite-errors [test/run output-passes]]
 [file/test/directory "./stdlib_modules"]
 
-[when [tree/has? repl/options :only-test-suite]
+[when [tree/has? init/options :only-test-suite]
   [exit test/testsuite-errors]]
 
 [println [ansi/green "Great, Now we can do some more complicated and thorough tests."]]
 
-[def test/slow [or [ref repl/options :slow-test] #f]]
-[def test/ridiculous [or [ref repl/options :ridiculous-test] #f]]
+[def test/slow [or [ref init/options :slow-test] #f]]
+[def test/ridiculous [or [ref init/options :ridiculous-test] #f]]
 [def test/start [time/milliseconds]]
 [def test/success 0]
 [def test/errors 0]

@@ -108,3 +108,14 @@
                                              "That symbol was not exported"
                                              "That symbol does not exist in that module"]]]
       [tree/ref exports symbol]]
+
+[defn module/main [module args]
+      "Import and run MODULE's main function with ARGS"
+      [def mod [module/load module]]
+      [when-not mod [exception "Module not found" module]]
+      [def exports [resolve 'exports mod]]
+      [when-not exports [exception "Invalid module, can't resolve exports" module]]
+      [def main [tree/ref exports :main]]
+      [when-not main [exception "There is no symbol exported as main" module]]
+      [when-not [procedure? main] [exception "main is not a callable value" module]]
+      [main args]]

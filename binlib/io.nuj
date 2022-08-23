@@ -54,7 +54,7 @@
       [return object-code]]
 
 [defn file/compile/argv []
-      [def path [car [last-pair repl/args]]]
+      [def path [car [last-pair init/args]]]
       [def module [index-of path "_modules/"]]
       [if [>= module 0]
           [file/compile/module path #nil [string/cut path 0 [+ module 9]]]
