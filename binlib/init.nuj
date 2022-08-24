@@ -55,7 +55,7 @@
                                                      [exit 1]]
                                                    [when [= [buffer/ref arg 0] #\:]
                                                      [set! arg [string/cut arg 1]]]
-                                                   [module/main [string->keyword arg] args]
+                                                   [module/main [string->keyword arg] [cdr args]]
                                                    [exit 0]]]
             [[= [buffer/ref arg 0] #\-] [init/parse-options [string/cut arg 1]]]
             [#t [try [fn [e]

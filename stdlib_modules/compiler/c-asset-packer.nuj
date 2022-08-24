@@ -1,11 +1,15 @@
-#!/usr/bin/env nujel
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Can be used to create C source files for various binary/text files to be
+;;; included in exceutables
 
-[defn get-hex-cache []
-      [def ret [array/allocate 256]]
-      [dotimes [i 256 ret]
-        [array/set! ret i [fmt "0x{i:02X}, "]]]]
+[def hex-cache [array/allocate 256]]
+[dotimes [i 256]
+  [array/set! hex-cache i [fmt "0x{i:02X}, "]]]
 
 [defn create-c-asset [filename output-file symbol-name]
+      :export
       [typecheck/only filename :string]
       [typecheck/only output-file :string]
       [typecheck/only symbol-name :string]
@@ -14,7 +18,6 @@
       [out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n"]
       [out 'block-write [fmt "unsigned char {symbol-name}[] = "]]
       [out 'block-write "{"]
-      [def hex-cache [get-hex-cache]]
       [dotimes [i [buffer/length raw]]
                [when [zero? [rem i 32]]
                      [out 'block-write "\n"]]
