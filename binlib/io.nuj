@@ -62,10 +62,10 @@
       [exit 0]]
 
 [defn file/test/module/run [tests module-name]
-      [require :test]
+      [import [run-test!] :test]
       [doseq [expr tests]
-             [test/run-test! [eval [cadr expr]]
-                             `[do [require ~module-name] ~@[cddr expr]]]]]
+             [run-test! [eval [cadr expr]]
+                        `[do [require ~module-name] ~@[cddr expr]]]]]
 
 [defn file/test/valid-test-form? [form]
       [== [car form] 'deftest]]
@@ -76,13 +76,13 @@
       [when [== [buffer/ref rel-path 0] #\/]
             [set! rel-path [string/cut rel-path 1]]]
       [def module-name [string->keyword [path/without-extension rel-path]]]
-      [require :ansi]
+      [import [blue] :ansi]
       [import [init! finish!] :test]
       [init!]
       [-> [read [file/read path]]
           [filter file/test/valid-test-form?]
           [file/test/module/run module-name]]
-      [finish! [ansi/blue module-name]]]
+      [finish! [blue module-name]]]
 
 [defn file/test/directory [base-dir]
       "Compile a Nujel source file into optimized object code"
@@ -108,7 +108,7 @@
                              [fn [A] [if [file/dir? A]
                                          [directory/read-recursive A]
                                          A]]]
-                        [fn [A] A]]]]
+                        identity]]]
 
 [defn load [filename]
   [try [fn [err]

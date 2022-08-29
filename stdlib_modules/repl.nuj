@@ -3,7 +3,7 @@
 ;;;
 ;;; The REPL implementation, also parses command line arguments and determines
 ;;; which files to load and whether to start a interactive session.
-[require :ansi]
+[import [rainbow] :ansi]
 
 [def *1 #nil]
 [def *2 #nil]
@@ -60,7 +60,7 @@
           [cmd/raw line]]]
 
 [defn welcome []
-      [println [cat [ansi/rainbow "Nujel"] " REPL is ready for service!"]]]
+      [println [cat [rainbow "Nujel"] " REPL is ready for service!"]]]
 
 [defn main [args]
       :export

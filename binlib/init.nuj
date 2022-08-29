@@ -18,17 +18,16 @@
                [set! init/parse-args/eval-next-module #t]]]
 [tree/set! init/option-map 'h
            [fn [option]
-               [import [main] :help]
-               [main #nil]
+               [module/main :help #nil]
                [exit 0]]]
 [tree/set! init/option-map 'no-color
            [fn [option]
-               [require :ansi]
-               [set! ansi/disable! #t]]]
+               [import [disable!] :ansi]
+               [set! disable! #t]]]
 [tree/set! init/option-map 'color
            [fn [option]
-               [require :ansi]
-               [set! ansi/disable! #f]]]
+               [import [disable!] :ansi]
+               [set! disable! #f]]]
 [tree/set! init/option-map 'x
            [fn [option]
                [set! init/parse-args/eval-next #t]

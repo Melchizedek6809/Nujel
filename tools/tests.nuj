@@ -1,7 +1,7 @@
 #!/usr/bin/env nujel
 
-[require :ansi]
-[require :test]
+[import [blue green red purple yellow] :ansi]
+[import [run :as test-run load-file :as test-load] :test]
 
 [def test/beginning [time/milliseconds]]
 [def test/testsuite-errors 0]
@@ -10,23 +10,23 @@
   [cat "[" [fun-color [string/pad-start i 2]]
        "/" [string/pad-start test/count 2]
        "] " [string/pad-end [cut path 2 [length path]] 48]
-       [if start [cat " " [ansi/blue [string/pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
+       [if start [cat " " [blue [string/pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
 
 [when [not [tree/has? init/options :only-test-suite]]
-  [println [ansi/purple "First we test the basic functions of the runtime."]]]
-[for-each [-> [directory/read-relative "tests/testsuite"] sort] test/load-file]
+  [println [purple "First we test the basic functions of the runtime."]]]
+[for-each [-> [directory/read-relative "tests/testsuite"] sort] test-load]
 
 [def output-passes #f]
 [when [tree/has? init/options :verbose]
   [set! output-passes #t]]
 
-[set! test/testsuite-errors [test/run output-passes]]
+[set! test/testsuite-errors [test-run output-passes]]
 [file/test/directory "./stdlib_modules"]
 
 [when [tree/has? init/options :only-test-suite]
   [exit test/testsuite-errors]]
 
-[println [ansi/green "Great, Now we can do some more complicated and thorough tests."]]
+[println [green "Great, Now we can do some more complicated and thorough tests."]]
 
 [def test/slow [or [ref init/options :slow-test] #f]]
 [def test/ridiculous [or [ref init/options :ridiculous-test] #f]]
@@ -39,16 +39,16 @@
   [def test/start/file [time/milliseconds]]
   [try [fn [err]
            [print "\r"]
-           [println [prog-str ansi/red i path test/start/file]]
+           [println [prog-str red i path test/start/file]]
            [inc! test/errors]
            [print/error err]
            [newline]]
-       [print [prog-str ansi/yellow i path #nil]]
+       [print [prog-str yellow i path #nil]]
        [def ret [file/eval path [environment*]]]
        [when [not= ret :success] [exception :wrong-result "Test did not return :success"]]
        [inc! test/success]
        [print "\r"]
-       [println [prog-str ansi/green i path test/start/file]]]]
+       [println [prog-str green i path test/start/file]]]]
 
 [def test-paths [list/sort [filter [append [directory/read-relative "./tests/fast"]
                                            [when test/slow [directory/read-relative "./tests/slow"]]
@@ -60,8 +60,8 @@
 [newline]
 [def dur [- [time/milliseconds] test/start]]
 [if [and [> test/success 0] [zero? test/errors]]
-    [do [println [cat [ansi/green "Extended Tests succeeded"] " - [" [ansi/green test/success] " / " [ansi/red test/errors] "] in " dur "ms"]]]
-    [do [println [cat [ansi/red   "Extended Tests failed"]    " - [" [ansi/green test/success] " / " [ansi/red test/errors] "] in " dur "ms"]]]]
+    [do [println [cat [green "Extended Tests succeeded"] " - [" [green test/success] " / " [red test/errors] "] in " dur "ms"]]]
+    [do [println [cat [red   "Extended Tests failed"]    " - [" [green test/success] " / " [red test/errors] "] in " dur "ms"]]]]
 
-[println [cat "Running everything took " [ansi/blue [- [time/milliseconds] test/beginning]] "ms"]]
+[println [cat "Running everything took " [blue [- [time/milliseconds] test/beginning]] "ms"]]
 [exit test/errors + test/testsuite-errors]
