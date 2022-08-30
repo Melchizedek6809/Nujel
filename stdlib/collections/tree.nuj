@@ -45,9 +45,17 @@
       [list/reduce [tree/values l] o s]]
 
 [defn tree/filter [l f]
-      "Return a new tree with all elements from L where F retunrs true"
+      "Return a new tree with all elements from L where F returns true"
       [def ret @[]]
       [doseq [e [tree/keys l] ret]
              [def t [tree/ref l e]]
              [when [f t]
                    [tree/set! ret e t]]]]
+
+[defn tree/merge [a b]
+      "Merge two trees together, if a key is contained in both trees the on in B gets priority"
+      [when-not b [return [if a [tree/dup a] @[]]]]
+      [when-not a [return [tree/dup b]]]
+      [def ret [tree/dup a]]
+      [doseq [k [tree/keys b] ret]
+             [tree/set! ret k [tree/ref b k]]]]

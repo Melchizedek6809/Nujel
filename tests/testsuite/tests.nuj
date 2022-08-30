@@ -655,3 +655,7 @@
 [3 [apply + '[1 2]]]
 [3 [inc/int 2]]
 [-1 [inc/int -2]]
+[@[] [tree/merge #nil #nil]]
+[@[a: 1 b: 9] [tree/merge @[a: 1 b: 9] #nil]]
+[@[b: 2 c: 3] [tree/merge #nil @[b: 2 c: 3]]]
+[@[a: 1 b: 2 c: 3] [tree/merge @[a: 1 b: 9] @[b: 2 c: 3]]]
