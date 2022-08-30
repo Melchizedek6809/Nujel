@@ -144,7 +144,7 @@
             [:string          [write/raw/string v port hr?]]
             [:tree            [write/raw/tree v port hr?]]
             [:pair            [write/raw/pair v port hr?]]
-            [otherwise [exception :type-error "Don't know how to write that" v]]]]
+            [otherwise [exception :type-error [fmt "Don't know how to write {}" [type-of v]] v]]]]
 
 [defn write [v port]
       [write/raw v [or port stdout] #f]]

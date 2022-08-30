@@ -62,6 +62,7 @@ lSymbol *lSymLTBytecodeOp;
 lSymbol *lSymLTBytecodeArray;
 lSymbol *lSymLTBuffer;
 lSymbol *lSymLTBufferView;
+lSymbol *lSymLTFileHandle;
 lSymbol *lSymLTUnknownType;
 
 uint symbolLookups = 0;
@@ -113,6 +114,7 @@ void lSymbolInit(){
 	lSymLTBytecodeArray  = lSymSM("bytecode-array");
 	lSymLTBuffer         = lSymSM("buffer");
 	lSymLTBufferView     = lSymSM("buffer-view");
+	lSymLTFileHandle     = lSymSM("file-handle");
 	lSymLTUnknownType    = lSymSM("unknown-type");
 }
 
@@ -244,6 +246,7 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltBytecodeArr: return lSymLTBytecodeArray;
 		case ltBuffer:      return lSymLTBuffer;
 		case ltBufferView:  return lSymLTBufferView;
+		case ltFileHandle:  return lSymLTFileHandle;
 	}
 }
 
