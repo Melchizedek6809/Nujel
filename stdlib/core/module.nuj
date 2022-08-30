@@ -18,7 +18,10 @@
       [set! module/loader [tree/ref c :loader]]]
 
 [defn module/qualify-symbol [module-name symbol]
-      [string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]
+      [case [type-of module-name]
+            [:string [module/qualify-symbol [string->keyword module-name] symbol]]
+            [:keyword [string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]
+            [otherwise [exception "Can't qualify that" module-name]]]]
 
 [defmacro module body
           "Define a new module and return it"
@@ -36,7 +39,8 @@
           `[tree/set! exports '~name ~value]]
 
 [defn require* [module env qualify?]
-      [def mod [module/load module]]
+      [def mod [module/load module env]]
+      [when-not mod [exception "Can't load that module" module]]
       [def exports [resolve 'exports mod]]
       [doseq [k [tree/keys exports]]
              [def-in! env
@@ -56,13 +60,13 @@
 
 [defmacro import [names module]
           [when-not [list? names]
-                    [return `[import* ~names [module/load ~module] ~names]]]
+                    [return `[import* ~names [module/load ~module [current-closure]] ~names]]]
           [def ret #nil]
           [while names
                  [if [= [cadr names] :as]
-                     [do [set! ret [cons `[import* ~[caddr names] [module/load ~module] ~[car names]] ret]]
+                     [do [set! ret [cons `[import* ~[caddr names] [module/load ~module [current-closure]] ~[car names]] ret]]
                          [set! names [cddr names]]]
-                     [set! ret [cons `[import* ~[car names] [module/load ~module] ~[car names]] ret]]]
+                     [set! ret [cons `[import* ~[car names] [module/load ~module [current-closure]] ~[car names]] ret]]]
                  [cdr! names]]
           [cons do [nreverse ret]]]
 
@@ -88,9 +92,26 @@
 [defn module/insert [name module]
       [tree/set! module/cache name module]]
 
-[defn module/load [name]
+[defn module/resolve-string/join [parts ret]
+      [cond [[not parts] ret]
+            [[or [== "" [car parts]]
+                 [== "." [car parts]]]
+             [module/resolve-string/join [cdr parts] ret]]
+            [[== ".." [car parts]]
+             [when-not [cadr parts]
+                       [exception "Invalid path" parts]]
+             [module/resolve-string/join [cddr parts] ret]]
+            [otherwise [module/resolve-string/join [cdr parts] [cons [car parts] ret]]]]]
+
+[defn module/resolve-string [name wd]
+      [def mod-path wd]
+      [def parts [module/resolve-string/join [nreverse [append [split mod-path "/"] [split name "/"]]] #nil]]
+      [string->keyword [join [cons "" parts] "/"]]] ; The cons is for the leading /
+
+[defn module/load [name env]
       [case [type-of name]
             [:object name]
+            [:string [module/load [module/resolve-string name [resolve '*module-path* env]] env]]
             [:keyword [or [module/load/cache name]
                           [module/load/store name]
                           [module/load/external name]]]
@@ -111,7 +132,7 @@
 
 [defn module/main [module args]
       "Import and run MODULE's main function with ARGS"
-      [def mod [module/load module]]
+      [def mod [module/load module [current-closure]]]
       [when-not mod [exception "Module not found" module]]
       [def exports [resolve 'exports mod]]
       [when-not exports [exception "Invalid module, can't resolve exports" module]]

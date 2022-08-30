@@ -17,18 +17,13 @@
 
 [defn file/eval [path environment]
        "Evaluate a Nujel source file in the current context"
-       [when-not environment [set! environment root-closure]]
-       [def dirname [path/dirname path]]
-       [when [not= dirname ""]
-         [file/add-module-loader [cat [cwd] "/" dirname]]]
-       [eval-in environment [cons 'do [read [file/read path]]]]]
+       [eval-in [or environment root-closure]
+                [cons 'do [read [file/read path]]]]]
 
 [defn file/eval-module [path args]
        "Evaluate a Nujel source file in the current context"
-       [def dirname [path/dirname path]]
-       [when [not= dirname ""]
-         [file/add-module-loader [cat [cwd] "/" dirname]]]
-       [def mod [module/load [string->keyword [path/without-extension [path/basename path]]]]]
+       [def mod-name [module/resolve-string [cat [path/without-extension path]] [path/working-directory]]]
+       [def mod [module/load mod-name]]
        [when-not [= :object [type-of mod]]
                  [return mod]]
        [def exports [resolve 'exports mod]]
@@ -214,14 +209,18 @@
   [trim [cdr [popen cmd]]]]
 
 [def +root-working-dir+ [path/working-directory]]
+[def *module-path* [path/working-directory]]
 
-[defn file/add-module-loader [module-root]
-      [module/add-loader [fn [name]
-                             [def module-path [fmt "{module-root}/{}.nuj" [keyword->string name]]]
-                           [def source [file/read module-path]]
-                           [when-not source [return #nil]]
-                           [def expr [list 'module
-                                           `[def *module* ~name]
-                                           [cons do [read source]]]]
-                           [def mod [eval expr]]
-                           [return mod]]]]
+[defn module/loader/filesystem [name]
+      [def name-string [keyword->string name]]
+      [when-not [== [buffer/ref name-string 0] #\/] [return #nil]] ; Paths have to start with a /
+      [def module-path [fmt "{}.nuj" name-string]]
+      [def source [file/read module-path]]
+      [when-not source [return #nil]]
+      [def expr [list 'module
+                      `[def *module* ~name]
+                      `[def *module-path* ~[path/dirname module-path]]
+                      [cons do [read source]]]]
+      [def mod [eval expr]]
+      [return mod]]
+[module/add-loader module/loader/filesystem]
