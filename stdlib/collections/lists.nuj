@@ -156,8 +156,8 @@
           l
           [do [def parts [list/split-half l]]
               [list/merge-sorted-lists
-               [list/sort/merge [car parts]]
-               [list/sort/merge [cdr parts]]
+               [list/sort/merge [car parts] pred]
+               [list/sort/merge [cdr parts] pred]
                pred]]]]
 
                                         ; Set default sort to merge-sort
