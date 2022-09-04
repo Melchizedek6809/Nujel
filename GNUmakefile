@@ -100,6 +100,12 @@ release.future: $(FUTURE_SRCS)
 	@$(STRIP) -xS $(FUTURE_NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(FUTURE_NUJEL)
 
+release.static: $(RUNTIME_SRCS)
+	@rm -f $(NUJEL)
+	@gcc -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)  $(LDFLAGS)
+	@$(STRIP) -xS $(NUJEL)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
 release.musl: $(RUNTIME_SRCS)
 	@rm -f $(NUJEL)
 	@musl-gcc -s -static -o $(NUJEL) $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)  $(LDFLAGS)
