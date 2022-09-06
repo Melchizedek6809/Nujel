@@ -49,6 +49,7 @@
                              :write [fn [self . buffers]
                                         [doseq [buf buffers self]
                                                [self :block-write buf]]]
+                             :close! [fn [self] self]
                              :return-string [fn [self]
                                                 [buffer->string [meta self :buffer]
                                                                 [meta self :position]]]
