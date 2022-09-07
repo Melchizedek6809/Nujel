@@ -151,6 +151,9 @@ static lVal *lnfMulAstI(lClosure *c, lVal *v){
 
 static lVal *lnfDivAstI(lClosure *c, lVal *v){
 	(void)c;
+	if(unlikely(((v == NULL) || (v->vList.car == NULL) || (v->vList.cdr == NULL) || (v->vList.cdr->vList.car == NULL)))){
+		lExceptionThrowValClo("arity-error", "Expected 2 arguments", v, c);
+	}
 	const i64 a = v->vList.car->vInt;
 	const i64 b = v->vList.cdr->vList.car->vInt;
 	if(unlikely(b == 0)){
