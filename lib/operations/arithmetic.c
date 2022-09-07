@@ -153,6 +153,9 @@ static lVal *lnfDivAstI(lClosure *c, lVal *v){
 	(void)c;
 	const i64 a = v->vList.car->vInt;
 	const i64 b = v->vList.cdr->vList.car->vInt;
+	if(unlikely(b == 0)){
+		lExceptionThrowValClo("divide-by-zero", "Can't divide by zero", v, c);
+	}
 	return lValInt(a / b);
 }
 

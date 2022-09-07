@@ -659,3 +659,4 @@
 [@[a: 1 b: 9] [tree/merge @[a: 1 b: 9] #nil]]
 [@[b: 2 c: 3] [tree/merge #nil @[b: 2 c: 3]]]
 [@[a: 1 b: 2 c: 3] [tree/merge @[a: 1 b: 9] @[b: 2 c: 3]]]
+[:divide-by-zero [try car [div/int 10 0]]]
