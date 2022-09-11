@@ -26,10 +26,18 @@
 ['a [eval [read/single "'a"]]]
 ['[1 2 3] [eval [read/single "'[1 2 3]"]]]
 ['[1 2 3] [eval [read/single "`[1 2 ~[+ 1 1 1]]"]]]
+
+;; Symbols / Keywords
+[:unbound-variable [try car [eval [read "asd"]]]]
+['asd 'asd]
+['asd [string->symbol "asd"]]
+[#t [== 'asd [string->symbol "asd"]]]
+
 [:asd [eval [read/single ":asd"]]]
 [:asd [eval [read/single "asd:"]]]
 [#t [eval [read/single "[= asd: :asd]"]]]
 [#t [eval [read/single "[= :asd [symbol->keyword 'asd]]"]]]
+
 [4 [eval [read/single "[do [defn double [α] [* α α]] [double 2]]"]]]
 ['[2 4 6] [eval [read/single "[do [defn multiply-vals [val . l] [map l [fn [v] [* v val]]]] [multiply-vals 2 1 2 3]]"]]]
 ['[1 2 3 4] [eval [read/single "[do [defn my-list l l] [my-list 1 2 3 4]]"]]]
