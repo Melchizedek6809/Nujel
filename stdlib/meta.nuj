@@ -48,9 +48,17 @@
 
 [defn describe/thing [o]
       "Describe a specific value O"
+      [import [white] :ansi]
       [def documentation [closure/documentation o]]
+      [def name [closure/name o]]
+      [pfmt "[{}" [white [closure/name o]]]
       [def arguments [closure/arguments o]]
-      [fmt "{arguments:?} - {documentation}"]]
+      [if [pair? arguments]
+          [doseq [arg arguments [println "]"]]
+                 [when arg [pfmt " {arg}"]]]
+          [pfmt " . {arguments}]"]]
+      [pfmtln "  {documentation}"]
+      #nil]
 
 [defn describe/string [a]
       "Descibe whatever value string A resolves to"
