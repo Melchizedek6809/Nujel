@@ -10,8 +10,6 @@
 #if !defined(NUJEL_USE_JUMPTABLE)
 #if defined(__GNUC__)
 #define NUJEL_USE_JUMPTABLE 1
-#else
-#define NUJEL_USE_JUMPTABLE 0
 #endif
 #endif
 

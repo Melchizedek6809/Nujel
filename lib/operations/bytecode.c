@@ -63,7 +63,7 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
 		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
 		return NULL;
-	}
+	}    
 	lVal *ret = lValBytecodeArray(ops,len,literals,c);
 	free(ops);
 	return ret;

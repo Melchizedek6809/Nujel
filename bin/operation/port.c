@@ -12,7 +12,11 @@ static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
 
 	FILE *fh = NULL;
 	if(mode == lSymError){
+#if defined(_MSC_VER)
+		if (_access(path, 02) == 0) { lValBool(false); }
+#else
 		if(access(path, F_OK) == 0){lValBool(false);}
+#endif
 		fh = fopen(path, "wb");
 	}else if(mode == lSymReplace){
 		fh = fopen(path, "wb");
