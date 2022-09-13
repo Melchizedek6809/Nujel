@@ -5,14 +5,17 @@
 
 [defn bit-nand [a b]
       "Returns the Nand of A and B"
+      :cat :bitwise
       [bit-not [bit-and a b]]]
 
 [defn bit-and-not [x y]
       "Bitwise and with complement"
+      :cat :bitwise
       [bit-and x [bit-not y]]]
 
 [defn bit-test? [α i]
       "Test bit at position i"
+      :cat :bitwise
       [typecheck/only α :int]
       [typecheck/only i :int]
       [not [zero? [bit-and α [bit-shift-left 1 i]]]]]
@@ -20,16 +23,20 @@
 
 [defn bit-shift-right [α i]
       "Bitwise shift right"
+      :cat :bitwise
       [bit-shift-left α [- i]]]
 
 [defn bit-set [x i]
       "Set bit at i"
+      :cat :bitwise
       [bit-or x [bit-shift-left 1 i]]]
 
 [defn bit-flip [x i]
       "Flip bit at i"
+      :cat :bitwise
       [bit-xor x [bit-shift-left 1 i]]]
 
 [defn bit-clear [x i]
       "Clear bit at i"
+      :cat :bitwise
       [bit-and x [bit-not [bit-shift-left 1 i]]]]
