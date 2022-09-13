@@ -47,6 +47,9 @@
 [defn closure/documentation [o]
       [meta o :documentation]]
 
+[defn closure/cat [o]
+      [or [meta o :cat] :unsorted]]
+
 [def describe [let*
                 [defn describe/thing [o]
                       "Describe a specific value O"

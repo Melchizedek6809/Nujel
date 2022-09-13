@@ -52,6 +52,8 @@
                                        [tree/set! meta :source source]]
                               [:export-as [tree/set! meta :export [cadr body]]
                                           [cdr! body]]
+                              [:cat [tree/set! meta :cat [cadr body]]
+                                    [cdr! body]]
                               [otherwise [tree/set! meta v #t]]]]]
         [cdr! body]]
       [return meta]]
