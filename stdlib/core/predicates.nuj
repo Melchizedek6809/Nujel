@@ -104,5 +104,8 @@
 [defn procedure? [val]
       [or [lambda? val] [native? val]]]
 
+[defn callable? [val]
+      [or [macro? val] [lambda? val] [native? val]]]
+
 [defn in-range? [v min max]
       [and [>= v min] [<= v max]]]
