@@ -85,7 +85,7 @@
 ["this\nis\na\ntest\nof\nmultiline\ndocstrings" [meta [fn [] "this" "is" "a" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :documentation]]
 [#t [meta [fn [] "this" "is" "a" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :inline]]
 [#nil [meta [fn [] "this" "is" "a" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :outline]]
-[#t [macro? +1]]
+[#t [macro? cond]]
 [#f [macro? min]]
 [#f [macro? 123]]
 [#t [in-range? 3 1 5]]

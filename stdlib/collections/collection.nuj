@@ -42,10 +42,11 @@
       "Returns a filtered list l with all elements where P equal true removed"
       [filter l [fn [a] [not [p a]]]]]
 
-[defn flatten/λ [a b]
-      [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
-            [#t [cons b a]]]]
-[defn flatten [l]
-      "Flatten a collection of collections into a simple list"
-      [if-not [collection? l] l
-              [nreverse [reduce l flatten/λ #nil]]]]
+[def flatten [let*
+               [defn flatten/λ [a b]
+                     [cond [[collection? b ] [append [reduce b flatten/λ #nil] a]]
+                           [#t [cons b a]]]]
+               [defn flatten [l]
+                     "Flatten a collection of collections into a simple list"
+                     [if-not [collection? l] l
+                             [nreverse [reduce l flatten/λ #nil]]]]]]

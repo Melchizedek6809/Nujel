@@ -15,15 +15,16 @@
              [dec! i]]
       [return ret]]
 
-[defn except-last-pair/iter [list rest]
-      "Iterator for except-last-pair"
-      [if [nil? [cdr list]]
-          [reverse rest]
-          [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
+[def except-last-pair [let*
+                        [defn except-last-pair/iter [list rest]
+                              "Iterator for except-last-pair"
+                              [if [nil? [cdr list]]
+                                  [reverse rest]
+                                  [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
 
-[defn except-last-pair [list]
-      "Return a copy of LIST without the last pair"
-      [except-last-pair/iter list #nil]]
+                        [defn except-last-pair [list]
+                              "Return a copy of LIST without the last pair"
+                              [except-last-pair/iter list #nil]]]]
 
 [defn last-pair [list]
       "Return the last pair of LIST"
@@ -121,47 +122,33 @@
             [[= key [car l]] [cadr l]]
             [#t [getf [cdr l] key]]]]
 
-[defn list/sort/bubble [l]
-      "Terribly slow way to sort a list, though it was simple to write"
-      [if-not l #nil
-              [do [def top [car l]]
-                  [def next #nil]
-                [cdr! l]
-                [while l
-                       [if [<= [car l] top]
-                           [do [set! next [cons top next]]
-                               [set! top [car l]]]
-                           [set! next [cons [car l] next]]]
-                       [cdr! l]]
-                [cons top [list/sort/bubble next]]]]]
+[def list/sort/merge [let*
+                       [defn list/merge-sorted-lists [l1 l2 pred]
+                             [cond [[nil? l1] l2]
+                                   [[nil? l2] l1]
+                                   [#t [if [pred [car l1] [car l2]]
+                                           [cons [car l1] [list/merge-sorted-lists [cdr l1] l2 pred]]
+                                           [cons [car l2] [list/merge-sorted-lists l1 [cdr l2] pred]]]]]]
 
-[defn list/merge-sorted-lists [l1 l2 pred]
-      [cond [[nil? l1] l2]
-            [[nil? l2] l1]
-            [#t [if [pred [car l1] [car l2]]
-                    [cons [car l1] [list/merge-sorted-lists [cdr l1] l2 pred]]
-                    [cons [car l2] [list/merge-sorted-lists l1 [cdr l2] pred]]]]]]
+                       [defn list/split-half-rec [l acc1 acc2]
+                             [cond [[nil? l] [cons acc1 acc2]]
+                                   [[nil? [cdr l]] [cons [cons [car l] acc1] acc2]]
+                                   [#t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]]]]]
 
-[defn list/split-half-rec [l acc1 acc2]
-      [cond [[nil? l] [cons acc1 acc2]]
-            [[nil? [cdr l]] [cons [cons [car l] acc1] acc2]]
-            [#t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]]]]]
+                       [defn list/split-half [l] [list/split-half-rec l #nil #nil]]
 
-[defn list/split-half [l] [list/split-half-rec l #nil #nil]]
+                       [defn list/sort/merge [l pred]
+                             "Sorts a list"
+                             [when-not pred [set! pred <]]
+                             [if [nil? [cdr l]]
+                                 l
+                                 [do [def parts [list/split-half l]]
+                                     [list/merge-sorted-lists
+                                      [list/sort/merge [car parts] pred]
+                                      [list/sort/merge [cdr parts] pred]
+                                      pred]]]]]]
 
-[defn list/sort/merge [l pred]
-      "Sorts a list"
-      [when-not pred [set! pred <]]
-      [if [nil? [cdr l]]
-          l
-          [do [def parts [list/split-half l]]
-              [list/merge-sorted-lists
-               [list/sort/merge [car parts] pred]
-               [list/sort/merge [cdr parts] pred]
-               pred]]]]
-
-                                        ; Set default sort to merge-sort
-[def list/sort list/sort/merge]
+[def list/sort list/sort/merge] ; Set default sort to merge-sort
 
 [defn list? [a]
       "Return #t is A is a proper list"

@@ -4,35 +4,36 @@
 ;;; The Nujel implementation for quasiquote, it is important to note that it is
 ;;; a macro, not a special form.
 
-[defn quasiquote-real [l depth]
-      [when-not l [return #nil]]
-      [if [pair? l]
-          [if [= [caar l] 'unquote-splicing]
-              [if [zero? depth]
-                  [list 'append
-                        [cadr [car l]]
-                        [quasiquote-real [cdr l] depth]]
-                  [list 'unquote-splicing
-                        [quasiquote-real [cadr l] [+ -1 depth]]]]
-              [if [= [car l] 'unquote]
-                  [if [zero? depth]
-                      [cadr l]
-                      [list 'unquote
-                            [quasiquote-real [cadr l] [+ -1 depth]]]]
-                  [if [= [car l] 'quasiquote]
-                      [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth]
-                      [if [zero? depth]
-                          [list 'cons
-                                [quasiquote-real [car l] depth]
-                                [quasiquote-real [cdr l] depth]]
-                          [cons [quasiquote-real [car l] depth]
-                                [quasiquote-real [cdr l] depth]]]]]]
-          [if [and [zero? depth] [symbol? l]]
-              [cons 'quote [cons l #nil]]
-              l]]]
+[def quasiquote [let*
+                  [defn quasiquote-real [l depth]
+                        [when-not l [return #nil]]
+                        [if [pair? l]
+                            [if [= [caar l] 'unquote-splicing]
+                                [if [zero? depth]
+                                    [list 'append
+                                          [cadr [car l]]
+                                          [quasiquote-real [cdr l] depth]]
+                                    [list 'unquote-splicing
+                                          [quasiquote-real [cadr l] [+ -1 depth]]]]
+                                [if [= [car l] 'unquote]
+                                    [if [zero? depth]
+                                        [cadr l]
+                                        [list 'unquote
+                                              [quasiquote-real [cadr l] [+ -1 depth]]]]
+                                    [if [= [car l] 'quasiquote]
+                                        [quasiquote-real [quasiquote-real [cadr l] [+ 1 depth]] depth]
+                                        [if [zero? depth]
+                                            [list 'cons
+                                                  [quasiquote-real [car l] depth]
+                                                  [quasiquote-real [cdr l] depth]]
+                                            [cons [quasiquote-real [car l] depth]
+                                                  [quasiquote-real [cdr l] depth]]]]]]
+                            [if [and [zero? depth] [symbol? l]]
+                                [cons 'quote [cons l #nil]]
+                                l]]]
 
-[defmacro quasiquote [l]
-          [quasiquote-real l 0]]
+                  [defmacro quasiquote [l]
+                            [quasiquote-real l 0]]]]
 
 [defn unquote [expr]
       [throw [list :unquote-without-quasiquote "unquote should only occur inside a quasiquote, never evaluated directly"]]]

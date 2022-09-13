@@ -6,7 +6,6 @@
 
 [def otherwise #t]
 [defmacro deftest l #nil] ; Tests should be skipped when compiling
-[defmacro defqtest l #nil] ; Tests should be skipped when compiling
 
 [defmacro comment body
           "Does nothing"
@@ -19,20 +18,21 @@
           "[set! l [cdr l]]"
           `[set! ~l [cdr ~l]]]
 
-[defn let/arg [arg]
-      [when arg
-            [when [or [not [pair? arg]]
-                      [not [symbol? [car arg]]]]
-                  [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]]
-            `[def ~[car arg] ~[cadr arg]]]]
+[def let [let*
+              [defn let/arg [arg]
+                    [when arg
+                      [when [or [not [pair? arg]]
+                                [not [symbol? [car arg]]]]
+                        [throw [list :invalid-let-form "Please fix the structure of the let form" arg]]]
+                      `[def ~[car arg] ~[cadr arg]]]]
 
-[defn let/args [args]
-      [if-not args #nil
-              [cons [let/arg [car args]]
-                    [let/args [cdr args]]]]]
-[defmacro let [bindings . body]
-          "Evalutes to BODY if PRED is true"
-          `[let* [do ~@[let/args bindings] ~@body]]]
+              [defn let/args [args]
+                    [if-not args #nil
+                            [cons [let/arg [car args]]
+                                  [let/args [cdr args]]]]]
+              [defmacro let [bindings . body]
+                        "Evalutes to BODY if PRED is true"
+                        `[let* [do ~@[let/args bindings] ~@body]]]]]
 
 [defn boolean [v] :inline
       "Coerce to boolean"
@@ -104,6 +104,3 @@
 
 [defmacro exception [type description value]
           `[throw [list ~type ~description ~value [current-lambda]]]]
-
-[defn min/simple [a b] [if [< a b] a b]]
-[defn max/simple [a b] [if [> a b] a b]]

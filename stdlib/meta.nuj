@@ -25,49 +25,51 @@
 [defn stacktrace []
       [print [describe/closure [closure/caller [current-lambda]]]]]
 
-[defn print/error/wrap [i v]
-      [require :ansi]
-      [case i
-            [0 [ansi/red v]]
-            [2 [string/write v]]
-            [3 [describe/closure v]]
-            [otherwise [string v]]]]
+[def print/error [let*
+                   [defn print/error/wrap [i v]
+                         [require :ansi]
+                         [case i
+                               [0 [ansi/red v]]
+                               [2 [string/write v]]
+                               [3 [describe/closure v]]
+                               [otherwise [string v]]]]
 
-[defn print/error/iter [error i]
-      [if error
-          [cons [print/error/wrap i [car error]]
-                [print/error/iter [cdr error] [+ 1 i]]]
-          [cons "" #nil]]]
+                   [defn print/error/iter [error i]
+                         [if error
+                             [cons [print/error/wrap i [car error]]
+                                   [print/error/iter [cdr error] [+ 1 i]]]
+                             [cons "" #nil]]]
 
-[defn print/error [error]
-      "Display ERROR in a nice, human readable way"
-      [print [join [print/error/iter error 0] "\r\n"]]]
+                   [defn print/error [error]
+                         "Display ERROR in a nice, human readable way"
+                         [print [join [print/error/iter error 0] "\r\n"]]]]]
 
 [defn closure/documentation [o]
       [meta o :documentation]]
 
-[defn describe/thing [o]
-      "Describe a specific value O"
-      [import [white] :ansi]
-      [def documentation [closure/documentation o]]
-      [def name [closure/name o]]
-      [pfmt "[{}" [white [closure/name o]]]
-      [def arguments [closure/arguments o]]
-      [if [pair? arguments]
-          [doseq [arg arguments [println "]"]]
-                 [when arg [pfmt " {arg}"]]]
-          [pfmt " . {arguments}]"]]
-      [pfmtln "  {documentation}"]
-      #nil]
+[def describe [let*
+                [defn describe/thing [o]
+                      "Describe a specific value O"
+                      [import [white] :ansi]
+                      [def documentation [closure/documentation o]]
+                      [def name [closure/name o]]
+                      [pfmt "[{}" [white [closure/name o]]]
+                      [def arguments [closure/arguments o]]
+                      [if [pair? arguments]
+                          [doseq [arg arguments [println "]"]]
+                                 [when arg [pfmt " {arg}"]]]
+                          [pfmt " . {arguments}]"]]
+                      [pfmtln "  {documentation}"]
+                      #nil]
 
-[defn describe/string [a]
-      "Descibe whatever value string A resolves to"
-      [describe/thing [resolve [string->symbol a]]]]
+                [defn describe/string [a]
+                      "Descibe whatever value string A resolves to"
+                      [describe/thing [resolve [string->symbol a]]]]
 
-[defn describe [fun] "Describe FUN, if there is documentation available"
-      [if [string? fun]
-          [describe/string fun]
-          [describe/thing fun]]]
+                [defn describe [fun] "Describe FUN, if there is documentation available"
+                      [if [string? fun]
+                          [describe/string fun]
+                          [describe/thing fun]]]]]
 
 [defn symbol-table [off len environment]
       "Return a list of LEN symbols defined in ENVIRONMENT starting at OFF"
@@ -76,9 +78,9 @@
       [when-not len [set! len 9999999]]
       [sublist [eval-in environment '[symbol-table*]] off [+ off len] #nil]]
 
-[def gensym/counter 0]
-[defn gensym [prefix]
-      [inc! gensym/counter]
-      [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]
+[def gensym [let [[gensym/counter 0]]
+                 [defn gensym [prefix]
+                       [inc! gensym/counter]
+                       [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]]
 
 [def root-closure [current-closure]]

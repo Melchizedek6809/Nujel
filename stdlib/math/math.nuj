@@ -15,11 +15,6 @@
           "Decrement I by V (defaults to 1) and store the result in I"
           `[set! ~i [+ ~i ~[or v 1]]]]
 
-[defn dec [x]
-      :inline
-      "Return a number 1 less than x"
-      [+ -1 x]]
-
 [defmacro dec! [i v]
           "Decrement I by V and store the result in I"
           `[set! ~i [- ~i ~[or v 1]]]]
@@ -28,17 +23,6 @@
       "Return a function that adds α to it's argument, useful for mapping"
       [fn [β]
           [+ α β]]]
-
-[defn fib [i]
-      "Terribly inefficient, but, useful for testing the GC"
-      [if [< i 2] i
-          [+ [fib [- i 2]] [fib [- i 1]]]]]
-
-[defn wrap-value [val min max] "Constrains VAL to be within MIN and MAX, wrapping it around"
-      [+ min [rem [- val min] [- max min]]]]
-
-[defmacro +1 [v]
-          `[+ 1 ~v]]
 
 [defn radians [degrees]
       "Convert a quantity in degrees to radians"

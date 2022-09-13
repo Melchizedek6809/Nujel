@@ -284,120 +284,121 @@
             [val->bytecode-op docs]
             [val->bytecode-op body]]]
 
-[defn assemble/build-sym-map [code sym-map pos]
-      [while code
-             [case [type-of [car code]]
-                   [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]]
-                   [:keyword [case [car code]
-                                   [:label [tree/set! sym-map [cadr code] pos]
-                                           [cdr! code]]
-                                   [:literal [cdr! code]]]]
-                   [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
-             [cdr! code]]
-      [return pos]]
+[def assemble* [let*
+                 [defn assemble/build-sym-map [code sym-map pos]
+                       [while code
+                         [case [type-of [car code]]
+                               [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]]
+                               [:keyword [case [car code]
+                                               [:label [tree/set! sym-map [cadr code] pos]
+                                                       [cdr! code]]
+                                               [:literal [cdr! code]]]]
+                               [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
+                         [cdr! code]]
+                       [return pos]]
 
-[defn assemble/relocate-op [code sym-map pos out]
-      [def target [tree/ref sym-map [cadr code]]]
-      [def off [- [+ target [cadddr code]] pos]]
-      [array/set! out [inc! pos] [int->bytecode-op [bit-and [bit-shift-right off [caddr code]] #xFF]]]
-      [return pos]]
+                 [defn assemble/relocate-op [code sym-map pos out]
+                       [def target [tree/ref sym-map [cadr code]]]
+                       [def off [- [+ target [cadddr code]] pos]]
+                       [array/set! out [inc! pos] [int->bytecode-op [bit-and [bit-shift-right off [caddr code]] #xFF]]]
+                       [return pos]]
 
-[defn assemble/emit-relocated-ops [code sym-map pos out]
-      [if [= [car code] :relocate]
-          [set! pos [assemble/relocate-op code sym-map pos out]]
-          [doseq [op code pos]
-                 [case [type-of op]
-                       [:bytecode-op [array/set! out [inc! pos] op]]
-                       [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]]
+                 [defn assemble/emit-relocated-ops [code sym-map pos out]
+                       [if [= [car code] :relocate]
+                           [set! pos [assemble/relocate-op code sym-map pos out]]
+                           [doseq [op code pos]
+                                  [case [type-of op]
+                                        [:bytecode-op [array/set! out [inc! pos] op]]
+                                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]]
 
-[defn literal-index->bytecode-op [i]
-      [if [< i 256]
-          [int->bytecode-op i]
-          [list [int->bytecode-op [bit-and [bit-shift-right i 8] #xFF]]
-                [int->bytecode-op [bit-and i #xFF]]]]]
+                 [defn literal-index->bytecode-op [i]
+                       [if [< i 256]
+                           [int->bytecode-op i]
+                           [list [int->bytecode-op [bit-and [bit-shift-right i 8] #xFF]]
+                                 [int->bytecode-op [bit-and i #xFF]]]]]
 
-[def *max-literal-arr* 0]
-[defn assemble/add-literal [lit lit-arr]
-      [when [>= [array/length lit-arr] 65535]
-            [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
-      [when [not= [type-of lit] :pair]
-            [dotimes [i [array/length lit-arr]]
-                     [when [equal? [array/ref lit-arr i] lit]
-                           [return [literal-index->bytecode-op i]]]]]
-      [array/length! lit-arr [+ 1 [array/length lit-arr]]]
-      [array/set! lit-arr [- [array/length lit-arr] 1] lit]
-      #;[when [> [array/length lit-arr] *max-literal-arr*]
-            [set! *max-literal-arr* [array/length lit-arr]]
-            [pfmtln "Max: {*max-literal-arr*}"]]
-      [literal-index->bytecode-op [- [array/length lit-arr] 1]]]
+                 [def *max-literal-arr* 0]
+                 [defn assemble/add-literal [lit lit-arr]
+                       [when [>= [array/length lit-arr] 65535]
+                         [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
+                       [when [not= [type-of lit] :pair]
+                         [dotimes [i [array/length lit-arr]]
+                           [when [equal? [array/ref lit-arr i] lit]
+                             [return [literal-index->bytecode-op i]]]]]
+                       [array/length! lit-arr [+ 1 [array/length lit-arr]]]
+                       [array/set! lit-arr [- [array/length lit-arr] 1] lit]
+                       #;[when [> [array/length lit-arr] *max-literal-arr*]
+                       [set! *max-literal-arr* [array/length lit-arr]]
+                       [pfmtln "Max: {*max-literal-arr*}"]]
+                       [literal-index->bytecode-op [- [array/length lit-arr] 1]]]
 
-[defn assemble/build-lit-arr [code lit-arr]
-      [when-not code [return #nil]]
-      [cond [[pair? [car code]]
-             [cons [assemble/build-lit-arr [car code] lit-arr]
-                   [assemble/build-lit-arr [cdr code] lit-arr]]]
-            [[and [= [car code] #$1A]
-                  [= [car [cadr code]] :literal]]
-             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-             [def index-op [assemble/add-literal [cadar code] lit-arr]]
-             [cons [if [pair? index-op]
-                       #$6
-                       #$1A]
-                   [cons index-op
-                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
-            [[and [= [car code] #$E]
-                  [= [car [cadr code]] :literal]]
-             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-             [def index-op [assemble/add-literal [cadar code] lit-arr]]
-             [cons [if [pair? index-op]
-                       #$F
-                       #$E]
-                   [cons index-op
-                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
-            [[and [= [car code] #$5]
-                  [= [car [cadr code]] :literal]]
-             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-             [def index-op [assemble/add-literal [cadar code] lit-arr]]
-             [cons [if [pair? index-op]
-                       #$10
-                       #$5]
-                   [cons index-op
-                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
-           [[and [= [car code] #$7]
-                  [= [car [cadr code]] :literal]]
-             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-             [def index-op [assemble/add-literal [cadar code] lit-arr]]
-             [cons [if [pair? index-op]
-                       #$8
-                       #$7]
-                   [cons index-op
-                         [assemble/build-lit-arr [cdr code] lit-arr]]]]
-            [[= :literal [car code]]
-             [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-             [cons [assemble/add-literal [car code] lit-arr]
-                   [assemble/build-lit-arr [cdr code] lit-arr]]]
-            [otherwise [cons [car code]
-                             [assemble/build-lit-arr [cdr code] lit-arr]]]]]
+                 [defn assemble/build-lit-arr [code lit-arr]
+                       [when-not code [return #nil]]
+                       [cond [[pair? [car code]]
+                              [cons [assemble/build-lit-arr [car code] lit-arr]
+                                    [assemble/build-lit-arr [cdr code] lit-arr]]]
+                             [[and [= [car code] #$1A]
+                                   [= [car [cadr code]] :literal]]
+                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
+                              [cons [if [pair? index-op]
+                                        #$6
+                                        #$1A]
+                                    [cons index-op
+                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
+                             [[and [= [car code] #$E]
+                                   [= [car [cadr code]] :literal]]
+                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
+                              [cons [if [pair? index-op]
+                                        #$F
+                                        #$E]
+                                    [cons index-op
+                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
+                             [[and [= [car code] #$5]
+                                   [= [car [cadr code]] :literal]]
+                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
+                              [cons [if [pair? index-op]
+                                        #$10
+                                        #$5]
+                                    [cons index-op
+                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
+                             [[and [= [car code] #$7]
+                                   [= [car [cadr code]] :literal]]
+                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
+                              [cons [if [pair? index-op]
+                                        #$8
+                                        #$7]
+                                    [cons index-op
+                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
+                             [[= :literal [car code]]
+                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
+                              [cons [assemble/add-literal [car code] lit-arr]
+                                    [assemble/build-lit-arr [cdr code] lit-arr]]]
+                             [otherwise [cons [car code]
+                                              [assemble/build-lit-arr [cdr code] lit-arr]]]]]
 
-[defn assemble/flatten [code ret]
-      [when-not code [return ret]]
-      [when-not [pair? code] [return ret]]
-      [set! ret [assemble/flatten [cdr code] ret]]
-      [if [and [pair? [car code]]
-               [not [keyword? [caar code]]]]
-          [assemble/flatten [car code] ret]
-          [cons [car code] ret]]]
+                 [defn assemble/flatten [code ret]
+                       [when-not code [return ret]]
+                       [when-not [pair? code] [return ret]]
+                       [set! ret [assemble/flatten [cdr code] ret]]
+                       [if [and [pair? [car code]]
+                                [not [keyword? [caar code]]]]
+                           [assemble/flatten [car code] ret]
+                           [cons [car code] ret]]]
 
-[defn assemble* [code]
-      "Assemble all arguments into a single :bytecode-array"
-      [def sym-map @[]]
-      [def lit-arr #[]]
-      [def tmp [-> [assemble/flatten code]
-                   [assemble/build-lit-arr lit-arr]]]
-      [assemble/build-sym-map tmp sym-map 0]
-      [def out [array/allocate [tree/ref sym-map :last-op]]]
-      [assemble/emit-relocated-ops tmp sym-map -1 out]
-      [arr->bytecode-arr out lit-arr]]
+                 [defn assemble* [code]
+                       "Assemble all arguments into a single :bytecode-array"
+                       [def sym-map @[]]
+                       [def lit-arr #[]]
+                       [def tmp [-> [assemble/flatten code]
+                                    [assemble/build-lit-arr lit-arr]]]
+                       [assemble/build-sym-map tmp sym-map 0]
+                       [def out [array/allocate [tree/ref sym-map :last-op]]]
+                       [assemble/emit-relocated-ops tmp sym-map -1 out]
+                       [arr->bytecode-arr out lit-arr]]]]
 
 [defn assemble l
       "Assemble all arguments into a single :bytecode-array"
@@ -406,10 +407,3 @@
 [defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
           `[bytecode-eval* [assemble ~@ops] [current-closure]]]
-
-[defn asmdebug ops
-      "Assemble and evaluate all bytecode arguments"
-      [def bc [assemble* ops]]
-      [disassemble bc]
-      [def v [bytecode-eval* bc [current-closure]]]
-      [pfmtln "Result: {:?}{}" v [type-of v]]]

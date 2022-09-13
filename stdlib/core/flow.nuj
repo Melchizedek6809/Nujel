@@ -21,29 +21,30 @@
           "Evalutes to BODY if PRED is true"
           `[if ~pred [do ~@body] #nil]]
 
-[defn case/clauses/multiple [key-sym cases]
-      [when cases
-            [cons [list '= key-sym [car cases]]
-                  [case/clauses/multiple key-sym [cdr cases]]]]]
-[defn case/clauses [key-sym clauses]
-      [when clauses
-            [if [= [caar clauses] 'otherwise]
-                [cons 'do [cdar clauses]]
-                [list 'if
-                      [if [pair? [caar clauses]]
-                          [if [and [= [car [caar clauses]] 'quote]
-                                   [last? [cdr [caar clauses]]]
-                                   [symbol? [cadr [caar clauses]]]]
-                              [list '= key-sym [caar clauses]]
-                              [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
-                          [list '= key-sym [caar clauses]]]
-                      [cons 'do [cdar clauses]]
-                      [case/clauses key-sym [cdr clauses]]]]]]
-[defmacro case [key-form . clauses]
-          [def key-sym [gensym]]
-          [list 'let*
-                [list 'def key-sym key-form]
-                [case/clauses key-sym clauses]]]
+[def case [let*
+            [defn case/clauses/multiple [key-sym cases]
+                  [when cases
+                    [cons [list '= key-sym [car cases]]
+                          [case/clauses/multiple key-sym [cdr cases]]]]]
+            [defn case/clauses [key-sym clauses]
+                  [when clauses
+                    [if [= [caar clauses] 'otherwise]
+                        [cons 'do [cdar clauses]]
+                        [list 'if
+                              [if [pair? [caar clauses]]
+                                  [if [and [= [car [caar clauses]] 'quote]
+                                           [last? [cdr [caar clauses]]]
+                                           [symbol? [cadr [caar clauses]]]]
+                                      [list '= key-sym [caar clauses]]
+                                      [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
+                                  [list '= key-sym [caar clauses]]]
+                              [cons 'do [cdar clauses]]
+                              [case/clauses key-sym [cdr clauses]]]]]]
+            [defmacro case [key-form . clauses]
+                      [def key-sym [gensym]]
+                      [list 'let*
+                            [list 'def key-sym key-form]
+                            [case/clauses key-sym clauses]]]]]
 
 [defmacro cond body
           "Contains multiple cond clauses"
@@ -78,19 +79,21 @@
                   [cdr! ~symbol-name]]
                 ~[caddr for-loop]]]
 
-[defn thread/-> [init fun]
-      [if-not fun init
-              [if [pair? [car fun]]
-                  `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
-                  [list [car fun] [thread/-> init [cdr fun]]]]]]
+[def -> [let*
+          [defn thread/-> [init fun]
+                [if-not fun init
+                        [if [pair? [car fun]]
+                            `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
+                            [list [car fun] [thread/-> init [cdr fun]]]]]]
 
-[defmacro -> [init . fun]
-          "Thread init as the first argument through every function in fun"
-          [thread/-> init [reverse fun]]]
+          [defmacro -> [init . fun]
+                    "Thread init as the first argument through every function in fun"
+                    [thread/-> init [reverse fun]]]]]
 
-[defn thread/->> [init fun]
-      [if-not fun init
-              [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
-[defmacro ->> [init . fun]
-          "Thread init as the last argument through every function in fun"
-          [thread/->> init [reverse fun]]]
+[def ->> [let*
+           [defn thread/->> [init fun]
+                 [if-not fun init
+                         [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
+           [defmacro ->> [init . fun]
+                     "Thread init as the last argument through every function in fun"
+                     [thread/->> init [reverse fun]]]]]

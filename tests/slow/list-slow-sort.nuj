@@ -13,6 +13,6 @@
                     [throw :list-not-sorted]]
               [cdr! sorted]]]
 
-[test-sort 1500 list/sort/bubble]
+[test-sort 1500 list/sort]
 
 [return :success]
