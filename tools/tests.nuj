@@ -1,7 +1,7 @@
 #!/usr/bin/env nujel
 
 [import [blue green red purple yellow] :ansi]
-[import [run :as test-run load-file :as test-load] :test]
+[import [run :as test-run load-file :as test-load add-builtin-tests] :test]
 
 [def test/beginning [time/milliseconds]]
 [def test/testsuite-errors 0]
@@ -15,6 +15,7 @@
 [when [not [tree/has? init/options :only-test-suite]]
   [println [purple "First we test the basic functions of the runtime."]]]
 [for-each [-> [directory/read-relative "tests/testsuite"] sort] test-load]
+[add-builtin-tests]
 
 [def output-passes #f]
 [when [tree/has? init/options :verbose]

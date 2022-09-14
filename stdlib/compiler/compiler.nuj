@@ -43,10 +43,12 @@
       [while body
         [def v [car body]]
         [case [type-of v]
-              [:pair [return meta]]
-              [:string [tree/set! meta :documentation [trim [cat [string [tree/ref meta :documentation]]
+              [:pair [if [== [car v] 'deftest]
+                         [tree/set! meta :tests [cons [cdr v] [tree/ref meta :tests]]]
+                         [set! body #nil]]]
+              [:string [tree/set! meta :documentation [cat [string [tree/ref meta :documentation]]
                                                                  "\n"
-                                                                 v]]]]
+                                                                 v]]]
               [:keyword [case v
                               [:inline [tree/set! meta v #t]
                                        [tree/set! meta :source source]]
@@ -56,6 +58,8 @@
                                     [cdr! body]]
                               [otherwise [tree/set! meta v #t]]]]]
         [cdr! body]]
+      [when [tree/ref meta :documentation]
+        [tree/set! meta :documentation [trim [tree/ref meta :documentation]]]]
       [return meta]]
 
 [defmacro defmacro [name args . body]

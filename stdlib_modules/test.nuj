@@ -101,5 +101,15 @@
              [add* [eval [car t]] [cons 'do [cdr t]]]]]
 [reset!]
 
+[defn add-builtin-tests []
+      :export
+      [doseq [test-funs [-> [symbol-table]
+                            [map resolve]
+                            [filter callable?]
+                            [map [fn [a] [meta a :tests]]]
+                            [filter identity]]]
+             [doseq [fun test-funs]
+                    [add* [car fun] [cadr fun]]]]]
+
 [deftest #t [lambda? test/run]]
 ;; [error"Evaluating comments is a terrible Idea!"] [newline] [exit 2]
