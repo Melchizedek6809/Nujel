@@ -84,7 +84,7 @@
                  [if-not [tree/ref opts :width]
                          opts
                          [tree/set! opts :argument [list [case [tree/ref opts :align]
-                                                               [:right   string/pad-start]
+                                                               [:right   pad-start]
                                                                [:center string/pad-middle]
                                                                [:left  string/pad-end]]
                                                          [tree/ref opts :argument]

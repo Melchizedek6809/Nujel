@@ -1,7 +1,7 @@
 #!/usr/bin/env nujel
 
 [defn bits/hex->bits [s]
-      [string/pad-start [int->string/binary [read/single [cat "#x" s]]] 4 "0"]]
+      [pad-start [int->string/binary [read/single [cat "#x" s]]] 4 "0"]]
 
 [defn bits/read-value [s offset len]
       [read/single [cat "#b" [string/cut s offset [+ offset len]]]]]
@@ -85,10 +85,10 @@
 [defn bits/print [p indent]
       [when-not indent [set! indent 0]]
       [case [ref p :type]
-	    [4 [println [cat [string/pad-start "" indent]
+	    [4 [println [cat [pad-start "" indent]
 			     [ansi-blue [ref p :value]]
 			     " v:" [ansi-green [ref p :version]]]]]
-	    [otherwise [println [cat [string/pad-start "" indent]
+	    [otherwise [println [cat [pad-start "" indent]
 				     [ansi-yellow [ref p :type]]
 				     " v:" [ansi-green [ref p :version]]]]
 		       [for-each [ref p :value] [fn [a] [bits/print a [+ 4 indent]]]]]]]

@@ -60,7 +60,7 @@
                            [do [port 'block-write "#m"]
                                [def view [buffer/u8* v]]
                              [dotimes [i [buffer/length v]]
-                               [port 'block-write [string/pad-start [int->string/HEX [buffer/ref view i]] 2 "0"]]]]]]
+                               [port 'block-write [pad-start [int->string/HEX [buffer/ref view i]] 2 "0"]]]]]]
 
                  [defn write/raw/bytecode-array [v port hr?]
                        [port 'block-write "#{"]
@@ -68,7 +68,7 @@
                        [dotimes [i [bytecode-array/length v]]
                          [when [zero? [bit-and i #x1F]]
                            [port 'block-write "\n"]]
-                         [port 'block-write [string/pad-start [int->string/HEX [bytecode-op->int [bytecode-array/ref v i]]] 2 "0"]]]
+                         [port 'block-write [pad-start [int->string/HEX [bytecode-op->int [bytecode-array/ref v i]]] 2 "0"]]]
                        [port 'block-write "\n}"]]
 
                  [defn write/raw/tree/rec [v port hr? always-space?]

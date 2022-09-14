@@ -21,7 +21,7 @@
           "\n"
           [cat "\n" [br [+ -1 num]]]]]
 
-[defn string/pad-start [text pad-length padding]
+[defn pad-start [text pad-length padding]
       "Pad a string to a certain length by prepending another string."
       ""
       "This function will, if necessary, prepend padding on to the beginning of"
@@ -39,15 +39,16 @@
       "Returns the padded string"
 
       :cat :string
-      [deftest "   123" [string/pad-start "123" 6]]
-      [deftest "000123" [string/pad-start 123 6 "0"]]
-      [deftest "-.-123" [string/pad-start :123 6 ".-"]]
-
+      [deftest "   123" [pad-start "123" 6]]
+      [deftest "000123" [pad-start 123 6 "0"]]
+      [deftest "-.-123" [pad-start '123 6 ".-"]]
+      :related string/pad-end
+      :related string/pad-middle
 
       [when-not padding [set! padding " "]]
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? padding]
-                [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" padding [current-lambda]]]]
+                [throw [list :type-error "pad-start needs char as a string, so that one can pad with multiple characters" padding [current-lambda]]]]
       [while [< [buffer/length text] pad-length]
              [set! text [cat padding text]]]
       [if [> [buffer/length text] pad-length]
@@ -59,7 +60,7 @@
       [when-not char [set! char " "]]
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
-                [throw [list :type-error "string/pad-start needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
+                [throw [list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
       [while [< [buffer/length text] goal-length]
              [set! text [cat text char]]]
       [if [> [buffer/length text] goal-length]

@@ -7,10 +7,10 @@
 [def test/testsuite-errors 0]
 
 [defn prog-str [fun-color i path start]
-  [cat "[" [fun-color [string/pad-start i 2]]
-       "/" [string/pad-start test/count 2]
+  [cat "[" [fun-color [pad-start i 2]]
+       "/" [pad-start test/count 2]
        "] " [string/pad-end [cut path 2 [length path]] 48]
-       [if start [cat " " [blue [string/pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
+       [if start [cat " " [blue [pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
 
 [when [not [tree/has? init/options :only-test-suite]]
   [println [purple "First we test the basic functions of the runtime."]]]

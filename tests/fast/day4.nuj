@@ -16,8 +16,8 @@
 
 [defn print/board/line/number [num marks]
        [if [marks num]
-           [display [ansi-green [string/pad-start num 3]]]
-           [display [string/pad-start num 3]]]]
+           [display [ansi-green [pad-start num 3]]]
+           [display [pad-start num 3]]]]
 
 [defn print/board/line [board marks]
        [print/board/line/number [array/ref board 0] marks]

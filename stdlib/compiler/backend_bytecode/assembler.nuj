@@ -8,14 +8,12 @@
       "[] -> []"
       "Do nothing"
       :inline
-      :cat :bytecode
       '[#$00]]
 
 [defn $ret []
       "[a] -> []"
       "Return top of value stack"
       :inline
-      :cat :bytecode
       '[#$01]]
 
 [defn $add/int []
