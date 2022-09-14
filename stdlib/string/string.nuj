@@ -3,10 +3,6 @@
 ;;;
 ;;; Various functions dealing with strings of all sorts
 
-[defn string->keyword [α] :inline
-      "Return string α as a keyword"
-      [symbol->keyword [string->symbol α]]]
-
 [defn println [str]
       "Print STR on a single line"
       [print [cat str "\r\n"]]]
@@ -34,16 +30,16 @@
       ""
       "text: The input string"
       "pad-length: The minimum length of the result"
-      "padding: A string that will be used to pad text, defaults to a single space. If the amount of padding can't be evenly divided through the length of padding, then it will be truncated"
+      "padding: A string that will be used to pad text, defaults to a single space"
       ""
       "Returns the padded string"
-
       :cat :string
+      :related pad-middle
+      :related pad-end
       [deftest "   123" [pad-start "123" 6]]
       [deftest "000123" [pad-start 123 6 "0"]]
       [deftest "-.-123" [pad-start '123 6 ".-"]]
-      :related string/pad-end
-      :related string/pad-middle
+
 
       [when-not padding [set! padding " "]]
       [when-not [string? text] [set! text [string text]]]
@@ -55,30 +51,73 @@
           [string/cut text [- [buffer/length text] pad-length] [buffer/length text]]
           text]]
 
-[defn string/pad-end [text goal-length char]
-      "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
+[defn pad-end [text pad-length char]
+      "Pad a string to a certain length by appending another string."
+      ""
+      "This function will, if necessary, append padding on to the end of"
+      "text repeatedly until the desired pad-length is reached."
+      ""
+      "Because of this the string in padding can be truncated if the amount of"
+      "characters that need to be added can't be evenly divided through the length of padding."
+      ""
+      "This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation."
+      ""
+      "text: The input string"
+      "pad-length: The minimum length of the result"
+      "padding: A string that will be used to pad text, defaults to a single space"
+      ""
+      "Returns the padded string"
+      :cat :string
+      :related pad-middle
+      :related pad-start
+      [deftest "123   " [pad-end "123" 6]]
+      [deftest "123000" [pad-end 123 6 "0"]]
+      [deftest "123.-." [pad-end '123 6 ".-"]]
+
+
       [when-not char [set! char " "]]
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
                 [throw [list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
-      [while [< [buffer/length text] goal-length]
+      [while [< [buffer/length text] pad-length]
              [set! text [cat text char]]]
-      [if [> [buffer/length text] goal-length]
-          [string/cut text 0 goal-length]
+      [if [> [buffer/length text] pad-length]
+          [string/cut text 0 pad-length]
           text]]
 
-[defn string/pad-middle [text goal-length char]
-      "Pad out TEXT with CHAR at the end until it is GOAL-LENGTH chars long, may also truncate the string"
+[defn pad-middle [text pad-length char]
+      "Pad a string to a certain length by surrounding it with another string."
+      ""
+      "This function will, if necessary, append and prepend padding to the"
+      "beginning and end of text repeatedly until the desired pad-length is reached."
+      ""
+      "Because of this the string in padding can be truncated if the amount of"
+      "characters that need to be added can't be evenly divided through the length of padding."
+      ""
+      "This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation."
+      ""
+      "text: The input string"
+      "pad-length: The minimum length of the result"
+      "padding: A string that will be used to pad text, defaults to a single space"
+      ""
+      "Returns the padded string"
+      :cat :string
+      :related pad-start
+      :related pad-end
+      [deftest " 123  " [pad-middle "123" 6]]
+      [deftest "012300" [pad-middle 123 6 "0"]]
+      [deftest "-123.-" [pad-middle '123 6 ".-"]]
+
       [when-not char [set! char " "]]
       [when-not [string? text] [set! text [string text]]]
       [when-not [string? char]
                 [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
-      [while [< [buffer/length text] goal-length]
+      [while [< [buffer/length text] pad-length]
              [set! text [cat char text char]]]
-      [if [> [buffer/length text] goal-length]
-          [let [[end-overflow [div/int [- [buffer/length text] goal-length] 2]]
-                [start-overflow [- [- [buffer/length text] goal-length] end-overflow]]]
-               [string/cut text start-overflow [+ start-overflow goal-length]]]
+      [if [> [buffer/length text] pad-length]
+          [let [[end-overflow [div/int [- [buffer/length text] pad-length] 2]]
+                [start-overflow [- [- [buffer/length text] pad-length] end-overflow]]]
+               [string/cut text start-overflow [+ start-overflow pad-length]]]
           text]]
 
 [defn string/round [text decimal-digits]

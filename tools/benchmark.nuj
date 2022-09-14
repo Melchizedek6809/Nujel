@@ -108,13 +108,13 @@
       [when-not [runtime/available? runtime]
                 [when [zero? i]
                       [pfmt "{} {} Runtime not found"
-                            [ansi-blue [string/pad-end language 14]]
-                            [ansi-yellow [string/pad-end runtime 20]]]]
+                            [ansi-blue [pad-end language 14]]
+                            [ansi-yellow [pad-end runtime 20]]]]
                 [return #nil]]
       [when [zero? i]
             [pfmt "{} {} "
-                  [ansi-blue [string/pad-end language 14]]
-                  [ansi-green [string/pad-end runtime 20]]]]
+                  [ansi-blue [pad-end language 14]]
+                  [ansi-green [pad-end runtime 20]]]]
       [when [>= i 0] [pfmt "{i} "]]
       [when-not [file/file? filename]
                 [exception :io-error "Can't open the following file to benchmark it:" filename]]

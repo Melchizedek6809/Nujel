@@ -85,8 +85,8 @@
                          opts
                          [tree/set! opts :argument [list [case [tree/ref opts :align]
                                                                [:right   pad-start]
-                                                               [:center string/pad-middle]
-                                                               [:left  string/pad-end]]
+                                                               [:center pad-middle]
+                                                               [:left  pad-end]]
                                                          [tree/ref opts :argument]
                                                          [if [and [tree/ref opts :debug] [tree/ref opts :base]]
                                                              [- [tree/ref opts :width] 2]
