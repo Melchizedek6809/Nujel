@@ -34,6 +34,8 @@
 
                      [defn constant-fold [expr]
                            "Will try and evaluate as many constant as possible to make the expression simpler."
+                           :cat :compiler
+                           :internal
                            [when-not [pair? expr] [return expr]]
                            [def folded-fun  [car expr]]
                            [when [= 'quote folded-fun] [return expr]]

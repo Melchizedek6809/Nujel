@@ -4,8 +4,13 @@
 ;;; Contains an abstraction that allows for multiple backends, right now we only
 ;;; support :bytecode and :none (:none is lowered Nujel, with most of the sugar removed).
 
-[defn compile/backend/none [expr] expr]
+[defn compile/backend/none [expr]
+      :cat :compiler
+      :internal
+      expr]
 [defn compile/backend/bytecode [expr]
+      :cat :compiler
+      :internal
       [-> [bytecompile expr]
           assemble*]]
 
@@ -14,6 +19,8 @@
                      :none compile/backend/none]]
 
 [defn backend [expr]
+      :cat :compiler
+      :internal
       [[tree/ref backend/tree *active-backend*] expr]]
 
 [defn compile/for [backend expr environment]

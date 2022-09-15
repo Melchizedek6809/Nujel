@@ -182,7 +182,7 @@
       [def ret [buffer/allocate [buffer/length text]]]
       [def caps? #t]
       [dotimes [i [buffer/length text] [buffer->string ret]]
-        [buffer/set! ret i [[if caps? upper-case-char lower-case-char] [buffer/ref text i]]]
+         [buffer/set! ret i [[if caps? upper-case-char lower-case-char] [buffer/ref text i]]]
         [set! caps? [if [whitespace? [buffer/ref text i]] #t #f]]]]
 
 [defn string/round [text decimal-digits]

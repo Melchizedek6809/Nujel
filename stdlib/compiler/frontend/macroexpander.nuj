@@ -51,6 +51,8 @@
 
                     [defn macroexpand* [source env]
                           "Expand all macros within source"
+                          :cat :compiler
+                          :internal
                           [def op [if [resolves? [car source] env]
                                       [resolve   [car source] env]
                                       [car source]]]
