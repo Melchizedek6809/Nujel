@@ -1,0 +1,36 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Some convenience functions for dealing with characters
+
+[defn lower-case-char [c]
+      [if [< c 65]
+          c
+          [if [> c 90]
+              c
+              [+ c 32]]]]
+
+[defn upper-case-char [c]
+      [if [< c 97]
+          c
+          [if [> c 122]
+              c
+              [+ c -32]]]]
+
+[defn whitespace? [c]
+      "Return #t if C is a whitespace char"
+      [or [== c #x20] ; Space
+          [== c #x09] ; Tabl
+          [and [>= c #x0a]
+               [<= c #x0d]]]]
+
+[defn from-char-code l
+      "Turn the provided char codes into a string and return it"
+      [def buf [buffer/allocate [list/length l]]]
+      [dotimes [i [buffer/length buf] [buffer->string buf]]
+               [when [or [not [int? [car l]]]
+                         [> [car l] 255]
+                         [< [car l] 0]]
+                     [exception :type-error "[from-char-code] expects :int arguments from 0 to 255, not: " [car l]]]
+               [buffer/set! buf i [car l]]
+               [cdr! l]]]

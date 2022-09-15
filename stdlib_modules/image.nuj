@@ -16,20 +16,20 @@
 
 [defn add-encoder! [ext enc]
       :export
-      [def ext [string->keyword [lowercase ext]]]
+      [def ext [string->keyword [lower-case ext]]]
       [tree/set! image/encoders ext enc]]
 
 [defn add-decoder! [ext dec]
       :export
-      [def ext [string->keyword [lowercase ext]]]
+      [def ext [string->keyword [lower-case ext]]]
       [tree/set! image/decoders ext dec]]
 
 [defn get-encoder [path]
-      [def ext [string->keyword [lowercase [path/extension path]]]]
+      [def ext [string->keyword [lower-case [path/extension path]]]]
       [tree/ref image/encoders ext]]
 
 [defn get-decoder [path]
-      [def ext [string->keyword [lowercase [path/extension path]]]]
+      [def ext [string->keyword [lower-case [path/extension path]]]]
       [tree/ref image/decoders ext]]
 
 

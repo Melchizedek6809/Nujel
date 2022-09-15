@@ -19,7 +19,7 @@
 [def hostname [popen/trim "uname -n"]]
 
 [defn bench/get-language [filename]
-      [case [lowercase [path/extension filename]]
+      [case [lower-case [path/extension filename]]
             ["lisp" :common-lisp]
             ["newlisp" :newlisp]
             ["el" :emacs-lisp]

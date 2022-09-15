@@ -3,20 +3,6 @@
 ;;;
 ;;; Various functions dealing with strings of all sorts
 
-[defn println [str]
-      "Print STR on a single line"
-      [print [cat str "\r\n"]]]
-
-[defn errorln [str]
-      "Print to stderr STR on a single line"
-      [error [cat str "\r\n"]]]
-
-[defn br [num]
-      "Return NUM=1 linebreaks"
-      [if [or [nil? num] [<= [int num] 1]]
-          "\n"
-          [cat "\n" [br [+ -1 num]]]]]
-
 [defn pad-start [text pad-length padding]
       "Pad a string to a certain length by prepending another string."
       ""
@@ -36,6 +22,7 @@
       :cat :string
       :related pad-middle
       :related pad-end
+      :related trim
       [deftest "   123" [pad-start "123" 6]]
       [deftest "000123" [pad-start 123 6 "0"]]
       [deftest "-.-123" [pad-start '123 6 ".-"]]
@@ -51,7 +38,7 @@
           [string/cut text [- [buffer/length text] pad-length] [buffer/length text]]
           text]]
 
-[defn pad-end [text pad-length char]
+[defn pad-end [text pad-length padding]
       "Pad a string to a certain length by appending another string."
       ""
       "This function will, if necessary, append padding on to the end of"
@@ -70,22 +57,23 @@
       :cat :string
       :related pad-middle
       :related pad-start
+      :related trim
       [deftest "123   " [pad-end "123" 6]]
       [deftest "123000" [pad-end 123 6 "0"]]
       [deftest "123.-." [pad-end '123 6 ".-"]]
 
 
-      [when-not char [set! char " "]]
+      [when-not padding [set! padding " "]]
       [when-not [string? text] [set! text [string text]]]
-      [when-not [string? char]
-                [throw [list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
+      [when-not [string? padding]
+                [throw [list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" padding [current-lambda]]]]
       [while [< [buffer/length text] pad-length]
-             [set! text [cat text char]]]
+             [set! text [cat text padding]]]
       [if [> [buffer/length text] pad-length]
           [string/cut text 0 pad-length]
           text]]
 
-[defn pad-middle [text pad-length char]
+[defn pad-middle [text pad-length padding]
       "Pad a string to a certain length by surrounding it with another string."
       ""
       "This function will, if necessary, append and prepend padding to the"
@@ -104,21 +92,98 @@
       :cat :string
       :related pad-start
       :related pad-end
+      :related trim
       [deftest " 123  " [pad-middle "123" 6]]
       [deftest "012300" [pad-middle 123 6 "0"]]
       [deftest "-123.-" [pad-middle '123 6 ".-"]]
 
-      [when-not char [set! char " "]]
+      [when-not padding [set! padding " "]]
       [when-not [string? text] [set! text [string text]]]
-      [when-not [string? char]
-                [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" char [current-lambda]]]]
+      [when-not [string? padding]
+                [throw [list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" padding [current-lambda]]]]
       [while [< [buffer/length text] pad-length]
-             [set! text [cat char text char]]]
+             [set! text [cat padding text padding]]]
       [if [> [buffer/length text] pad-length]
           [let [[end-overflow [div/int [- [buffer/length text] pad-length] 2]]
                 [start-overflow [- [- [buffer/length text] pad-length] end-overflow]]]
                [string/cut text start-overflow [+ start-overflow pad-length]]]
           text]]
+
+[defn trim [text]
+      "Remove all whitespace from the start and end of text"
+      ""
+      "Whitespace is determined by the whitespace? predicate."
+      ""
+      "text: The input string"
+      ""
+      "Returns a trimmed version of text"
+      :cat :string
+      :related pad-start
+      :related pad-middle
+      :related pad-end
+      :related trim
+      [deftest "Test" [trim " Test"]]
+      [deftest "Test" [trim "Test "]]
+      [deftest "Test" [trim "Test"]]
+      [deftest "" [trim ""]]
+      [deftest "Test" [trim "   Test\t\n"]]
+      [deftest "Trim Test" [trim "   Trim Test    \n"]]
+
+      [def start 0]
+      [def end [buffer/length text]]
+      [while [and [< start end] [whitespace? [buffer/ref text start]]] [set! start [+ start 1]]]
+      [while [and [> end 0] [whitespace? [buffer/ref text [- end 1]]]] [set! end [- end 1]]]
+      [string/cut text start end]]
+
+[defn upper-case [text]
+      "Convert text into a version using only capitals or uppercase letters."
+      ""
+      "text: The input string"
+      ""
+      "Returns the resulting upper-case version"
+      :cat :string
+      :related lower-case
+      :related capitalize
+      [deftest "TESTING THE CAPITALIZATION!" [upper-case "Testing THE Capitalization!"]]
+
+      [def ret [buffer/allocate [buffer/length text]]]
+      [dotimes [i [buffer/length text] [buffer->string ret]]
+        [buffer/set! ret i [upper-case-char [buffer/ref text i]]]]]
+
+[defn lower-case [text]
+      "Convert text into a version using only lowercase letters."
+      ""
+      "text: The input string"
+      ""
+      "Returns the resulting lower-case version"
+      :cat :string
+      :related upper-case
+      :related capitalize
+      [deftest "testing the capitalization!" [lower-case "Testing THE Capitalization!"]]
+
+      [def ret [buffer/allocate [buffer/length text]]]
+      [dotimes [i [buffer/length text] [buffer->string ret]]
+        [buffer/set! ret i [lower-case-char [buffer/ref text i]]]]]
+
+[defn capitalize [text]
+      "Convert text into a capitalized version."
+      ""
+      "This is simplified by having the first character be an upper-case version, as well"
+      "as any character following a whitespace character, and all other characters be in lower-case."
+      ""
+      "text: The input string"
+      ""
+      "Returns the capitalized version"
+      :cat :string
+      :related upper-case
+      :related lower-case
+      [deftest "Testing The Capitalization!" [capitalize "Testing THE Capitalization!"]]
+
+      [def ret [buffer/allocate [buffer/length text]]]
+      [def caps? #t]
+      [dotimes [i [buffer/length text] [buffer->string ret]]
+        [buffer/set! ret i [[if caps? upper-case-char lower-case-char] [buffer/ref text i]]]
+        [set! caps? [if [whitespace? [buffer/ref text i]] #t #f]]]]
 
 [defn string/round [text decimal-digits]
       "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period"
@@ -167,63 +232,10 @@
       "Reads the first float from TEXT"
       [float [read/single text]]]
 
-[defn buffer/length?! [chars]
-      [fn [a] [= chars [buffer/length a]]]]
+[defn println [str]
+      "Print STR on a single line"
+      [print [cat str "\r\n"]]]
 
-[defn from-char-code l
-      "Turn the provided char codes into a string and return it"
-      [def buf [buffer/allocate [list/length l]]]
-      [dotimes [i [buffer/length buf] [buffer->string buf]]
-               [when [or [not [int? [car l]]]
-                         [> [car l] 255]
-                         [< [car l] 0]]
-                     [exception :type-error "[from-char-code] expects :int arguments from 0 to 255, not: " [car l]]]
-               [buffer/set! buf i [car l]]
-               [cdr! l]]]
-
-[defn char/whitespace? [c]
-      "Return #t if C is a whitespace char"
-      :inline
-      [<= c 33]]
-
-[defn trim [s]
-      "Trim all whitespace off the beginning and end of S"
-      [def start 0]
-      [def end [buffer/length s]]
-      [while [and [< start end] [char/whitespace? [buffer/ref s start]]] [set! start [+ start 1]]]
-      [while [and [> end 0] [char/whitespace? [buffer/ref s [- end 1]]]] [set! end [- end 1]]]
-      [string/cut s start end]]
-
-[defn lowercase/char [c]
-      [if [< c 65]
-          c
-          [if [> c 90]
-              c
-              [+ c 32]]]]
-
-[defn uppercase/char [c]
-      [if [< c 97]
-          c
-          [if [> c 122]
-              c
-              [+ c -32]]]]
-
-[defn uppercase [s]
-      "Uppercase a string S"
-      [def ret [buffer/allocate [buffer/length s]]]
-      [dotimes [i [buffer/length s] [buffer->string ret]]
-        [buffer/set! ret i [uppercase/char [buffer/ref s i]]]]]
-
-[defn lowercase [s]
-      "Lowercase a string S"
-      [def ret [buffer/allocate [buffer/length s]]]
-      [dotimes [i [buffer/length s] [buffer->string ret]]
-        [buffer/set! ret i [lowercase/char [buffer/ref s i]]]]]
-
-[defn capitalize [s]
-      "Capitalize a string S"
-      [def ret [buffer/allocate [buffer/length s]]]
-      [def caps? #t]
-      [dotimes [i [buffer/length s] [buffer->string ret]]
-        [buffer/set! ret i [[if caps? uppercase/char lowercase/char] [buffer/ref s i]]]
-        [set! caps? [if [char/whitespace? [buffer/ref s i]] #t #f]]]]
+[defn errorln [str]
+      "Print to stderr STR on a single line"
+      [error [cat str "\r\n"]]]

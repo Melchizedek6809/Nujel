@@ -7,9 +7,9 @@
       "Return a predicate that checks if a path ends on EXT"
       [case [type-of ext]
             [:string [fn [path]
-                         [= ext [lowercase [path/extension path]]]]]
+                         [= ext [lower-case [path/extension path]]]]]
             [:pair [fn [path]
-                       [def cext [lowercase [path/extension path]]]
+                       [def cext [lower-case [path/extension path]]]
                      [reduce ext [fn [α β] [or α [= β cext]]]]]]
             [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
 

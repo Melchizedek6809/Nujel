@@ -38,7 +38,7 @@
 
 [defn int->string/hex [α]
       "Turn α into a its **hexadecimal** string representation"
-      [lowercase [int->string/HEX α]]]
+      [lower-case [int->string/HEX α]]]
 
 [defn int->string/decimal [α]
       "Turn α into a its **decimal** string representation"

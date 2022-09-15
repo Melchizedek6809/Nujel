@@ -3,13 +3,6 @@
 ;;;
 ;;; Mostly macros implementing different control flow constructs
 
-[defmacro if-let [binding then else]
-          `[let* [def ~[car binding] ~[cadr binding]]
-                 [if ~[car binding] ~then ~else]]]
-
-[defmacro when-let [binding . body]
-          `[if-let ~binding ~[cons 'do body] #nil]]
-
 [defmacro if-not [pred then else]
           `[if ~pred ~else ~then]]
 

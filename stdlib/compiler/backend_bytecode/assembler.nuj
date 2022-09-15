@@ -5,160 +5,198 @@
 ;;; and emits. Additionally it calculates branch offsets using the labels provided.
 
 [defn $nop []
-      "[] -> []"
-      "Do nothing"
+      "[] -> [] --- Do Nothing"
+      :cat :bytecode
+      :internal
       :inline
       '[#$00]]
 
 [defn $ret []
-      "[a] -> []"
-      "Return top of value stack"
+      "[a] -> [] --- Return top of value stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$01]]
 
 [defn $add/int []
-      "[a b] -> [result]"
-      "Adds the two topmost values and pushes the result"
+      "[a b] -> [result] --- Adds the two topmost values and pushes the result"
+      :cat :bytecode
+      :internal
       :inline
       '[#$03]]
 
 [defn $dup []
-      "[a] -> [a a]"
-      "Duplicates the value that is on the top of the stack"
+      "[a] -> [a a] --- Duplicates the value that is on the top of the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$0C]]
 
 [defn $drop []
-      "[a] -> []"
-      "Drop whatever is on top of the stack"
+      "[a] -> [] --- Drop whatever is on top of the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$0D]]
 
 [defn $closure/push []
-      "[] -> [closure]"
-      "Push the current closure as a λ on the stack"
+      "[] -> [closure] --- Push the current closure as a λ on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$13]]
 
 [defn $let []
-      "[] -> []"
-      "Create a new let closure and switch to it"
+      "[] -> [] --- Create a new let closure and switch to it"
+      :cat :bytecode
+      :internal
       :inline
       '[#$15]]
 
 [defn $closure/pop []
-      "[] -> []"
-      "Leave the current closure and return to the parent one"
+      "[] -> [] --- Leave the current closure and return to the parent one"
+      :cat :bytecode
+      :internal
       :inline
       '[#$16]]
 
 [defn $< []
-      "[a b] -> [bool]"
-      "Compare A and B and push the result on the stack"
+      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$1E]]
 
 [defn $<= []
-      "[a b] -> [bool]"
-      "Compare A and B and push the result on the stack"
+      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$1F]]
 
 [defn $= []
-      "[a b] -> [bool]"
-      "Compare A and B and push the result on the stack"
+      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$20]]
 
 [defn $>= []
-      "[a b] -> [bool]"
-      "Compare A and B and push the result on the stack"
+      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$21]]
 
 [defn $> []
-      "[a b] -> [bool]"
-      "Compare A and B and push the result on the stack"
+      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$22]]
 
 [defn $push/nil []
-      "[] -> [nil]"
-      "Push a #nil on the stack"
+      "[] -> [nil] --- Push a #nil on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$24]]
 
 [defn $car []
-      "[l] -> [car]"
-      "Replace L with its car"
+      "[l] -> [car] --- Replace L with its car"
+      :cat :bytecode
+      :internal
       :inline
       '[#$11]]
 
 [defn $cdr []
-      "[l] -> [cdr]"
-      "Replace L with its cdr"
+      "[l] -> [cdr] --- Replace L with its cdr"
+      :cat :bytecode
+      :internal
       :inline
       '[#$12]]
 
 [defn $cons []
-      "[car cdr] -> [pair]"
-      "Cons CAR and CDR together and put it on the stack"
+      "[car cdr] -> [pair] --- Cons CAR and CDR together and put it on the stack"
+      :cat :bytecode
+      :internal
       :inline
       '[#$14]]
 
 [defn $fn/dynamic []
-      "[name args docs body] -> [λ]"
-      "Create a new λ"
+      "[name args docs body] -> [λ] --- Create a new λ"
+      :cat :bytecode
+      :internal
       :inline
       '[#$17]]
 
 [defn $macro/dynamic []
-      "[name args docs body] -> [μ]"
-      "Create a new μ"
+      "[name args docs body] -> [μ] --- Create a new μ"
+      :cat :bytecode
+      :internal
       :inline
       '[#$18]]
 
 [defn $add []
       "[a b] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$25]]
 
 [defn $sub []
       "[a b] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$26]]
 
 [defn $mul []
       "[a b] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$27]]
 
 [defn $div []
       "[a b] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$28]]
 
 [defn $rem []
       "[a b] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$29]]
 
 [defn $push/true []
       "[] -> [#t]"
+      :cat :bytecode
+      :internal
+      :inline
       '[#$1B]]
 
 [defn $push/false []
       "[] -> [#f]"
+      :cat :bytecode
+      :internal
+      :inline
       '[#$1C]]
 
 [defn $zero? []
       "[a] -> [result]"
+      :cat :bytecode
+      :internal
       :inline
       '[#$2A]]
 
 [defn $inc/int []
-      "[a] -> [result]"
-      "Adds 1 to the topmost int"
+      "[a] -> [result] --- Adds 1 to the topmost int"
+      :cat :bytecode
+      :internal
       :inline
       '[#$23]]
 
@@ -166,27 +204,32 @@
       [and [<= a 127] [>= a -128]]]
 
 [defn $push/int [a]
-      "[] -> [a]"
-      "Push A on the stack as an :int"
+      "[] -> [a] --- Push A on the stack as an :int"
+      :cat :bytecode
+      :internal
       [if [int-fit-in-byte? a]
           [$push/int/byte a]
           [$push/val a]]]
 
 [defn $push/int/byte [a]
-      "[] -> [a]"
-      "Push A on the stack as an :int that fits within a byte"
+      "[] -> [a] --- Push A on the stack as an :int that fits within a byte"
+      :cat :bytecode
+      :internal
       [when-not [int-fit-in-byte? a]
                 [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
       [list #$2 [int->bytecode-op a]]]
 
 [defn $apply/optimize? [fun arg-count]
+      :cat :bytecode
+      :internal
       [case fun
             [[+ - * / rem] [= arg-count 2]]
             [[zero? car cdr add/int inc/int cons < <= = >= >] #t]]]
 
 [defn $apply/optimized [arg-count fun]
-      "arguments -> [result]"
-      "Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+      "arguments -> [result] --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+      :cat :bytecode
+      :internal
       [case arg-count
             [1 [case fun
                      [car [$car]]
@@ -211,25 +254,32 @@
             [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 
 [defn $apply [arg-count fun]
+      "arguments -> [result] --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+      :cat :bytecode
+      :internal
       [when [> arg-count 255]
         [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
       [list #$4
             [int->bytecode-op arg-count]]]
 
 [defn $try [target]
-      "[] -> []"
-      "Try something, jumping to target if an exception occurs"
+      "[] -> [] --- Try something, jumping to target if an exception occurs"
+      :cat :bytecode
+      :internal
       [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]]
             [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jmp [target]
+      :cat :bytecode
+      :internal
       [list #$9
             [list :relocate target 8 0 [int->bytecode-op 0]]
             [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $push/val [v]
-      "[] -> [v]"
-      "Pushes v onto the stack"
+      "[] -> [v] --- Pushes v onto the stack"
+      :cat :bytecode
+      :internal
       [when [nil? v]
             [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
       [list #$1A
@@ -237,40 +287,49 @@
 [def $push/val/ext $push/val]
 
 [defn $get/val [v]
-      "[] -> [v]"
-      "Resolve V and get the associated value on the stack"
+      "[] -> [v] --- Resolve V and get the associated value on the stack"
+      :cat :bytecode
+      :internal
       [when-not [symbol? v]
             [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
       [list #$E
             [list :literal v]]]
 
 [defn $set/val [v]
-      "[v] -> [v]"
-      "Resolve V and get the associated value on the stack"
+      "[v] -> [v] --- Resolve V and get the associated value on the stack"
+      :cat :bytecode
+      :internal
       [when-not [symbol? v]
             [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
       [list #$5
             [list :literal v]]]
 
 [defn $def/val [v]
-      "[v] -> [v]"
-      "Resolve V and get the associated value on the stack"
+      "[v] -> [v] --- Resolve V and get the associated value on the stack"
+      :cat :bytecode
+      :internal
       [when-not [symbol? v]
             [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
       [list #$7
             [list :literal v]]]
 
 [defn $jt [target]
+      :cat :bytecode
+      :internal
       [list #$A
             [list :relocate target 8 0 [int->bytecode-op 0]]
             [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $jf [target]
+      :cat :bytecode
+      :internal
       [list #$B
             [list :relocate target 8 0 [int->bytecode-op 0]]
             [list :relocate target 0 1 [int->bytecode-op 0]]]]
 
 [defn $fn [name args docs body]
+      :cat :bytecode
+      :internal
       [list #$25
             [val->bytecode-op name]
             [val->bytecode-op args]
@@ -278,6 +337,8 @@
             [val->bytecode-op body]]]
 
 [defn $macro* [name args docs body]
+      :cat :bytecode
+      :internal
       [list #$26
             [val->bytecode-op name]
             [val->bytecode-op args]
@@ -391,6 +452,8 @@
 
                  [defn assemble* [code]
                        "Assemble all arguments into a single :bytecode-array"
+                       :cat :bytecode
+                       :internal
                        [def sym-map @[]]
                        [def lit-arr #[]]
                        [def tmp [-> [assemble/flatten code]
@@ -402,8 +465,12 @@
 
 [defn assemble l
       "Assemble all arguments into a single :bytecode-array"
+      :cat :bytecode
+      :internal
       [assemble* l]]
 
 [defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
+          :cat :bytecode
+          :internal
           `[bytecode-eval* [assemble ~@ops] [current-closure]]]
