@@ -24,7 +24,7 @@
        "Evaluate a Nujel source file in the current context"
        [def mod-name [module/resolve-string [cat [path/without-extension path]] [path/working-directory]]]
        [def mod [module/load mod-name]]
-       [when-not [= :object [type-of mod]]
+       [when-not [= :environment [type-of mod]]
                  [return mod]]
        [def exports [resolve 'exports mod]]
        [when-not exports [exception [fmt "Couldn't load {path} as a module since it has no exports"]]]

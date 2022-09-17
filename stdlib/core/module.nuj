@@ -95,7 +95,7 @@
       :cat :modules
       :internal
       [case [type-of name]
-            [:object name]
+            [:environment name]
             [:string [module/load [module/resolve-string name [resolve '*module-path* env]] env]]
             [:keyword [or [module/load/cache name]
                           [module/load/store name]

@@ -155,7 +155,7 @@ const lSymbol *optionalSymbolic(lClosure *c, lVal *v, const lSymbol *fallback){
 lClosure *requireClosure(lClosure *c, lVal *v){
 	if((v == NULL)
 		|| !((v->type == ltLambda)
-		||   (v->type == ltObject)
+		||   (v->type == ltEnvironment)
 		||   (v->type == ltMacro))){
 			lExceptionThrowValClo("type-error", "Need a closure, not: ", v, c);
 			return NULL;
@@ -174,7 +174,7 @@ lVal *requireCallable(lClosure *c, lVal *v){
 }
 
 lVal *requireEnvironment(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltObject);
+	return requireCertainType(c, v, ltEnvironment);
 }
 
 FILE *requireFileHandle(lClosure *c, lVal *v){

@@ -54,7 +54,7 @@ lSymbol *lSymLTString;
 lSymbol *lSymLTSymbol;
 lSymbol *lSymLTKeyword;
 lSymbol *lSymLTNativeFunction;
-lSymbol *lSymLTObject;
+lSymbol *lSymLTEnvironment;
 lSymbol *lSymLTMacro;
 lSymbol *lSymLTArray;
 lSymbol *lSymLTTree;
@@ -99,7 +99,7 @@ void lSymbolInit(){
 	lSymLTNoAlloc        = lSymSM("no-alloc");
 	lSymLTBool           = lSymSM("bool");
 	lSymLTPair           = lSymSM("pair");
-	lSymLTObject         = lSymSM("object");
+	lSymLTEnvironment    = lSymSM("environment");
 	lSymLTLambda         = lSymSM("lambda");
 	lSymLTInt            = lSymSM("int");
 	lSymLTFloat          = lSymSM("float");
@@ -231,7 +231,7 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltNoAlloc:     return lSymLTNoAlloc;
 		case ltBool:        return lSymLTBool;
 		case ltPair:        return lSymLTPair;
-		case ltObject:      return lSymLTObject;
+		case ltEnvironment: return lSymLTEnvironment;
 		case ltLambda:      return lSymLTLambda;
 		case ltInt:         return lSymLTInt;
 		case ltFloat:       return lSymLTFloat;

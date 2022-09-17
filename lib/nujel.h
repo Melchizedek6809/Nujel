@@ -67,7 +67,7 @@ typedef enum {
 
 	ltLambda,
 	ltMacro,
-	ltObject,
+	ltEnvironment,
 	ltNativeFunc,
 	ltBytecodeOp,
 
@@ -234,7 +234,7 @@ lVal     *lValBool         (bool v);
 lVal     *lValInt          (i64 v);
 lVal     *lValFloat        (lClosure *c, double v);
 lVal     *lValTree         (lTree *v);
-lVal     *lValObject       (lClosure *v);
+lVal     *lValEnvironment  (lClosure *v);
 lVal     *lValLambda       (lClosure *v);
 lVal     *lValString       (const char *s);
 lVal     *lValStringLen    (const char *s, int len);

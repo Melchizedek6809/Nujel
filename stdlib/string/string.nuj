@@ -19,7 +19,7 @@
       "padding: A string that will be used to pad text, defaults to a single space"
       ""
       "Returns the padded string"
-      :cat :string
+      :cat :string-manipulation
       :related pad-middle
       :related pad-end
       :related trim
@@ -54,7 +54,7 @@
       "padding: A string that will be used to pad text, defaults to a single space"
       ""
       "Returns the padded string"
-      :cat :string
+      :cat :string-manipulation
       :related pad-middle
       :related pad-start
       :related trim
@@ -89,7 +89,7 @@
       "padding: A string that will be used to pad text, defaults to a single space"
       ""
       "Returns the padded string"
-      :cat :string
+      :cat :string-manipulation
       :related pad-start
       :related pad-end
       :related trim
@@ -117,7 +117,7 @@
       "text: The input string"
       ""
       "Returns a trimmed version of text"
-      :cat :string
+      :cat :string-manipulation
       :related pad-start
       :related pad-middle
       :related pad-end
@@ -141,7 +141,7 @@
       "text: The input string"
       ""
       "Returns the resulting upper-case version"
-      :cat :string
+      :cat :string-manipulation
       :related lower-case
       :related capitalize
       [deftest "TESTING THE CAPITALIZATION!" [upper-case "Testing THE Capitalization!"]]
@@ -156,7 +156,7 @@
       "text: The input string"
       ""
       "Returns the resulting lower-case version"
-      :cat :string
+      :cat :string-manipulation
       :related upper-case
       :related capitalize
       [deftest "testing the capitalization!" [lower-case "Testing THE Capitalization!"]]
@@ -174,7 +174,7 @@
       "text: The input string"
       ""
       "Returns the capitalized version"
-      :cat :string
+      :cat :string-manipulation
       :related upper-case
       :related lower-case
       [deftest "Testing The Capitalization!" [capitalize "Testing THE Capitalization!"]]

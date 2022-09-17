@@ -87,7 +87,7 @@ void lValGCMark(lVal *v){
 		lValGCMark(v->vList.cdr);
 		break;
 	case ltMacro:
-	case ltObject:
+	case ltEnvironment:
 	case ltLambda:
 		lClosureGCMark(v->vClosure);
 		break;

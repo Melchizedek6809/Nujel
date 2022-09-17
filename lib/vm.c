@@ -339,7 +339,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
 		vmbreak;
 	vmcase(lopClosurePush)
-		ctx.valueStack[ctx.sp++] = lValObject(c);
+		ctx.valueStack[ctx.sp++] = lValEnvironment(c);
 		vmbreak;
 	vmcase(lopLet)
 		c = lClosureNew(c, closureLet);

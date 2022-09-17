@@ -37,8 +37,8 @@ lVal *lValTree(lTree *v){
 	return ret;
 }
 
-lVal *lValObject(lClosure *v){
-	lVal *ret = lValAlloc(ltObject);
+lVal *lValEnvironment(lClosure *v){
+	lVal *ret = lValAlloc(ltEnvironment);
 	ret->vClosure = v;
 	return ret;
 }
@@ -125,7 +125,7 @@ bool lValEqual(const lVal *a, const lVal *b){
 	case ltKeyword:
 	case ltSymbol:
 		return b->vSymbol == a->vSymbol;
-	case ltObject:
+	case ltEnvironment:
 	case ltMacro:
 	case ltLambda:
 		return b->vClosure == a->vClosure;

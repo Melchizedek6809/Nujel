@@ -100,7 +100,7 @@
       "kw: The input keyword"
       ""
       "Returns the string for kw"
-      :cat :converter
+      :cat :type-conversion
       :related string->keyword
       [deftest "asd" [keyword->string :asd]]
 
@@ -113,7 +113,7 @@
       "kw: The input string"
       ""
       "Returns the keyword for kw"
-      :cat :converter
+      :cat :type-conversion
       :related keyword->string
       [deftest :asd [string->keyword "asd"]]
 

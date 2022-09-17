@@ -50,62 +50,326 @@
       "High level inequality comparator"
       [not [equal? a b]]]
 
-[defn int? [val] :inline
+[defn int? [val]
+      "Test whether val is an integer"
+      ""
+      "Integer are sometimes called fixnum's as well"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is an integer"
+      :cat :type-predicate
+      [deftest #t [int? 123]]
+      [deftest #f [int? 123.123]]
+      [deftest #f [int? 'asd]]
+      :inline
+
       [= :int [type-of val]]]
 
-[defn float? [val] :inline
+[defn float? [val]
+      "Test whether val is a floating-point number"
+      ""
+      "Float's are sometimes called flonum's as well"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a floating-point number"
+      :cat :type-predicate
+      [deftest #f [float? 123]]
+      [deftest #t [float? 123.123]]
+      [deftest #f [float? 'abc]]
+      :inline
+
       [= :float [type-of val]]]
 
-[defn boolean? [val] :inline
+[defn bool? [val]
+      "Test whether val is a boolean"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a boolean"
+      :cat :type-predicate
+      [deftest #t [bool? #t]]
+      [deftest #t [bool? #f]]
+      [deftest #f [bool? #nil]]
+      [deftest #f [bool? 123]]
+      [deftest #f [bool? 123.123]]
+      [deftest #f [bool? 'qwe]]
+      :inline
+
       [= :bool [type-of val]]]
 
-[defn pair? [val] :inline
+[defn pair? [val]
+      "Test whether val is a pair"
+      ""
+      "A pair is sometimes also called a cons cell, which can be used to build lists and much more."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a pair"
+      :cat :type-predicate
+      [deftest #t [pair? '[]]]
+      [deftest #t [pair? '[123]]]
+      [deftest #f [pair? 123]]
+      [deftest #f [pair? 123.123]]
+      [deftest #f [pair? 'qwe]]
+      :inline
+
       [= :pair [type-of val]]]
 
-[defn array? [val] :inline
+[defn array? [val]
+      "Test whether val is an array"
+      ""
+      "Sometimes also called a vector."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is an array"
+      :cat :type-predicate
+      [deftest #t [array? #[]]]
+      [deftest #f [array? '[123]]]
+      [deftest #f [array? 123]]
+      [deftest #f [array? 123.123]]
+      [deftest #f [array? 'abc]]
+      :inline
+
       [= :array [type-of val]]]
 
-[defn string? [val] :inline
+[defn string? [val]
+      "Test whether val is a string"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a string"
+      :cat :type-predicate
+      [deftest #t [string? "asd"]]
+      [deftest #f [string? #[]]]
+      [deftest #f [string? '[123]]]
+      [deftest #f [string? 123]]
+      [deftest #f [string? 123.123]]
+      [deftest #f [string? 'abc]]
+      :inline
+
       [= :string [type-of val]]]
 
-[defn symbol? [val] :inline
+[defn symbol? [val]
+      "Test whether val is a symbol"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a symbol"
+      :cat :type-predicate
+      [deftest #t [symbol? 'abc]]
+      [deftest #f [symbol? "asd"]]
+      [deftest #f [symbol? '[123]]]
+      [deftest #f [symbol? 123]]
+      [deftest #f [symbol? 123.123]]
+      :inline
+
       [= :symbol [type-of val]]]
 
-[defn object? [val] :inline
-      [= :object [type-of val]]]
+[defn environment? [val]
+      "Test whether val is an environment"
+      ""
+      "Sometimes also called a closure"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is an environment"
+      :cat :type-predicate
+      [deftest #t [environment? [current-closure]]]
+      [deftest #f [environment? #[]]]
+      [deftest #f [environment? '[123]]]
+      :inline
 
-[defn tree? [val] :inline
+      [= :environment [type-of val]]]
+
+[defn tree? [val]
+      "Test whether val is a binary tree"
+      ""
+      "Trees can also be used as maps, tuples or 'objects'."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a tree"
+      :cat :type-predicate
+      [deftest #t [tree? @[]]]
+      [deftest #f [tree? [current-closure]]]
+      [deftest #f [tree? #[]]]
+      [deftest #f [tree? '[123]]]
+      [deftest #f [tree? 123]]
+      [deftest #f [tree? 123.123]]
+      [deftest #f [tree? 'abc]]
+      :inline
+
       [= :tree [type-of val]]]
 
-[defn keyword? [v] :inline
+[defn keyword? [v]
+      "Test whether val is a keyword"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a keyword"
+      :cat :type-predicate
+      [deftest #t [keyword? :abc]]
+      [deftest #f [keyword? 'abc]]
+      [deftest #f [keyword? "asd"]]
+      [deftest #f [keyword? #[]]]
+      [deftest #f [keyword? '[123]]]
+      [deftest #f [keyword? 123]]
+      [deftest #f [keyword? 123.123]]
+      :inline
+
       [= :keyword [type-of v]]]
 
-[defn macro? [val] :inline
+[defn macro? [val]
+      "Test whether val is a macro"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a macro"
+      :cat :type-predicate
+      [deftest #t [macro? case]]
+      [deftest #f [macro? :abc]]
+      :inline
+
       [= :macro [type-of val]]]
 
-[defn lambda? [val] :inline
+[defn lambda? [val]
+      "Test whether val is a function"
+      ""
+      "Sometimes also called lambda or subroutine"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a function"
+      :cat :type-predicate
+      [deftest #t [lambda? min]]
+      [deftest #f [lambda? case]]
+      [deftest #f [lambda? [current-closure]]]
+      [deftest #f [lambda? 'abc]]
+      :inline
+
       [or [= :lambda [type-of val]]]]
 
-[defn native? [val] :inline
+[defn native? [val]
+      "Test whether val is a native function"
+      ""
+      "Sometimes also called lambda or subroutine"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a native function"
+      :cat :type-predicate
+      [deftest #t [native? sin]]
+      [deftest #f [native? [defn +123 [a] [+ a 123]]]]
+      [deftest #f [native? [defmacro +123 [a] [+ a 123]]]]
+      :inline
+
       [= :native-function [type-of val]]]
 
-[defn buffer? [v] :inline
+[defn buffer? [v]
+      "Test whether val is a buffer"
+      ""
+      "Buffers are just modifiable chunks of memory"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a buffer"
+      :cat :type-predicate
+      [deftest #t [buffer? #m00]]
+      [deftest #f [buffer? "asd"]]
+      [deftest #f [buffer? #[]]]
+
+      :inline
+
       [= :buffer [type-of v]]]
 
-[defn buffer-view? [v] :inline
+[defn buffer-view? [v]
+      "Test whether val is a buffer view"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a buffer view"
+      :cat :type-predicate
+      [deftest #t [buffer-view? [buffer/u8* #m00]]]
+      [deftest #f [buffer-view? #m00]]
+      [deftest #f [buffer-view? "asd"]]
+      [deftest #f [buffer-view? #[]]]
+      :inline
+
       [= :buffer-view [type-of v]]]
 
-[defn bytecode-array? [v] :inline
+[defn bytecode-array? [v]
+      "Test whether val is a bytecode-array"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a buffer view"
+      :cat :type-predicate
+      [deftest #t [bytecode-array? #{##[]01}]]
+      [deftest #f [bytecode-array? [buffer/u8* #m00]]]
+      [deftest #f [bytecode-array? #m00]]
+      [deftest #f [bytecode-array? "asd"]]
+      [deftest #f [bytecode-array? #[]]]
+      :inline
+
       [= :bytecode-array [type-of v]]]
 
-[defn bytecode-op? [v] :inline
+[defn bytecode-op? [v]
+      "Test whether val is a bytecode operation"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a bytecode op"
+      :cat :type-predicate
+      [deftest #t [bytecode-op? [int->bytecode-op 01]]]
+      [deftest #f [bytecode-op? 01]]
+      [deftest #f [bytecode-op? #{##[]01}]]
+      [deftest #f [bytecode-op? [buffer/u8* #m00]]]
+      [deftest #f [bytecode-op? #m00]]
+      [deftest #f [bytecode-op? #[]]]
+      :inline
+
       [= :bytecode-op [type-of v]]]
 
 [defn procedure? [val]
-      [or [lambda? val] [native? val]]]
+      "Test whether val is a procedure"
+      ""
+      "Procedures in this context mean something you can apply to or put at the beginning of an expression."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a procedure"
+      :cat :type-predicate
+      [deftest #t [and [native? sin] [procedure? sin]]]
+      [deftest #t [and [lambda? min] [procedure? min]]]
+      [deftest #t [procedure? min]]
+      [deftest #t [procedure? sin]]
+      [deftest #f [procedure? case]]
+      [deftest #f [procedure? [current-closure]]]
+
+      [or [lambda? val]
+          [native? val]]]
 
 [defn callable? [val]
-      [or [macro? val] [lambda? val] [native? val]]]
+      "Test whether val is callable"
+      ""
+      "This means basically anything where procedure? returns true, as well as macros, since they are"
+      "just standard procedures, but ones who run during compile time."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is callable"
+      :cat :type-predicate
+      [deftest #t [and [macro? case] [callable? case]]]
+      [deftest #t [callable? min]]
+      [deftest #t [callable? sin]]
+      [deftest #f [callable? [current-closure]]]
+
+      [or [macro? val]
+          [procedure? val]]]
 
 [defn in-range? [v min max]
-      [and [>= v min] [<= v max]]]
+      [and [>= v min]
+           [<= v max]]]

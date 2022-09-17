@@ -130,7 +130,7 @@
                        [case [type-of v]
                              [:nil             [when-not hr? [port 'block-write "#nil"]]]
                              [:bool            [port 'block-write [if v "#t" "#f"]]]
-                             [:object          [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
+                             [:environment     [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
                              [:file-handle     [port 'write "#<file-handle " [int->string/hex [val->id v]] ">"]]
                              [:buffer-view     [port 'write "#<buffer-view " [int->string/hex [val->id v]] ">"]]
                              [[:lambda :macro :native-function] [port 'block-write [string [or [closure/name v] 'anonymous]]]]

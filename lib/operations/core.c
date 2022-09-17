@@ -22,7 +22,7 @@ static lVal *lnfClosureParent(lClosure *c, lVal *v){
 	if(cc->parent == NULL){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc(cc->parent->type == closureObject ? ltObject : ltLambda);
+		lVal *ret = lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda);
 		ret->vClosure = cc->parent;
 		return ret;
 	}
@@ -33,7 +33,7 @@ static lVal *lnfClosureCaller(lClosure *c, lVal *v){
 	if((cc == NULL) || (cc->caller == NULL)){
 		return NULL;
 	}else{
-		lVal *ret = lValAlloc(cc->caller->type == closureObject ? ltObject : ltLambda);
+		lVal *ret = lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda);
 		ret->vClosure = cc->caller;
 		return ret;
 	}
@@ -68,7 +68,7 @@ static lVal *lnfClosureName(lClosure *c, lVal *v){
 static lVal *lnfDefIn(lClosure *c, lVal *v){
 	const lSymbol *sym = requireSymbol(c, lCadr(v));
 	lVal *env = lCar(v);
-	if(!env || ((env->type != ltLambda) && (env->type != ltObject))){
+	if(!env || ((env->type != ltLambda) && (env->type != ltEnvironment))){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	lDefineClosureSym(env->vClosure, sym, lCaddr(v));
@@ -78,7 +78,7 @@ static lVal *lnfDefIn(lClosure *c, lVal *v){
 static lVal *lnfResolve(lClosure *c, lVal *v){
 	const lSymbol *sym = requireSymbol(c, lCar(v));
 	lVal *env = lCadr(v);
-	if(env && (env->type != ltLambda) && (env->type != ltObject)){
+	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	return lGetClosureSym(env ? env->vClosure : c, sym);
@@ -89,7 +89,7 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	if(!car || (car->type != ltSymbol)){return lValBool(false);}
 	const lSymbol *sym = car->vSymbol;
 	lVal *env = lCadr(v);
-	if(env && (env->type != ltLambda) && (env->type != ltObject)){
+	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
 	return lValBool(lHasClosureSym(env ? env->vClosure : c, sym,NULL));
@@ -97,7 +97,7 @@ static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 
 static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
 	(void)v;
-	lVal *ret = lValAlloc(ltObject);
+	lVal *ret = lValAlloc(ltEnvironment);
 	ret->vClosure = c;
 	return ret;
 }
@@ -247,7 +247,7 @@ static lVal *lnfMetaGet(lClosure *c, lVal *v){
 	case ltNativeFunc:
 		return lTreeGet(l->vNFunc->meta, key, NULL);
 	case ltLambda:
-	case ltObject:
+	case ltEnvironment:
 		return lTreeGet(l->vClosure->meta, key, NULL);
 	default:
 		return NULL;
@@ -300,7 +300,7 @@ static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
 static i64 lValToId(lVal *v){
 	typeswitch(v){
 	default:      return 0;
-	case ltObject:
+	case ltEnvironment:
 	case ltMacro:
 	case ltLambda: return v->vClosure - lClosureList;
 	case ltBufferView: return v->vBufferView - lBufferViewList;
