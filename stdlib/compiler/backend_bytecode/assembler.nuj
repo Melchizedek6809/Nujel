@@ -216,7 +216,7 @@
       :cat :bytecode
       :internal
       [when-not [int-fit-in-byte? a]
-                [throw [list :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a [current-lambda]]]]
+                [exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ]]
       [list #$2 [int->bytecode-op a]]]
 
 [defn $apply/optimize? [fun arg-count]
@@ -281,7 +281,7 @@
       :cat :bytecode
       :internal
       [when [nil? v]
-            [throw [list :invalid-bc-op "Can't push #nil as a normal lVal" v [current-lambda]]]]
+            [exception :invalid-bc-op "Can't push #nil as a normal lVal" v ]]
       [list #$1A
             [list :literal v]]]
 [def $push/val/ext $push/val]
@@ -291,7 +291,7 @@
       :cat :bytecode
       :internal
       [when-not [symbol? v]
-            [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
+            [exception :invalid-bc-op "Can only get symbol" v ]]
       [list #$E
             [list :literal v]]]
 
@@ -300,7 +300,7 @@
       :cat :bytecode
       :internal
       [when-not [symbol? v]
-            [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
+            [exception :invalid-bc-op "Can only get symbol" v ]]
       [list #$5
             [list :literal v]]]
 
@@ -309,7 +309,7 @@
       :cat :bytecode
       :internal
       [when-not [symbol? v]
-            [throw [list :invalid-bc-op "Can only get symbol" v [current-lambda]]]]
+            [exception :invalid-bc-op "Can only get symbol" v ]]
       [list #$7
             [list :literal v]]]
 

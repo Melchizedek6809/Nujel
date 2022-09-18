@@ -11,7 +11,7 @@
             [:pair [fn [path]
                        [def cext [lower-case [path/extension path]]]
                      [reduce ext [fn [α β] [or α [= β cext]]]]]]
-            [otherwise [throw [list :type-error "Expected a :string or :list" ext]]]]]
+            [otherwise [exception :type-error "Expected a :string or :list" ext]]]]
 
 
 [defn path/extension [path]

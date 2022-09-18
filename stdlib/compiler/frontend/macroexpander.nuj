@@ -6,25 +6,24 @@
 ;;; Expands a do for, leaving out sub-expressions in the middle that are without
 ;;; side effects, which is simplified to mean anything that is not a pair.
 
-[def macroexpand/do [let*
-                      [defn macroexpand/do/args [args env]
-                            [if [last? args]
-                                [cons [macroexpand* [car args] env] #nil]
-                                [if [pair? [car args]]
-                                    [let* [def ocar [macroexpand* [car args] env]]
-                                          [if [pair? ocar]
-                                              [cons ocar [macroexpand/do/args [cdr args] env]]
-                                              [macroexpand/do/args [cdr args] env]]]
-                                    [macroexpand/do/args [cdr args] env]]]]
-
-                      [defn macroexpand/do [source env]
-                            [def args [macroexpand/do/args source env]]
-                            [if [last? args]
-                                [car args]
-                                [cons 'do args]]]]]
-
 [def macroexpand* [let*
-                    [defn macroexpand/form [source env op arity implicit-do? no-expand-bitmap]
+                    [defn macroexpand-do-args [args env]
+                          [if [last? args]
+                              [cons [macroexpand* [car args] env] #nil]
+                              [if [pair? [car args]]
+                                  [let* [def ocar [macroexpand* [car args] env]]
+                                        [if [pair? ocar]
+                                            [cons ocar [macroexpand-do-args [cdr args] env]]
+                                            [macroexpand-do-args [cdr args] env]]]
+                                  [macroexpand-do-args [cdr args] env]]]]
+
+                    [defn macroexpand-do [source env]
+                          [def args [macroexpand-do-args source env]]
+                          [if [last? args]
+                              [car args]
+                              [cons 'do args]]]
+
+                    [defn macroexpand-form [source env op arity implicit-do? no-expand-bitmap]
                           [def ret [cons op #nil]]
                           [def l [cdr source]]
                           [dotimes [i arity]
@@ -34,15 +33,15 @@
                                    ret]
                             [cdr! l]]
                           [if implicit-do?
-                              [set! ret [cons [macroexpand/do l env] ret]]
-                              [when l [throw [list :arity-error [cat "form contains more than " arity " arguments"] source [current-lambda]]]]]
+                              [set! ret [cons [macroexpand-do l env] ret]]
+                              [when l [throw [list :arity-error [cat op " form contains more than " arity " arguments"] source env]]]]
                           [return [nreverse ret]]]
 
-                    [defn macroexpand/fold [op source env]
+                    [defn macroexpand-fold [op source env]
                           [if [cdr source]
                               [if [cddr source]
                                   [list op
-                                        [macroexpand/fold op [except-last-pair source] env]
+                                        [macroexpand-fold op [except-last-pair source] env]
                                         [macroexpand* [car [last-pair source]] env]]
                                   [list op
                                         [macroexpand* [car source] env]
@@ -62,18 +61,18 @@
                                 [:native-function
                                  [case op
                                        [quote source]
-                                       [do                  [macroexpand/do   source env]]
-                                       [return              [macroexpand/form source env op 1 #f #b0]]
-                                       [[try while]         [macroexpand/form source env op 1 #t #b0]]
-                                       [[def set!]          [macroexpand/form source env op 2 #f #b01]]
-                                       [if                  [macroexpand/form source env op 3 #f #b0]]
-                                       [[fn* macro*]        [macroexpand/form source env op 4 #t #b0111]]
-                                       [[let* environment*] [list op [macroexpand/do [cdr source] env]]]
+                                       [do                  [macroexpand-do   source env]]
+                                       [return              [macroexpand-form source env op 1 #f #b0]]
+                                       [[try while]         [macroexpand-form source env op 1 #t #b0]]
+                                       [[def set!]          [macroexpand-form source env op 2 #f #b01]]
+                                       [if                  [macroexpand-form source env op 3 #f #b0]]
+                                       [[fn* macro*]        [macroexpand-form source env op 4 #t #b0111]]
+                                       [[let* environment*] [list op [macroexpand-do [cdr source] env]]]
                                        [otherwise [if [meta op :fold]
-                                                      [macroexpand/fold op [cdr source]]
+                                                      [macroexpand-fold op [cdr source]]
                                                       [map source [fn [α] [macroexpand* α env]]]]]]]
                                 [otherwise [map source [fn [α] [macroexpand* α env]]]]]]]]
 
 [defn macroexpand [source env]
       "Macroexpand the forms in source"
-      [macroexpand* source [or env [current-closure]]]]
+      [macroexpand* source [or env root-closure]]]

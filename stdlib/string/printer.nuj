@@ -30,7 +30,7 @@
       [def ret ""]
       [when [or [not α] [zero? α]]
         [return "0"]]
-      [when [< α 0] [throw [list :type-error "Can't print negative numbers in hex for now" α [current-lambda]]]]
+      [when [< α 0] [exception :type-error "Can't print negative numbers in hex for now" α ]]
       [while [not-zero? α]
              [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
              [set! α [bit-shift-right α 4]]]

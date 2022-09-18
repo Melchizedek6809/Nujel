@@ -13,5 +13,5 @@
                     [throw :list-not-sorted]]
               [cdr! sorted]]]
 
-[test-sort 1500 list/sort/merge]
+[test-sort 1500 list-merge-sort]
 [return :success]

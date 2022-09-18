@@ -30,7 +30,7 @@
 
 [defn range [end start step]
       "Return a list containing values from START (inclusive) to END (exclusive) by STEP"
-      [when-not end   [throw [list :arity-error "[range] needs at least a specific end"]]]
+      [when-not end   [exception :arity-error "[range] needs at least a specific end"]]
       [when-not start [set! start 0]]
       [when-not step  [set! step 1]]
       [def pred [if [pos? step] < >]]
@@ -83,15 +83,7 @@
       [doseq [t a ret]
              [set! ret [cons t ret]]]]
 
-[defn sublist [l start end ret]
-      "Returns a new list containing all elements of l from start to end"
-      [cond [[nil?    l] [reverse ret]]
-            [[neg?  end] [sublist      l      start  [+ [length l] end]]]
-            [[zero? end] [reverse ret]]
-            [[> start 0] [sublist [cdr l] [+ -1 start] [+ -1 end] #nil]]
-            [[> end   0] [sublist [cdr l] 0            [+ -1 end] [cons [car l] ret]]]]]
-
-[def list/sort/merge [let*
+[def list-merge-sort [let*
                        [defn list/merge-sorted-lists [l1 l2 pred]
                              [cond [[nil? l1] l2]
                                    [[nil? l2] l1]
@@ -116,8 +108,7 @@
                                       [list/sort/merge [car parts] pred]
                                       [list/sort/merge [cdr parts] pred]
                                       pred]]]]]]
-
-[def list/sort list/sort/merge] ; Set default sort to merge-sort
+[def list/sort list-merge-sort] ; Set default sort to merge-sort
 
 [defn list? [a]
       "Return #t is A is a proper list"
@@ -135,21 +126,21 @@
                [list/equal? [cdr a] [cdr b]]]
           [equal? a b]]]
 
-[defn list/take [l count]
+[defn list-take [l count]
       "Take the first COUNT elements from list L"
       [if [<= count 0]
           #nil
-          [cons [car l] [list/take [cdr l] [- count 1]]]]]
+          [cons [car l] [list-take [cdr l] [- count 1]]]]]
 
-[defn list/drop [l count]
+[defn list-drop [l count]
       "Drop the final COUNT elements from list L"
       [if [<= count 0]
           l
-          [list/drop [cdr l] [- count 1]]]]
+          [list-drop [cdr l] [- count 1]]]]
 
 [defn list/cut [l start end]
       "Return a subsequence of L from START to END"
-      [list/take [list/drop l [max 0 start]] [- end [max 0 start]]]]
+      [list-take [list-drop l [max 0 start]] [- end [max 0 start]]]]
 
 [defn list/replace [l search-for replace-with]
       "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
