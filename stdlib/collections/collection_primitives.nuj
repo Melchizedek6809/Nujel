@@ -57,12 +57,6 @@
             [:array    [array/sort l]]
             [otherwise [throw [list :type-error "You can only use sort with a collection" l [current-lambda]]]]]]
 
-[defn member [l m]
-      "Returns the first pair/item of collection l whose car is equal to m"
-      [case [type-of l]
-            [:pair     [list/member l m]]
-            [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
-
 [defn cut [l start end]
       "Return a subcollection of L from START to END"
       [case [type-of l]
@@ -70,8 +64,3 @@
             [:pair     [list/cut   l start end]]
             [:string   [string/cut l start end]]
             [otherwise [throw [list :type-error "You can only use member with a collection" l [current-lambda]]]]]]
-
-[defn collection? [l]
-      [case [type-of l]
-            [[:pair :array :tree] #t]
-            [otherwise #f]]]

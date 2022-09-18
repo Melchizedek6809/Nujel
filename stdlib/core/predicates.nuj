@@ -3,10 +3,6 @@
 ;;;
 ;;; Some predicates that were simpler to do in nujel
 
-[defn numeric? [a]
-      "Return #t if a is a number"
-      [or [int? a] [float? a]]]
-
 [defn last? [a] :inline
       "Return #t if a is the last pair in a list"
       [nil? [cdr a]]]
@@ -35,20 +31,54 @@
       "#t if VAL is not zero"
       [not= 0 val]]
 
-[defn equal? [a b]
-      "High level equality comparator, can also recursively test lists/arrays for equivalence, can be slow."
-      [def cur-type [type-of a]]
-      [if [not= cur-type [type-of b]]
+[defn equal? [val-a val-b]
+      "Test whether two values are equal"
+      ""
+      "Unlike = this is actually comparing the contents of compound data,"
+      "which can be very slow."
+      ""
+      "val-a: The first argument"
+      "val-b: The second argument"
+      ""
+      "Whether the two arguments are equal?"
+      :cat :predicate
+      [deftest #t [equal? 1 1]]
+      [deftest #t [equal? 2.0 2.0]]
+      [deftest #f [equal? 2.0 2.1]]
+      [deftest #t [equal? :a :a]]
+      [deftest #f [equal? :a :b]]
+      [deftest #t [equal? '[1 :b "c"] '[1 :b "c"]]]
+      [deftest #f [equal? '[1 :b "c" #[4.0]] '[1 :b "c"]]]
+      [deftest #t [equal? '[1 :b "c" #[4.0]] '[1 :b "c" #[4.0]]]]
+      [deftest #t [equal? #['[1 #o2 #x3] '[4.0 5.0 @[:a 1 :b 2]] '["7" #[8 88] :9]] #['[1 #o2 #x3] '[4.0 5.0 @[:a 1 :b 2]] '["7" #[8 88] :9]]]]
+
+      [def cur-type [type-of val-a]]
+      [if [not= cur-type [type-of val-b]]
           #f
           [case cur-type
-                [:array [array/equal? a b]]
-                [:tree [tree/equal? a b]]
-                [:pair [list/equal? a b]]
-                [otherwise [= a b]]]]]
+                [:array [array/equal? val-a val-b]]
+                [:tree [tree/equal? val-a val-b]]
+                [:pair [list/equal? val-a val-b]]
+                [otherwise [= val-a val-b]]]]]
 
-[defn inequal? [a b]
-      "High level inequality comparator"
-      [not [equal? a b]]]
+[defn not-equal? [val-a val-b]
+      "Test whether two values are not equal"
+      ""
+      "This is using equal? under the hood, meaning it can be quite slow since"
+      "it actually compares the contents of complex data structures."
+      ""
+      "val-a: The first argument"
+      "val-b: The second argument"
+      ""
+      "Whether the two arguments are not equal?"
+      :cat :predicate
+      [deftest #t [not-equal? #['[1 #o2 #x3] '[4.0 5.0 @[:a 1 :b 2]] '["7" #[8 88] :9]] #['[1 #o2 #x3] '[4.0 5.0 @[:a 1 :a 2]] '["7" #[8 88] :9]]]]
+      [deftest #f [not-equal? :a :a]]
+      [deftest #t [not-equal? :a :b]]
+      [deftest #t [not-equal? '[1 :b "c" #[4.0]] '[1 :b "c"]]]
+      [deftest #t [not-equal? #['[1 #o2 #x3] '[4.0 5.0 6.0] '["7" #[8 88] :9]] #['[1 #o2 #x3] '[4.0 5.0 6.0] '["7" #[8 88] :99]]]]
+
+      [not [equal? val-a val-b]]]
 
 [defn int? [val]
       "Test whether val is an integer"
@@ -81,6 +111,23 @@
       :inline
 
       [= :float [type-of val]]]
+
+[defn number? [a]
+      "Test whether val is a number"
+      ""
+      "Right now this means either a floating-point or integer value."
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a number"
+      :cat :type-predicate
+      [deftest #t [number? 123]]
+      [deftest #t [number? 123.123]]
+      [deftest #f [number? 'abc]]
+      [deftest #f [number? "123"]]
+
+      [or [int? a]
+          [float? a]]]
 
 [defn bool? [val]
       "Test whether val is a boolean"
@@ -203,6 +250,26 @@
       :inline
 
       [= :tree [type-of val]]]
+
+[defn collection? [l]
+      "Test whether val is a collection"
+      ""
+      "val: This argument is going to be tested"
+      ""
+      "Whether val is a collection"
+      :cat :type-predicate
+      [deftest #t [collection? @[]]]
+      [deftest #t [collection? #[]]]
+      [deftest #t [collection? '[123]]]
+      [deftest #f [collection? [current-closure]]]
+      [deftest #f [collection? 123]]
+      [deftest #f [collection? 123.123]]
+      [deftest #f [collection? 'abc]]
+      :inline
+
+      [case [type-of l]
+            [[:pair :array :tree] #t]
+            [otherwise #f]]]
 
 [defn keyword? [v]
       "Test whether val is a keyword"

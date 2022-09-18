@@ -4,21 +4,6 @@
 ;;; Contains some high level functions/macros, mainly abstacting the low level
 ;;; interface to the compiler
 
-[defn load/forms [source environment]
-      "Load multiple forms, evaluating the results in environment, so we can make use of macros we just defined"
-      :cat :compiler
-      :internal
-      [doseq [form source]
-             [bytecode-eval* [compile* source environment] environment]]]
-
-[defn macroexpand/forms [source-raw environment]
-      "Expand multiple forms, evaluating the source in a temporary environment, so we can make use of macros we just defined."
-      :cat :compiler
-      :internal
-      [when-not environment [set! environment [environment*]]]
-      [load/forms source-raw environment]
-      [macroexpand source-raw environment]]
-
 [defn compile* [source environment]
       "Compile SOURCE so it can be evaluated/applied"
       :cat :compiler
@@ -39,12 +24,6 @@
           :internal
           "Compile SOURCE so it can be evaluated/applied"
           `[compile* ~source [current-closure]]]
-
-[defmacro compile/do [source]
-          :cat :compiler
-          :internal
-          "Compile SOURCE so it can be evaluated/applied"
-          `[compile* [cons do ~source] [current-closure]]]
 
 [defn meta/parse/body [type args body]
       :cat :compiler
@@ -127,21 +106,3 @@
 
 [defmacro typecheck/only [v t]
           `[when-not [= [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
-
-[defn typecheck/numeric/single [v]
-      `[when-not [numeric? ~v] [throw [list :type-error ~[fmt "Expected numeric value"] ~v [current-lambda]]]]]
-
-[defmacro typecheck/numeric v
-          [map v typecheck/numeric/single]]
-
-[defn profile-form [raw]
-      [def start-time [time/milliseconds]]
-      [def val [eval raw]]
-      [def end-time [time/milliseconds]]
-      [println [cat "Evaluating " [string/write raw] " to " [string/write val] " took " [cat [- end-time start-time] "ms"]]]]
-
-[defmacro profile body
-          "Measure and display how much time and ressources it takes for BODY to be evaluated"
-          `[profile-form '~[if [last? body]
-                               [car body]
-                               [cons 'do body]]]]

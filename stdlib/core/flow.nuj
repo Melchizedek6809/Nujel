@@ -82,11 +82,3 @@
           [defmacro -> [init . fun]
                     "Thread init as the first argument through every function in fun"
                     [thread/-> init [reverse fun]]]]]
-
-[def ->> [let*
-           [defn thread/->> [init fun]
-                 [if-not fun init
-                         [append [car fun] [cons [thread/->> init [cdr fun]] #nil]]]]
-           [defmacro ->> [init . fun]
-                     "Thread init as the last argument through every function in fun"
-                     [thread/->> init [reverse fun]]]]]

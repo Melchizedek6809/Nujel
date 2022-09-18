@@ -14,10 +14,6 @@
 [defmacro += [val inc]
           `[set! ~val [+ ~val ~inc]]]
 
-[defmacro cdr! [l]
-          "[set! l [cdr l]]"
-          `[set! ~l [cdr ~l]]]
-
 [def let [let*
               [defn let/arg [arg]
                     [when arg

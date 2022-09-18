@@ -73,7 +73,7 @@
 
            [defn fmt/number-format-prefix [opts]
                  [if [or [not [tree/ref opts :debug]] [not [tree/ref opts :base]]] opts
-                     [-> [if [member '[:binary :octal :decimal :hexadecimal :HEXADECIMAL] [tree/ref opts :base]]
+                     [-> [if [tree/ref fmt/number-format-prefixex [tree/ref opts :base]]
                              [tree/set! opts :argument [list cat
                                                              [tree/ref fmt/number-format-prefixex [tree/ref opts :base]]
                                                              [tree/ref opts :argument]]]

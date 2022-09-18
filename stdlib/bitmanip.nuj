@@ -16,7 +16,6 @@
       [typecheck/only α :int]
       [typecheck/only i :int]
       [not [zero? [bit-and α [bit-shift-left 1 i]]]]]
-[def bit-set? bit-test?]
 
 [defn bit-shift-right [α i]
       "Bitwise shift right"
