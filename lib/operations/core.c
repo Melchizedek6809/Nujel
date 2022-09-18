@@ -91,6 +91,20 @@ static lVal *lnfResolve(lClosure *c, lVal *v){
 	return lGetClosureSym(env ? env->vClosure : c, sym);
 }
 
+static lVal *lnfResolveOrNull(lClosure *c, lVal *v){
+	const lSymbol *sym = requireSymbol(c, lCar(v));
+	lVal *env = lCadr(v);
+	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
+		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+	}
+	lVal *ret;
+	if(lHasClosureSym(c, sym, &ret)){
+		return ret;
+	}else{
+		return NULL;
+	}
+}
+
 static lVal *lnfResolvesPred(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
 	if(!car || (car->type != ltSymbol)){return lValBool(false);}
@@ -375,7 +389,8 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc    (c,"throw", "[v]",   "Throw V to the closest exception handler", lnfThrow);
 
 	lAddNativeFunc(c,"def-in!",        "[environment sym v]", "Define SYM to be V in ENVIRONMENT", lnfDefIn);
-	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM until it is no longer a symbol", lnfResolve);
+	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM", lnfResolve);
+	lAddNativeFunc(c,"resolve-or-nil","[sym environment]", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull);
 	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
 
 	lAddNativeFunc(c,"val->id", "[v]",                "Generate some sort of ID value for V, mainly used in [write]", lnfValToId);
