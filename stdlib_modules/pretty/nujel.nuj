@@ -46,7 +46,7 @@
                [set! i [comment-block source i pp colors]]]
               [[and [== c #\|]
                     [== [buffer/ref source [inc/int i]] #\#]]
-               [pp 'char-write c]
+               [pp 'block-write "|#"]
                [pp 'block-write [array/ref colors 0]]
                [return [+ 2 i]]]
               [#t [pp 'char-write c]
@@ -73,7 +73,7 @@
       [while [< i len]
         [def c [buffer/ref source i]]
         [case c
-              [[32 #\( #\) #\[ #\] #\"]
+              [[10 13 32 #\( #\) #\[ #\] #\"]
                [pp 'block-write [array/ref colors 0]]
                [return i]]
               [otherwise [pp 'char-write c]
@@ -86,6 +86,8 @@
       [case n
             [#\! [return [comment-eol source i pp colors]]]
             [#\| [return [comment-block source i pp colors]]]
+            [#\n [return [literal-nil source i pp colors]]]
+            [[#\t #\f] [return [literal-bool source i pp colors]]]
             [otherwise
              [pp 'block-write [array/ref colors 2]]
              [continue-until-separator source i pp colors]]]]
@@ -123,6 +125,7 @@
 [defn list-car [source i pp colors d]
       [pp 'block-write [array/ref colors 15]]
       [set! i [continue-until-separator source i pp colors]]
+      [pp 'block-write [array/ref colors 0]]
       [return [top source i pp colors d]]]
 
 [defn bracket-open [source i pp colors d]
@@ -137,6 +140,25 @@
       [pp 'block-write [array/ref colors 0]]
       [return [inc/int i]]]
 
+[defn literal-nil [source i pp colors]
+      [pp 'block-write [array/ref colors 8]]
+      [set! i [continue-until-separator source i pp colors]]
+      [pp 'block-write [array/ref colors 0]]
+      [return i]]
+
+[defn literal-bool [source i pp colors]
+      [case [buffer/ref source [inc/int i]]
+            [#\t [pp 'block-write [array/ref colors 2]]]
+            [otherwise [pp 'block-write [array/ref colors 1]]]]
+      [set! i [continue-until-separator source i pp colors]]
+      [pp 'block-write [array/ref colors 0]]
+      [return i]]
+
+[defn start-quote [source i pp colors d]
+      [pp 'block-write [array/ref colors 3]]
+      [pp 'char-write [buffer/ref source i]]
+      [continue-until-separator source [inc/int i] pp colors d]]
+
 [defn top [source i pp colors d]
       [def len [buffer/length source]]
       [while [< i len]
@@ -146,6 +168,7 @@
               [#\; [set! i [comment-eol source i pp colors]]]
               [#\" [set! i [literal-string source i pp colors]]]
               [#\: [set! i [literal-keyword source i pp colors]]]
+              [#\' [set! i [start-quote source i pp colors d]]]
               [[#\[ #\(] [set! i [bracket-open source i pp colors [inc/int d]]]]
               [[#\] #\)] [return [bracket-close source i pp colors d]]]
               [[#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9]
