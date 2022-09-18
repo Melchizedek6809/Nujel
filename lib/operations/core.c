@@ -1,4 +1,4 @@
- /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #ifndef NUJEL_AMALGAMATION
 #include "../nujel-private.h"
@@ -7,14 +7,21 @@
 #include <time.h>
 #include <inttypes.h>
 
+static lVal *lTreeAddSymbolsToList(const lTree *t, lVal *list){
+	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
+	list = lTreeAddSymbolsToList(t->right, list);
+	list = lCons(lValSymS(t->key), list);
+	return lTreeAddSymbolsToList(t->left, list);
+}
+
+static lVal *lSymbolTable(lClosure *c, lVal *ret){
+	if(unlikely(c == NULL)){return ret;}
+	return lSymbolTable(c->parent, lTreeAddSymbolsToList(c->data, ret));
+}
+
 static lVal *lnfSymbolTable(lClosure *c, lVal *v){
 	(void)v;
-	lVal *l = lTreeKeysToList(c->data);
-	for(lVal *n = l;n;n = n->vList.cdr){
-		if(n->vList.car == NULL){break;}
-		n->vList.car->type = ltSymbol;
-	}
-	return l;
+	return lSymbolTable(c, NULL);
 }
 
 static lVal *lnfClosureParent(lClosure *c, lVal *v){
@@ -375,20 +382,20 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"meta",    "[v key]",            "Retrieve KEY from V's metadata", lnfMetaGet);
 	lAddNativeFunc(c,"meta!",   "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
 
-	lAddNativeFunc(c,"closure/data",     "[clo]", "Return the data of CLO",                     lnfClosureData);
-	lAddNativeFunc(c,"closure/code",     "[clo]", "Return the code of CLO",                     lnfClosureCode);
-	lAddNativeFunc(c,"closure/name",     "[clo]", "Return the name of CLO",                     lnfClosureName);
-	lAddNativeFunc(c,"closure/arguments","[clo]", "Return the argument list of CLO",            lnfClosureArguments);
-	lAddNativeFunc(c,"closure/parent",   "[clo]", "Return the parent of CLO",                   lnfClosureParent);
-	lAddNativeFunc(c,"closure/caller",   "[clo]", "Return the caller of CLO",                   lnfClosureCaller);
+	lAddNativeFunc(c,"closure/data",     "[clo]",  "Return the data of CLO",                     lnfClosureData);
+	lAddNativeFunc(c,"closure/code",     "[clo]",  "Return the code of CLO",                     lnfClosureCode);
+	lAddNativeFunc(c,"closure/name",     "[clo]",  "Return the name of CLO",                     lnfClosureName);
+	lAddNativeFunc(c,"closure/arguments","[clo]",  "Return the argument list of CLO",            lnfClosureArguments);
+	lAddNativeFunc(c,"closure/parent",   "[clo]",  "Return the parent of CLO",                   lnfClosureParent);
+	lAddNativeFunc(c,"closure/caller",   "[clo]",  "Return the caller of CLO",                   lnfClosureCaller);
 
-	lAddNativeFunc(c,"current-closure",  "[]",    "Return the current closure as an object",    lnfCurrentClosure);
-	lAddNativeFunc(c,"current-lambda",   "[]",    "Return the current closure as a lambda",     lnfCurrentLambda);
+	lAddNativeFunc(c,"current-closure",  "[]",     "Return the current closure as an object",    lnfCurrentClosure);
+	lAddNativeFunc(c,"current-lambda",   "[]",     "Return the current closure as a lambda",     lnfCurrentLambda);
 
-	lAddNativeFunc(c,"symbol-table*",  "[]",            "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
+	lAddNativeFunc(c,"symbol-table",  "[]",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 
-	lAddNativeFunc(c,"apply",       "[func list]",  "Evaluate FUNC with LIST as arguments",  lnfApply);
-	lAddNativeFunc(c,"macro-apply", "[macro list]", "Evaluate MACRO with LIST as arguments", lnfMacroApply);
+	lAddNativeFunc(c,"apply",       "[func list]", "Evaluate FUNC with LIST as arguments",  lnfApply);
+	lAddNativeFunc(c,"macro-apply", "[macro list]","Evaluate MACRO with LIST as arguments", lnfMacroApply);
 
 	lAddNativeFuncPure(c,"car",     "[list]",    "Returs the head of LIST",          lnfCar);
 	lAddNativeFuncPure(c,"cdr",     "[list]",    "Return the rest of LIST",          lnfCdr);

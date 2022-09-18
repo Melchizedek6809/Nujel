@@ -101,10 +101,15 @@
              [add* [eval [car t]] [cons 'do [cdr t]]]]]
 [reset!]
 
+[defn resolve-or-null [sym]
+      [if [resolves? sym root-closure]
+          [resolve sym root-closure]
+          #nil]]
+
 [defn add-builtin-tests []
       :export
       [doseq [test-funs [-> [symbol-table]
-                            [map resolve]
+                            [map resolve-or-null]
                             [filter callable?]
                             [map [fn [a] [meta a :tests]]]
                             [filter identity]]]

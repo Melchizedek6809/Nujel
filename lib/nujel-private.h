@@ -158,10 +158,10 @@ struct lThread {
 /*
  | Tree related procedures
  */
-uint   lTreeSize            (const lTree *t);
-lVal  *lTreeToList          (const lTree *t);
-lVal  *lTreeKeysToList      (const lTree *t);
-lVal  *lTreeValuesToList    (const lTree *t);
+uint  lTreeSize            (const lTree *t);
+lVal *lTreeToList          (const lTree *t);
+lVal *lTreeKeysToList      (const lTree *t);
+lVal *lTreeValuesToList    (const lTree *t);
 
 /*
  | Closure related procedures
