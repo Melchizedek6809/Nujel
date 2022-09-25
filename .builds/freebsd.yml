@@ -8,3 +8,9 @@ tasks:
   - test: |
       cd Nujel
       make test
+  - compile-future: |
+      cd Nujel
+      make future-nujel
+  - test-future: |
+      cd Nujel
+      make test.future
