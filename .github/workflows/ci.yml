@@ -124,12 +124,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        cc: [gcc]
         make: [make, bmake]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Install compiler
+      run: sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
     - name: Test runtime
-      run: ${{matrix.make}} test.future.slow
+      run: ${{matrix.make}} CC=${{ matrix.cc }} test.future.slow
   static-analysis-linux:
     name: Clang - static analysis
     runs-on: ubuntu-22.04
