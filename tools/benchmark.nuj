@@ -7,6 +7,7 @@
 | file for the viewer.
 |#
 
+[import [blue green yellow] :ansi]
 [import [serialize :as val->json] :serialization/json]
 
 [def single-runs 8]
@@ -108,13 +109,13 @@
       [when-not [runtime/available? runtime]
                 [when [zero? i]
                       [pfmt "{} {} Runtime not found"
-                            [ansi-blue [pad-end language 14]]
-                            [ansi-yellow [pad-end runtime 20]]]]
+                            [blue [pad-end language 14]]
+                            [yellow [pad-end runtime 20]]]]
                 [return #nil]]
       [when [zero? i]
             [pfmt "{} {} "
-                  [ansi-blue [pad-end language 14]]
-                  [ansi-green [pad-end runtime 20]]]]
+                  [blue [pad-end language 14]]
+                  [green [pad-end runtime 20]]]]
       [when [>= i 0] [pfmt "{i} "]]
       [when-not [file/file? filename]
                 [exception :io-error "Can't open the following file to benchmark it:" filename]]
@@ -125,7 +126,7 @@
                [file/remove result-file]
              [print/error err]
              [throw err]]
-           [def ret [popen [fmt "time -o {result-file} --format=\"{time-template}\" {runtime} {filename}"]]]
+           [def ret [popen [fmt "/usr/bin/time -o {result-file} --format=\"{time-template}\" {runtime} {filename}"]]]
            [when-not [zero? [car ret]]
                      [exception :benchmark-error "Benchmark returned non-zero exit code" [cons filename ret]]]
            [when-not [>= [index-of [cdr ret] [get-result testcase]] 0]
