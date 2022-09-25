@@ -121,15 +121,15 @@ jobs:
   build-stdlib:
     name: Build stdlib from source
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        make: [make, bmake]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Compile runtime
-      run: make nujel
-    - name: Compile future runtime
-      run: make future-nujel
     - name: Test runtime
-      run: make test.future.slow
+      run: ${{matrix.make}} test.future.slow
   static-analysis-linux:
     name: Clang - static analysis
     runs-on: ubuntu-22.04
