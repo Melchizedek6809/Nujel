@@ -50,7 +50,7 @@ nujel.a: $(LIB_OBJS)
 	$(AR) cq $@ $>
 	@echo "$(ANSI_BG_CYAN)" "[AR] " "$(ANSI_RESET)" $@
 
-future-nujel: $(FUTURE_OBJS)<
+future-nujel: $(FUTURE_OBJS)
 	@rm -f $@
 	@$(CC) -o $@ $> $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $@
