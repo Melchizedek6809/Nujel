@@ -63,7 +63,7 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
 		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
 		return NULL;
-	}    
+	}
 	lVal *ret = lValBytecodeArray(ops,len,literals,c);
 	free(ops);
 	return ret;
@@ -110,7 +110,7 @@ static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
 static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	lClosure *env = requireClosure(c, lCadr(v));
-	lVal *ret = lBytecodeEval(env, arr);
+	lVal *ret = lBytecodeEval(lClosureNew(env, closureCall), arr);
 	return ret;
 }
 

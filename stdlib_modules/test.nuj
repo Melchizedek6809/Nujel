@@ -58,14 +58,12 @@
                     [string/write expr]]]
       [set! error-count [+ 1 error-count]]]
 
-[defn run-test! [result rawexpr i]
+[defn run-test! [result rawexpr]
       :export
       "Tests that RAWEXPR evaluates to RESULT"
       [try [fn [err]
-               [set! +bytecompile/apply-new+ #f]
              [test-failure result [list :exception-caught err] rawexpr]]
            [def expr [eval rawexpr]]
-           [set! +bytecompile/apply-new+ #f]
            [if [equal? result expr]
                [test-success result expr rawexpr]
                [test-failure result expr rawexpr]]]]
@@ -73,7 +71,7 @@
 [defn init! [output-passes hide-errors]
       :export
       "Initialize the testing framework"
-      [set! print-errors   [not [boolean hide-errors]]]
+      [set! print-errors   [not hide-errors]]
       [set! print-passes   [boolean output-passes]]
       [set! nujel-start    [time/milliseconds]]
       [set! success-count  0]

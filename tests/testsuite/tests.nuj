@@ -538,16 +538,6 @@
 [4 [identity 4]]
 ["4" [identity "4"]]
 [#[1 2 3] [identity #[1 2 3]]]
-["Polizei"
-          [def eins [environment*]]
-          [eval-in eins '[def say [fn [] "Eins"]]]
-          [def zwei [eval-in eins '[environment*]]]
-          [eval-in zwei '[def say [fn [] "Polizei"]]]
-          [eval-in zwei '[say]]]
-["Eins"
-          [def eins [environment*]]
-          [eval-in eins '[def say [fn [] "Eins"]]]
-          [eval-in eins '[say]]]
 [11 [def counter [let [[a 0]] [fn [b] [set! a [+ a [or b 1]]]]]] [counter 10] [counter]]
 ['[0 1 2 3 4] [range 5]]
 [#nil [range 0]]

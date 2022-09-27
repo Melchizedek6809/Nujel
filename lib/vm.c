@@ -243,7 +243,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopLessPred)
 	vmcase(lopEqualPred)
 	vmcase(lopGreaterEqPred)
-		vmcase(lopGreaterPred) {
+	vmcase(lopGreaterPred) {
 		lVal *a = ctx.valueStack[ctx.sp-2];
 		lVal *b = ctx.valueStack[ctx.sp-1];
 		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
@@ -376,7 +376,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		if(false && fun && (fun->type == ltLambda)){
+		if(fun && (fun->type == ltLambda)){
 			c->text = ops;
 			c->sp   = ctx.sp;
 			c->ip   = ip;

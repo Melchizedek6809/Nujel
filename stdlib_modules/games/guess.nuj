@@ -2,7 +2,7 @@
 [require :random]
 
 [defn win [guesses-left]
-      [pfmtln "Fantastic, {} with {guesses-left} guesses left." [ansi-rainbow "you won"]]
+      [pfmtln "Fantastic, {} with {guesses-left} guesses left." [ansi/rainbow "you won"]]
       [pfmtln "Hope you had fun and have a nice day!"]
       [exit 0]]
 
