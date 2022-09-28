@@ -7,7 +7,7 @@ packages:
 tasks:
   - compile-runtime: |
       cd Nujel
-      make -j2 nujel
+      make nujel
   - test: |
       cd Nujel
       make test

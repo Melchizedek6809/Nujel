@@ -6,7 +6,7 @@ sources:
 tasks:
   - compile-runtime: |
       cd Nujel
-      make -j2 nujel CC=tcc
+      make nujel CC=tcc
   - test: |
       cd Nujel
       make test CC=tcc

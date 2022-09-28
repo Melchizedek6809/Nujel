@@ -6,7 +6,7 @@ sources:
 tasks:
   - compile-runtime: |
       cd Nujel
-      make -j2 nujel CC=clang
+      make nujel CC=clang
   - test: |
       cd Nujel
       make test CC=clang

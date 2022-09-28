@@ -6,7 +6,7 @@ sources:
 tasks:
   - compile-runtime: |
       cd Nujel
-      bmake -j2 nujel
+      bmake nujel
   - test: |
       cd Nujel
       bmake test
