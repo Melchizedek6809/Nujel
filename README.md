@@ -27,7 +27,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Constant Folding
 - [X] Module system
 - [X] Printer written in Nujel
-- [ ] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
+- [X] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [ ] Tail-call optimization
 - [ ] Continuations
 - [ ] Value types
@@ -37,12 +37,11 @@ Here is a collection of features already implemented, or about to be finished.
 
 ## Current Limitations
 These will be addressed in later versions
-- [X] No file streams (can only read/write files in their entirety)
 - [ ] No networking support
 - [ ] Static Heap (works far better than expected)
 
-## Try it out
-You can try out a current [WASM Build over here](https://wolkenwelten.net/nujel/).
+## Documentation
+I've started to write some documentation, which you can read here: [https://nujel.net/](https://nujel.net/)
 
 ### GitHub CI (Windows/MacOS/Ubuntu)
 | Master | Develop   |
