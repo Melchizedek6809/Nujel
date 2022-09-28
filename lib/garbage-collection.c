@@ -43,10 +43,6 @@ T##MarkMap[ci] = 1						\
 
 void lThreadGCMark(lThread *c){
 	if(unlikely(c == NULL)){return;}
-	if(unlikely((c->csp > 8192) || (c->csp < 0))){
-		exit(125);
-		return;
-	}
 	lBytecodeArrayMark(c->text);
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);
@@ -124,6 +120,7 @@ void lTreeGCMark(const lTree *v){
 
 	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
+
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
 }
@@ -137,6 +134,7 @@ void lClosureGCMark(const lClosure *v){
 	lBytecodeArrayMark(v->text);
 	lValGCMark(v->args);
 	lSymbolGCMark(v->name);
+
 	lClosureGCMark(v->caller);
 }
 

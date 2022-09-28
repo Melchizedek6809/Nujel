@@ -18,6 +18,10 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 	return c;
 }
 
+static const lSymbol *lGetSymbol(const lVal *v){
+	return ((v == NULL) || (v->type != ltSymbol)) ? symNull : v->vSymbol;
+}
+
 lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
 	lClosure *tmpc = lClosureNew(lambda->vClosure, closureCall);
 	tmpc->text = lambda->vClosure->text;
@@ -90,10 +94,6 @@ lVal *lGetClosureSym(lClosure *c, const lSymbol *s){
 	}
 	lExceptionThrowValClo("unbound-variable","Can't resolve symbol", lValSymS(s), c);
 	return NULL;
-}
-
-lVal *lResolveVal(lClosure *c, const char *str){
-	return lGetClosureSym(c, lSymS(str));
 }
 
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */

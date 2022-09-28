@@ -130,24 +130,23 @@ lClosure *lNewRoot ();
 lVal     *lApply   (lClosure *c, lVal *args, lVal *fun);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
-int         lListLength   (lVal *v);
-const char *lStringData   (const lString *v);
-const void *lBufferData   (lBuffer *v);
-void *      lBufferDataMutable(lBuffer *v);
-size_t      lBufferLength (const lBuffer *v);
-static inline size_t lStringLength(const lString *v){return lBufferLength(v);}
-const void *         lBufferViewData(lBufferView *v);
-void *               lBufferViewDataMutable(lBufferView *v);
-size_t               lBufferViewLength(const lBufferView *v);
+const char *         lStringData            (const lString *v);
+const void *         lBufferData            (lBuffer *v);
+void *               lBufferDataMutable     (lBuffer *v);
+size_t               lBufferLength          (const lBuffer *v);
+static inline size_t lStringLength          (const lString *v){return lBufferLength(v);}
+const void *         lBufferViewData        (lBufferView *v);
+void *               lBufferViewDataMutable (lBufferView *v);
+size_t               lBufferViewLength      (const lBufferView *v);
 
 lVal *lCons(lVal *car, lVal *cdr);
 
 static inline lVal *lCar(lVal *v){
-	return (v != NULL) && (v->type == ltPair) ? v->vList.car : NULL;
+	return (v != NULL) && likely(v->type == ltPair) ? v->vList.car : NULL;
 }
 
 static inline lVal *lCdr(lVal *v){
-	return (v != NULL) && (v->type == ltPair) ? v->vList.cdr : NULL;
+	return (v != NULL) && likely(v->type == ltPair) ? v->vList.cdr : NULL;
 }
 
 static inline lVal *lCaar  (lVal *v){return lCar(lCar(v));}
@@ -168,10 +167,10 @@ lVal *lRead(lClosure *c, const char *str);
 /*
  | Type related procedores
  */
-i64             castToInt   (const lVal *v, i64 fallback);
-bool            castToBool  (const lVal *v);
-const char *    castToString(const lVal *v, const char *fallback);
-const lSymbol * optionalSymbolic(lClosure *c, lVal *v, const lSymbol *fallback);
+i64             castToInt        (const lVal *v, i64 fallback);
+bool            castToBool       (const lVal *v);
+const char *    castToString     (const lVal *v, const char *fallback);
+const lSymbol * optionalSymbolic (lClosure *c, lVal *v, const lSymbol *fallback);
 
 NORETURN void   throwTypeError          (lClosure *c, lVal *v, lType T);
 NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
@@ -203,7 +202,6 @@ lVal     *lGetClosureSym     (lClosure *c, const lSymbol *s);
 void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal *v);
 bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 void      lDefineVal         (lClosure *c, const char *str,  lVal *v);
-lVal     *lResolveVal        (lClosure *c, const char *str);
 
 lVal     *lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
 lVal     *lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
@@ -240,13 +238,6 @@ lVal     *lValString       (const char *s);
 lVal     *lValStringLen    (const char *s, int len);
 lVal     *lValStringNoCopy (const char *s, int len);
 lVal     *lValFileHandle   (FILE *fh);
-
-extern lSymbol *symNull;
-static inline const lSymbol *lGetSymbol(const lVal *v){
-	return ((v == NULL) || (v->type != ltSymbol))
-		? symNull
-		: v->vSymbol;
-}
 
 /*
  | Allocator related procedures

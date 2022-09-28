@@ -118,13 +118,17 @@ void lSymbolInit(){
 	lSymLTUnknownType    = lSymSM("unknown-type");
 }
 
+static inline int lSymIndex(const lSymbol *s){
+	return s - lSymbolList;
+}
+
 void lSymbolFree(lSymbol *s){
 	s->nextFree = lSymbolFFree;
 	s->c[sizeof(s->c)-1] = 0xFF;
 	lSymbolFFree = s;
 	lSymbolActive--;
-	int symIndex = lSymIndex(s);
-	int slot = lSymbolBackIndex[symIndex];
+	const int symIndex = lSymIndex(s);
+	const int slot = lSymbolBackIndex[symIndex];
 	lSymbolIndex[slot] = -symIndex;
 }
 

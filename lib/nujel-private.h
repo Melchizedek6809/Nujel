@@ -156,14 +156,6 @@ struct lThread {
 };
 
 /*
- | Tree related procedures
- */
-uint  lTreeSize            (const lTree *t);
-lVal *lTreeToList          (const lTree *t);
-lVal *lTreeKeysToList      (const lTree *t);
-lVal *lTreeValuesToList    (const lTree *t);
-
-/*
  | Closure related procedures
  */
 lClosure *lClosureNew        (lClosure *parent, closureType t);
@@ -356,13 +348,6 @@ void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);
 lSymbol  *getTypeSymbol (const lVal *a);
 lSymbol  *getTypeSymbolT(const lType T);
-
-static inline int lSymIndex(const lSymbol *s){
-	return s - lSymbolList;
-}
-static inline lSymbol *lIndexSym(uint i){
-	return (i >= lSymbolMax) ? NULL : &lSymbolList[i];
-}
 
 lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal *v);
 lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal *v);

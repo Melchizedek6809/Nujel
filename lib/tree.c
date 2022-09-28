@@ -13,7 +13,7 @@ lTree *lTreeNew(const lSymbol *s, lVal *v){
 }
 
 static uint lTreeHeight(const lTree *t){
-	return unlikely(t == NULL) ? 0 : t->height;
+	return t == NULL ? 0 : t->height;
 }
 
 static uint lTreeCalcHeight(const lTree *t){
@@ -119,8 +119,8 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
 	const lTree *c = t;
 	while(c){
-		if(s == c->key){
-			if(found != NULL){*found = true;}
+		if(unlikely(s == c->key)){
+			if(likely(found != NULL)){*found = true;}
 			return c->value;
 		}
 		c = s > c->key ? c->right : c->left;
@@ -135,16 +135,6 @@ bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
 	lVal *v = lTreeGet(t, s, &found);
 	if(found && value){*value = v;}
 	return found;
-}
-
-/* Add every symbol/value pair within T onto list, making it a big a-list */
-static lVal *lTreeAddToList(const lTree *t, lVal *list){
-	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
-	lVal *l = lCons(NULL,NULL);
-	l->vList.cdr = lCons(NULL,lTreeAddToList(t->right,list));
-	l->vList.cdr->vList.car = t->value;
-	l->vList.car = lValKeywordS(t->key);
-	return lTreeAddToList(t->left,l);
 }
 
 /* Add all the keys within T to the beginning LIST */
@@ -162,23 +152,18 @@ static lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
 	return lTreeAddValuesToList(t->left, list);
 }
 
-/* Create an a-list with all the key/value bindings from T */
-lVal *lTreeToList(const lTree *t){
-	return t ? lTreeAddToList(t,NULL) : NULL;
-}
-
 /* Create a list of all the keys within T */
-lVal *lTreeKeysToList(const lTree *t){
+static lVal *lTreeKeysToList(const lTree *t){
 	return t ? lTreeAddKeysToList(t,NULL) : NULL;
 }
 
 /* Create a list of all the values within T */
-lVal *lTreeValuesToList(const lTree *t){
+static lVal *lTreeValuesToList(const lTree *t){
 	return t ? lTreeAddValuesToList(t,NULL) : NULL;
 }
 
 /* Return the total size of the tree T */
-uint lTreeSize(const lTree *t){
+static uint lTreeSize(const lTree *t){
 	return t == NULL ? 0 : (t->key ? 1 : 0) + lTreeSize(t->left) + lTreeSize(t->right);
 }
 
@@ -204,10 +189,6 @@ lVal* lnfTreeNew(lClosure* c, lVal* v) {
 		ret->vTree = lTreeInsert(ret->vTree, requireSymbolic(c, car), lCadr(n));
 	}
 	return ret;
-}
-
-static lVal* lnfTreeGetList(lClosure* c, lVal* v) {
-	return lTreeToList(requireTree(c, lCar(v)));
 }
 
 static lVal* lnfTreeGetKeys(lClosure* c, lVal* v) {
@@ -275,7 +256,6 @@ static lVal* lnfTreeRightAst(lClosure* c, lVal* v) {
 void lOperationsTree(lClosure* c) {
 	lAddNativeFunc(c, "tree/new",    "plist",          "Return a new tree", lnfTreeNew);
 	lAddNativeFunc(c, "tree/ref",    "[tree sym]",     "Return the value of SYM in TREE, or #nil if not found", lnfTreeGet);
-	lAddNativeFunc(c, "tree/list",   "[tree]",         "Return a TREE as a plist", lnfTreeGetList);
 	lAddNativeFunc(c, "tree/keys",   "[tree]",         "Return each key of TREE in a list", lnfTreeGetKeys);
 	lAddNativeFunc(c, "tree/values", "[tree]",         "Return each value of TREE in a list", lnfTreeGetValues);
 	lAddNativeFunc(c, "tree/size",   "[tree]",         "Return the amount of entries in TREE", lnfTreeSize);

@@ -146,13 +146,6 @@ lClosure *lNewRoot(){
 	return lLoad(c, (const char *)stdlib_no_data);
 }
 
-/* Return the length of the list V */
-int lListLength(lVal *v){
-	int i = 0;
-	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
-	return i;
-}
-
 lVal *lCons(lVal *car, lVal *cdr){
 	lVal *v = lValAlloc(ltPair);
 	v->vList.car = car;

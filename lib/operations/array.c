@@ -68,6 +68,13 @@ static lVal *lnfArrRef(lClosure *c, lVal *v){
 	return arr->data[key];
 }
 
+/* Return the length of the list V */
+static int lListLength(lVal *v){
+	int i = 0;
+	for(lVal *n = v;(n != NULL) && (lCar(n) != NULL); n = lCdr(n)){i++;}
+	return i;
+}
+
 lVal *lnfArrNew(lClosure *c, lVal *v){
 	(void)c;
 	int length = v ? lListLength(v) : 0;
