@@ -10,6 +10,10 @@
 [import [blue green yellow] :ansi]
 [import [serialize :as val->json] :serialization/json]
 
+
+[def time-path [if [file/file? "/usr/local/bin/time"]
+                   "/usr/local/bin/time"
+                   "/usr/bin/time"]]
 [def single-runs 8]
 [def nujel-runs  8]
 [def git-head [popen/trim "git rev-parse HEAD"]]
@@ -126,7 +130,7 @@
                [file/remove result-file]
              [print/error err]
              [throw err]]
-           [def ret [popen [fmt "/usr/bin/time -o {result-file} --format=\"{time-template}\" {runtime} {filename}"]]]
+           [def ret [popen [fmt "{} -o {result-file} --format=\"{time-template}\" {runtime} {filename}" time-path]]]
            [when-not [zero? [car ret]]
                      [exception :benchmark-error "Benchmark returned non-zero exit code" [cons filename ret]]]
            [when-not [>= [index-of [cdr ret] [get-result testcase]] 0]
