@@ -386,6 +386,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ip = c->ip;
 			ctx.text = ops = c->text;
 			lBytecodeEnsureSufficientStack(&ctx);
+			lGarbageCollectIfNecessary();
 		}else{
 			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
 		}
