@@ -4,8 +4,8 @@
 (define (reverse-num a ret)
   (if (< a 1)
       ret
-      (reverse-num (floor (/ a 10))
-                   (+ (* ret 10) (floor (modulo a 10))))))
+      (reverse-num (truncate (/ a 10))
+                   (+ (* ret 10) (truncate (modulo a 10))))))
 
 (define (palindrome? a)
   (= a (reverse-num a 0)))
