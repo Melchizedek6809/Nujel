@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern u8 stdlib_no_data[];
 extern u8 binlib_no_data[];
 lClosure *mainClosure;
 
@@ -47,6 +48,7 @@ int initNujel(int argc, char *argv[], lClosure *c){
 
 int main(int argc, char *argv[]){
 	(void)argc; (void)argv;
+	// printf("%s",stdlib_no_data); return 0;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
