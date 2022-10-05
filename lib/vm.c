@@ -373,6 +373,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopEval) {
 		lVal *env = ctx.valueStack[--ctx.sp];
 		lVal *bc = ctx.valueStack[--ctx.sp];
+		if(unlikely((env == NULL) || (env->type != ltEnvironment))){
+			lExceptionThrowValClo("type-error", "Can't eval in that", env, c);
+		}
+		if(unlikely((bc == NULL) || (bc->type != ltBytecodeArr))){
+			lExceptionThrowValClo("type-error", "Can't eval that", bc, c);
+		}
 
 		c->text = ops;
 		c->sp   = ctx.sp;
