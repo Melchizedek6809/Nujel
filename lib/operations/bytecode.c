@@ -107,13 +107,6 @@ static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
 	return lValInt(arr->dataEnd - arr->data);
 }
 
-static lVal *lnfBytecodeEval(lClosure *c, lVal *v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	lClosure *env = requireClosure(c, lCadr(v));
-	lVal *ret = lBytecodeEval(lClosureNew(env, closureCall), arr);
-	return ret;
-}
-
 void lOperationsBytecode(lClosure *c){
 	lAddNativeFuncPure(c,"int->bytecode-op", "[a]", "Turns an integer into a bytecode operation with the same value", lnfIntBytecodeOp);
 	lAddNativeFuncPure(c,"bytecode-op->int", "[a]", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
@@ -123,6 +116,4 @@ void lOperationsBytecode(lClosure *c){
 
 	lAddNativeFunc(c,"bytecode-array/ref",   "[a i]", "Return the bytecode-op in A at position I", lnfBytecodeArrRef);
 	lAddNativeFunc(c,"bytecode-array/length","[a]", "Return the length of the bytecode-array A", lnfBytecodeArrLength);
-
-	lAddNativeFunc(c,"bytecode-eval*","[bc-arr env]", "Evaluate BC-ARR in ENV", lnfBytecodeEval);
 }

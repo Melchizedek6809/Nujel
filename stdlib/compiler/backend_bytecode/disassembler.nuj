@@ -72,9 +72,9 @@
                                [#$18 '[$macro/dynamic]]
                                [#$19 `[$try      ~[bytecode-arr->offset a [+ i 1]]]]
                                [#$1A `[$push/val ~[disassemble/maybe-quote [ref literals [bytecode-op->int [ref a [+ i 1]]]]]]]
-
-
-
+                               [#$1B '[$push/true]]
+                               [#$1C '[$push/false]]
+                               [#$1D '[$eval]]
                                [#$1E '[$<]]
                                [#$1F '[$<=]]
                                [#$20 '[$=]]

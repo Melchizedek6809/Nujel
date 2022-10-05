@@ -22,10 +22,19 @@ void lInit(){
 /* Super simple printer, not meant for production use, but only as a tool of last resort, for example when
  * we throw past the root exception handler.
  */
-static void simplePrintVal(lVal *v){
+void simplePrintVal(lVal *v){
 	typeswitch(v){
 	default:
 		fprintf(stderr, "#<not-printable-from-c %i> ", v->type);
+		break;
+	case ltEnvironment:
+		fprintf(stderr, "#<env> ");
+		break;
+	case ltBytecodeArr:
+		fprintf(stderr, "#<bc-arr> ");
+		break;
+	case ltBytecodeOp:
+		fprintf(stderr, "#<bc-op %x> ", v->vBytecodeOp);
 		break;
 	case ltLambda:
 		fprintf(stderr, "#<fn> ");

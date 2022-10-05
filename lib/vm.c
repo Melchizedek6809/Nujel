@@ -138,7 +138,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopPushVal,
 		&&llopPushTrue,
 		&&llopPushFalse,
-		&&llopUNUSEDX1D,
+		&&llopEval,
 		&&llopLessPred,
 		&&llopLessEqPred,
 		&&llopEqualPred,
@@ -225,7 +225,6 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		#endif
 	vmdispatch(*ip++){
-	vmcase(lopUNUSEDX1D)
 	vmcase(lopNOP)
 		vmbreak;
 	vmcase(lopIntByte) {
@@ -370,6 +369,22 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lClosureSetMeta(fun->vClosure, cDocs);
 		ctx.valueStack[ctx.sp++] = fun;
 		if(unlikely(curOp == lopMacroDynamic)){ fun->type = ltMacro; }
+		vmbreak; }
+	vmcase(lopEval) {
+		lVal *env = ctx.valueStack[--ctx.sp];
+		lVal *bc = ctx.valueStack[--ctx.sp];
+
+		c->text = ops;
+		c->sp   = ctx.sp;
+		c->ip   = ip;
+
+		c = ctx.closureStack[++ctx.csp] = lClosureNew(env->vClosure, closureCall);
+		c->text = bc->vBytecodeArr;
+		ip = c->ip = c->text->data;
+		ctx.text = ops = c->text;
+		lBytecodeEnsureSufficientStack(&ctx);
+		lGarbageCollectIfNecessary();
+
 		vmbreak; }
 	vmcase(lopApply) {
 		int len = *ip++;

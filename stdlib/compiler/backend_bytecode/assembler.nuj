@@ -186,6 +186,13 @@
       :inline
       '[#$1C]]
 
+[defn $eval []
+      "[bc env] -> [return-val]"
+      :cat :bytecode
+      :internal
+      :inline
+      '[#$1D]]
+
 [defn $zero? []
       "[a] -> [result]"
       :cat :bytecode
@@ -223,7 +230,7 @@
       :cat :bytecode
       :internal
       [case fun
-            [[+ - * / rem] [= arg-count 2]]
+            [[+ - * / rem bytecode-eval*] [= arg-count 2]]
             [[zero? car cdr add/int inc/int cons < <= = >= >] #t]]]
 
 [defn $apply/optimized [arg-count fun]
@@ -250,6 +257,7 @@
                      [= [$=]]
                      [>= [$>=]]
                      [> [$>]]
+                     [bytecode-eval* [$eval]]
                      [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
             [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
 

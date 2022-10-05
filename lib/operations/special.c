@@ -25,6 +25,7 @@ lVMErrorPlaceholder(lnfLetRaw)
 lVMErrorPlaceholder(lnfLambda)
 lVMErrorPlaceholder(lnfMacro)
 lVMErrorPlaceholder(lnfEnvironment)
+lVMErrorPlaceholder(lnfBytecodeEval)
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",              "body",                    "Evaluate body in order and returns the last result", lnfDo);
@@ -40,4 +41,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"macro*",          "[name args source body]", "Create a new, bytecoded, macro", lnfMacro);
 	lAddNativeFunc(c,"fn*",             "[name args source body]", "Create a new, bytecoded, lambda", lnfLambda);
 	lAddNativeFunc(c,"environment*",    "[]",                      "Create a new object",       lnfEnvironment);
+	lAddNativeFunc(c,"bytecode-eval*","[bc-arr env]", "Evaluate BC-ARR in ENV", lnfBytecodeEval);
 }

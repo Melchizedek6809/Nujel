@@ -205,7 +205,7 @@ typedef enum lOpcode {
 	lopPushVal         = 0x1A,
 	lopPushTrue        = 0x1B,
 	lopPushFalse       = 0x1C,
-	lopUNUSEDX1D       = 0x1D,
+	lopEval            = 0x1D,
 	lopLessPred        = 0x1E,
 	lopLessEqPred      = 0x1F,
 	lopEqualPred       = 0x20,
@@ -221,11 +221,11 @@ typedef enum lOpcode {
 	lopZeroPred        = 0x2A
 } lOpcode;
 
-i64 lBytecodeGetOffset16(const lBytecodeOp *ip);
-lVal *lBytecodeEval(lClosure *c, lBytecodeArray *ops);
-lVal     *lLambda  (lClosure *c, lVal *args, lVal *lambda);
-lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
-
+i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
+lVal *lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
+lVal *lLambda              (lClosure *c, lVal *args, lVal *lambda);
+lVal *lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
+void  simplePrintVal(lVal *v);
 
 /*
  | Workarounds for missing builtins
