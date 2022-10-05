@@ -31,7 +31,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [ ] Tail-call optimization
 - [ ] Continuations
 - [ ] Value types
-- [ ] Binary FASL format with C reader/writer
+- [ ] Binary/FASL format
 - [ ] Reader written in Nujel
 - [ ] Simple HTTP 1.1 client/server
 

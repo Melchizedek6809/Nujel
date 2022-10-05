@@ -3,17 +3,6 @@
 ;;;
 ;;; Some functions dealing with arrays
 
-[defn array/n l
-      "Create a new array from ...ARGS"
-      [pfmtln "L: {l:?}"]
-      [when-not l [return [array/allocate 0]]]
-      [def ret [array/allocate [length l]]]
-      [println [string [array/length ret]]]
-      [dotimes [i [array/length ret]]
-        [array/set! ret i [car l]]
-        [cdr! l]]
-      [return ret]]
-
 [defn array/+= [a i v]
       "Add V to the value in A at position I and store the result in A returning A"
       [array/set! a i [+ v [array/ref a i]]]]
