@@ -65,6 +65,8 @@
                                                [when-not [file/read* handle temporary-buffer-view 1]
                                                          [return :end-of-file]]
                                                [buffer/ref temporary-buffer-view 0 char]]
+                                  :raw! [fn [handle]
+                                            [file/raw* handle #t]]
                                   :close! [tree/ref output-port-method-table :close!]
                                   :position [tree/ref output-port-method-table :position]
                                   :position! [tree/ref output-port-method-table :position!]

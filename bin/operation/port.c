@@ -4,6 +4,37 @@
 #include "../private.h"
 #endif
 
+#if (!defined(_WIN32))
+#include <termios.h>
+#include <stdlib.h>
+
+bool rawMode = false;
+struct termios orig_termios;
+
+static void disableRawMode() {
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
+
+static lVal *lnfFileRaw(lClosure *c, lVal *v){
+	struct termios raw;
+	FILE *fh = requireFileHandle(c, lCar(v));
+
+	tcgetattr(fileno(fh), &raw);
+	if(!rawMode){
+		orig_termios = raw;
+		atexit(disableRawMode);
+		rawMode = true;
+	}
+	raw.c_iflag &= ~(ICRNL | IXON);
+	raw.c_oflag &= ~(OPOST);
+	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+	tcsetattr(fileno(fh), TCSAFLUSH, &raw);
+
+	return NULL;
+}
+
+#endif
+
 
 static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
 	lString *pathname = requireString(c, lCar(v));
@@ -173,6 +204,9 @@ void lOperationsPort(lClosure *c){
 	lAddNativeFunc(c,"file/seek*",   "[handle offset whence]",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
 	lAddNativeFunc(c,"file/eof*?",   "[handle]",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
 	lAddNativeFunc(c,"file/error*?", "[handle]",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
+#if (!defined(_WIN32))
+	lAddNativeFunc(c,"file/raw*", "[handle]",                    "Set an input stream into raw mode", lnfFileRaw);
+#endif
 }
 
 void lOperationsInit(lClosure *c){

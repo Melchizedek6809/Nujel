@@ -1,0 +1,31 @@
+[require :core/term]
+[core/term/start]
+
+[core/term/clear-screen]
+[core/term/move-cursor 4 4]
+[core/term/set-fg-color :red]
+[core/term/put-string "Test"]
+[core/term/set-fg-color :default]
+[core/term/put-string "!@#"]
+
+[def size [core/term/get-size]]
+[core/term/draw-box :red
+                    2
+                    2
+                    [- [tree/ref size :width] 4]
+                    [- [tree/ref size :height] 4]]
+
+[core/term/draw-box :blue
+                    4
+                    4
+                    [- [tree/ref size :width] 8]
+                    [- [tree/ref size :height] 8]]
+
+[core/term/move-cursor 6 6]
+
+[while #t
+  [def c [core/term/poll-input]]
+  [when [= c #\q]
+    [core/term/stop]
+    [exit 0]]
+  [core/term/put-char c]]

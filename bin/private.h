@@ -5,6 +5,11 @@
 #include "../lib/nujel.h"
 #endif
 
+#if (!defined(_WIN32))
+#include <termios.h>
+#endif
+
+#include <stdlib.h>
 #include <stdio.h>
 
 #if defined(_MSC_VER)

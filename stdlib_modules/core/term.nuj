@@ -1,0 +1,109 @@
+
+[defn put-char [char]
+      :export
+      [stdout 'char-write char]]
+
+[defn put-string [text]
+      :export
+      [stdout 'block-write text]]
+
+[defn clear-screen []
+      :export
+      [stdout 'block-write "\e[2J"]]
+
+[defn start []
+      :export
+      [stdin :raw!]
+      [stdout 'block-write "\e[?1049h"]]
+
+[defn stop []
+      :export
+      [stdout 'block-write "\e[?1049l"]]
+
+[defn move-cursor [column line]
+      :export
+      [stdout 'block-write [fmt "\e[{line};{column}H"]]]
+
+[def fg-colors @[ :default "\e[0m"
+
+                  :black "\e[0;30m"
+                  :red "\e[0;31m"
+                  :green "\e[0;32m"
+                  :yellow "\e[0;33m"
+                  :blue "\e[0;34m"
+
+                  :pink "\e[0;35m"
+                  :magenta "\e[0;35m"
+                  :purple "\e[0;35m"
+
+                  :cyan "\e[0;36m"
+                  :teal "\e[0;36m"
+
+                  :white "\e[0;37m"]]
+
+[def bg-colors @[ :default "\e[49m"
+
+                  :black "\e[40m"
+                  :red "\e[41m"
+                  :green "\e[42m"
+                  :yellow "\e[43m"
+                  :blue "\e[44m"
+
+                  :pink "\e[45m"
+                  :magenta "\e[45m"
+                  :purple "\e[45m"
+
+                  :cyan "\e[46m"
+                  :teal "\e[46m"
+
+                  :white "\e[47m"]]
+
+[defn set-fg-color [color-name]
+      :export
+      [def v [tree/ref fg-colors color-name]]
+      [when-not v [exception "Unknown color" color-name]]
+      [stdout 'block-write v]]
+
+[defn set-bg-color [color-name]
+      :export
+      [def v [tree/ref bg-colors color-name]]
+      [when-not v [exception "Unknown color" color-name]]
+      [stdout 'block-write v]]
+
+[defn get-size []
+      :export
+      [stdout 'block-write "\e 7"]
+      [move-cursor 9999 9999]
+      [stdout 'block-write "\e[6n"]
+      [stdout 'flush-output]
+      [def buf [buffer/allocate 128]]
+      [def i 0]
+      [while #t
+        [def c [stdin 'char-read]]
+        [when [= c #\R]
+          [stdout 'block-write "\e 8"]
+          [def s [split [cut [buffer->string buf i] 2] ";"]]
+          [return @[:width [read/int [cadr s]] :height [read/int [car s]]]]]
+        [buffer/set! buf i c]
+        [inc! i]]]
+
+[defn get-width []
+      :export
+      [tree/ref [get-size] :width]]
+
+[defn get-height []
+      :export
+      [tree/ref [get-size] :height]]
+
+[defn poll-input []
+      :export
+      [stdin 'char-read]]
+
+[defn draw-box [color pos-x pos-y width height]
+      :export
+      [set-bg-color color]
+      [dotimes [y height]
+               [move-cursor pos-x [+ y pos-y]]
+               [dotimes [x width]
+                        [put-char 32]]]
+      [set-bg-color :default]]
