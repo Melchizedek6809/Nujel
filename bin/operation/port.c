@@ -25,8 +25,9 @@ static lVal *lnfFileRaw(lClosure *c, lVal *v){
 		atexit(disableRawMode);
 		rawMode = true;
 	}
-	raw.c_iflag &= ~(ICRNL | IXON);
+	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 	raw.c_oflag &= ~(OPOST);
+	raw.c_cflag |= (CS8);
 	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 	tcsetattr(fileno(fh), TCSAFLUSH, &raw);
 

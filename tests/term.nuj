@@ -23,9 +23,11 @@
 
 [core/term/move-cursor 6 6]
 
+[def i 8]
+
 [while #t
   [def c [core/term/poll-input]]
-  [when [= c #\q]
+  [when [= c #x11]
     [core/term/stop]
     [exit 0]]
-  [core/term/put-char c]]
+  [core/term/put-string [fmt "{c:X} "]]]

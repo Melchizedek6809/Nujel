@@ -97,7 +97,10 @@
 
 [defn poll-input []
       :export
-      [stdin 'char-read]]
+      [def c [stdin 'char-read]]
+      [if [= c :end-of-file]
+          0
+          c]]
 
 [defn draw-box [color pos-x pos-y width height]
       :export
