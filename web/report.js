@@ -150,6 +150,40 @@ const getSingleViews = key => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(entry.language != "nujel"){continue;}
+			const k = `${entry.hostname}`;
+			if(!data[k]){data[k]={};}
+			const d = entry.date;
+			if(!data[k][d]){
+				data[k][d] = {
+					"value": 0,
+					"count": 0
+				};
+			}
+			data[k][d].value += entry[key] * 1000.0;
+			data[k][d].count += 1;
+		}
+	}
+	const retArr = [];
+	for(const name in data){
+		const ret = {x:[],y:[],type: 'line', name};
+		const dates = Object.keys(data[name]).sort();
+		for(const d of dates){
+			ret.x.push(d);
+			const v = data[name][d].value / data[name][d].count;
+			ret.y.push(v ? v : 1.0);
+		}
+		retArr.push(ret);
+	}
+	return retArr;
+};
+
+const getSingleViewsHost = (key,host) => {
+	const data = {};
+	for(const run of reportData){
+		for(const entry of run){
+			if(!entry){continue;}
+			if(entry.language != "nujel"){continue;}
+			if(entry.hostname !== host){continue;}
 			const k = `${entry.testcase}-${entry.hostname}-${entry.architecture}`;
 			if(!data[k]){data[k]={};}
 			const d = entry.date;
@@ -239,6 +273,7 @@ const analyzeData = () => {
 		}
 	});
 
+	/*
 	Plotly.newPlot("report-memory-time", {
 		data: getSingleViews("max-resident"),
 		layout: {
@@ -253,12 +288,33 @@ const analyzeData = () => {
 			}
 		}
 	});
+	*/
 
-	const barReports = document.querySelectorAll(".bar-report");
 	let to = 0;
-	for(const barReport of barReports){
+	for(const barReport of document.querySelectorAll(".bar-report")){
 		to += 10;
 		setTimeout(() => drawSinglePlot(barReport), to);
+	}
+
+	for(const barReport of document.querySelectorAll(".cpu-report")){
+		to += 10;
+		setTimeout(() => {
+			const host = barReport.getAttribute("report-hostname");
+			Plotly.newPlot(barReport, {
+				data: getSingleViewsHost("total", host),
+				layout: {
+					title: `Nujel CPU Benchmark (${host})`,
+					xaxis: {
+						title: "Date"
+					},
+					yaxis: {
+						title: "milliseconds",
+						type: options.log ? 'log' : null,
+						autorange: true
+					}
+				}
+			});
+		}, to);
 	}
 };
 setTimeout(analyzeData, 0);

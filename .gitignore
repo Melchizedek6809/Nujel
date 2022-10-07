@@ -57,6 +57,7 @@ gmon.out
 /web/index.html
 /web/index.wasm
 /web/index.wasm
+/web/plotly-*
 /.vs
 
 /web/filesystem.json
