@@ -11,9 +11,7 @@
 [import [serialize :as val->json] :serialization/json]
 
 
-[def time-path [if [file/file? "/usr/local/bin/time"]
-                   "/usr/local/bin/time"
-                   "/usr/bin/time"]]
+[def time-path [cdr [popen "which time"]]]
 [def single-runs 8]
 [def nujel-runs  8]
 [def git-head [popen/trim "git rev-parse HEAD"]]
