@@ -1,4 +1,3 @@
-
 [defn put-char [char]
       :export
       [stdout 'char-write char]]
@@ -26,20 +25,20 @@
 
 [def fg-colors @[ :default "\e[0m"
 
-                  :black "\e[0;30m"
-                  :red "\e[0;31m"
-                  :green "\e[0;32m"
-                  :yellow "\e[0;33m"
-                  :blue "\e[0;34m"
+                  :black "\e[30m"
+                  :red "\e[31m"
+                  :green "\e[32m"
+                  :yellow "\e[33m"
+                  :blue "\e[34m"
 
-                  :pink "\e[0;35m"
-                  :magenta "\e[0;35m"
-                  :purple "\e[0;35m"
+                  :pink "\e[35m"
+                  :magenta "\e[35m"
+                  :purple "\e[35m"
 
-                  :cyan "\e[0;36m"
-                  :teal "\e[0;36m"
+                  :cyan "\e[36m"
+                  :teal "\e[36m"
 
-                  :white "\e[0;37m"]]
+                  :white "\e[37m"]]
 
 [def bg-colors @[ :default "\e[49m"
 
@@ -83,7 +82,8 @@
         [when [= c #\R]
           [stdout 'block-write "\e 8"]
           [def s [split [cut [buffer->string buf i] 2] ";"]]
-          [return @[:width [read/int [cadr s]] :height [read/int [car s]]]]]
+          [return @[ :width [read/int [cadr s]]
+                     :height [read/int [car s]]]]]
         [buffer/set! buf i c]
         [inc! i]]]
 
