@@ -11,6 +11,11 @@
       "Return a number 1 greater than x"
       [+ 1 x]]
 
+[defn dec [x]
+      :inline
+      "Return a number 1 less than x"
+      [- x 1]]
+
 [defmacro inc! [i v]
           "Decrement I by V (defaults to 1) and store the result in I"
           `[set! ~i [+ ~i ~[or v 1]]]]

@@ -69,6 +69,11 @@
       [when-not v [exception "Unknown color" color-name]]
       [stdout 'block-write v]]
 
+[defn set-color [fg-color-name bg-color-name]
+      :export
+      [when fg-color-name [set-fg-color fg-color-name]]
+      [when bg-color-name [set-bg-color bg-color-name]]]
+
 [defn get-size []
       :export
       [stdout 'block-write "\e 7"]
