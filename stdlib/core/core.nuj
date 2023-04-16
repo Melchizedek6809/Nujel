@@ -5,11 +5,6 @@
 ;;; core language constructs and essential macros
 
 [def otherwise #t]
-[defmacro deftest l #nil] ; Tests should be skipped when compiling
-
-[defmacro comment body
-          "Does nothing"
-          #nil]
 
 [defmacro += [val inc]
           `[set! ~val [+ ~val ~inc]]]
@@ -30,12 +25,34 @@
                         "Evalutes to BODY if PRED is true"
                         `[let* [do ~@[let/args bindings] ~@body]]]]]
 
-[defn boolean [v] :inline
+[defn boolean [v]
       "Coerce to boolean"
+      :inline
+      :cat :boolean-operations
+      :related not
+      [deftest #t [boolean #t]]
+      [deftest #f [boolean #nil]]
+      [deftest #f [boolean #f]]
+      [deftest #t [boolean 0]]
+      [deftest #t [boolean 1]]
+      [deftest #t [boolean 0.1]]
+      [deftest #t [boolean ""]]
+      [deftest #t [boolean "a"]]
+
       [if v #t #f]]
 
-[defn not [v] :inline
+[defn not [v]
       "Return true if V is false"
+      :inline
+      :cat :boolean-operations
+      :related boolean
+      [deftest #f [not #t]]
+      [deftest #t [not #f]]
+      [deftest #t [not [< 5 1]]]
+      [deftest #t [not [= #f #t]]]
+      [deftest #t [not [< 3 2]]]
+      [deftest #t [not [>= "2" 3]]]
+
       [if v #f #t]]
 
 [defn identity [α] :inline
@@ -46,48 +63,128 @@
       "Return ARGUMENTS as a list"
       arguments]
 
-[defn caar [p] :inline
+[defn caar [p]
       "[car [car p]]"
+      :inline
+      :cat :list-manipulation
+      :related cadr
+      :related car
+      :related cdr
+      [deftest #t [caar '[[#t] #f]]]
+
       [car [car p]]]
 
-[defn cadr [p] :inline
+[defn cadr [p]
       "[car [cdr p]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cadr '[#f #t #f]]]
+
       [car [cdr p]]]
 
-[defn cdar [p] :inline
+[defn cdar [p]
       "[cdr [car p]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cdar '[[#f . #t] #f]]]
+      [deftest [#t] [cdar '[[#f #t] #f]]]
+
       [cdr [car p]]]
 
-[defn cddr [p] :inline
+[defn cddr [p]
       "[cdr [cdr p]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cddr '[#f #f . #t]]]
+      [deftest [#t] [cddr '[#f #f #t]]]
+
       [cdr [cdr p]]]
 
 [defn cadar [p]
-      "[cdr [car p]]"
+      "[car [cdr [car p]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cadar '[[#f #t] #f]]]
+
       [car [cdr [car p]]]]
 
 [defn caddr [p]
       "[car [cdr [cdr p]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [caddr '[#f #f #t]]]
+
       [car [cdr [cdr p]]]]
 
 [defn cdddr [p]
       "[cdr [cdr [cdr p]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cdddr '[#f #f #f . #t]]]
+      [deftest [#t] [cdddr '[#f #f #f #t]]]
+
       [cdr [cdr [cdr p]]]]
 
 [defn cadddr [p]
       "[car [cdr [cdr [cdr p]]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cadddr '[#f #f #f #t]]]
+
       [car [cdr [cdr [cdr p]]]]]
 
 [defn cddddr [p]
-      "[car [cdr [cdr [cdr p]]]]"
+      "[cdr [cdr [cdr [cdr p]]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cddddr '[#f #f #f #f . #t]]]
+
       [cdr [cdr [cdr [cdr p]]]]]
 
 [defn caddddr [p]
-      "[car [cdr [cdr [cdr p]]]]"
+      "[car [cdr [cdr [cdr [cdr p]]]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [caddddr '[#f #f #f #f #t]]]
+
       [car [cdr [cdr [cdr [cdr p]]]]]]
 
 [defn cdddddr [p]
-      "[cdr [cdr [cdr [cdr p]]]]"
+      "[cdr [cdr [cdr [cdr [cdr p]]]]]"
+      :inline
+      :cat :list-manipulation
+      :related caar
+      :related car
+      :related cdr
+      [deftest #t [cdddddr '[#f #f #f #f #f. #t]]]
+
       [cdr [cdr [cdr [cdr [cdr p]]]]]]
 
 [defmacro exception [type description value]

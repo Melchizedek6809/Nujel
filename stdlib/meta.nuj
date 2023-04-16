@@ -82,3 +82,14 @@
                        [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]]
 
 [def root-closure [current-closure]]
+
+[defmacro deftest l #nil] ; Tests should be skipped when compiling
+
+[defmacro comment body
+          "Does nothing, mainly used for commenting out"
+          "parts of an expression, but having the sub expressions"
+          "be available so you can use them easily via nujel-mode."
+          :cat :documentation
+          [deftest #nil [let [x #nil] [comment [set! x #t]] x]]
+
+          #nil]
