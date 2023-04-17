@@ -266,7 +266,7 @@
       :cat :bytecode
       :internal
       [when [> arg-count 255]
-        [exception :arity-error "Functions can only take up to 255 arguments directly, you can use [apply] instead though" arg-count]]
+        [exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count]]
       [list #$4
             [int->bytecode-op arg-count]]]
 

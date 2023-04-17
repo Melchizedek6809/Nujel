@@ -403,7 +403,7 @@
 [defn procedure? [val]
       "Test whether val is a procedure"
       ""
-      "Procedures in this context mean something you can apply to or put at the beginning of an expression."
+      "Procedures in this context mean something you can use with map or put at the beginning of an expression."
       ""
       "val: This argument is going to be tested"
       ""
