@@ -3,23 +3,23 @@
 ;;;
 ;;; Time related λs
 
-[defn seconds [timestamp]
+(defn seconds (timestamp)
       :export
       "Return the seconds part of TIMESTAMP, defaults to current time"
-      [rem [or timestamp [time]] 60]]
+      (rem (or timestamp (time)) 60))
 
-[defn minutes [timestamp]
+(defn minutes (timestamp)
       :export
       "Return the minutes part of TIMESTAMP, defaults to current time"
-      [rem [div/int [or timestamp [time]] 60] 60]]
+      (rem (div/int (or timestamp (time)) 60) 60))
 
-[defn hours [timestamp]
+(defn hours (timestamp)
       :export
       "Return the hours part of TIMESTAMP, defaults to current time"
-      [rem [div/int [or timestamp [time]] 3600] 24]]
+      (rem (div/int (or timestamp (time)) 3600) 24))
 
-[deftest 34 [time/seconds 1637755714]]
-[deftest  8 [time/minutes 1637755714]]
-[deftest 12 [time/hours   1637755714]]
-[deftest 59 [time/seconds 1637755739]]
-[deftest  0 [time/seconds 1637755740]]
+(deftest 34 (time/seconds 1637755714))
+(deftest  8 (time/minutes 1637755714))
+(deftest 12 (time/hours   1637755714))
+(deftest 59 (time/seconds 1637755739))
+(deftest  0 (time/seconds 1637755740))

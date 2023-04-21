@@ -3,82 +3,82 @@
 ;;;
 ;;; Mostly macros implementing different control flow constructs
 
-[defmacro if-not [pred then else]
-          `[if ~pred ~else ~then]]
+(defmacro if-not (pred then else)
+          `(if ~pred ~else ~then))
 
-[defmacro when-not [pred . body]
+(defmacro when-not (pred . body)
           "Evalutes to BODY if PRED is false"
-          `[if ~pred #nil [do ~@body]]]
+          `(if ~pred #nil (do ~@body)))
 
-[defmacro when [pred . body]
+(defmacro when (pred . body)
           "Evalutes to BODY if PRED is true"
-          `[if ~pred [do ~@body] #nil]]
+          `(if ~pred (do ~@body) #nil))
 
-[def case [let*
-            [defn case/clauses/multiple [key-sym cases]
-                  [when cases
-                    [cons [list '= key-sym [car cases]]
-                          [case/clauses/multiple key-sym [cdr cases]]]]]
-            [defn case/clauses [key-sym clauses]
-                  [when clauses
-                    [if [= [caar clauses] 'otherwise]
-                        [cons 'do [cdar clauses]]
-                        [list 'if
-                              [if [pair? [caar clauses]]
-                                  [if [and [= [car [caar clauses]] 'quote]
-                                           [last? [cdr [caar clauses]]]
-                                           [symbol? [cadr [caar clauses]]]]
-                                      [list '= key-sym [caar clauses]]
-                                      [cons 'or [case/clauses/multiple key-sym [caar clauses]]]]
-                                  [list '= key-sym [caar clauses]]]
-                              [cons 'do [cdar clauses]]
-                              [case/clauses key-sym [cdr clauses]]]]]]
-            [defmacro case [key-form . clauses]
-                      [def key-sym [gensym]]
-                      [list 'let*
-                            [list 'def key-sym key-form]
-                            [case/clauses key-sym clauses]]]]]
+(def case (let*
+            (defn case/clauses/multiple (key-sym cases)
+                  (when cases
+                    (cons (list '= key-sym (car cases))
+                          (case/clauses/multiple key-sym (cdr cases)))))
+            (defn case/clauses (key-sym clauses)
+                  (when clauses
+                    (if (= (caar clauses) 'otherwise)
+                        (cons 'do (cdar clauses))
+                        (list 'if
+                              (if (pair? (caar clauses))
+                                  (if (and (= (car (caar clauses)) 'quote)
+                                           (last? (cdr (caar clauses)))
+                                           (symbol? (cadr (caar clauses))))
+                                      (list '= key-sym (caar clauses))
+                                      (cons 'or (case/clauses/multiple key-sym (caar clauses))))
+                                  (list '= key-sym (caar clauses)))
+                              (cons 'do (cdar clauses))
+                              (case/clauses key-sym (cdr clauses))))))
+            (defmacro case (key-form . clauses)
+                      (def key-sym (gensym))
+                      (list 'let*
+                            (list 'def key-sym key-form)
+                            (case/clauses key-sym clauses)))))
 
-[defmacro cond body
+(defmacro cond body
           "Contains multiple cond clauses"
-          [when [and body [caar body]]
-                [list 'if
-                      [caar body]
-                      [cons 'do [cdar body]]
-                      [macro-apply cond [cdr body]]]]]
+          (when (and body (caar body))
+                (list 'if
+                      (caar body)
+                      (cons 'do (cdar body))
+                      (macro-apply cond (cdr body)))))
 
-[defmacro dotimes [binding . body]
-          "binding => [name n result-form]"
+(defmacro dotimes (binding . body)
+          "binding => (name n result-form)"
           "Repeatedly executes body with name bound to integers from 0 through n-1. Returns result-form or #nil."
-          [def sym [car binding]]
-          [typecheck/only sym :symbol]
-          [def times [cadr binding]]
-          [def result-form [caddr binding]]
-          `[let [[~sym 0]]
-                [while [< ~sym ~times]
+          (def sym (car binding))
+          (typecheck/only sym :symbol)
+          (def times (cadr binding))
+          (def result-form (caddr binding))
+          `(let ((~sym 0))
+                (while (< ~sym ~times)
                        ~@body
-                       [set! ~sym [inc/int ~sym]]]
-                ~result-form]]
+                       (set! ~sym (inc/int ~sym)))
+                ~result-form))
 
-[defmacro doseq [for-loop . body]
-          "[doseq [l [list 1 2 3 4] result-form] [println l]]"
-          [def symbol-name [gensym]]
-          `[let [[~symbol-name ~[cadr for-loop]]]
-                [while ~symbol-name
-                  [when-not [pair? ~symbol-name] [exception :type-error "Improper list detected, please provide a proper list instead" ~[cadr for-loop]]]
-                  [typecheck/only ~symbol-name :pair]
-                  [def ~[car for-loop] [car ~symbol-name]]
+(defmacro doseq (for-loop . body)
+          "(doseq (l (list 1 2 3 4) result-form) (println l))"
+          (def symbol-name (gensym))
+          `(let ((~symbol-name ~(cadr for-loop)))
+                (while ~symbol-name
+                  (when-not (pair? ~symbol-name) (exception :type-error "Improper list detected, please provide a proper list instead" ~(cadr for-loop)))
+                  (typecheck/only ~symbol-name :pair)
+                  (def ~(car for-loop) (car ~symbol-name))
                   ~@body
-                  [cdr! ~symbol-name]]
-                ~[caddr for-loop]]]
+                  (cdr! ~symbol-name))
+                ~(caddr for-loop)))
 
-[def -> [let*
-          [defn thread/-> [init fun]
-                [if-not fun init
-                        [if [pair? [car fun]]
-                            `[~[caar fun] ~[thread/-> init [cdr fun]] ~@[cdar fun]]
-                            [list [car fun] [thread/-> init [cdr fun]]]]]]
+(def -> (let*
+          (defn thread/-> (init fun)
+                (if-not fun init
+                        (if (pair? (car fun))
+                            `(~(caar fun) ~(thread/-> init (cdr fun)) ~@(cdar fun))
+                            (list (car fun) (thread/-> init (cdr fun))))))
 
-          [defmacro -> [init . fun]
+          (defmacro -> (init . fun)
                     "Thread init as the first argument through every function in fun"
-                    [thread/-> init [reverse fun]]]]]
+                    (thread/-> init (reverse fun)))))

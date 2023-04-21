@@ -1,18 +1,18 @@
 #!/usr/bin/env nujel
 
-[require :random]
+(require :random)
 
-[defn test-sort [times sort-func]
-       [def l #nil]
-       [dotimes [i times]
-                [set! l [cons [random/rng!] l]]]
-       [def sorted [sort-func l]]
-       [while sorted
-              [when [and [cadr sorted]
-                         [> [car sorted] [cadr sorted]]]
-                    [throw :list-not-sorted]]
-              [cdr! sorted]]]
+(defn test-sort (times sort-func)
+       (def l #nil)
+       (dotimes (i times)
+                (set! l (cons (random/rng!) l)))
+       (def sorted (sort-func l))
+       (while sorted
+              (when (and (cadr sorted)
+                         (> (car sorted) (cadr sorted)))
+                    (throw :list-not-sorted))
+              (cdr! sorted)))
 
-[test-sort 1500 list/sort]
+(test-sort 1500 list/sort)
 
-[return :success]
+(return :success)

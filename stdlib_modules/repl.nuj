@@ -3,68 +3,68 @@
 ;;;
 ;;; The REPL implementation, also parses command line arguments and determines
 ;;; which files to load and whether to start a interactive session.
-[import [rainbow] :ansi]
+(import (rainbow) :ansi)
 
-[def *1 #nil]
-[def *2 #nil]
-[def *3 #nil]
-[def line-history #nil]
-[def ctx [environment*]]
+(def *1 #nil)
+(def *2 #nil)
+(def *3 #nil)
+(def line-history #nil)
+(def ctx (environment*))
 
-[defn exception-handler [error]
-      [print/error error]]
+(defn exception-handler (error)
+      (print/error error))
 
-[defn push-result [result]
-      [set! *3 *2]
-      [set! *2 *1]
-      [set! *1 result]
-      [return result]]
+(defn push-result (result)
+      (set! *3 *2)
+      (set! *2 *1)
+      (set! *1 result)
+      (return result))
 
-[defn cmd/raw [line]
+(defn cmd/raw (line)
       :export
-      [try [fn [err]
-               [if [= [car err] :unmatched-opening-bracket]
-                   [cmd/raw ctx [cat line [readline "... "]]]
-                   [throw err]]]
-           [def expr [read line]]
-           [when [equal? '[] expr]
-                 [print "\r"]
-                 [return]]
-           [try exception-handler
-                [def result [eval-in ctx [cons do expr]]]
-                [push-result result]
-                [println [if [nil? result] "" [string/display result]]]]]]
+      (try (fn (err)
+               (if (= (car err) :unmatched-opening-bracket)
+                   (cmd/raw ctx (cat line (readline "... ")))
+                   (throw err)))
+           (def expr (read line))
+           (when (equal? '() expr)
+                 (print "\r")
+                 (return))
+           (try exception-handler
+                (def result (eval-in ctx (cons do expr)))
+                (push-result result)
+                (println (if (nil? result) "" (string/display result))))))
 
-[defn cmd []
-      [def buf ""]
-      [def line ""]
-      [while [not= [trim line] "[/cmd]"]
-             [set! buf [cat buf line]]
-             [set! line [readline]]]
-      [def expr [cons do [read buf]]]
-      [def result [eval-in ctx expr]]
-      [push-result result]
-      [println [if [nil? result] "" [string/display result]]]]
+(defn cmd ()
+      (def buf "")
+      (def line "")
+      (while (not= (trim line) "[/cmd]")
+             (set! buf (cat buf line))
+             (set! line (readline)))
+      (def expr (cons do (read buf)))
+      (def result (eval-in ctx expr))
+      (push-result result)
+      (println (if (nil? result) "" (string/display result))))
 
-[defn prompt []
-      "> "]
+(defn prompt ()
+      "> ")
 
-[defn read-cmd []
-      [def line [readline [prompt]]]
-      [cons! line line-history]
-      [when [nil? line]
-            [println "Adios, cowboy..."]
-            [exit 0]]
-      [if [= [trim line] "[cmd]"]
-          [cmd]
-          [cmd/raw line]]]
+(defn read-cmd ()
+      (def line (readline (prompt)))
+      (cons! line line-history)
+      (when (nil? line)
+            (println "Adios, cowboy...")
+            (exit 0))
+      (if (= (trim line) "[cmd]")
+          (cmd)
+          (cmd/raw line)))
 
-[defn welcome []
-      [println [cat [rainbow "Nujel"] " REPL is ready for service!"]]]
+(defn welcome ()
+      (println (cat (rainbow "Nujel") " REPL is ready for service!")))
 
-[defn main [args]
+(defn main (args)
       :export
-      [welcome]
-      [while #t
-             [try exception-handler
-                  [read-cmd]]]]
+      (welcome)
+      (while #t
+             (try exception-handler
+                  (read-cmd))))

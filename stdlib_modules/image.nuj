@@ -11,86 +11,86 @@
 ;;; Some simple drawing routines (line/box/circle) and some simple
 ;;; filters (scale/blur) would also be good to have here.
 
-[def image/decoders @[]]
-[def image/encoders @[]]
+(def image/decoders @())
+(def image/encoders @())
 
-[defn add-encoder! [ext enc]
+(defn add-encoder! (ext enc)
       :export
-      [def ext [string->keyword [lower-case ext]]]
-      [tree/set! image/encoders ext enc]]
+      (def ext (string->keyword (lower-case ext)))
+      (tree/set! image/encoders ext enc))
 
-[defn add-decoder! [ext dec]
+(defn add-decoder! (ext dec)
       :export
-      [def ext [string->keyword [lower-case ext]]]
-      [tree/set! image/decoders ext dec]]
+      (def ext (string->keyword (lower-case ext)))
+      (tree/set! image/decoders ext dec))
 
-[defn get-encoder [path]
-      [def ext [string->keyword [lower-case [path/extension path]]]]
-      [tree/ref image/encoders ext]]
+(defn get-encoder (path)
+      (def ext (string->keyword (lower-case (path/extension path))))
+      (tree/ref image/encoders ext))
 
-[defn get-decoder [path]
-      [def ext [string->keyword [lower-case [path/extension path]]]]
-      [tree/ref image/decoders ext]]
+(defn get-decoder (path)
+      (def ext (string->keyword (lower-case (path/extension path))))
+      (tree/ref image/decoders ext))
 
 
-[defn new [width height]
+(defn new (width height)
       :export
-      [def buffer [buffer/allocate [* width height 4]]]
-      @[ :width width
+      (def buffer (buffer/allocate (* width height 4)))
+      @( :width width
          :height height
          :buffer buffer
-         :pixels [buffer/u32* buffer]]]
+         :pixels (buffer/u32* buffer)))
 
-[defn image/ref [img x y]
+(defn image/ref (img x y)
       :export-as ref
-      [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
-      [buffer/ref [tree/ref img :pixels] i]]
+      (def i (+ (int x) (* (int y) (tree/ref img :width))))
+      (buffer/ref (tree/ref img :pixels) i))
 
-[defn image/set! [img x y value]
+(defn image/set! (img x y value)
       :export-as set!
-      [def i [+ [int x] [* [int y] [tree/ref img :width]]]]
-      [buffer/set! [tree/ref img :pixels] i value]]
+      (def i (+ (int x) (* (int y) (tree/ref img :width))))
+      (buffer/set! (tree/ref img :pixels) i value))
 
-[defn fill! [img value]
+(defn fill! (img value)
       :export
-      [def p [tree/ref img :pixels]]
-      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
-        [buffer/set! p i value]]]
+      (def p (tree/ref img :pixels))
+      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
+        (buffer/set! p i value)))
 
-[defn map! [img fun]
+(defn map! (img fun)
       :export
-      [def p [tree/ref img :pixels]]
-      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
-        [buffer/set! p i [fun [buffer/ref p i]]]]]
+      (def p (tree/ref img :pixels))
+      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
+        (buffer/set! p i (fun (buffer/ref p i)))))
 
-[defn dup [img]
+(defn dup (img)
       :export
-      [def ret [image/new [tree/ref img :width]
-                          [tree/ref img :height]]]
-      [def in [tree/ref img :pixels]]
-      [def out [tree/ref ret :pixels]]
-      [dotimes [i [* [tree/ref img :width] [tree/ref img :height]] img]
-        [buffer/set! out i [buffer/ref in i]]]]
+      (def ret (image/new (tree/ref img :width)
+                          (tree/ref img :height)))
+      (def in (tree/ref img :pixels))
+      (def out (tree/ref ret :pixels))
+      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
+        (buffer/set! out i (buffer/ref in i))))
 
-[defn save! [img path]
+(defn save! (img path)
       :export
-      [def enc [get-encoder path]]
-      [if enc
-          [file/write [enc img] path]
-          [exception :missing-encoder "Currently there is no encoder loaded for that image format" path]]]
+      (def enc (get-encoder path))
+      (if enc
+          (file/write (enc img) path)
+          (exception :missing-encoder "Currently there is no encoder loaded for that image format" path)))
 
-[defn adler32 [img]
+(defn adler32 (img)
       :export
-      [import [hash] :crypto/adler32]
-      [hash [tree/ref img :buffer]]]
+      (import (hash) :crypto/adler32)
+      (hash (tree/ref img :buffer)))
 
-[defn test-image-xor []
+(defn test-image-xor ()
       :export
-      [def w 256]
-      [def h 256]
-      [def out [new w h]]
-      [dotimes [x w out]
-        [dotimes [y h]
-          [image/set! out x y [bit-or x [bit-shift-left y 8] [bit-shift-left [bit-xor x y] 16]]]]]]
+      (def w 256)
+      (def h 256)
+      (def out (new w h))
+      (dotimes (x w out)
+        (dotimes (y h)
+          (image/set! out x y (bit-or x (bit-shift-left y 8) (bit-shift-left (bit-xor x y) 16))))))
 
-[deftest 4040398435 [image/adler32 [image/test-image-xor]]]
+(deftest 4040398435 (image/adler32 (image/test-image-xor)))

@@ -1,5 +1,5 @@
-[:float-inf [try car [/ 3 0]]]
-[:test [try [fn [e] :test] [/ 3 0]]]
-[:test [try car [try [fn [e] :test] [/ 3 0]]]]
-[:inner [try [fn [e] :outer] [try [fn [e] :inner] [throw :asd]]]]
-[:outer [try [fn [e] :outer] [try [fn [e] :inner] 1] [throw :asd]]]
+(:float-inf (try car (/ 3 0)))
+(:test (try (fn (e) :test) (/ 3 0)))
+(:test (try car (try (fn (e) :test) (/ 3 0))))
+(:inner (try (fn (e) :outer) (try (fn (e) :inner) (throw :asd))))
+(:outer (try (fn (e) :outer) (try (fn (e) :inner) 1) (throw :asd)))

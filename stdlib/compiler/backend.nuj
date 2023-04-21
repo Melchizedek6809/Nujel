@@ -4,33 +4,33 @@
 ;;; Contains an abstraction that allows for multiple backends, right now we only
 ;;; support :bytecode and :none (:none is lowered Nujel, with most of the sugar removed).
 
-[defn compile/backend/none [expr]
+(defn compile/backend/none (expr)
       :cat :compiler
       :internal
-      expr]
+      expr)
 
-[defn compile/backend/bytecode [expr]
+(defn compile/backend/bytecode (expr)
       :cat :compiler
       :internal
-      [-> [bytecompile expr]
-          assemble*]]
+      (-> (bytecompile expr)
+          assemble*))
 
-[def *active-backend* :bytecode]
-[def backend/tree @[ :bytecode compile/backend/bytecode
-                     :none compile/backend/none]]
+(def *active-backend* :bytecode)
+(def backend/tree @( :bytecode compile/backend/bytecode
+                     :none compile/backend/none))
 
-[defn backend [expr]
+(defn backend (expr)
       :cat :compiler
       :internal
-      [[tree/ref backend/tree *active-backend*] expr]]
+      ((tree/ref backend/tree *active-backend*) expr))
 
-[defn compile/for [backend expr environment]
-      [def last-backend *active-backend*]
-      [def ret #nil]
-      [try [fn [e]
-               [set! *active-backend* last-backend]
-               [throw e]]
-           [set! *active-backend* backend]
-           [set! ret [compile expr environment]]
-           [set! *active-backend* last-backend]
-           [return ret]]]
+(defn compile/for (backend expr environment)
+      (def last-backend *active-backend*)
+      (def ret #nil)
+      (try (fn (e)
+               (set! *active-backend* last-backend)
+               (throw e))
+           (set! *active-backend* backend)
+           (set! ret (compile expr environment))
+           (set! *active-backend* last-backend)
+           (return ret)))

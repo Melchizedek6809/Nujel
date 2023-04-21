@@ -4,18 +4,18 @@
 ;
 ; By considering the terms in the Fibonacci sequence whose values do not exceed four million, find the sum of the even-valued terms.
 
-[defn fib-range/iter [l max]
-       [def v [+ [car l] [cadr l]]]
-       [if [> v max]
+(defn fib-range/iter (l max)
+       (def v (+ (car l) (cadr l)))
+       (if (> v max)
            l
-           [fib-range/iter [cons v l] max]]]
+           (fib-range/iter (cons v l) max)))
 
-[defn fib-range [max]
-       [nreverse [fib-range/iter [list 2 1] max]]]
+(defn fib-range (max)
+       (nreverse (fib-range/iter (list 2 1) max)))
 
-[def ret [-> [fib-range 4,000,000]
-             [filter even?]
-             [sum]]]
-[when [not= ret 4613732]
-      [throw [list :wrong-result "Wrong result" ret]]]
-[return :success]
+(def ret (-> (fib-range 4,000,000)
+             (filter even?)
+             (sum)))
+(when (not= ret 4613732)
+      (throw (list :wrong-result "Wrong result" ret)))
+(return :success)

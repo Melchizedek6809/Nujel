@@ -2,19 +2,19 @@
 ; This project uses the MIT license, a copy should be included under /LICENSE
 
 
-[#t [file/dir? "stdlib"]]
-[#f [file/file? "stdlib"]]
-[#t [file/file? "GNUmakefile"]]
-[#f [file/dir? "GNUmakefile"]]
-[#f [ref [file/stat "GNUmakefile"] :error?]]
-[#t [ref [file/stat "This-file-should-never-exist.jpeg"] :error?]]
-[#t [> [ref [file/stat "GNUmakefile"] :size] 1024]]
-[#t [int? [ref [file/stat "GNUmakefile"] :modification-time]]]
-[#t [int? [ref [file/stat "GNUmakefile"] :access-time]]]
-[#t [bool? [ref [file/stat "GNUmakefile"] :regular-file?]]]
-[#t [bool? [ref [file/stat "GNUmakefile"] :directory?]]]
-[#t [bool? [ref [file/stat "GNUmakefile"] :character-device?]]]
-[#t [bool? [ref [file/stat "GNUmakefile"] :block-device?]]]
-[#t [bool? [ref [file/stat "GNUmakefile"] :named-pipe?]]]
-[#t [tree? System/Environment]]
-[#t [string? [ref System/Environment 'PATH]]]
+(#t (file/dir? "stdlib"))
+(#f (file/file? "stdlib"))
+(#t (file/file? "GNUmakefile"))
+(#f (file/dir? "GNUmakefile"))
+(#f (ref (file/stat "GNUmakefile") :error?))
+(#t (ref (file/stat "This-file-should-never-exist.jpeg") :error?))
+(#t (> (ref (file/stat "GNUmakefile") :size) 1024))
+(#t (int? (ref (file/stat "GNUmakefile") :modification-time)))
+(#t (int? (ref (file/stat "GNUmakefile") :access-time)))
+(#t (bool? (ref (file/stat "GNUmakefile") :regular-file?)))
+(#t (bool? (ref (file/stat "GNUmakefile") :directory?)))
+(#t (bool? (ref (file/stat "GNUmakefile") :character-device?)))
+(#t (bool? (ref (file/stat "GNUmakefile") :block-device?)))
+(#t (bool? (ref (file/stat "GNUmakefile") :named-pipe?)))
+(#t (tree? System/Environment))
+(#t (string? (ref System/Environment 'PATH)))

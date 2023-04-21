@@ -1,68 +1,68 @@
 #!/usr/bin/env nujel
 
-[import [blue green red purple yellow] :ansi]
-[import [run :as test-run load-file :as test-load add-builtin-tests] :test]
+(import (blue green red purple yellow) :ansi)
+(import (run :as test-run load-file :as test-load add-builtin-tests) :test)
 
-[def test/beginning [time/milliseconds]]
-[def test/testsuite-errors 0]
+(def test/beginning (time/milliseconds))
+(def test/testsuite-errors 0)
 
-[defn prog-str [fun-color i path start]
-  [cat "[" [fun-color [pad-start i 2]]
-       "/" [pad-start test/count 2]
-       "] " [pad-end [cut path 2 [length path]] 48]
-       [if start [cat " " [blue [pad-start [- [time/milliseconds] start] 8]] "ms"] #nil]]]
+(defn prog-str (fun-color i path start)
+  (cat "(" (fun-color (pad-start i 2))
+       "/" (pad-start test/count 2)
+       ") " (pad-end (cut path 2 (length path)) 48)
+       (if start (cat " " (blue (pad-start (- (time/milliseconds) start) 8)) "ms") #nil)))
 
-[when [not [tree/has? init/options :only-test-suite]]
-  [println [purple "First we test the basic functions of the runtime."]]]
-[for-each [-> [directory/read-relative "tests/testsuite"] sort] test-load]
-[add-builtin-tests]
+(when (not (tree/has? init/options :only-test-suite))
+  (println (purple "First we test the basic functions of the runtime.")))
+(for-each (-> (directory/read-relative "tests/testsuite") sort) test-load)
+(add-builtin-tests)
 
-[def output-passes #f]
-[when [tree/has? init/options :verbose]
-  [set! output-passes #t]]
+(def output-passes #f)
+(when (tree/has? init/options :verbose)
+  (set! output-passes #t))
 
-[set! test/testsuite-errors [test-run output-passes]]
-[file/test/directory "./stdlib_modules"]
+(set! test/testsuite-errors (test-run output-passes))
+(file/test/directory "./stdlib_modules")
 
-[when [tree/has? init/options :only-test-suite]
-  [exit test/testsuite-errors]]
+(when (tree/has? init/options :only-test-suite)
+  (exit test/testsuite-errors))
 
-[println [green "Great, Now we can do some more complicated and thorough tests."]]
+(println (green "Great, Now we can do some more complicated and thorough tests."))
 
-[def test/slow [or [ref init/options :slow-test] #f]]
-[def test/ridiculous [or [ref init/options :ridiculous-test] #f]]
-[def test/start [time/milliseconds]]
-[def test/success 0]
-[def test/errors 0]
-[def i 0]
-[defn file/test [path]
-  [inc! i]
-  [def test/start/file [time/milliseconds]]
-  [try [fn [err]
-           [print "\r"]
-           [println [prog-str red i path test/start/file]]
-           [inc! test/errors]
-           [print/error err]
-           [newline]]
-       [print [prog-str yellow i path #nil]]
-       [def ret [file/eval path [environment*]]]
-       [when [not= ret :success] [exception :wrong-result "Test did not return :success"]]
-       [inc! test/success]
-       [print "\r"]
-       [println [prog-str green i path test/start/file]]]]
+(def test/slow (or (ref init/options :slow-test) #f))
+(def test/ridiculous (or (ref init/options :ridiculous-test) #f))
+(def test/start (time/milliseconds))
+(def test/success 0)
+(def test/errors 0)
+(def i 0)
+(defn file/test (path)
+  (inc! i)
+  (def test/start/file (time/milliseconds))
+  (try (fn (err)
+           (print "\r")
+           (println (prog-str red i path test/start/file))
+           (inc! test/errors)
+           (print/error err)
+           (newline))
+       (print (prog-str yellow i path #nil))
+       (def ret (file/eval path (environment*)))
+       (when (not= ret :success) (exception :wrong-result "Test did not return :success"))
+       (inc! test/success)
+       (print "\r")
+       (println (prog-str green i path test/start/file))))
 
-[def test-paths [list/sort [filter [append [directory/read-relative "./tests/fast"]
-                                           [when test/slow [directory/read-relative "./tests/slow"]]
-					   [when test/ridiculous [directory/read-relative "./tests/ridiculous"]]]
-                                   [path/ext?! "nuj"]]]]
+(def test-paths (list/sort (filter (append (directory/read-relative "./tests/fast")
+                                           (when test/slow (directory/read-relative "./tests/slow"))
+					   (when test/ridiculous (directory/read-relative "./tests/ridiculous")))
+                                   (path/ext?! "nuj"))))
 
-[def test/count [length test-paths]]
-[for-each test-paths file/test]
-[newline]
-[def dur [- [time/milliseconds] test/start]]
-[if [and [> test/success 0] [zero? test/errors]]
-    [do [println [cat [green "Extended Tests succeeded"] " - [" [green test/success] " / " [red test/errors] "] in " dur "ms"]]]
-    [do [println [cat [red   "Extended Tests failed"]    " - [" [green test/success] " / " [red test/errors] "] in " dur "ms"]]]]
+(def test/count (length test-paths))
+(for-each test-paths file/test)
+(newline)
+(def dur (- (time/milliseconds) test/start))
+(if (and (> test/success 0) (zero? test/errors))
+    (do (println (cat (green "Extended Tests succeeded") " - (" (green test/success) " / " (red test/errors) ") in " dur "ms")))
+    (do (println (cat (red   "Extended Tests failed")    " - (" (green test/success) " / " (red test/errors) ") in " dur "ms"))))
 
-[println [cat "Running everything took " [blue [- [time/milliseconds] test/beginning]] "ms"]]
-[exit test/errors + test/testsuite-errors]
+(println (cat "Running everything took " (blue (- (time/milliseconds) test/beginning)) "ms"))
+(exit test/errors + test/testsuite-errors)

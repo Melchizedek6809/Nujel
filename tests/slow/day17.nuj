@@ -1,41 +1,41 @@
 #!/usr/bin/env nujel
 
-[def counter 0]
+(def counter 0)
 
-[defn in-area? [x y]
-       [and [>= x 144]
-	    [<= x 178]
-	    [>= y -100]
-	    [<= y -76]]]
+(defn in-area? (x y)
+       (and (>= x 144)
+	    (<= x 178)
+	    (>= y -100)
+	    (<= y -76)))
 
-[defn over? [x y]
-       [or [> x 178]
-	   [< y -100]]]
+(defn over? (x y)
+       (or (> x 178)
+	   (< y -100)))
 
-[defn zdir [a]
-       [cond [[zero? a] 0]
-             [[> a 0] -1]
-	     [#t 1]]]
+(defn zdir (a)
+       (cond ((zero? a) 0)
+             ((> a 0) -1)
+	     (#t 1)))
 
-[defn shoot [x y vx vy max-y]
-       ;[println [cat x " " y " " vx " " vy]]
-       [cond [[in-area? x y] [inc! counter] max-y]
-	     [[over? x y] 0]
-	     [#t [shoot [+ x vx] [+ y vy] [+ vx [zdir vx]] [+ vy -1] [max y max-y]]]]]
+(defn shoot (x y vx vy max-y)
+       ;(println (cat x " " y " " vx " " vy))
+       (cond ((in-area? x y) (inc! counter) max-y)
+	     ((over? x y) 0)
+	     (#t (shoot (+ x vx) (+ y vy) (+ vx (zdir vx)) (+ vy -1) (max y max-y)))))
 
-[defn find-max []
-       [def ret 0]
-       [dotimes [vx 300]
-       [dotimes [vy 600]
-	    [def res [shoot 0 0 vx [- vy 300] 0]]
-	    [set! ret [max ret res]]
-       ]] ret]
+(defn find-max ()
+       (def ret 0)
+       (dotimes (vx 300)
+       (dotimes (vy 600)
+	    (def res (shoot 0 0 vx (- vy 300) 0))
+	    (set! ret (max ret res))
+       )) ret)
 
-[def res-p1 [find-max]]
-[when [not= res-p1 4950]
-      [throw [list :wrong-result "Wrong result" res-p1]]]
-[def res-p2 counter]
-[when [not= res-p2 1477]
-      [throw [list :wrong-result "Wrong result" res-p2]]]
+(def res-p1 (find-max))
+(when (not= res-p1 4950)
+      (throw (list :wrong-result "Wrong result" res-p1)))
+(def res-p2 counter)
+(when (not= res-p2 1477)
+      (throw (list :wrong-result "Wrong result" res-p2)))
 
-[return :success]
+(return :success)

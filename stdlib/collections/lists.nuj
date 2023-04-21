@@ -3,156 +3,156 @@
 ;;;
 ;;; Put all the LISt Processing stuff in here
 
-[defmacro cdr! [l]
-          "[set! l [cdr l]]"
-          `[set! ~l [cdr ~l]]]
+(defmacro cdr! (l)
+          "(set! l (cdr l))"
+          `(set! ~l (cdr ~l)))
 
-[defmacro cons! [v l]
+(defmacro cons! (v l)
           "Cons V onto L and set! the value for L"
-          `[set! ~l [cons ~v ~l]]]
+          `(set! ~l (cons ~v ~l)))
 
-[def except-last-pair [let*
-                        [defn except-last-pair/iter [list rest]
+(def except-last-pair (let*
+                        (defn except-last-pair/iter (list rest)
                               "Iterator for except-last-pair"
-                              [if [nil? [cdr list]]
-                                  [reverse rest]
-                                  [except-last-pair/iter [cdr list] [cons [car list] rest]]]]
+                              (if (nil? (cdr list))
+                                  (reverse rest)
+                                  (except-last-pair/iter (cdr list) (cons (car list) rest))))
 
-                        [defn except-last-pair [list]
+                        (defn except-last-pair (list)
                               "Return a copy of LIST without the last pair"
-                              [except-last-pair/iter list #nil]]]]
+                              (except-last-pair/iter list #nil))))
 
-[defn last-pair [list]
+(defn last-pair (list)
       "Return the last pair of LIST"
-      [while [cdr list]
-             [cdr! list]]
-      list]
+      (while (cdr list)
+             (cdr! list))
+      list)
 
-[defn range [end start step]
+(defn range (end start step)
       "Return a list containing values from START (inclusive) to END (exclusive) by STEP"
-      [when-not end   [exception :arity-error "[range] needs at least a specific end"]]
-      [when-not start [set! start 0]]
-      [when-not step  [set! step 1]]
-      [def pred [if [pos? step] < >]]
-      [def ret #nil]
-      [while [pred start end]
-             [set! ret [cons start ret]]
-             [set! start [+ start step]]]
-      [nreverse ret]]
+      (when-not end   (exception :arity-error "(range) needs at least a specific end"))
+      (when-not start (set! start 0))
+      (when-not step  (set! step 1))
+      (def pred (if (pos? step) < >))
+      (def ret #nil)
+      (while (pred start end)
+             (set! ret (cons start ret))
+             (set! start (+ start step)))
+      (nreverse ret))
 
-[defn list/reduce [l o s]
+(defn list/reduce (l o s)
       "Combine all elements in l using operation o and starting value s"
-      [doseq [e l s]
-             [set! s [o s e]]]]
+      (doseq (e l s)
+             (set! s (o s e))))
 
-[defn list/ref [l i]
+(defn list/ref (l i)
       "Returns the the element of list l at location i"
-      [while [and l [> i 0]]
-             [dec! i]
-             [cdr! l]]
-      [car l]]
+      (while (and l (> i 0))
+             (dec! i)
+             (cdr! l))
+      (car l))
 
-[defn reverse [l]
+(defn reverse (l)
       "Return the list l in reverse order"
-      [def ret]
-      [doseq [e l ret]
-             [set! ret [cons e ret]]]]
+      (def ret)
+      (doseq (e l ret)
+             (set! ret (cons e ret))))
 
-[defn list/length [l]
+(defn list/length (l)
       "Returns the length of list l"
-      [def ret 0]
-      [doseq [e l ret]
-             [inc! ret]]]
+      (def ret 0)
+      (doseq (e l ret)
+             (inc! ret)))
 
-[defn list/filter [l p]
+(defn list/filter (l p)
       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
-      [def ret #nil]
-      [doseq [e l [nreverse ret]]
-             [when [p e] [set! ret [cons e ret]]]]]
+      (def ret #nil)
+      (doseq (e l (nreverse ret))
+             (when (p e) (set! ret (cons e ret)))))
 
-[defn list/map [l f]
+(defn list/map (l f)
       "Runs f over every item in list l and returns the resulting list"
-      [def ret #nil]
-      [doseq [e l [nreverse ret]]
-             [set! ret [cons [f e] ret]]]]
+      (def ret #nil)
+      (doseq (e l (nreverse ret))
+             (set! ret (cons (f e) ret))))
 
-[defn append [a b]
+(defn append (a b)
       "Appends two lists A and B together"
-      [def ret b]
-      [set! a [reverse a]]
-      [doseq [t a ret]
-             [set! ret [cons t ret]]]]
+      (def ret b)
+      (set! a (reverse a))
+      (doseq (t a ret)
+             (set! ret (cons t ret))))
 
-[def list-merge-sort [let*
-                       [defn list/merge-sorted-lists [l1 l2 pred]
-                             [cond [[nil? l1] l2]
-                                   [[nil? l2] l1]
-                                   [#t [if [pred [car l1] [car l2]]
-                                           [cons [car l1] [list/merge-sorted-lists [cdr l1] l2 pred]]
-                                           [cons [car l2] [list/merge-sorted-lists l1 [cdr l2] pred]]]]]]
+(def list-merge-sort (let*
+                       (defn list/merge-sorted-lists (l1 l2 pred)
+                             (cond ((nil? l1) l2)
+                                   ((nil? l2) l1)
+                                   (#t (if (pred (car l1) (car l2))
+                                           (cons (car l1) (list/merge-sorted-lists (cdr l1) l2 pred))
+                                           (cons (car l2) (list/merge-sorted-lists l1 (cdr l2) pred))))))
 
-                       [defn list/split-half-rec [l acc1 acc2]
-                             [cond [[nil? l] [cons acc1 acc2]]
-                                   [[nil? [cdr l]] [cons [cons [car l] acc1] acc2]]
-                                   [#t [list/split-half-rec [cddr l] [cons [car l] acc1] [cons [cadr l] acc2]]]]]
+                       (defn list/split-half-rec (l acc1 acc2)
+                             (cond ((nil? l) (cons acc1 acc2))
+                                   ((nil? (cdr l)) (cons (cons (car l) acc1) acc2))
+                                   (#t (list/split-half-rec (cddr l) (cons (car l) acc1) (cons (cadr l) acc2)))))
 
-                       [defn list/split-half [l] [list/split-half-rec l #nil #nil]]
+                       (defn list/split-half (l) (list/split-half-rec l #nil #nil))
 
-                       [defn list/sort/merge [l pred]
+                       (defn list/sort/merge (l pred)
                              "Sorts a list"
-                             [when-not pred [set! pred <]]
-                             [if [nil? [cdr l]]
+                             (when-not pred (set! pred <))
+                             (if (nil? (cdr l))
                                  l
-                                 [do [def parts [list/split-half l]]
-                                     [list/merge-sorted-lists
-                                      [list/sort/merge [car parts] pred]
-                                      [list/sort/merge [cdr parts] pred]
-                                      pred]]]]]]
-[def list/sort list-merge-sort] ; Set default sort to merge-sort
+                                 (do (def parts (list/split-half l))
+                                     (list/merge-sorted-lists
+                                      (list/sort/merge (car parts) pred)
+                                      (list/sort/merge (cdr parts) pred)
+                                      pred))))))
+(def list/sort list-merge-sort) ; Set default sort to merge-sort
 
-[defn list? [a]
+(defn list? (a)
       "Return #t is A is a proper list"
-      [when-not a [return #f]]
-      [while a
-             [when-not [pair? a]
-                       [return #f]]
-             [cdr! a]]
-      [return #t]]
+      (when-not a (return #f))
+      (while a
+             (when-not (pair? a)
+                       (return #f))
+             (cdr! a))
+      (return #t))
 
-[defn list/equal? [a b]
+(defn list/equal? (a b)
       "#t if A and B are equal"
-      [if [pair? a]
-          [and [list/equal? [car a] [car b]]
-               [list/equal? [cdr a] [cdr b]]]
-          [equal? a b]]]
+      (if (pair? a)
+          (and (list/equal? (car a) (car b))
+               (list/equal? (cdr a) (cdr b)))
+          (equal? a b)))
 
-[defn list-take [l count]
+(defn list-take (l count)
       "Take the first COUNT elements from list L"
-      [if [<= count 0]
+      (if (<= count 0)
           #nil
-          [cons [car l] [list-take [cdr l] [- count 1]]]]]
+          (cons (car l) (list-take (cdr l) (- count 1)))))
 
-[defn list-drop [l count]
+(defn list-drop (l count)
       "Drop the final COUNT elements from list L"
-      [if [<= count 0]
+      (if (<= count 0)
           l
-          [list-drop [cdr l] [- count 1]]]]
+          (list-drop (cdr l) (- count 1))))
 
-[defn list/cut [l start end]
+(defn list/cut (l start end)
       "Return a subsequence of L from START to END"
-      [list-take [list-drop l [max 0 start]] [- end [max 0 start]]]]
+      (list-take (list-drop l (max 0 start)) (- end (max 0 start))))
 
-[defn list/replace [l search-for replace-with]
+(defn list/replace (l search-for replace-with)
       "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
       ""
-      "Uses [equal?] so we can search/replace lists/trees and other complex data structures"
-      [cond [[not l] #nil]
-            [[equal? l search-for]
-             replace-with]
-            [[equal? [car l] search-for]
-             [cons replace-with
-                   [list/replace [cdr l] search-for replace-with]]]
-            [#t [cons [if [pair? [car l]]
-                          [list/replace [car l] search-for replace-with]
-                          [car l]]
-                      [list/replace [cdr l] search-for replace-with]]]]]
+      "Uses (equal?) so we can search/replace lists/trees and other complex data structures"
+      (cond ((not l) #nil)
+            ((equal? l search-for)
+             replace-with)
+            ((equal? (car l) search-for)
+             (cons replace-with
+                   (list/replace (cdr l) search-for replace-with)))
+            (#t (cons (if (pair? (car l))
+                          (list/replace (car l) search-for replace-with)
+                          (car l))
+                      (list/replace (cdr l) search-for replace-with)))))

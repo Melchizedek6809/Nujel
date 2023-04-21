@@ -3,7 +3,7 @@
 ;;;
 ;;; Functions converting from one type to another
 
-[defn keyword->string [kw]
+(defn keyword->string (kw)
       "Convert a keyword into a string"
       ""
       "kw: The input keyword"
@@ -11,12 +11,12 @@
       "Returns the string for kw"
       :cat :type-conversion
       :related string->keyword
-      [deftest "asd" [keyword->string :asd]]
+      (deftest "asd" (keyword->string :asd))
 
-      [when-not [keyword? kw] [exception :type-error "[keyword->string] can only be called on keywords" kw]]
-      [string [keyword->symbol kw]]]
+      (when-not (keyword? kw) (exception :type-error "(keyword->string) can only be called on keywords" kw))
+      (string (keyword->symbol kw)))
 
-[defn string->keyword [kw]
+(defn string->keyword (kw)
       "Convert a string into a keyword"
       ""
       "kw: The input string"
@@ -24,7 +24,7 @@
       "Returns the keyword for kw"
       :cat :type-conversion
       :related keyword->string
-      [deftest :asd [string->keyword "asd"]]
+      (deftest :asd (string->keyword "asd"))
 
-      [when-not [string? kw] [exception :type-error "[string->keyword] can only be called on strings" kw]]
-      [symbol->keyword [string->symbol kw]]]
+      (when-not (string? kw) (exception :type-error "(string->keyword) can only be called on strings" kw))
+      (symbol->keyword (string->symbol kw)))

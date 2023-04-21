@@ -4,481 +4,481 @@
 ;;; Contains the bytecode assembler, so we don't have to write opcode literals
 ;;; and emits. Additionally it calculates branch offsets using the labels provided.
 
-[defn $nop []
-      "[] -> [] --- Do Nothing"
+(defn $nop ()
+      "() -> () --- Do Nothing"
       :cat :bytecode
       :internal
       :inline
-      '[#$00]]
+      '(#$00))
 
-[defn $ret []
-      "[a] -> [] --- Return top of value stack"
+(defn $ret ()
+      "(a) -> () --- Return top of value stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$01]]
+      '(#$01))
 
-[defn $add/int []
-      "[a b] -> [result] --- Adds the two topmost values and pushes the result"
+(defn $add/int ()
+      "(a b) -> (result) --- Adds the two topmost values and pushes the result"
       :cat :bytecode
       :internal
       :inline
-      '[#$03]]
+      '(#$03))
 
-[defn $dup []
-      "[a] -> [a a] --- Duplicates the value that is on the top of the stack"
+(defn $dup ()
+      "(a) -> (a a) --- Duplicates the value that is on the top of the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$0C]]
+      '(#$0C))
 
-[defn $drop []
-      "[a] -> [] --- Drop whatever is on top of the stack"
+(defn $drop ()
+      "(a) -> () --- Drop whatever is on top of the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$0D]]
+      '(#$0D))
 
-[defn $closure/push []
-      "[] -> [closure] --- Push the current closure as a λ on the stack"
+(defn $closure/push ()
+      "() -> (closure) --- Push the current closure as a λ on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$13]]
+      '(#$13))
 
-[defn $let []
-      "[] -> [] --- Create a new let closure and switch to it"
+(defn $let ()
+      "() -> () --- Create a new let closure and switch to it"
       :cat :bytecode
       :internal
       :inline
-      '[#$15]]
+      '(#$15))
 
-[defn $closure/pop []
-      "[] -> [] --- Leave the current closure and return to the parent one"
+(defn $closure/pop ()
+      "() -> () --- Leave the current closure and return to the parent one"
       :cat :bytecode
       :internal
       :inline
-      '[#$16]]
+      '(#$16))
 
-[defn $< []
-      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+(defn $< ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$1E]]
+      '(#$1E))
 
-[defn $<= []
-      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+(defn $<= ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$1F]]
+      '(#$1F))
 
-[defn $= []
-      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+(defn $= ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$20]]
+      '(#$20))
 
-[defn $>= []
-      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+(defn $>= ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$21]]
+      '(#$21))
 
-[defn $> []
-      "[a b] -> [bool] --- Compare A and B and push the result on the stack"
+(defn $> ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$22]]
+      '(#$22))
 
-[defn $push/nil []
-      "[] -> [nil] --- Push a #nil on the stack"
+(defn $push/nil ()
+      "() -> (nil) --- Push a #nil on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$24]]
+      '(#$24))
 
-[defn $car []
-      "[l] -> [car] --- Replace L with its car"
+(defn $car ()
+      "(l) -> (car) --- Replace L with its car"
       :cat :bytecode
       :internal
       :inline
-      '[#$11]]
+      '(#$11))
 
-[defn $cdr []
-      "[l] -> [cdr] --- Replace L with its cdr"
+(defn $cdr ()
+      "(l) -> (cdr) --- Replace L with its cdr"
       :cat :bytecode
       :internal
       :inline
-      '[#$12]]
+      '(#$12))
 
-[defn $cons []
-      "[car cdr] -> [pair] --- Cons CAR and CDR together and put it on the stack"
+(defn $cons ()
+      "(car cdr) -> (pair) --- Cons CAR and CDR together and put it on the stack"
       :cat :bytecode
       :internal
       :inline
-      '[#$14]]
+      '(#$14))
 
-[defn $fn/dynamic []
-      "[name args docs body] -> [λ] --- Create a new λ"
+(defn $fn/dynamic ()
+      "(name args docs body) -> (λ) --- Create a new λ"
       :cat :bytecode
       :internal
       :inline
-      '[#$17]]
+      '(#$17))
 
-[defn $macro/dynamic []
-      "[name args docs body] -> [μ] --- Create a new μ"
+(defn $macro/dynamic ()
+      "(name args docs body) -> (μ) --- Create a new μ"
       :cat :bytecode
       :internal
       :inline
-      '[#$18]]
+      '(#$18))
 
-[defn $add []
-      "[a b] -> [result]"
+(defn $add ()
+      "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$25]]
+      '(#$25))
 
-[defn $sub []
-      "[a b] -> [result]"
+(defn $sub ()
+      "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$26]]
+      '(#$26))
 
-[defn $mul []
-      "[a b] -> [result]"
+(defn $mul ()
+      "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$27]]
+      '(#$27))
 
-[defn $div []
-      "[a b] -> [result]"
+(defn $div ()
+      "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$28]]
+      '(#$28))
 
-[defn $rem []
-      "[a b] -> [result]"
+(defn $rem ()
+      "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$29]]
+      '(#$29))
 
-[defn $push/true []
-      "[] -> [#t]"
+(defn $push/true ()
+      "() -> (#t)"
       :cat :bytecode
       :internal
       :inline
-      '[#$1B]]
+      '(#$1B))
 
-[defn $push/false []
-      "[] -> [#f]"
+(defn $push/false ()
+      "() -> (#f)"
       :cat :bytecode
       :internal
       :inline
-      '[#$1C]]
+      '(#$1C))
 
-[defn $eval []
-      "[bc env] -> [return-val]"
+(defn $eval ()
+      "(bc env) -> (return-val)"
       :cat :bytecode
       :internal
       :inline
-      '[#$1D]]
+      '(#$1D))
 
-[defn $zero? []
-      "[a] -> [result]"
+(defn $zero? ()
+      "(a) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '[#$2A]]
+      '(#$2A))
 
-[defn $inc/int []
-      "[a] -> [result] --- Adds 1 to the topmost int"
+(defn $inc/int ()
+      "(a) -> (result) --- Adds 1 to the topmost int"
       :cat :bytecode
       :internal
       :inline
-      '[#$23]]
+      '(#$23))
 
-[defn int-fit-in-byte? [a]
-      [and [<= a 127] [>= a -128]]]
+(defn int-fit-in-byte? (a)
+      (and (<= a 127) (>= a -128)))
 
-[defn $push/int [a]
-      "[] -> [a] --- Push A on the stack as an :int"
+(defn $push/int (a)
+      "() -> (a) --- Push A on the stack as an :int"
       :cat :bytecode
       :internal
-      [if [int-fit-in-byte? a]
-          [$push/int/byte a]
-          [$push/val a]]]
+      (if (int-fit-in-byte? a)
+          ($push/int/byte a)
+          ($push/val a)))
 
-[defn $push/int/byte [a]
-      "[] -> [a] --- Push A on the stack as an :int that fits within a byte"
+(defn $push/int/byte (a)
+      "() -> (a) --- Push A on the stack as an :int that fits within a byte"
       :cat :bytecode
       :internal
-      [when-not [int-fit-in-byte? a]
-                [exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ]]
-      [list #$2 [int->bytecode-op a]]]
+      (when-not (int-fit-in-byte? a)
+                (exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ))
+      (list #$2 (int->bytecode-op a)))
 
-[defn $apply/optimize? [fun arg-count]
+(defn $apply/optimize? (fun arg-count)
       :cat :bytecode
       :internal
-      [case fun
-            [[+ - * / rem bytecode-eval*] [= arg-count 2]]
-            [[zero? car cdr add/int inc/int cons < <= = >= >] #t]]]
+      (case fun
+            ((+ - * / rem bytecode-eval*) (= arg-count 2))
+            ((zero? car cdr add/int inc/int cons < <= = >= >) #t)))
 
-[defn $apply/optimized [arg-count fun]
-      "arguments -> [result] --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+(defn $apply/optimized (arg-count fun)
+      "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       :cat :bytecode
       :internal
-      [case arg-count
-            [1 [case fun
-                     [car [$car]]
-                     [cdr [$cdr]]
-                     [zero? [$zero?]]
-                     [inc/int [$inc/int]]
-                     [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
-            [2 [case fun
-                     [add/int [$add/int]]
-                     [+ [$add]]
-                     [- [$sub]]
-                     [* [$mul]]
-                     [/ [$div]]
-                     [rem [$rem]]
-                     [cons [$cons]]
-                     [< [$<]]
-                     [<= [$<=]]
-                     [= [$=]]
-                     [>= [$>=]]
-                     [> [$>]]
-                     [bytecode-eval* [$eval]]
-                     [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
-            [otherwise [exception :arity-error "Wrong number of arguments for that function" fun]]]]
+      (case arg-count
+            (1 (case fun
+                     (car ($car))
+                     (cdr ($cdr))
+                     (zero? ($zero?))
+                     (inc/int ($inc/int))
+                     (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
+            (2 (case fun
+                     (add/int ($add/int))
+                     (+ ($add))
+                     (- ($sub))
+                     (* ($mul))
+                     (/ ($div))
+                     (rem ($rem))
+                     (cons ($cons))
+                     (< ($<))
+                     (<= ($<=))
+                     (= ($=))
+                     (>= ($>=))
+                     (> ($>))
+                     (bytecode-eval* ($eval))
+                     (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
+            (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
 
-[defn $apply [arg-count fun]
-      "arguments -> [result] --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+(defn $apply (arg-count fun)
+      "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       :cat :bytecode
       :internal
-      [when [> arg-count 255]
-        [exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count]]
-      [list #$4
-            [int->bytecode-op arg-count]]]
+      (when (> arg-count 255)
+        (exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count))
+      (list #$4
+            (int->bytecode-op arg-count)))
 
-[defn $try [target]
-      "[] -> [] --- Try something, jumping to target if an exception occurs"
+(defn $try (target)
+      "() -> () --- Try something, jumping to target if an exception occurs"
       :cat :bytecode
       :internal
-      [list #$19 [list :relocate target 8 0 [int->bytecode-op 0]]
-            [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      (list #$19 (list :relocate target 8 0 (int->bytecode-op 0))
+            (list :relocate target 0 1 (int->bytecode-op 0))))
 
-[defn $jmp [target]
+(defn $jmp (target)
       :cat :bytecode
       :internal
-      [list #$9
-            [list :relocate target 8 0 [int->bytecode-op 0]]
-            [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      (list #$9
+            (list :relocate target 8 0 (int->bytecode-op 0))
+            (list :relocate target 0 1 (int->bytecode-op 0))))
 
-[defn $push/val [v]
-      "[] -> [v] --- Pushes v onto the stack"
+(defn $push/val (v)
+      "() -> (v) --- Pushes v onto the stack"
       :cat :bytecode
       :internal
-      [when [nil? v]
-            [exception :invalid-bc-op "Can't push #nil as a normal lVal" v ]]
-      [list #$1A
-            [list :literal v]]]
-[def $push/val/ext $push/val]
+      (when (nil? v)
+            (exception :invalid-bc-op "Can't push #nil as a normal lVal" v ))
+      (list #$1A
+            (list :literal v)))
+(def $push/val/ext $push/val)
 
-[defn $get/val [v]
-      "[] -> [v] --- Resolve V and get the associated value on the stack"
+(defn $get/val (v)
+      "() -> (v) --- Resolve V and get the associated value on the stack"
       :cat :bytecode
       :internal
-      [when-not [symbol? v]
-            [exception :invalid-bc-op "Can only get symbol" v ]]
-      [list #$E
-            [list :literal v]]]
+      (when-not (symbol? v)
+            (exception :invalid-bc-op "Can only get symbol" v ))
+      (list #$E
+            (list :literal v)))
 
-[defn $set/val [v]
-      "[v] -> [v] --- Resolve V and get the associated value on the stack"
+(defn $set/val (v)
+      "(v) -> (v) --- Resolve V and get the associated value on the stack"
       :cat :bytecode
       :internal
-      [when-not [symbol? v]
-            [exception :invalid-bc-op "Can only get symbol" v ]]
-      [list #$5
-            [list :literal v]]]
+      (when-not (symbol? v)
+            (exception :invalid-bc-op "Can only get symbol" v ))
+      (list #$5
+            (list :literal v)))
 
-[defn $def/val [v]
-      "[v] -> [v] --- Resolve V and get the associated value on the stack"
+(defn $def/val (v)
+      "(v) -> (v) --- Resolve V and get the associated value on the stack"
       :cat :bytecode
       :internal
-      [when-not [symbol? v]
-            [exception :invalid-bc-op "Can only get symbol" v ]]
-      [list #$7
-            [list :literal v]]]
+      (when-not (symbol? v)
+            (exception :invalid-bc-op "Can only get symbol" v ))
+      (list #$7
+            (list :literal v)))
 
-[defn $jt [target]
+(defn $jt (target)
       :cat :bytecode
       :internal
-      [list #$A
-            [list :relocate target 8 0 [int->bytecode-op 0]]
-            [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      (list #$A
+            (list :relocate target 8 0 (int->bytecode-op 0))
+            (list :relocate target 0 1 (int->bytecode-op 0))))
 
-[defn $jf [target]
+(defn $jf (target)
       :cat :bytecode
       :internal
-      [list #$B
-            [list :relocate target 8 0 [int->bytecode-op 0]]
-            [list :relocate target 0 1 [int->bytecode-op 0]]]]
+      (list #$B
+            (list :relocate target 8 0 (int->bytecode-op 0))
+            (list :relocate target 0 1 (int->bytecode-op 0))))
 
-[defn $fn [name args docs body]
+(defn $fn (name args docs body)
       :cat :bytecode
       :internal
-      [list #$25
-            [val->bytecode-op name]
-            [val->bytecode-op args]
-            [val->bytecode-op docs]
-            [val->bytecode-op body]]]
+      (list #$25
+            (val->bytecode-op name)
+            (val->bytecode-op args)
+            (val->bytecode-op docs)
+            (val->bytecode-op body)))
 
-[defn $macro* [name args docs body]
+(defn $macro* (name args docs body)
       :cat :bytecode
       :internal
-      [list #$26
-            [val->bytecode-op name]
-            [val->bytecode-op args]
-            [val->bytecode-op docs]
-            [val->bytecode-op body]]]
+      (list #$26
+            (val->bytecode-op name)
+            (val->bytecode-op args)
+            (val->bytecode-op docs)
+            (val->bytecode-op body)))
 
-[def assemble* [let*
-                 [defn assemble/build-sym-map [code sym-map pos]
-                       [while code
-                         [case [type-of [car code]]
-                               [:bytecode-op [tree/set! sym-map :last-op [inc! pos]]]
-                               [:keyword [case [car code]
-                                               [:label [tree/set! sym-map [cadr code] pos]
-                                                       [cdr! code]]
-                                               [:literal [cdr! code]]]]
-                               [:pair        [set! pos [assemble/build-sym-map [car code] sym-map pos]]]]
-                         [cdr! code]]
-                       [return pos]]
+(def assemble* (let*
+                 (defn assemble/build-sym-map (code sym-map pos)
+                       (while code
+                         (case (type-of (car code))
+                               (:bytecode-op (tree/set! sym-map :last-op (inc! pos)))
+                               (:keyword (case (car code)
+                                               (:label (tree/set! sym-map (cadr code) pos)
+                                                       (cdr! code))
+                                               (:literal (cdr! code))))
+                               (:pair        (set! pos (assemble/build-sym-map (car code) sym-map pos))))
+                         (cdr! code))
+                       (return pos))
 
-                 [defn assemble/relocate-op [code sym-map pos out]
-                       [def target [tree/ref sym-map [cadr code]]]
-                       [def off [- [+ target [cadddr code]] pos]]
-                       [array/set! out [inc! pos] [int->bytecode-op [bit-and [bit-shift-right off [caddr code]] #xFF]]]
-                       [return pos]]
+                 (defn assemble/relocate-op (code sym-map pos out)
+                       (def target (tree/ref sym-map (cadr code)))
+                       (def off (- (+ target (cadddr code)) pos))
+                       (array/set! out (inc! pos) (int->bytecode-op (bit-and (bit-shift-right off (caddr code)) #xFF)))
+                       (return pos))
 
-                 [defn assemble/emit-relocated-ops [code sym-map pos out]
-                       [if [= [car code] :relocate]
-                           [set! pos [assemble/relocate-op code sym-map pos out]]
-                           [doseq [op code pos]
-                                  [case [type-of op]
-                                        [:bytecode-op [array/set! out [inc! pos] op]]
-                                        [:pair        [set! pos [assemble/emit-relocated-ops op sym-map pos out]]]]]]]
+                 (defn assemble/emit-relocated-ops (code sym-map pos out)
+                       (if (= (car code) :relocate)
+                           (set! pos (assemble/relocate-op code sym-map pos out))
+                           (doseq (op code pos)
+                                  (case (type-of op)
+                                        (:bytecode-op (array/set! out (inc! pos) op))
+                                        (:pair        (set! pos (assemble/emit-relocated-ops op sym-map pos out)))))))
 
-                 [defn literal-index->bytecode-op [i]
-                       [if [< i 256]
-                           [int->bytecode-op i]
-                           [list [int->bytecode-op [bit-and [bit-shift-right i 8] #xFF]]
-                                 [int->bytecode-op [bit-and i #xFF]]]]]
+                 (defn literal-index->bytecode-op (i)
+                       (if (< i 256)
+                           (int->bytecode-op i)
+                           (list (int->bytecode-op (bit-and (bit-shift-right i 8) #xFF))
+                                 (int->bytecode-op (bit-and i #xFF)))))
 
-                 [def *max-literal-arr* 0]
-                 [defn assemble/add-literal [lit lit-arr]
-                       [when [>= [array/length lit-arr] 65535]
-                         [exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code]]
-                       [when [not= [type-of lit] :pair]
-                         [dotimes [i [array/length lit-arr]]
-                           [when [equal? [array/ref lit-arr i] lit]
-                             [return [literal-index->bytecode-op i]]]]]
-                       [array/length! lit-arr [+ 1 [array/length lit-arr]]]
-                       [array/set! lit-arr [- [array/length lit-arr] 1] lit]
-                       #;[when [> [array/length lit-arr] *max-literal-arr*]
-                       [set! *max-literal-arr* [array/length lit-arr]]
-                       [pfmtln "Max: {*max-literal-arr*}"]]
-                       [literal-index->bytecode-op [- [array/length lit-arr] 1]]]
+                 (def *max-literal-arr* 0)
+                 (defn assemble/add-literal (lit lit-arr)
+                       (when (>= (array/length lit-arr) 65535)
+                         (exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code))
+                       (when (not= (type-of lit) :pair)
+                         (dotimes (i (array/length lit-arr))
+                           (when (equal? (array/ref lit-arr i) lit)
+                             (return (literal-index->bytecode-op i)))))
+                       (array/length! lit-arr (+ 1 (array/length lit-arr)))
+                       (array/set! lit-arr (- (array/length lit-arr) 1) lit)
+                       #;(when (> (array/length lit-arr) *max-literal-arr*)
+                       (set! *max-literal-arr* (array/length lit-arr))
+                       (pfmtln "Max: {*max-literal-arr*}"))
+                       (literal-index->bytecode-op (- (array/length lit-arr) 1)))
 
-                 [defn assemble/build-lit-arr [code lit-arr]
-                       [when-not code [return #nil]]
-                       [cond [[pair? [car code]]
-                              [cons [assemble/build-lit-arr [car code] lit-arr]
-                                    [assemble/build-lit-arr [cdr code] lit-arr]]]
-                             [[and [= [car code] #$1A]
-                                   [= [car [cadr code]] :literal]]
-                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
-                              [cons [if [pair? index-op]
+                 (defn assemble/build-lit-arr (code lit-arr)
+                       (when-not code (return #nil))
+                       (cond ((pair? (car code))
+                              (cons (assemble/build-lit-arr (car code) lit-arr)
+                                    (assemble/build-lit-arr (cdr code) lit-arr)))
+                             ((and (= (car code) #$1A)
+                                   (= (car (cadr code)) :literal))
+                              (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
+                              (def index-op (assemble/add-literal (cadar code) lit-arr))
+                              (cons (if (pair? index-op)
                                         #$6
-                                        #$1A]
-                                    [cons index-op
-                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
-                             [[and [= [car code] #$E]
-                                   [= [car [cadr code]] :literal]]
-                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
-                              [cons [if [pair? index-op]
+                                        #$1A)
+                                    (cons index-op
+                                          (assemble/build-lit-arr (cdr code) lit-arr))))
+                             ((and (= (car code) #$E)
+                                   (= (car (cadr code)) :literal))
+                              (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
+                              (def index-op (assemble/add-literal (cadar code) lit-arr))
+                              (cons (if (pair? index-op)
                                         #$F
-                                        #$E]
-                                    [cons index-op
-                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
-                             [[and [= [car code] #$5]
-                                   [= [car [cadr code]] :literal]]
-                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
-                              [cons [if [pair? index-op]
+                                        #$E)
+                                    (cons index-op
+                                          (assemble/build-lit-arr (cdr code) lit-arr))))
+                             ((and (= (car code) #$5)
+                                   (= (car (cadr code)) :literal))
+                              (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
+                              (def index-op (assemble/add-literal (cadar code) lit-arr))
+                              (cons (if (pair? index-op)
                                         #$10
-                                        #$5]
-                                    [cons index-op
-                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
-                             [[and [= [car code] #$7]
-                                   [= [car [cadr code]] :literal]]
-                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-                              [def index-op [assemble/add-literal [cadar code] lit-arr]]
-                              [cons [if [pair? index-op]
+                                        #$5)
+                                    (cons index-op
+                                          (assemble/build-lit-arr (cdr code) lit-arr))))
+                             ((and (= (car code) #$7)
+                                   (= (car (cadr code)) :literal))
+                              (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
+                              (def index-op (assemble/add-literal (cadar code) lit-arr))
+                              (cons (if (pair? index-op)
                                         #$8
-                                        #$7]
-                                    [cons index-op
-                                          [assemble/build-lit-arr [cdr code] lit-arr]]]]
-                             [[= :literal [car code]]
-                              [cdr! code]  ; Skip the literal, especially important for :bytecode-op literals
-                              [cons [assemble/add-literal [car code] lit-arr]
-                                    [assemble/build-lit-arr [cdr code] lit-arr]]]
-                             [otherwise [cons [car code]
-                                              [assemble/build-lit-arr [cdr code] lit-arr]]]]]
+                                        #$7)
+                                    (cons index-op
+                                          (assemble/build-lit-arr (cdr code) lit-arr))))
+                             ((= :literal (car code))
+                              (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
+                              (cons (assemble/add-literal (car code) lit-arr)
+                                    (assemble/build-lit-arr (cdr code) lit-arr)))
+                             (otherwise (cons (car code)
+                                              (assemble/build-lit-arr (cdr code) lit-arr)))))
 
-                 [defn assemble/flatten [code ret]
-                       [when-not code [return ret]]
-                       [when-not [pair? code] [return ret]]
-                       [set! ret [assemble/flatten [cdr code] ret]]
-                       [if [and [pair? [car code]]
-                                [not [keyword? [caar code]]]]
-                           [assemble/flatten [car code] ret]
-                           [cons [car code] ret]]]
+                 (defn assemble/flatten (code ret)
+                       (when-not code (return ret))
+                       (when-not (pair? code) (return ret))
+                       (set! ret (assemble/flatten (cdr code) ret))
+                       (if (and (pair? (car code))
+                                (not (keyword? (caar code))))
+                           (assemble/flatten (car code) ret)
+                           (cons (car code) ret)))
 
-                 [defn assemble* [code]
+                 (defn assemble* (code)
                        "Assemble all arguments into a single :bytecode-array"
                        :cat :bytecode
                        :internal
-                       [def sym-map @[]]
-                       [def lit-arr #[]]
-                       [def tmp [-> [assemble/flatten code]
-                                    [assemble/build-lit-arr lit-arr]]]
-                       [assemble/build-sym-map tmp sym-map 0]
-                       [def out [array/allocate [tree/ref sym-map :last-op]]]
-                       [assemble/emit-relocated-ops tmp sym-map -1 out]
-                       [arr->bytecode-arr out lit-arr]]]]
+                       (def sym-map @())
+                       (def lit-arr #())
+                       (def tmp (-> (assemble/flatten code)
+                                    (assemble/build-lit-arr lit-arr)))
+                       (assemble/build-sym-map tmp sym-map 0)
+                       (def out (array/allocate (tree/ref sym-map :last-op)))
+                       (assemble/emit-relocated-ops tmp sym-map -1 out)
+                       (arr->bytecode-arr out lit-arr))))
 
-[defn assemble l
+(defn assemble l
       "Assemble all arguments into a single :bytecode-array"
       :cat :bytecode
       :internal
-      [assemble* l]]
+      (assemble* l))
 
-[defmacro asmrun ops
+(defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
           :cat :bytecode
           :internal
-          `[bytecode-eval* [assemble ~@ops] [current-closure]]]
+          `(bytecode-eval* (assemble ~@ops) (current-closure)))

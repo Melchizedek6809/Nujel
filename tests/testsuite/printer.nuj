@@ -1,111 +1,111 @@
-["1.1" [string/write 1.1]]
-["1.01" [string/write 1.01]]
-["1.001" [string/write 1.001]]
-["1.0001" [string/write 1.0001]]
-["10.1" [string/write 10.1]]
-["10.01" [string/write 10.01]]
-["10.001" [string/write 10.001]]
-["10.0001" [string/write 10.0001]]
-["100.1" [string/write 100.1]]
-["100.01" [string/write 100.01]]
-["100.001" [string/write 100.001]]
-["100.0001" [string/write 100.0001]]
-["1000.1" [string/write 1000.1]]
-["1000.01" [string/write 1000.01]]
-["1000.001" [string/write 1000.001]]
-["1000.0001" [string/write 1000.0001]]
-["10000.1" [string/write 10000.1]]
-["10000.01" [string/write 10000.01]]
-["10000.001" [string/write 10000.001]]
-["10000.0001" [string/write 10000.0001]]
-["100000.1" [string/write 100000.1]]
-["100000.01" [string/write 100000.01]]
-["40004.40004" [string/write [* 4 10001.10001]]]
-["30003.30003" [string/write [* 3 10001.10001]]]
-["20002.20002" [string/write [* 2 10001.10001]]]
-["50004201.04706" [string/write [+ 50004201 0.04706]]]
-["504201.91003" [string/write [+ 504201 0.91003]]]
-["-900200.01003" [string/write -900200.01003]]
-["-900000.00001" [string/write -900000.00001]]
-["109234.00012" [string/write 109234.00012]]
-["102005" [string/write 102005]]
-["-100295" [string/write -100295]]
-["   1" [pad-start "1" 4]]
-["0001" [pad-start "1" 4 "0"]]
-["asd1" [pad-start "1" 4 "asdasd"]]
-["1   " [pad-end "1" 4]]
-["1000" [pad-end "1" 4 "0"]]
-["1asd" [pad-end "1" 4 "asdasd"]]
-[" 1  " [pad-middle "1" 4]]
-["0100" [pad-middle "1" 4 "0"]]
-["d1as" [pad-middle "1" 4 "asdasd"]]
-["asd1asd" [pad-middle "1" 7 "asd"]]
-["[quote . 123]" [string/write [cons 'quote 123]]]
-["[quote . asd]" [string/write [cons 'quote 'asd]]]
-["[quote . asd]" [string/write [cons 'quote 'asd]]]
-["0"    [int->string 0]]
-["123"  [int->string 123]]
-["999"  [int->string/decimal 999]]
-["0"    [int->string/binary 0]]
-["1100" [int->string/binary 12]]
-["1010" [int->string/binary 10]]
-["1001" [int->string/binary 9]]
-["100000000" [int->string/binary 256]]
-["0"    [int->string/octal 0]]
-["17"   [int->string/octal 15]]
-["36"   [int->string/octal 30]]
-["400"  [int->string/octal 256]]
-["1000" [int->string/hex 4096]]
-["100"  [int->string/hex 256]]
-["FF"   [int->string/HEX 255]]
-["ff"   [int->string/hex 255]]
-["1F"   [int->string/HEX 31]]
-["0"    [int->string/hex 0]]
-["0.1" [string/write 0.1]]
-["0.02" [string/write 0.02]]
-["0.003" [string/write 0.003]]
-["0.01234" [string/write 0.01234]]
-["0.1" [string/write [car [read "0.1"]]]]
-["0.1001" [string/write [car [read "0.1001"]]]]
-["0.913" [string/write [car [read "0.913"]]]]
-["0.00012" [string/write [car [read "0.00012"]]]]
-["[1 . 2]" [string/write [cons 1 2]]]
-["[1 2]" [string/write [cons 1 '[2]]]]
-["[123]" [string/write '[123]]]
-["[1 2 3]" [string/write '[1 2 3]]]
-["[1 2 . 3]" [string/write '[1 2 . 3]]]
-["[1 2 . 3]" [string/write [cons 1 [cons 2 3]]]]
-["[1 2.0 3 1 2.0 3]" [string/write [append '[1 2.0 3] '[1 2.0 3]]]]
-["[2.0]" [string/write [filter '[1 2.0 #t 4] float?]]]
-["[2.0]" [string/write [filter '[1 2.0 #t 4] float?]]]
-["2.7" [string/write [+ [- 1 -1.0] [- 5 1.1 1] [- 1 1.1 1] [- 1 1.1 [read/int "1"]]]]]
-["[1]" [string/write [cons 1 #nil]]]
-["11.6" [string/write [+ [+ 1.1 2.2] [+ 1.1 3] [+ 1 3.2]]]]
-["20.1" [string/write [+ [+ 1.1 3] [+ 1 3.3] [+ 3.3 4.1 4.3]]]]
-["15.54" [string/write [+ [+ [* 3.2 3.2] [- [- [- 5.5 1.1] 1] 1.1]] [/ 9.9 3.3]]]]
-["0.7" [string/write [rem 10 3.1]]]
-["11.7" [string/write [+ [+ [+ 1.1 2.2] [+ 1.1 3]] [+ 1 3.3]]]]
-["11.75" [string/write [+ [float 10] [read/int "10"] [read/float "-8.25"]]]]
-["30.3" [string/write [+ [abs [read/int "-10"]] [int 8.2] 12.3]]]
-["3.1" [string/write [+ 1 2.1]]]
-["2.1" [string/write [* 1 2.1]]]
-["3.33333" [string/write [+ 1.11111 2.22222]]]
-[":testerle" [string/write :testerle]]
-["[1.0 2.0 3.0]" [string/write [map [split "1,2,3" ","] read/float]]]
-["do" [string/write 'do]]
-["[123]" [string/write '[123]]]
-["[123 #t]" [string/write '[123 #t]]]
-["[123 'do]" [string/write '[123 'do]]]
-["[123 \"asd\"]" [string/write '[123 "asd"]]]
-["[123 #nil]" [string/write '[123 #nil]]]
-['[123 #nil] '[123 #nil]]
-["#@[asd: 123]" [string/write [tree/new asd: 123]]]
-["#@[asd: 123]" [string/write @[asd: 123]]]
-["[#nil]" [string/write '[]]]
-["[#nil]" [string/write '[#nil]]]
-["[#nil]" [string/write [cons #nil #nil]]]
-["[#nil #nil]" [string/write '[#nil #nil]]]
-["[and #nil #nil]" [string/write '[and #nil #nil]]]
-["10.1" [string/write #d10.1]]
-["-10.1" [string/write #d-10.1]]
-["[a . b]" [string/write [cons 'a 'b]]]
+("1.1" (string/write 1.1))
+("1.01" (string/write 1.01))
+("1.001" (string/write 1.001))
+("1.0001" (string/write 1.0001))
+("10.1" (string/write 10.1))
+("10.01" (string/write 10.01))
+("10.001" (string/write 10.001))
+("10.0001" (string/write 10.0001))
+("100.1" (string/write 100.1))
+("100.01" (string/write 100.01))
+("100.001" (string/write 100.001))
+("100.0001" (string/write 100.0001))
+("1000.1" (string/write 1000.1))
+("1000.01" (string/write 1000.01))
+("1000.001" (string/write 1000.001))
+("1000.0001" (string/write 1000.0001))
+("10000.1" (string/write 10000.1))
+("10000.01" (string/write 10000.01))
+("10000.001" (string/write 10000.001))
+("10000.0001" (string/write 10000.0001))
+("100000.1" (string/write 100000.1))
+("100000.01" (string/write 100000.01))
+("40004.40004" (string/write (* 4 10001.10001)))
+("30003.30003" (string/write (* 3 10001.10001)))
+("20002.20002" (string/write (* 2 10001.10001)))
+("50004201.04706" (string/write (+ 50004201 0.04706)))
+("504201.91003" (string/write (+ 504201 0.91003)))
+("-900200.01003" (string/write -900200.01003))
+("-900000.00001" (string/write -900000.00001))
+("109234.00012" (string/write 109234.00012))
+("102005" (string/write 102005))
+("-100295" (string/write -100295))
+("   1" (pad-start "1" 4))
+("0001" (pad-start "1" 4 "0"))
+("asd1" (pad-start "1" 4 "asdasd"))
+("1   " (pad-end "1" 4))
+("1000" (pad-end "1" 4 "0"))
+("1asd" (pad-end "1" 4 "asdasd"))
+(" 1  " (pad-middle "1" 4))
+("0100" (pad-middle "1" 4 "0"))
+("d1as" (pad-middle "1" 4 "asdasd"))
+("asd1asd" (pad-middle "1" 7 "asd"))
+("(quote . 123)" (string/write (cons 'quote 123)))
+("(quote . asd)" (string/write (cons 'quote 'asd)))
+("(quote . asd)" (string/write (cons 'quote 'asd)))
+("0"    (int->string 0))
+("123"  (int->string 123))
+("999"  (int->string/decimal 999))
+("0"    (int->string/binary 0))
+("1100" (int->string/binary 12))
+("1010" (int->string/binary 10))
+("1001" (int->string/binary 9))
+("100000000" (int->string/binary 256))
+("0"    (int->string/octal 0))
+("17"   (int->string/octal 15))
+("36"   (int->string/octal 30))
+("400"  (int->string/octal 256))
+("1000" (int->string/hex 4096))
+("100"  (int->string/hex 256))
+("FF"   (int->string/HEX 255))
+("ff"   (int->string/hex 255))
+("1F"   (int->string/HEX 31))
+("0"    (int->string/hex 0))
+("0.1" (string/write 0.1))
+("0.02" (string/write 0.02))
+("0.003" (string/write 0.003))
+("0.01234" (string/write 0.01234))
+("0.1" (string/write (car (read "0.1"))))
+("0.1001" (string/write (car (read "0.1001"))))
+("0.913" (string/write (car (read "0.913"))))
+("0.00012" (string/write (car (read "0.00012"))))
+("(1 . 2)" (string/write (cons 1 2)))
+("(1 2)" (string/write (cons 1 '(2))))
+("(123)" (string/write '(123)))
+("(1 2 3)" (string/write '(1 2 3)))
+("(1 2 . 3)" (string/write '(1 2 . 3)))
+("(1 2 . 3)" (string/write (cons 1 (cons 2 3))))
+("(1 2.0 3 1 2.0 3)" (string/write (append '(1 2.0 3) '(1 2.0 3))))
+("(2.0)" (string/write (filter '(1 2.0 #t 4) float?)))
+("(2.0)" (string/write (filter '(1 2.0 #t 4) float?)))
+("2.7" (string/write (+ (- 1 -1.0) (- 5 1.1 1) (- 1 1.1 1) (- 1 1.1 (read/int "1")))))
+("(1)" (string/write (cons 1 #nil)))
+("11.6" (string/write (+ (+ 1.1 2.2) (+ 1.1 3) (+ 1 3.2))))
+("20.1" (string/write (+ (+ 1.1 3) (+ 1 3.3) (+ 3.3 4.1 4.3))))
+("15.54" (string/write (+ (+ (* 3.2 3.2) (- (- (- 5.5 1.1) 1) 1.1)) (/ 9.9 3.3))))
+("0.7" (string/write (rem 10 3.1)))
+("11.7" (string/write (+ (+ (+ 1.1 2.2) (+ 1.1 3)) (+ 1 3.3))))
+("11.75" (string/write (+ (float 10) (read/int "10") (read/float "-8.25"))))
+("30.3" (string/write (+ (abs (read/int "-10")) (int 8.2) 12.3)))
+("3.1" (string/write (+ 1 2.1)))
+("2.1" (string/write (* 1 2.1)))
+("3.33333" (string/write (+ 1.11111 2.22222)))
+(":testerle" (string/write :testerle))
+("(1.0 2.0 3.0)" (string/write (map (split "1,2,3" ",") read/float)))
+("do" (string/write 'do))
+("(123)" (string/write '(123)))
+("(123 #t)" (string/write '(123 #t)))
+("(123 'do)" (string/write '(123 'do)))
+("(123 \"asd\")" (string/write '(123 "asd")))
+("(123 #nil)" (string/write '(123 #nil)))
+('(123 #nil) '(123 #nil))
+("#@(asd: 123)" (string/write (tree/new asd: 123)))
+("#@(asd: 123)" (string/write @(asd: 123)))
+("(#nil)" (string/write '()))
+("(#nil)" (string/write '(#nil)))
+("(#nil)" (string/write (cons #nil #nil)))
+("(#nil #nil)" (string/write '(#nil #nil)))
+("(and #nil #nil)" (string/write '(and #nil #nil)))
+("10.1" (string/write #d10.1))
+("-10.1" (string/write #d-10.1))
+("(a . b)" (string/write (cons 'a 'b)))

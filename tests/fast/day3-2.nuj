@@ -1,67 +1,67 @@
  #!/usr/bin/env nujel
 
-[def example-data "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"]
-[def input-data [file/read "tests/fast/day3.dat"]]
+(def example-data "00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010")
+(def input-data (file/read "tests/fast/day3.dat"))
 
-[defn bit-set?! [i]
+(defn bit-set?! (i)
       "Returns a function that checks if bit I is set in the provided number"
-      [def mask [bit-shift-left 1 i]]
-      [fn [α] [not [zero? [bit-and α mask]]]]]
+      (def mask (bit-shift-left 1 i))
+      (fn (α) (not (zero? (bit-and α mask)))))
 
-[defn bit-clear?! [i]
+(defn bit-clear?! (i)
       "Returns a function that checks if bit I is clear in the provided number"
-      [def mask [bit-shift-left 1 i]]
-      [fn [α] [zero? [bit-and α mask]]]]
+      (def mask (bit-shift-left 1 i))
+      (fn (α) (zero? (bit-and α mask))))
 
-[defn read-data [lines]
-       [map [split lines "\n"]
-            [fn [line]
-                [car [read [cat "#b" line]]]]]]
+(defn read-data (lines)
+       (map (split lines "\n")
+            (fn (line)
+                (car (read (cat "#b" line))))))
 
-[defn calc-γε [numbers bit-count]
-       [def γ 0]
-       [def ε 0]
-       [def i 0]
-       [def threshold [/ [length numbers] 2]]
-       [while [< i bit-count]
-              [if [> [count numbers [bit-set?! i]] threshold]
-                  [set! γ [bit-or γ [bit-shift-left 1 i]]]
-                  [set! ε [bit-or ε [bit-shift-left 1 i]]]]
-              [inc! i]]
-       @[:γ γ :ε ε :power-consumption [* γ ε]]]
+(defn calc-γε (numbers bit-count)
+       (def γ 0)
+       (def ε 0)
+       (def i 0)
+       (def threshold (/ (length numbers) 2))
+       (while (< i bit-count)
+              (if (> (count numbers (bit-set?! i)) threshold)
+                  (set! γ (bit-or γ (bit-shift-left 1 i)))
+                  (set! ε (bit-or ε (bit-shift-left 1 i))))
+              (inc! i))
+       @(:γ γ :ε ε :power-consumption (* γ ε)))
 
-[defn calc-real [numbers bit p]
-       [if [<= [length numbers] 1]
-           [car numbers]
-           [do [when [< bit 0] [stacktrace] [throw :we-dun-goof]]
-               [def bits [count numbers [bit-set?! bit]]]
-               [def rest [- [length numbers] bits]]
-               [if [p bits rest]
-                   [calc-real [filter numbers [bit-set?! bit]] [- bit 1] p]
-                   [if [= bits rest]
-                       [if [= p >]
-                           [calc-real [filter numbers [bit-set?!   bit]] [- bit 1] p]
-                           [calc-real [filter numbers [bit-clear?! bit]] [- bit 1] p]]
-                       [calc-real [filter numbers [bit-clear?! bit]] [- bit 1] p]]]]]]
+(defn calc-real (numbers bit p)
+       (if (<= (length numbers) 1)
+           (car numbers)
+           (do (when (< bit 0) (stacktrace) (throw :we-dun-goof))
+               (def bits (count numbers (bit-set?! bit)))
+               (def rest (- (length numbers) bits))
+               (if (p bits rest)
+                   (calc-real (filter numbers (bit-set?! bit)) (- bit 1) p)
+                   (if (= bits rest)
+                       (if (= p >)
+                           (calc-real (filter numbers (bit-set?!   bit)) (- bit 1) p)
+                           (calc-real (filter numbers (bit-clear?! bit)) (- bit 1) p))
+                       (calc-real (filter numbers (bit-clear?! bit)) (- bit 1) p))))))
 
-[defn calc-oxy-co [numbers bit-count]
-       [def oxy [calc-real numbers [- bit-count 1] >]]
-       [def co  [calc-real numbers [- bit-count 1] <]]
-       @[:oxy oxy :co co :power-consumption [* oxy co]]]
+(defn calc-oxy-co (numbers bit-count)
+       (def oxy (calc-real numbers (- bit-count 1) >))
+       (def co  (calc-real numbers (- bit-count 1) <))
+       @(:oxy oxy :co co :power-consumption (* oxy co)))
 
-[def result [calc-γε [read-data example-data] 5]]
-[when [not= [ref result :power-consumption] 198]
-      [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-γε (read-data example-data) 5))
+(when (not= (ref result :power-consumption) 198)
+      (throw (list :wrong-result "Wrong result" result)))
 
-[def result [calc-γε [read-data input-data] 12]]
-[when [not= [ref result :power-consumption] 4103154]
-      [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-γε (read-data input-data) 12))
+(when (not= (ref result :power-consumption) 4103154)
+      (throw (list :wrong-result "Wrong result" result)))
 
-[def result [calc-oxy-co [read-data example-data] 5]]
-[when [not= [ref result :power-consumption] 230]
-      [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-oxy-co (read-data example-data) 5))
+(when (not= (ref result :power-consumption) 230)
+      (throw (list :wrong-result "Wrong result" result)))
 
-[def result [calc-oxy-co [read-data input-data] 12]]
-[when [not= [ref result :power-consumption] 4245351]
-      [throw [list :wrong-result "Wrong result" result]]]
-[return :success]
+(def result (calc-oxy-co (read-data input-data) 12))
+(when (not= (ref result :power-consumption) 4245351)
+      (throw (list :wrong-result "Wrong result" result)))
+(return :success)

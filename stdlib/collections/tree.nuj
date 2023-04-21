@@ -3,59 +3,59 @@
 ;;;
 ;;; Some functions about trees
 
-[defn tree/zip [keys values]
+(defn tree/zip (keys values)
       "Return a tree where KEYS point to VALUES"
-      [def ret @[]]
-      [doseq [key keys ret]
-	     [tree/set! ret key [car values]]
-	     [cdr! values]]]
+      (def ret @())
+      (doseq (key keys ret)
+	     (tree/set! ret key (car values))
+	     (cdr! values)))
 
-[defn tree/+= [t k v]
+(defn tree/+= (t k v)
       "Increment value at K in T by V"
-      [tree/set! t k [+ v [int [or [tree/ref t k] 0]]]]]
+      (tree/set! t k (+ v (int (or (tree/ref t k) 0)))))
 
-[defmacro tree/-= [t k v]
+(defmacro tree/-= (t k v)
           "Decrement value at K in T by V"
-          `[tree/+= ~t ~k [- ~v]]]
+          `(tree/+= ~t ~k (- ~v)))
 
-[defmacro tree/++ [t k]
+(defmacro tree/++ (t k)
           "Increment value at K in T by 1"
-          `[tree/+= ~t ~k 1]]
+          `(tree/+= ~t ~k 1))
 
-[defmacro tree/-- [t k]
+(defmacro tree/-- (t k)
           "Increment value at K in T by 1"
-          `[tree/-= ~t ~k 1]]
+          `(tree/-= ~t ~k 1))
 
-[defn tree/equal? [a b]
+(defn tree/equal? (a b)
       "Compares two trees for equality"
-      [if [and [tree? a]
-               [tree? b]]
-          [and [= [tree/key* a]
-                   [tree/key* b]]
-               [equal? [tree/value* a]
-                       [tree/value* b]]
-               [tree/equal? [tree/left* a]
-                            [tree/left* b]]
-               [tree/equal? [tree/right* a]
-                            [tree/right* b]]]
-          [equal? a b]]]
+      (if (and (tree? a)
+               (tree? b))
+          (and (= (tree/key* a)
+                   (tree/key* b))
+               (equal? (tree/value* a)
+                       (tree/value* b))
+               (tree/equal? (tree/left* a)
+                            (tree/left* b))
+               (tree/equal? (tree/right* a)
+                            (tree/right* b)))
+          (equal? a b)))
 
-[defn tree/reduce [l o s]
+(defn tree/reduce (l o s)
       "Combine all elements in l using operation o and starting value s"
-      [list/reduce [tree/values l] o s]]
+      (list/reduce (tree/values l) o s))
 
-[defn tree/filter [l f]
+(defn tree/filter (l f)
       "Return a new tree with all elements from L where F returns true"
-      [def ret @[]]
-      [doseq [e [tree/keys l] ret]
-             [def t [tree/ref l e]]
-             [when [f t]
-                   [tree/set! ret e t]]]]
+      (def ret @())
+      (doseq (e (tree/keys l) ret)
+             (def t (tree/ref l e))
+             (when (f t)
+                   (tree/set! ret e t))))
 
-[defn tree/merge [a b]
+(defn tree/merge (a b)
       "Merge two trees together, if a key is contained in both trees the on in B gets priority"
-      [when-not b [return [if a [tree/dup a] @[]]]]
-      [when-not a [return [tree/dup b]]]
-      [def ret [tree/dup a]]
-      [doseq [k [tree/keys b] ret]
-             [tree/set! ret k [tree/ref b k]]]]
+      (when-not b (return (if a (tree/dup a) @())))
+      (when-not a (return (tree/dup b)))
+      (def ret (tree/dup a))
+      (doseq (k (tree/keys b) ret)
+             (tree/set! ret k (tree/ref b k))))

@@ -4,33 +4,33 @@
 ;;
 ;; Find the largest prime factor of 600851475143
 
-[defn prime? [v]
-      [def mv [int v]]
-      [def i 2]
-      [while [< i mv]
-             [when [zero? [rem v i]]
-                   [return #f]]
-             [set! i [add/int i 1]]]
-      [return #t]]
+(defn prime? (v)
+      (def mv (int v))
+      (def i 2)
+      (while (< i mv)
+             (when (zero? (rem v i))
+                   (return #f))
+             (set! i (add/int i 1)))
+      (return #t))
 
-[defn prime-factors [v]
-      [def factors #nil]
-      [def mv [+ 1 [int [/ v 2]]]]
-      [def i 2]
-      [while [<= i mv]
-             [when [prime? i]
-                   [while [zero? [rem v i]]
-                          [set! v [/ v i]]
-                          [set! mv [+ 1 [int v]]]
-                          [set! factors [cons i factors]]]]
-             [inc! i]]
-      [return factors]]
+(defn prime-factors (v)
+      (def factors #nil)
+      (def mv (+ 1 (int (/ v 2))))
+      (def i 2)
+      (while (<= i mv)
+             (when (prime? i)
+                   (while (zero? (rem v i))
+                          (set! v (/ v i))
+                          (set! mv (+ 1 (int v)))
+                          (set! factors (cons i factors))))
+             (inc! i))
+      (return factors))
 
-[defn largest-prime-factor [v]
-      [car [prime-factors v]]]
+(defn largest-prime-factor (v)
+      (car (prime-factors v)))
 
-[def ret [largest-prime-factor 600851475143]]
-[when [not= ret 6857]
-      [throw [list :wrong-result "Wrong result" ret]]]
+(def ret (largest-prime-factor 600851475143))
+(when (not= ret 6857)
+      (throw (list :wrong-result "Wrong result" ret)))
 
-[return :success]
+(return :success)

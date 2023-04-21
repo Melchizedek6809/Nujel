@@ -1,34 +1,34 @@
 #!/usr/bin/env nujel
 
-[defn do-commands-1 [name val state]
-       [case name
-             [['forward] [tree/set! state :horiz [+ [ref state :horiz] val]]]
-             [['up     ] [tree/set! state :depth [- [ref state :depth] val]]]
-             [['down   ] [tree/set! state :depth [+ [ref state :depth] val]]]
-             [otherwise  [println "Unknown Command, continuing."]]]]
+(defn do-commands-1 (name val state)
+       (case name
+             (('forward) (tree/set! state :horiz (+ (ref state :horiz) val)))
+             (('up     ) (tree/set! state :depth (- (ref state :depth) val)))
+             (('down   ) (tree/set! state :depth (+ (ref state :depth) val)))
+             (otherwise  (println "Unknown Command, continuing."))))
 
-[defn do-commands-2 [name val state]
-       [case name
-             [['forward] [tree/set! state :horiz [+ [ref state :horiz] val]]
-                         [tree/set! state :depth [+ [ref state :depth] [* [ref state :aim] val]]]]
-             [['up     ] [tree/set! state :aim   [- [ref state   :aim] val]]]
-             [['down   ] [tree/set! state :aim   [+ [ref state   :aim] val]]]
-             [otherwise  [println "Unknown Command, continuing."]]]]
+(defn do-commands-2 (name val state)
+       (case name
+             (('forward) (tree/set! state :horiz (+ (ref state :horiz) val))
+                         (tree/set! state :depth (+ (ref state :depth) (* (ref state :aim) val))))
+             (('up     ) (tree/set! state :aim   (- (ref state   :aim) val)))
+             (('down   ) (tree/set! state :aim   (+ (ref state   :aim) val)))
+             (otherwise  (println "Unknown Command, continuing."))))
 
-[defn step [l state fun]
-       [if-not [and l [cdr l]] state
-               [step [cddr l] [fun [car l] [cadr l] state] fun]]]
+(defn step (l state fun)
+       (if-not (and l (cdr l)) state
+               (step (cddr l) (fun (car l) (cadr l) state) fun)))
 
-[defn calc-result [state]
-       [* [ref state :depth] [ref state :horiz]]]
+(defn calc-result (state)
+       (* (ref state :depth) (ref state :horiz)))
 
-[def result [calc-result [step '[forward 5 down 5 forward 8 up 3 down 8 forward 2] @[:depth 0 :horiz 0] do-commands-1]]]
-[when [not= 150 result] [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-result (step '(forward 5 down 5 forward 8 up 3 down 8 forward 2) @(:depth 0 :horiz 0) do-commands-1)))
+(when (not= 150 result) (throw (list :wrong-result "Wrong result" result)))
 
-[def result [calc-result [step [read [file/read "tests/fast/day2.dat"]] @[:depth 0 :horiz 0] do-commands-1]]]
-[when [not= 1561344 result] [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) @(:depth 0 :horiz 0) do-commands-1)))
+(when (not= 1561344 result) (throw (list :wrong-result "Wrong result" result)))
 
-[def result [calc-result [step [read [file/read "tests/fast/day2.dat"]] @[:depth 0 :horiz 0 :aim 0] do-commands-2]]]
-[when [not= 1848454425 result] [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) @(:depth 0 :horiz 0 :aim 0) do-commands-2)))
+(when (not= 1848454425 result) (throw (list :wrong-result "Wrong result" result)))
 
-[return :success]
+(return :success)

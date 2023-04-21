@@ -3,44 +3,44 @@
 ;;
 ;; Contains some routines for working with 2d data
 
-[defn allocate [width height]
+(defn allocate (width height)
       :export
-      @[ :data [-> [array/allocate [* width height]]
-                   [array/fill! 0]]
+      @( :data (-> (array/allocate (* width height))
+                   (array/fill! 0))
          :width width
-         :height height]]
+         :height height))
 
-[defn fill! [data v]
+(defn fill! (data v)
       :export
-      [array/fill! [tree/ref data :data] v]
-      [return data]]
+      (array/fill! (tree/ref data :data) v)
+      (return data))
 
-[defn ref [data x y oob-val]
+(defn ref (data x y oob-val)
       :export
-      [if [or [>= x [tree/ref data :width]]
-              [>= y [tree/ref data :height]]
-              [< x 0]
-              [< y 0]]
+      (if (or (>= x (tree/ref data :width))
+              (>= y (tree/ref data :height))
+              (< x 0)
+              (< y 0))
           oob-val
-          [array/ref [tree/ref data :data] [+ x [* y [tree/ref data :width]]]]]]
+          (array/ref (tree/ref data :data) (+ x (* y (tree/ref data :width))))))
 
-[defn set! [data x y val]
+(defn set! (data x y val)
       :export
-      [if [or [>= x [tree/ref data :width]]
-              [>= y [tree/ref data :height]]
-              [< x 0]
-              [< y 0]]
-          [exception :out-of-bounds "Trying to set an array out of bounds" data]
-          [array/set! [tree/ref data :data] [+ x [* y [tree/ref data :width]]] val]]
-      [return data]]
+      (if (or (>= x (tree/ref data :width))
+              (>= y (tree/ref data :height))
+              (< x 0)
+              (< y 0))
+          (exception :out-of-bounds "Trying to set an array out of bounds" data)
+          (array/set! (tree/ref data :data) (+ x (* y (tree/ref data :width))) val))
+      (return data))
 
-[defn print [data]
+(defn print (data)
       :export
-      [dotimes [y [tree/ref data :height]]
-        [dotimes [x [tree/ref data :width]]
-          [display [cat [array/2d/ref data x y] " "]]]
-        [newline]]
-      [return data]]
+      (dotimes (y (tree/ref data :height))
+        (dotimes (x (tree/ref data :width))
+          (display (cat (array/2d/ref data x y) " ")))
+        (newline))
+      (return data))
 
-[deftest #t [-> [array/2d/allocate 4 4] [array/2d/set! 1 1 #t] [array/2d/ref 1 1]]]
-[deftest #t [-> [array/2d/allocate 3 3] [array/2d/fill! #t] [array/2d/ref 1 1]]]
+(deftest #t (-> (array/2d/allocate 4 4) (array/2d/set! 1 1 #t) (array/2d/ref 1 1)))
+(deftest #t (-> (array/2d/allocate 3 3) (array/2d/fill! #t) (array/2d/ref 1 1)))

@@ -4,161 +4,161 @@
 ;;; Contains the printer, which is used pretty much everywhere a Nujel value needs
 ;;; a text representation.
 
-[defn int->string/binary [α]
+(defn int->string/binary (α)
       "Turn α into a its **binary** string representation"
-      [def ret ""]
-      [when [or [not α] [zero? α]]
-        [return "0"]]
-      [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b1]]] ret]]
-             [set! α [bit-shift-right α 1]]]
-      ret]
+      (def ret "")
+      (when (or (not α) (zero? α))
+        (return "0"))
+      (while (not-zero? α)
+             (set! ret (cat (from-char-code (+ #\0 (bit-and α #b1))) ret))
+             (set! α (bit-shift-right α 1)))
+      ret)
 
-[defn int->string/octal [α]
+(defn int->string/octal (α)
       "Turn α into a its **octal** string representation"
-      [def ret ""]
-      [when [or [not α] [zero? α]]
-        [return "0"]]
-      [while [not-zero? α]
-             [set! ret [cat [from-char-code [+ #\0 [bit-and α #b111]]] ret]]
-             [set! α [bit-shift-right α 3]]]
-      ret]
+      (def ret "")
+      (when (or (not α) (zero? α))
+        (return "0"))
+      (while (not-zero? α)
+             (set! ret (cat (from-char-code (+ #\0 (bit-and α #b111))) ret))
+             (set! α (bit-shift-right α 3)))
+      ret)
 
-[def int->string/hex/conversion-arr ##["0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"]]
-[defn int->string/HEX [α]
+(def int->string/hex/conversion-arr ##("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F"))
+(defn int->string/HEX (α)
       "Turn α into a its **hexadecimal** string representation"
-      [def ret ""]
-      [when [or [not α] [zero? α]]
-        [return "0"]]
-      [when [< α 0] [exception :type-error "Can't print negative numbers in hex for now" α ]]
-      [while [not-zero? α]
-             [set! ret [cat [array/ref int->string/hex/conversion-arr [bit-and α #b1111]] ret]]
-             [set! α [bit-shift-right α 4]]]
-      ret]
+      (def ret "")
+      (when (or (not α) (zero? α))
+        (return "0"))
+      (when (< α 0) (exception :type-error "Can't print negative numbers in hex for now" α ))
+      (while (not-zero? α)
+             (set! ret (cat (array/ref int->string/hex/conversion-arr (bit-and α #b1111)) ret))
+             (set! α (bit-shift-right α 4)))
+      ret)
 
-[defn int->string/hex [α]
+(defn int->string/hex (α)
       "Turn α into a its **hexadecimal** string representation"
-      [lower-case [int->string/HEX α]]]
+      (lower-case (int->string/HEX α)))
 
-[defn int->string/decimal [α]
+(defn int->string/decimal (α)
       "Turn α into a its **decimal** string representation"
-      [string α]]
-[def int->string int->string/decimal]
+      (string α))
+(def int->string int->string/decimal)
 
-[def write/raw [let*
-                 [defn write/raw/array [v port hr?]
-                       [port 'block-write "##["]
-                       [dotimes [i [array/length v]]
-                         [write/raw [array/ref v i] port hr?]
-                         [when [< i [- [array/length v] 1]]
-                           [port 'block-write " "]]]
-                       [port 'block-write "]"]]
+(def write/raw (let*
+                 (defn write/raw/array (v port hr?)
+                       (port 'block-write "##(")
+                       (dotimes (i (array/length v))
+                         (write/raw (array/ref v i) port hr?)
+                         (when (< i (- (array/length v) 1))
+                           (port 'block-write " ")))
+                       (port 'block-write ")"))
 
-                 [defn write/raw/buffer [v port hr?]
-                       [if hr?
-                           [port 'write "#<buffer :id " [int->string/decimal [val->id v]] " :size " [int->string/hex [buffer/length v]] ">"]
-                           [do [port 'block-write "#m"]
-                               [def view [buffer/u8* v]]
-                             [dotimes [i [buffer/length v]]
-                               [port 'block-write [pad-start [int->string/HEX [buffer/ref view i]] 2 "0"]]]]]]
+                 (defn write/raw/buffer (v port hr?)
+                       (if hr?
+                           (port 'write "#<buffer :id " (int->string/decimal (val->id v)) " :size " (int->string/hex (buffer/length v)) ">")
+                           (do (port 'block-write "#m")
+                               (def view (buffer/u8* v))
+                             (dotimes (i (buffer/length v))
+                               (port 'block-write (pad-start (int->string/HEX (buffer/ref view i)) 2 "0"))))))
 
-                 [defn write/raw/bytecode-array [v port hr?]
-                       [port 'block-write "#{"]
-                       [write/raw/array [bytecode-literals v] port #f]
-                       [dotimes [i [bytecode-array/length v]]
-                         [when [zero? [bit-and i #x1F]]
-                           [port 'block-write "\n"]]
-                         [port 'block-write [pad-start [int->string/HEX [bytecode-op->int [bytecode-array/ref v i]]] 2 "0"]]]
-                       [port 'block-write "\n}"]]
+                 (defn write/raw/bytecode-array (v port hr?)
+                       (port 'block-write "#{")
+                       (write/raw/array (bytecode-literals v) port #f)
+                       (dotimes (i (bytecode-array/length v))
+                         (when (zero? (bit-and i #x1F))
+                           (port 'block-write "\n"))
+                         (port 'block-write (pad-start (int->string/HEX (bytecode-op->int (bytecode-array/ref v i))) 2 "0")))
+                       (port 'block-write "\n}"))
 
-                 [defn write/raw/tree/rec [v port hr? always-space?]
-                       [when [or [not v]
-                                 [not [tree/key* v]]]
-                         [return always-space?]]
-                       [when [write/raw/tree/rec [tree/left* v] port hr? always-space?]
-                         [port 'block-write " "]]
-                       [port 'block-write [keyword->string [tree/key* v]]]
-                       [port 'block-write ": "]
-                       [write/raw [tree/value* v] port hr?]
-                       [write/raw/tree/rec [tree/right* v] port hr? #t]]
+                 (defn write/raw/tree/rec (v port hr? always-space?)
+                       (when (or (not v)
+                                 (not (tree/key* v)))
+                         (return always-space?))
+                       (when (write/raw/tree/rec (tree/left* v) port hr? always-space?)
+                         (port 'block-write " "))
+                       (port 'block-write (keyword->string (tree/key* v)))
+                       (port 'block-write ": ")
+                       (write/raw (tree/value* v) port hr?)
+                       (write/raw/tree/rec (tree/right* v) port hr? #t))
 
-                 [defn write/raw/tree [v port hr?]
-                       [port 'block-write "#@["]
-                       [write/raw/tree/rec v port hr? #f]
-                       [port 'block-write "]"]]
+                 (defn write/raw/tree (v port hr?)
+                       (port 'block-write "#@(")
+                       (write/raw/tree/rec v port hr? #f)
+                       (port 'block-write ")"))
 
-                 [defn write/raw/pair [v port hr?]
-                       [when [and [== 'quote [car v]]
-                                  [nil? [cddr v]]
-                                  [pair? [cdr v]]]
-                         [port 'block-write "'"]
-                         [return [write/raw [cadr v] port hr?]]]
-                       [port 'block-write "["]
-                       [def first? #f]
-                       [while v
-                         [if first?
-                             [port 'block-write " "]
-                             [set! first? #t]]
-                         [if [pair? v]
-                             [write/raw [car v] port hr?]
-                             [do [port 'block-write ". "]
-                                 [write/raw v port hr?]]]
-                         [cdr! v]]
-                       [port 'block-write "]"]]
+                 (defn write/raw/pair (v port hr?)
+                       (when (and (== 'quote (car v))
+                                  (nil? (cddr v))
+                                  (pair? (cdr v)))
+                         (port 'block-write "'")
+                         (return (write/raw (cadr v) port hr?)))
+                       (port 'block-write "(")
+                       (def first? #f)
+                       (while v
+                         (if first?
+                             (port 'block-write " ")
+                             (set! first? #t))
+                         (if (pair? v)
+                             (write/raw (car v) port hr?)
+                             (do (port 'block-write ". ")
+                                 (write/raw v port hr?)))
+                         (cdr! v))
+                       (port 'block-write ")"))
 
-                 [defn write/raw/string [v port hr?]
-                       [when hr? [return [port 'block-write v]]]
-                       [port 'block-write "\""]
-                       [dotimes [i [buffer/length v]]
-                         [def c [buffer/ref v i]]
-                         [case c
-                               [0 [return [port 'block-write "\""]]]
-                               [#x07 [port 'block-write "\\a"]]
-                               [#x08 [port 'block-write "\\b"]]
-                               [#x09 [port 'block-write "\\t"]]
-                               [#x0A [port 'block-write "\\n"]]
-                               [#x0B [port 'block-write "\\v"]]
-                               [#x0C [port 'block-write "\\f"]]
-                               [#x0D [port 'block-write "\\r"]]
-                               [#x1B [port 'block-write "\\e"]]
-                               [#x22 [port 'block-write "\\\""]]
-                               [#x5C [port 'block-write "\\\\"]]
-                               [otherwise [port 'char-write c]]]]
-                       [port 'block-write "\""]]
+                 (defn write/raw/string (v port hr?)
+                       (when hr? (return (port 'block-write v)))
+                       (port 'block-write "\"")
+                       (dotimes (i (buffer/length v))
+                         (def c (buffer/ref v i))
+                         (case c
+                               (0 (return (port 'block-write "\"")))
+                               (#x07 (port 'block-write "\\a"))
+                               (#x08 (port 'block-write "\\b"))
+                               (#x09 (port 'block-write "\\t"))
+                               (#x0A (port 'block-write "\\n"))
+                               (#x0B (port 'block-write "\\v"))
+                               (#x0C (port 'block-write "\\f"))
+                               (#x0D (port 'block-write "\\r"))
+                               (#x1B (port 'block-write "\\e"))
+                               (#x22 (port 'block-write "\\\""))
+                               (#x5C (port 'block-write "\\\\"))
+                               (otherwise (port 'char-write c))))
+                       (port 'block-write "\""))
 
-                 [defn write/raw [v port hr?]
-                       [case [type-of v]
-                             [:nil             [when-not hr? [port 'block-write "#nil"]]]
-                             [:bool            [port 'block-write [if v "#t" "#f"]]]
-                             [:environment     [port 'write "#<environment " [int->string/hex [val->id v]] ">"]]
-                             [:file-handle     [port 'write "#<file-handle " [int->string/hex [val->id v]] ">"]]
-                             [:buffer-view     [port 'write "#<buffer-view " [int->string/hex [val->id v]] ">"]]
-                             [[:lambda :macro :native-function] [port 'block-write [string [or [closure/name v] 'anonymous]]]]
-                             [:int             [port 'block-write [int->string/decimal v]]]
-                             [:float           [port 'block-write [string v]]] ;; This one is kinda cheating
-                             [:keyword         [port 'write ":" [keyword->string v]]]
-                             [:symbol          [port 'block-write [string v]]]
-                             [:bytecode-op     [port 'write "#$" [int->string/HEX [bytecode-op->int v]]]]
-                             [:array           [write/raw/array v port hr?]]
-                             [:buffer          [write/raw/buffer v port hr?]]
-                             [:bytecode-array  [write/raw/bytecode-array v port hr?]]
-                             [:string          [write/raw/string v port hr?]]
-                             [:tree            [write/raw/tree v port hr?]]
-                             [:pair            [write/raw/pair v port hr?]]
-                             [otherwise [exception :type-error [fmt "Don't know how to write {}" [type-of v]] v]]]]]]
+                 (defn write/raw (v port hr?)
+                       (case (type-of v)
+                             (:nil             (when-not hr? (port 'block-write "#nil")))
+                             (:bool            (port 'block-write (if v "#t" "#f")))
+                             (:environment     (port 'write "#<environment " (int->string/hex (val->id v)) ">"))
+                             (:file-handle     (port 'write "#<file-handle " (int->string/hex (val->id v)) ">"))
+                             (:buffer-view     (port 'write "#<buffer-view " (int->string/hex (val->id v)) ">"))
+                             ((:lambda :macro :native-function) (port 'block-write (string (or (closure/name v) 'anonymous))))
+                             (:int             (port 'block-write (int->string/decimal v)))
+                             (:float           (port 'block-write (string v))) ;; This one is kinda cheating
+                             (:keyword         (port 'write ":" (keyword->string v)))
+                             (:symbol          (port 'block-write (string v)))
+                             (:bytecode-op     (port 'write "#$" (int->string/HEX (bytecode-op->int v))))
+                             (:array           (write/raw/array v port hr?))
+                             (:buffer          (write/raw/buffer v port hr?))
+                             (:bytecode-array  (write/raw/bytecode-array v port hr?))
+                             (:string          (write/raw/string v port hr?))
+                             (:tree            (write/raw/tree v port hr?))
+                             (:pair            (write/raw/pair v port hr?))
+                             (otherwise (exception :type-error (fmt "Don't know how to write {}" (type-of v)) v))))))
 
-[defn write [v port]
-      [write/raw v [or port stdout] #f]]
+(defn write (v port)
+      (write/raw v (or port stdout) #f))
 
-[defn display/new [v port]
-      [write/raw v [or port stdout] #t]]
+(defn display/new (v port)
+      (write/raw v (or port stdout) #t))
 
-[defn string/write [v]
-      [def p [make-string-output-port]]
-      [write/raw v p #f]
-      [p :return-string]]
+(defn string/write (v)
+      (def p (make-string-output-port))
+      (write/raw v p #f)
+      (p :return-string))
 
-[defn string/display [v]
-      [def p [make-string-output-port]]
-      [write/raw v p #t]
-      [p :return-string]]
+(defn string/display (v)
+      (def p (make-string-output-port))
+      (write/raw v p #t)
+      (p :return-string))

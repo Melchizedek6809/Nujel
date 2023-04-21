@@ -1,14 +1,14 @@
 #!/usr/bin/env nujel
-[def hostname [popen/trim "uname -n"]]
-[when [= hostname "wolkenwelten"]
- [popen "rsync -avh web/benchmark-results/ /home/nujel/nujel/benchmark-results/"]
- [popen "rsync -avh /home/nujel/nujel/benchmark-results/ web/benchmark-results/"]
- [popen "./tools/benchmark-aggregate.nuj"]
- [popen "rsync -avh web/report* /home/nujel/nujel/"]
- [exit 0]]
+(def hostname (popen/trim "uname -n"))
+(when (= hostname "wolkenwelten")
+ (popen "rsync -avh web/benchmark-results/ /home/nujel/nujel/benchmark-results/")
+ (popen "rsync -avh /home/nujel/nujel/benchmark-results/ web/benchmark-results/")
+ (popen "./tools/benchmark-aggregate.nuj")
+ (popen "rsync -avh web/report* /home/nujel/nujel/")
+ (exit 0))
 
-[popen "rsync -avhe ssh web/benchmark-results/ wolkenwelten.net:/home/nujel/nujel/benchmark-results/"]
-[popen "rsync -avhe ssh wolkenwelten.net:/home/nujel/nujel/benchmark-results/ web/benchmark-results/"]
-[popen "./tools/benchmark-aggregate.nuj"]
-[popen "rsync -avhe ssh web/report* wolkenwelten.net:/home/nujel/nujel/"]
-[popen "ssh wolkenwelten.net \"chown -R nujel:nujel /home/nujel/nujel\""]
+(popen "rsync -avhe ssh web/benchmark-results/ wolkenwelten.net:/home/nujel/nujel/benchmark-results/")
+(popen "rsync -avhe ssh wolkenwelten.net:/home/nujel/nujel/benchmark-results/ web/benchmark-results/")
+(popen "./tools/benchmark-aggregate.nuj")
+(popen "rsync -avhe ssh web/report* wolkenwelten.net:/home/nujel/nujel/")
+(popen "ssh wolkenwelten.net \"chown -R nujel:nujel /home/nujel/nujel\"")

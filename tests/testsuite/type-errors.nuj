@@ -1,12 +1,12 @@
-[:type-error [try car [abs]]]
-[:type-error [try car [sqrt]]]
-[:type-error [try car [cbrt]]]
-[:type-error [try car [floor]]]
-[:type-error [try car [ceil]]]
-[:type-error [try car [round]]]
-[:type-error [try car [sin]]]
-[:type-error [try car [cos]]]
-[:type-error [try car [tan]]]
-[:type-error [try car [atan2]]]
-[:type-error [try car [atan2 1.0]]]
-[:type-error [try car [atan2 1.0 "1.0"]]]
+(:type-error (try car (abs)))
+(:type-error (try car (sqrt)))
+(:type-error (try car (cbrt)))
+(:type-error (try car (floor)))
+(:type-error (try car (ceil)))
+(:type-error (try car (round)))
+(:type-error (try car (sin)))
+(:type-error (try car (cos)))
+(:type-error (try car (tan)))
+(:type-error (try car (atan2)))
+(:type-error (try car (atan2 1.0)))
+(:type-error (try car (atan2 1.0 "1.0")))

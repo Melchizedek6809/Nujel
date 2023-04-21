@@ -1,85 +1,85 @@
 #!/usr/bin/env nujel
 
-[require :array/2d]
+(require :array/2d)
 
-[def flashes/get]
-[def flashes/inc!]
-[let [[flashes/counter 0]]
-     [set! flashes/get [fn [] flashes/counter]]
-     [set! flashes/inc! [fn [] [inc! flashes/counter]]]]
-[def p1-res 0]
-[def p2-res 0]
+(def flashes/get)
+(def flashes/inc!)
+(let ((flashes/counter 0))
+     (set! flashes/get (fn () flashes/counter))
+     (set! flashes/inc! (fn () (inc! flashes/counter))))
+(def p1-res 0)
+(def p2-res 0)
 
-[defn map/set/row [data y line w]
-      [def cols [map [split line ""] read/int]]
-      [dotimes [x w]
-               [array/2d/set! data x y [car cols]]
-               [cdr! cols]]]
+(defn map/set/row (data y line w)
+      (def cols (map (split line "") read/int))
+      (dotimes (x w)
+               (array/2d/set! data x y (car cols))
+               (cdr! cols)))
 
-[defn map/load [filename w h]
-      [def ret [array/2d/allocate w h]]
-      [def lines [split [file/read filename] "\n"]]
-      [dotimes [y h]
-               [map/set/row ret y [car lines] w]
-               [cdr! lines]]
-      ret]
+(defn map/load (filename w h)
+      (def ret (array/2d/allocate w h))
+      (def lines (split (file/read filename) "\n"))
+      (dotimes (y h)
+               (map/set/row ret y (car lines) w)
+               (cdr! lines))
+      ret)
 
-[defn step/increase-energy [α β]
-      [dotimes [x [ref α :width]]
-               [dotimes [y [ref α :height]]
-                        [array/2d/set! β x y [+ 1 [array/2d/ref α x y]]]]]]
+(defn step/increase-energy (α β)
+      (dotimes (x (ref α :width))
+               (dotimes (y (ref α :height))
+                        (array/2d/set! β x y (+ 1 (array/2d/ref α x y))))))
 
-[defn step/flash-increase [β flash-map x y]
-      [when [and [= #f [array/2d/ref flash-map x y]]
-                 [>= x 0]
-                 [>= y 0]
-                 [< x [ref β :width]]
-                 [< y [ref β :height]]]
-            [array/2d/set! β x y [+ 1 [array/2d/ref β x y]]]
-            [step/flash-try β flash-map x y]]]
+(defn step/flash-increase (β flash-map x y)
+      (when (and (= #f (array/2d/ref flash-map x y))
+                 (>= x 0)
+                 (>= y 0)
+                 (< x (ref β :width))
+                 (< y (ref β :height)))
+            (array/2d/set! β x y (+ 1 (array/2d/ref β x y)))
+            (step/flash-try β flash-map x y)))
 
-[defn step/flash-try [β flash-map x y]
-      [when-not [array/2d/ref flash-map x y]
-                [when [> [array/2d/ref β x y] 9]
-                      [array/2d/set! β x y 0]
-                      [array/2d/set! flash-map x y #t]
-                      [flashes/inc!]
-                      [def cx [- x 1]]
-                      [while [< cx [+ x 2]]
-                             [def cy [- y 1]]
-                             [while [< cy [+ y 2]]
-                                    [step/flash-increase β flash-map cx cy]
-                                    [inc! cy]]
-                             [inc! cx]]]]]
+(defn step/flash-try (β flash-map x y)
+      (when-not (array/2d/ref flash-map x y)
+                (when (> (array/2d/ref β x y) 9)
+                      (array/2d/set! β x y 0)
+                      (array/2d/set! flash-map x y #t)
+                      (flashes/inc!)
+                      (def cx (- x 1))
+                      (while (< cx (+ x 2))
+                             (def cy (- y 1))
+                             (while (< cy (+ y 2))
+                                    (step/flash-increase β flash-map cx cy)
+                                    (inc! cy))
+                             (inc! cx)))))
 
-[defn step/flash [β]
-      [def flash-map [array/2d/allocate [ref β :width] [ref β :height]]]
-      [array/fill! [ref flash-map :data] #f]
-      [dotimes [x [ref β :width]]
-               [dotimes [y [ref β :height]]
-                        [step/flash-try β flash-map x y]]]]
+(defn step/flash (β)
+      (def flash-map (array/2d/allocate (ref β :width) (ref β :height)))
+      (array/fill! (ref flash-map :data) #f)
+      (dotimes (x (ref β :width))
+               (dotimes (y (ref β :height))
+                        (step/flash-try β flash-map x y))))
 
-[defn step [α]
-      [def β [array/2d/allocate [ref α :width] [ref α :height]]]
-      [step/increase-energy α β]
-      [step/flash β]
-      β]
+(defn step (α)
+      (def β (array/2d/allocate (ref α :width) (ref α :height)))
+      (step/increase-energy α β)
+      (step/flash β)
+      β)
 
-[defn step/do-many [α steps]
-      [dotimes [i steps]
-               [if [= i 100] [set! p1-res [flashes/get]]]
-               [def pre-flashes [flashes/get]]
-               [set! α [step α]]
-               [when [= 100 [- [flashes/get] pre-flashes]]
-                     [set! p2-res [+ 1 i]]
-                     [throw [list :all-flashes]]]]
-      α]
+(defn step/do-many (α steps)
+      (dotimes (i steps)
+               (if (= i 100) (set! p1-res (flashes/get)))
+               (def pre-flashes (flashes/get))
+               (set! α (step α))
+               (when (= 100 (- (flashes/get) pre-flashes))
+                     (set! p2-res (+ 1 i))
+                     (throw (list :all-flashes))))
+      α)
 
-[def state [map/load "tests/fast/day11.dat" 10 10]]
-[try [fn [ε] [when [not= [car ε] :all-flashes] [throw ε]]]
-     [def ret [step/do-many state 1000]]]
-[when [not= p1-res 1694]
-      [throw [list :wrong-result "Wrong result" p1-res]]]
-[when [not= p2-res 346]
-      [throw [list :wrong-result "Wrong result" p2-res]]]
-[return :success]
+(def state (map/load "tests/fast/day11.dat" 10 10))
+(try (fn (ε) (when (not= (car ε) :all-flashes) (throw ε)))
+     (def ret (step/do-many state 1000)))
+(when (not= p1-res 1694)
+      (throw (list :wrong-result "Wrong result" p1-res)))
+(when (not= p2-res 346)
+      (throw (list :wrong-result "Wrong result" p2-res)))
+(return :success)

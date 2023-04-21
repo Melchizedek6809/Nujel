@@ -4,105 +4,105 @@
 ;;; Contains some high level functions/macros, mainly abstacting the low level
 ;;; interface to the compiler
 
-[defn compile* [source environment]
+(defn compile* (source environment)
       "Compile SOURCE so it can be evaluated/applied"
       :cat :compiler
       :internal
-      [-> [macroexpand source environment]
+      (-> (macroexpand source environment)
           constant-fold
-          backend]]
+          backend))
 
-[defn compile/do* [source environment]
+(defn compile/do* (source environment)
       :cat :compiler
       :internal
-      [if [pair? source]
-          [compile* [cons do source] environment]
-          source]]
+      (if (pair? source)
+          (compile* (cons do source) environment)
+          source))
 
-[defmacro compile [source]
+(defmacro compile (source)
           :cat :compiler
           :internal
           "Compile SOURCE so it can be evaluated/applied"
-          `[compile* ~source [current-closure]]]
+          `(compile* ~source (current-closure)))
 
-[defn meta/parse/body [type args body]
+(defn meta/parse/body (type args body)
       :cat :compiler
       :internal
-      [def source body]
-      [def meta @[]]
-      [while body
-        [def v [car body]]
-        [case [type-of v]
-              [:pair [if [== [car v] 'deftest]
-                         [tree/set! meta :tests [cons [cdr v] [tree/ref meta :tests]]]
-                         [set! body #nil]]]
-              [:string [tree/set! meta :documentation [cat [string [tree/ref meta :documentation]]
+      (def source body)
+      (def meta @())
+      (while body
+        (def v (car body))
+        (case (type-of v)
+              (:pair (if (== (car v) 'deftest)
+                         (tree/set! meta :tests (cons (cdr v) (tree/ref meta :tests)))
+                         (set! body #nil)))
+              (:string (tree/set! meta :documentation (cat (string (tree/ref meta :documentation))
                                                                  "\n"
-                                                                 v]]]
-              [:keyword [case v
-                              [:inline [tree/set! meta v #t]
-                                       [tree/set! meta :source source]]
-                              [:related [tree/set! meta :related [cons [cadr body] [tree/ref meta :related]]]
-                                        [cdr! body]]
-                              [:export-as [tree/set! meta :export [cadr body]]
-                                          [cdr! body]]
-                              [:cat [tree/set! meta :cat [cadr body]]
-                                    [cdr! body]]
-                              [otherwise [tree/set! meta v #t]]]]]
-        [cdr! body]]
-      [when [tree/ref meta :documentation]
-        [tree/set! meta :documentation [trim [tree/ref meta :documentation]]]]
-      [return meta]]
+                                                                 v)))
+              (:keyword (case v
+                              (:inline (tree/set! meta v #t)
+                                       (tree/set! meta :source source))
+                              (:related (tree/set! meta :related (cons (cadr body) (tree/ref meta :related)))
+                                        (cdr! body))
+                              (:export-as (tree/set! meta :export (cadr body))
+                                          (cdr! body))
+                              (:cat (tree/set! meta :cat (cadr body))
+                                    (cdr! body))
+                              (otherwise (tree/set! meta v #t)))))
+        (cdr! body))
+      (when (tree/ref meta :documentation)
+        (tree/set! meta :documentation (trim (tree/ref meta :documentation))))
+      (return meta))
 
-[defmacro defmacro [name args . body]
+(defmacro defmacro (name args . body)
           "Define a new macro"
-          `[def ~name [macro* '~name
+          `(def ~name (macro* '~name
                               '~args
-                              ~[meta/parse/body :macro args body]
-                              '~[compile/do* body [current-closure]]]]]
+                              ~(meta/parse/body :macro args body)
+                              '~(compile/do* body (current-closure)))))
 
-[defn fn/check [args body]
+(defn fn/check (args body)
       :cat :compiler
       :internal
-      [when-not args [exception :type-error "Every function needs an argument list" args]]
-      [while args
-        [when-not [or [symbol? args]
-                      [pair? args]]
-                  [exception :type-error "Wrong type for argument list" args]]
-        [cdr! args]]
-      [when-not body [exception :type-error "Every function needs a body" body]]]
+      (when-not args (exception :type-error "Every function needs an argument list" args))
+      (while args
+        (when-not (or (symbol? args)
+                      (pair? args))
+                  (exception :type-error "Wrong type for argument list" args))
+        (cdr! args))
+      (when-not body (exception :type-error "Every function needs a body" body)))
 
-[defmacro fn [args . body]
+(defmacro fn (args . body)
           "Define an anonymous function"
-          [fn/check args body]
-          `[fn* 'anonymous
+          (fn/check args body)
+          `(fn* 'anonymous
                 '~args
-                ~[meta/parse/body :lambda args body]
-                '~[compile/do* body [current-closure]]]]
+                ~(meta/parse/body :lambda args body)
+                '~(compile/do* body (current-closure))))
 
-[defmacro defn [name args . body]
+(defmacro defn (name args . body)
           "Define a new function"
-          [fn/check args body]
-          [def fn-meta [meta/parse/body :lambda args body]]
-          [def def-form `[def ~name [fn* '~name
+          (fn/check args body)
+          (def fn-meta (meta/parse/body :lambda args body))
+          (def def-form `(def ~name (fn* '~name
                            '~args
                            ~fn-meta
-                           '~[compile/do* body [current-closure]]]]]
-          [if [tree/ref fn-meta :export]
-              [list 'export [if [symbol? [tree/ref fn-meta :export]]
-                                [tree/ref fn-meta :export]
-                                name] def-form]
-              def-form]]
+                           '~(compile/do* body (current-closure)))))
+          (if (tree/ref fn-meta :export)
+              (list 'export (if (symbol? (tree/ref fn-meta :export))
+                                (tree/ref fn-meta :export)
+                                name) def-form)
+              def-form))
 
-[defn eval-in [closure expr]
+(defn eval-in (closure expr)
       "Compile and the immediatly evaluate the result"
       ""
-      "Mostly used by lRun() and [eval]"
-      [bytecode-eval* [compile* expr closure] closure]]
+      "Mostly used by lRun() and (eval)"
+      (bytecode-eval* (compile* expr closure) closure))
 
-[defmacro eval [expr]
+(defmacro eval (expr)
           "Compile, Evaluate and then return the result of EXPR"
-          `[eval-in [current-closure] ~expr]]
+          `(eval-in (current-closure) ~expr))
 
-[defmacro typecheck/only [v t]
-          `[when-not [= [type-of ~v] ~t] [throw [list :type-error ~[fmt "Expected a value of type {t}"] ~v [current-lambda]]]]]
+(defmacro typecheck/only (v t)
+          `(when-not (= (type-of ~v) ~t) (throw (list :type-error ~(fmt "Expected a value of type {t}") ~v (current-lambda)))))

@@ -1,4 +1,4 @@
 #!/usr/bin/env nujel
-[image/save! [image/test] "test.bmp"]
+(image/save! (image/test) "test.bmp")
 
-[defn min-tmp [a b] [if [< a b] a b]]
+(defn min-tmp (a b) (if (< a b) a b))

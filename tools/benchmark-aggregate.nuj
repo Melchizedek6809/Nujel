@@ -1,8 +1,8 @@
 #!/usr/bin/env nujel
 
-[file/write [cat "const reportData = ["
-                 [-> [directory/read-recursive "web/benchmark-results"]
-                     [map file/read]
-                     [join ","]]
-                 "];"]
-            "web/report-data.js"]
+(file/write (cat "const reportData = ("
+                 (-> (directory/read-recursive "web/benchmark-results")
+                     (map file/read)
+                     (join ","))
+                 ");")
+            "web/report-data.js")

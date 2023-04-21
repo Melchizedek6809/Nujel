@@ -1,152 +1,151 @@
-[import [start stop clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color] :core/term]
-[import [new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line] :app/termed/buffer]
+(import (start stop clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
+(import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line) :app/termed/buffer)
 
-[def buffers #[]]
-[def screen-width #nil]
-[def screen-height #nil]
-[def last-char 0]
+(def buffers #())
+(def screen-width #nil)
+(def screen-height #nil)
+(def last-char 0)
 
-[def scroll-interval 10]
+(def scroll-interval 10)
 
-[defn new-buffer [filename]
-      [def buf [new-buffer* filename]]
-      [array/push buffers buf]
-      buf]
+(defn new-buffer (filename)
+      (def buf (new-buffer* filename))
+      (array/push buffers buf)
+      buf)
 
-[defn draw-gutter []
-      [draw-box :red 1 2 4 [- screen-height 2]]]
+(defn draw-gutter ()
+      (draw-box :red 1 2 4 (- screen-height 2)))
 
-[defn get-modeline [buf]
-      [def x [tree/ref buf :pos-x]]
-      [def y [inc [tree/ref buf :pos-y]]]
-      [def bufname [get-buf-name buf]]
-      [def saved [if [tree/ref buf :changed] "*" ""]]
-      [fmt " L{y} - {bufname} - KeyCode: {last-char:X}"]]
+(defn get-modeline (buf)
+      (def x (tree/ref buf :pos-x))
+      (def y (inc (tree/ref buf :pos-y)))
+      (def bufname (get-buf-name buf))
+      (def saved (if (tree/ref buf :changed) "*" ""))
+      (fmt " L{y} - {bufname} - KeyCode: {last-char:X}"))
 
-[defn draw-modeline [buf]
-      [draw-box :blue 1 [dec screen-height] screen-width 1]
-      [move-cursor 1 [dec screen-height]]
-      [set-color :yellow :blue]
-      [put-string [get-modeline buf]]
-      [set-color :default :default]]
+(defn draw-modeline (buf)
+      (draw-box :blue 1 (dec screen-height) screen-width 1)
+      (move-cursor 1 (dec screen-height))
+      (set-color :yellow :blue)
+      (put-string (get-modeline buf))
+      (set-color :default :default))
 
-[defn draw-buffer-line [buf term-x term-y term-w line-y]
-      [def line [get-line buf line-y]]
-      [when-not line [return]]
-      [when [= line-y [tree/ref buf :pos-y]]
-        [set-color :yellow :blue]]
-      [move-cursor term-x term-y]
-      [def ln [fmt " {:4} " [inc line-y]]]
-      [put-string ln]
-      [set-color :default]
-      [move-cursor [+ 1 [buffer/length ln] term-x] term-y]
-      [put-string line]]
+(defn draw-buffer-line (buf term-x term-y term-w line-y)
+      (def line (get-line buf line-y))
+      (when-not line (return))
+      (when (= line-y (tree/ref buf :pos-y))
+        (set-color :yellow :blue))
+      (move-cursor term-x term-y)
+      (def ln (fmt " {:4} " (inc line-y)))
+      (put-string ln)
+      (set-color :default)
+      (move-cursor (+ 1 (buffer/length ln) term-x) term-y)
+      (put-string line))
 
-[defn draw-buffer [buf x y w h]
-      [dotimes [cy h]
-               [def line-y [+ cy [tree/ref buf :scroll-y]]]
-               [draw-buffer-line buf x [+ cy y] w line-y]]
-      [draw-modeline buf]]
+(defn draw-buffer (buf x y w h)
+      (dotimes (cy h)
+               (def line-y (+ cy (tree/ref buf :scroll-y)))
+               (draw-buffer-line buf x (+ cy y) w line-y))
+      (draw-modeline buf))
 
-[defn draw-screen []
-      [clear-screen]
-      [def cur-buffer [get-cur-buffer]]
-      [draw-buffer cur-buffer 1 1 screen-width [- screen-height 2]]
-      [move-cursor [+ 1 1 6 [tree/ref cur-buffer :pos-x]] [- [inc [tree/ref cur-buffer :pos-y]]
-                                                             [tree/ref cur-buffer :scroll-y]]]]
+(defn draw-screen ()
+      (clear-screen)
+      (def cur-buffer (get-cur-buffer))
+      (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
+      (move-cursor (+ 1 1 6 (tree/ref cur-buffer :pos-x)) (- (inc (tree/ref cur-buffer :pos-y))
+                                                             (tree/ref cur-buffer :scroll-y))))
 
-[defn quit []
-      [stop]
-      [exit 0]]
+(defn quit ()
+      (stop)
+      (exit 0))
 
-[defn beginning-of-line []
-      [tree/set! [get-cur-buffer] :pos-x 0]]
+(defn beginning-of-line ()
+      (tree/set! (get-cur-buffer) :pos-x 0))
 
-[defn end-of-line []
-      [def buf [get-cur-buffer]]
-      [tree/set! buf :pos-x [inc [line-length [tree/ref buf :pos-y]]]]]
+(defn end-of-line ()
+      (def buf (get-cur-buffer))
+      (tree/set! buf :pos-x (inc (line-length (tree/ref buf :pos-y)))))
 
-[defn scroll-into-view []
-      [def buf [get-cur-buffer]]
-      [def frame-height [- screen-height 3]]
-      [when [< [- [tree/ref buf :pos-y]
-                  [tree/ref buf :scroll-y]] 0]
-        [tree/set! buf :scroll-y [* scroll-interval [int [floor [/ [tree/ref buf :pos-y] scroll-interval]]]]]]
+(defn scroll-into-view ()
+      (def buf (get-cur-buffer))
+      (def frame-height (- screen-height 3))
+      (when (< (- (tree/ref buf :pos-y)
+                  (tree/ref buf :scroll-y)) 0)
+        (tree/set! buf :scroll-y (* scroll-interval (int (floor (/ (tree/ref buf :pos-y) scroll-interval))))))
 
-      [when [> [- [tree/ref buf :pos-y]
-                  [tree/ref buf :scroll-y]] frame-height]
-        [tree/set! buf :scroll-y [* scroll-interval [int [ceil [/ [- [tree/ref buf :pos-y] frame-height] scroll-interval]]]]]]
+      (when (> (- (tree/ref buf :pos-y)
+                  (tree/ref buf :scroll-y)) frame-height)
+        (tree/set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (tree/ref buf :pos-y) frame-height) scroll-interval))))))
 
-      [when [< [tree/ref buf :scroll-y] 0]
-        [tree/set! buf :scroll-y]]]
+      (when (< (tree/ref buf :scroll-y) 0)
+        (tree/set! buf :scroll-y)))
 
-[defn read-bracketed-input []
-      [def c [poll-input]]
-      [when [= c #\A]
-        [return [previous-line]]]
-      [when [= c #\B]
-        [return [next-line]]]
-      [when [= c #\C]
-        [return [forward-char]]]
-      [when [= c #\D]
-        [return [backward-char]]]
-      [return]]
+(defn read-bracketed-input ()
+      (def c (poll-input))
+      (when (= c #\A)
+        (return (previous-line)))
+      (when (= c #\B)
+        (return (next-line)))
+      (when (= c #\C)
+        (return (forward-char)))
+      (when (= c #\D)
+        (return (backward-char)))
+      (return))
 
-[defn read-escaped-input []
-      [def c [poll-input]]
-      [when [= c #\[]
-        [return [read-bracketed-input]]]
-      [return [insert-char #\[]]]
+(defn read-escaped-input ()
+      (def c (poll-input))
+      (when (= c #\()
+        (return (read-bracketed-input)))
+      (return (insert-char #\()))
 
-[defn read-cx-input []
-      [def c [poll-input]]
-      [when [= c 3]
-        [return [quit]]]
-      ]
+(defn read-cx-input ()
+      (def c (poll-input))
+      (when (= c 3)
+        (return (quit))))
 
-[defn read-input []
-      [def c [poll-input]]
-      [set! last-char c]
-      [when [= c #x1B]
-        [return [read-escaped-input]]]
-      [when [= c #x01] ; C-a
-        [return [beginning-of-line]]]
-      [when [= c #x02] ; C-b
-        [return [backward-char]]]
-      [when [= c #x05] ; C-e
-        [return [end-of-line]]]
-      [when [= c #x06] ; C-f
-        [return [forward-char]]]
-      [when [= c #x10] ; C-f
-        [return [previous-line]]]
-      [when [= c #x0e] ; C-f
-        [return [next-line]]]
-      [when [= c #x18] ; C-f
-        [return [read-cx-input]]]
-      [when [= c #x7F]
-        [return [backward-delete-char]]]
-      [when [= c #x0D]
-        [return [insert-newline]]]
-      [when [and [>= c #x20]
-                 [<  c #x80]]
-        [return [insert-char c]]]]
+(defn read-input ()
+      (def c (poll-input))
+      (set! last-char c)
+      (when (= c #x1B)
+        (return (read-escaped-input)))
+      (when (= c #x01) ; C-a
+        (return (beginning-of-line)))
+      (when (= c #x02) ; C-b
+        (return (backward-char)))
+      (when (= c #x05) ; C-e
+        (return (end-of-line)))
+      (when (= c #x06) ; C-f
+        (return (forward-char)))
+      (when (= c #x10) ; C-f
+        (return (previous-line)))
+      (when (= c #x0e) ; C-f
+        (return (next-line)))
+      (when (= c #x18) ; C-f
+        (return (read-cx-input)))
+      (when (= c #x7F)
+        (return (backward-delete-char)))
+      (when (= c #x0D)
+        (return (insert-newline)))
+      (when (and (>= c #x20)
+                 (<  c #x80))
+        (return (insert-char c))))
 
-[defn load-buffer [filename]
-      [def buf [new-buffer filename]]
-      [def text [slurp filename]]
-      [when text [tree/set! buf :lines [apply array/new [map [split text "\n"] string->buffer]]]]]
+(defn load-buffer (filename)
+      (def buf (new-buffer filename))
+      (def text (slurp filename))
+      (when text (tree/set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
 
-[defn main [args]
+(defn main (args)
       :export
-      [start]
-      [def s [get-size]]
-      [set! screen-width [tree/ref s :width]]
-      [set! screen-height [tree/ref s :height]]
-      [for-each args load-buffer]
-      [when [zero? [array/length buffers]]
-        [new-buffer "*scratch*"]]
-      [set-cur-buffer! [array/ref buffers [dec [array/length buffers]]]]
-      [while #t
-        [scroll-into-view]
-        [draw-screen]
-        [read-input]]]
+      (start)
+      (def s (get-size))
+      (set! screen-width (tree/ref s :width))
+      (set! screen-height (tree/ref s :height))
+      (for-each args load-buffer)
+      (when (zero? (array/length buffers))
+        (new-buffer "*scratch*"))
+      (set-cur-buffer! (array/ref buffers (dec (array/length buffers))))
+      (while #t
+        (scroll-into-view)
+        (draw-screen)
+        (read-input)))

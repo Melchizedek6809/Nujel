@@ -3,64 +3,64 @@
 ;;;
 ;;; A bunch of procedurs working on procedures, using type specialized λs
 
-[defn ref [l i]
+(defn ref (l i)
       "Return whatver is at position I in L"
-      [case [type-of l]
-            [:nil               #nil]
-            [:pair   [list/ref   l i]]
-            [:array  [array/ref  l i]]
-            [:tree   [tree/ref   l i]]
-            [[:buffer :string :buffer-view] [buffer/ref l i]]
-            [otherwise [exception :type-error "You can only ref a collection" l ]]]]
+      (case (type-of l)
+            (:nil               #nil)
+            (:pair   (list/ref   l i))
+            (:array  (array/ref  l i))
+            (:tree   (tree/ref   l i))
+            ((:buffer :string :buffer-view) (buffer/ref l i))
+            (otherwise (exception :type-error "You can only ref a collection" l ))))
 
-[defn filter [l p]
+(defn filter (l p)
       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
-      [case [type-of l]
-            [:nil #nil]
-            [:pair   [list/filter  l p]]
-            [:array  [array/filter l p]]
-            [:tree   [tree/filter  l p]]
-            [otherwise [exception :type-error "You can only filter collections" l ]]]]
+      (case (type-of l)
+            (:nil #nil)
+            (:pair   (list/filter  l p))
+            (:array  (array/filter l p))
+            (:tree   (tree/filter  l p))
+            (otherwise (exception :type-error "You can only filter collections" l ))))
 
-[defn reduce [l f α]
+(defn reduce (l f α)
       "Combine all elements in collection l using operation F and starting value α"
-      [case [type-of l]
-            [:nil    α]
-            [:tree   [tree/reduce  l f α]]
-            [:array  [array/reduce l f α]]
-            [:pair   [list/reduce  l f α]]
-            [otherwise [exception :type-error "You can only reduce collections" l ]]]]
+      (case (type-of l)
+            (:nil    α)
+            (:tree   (tree/reduce  l f α))
+            (:array  (array/reduce l f α))
+            (:pair   (list/reduce  l f α))
+            (otherwise (exception :type-error "You can only reduce collections" l ))))
 
-[defn length [α]
+(defn length (α)
       "Returns the length of collection α"
-      [case [type-of α]
-            [:nil                    0]
-            [:pair   [list/length   α]]
-            [:array  [array/length  α]]
-            [:tree   [tree/size     α]]
-            [[:buffer :string :buffer-view] [buffer/length α]]
-            [otherwise [exception :type-error "You can only use length with a collection" α ]]]]
+      (case (type-of α)
+            (:nil                    0)
+            (:pair   (list/length   α))
+            (:array  (array/length  α))
+            (:tree   (tree/size     α))
+            ((:buffer :string :buffer-view) (buffer/length α))
+            (otherwise (exception :type-error "You can only use length with a collection" α ))))
 
-[defn map [l f]
+(defn map (l f)
       "Runs f over every item in collection l and returns the resulting list"
-      [case [type-of l]
-            [:nil    #nil]
-            [:pair   [list/map  l f]]
-            [:array  [array/map l f]]
-            [otherwise [exception :type-error "You can only use map with a collection" l ]]]]
+      (case (type-of l)
+            (:nil    #nil)
+            (:pair   (list/map  l f))
+            (:array  (array/map l f))
+            (otherwise (exception :type-error "You can only use map with a collection" l ))))
 
-[defn sort [l]
+(defn sort (l)
       "Sorts the collection L"
-      [case [type-of l]
-            [:nil      #nil]
-            [:pair     [list/sort  l]]
-            [:array    [array/sort l]]
-            [otherwise [exception :type-error "You can only use sort with a collection" l ]]]]
+      (case (type-of l)
+            (:nil      #nil)
+            (:pair     (list/sort  l))
+            (:array    (array/sort l))
+            (otherwise (exception :type-error "You can only use sort with a collection" l ))))
 
-[defn cut [l start end]
+(defn cut (l start end)
       "Return a subcollection of L from START to END"
-      [case [type-of l]
-            [:pair     [list/cut   l start end]]
-            [:array    [array/cut  l start end]]
-            [:string   [string/cut l start end]]
-            [otherwise [exception :type-error "You can only use member with a collection" l ]]]]
+      (case (type-of l)
+            (:pair     (list/cut   l start end))
+            (:array    (array/cut  l start end))
+            (:string   (string/cut l start end))
+            (otherwise (exception :type-error "You can only use member with a collection" l ))))

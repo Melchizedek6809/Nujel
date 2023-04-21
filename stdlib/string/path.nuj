@@ -3,41 +3,41 @@
 ;;;
 ;;; Some functions for working with paths and file extensions
 
-[defn path/ext?! [ext]
+(defn path/ext?! (ext)
       "Return a predicate that checks if a path ends on EXT"
-      [case [type-of ext]
-            [:string [fn [path]
-                         [= ext [lower-case [path/extension path]]]]]
-            [:pair [fn [path]
-                       [def cext [lower-case [path/extension path]]]
-                     [reduce ext [fn [α β] [or α [= β cext]]]]]]
-            [otherwise [exception :type-error "Expected a :string or :list" ext]]]]
+      (case (type-of ext)
+            (:string (fn (path)
+                         (= ext (lower-case (path/extension path)))))
+            (:pair (fn (path)
+                       (def cext (lower-case (path/extension path)))
+                     (reduce ext (fn (α β) (or α (= β cext))))))
+            (otherwise (exception :type-error "Expected a :string or :list" ext))))
 
 
-[defn path/extension [path]
+(defn path/extension (path)
       "Return the extension of PATH"
-      [def last-period [last-index-of path "."]]
-      [if [>= last-period 0]
-          [string/cut path [+ 1 last-period] [buffer/length path]]
-          path]]
+      (def last-period (last-index-of path "."))
+      (if (>= last-period 0)
+          (string/cut path (+ 1 last-period) (buffer/length path))
+          path))
 
-[defn path/without-extension [path]
+(defn path/without-extension (path)
       "Return PATH, but without the extension part"
-      [def last-period [last-index-of path "."]]
-      [if [>= last-period 0]
-          [string/cut path 0 last-period]
-          path]]
+      (def last-period (last-index-of path "."))
+      (if (>= last-period 0)
+          (string/cut path 0 last-period)
+          path))
 
-[defn path/dirname [path]
+(defn path/dirname (path)
       "Return the directory part of a PATH"
-      [def last-slash [last-index-of path "/"]]
-      [if [>= last-slash 0]
-          [string/cut path 0 last-slash]
-          ""]]
+      (def last-slash (last-index-of path "/"))
+      (if (>= last-slash 0)
+          (string/cut path 0 last-slash)
+          ""))
 
-[defn path/basename [path]
+(defn path/basename (path)
       "Return the path without the directory part"
-      [def last-slash [last-index-of path "/"]]
-      [if [>= last-slash 0]
-          [string/cut path [inc last-slash]]
-          path]]
+      (def last-slash (last-index-of path "/"))
+      (if (>= last-slash 0)
+          (string/cut path (inc last-slash))
+          path))

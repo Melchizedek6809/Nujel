@@ -1,25 +1,25 @@
 #!/usr/bin/env nujel
 
-[defn reverse-num [a]
-      [def ret 0]
-      [while [> a 0]
-             [set! ret [* ret 10]]
-             [set! ret [+ ret [rem a 10]]]
-             [set! a [div/int a 10]]]
-      [return ret]]
+(defn reverse-num (a)
+      (def ret 0)
+      (while (> a 0)
+             (set! ret (* ret 10))
+             (set! ret (+ ret (rem a 10)))
+             (set! a (div/int a 10)))
+      (return ret))
 
-[defn palindrome? [a]
-      [== a [reverse-num a]]]
+(defn palindrome? (a)
+      (== a (reverse-num a)))
 
-[def max 0]
-[dotimes [a 1000]
-         [dotimes [b 1000]
-                  [def p [* a b]]
-                  [when [and [palindrome? p]
-                             [> p max]]
-                        [set! max p]]]]
+(def max 0)
+(dotimes (a 1000)
+         (dotimes (b 1000)
+                  (def p (* a b))
+                  (when (and (palindrome? p)
+                             (> p max))
+                        (set! max p))))
 
 
-[when [not= max 906609]
-      [throw [list :wrong-result "Wrong result" max]]]
-[return :success]
+(when (not= max 906609)
+      (throw (list :wrong-result "Wrong result" max)))
+(return :success)

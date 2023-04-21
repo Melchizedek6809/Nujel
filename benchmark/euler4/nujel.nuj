@@ -1,23 +1,23 @@
 ;; The biggest product of 2 3-digit numbers that is a palindrome
 ;; https://projecteuler.net/problem=4
 
-[defn reverse-num [a]
-      [def ret 0]
-      [while [> a 0]
-             [set! ret [+ [* ret 10] [rem a 10]]]
-             [set! a [div/int a 10]]]
-      [return ret]]
+(defn reverse-num (a)
+      (def ret 0)
+      (while (> a 0)
+             (set! ret (+ (* ret 10) (rem a 10)))
+             (set! a (div/int a 10)))
+      (return ret))
 
-[defn palindrome? [a]
-      [== a [reverse-num a]]]
+(defn palindrome? (a)
+      (== a (reverse-num a)))
 
-[defn bench-run []
-  [def max 0]
-  [dotimes [a 1000 max]
-    [dotimes [b 1000]
-      [def p [* a b]]
-      [when [and [palindrome? p]
-                 [> p max]]
-        [set! max p]]]]]
+(defn bench-run ()
+  (def max 0)
+  (dotimes (a 1000 max)
+    (dotimes (b 1000)
+      (def p (* a b))
+      (when (and (palindrome? p)
+                 (> p max))
+        (set! max p)))))
 
-[pfmtln "The biggest product of 2 3-digit numbers that is a palindrome is: {}" [bench-run]]
+(pfmtln "The biggest product of 2 3-digit numbers that is a palindrome is: {}" (bench-run))

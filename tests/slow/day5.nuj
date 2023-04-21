@@ -1,55 +1,55 @@
 #!/usr/bin/env nujel
 
-[defn array/2d/new [width height val]
-       [def ret [array/allocate width]]
-       [def x 0]
-       [while [< x width]
-	      [array/set! ret x [array/fill! [array/allocate height] val]]
-	      [inc! x]]
-       ret]
+(defn array/2d/new (width height val)
+       (def ret (array/allocate width))
+       (def x 0)
+       (while (< x width)
+	      (array/set! ret x (array/fill! (array/allocate height) val))
+	      (inc! x))
+       ret)
 
-[defn parse/point [text]
-       [tree/zip '[:x :y] [map [split text ","] read/single]]]
+(defn parse/point (text)
+       (tree/zip '(:x :y) (map (split text ",") read/single)))
 
-[defn line/dir [start end]
-       [cond [[= start end] 0]
-	     [[< start end] 1]
-	     [#t -1]]]
+(defn line/dir (start end)
+       (cond ((= start end) 0)
+	     ((< start end) 1)
+	     (#t -1)))
 
-[defn line/draw [x y end-x end-y]
-       [def dir-x [line/dir x end-x]]
-       [def dir-y [line/dir y end-y]]
-       [while [or [not= x end-x] [not= y end-y]]
-	      [array/++ [ref vents x] y 1]
-	      [inc! x dir-x]
-	      [inc! y dir-y]]
-       [array/++ [ref vents x] y 1]]
+(defn line/draw (x y end-x end-y)
+       (def dir-x (line/dir x end-x))
+       (def dir-y (line/dir y end-y))
+       (while (or (not= x end-x) (not= y end-y))
+	      (array/++ (ref vents x) y 1)
+	      (inc! x dir-x)
+	      (inc! y dir-y))
+       (array/++ (ref vents x) y 1))
 
-[defn line/horiz? [line]
-       [= [ref [ref line :a] :y]
-           [ref [ref line :b] :y]]]
+(defn line/horiz? (line)
+       (= (ref (ref line :a) :y)
+           (ref (ref line :b) :y)))
 
-[defn line/vert? [line]
-       [= [ref [ref line :a] :x]
-           [ref [ref line :b] :x]]]
+(defn line/vert? (line)
+       (= (ref (ref line :a) :x)
+           (ref (ref line :b) :x)))
 
-[defn line/draw-vents [line]
-       [when [or [line/horiz? line] [line/vert? line]]
-             [line/draw [ref [ref line :a] :x]
-                        [ref [ref line :a] :y]
-                        [ref [ref line :b] :x]
-                        [ref [ref line :b] :y]]]]
+(defn line/draw-vents (line)
+       (when (or (line/horiz? line) (line/vert? line))
+             (line/draw (ref (ref line :a) :x)
+                        (ref (ref line :a) :y)
+                        (ref (ref line :b) :x)
+                        (ref (ref line :b) :y))))
 
-[defn points/count [v num]
-       [reduce v [fn [a b] [+ a [reduce b [fn [a b] [+ a [if [> b num] 1 0]]] 0]]] 0]]
+(defn points/count (v num)
+       (reduce v (fn (a b) (+ a (reduce b (fn (a b) (+ a (if (> b num) 1 0))) 0))) 0))
 
-[defn parse/line [line]
-       [line/draw-vents [tree/zip '[:b :a] [map [split line "->"] parse/point]]]]
+(defn parse/line (line)
+       (line/draw-vents (tree/zip '(:b :a) (map (split line "->") parse/point))))
 
-[def vents [array/2d/new 1000 1000 0]]
-[def lines [split [file/read "tests/slow/day5.input"] "\n"]]
-[for-each lines parse/line]
-[when [not= [points/count vents 1] 3990]
-      [throw [list :wrong-result "Wrong result" result]]]
+(def vents (array/2d/new 1000 1000 0))
+(def lines (split (file/read "tests/slow/day5.input") "\n"))
+(for-each lines parse/line)
+(when (not= (points/count vents 1) 3990)
+      (throw (list :wrong-result "Wrong result" result)))
 
-[return :success]
+(return :success)

@@ -1,146 +1,146 @@
-[def cur-buffer #nil]
+(def cur-buffer #nil)
 
-[defn set-cur-buffer! [buf]
+(defn set-cur-buffer! (buf)
       :export
-      [set! cur-buffer buf]]
+      (set! cur-buffer buf))
 
-[defn get-cur-buffer []
+(defn get-cur-buffer ()
       :export
-      cur-buffer]
+      cur-buffer)
 
-[defn new-buffer [filename]
+(defn new-buffer (filename)
       :export
-      [def lines #[[buffer/allocate 16]]]
-      [def buf @[ :lines lines
+      (def lines #((buffer/allocate 16)))
+      (def buf @( :lines lines
                   :filename filename
                   :changed #f
                   :pos-x 0
                   :pos-y 0
                   :scroll-x 0
-                  :scroll-y 0]]
-      [return buf]]
+                  :scroll-y 0))
+      (return buf))
 
-[defn get-line [buf line-y]
+(defn get-line (buf line-y)
       :export
-      [def lines [tree/ref buf :lines]]
-      [if [or [< line-y 0]
-              [>= line-y [array/length lines]]]
+      (def lines (tree/ref buf :lines))
+      (if (or (< line-y 0)
+              (>= line-y (array/length lines)))
           #nil
-          [array/ref lines line-y]]]
+          (array/ref lines line-y)))
 
-[defn line-length [pos-y]
+(defn line-length (pos-y)
       :export
-      [def buf cur-buffer]
-      [def line [get-line buf pos-y]]
-      [when-not line [return 0]]
-      [dotimes [i [buffer/length line] [buffer/length line]]
-               [when [zero? [buffer/ref line i]]
-                 [return [- i 1]]]]]
+      (def buf cur-buffer)
+      (def line (get-line buf pos-y))
+      (when-not line (return 0))
+      (dotimes (i (buffer/length line) (buffer/length line))
+               (when (zero? (buffer/ref line i))
+                 (return (- i 1)))))
 
-[defn backward-delete-line []
+(defn backward-delete-line ()
       :export
-      [def buf cur-buffer]
-      [def lines [tree/ref buf :lines]]
-      [def ll [- [array/length lines] 1]]
-      [def pos-y [tree/ref buf :pos-y]]
-      [when [zero? pos-y] [return]]
-      [while [< pos-y ll]
-        [array/set! lines pos-y [inc pos-y]]
-        [inc! pos-y]]
-      [array/length! lines [max 0 ll]]
-      [tree/set! buf :pos-y [- [tree/ref buf :pos-y] 1]]
-      [tree/set! buf :pos-x [inc [line-length [tree/ref buf :pos-y]]]]]
+      (def buf cur-buffer)
+      (def lines (tree/ref buf :lines))
+      (def ll (- (array/length lines) 1))
+      (def pos-y (tree/ref buf :pos-y))
+      (when (zero? pos-y) (return))
+      (while (< pos-y ll)
+        (array/set! lines pos-y (inc pos-y))
+        (inc! pos-y))
+      (array/length! lines (max 0 ll))
+      (tree/set! buf :pos-y (- (tree/ref buf :pos-y) 1))
+      (tree/set! buf :pos-x (inc (line-length (tree/ref buf :pos-y)))))
 
-[defn backward-char []
+(defn backward-char ()
       :export
-      [def buf cur-buffer]
-      [def pos-x [tree/ref buf :pos-x]]
-      [when [< pos-x 1]
-        [def pos-y [tree/ref buf :pos-y]]
-        [when [< pos-y 1]
-          [return]]
-        [tree/set! buf :pos-y [dec pos-y]]
-        [tree/set! buf :pos-x [inc [line-length [dec pos-y]]]]
-        [return]]
-      [tree/set! buf :pos-x [dec pos-x]]]
+      (def buf cur-buffer)
+      (def pos-x (tree/ref buf :pos-x))
+      (when (< pos-x 1)
+        (def pos-y (tree/ref buf :pos-y))
+        (when (< pos-y 1)
+          (return))
+        (tree/set! buf :pos-y (dec pos-y))
+        (tree/set! buf :pos-x (inc (line-length (dec pos-y))))
+        (return))
+      (tree/set! buf :pos-x (dec pos-x)))
 
-[defn previous-line []
+(defn previous-line ()
       :export
-      [def buf cur-buffer]
-      [def pos-x [tree/ref buf :pos-x]]
-      [def pos-y [tree/ref buf :pos-y]]
-      [when [< pos-y 1]
-        [return]]
-      [tree/set! buf :pos-y [dec pos-y]]
-      [tree/set! buf :pos-x [min pos-x [inc [line-length [dec pos-y]]]]]]
+      (def buf cur-buffer)
+      (def pos-x (tree/ref buf :pos-x))
+      (def pos-y (tree/ref buf :pos-y))
+      (when (< pos-y 1)
+        (return))
+      (tree/set! buf :pos-y (dec pos-y))
+      (tree/set! buf :pos-x (min pos-x (inc (line-length (dec pos-y))))))
 
-[defn next-line []
+(defn next-line ()
       :export
-      [def buf cur-buffer]
-      [def pos-x [tree/ref buf :pos-x]]
-      [def pos-y [tree/ref buf :pos-y]]
-      [def lines [tree/ref buf :lines]]
-      [def ll [- [array/length lines] 1]]
-      [when [>= pos-y ll]
-        [return]]
-      [tree/set! buf :pos-y [inc pos-y]]
-      [tree/set! buf :pos-x [min pos-x [inc [line-length [inc pos-y]]]]]]
+      (def buf cur-buffer)
+      (def pos-x (tree/ref buf :pos-x))
+      (def pos-y (tree/ref buf :pos-y))
+      (def lines (tree/ref buf :lines))
+      (def ll (- (array/length lines) 1))
+      (when (>= pos-y ll)
+        (return))
+      (tree/set! buf :pos-y (inc pos-y))
+      (tree/set! buf :pos-x (min pos-x (inc (line-length (inc pos-y))))))
 
-[defn forward-char []
+(defn forward-char ()
       :export
-      [def buf cur-buffer]
-      [def pos-x [tree/ref buf :pos-x]]
-      [def pos-y [tree/ref buf :pos-y]]
-      [def ll [line-length pos-y]]
-      [when [> pos-x ll]
-        [when [>= [inc pos-y] [array/length [tree/ref buf :lines]]]
-          [return]]
-        [tree/set! buf :pos-x 0]
-        [tree/set! buf :pos-y [inc pos-y]]
-        [return]]
-      [tree/set! buf :pos-x [inc pos-x]]]
+      (def buf cur-buffer)
+      (def pos-x (tree/ref buf :pos-x))
+      (def pos-y (tree/ref buf :pos-y))
+      (def ll (line-length pos-y))
+      (when (> pos-x ll)
+        (when (>= (inc pos-y) (array/length (tree/ref buf :lines)))
+          (return))
+        (tree/set! buf :pos-x 0)
+        (tree/set! buf :pos-y (inc pos-y))
+        (return))
+      (tree/set! buf :pos-x (inc pos-x)))
 
-[defn backward-delete-char []
+(defn backward-delete-char ()
       :export
-      [def buf cur-buffer]
-      [def line [get-line buf [tree/ref buf :pos-y]]]
-      [when-not line [return]]
-      [def pos-x [tree/ref buf :pos-x]]
-      [when [< pos-x 1]
-        [backward-delete-line]
-        [return]]
-      [def bl [- [buffer/length line] 1]]
-      [buffer/set! line [- pos-x 1] 0]
-      [while [< pos-x [- bl 1]]
-        [buffer/set! line pos-x [buffer/ref line [inc pos-x]]]
-        [inc! pos-x]]
-      [buffer/set! line bl 0]
-      [tree/set! buf :pos-x [- [tree/ref buf :pos-x] 1]]]
+      (def buf cur-buffer)
+      (def line (get-line buf (tree/ref buf :pos-y)))
+      (when-not line (return))
+      (def pos-x (tree/ref buf :pos-x))
+      (when (< pos-x 1)
+        (backward-delete-line)
+        (return))
+      (def bl (- (buffer/length line) 1))
+      (buffer/set! line (- pos-x 1) 0)
+      (while (< pos-x (- bl 1))
+        (buffer/set! line pos-x (buffer/ref line (inc pos-x)))
+        (inc! pos-x))
+      (buffer/set! line bl 0)
+      (tree/set! buf :pos-x (- (tree/ref buf :pos-x) 1)))
 
-[defn insert-char [c]
+(defn insert-char (c)
       :export
-      [def buf cur-buffer]
-      [def line [get-line buf [tree/ref buf :pos-y]]]
-      [when-not line
+      (def buf cur-buffer)
+      (def line (get-line buf (tree/ref buf :pos-y)))
+      (when-not line
                 ; ToDo: add line?
-                [return]]
-      [def pos-x [tree/ref buf :pos-x]]
-      [when [>= pos-x [buffer/length line]]
-        [buffer/length! line [+ [buffer/length line] 16]]]
-      [buffer/set! line pos-x c]
-      [tree/set! buf :pos-x [inc pos-x]]]
+                (return))
+      (def pos-x (tree/ref buf :pos-x))
+      (when (>= pos-x (buffer/length line))
+        (buffer/length! line (+ (buffer/length line) 16)))
+      (buffer/set! line pos-x c)
+      (tree/set! buf :pos-x (inc pos-x)))
 
-[defn insert-newline []
+(defn insert-newline ()
       :export
-      [def buf cur-buffer]
-      [def lines [tree/ref buf :lines]]
-      [array/length! lines [inc [array/length lines]]]
-      [array/set! lines [- [array/length lines] 1] [buffer/allocate 16]]
-      [tree/set! buf :pos-x 0]
-      [tree/set! buf :pos-y [inc [tree/ref buf :pos-y]]]]
+      (def buf cur-buffer)
+      (def lines (tree/ref buf :lines))
+      (array/length! lines (inc (array/length lines)))
+      (array/set! lines (- (array/length lines) 1) (buffer/allocate 16))
+      (tree/set! buf :pos-x 0)
+      (tree/set! buf :pos-y (inc (tree/ref buf :pos-y))))
 
-[defn get-buf-name [buf]
+(defn get-buf-name (buf)
       :export
-      [def filename [tree/ref buf :filename]]
-      [def saved [if [tree/ref buf :changed] "*" ""]]
-      [fmt "{filename}{saved}"]]
+      (def filename (tree/ref buf :filename))
+      (def saved (if (tree/ref buf :changed) "*" ""))
+      (fmt "{filename}{saved}"))

@@ -70,11 +70,11 @@ void simplePrintVal(lVal *v){
 		simplePrintVal(v->vList.cdr);
 		break;
 	case ltArray:
-		fprintf(stderr, "##[");
+		fprintf(stderr, "##(");
 		for(int i=0;i<v->vArray->length;i++){
 			simplePrintVal(v->vArray->data[i]);
 		}
-		fprintf(stderr, "] ");
+		fprintf(stderr, ") ");
 	}
 }
 

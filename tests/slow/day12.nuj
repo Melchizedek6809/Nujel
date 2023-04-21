@@ -1,50 +1,50 @@
 #!/usr/bin/env nujel
 
-[def cave-map @[]]
-[def big-caves @[]]
-[defn big-cave? [α] [ref big-caves α]]
-[defn add-connections [line]
-  [def parts [map [split line "-"] string->symbol]]
-  [when [cadr parts]
-    [tree/set! cave-map   [car parts] [cons [cadr parts] [ref cave-map [car parts]]]]
-    [tree/set! cave-map  [cadr parts] [cons [car parts] [ref cave-map [cadr parts]]]]
-    [tree/set! big-caves  [car parts] [< [buffer/ref [string [car parts]] 0] #\a]]
-    [tree/set! big-caves [cadr parts] [< [buffer/ref [string [cadr parts]] 0] #\a]]]]
-[defn add-connections [line]
-  [def parts [map [split line "-"] string->symbol]]
-  [when [cadr parts]
-    [tree/set! cave-map   [car parts] [cons [cadr parts] [ref cave-map [car parts]]]]
-    [tree/set! cave-map  [cadr parts] [cons [car parts] [ref cave-map [cadr parts]]]]
-    [tree/set! big-caves  [car parts] [< [try [fn [] 0] [buffer/ref [string [car parts]] 0]] #\a]]
-    [tree/set! big-caves [cadr parts] [< [try [fn [] 0] [buffer/ref [string [cadr parts]] 0]] #\a]]]]
-[def connections [for-each [split [file/read "tests/slow/day12.input"] "\n"] add-connections]]
+(def cave-map @())
+(def big-caves @())
+(defn big-cave? (α) (ref big-caves α))
+(defn add-connections (line)
+  (def parts (map (split line "-") string->symbol))
+  (when (cadr parts)
+    (tree/set! cave-map   (car parts) (cons (cadr parts) (ref cave-map (car parts))))
+    (tree/set! cave-map  (cadr parts) (cons (car parts) (ref cave-map (cadr parts))))
+    (tree/set! big-caves  (car parts) (< (buffer/ref (string (car parts)) 0) #\a))
+    (tree/set! big-caves (cadr parts) (< (buffer/ref (string (cadr parts)) 0) #\a))))
+(defn add-connections (line)
+  (def parts (map (split line "-") string->symbol))
+  (when (cadr parts)
+    (tree/set! cave-map   (car parts) (cons (cadr parts) (ref cave-map (car parts))))
+    (tree/set! cave-map  (cadr parts) (cons (car parts) (ref cave-map (cadr parts))))
+    (tree/set! big-caves  (car parts) (< (try (fn () 0) (buffer/ref (string (car parts)) 0)) #\a))
+    (tree/set! big-caves (cadr parts) (< (try (fn () 0) (buffer/ref (string (cadr parts)) 0)) #\a))))
+(def connections (for-each (split (file/read "tests/slow/day12.input") "\n") add-connections))
 
-[def valid-routes 0]
+(def valid-routes 0)
 
-[defn calc-routes [position s twice]
-  [if [= position 'start]
-      [inc! valid-routes]
-      [when-not [and [= position 'end]
-                     [> [ref s 'end] 0]]
-                [def routes [ref cave-map position]]
-                [when-not [big-cave? position]
-                          [when [> [ref s position] 0]
-                            [if twice
-                                [return]
-                                [set! twice #t]]]
-                          [set! s [tree/dup s]]
-                          [tree/++ s position]]
-                [while routes
-                  [calc-routes [car routes] s twice]
-                  [cdr! routes]]]]]
+(defn calc-routes (position s twice)
+  (if (= position 'start)
+      (inc! valid-routes)
+      (when-not (and (= position 'end)
+                     (> (ref s 'end) 0))
+                (def routes (ref cave-map position))
+                (when-not (big-cave? position)
+                          (when (> (ref s position) 0)
+                            (if twice
+                                (return)
+                                (set! twice #t)))
+                          (set! s (tree/dup s))
+                          (tree/++ s position))
+                (while routes
+                  (calc-routes (car routes) s twice)
+                  (cdr! routes)))))
 
-[calc-routes 'end @[] #t]
-[when [not= valid-routes 4411]
-  [throw [list :wrong-result "Wrong result" valid-routes]]]
+(calc-routes 'end @() #t)
+(when (not= valid-routes 4411)
+  (throw (list :wrong-result "Wrong result" valid-routes)))
 
-[set! valid-routes 0]
-[calc-routes 'end @[] #f]
-[when [not= valid-routes 136767]
-  [throw [list :wrong-result "Wrong result" valid-routes]]]
+(set! valid-routes 0)
+(calc-routes 'end @() #f)
+(when (not= valid-routes 136767)
+  (throw (list :wrong-result "Wrong result" valid-routes)))
 
-[return :success]
+(return :success)

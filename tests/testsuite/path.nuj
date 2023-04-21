@@ -1,12 +1,12 @@
-["nuj" [path/extension "test.nuj"]]
-["nuj" [path/extension "Another/test.nuj"]]
-["NUJ" [upper-case [path/extension "Another/test.nuj"]]]
-["no" [path/extension "asd/test.nuj.no"]]
-["asd/test.nuj" [path/without-extension "asd/test.nuj.no"]]
-["" [path/dirname "test.nuj"]]
-["Another" [path/dirname "Another/test.nuj"]]
-["asd" [path/dirname "asd/test.nuj.no"]]
+("nuj" (path/extension "test.nuj"))
+("nuj" (path/extension "Another/test.nuj"))
+("NUJ" (upper-case (path/extension "Another/test.nuj")))
+("no" (path/extension "asd/test.nuj.no"))
+("asd/test.nuj" (path/without-extension "asd/test.nuj.no"))
+("" (path/dirname "test.nuj"))
+("Another" (path/dirname "Another/test.nuj"))
+("asd" (path/dirname "asd/test.nuj.no"))
 
-["test.nuj" [path/basename "test.nuj"]]
-["test.nuj" [path/basename "Another/test.nuj"]]
-["test.nuj.no" [path/basename "asd/test.nuj.no"]]
+("test.nuj" (path/basename "test.nuj"))
+("test.nuj" (path/basename "Another/test.nuj"))
+("test.nuj.no" (path/basename "asd/test.nuj.no"))

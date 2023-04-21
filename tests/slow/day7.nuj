@@ -1,40 +1,40 @@
 #!/usr/bin/env nujel
 
-[def real-data [apply array/new [map [split [file/read "tests/slow/day7.input"] ","] read/int]]]
+(def real-data (apply array/new (map (split (file/read "tests/slow/day7.input") ",") read/int)))
 
-[defn fancy/calc []
-      [def ret [array/allocate 2000]]
-      [def acc 0]
-      [dotimes [i 2000]
-               [set! acc [+ acc i]]
-	       [array/set! ret i acc]]
-      ret]
-[def fancy [fancy/calc]]
+(defn fancy/calc ()
+      (def ret (array/allocate 2000))
+      (def acc 0)
+      (dotimes (i 2000)
+               (set! acc (+ acc i))
+	       (array/set! ret i acc))
+      ret)
+(def fancy (fancy/calc))
 
-[defn calc/mm [data pred] [reduce data [fn [a b] [if [pred b a] b a]] [array/ref data 0]]]
-[defn calc/min [data] [calc/mm data <]]
-[defn calc/max [data] [calc/mm data >]]
-[defn calc/fuel/simple [data pos] [reduce data [fn [a b] [+ a [abs [- b pos]]]] 0]]
-[defn calc/fuel/complex [data pos] [reduce data [fn [a b] [+ a [array/ref fancy [abs [- b pos]]]]] 0]]
-[defn calc/optimal [data calc/fuel]
-      [def cmin [calc/min data]]
-      [def cmax [calc/max data]]
-      [def ret-pos cmin]
-      [def ret-fuel [calc/fuel data cmin]]
-      [def i [+ 1 cmin]]
-      [while [< i cmax]
-	     [def new-fuel [calc/fuel data i]]
-	     [when [< new-fuel ret-fuel]
-		   [do [set! ret-pos i]
-		       [set! ret-fuel new-fuel]]]
-             [set! i [add/int i 1]]]
-      @[:pos ret-pos :fuel ret-fuel]]
+(defn calc/mm (data pred) (reduce data (fn (a b) (if (pred b a) b a)) (array/ref data 0)))
+(defn calc/min (data) (calc/mm data <))
+(defn calc/max (data) (calc/mm data >))
+(defn calc/fuel/simple (data pos) (reduce data (fn (a b) (+ a (abs (- b pos)))) 0))
+(defn calc/fuel/complex (data pos) (reduce data (fn (a b) (+ a (array/ref fancy (abs (- b pos))))) 0))
+(defn calc/optimal (data calc/fuel)
+      (def cmin (calc/min data))
+      (def cmax (calc/max data))
+      (def ret-pos cmin)
+      (def ret-fuel (calc/fuel data cmin))
+      (def i (+ 1 cmin))
+      (while (< i cmax)
+	     (def new-fuel (calc/fuel data i))
+	     (when (< new-fuel ret-fuel)
+		   (do (set! ret-pos i)
+		       (set! ret-fuel new-fuel)))
+             (set! i (add/int i 1)))
+      @(:pos ret-pos :fuel ret-fuel))
 
-[def result [calc/optimal real-data calc/fuel/simple]]
-[when [not= [ref result :fuel] 355989]
-      [throw [list :wrong-result "Wrong result" result]]]
-[def result [calc/optimal real-data calc/fuel/complex]]
-[when [not= [ref result :fuel] 102245489]
-      [throw [list :wrong-result "Wrong result" result]]]
+(def result (calc/optimal real-data calc/fuel/simple))
+(when (not= (ref result :fuel) 355989)
+      (throw (list :wrong-result "Wrong result" result)))
+(def result (calc/optimal real-data calc/fuel/complex))
+(when (not= (ref result :fuel) 102245489)
+      (throw (list :wrong-result "Wrong result" result)))
 
-[return :success]
+(return :success)

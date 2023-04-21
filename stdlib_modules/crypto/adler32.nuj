@@ -3,18 +3,18 @@
 ;;;
 ;;; Simple implementation of adler32
 
-[defn hash [data]
+(defn hash (data)
       :export
-      [def a 1]
-      [def b 0]
-      [when [string? data] [set! data [string->buffer data]]]
-      [when [not= [type-of data] :buffer] [exception :type-error "Can only hash buffers or strings"]]
-      [def v [buffer/u8* data]]
-      [dotimes [i [buffer/length data]]
-        [set! a [mod/int [add/int a [buffer/ref v i]] 65521]]
-        [set! b [mod/int [add/int a b] 65521]]]
-      [bit-or a [bit-shift-left b 16]]]
+      (def a 1)
+      (def b 0)
+      (when (string? data) (set! data (string->buffer data)))
+      (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
+      (def v (buffer/u8* data))
+      (dotimes (i (buffer/length data))
+        (set! a (mod/int (add/int a (buffer/ref v i)) 65521))
+        (set! b (mod/int (add/int a b) 65521)))
+      (bit-or a (bit-shift-left b 16)))
 
-[deftest "00620062" [fmt "{:08X}" [crypto/adler32/hash "a"]]]
-[deftest "0F9D02BC" [fmt "{:08X}" [crypto/adler32/hash "asdQWE123"]]]
-[deftest "796B110D" [fmt "{:08X}" [crypto/adler32/hash "DiesIstEinTestDerNujelAdler32Implementierung"]]]
+(deftest "00620062" (fmt "{:08X}" (crypto/adler32/hash "a")))
+(deftest "0F9D02BC" (fmt "{:08X}" (crypto/adler32/hash "asdQWE123")))
+(deftest "796B110D" (fmt "{:08X}" (crypto/adler32/hash "DiesIstEinTestDerNujelAdler32Implementierung")))

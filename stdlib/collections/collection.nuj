@@ -3,50 +3,50 @@
 ;;;
 ;;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
-[defn sum [c]
+(defn sum (c)
       "Return the sum of every value in collection C"
-      [reduce c + 0]]
+      (reduce c + 0))
 
-[defn every? [l p]
+(defn every? (l p)
       "Returns #t if P is true for every entry of collection L"
-      [reduce l [fn [a b] [and a [p b]]] #t]]
+      (reduce l (fn (a b) (and a (p b))) #t))
 
-[defn join [l glue]
+(defn join (l glue)
       "Join every element of α together into a string with GLUE inbetween"
-      [when-not glue [set! glue ""]]
-      [if-not l "" [reduce l [fn [a b] [if a [cat a glue b] b]] #nil]]]
+      (when-not glue (set! glue ""))
+      (if-not l "" (reduce l (fn (a b) (if a (cat a glue b) b)) #nil)))
 
-[defn for-each [l f]
+(defn for-each (l f)
       "Runs F over every item in collection L"
-      [reduce l [fn [a b] [f b]] #nil]]
+      (reduce l (fn (a b) (f b)) #nil))
 
-[defn count [l p]
+(defn count (l p)
       "Count the number of items in L where P is true"
-      [if p
-          [reduce l [fn [a b] [+ a [if [p b] 1 0]]] 0]
-          [reduce l [fn [a b] [+ a 1]] 0]]]
+      (if p
+          (reduce l (fn (a b) (+ a (if (p b) 1 0))) 0)
+          (reduce l (fn (a b) (+ a 1)) 0)))
 
-[defn min l
+(defn min l
       "Returns the minimum value of its arguments"
-      [reduce l [fn [a b] [if [< a b] a b]]]]
+      (reduce l (fn (a b) (if (< a b) a b))))
 
-[defn max l
+(defn max l
       "Returns the maximum value of its arguments"
-      [reduce l [fn [a b] [if [> a b] a b]]]]
+      (reduce l (fn (a b) (if (> a b) a b))))
 
-[defn delete [l e]
+(defn delete (l e)
       "Returns a filtered list l with all elements equal to e omitted"
-      [filter l [fn [a] [not [= a e]]]]]
+      (filter l (fn (a) (not (= a e)))))
 
-[defn remove [l p]
+(defn remove (l p)
       "Returns a filtered list l with all elements where P equal true removed"
-      [filter l [fn [a] [not [p a]]]]]
+      (filter l (fn (a) (not (p a)))))
 
-[def flatten [let*
-               [defn flatten-λ [a b]
-                     [cond [[collection? b ] [append [reduce b flatten-λ #nil] a]]
-                           [#t [cons b a]]]]
-               [defn flatten [l]
+(def flatten (let*
+               (defn flatten-λ (a b)
+                     (cond ((collection? b ) (append (reduce b flatten-λ #nil) a))
+                           (#t (cons b a))))
+               (defn flatten (l)
                      "Flatten a collection of collections into a simple list"
-                     [if-not [collection? l] l
-                             [nreverse [reduce l flatten-λ #nil]]]]]]
+                     (if-not (collection? l) l
+                             (nreverse (reduce l flatten-λ #nil))))))

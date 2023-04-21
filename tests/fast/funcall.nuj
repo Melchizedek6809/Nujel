@@ -1,1 +1,1 @@
-[car [eval '[list :success]]]
+(car (eval '(list :success)))

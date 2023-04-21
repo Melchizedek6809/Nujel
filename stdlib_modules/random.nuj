@@ -4,36 +4,36 @@
 ;;; A very simple pseudo random number generator, suitable for the illusion of
 ;;; randomness
 
-[def seed 0]
+(def seed 0)
 
-[defn rng! []
+(defn rng! ()
       :export
-      [set! seed [+ 12345 [* seed 1103515245]]]
-      [bit-or [bit-shift-left [bit-and seed #xFFFF] 16]
-              [bit-and [bit-shift-right seed 16] #xFFFF]]]
+      (set! seed (+ 12345 (* seed 1103515245)))
+      (bit-or (bit-shift-left (bit-and seed #xFFFF) 16)
+              (bit-and (bit-shift-right seed 16) #xFFFF)))
 
-[defn seed! [new-seed]
+(defn seed! (new-seed)
       :export
       "Set a new seed value for the RNG"
-      [set! seed new-seed]]
+      (set! seed new-seed))
 
-[defn seed []
+(defn seed ()
       :export
       "Return the current RNG seed value"
-      [return seed]]
+      (return seed))
 
-[defn random [max]
+(defn random (max)
       :export-as int
       "Return a value from 0 to MAX, or, if left out, a random int"
-      [if max
-          [rem [abs [rng!]] max]
-          [rng!]]]
+      (if max
+          (rem (abs (rng!)) max)
+          (rng!)))
 
-[defn seed-initialize! []
+(defn seed-initialize! ()
       :export
-      [set! seed [bit-xor [time] [time/milliseconds]]]]
-[seed-initialize!]
+      (set! seed (bit-xor (time) (time/milliseconds))))
+(seed-initialize!)
 
-[deftest #t [int? [random/int]]]
-[deftest #t [random/seed! 123] [def first-value [random/int]] [random/seed! 123] [= first-value [random/int]]]
-[deftest #t [random/seed! 99] [not= [random/int] [random/int]]]
+(deftest #t (int? (random/int)))
+(deftest #t (random/seed! 123) (def first-value (random/int)) (random/seed! 123) (= first-value (random/int)))
+(deftest #t (random/seed! 99) (not= (random/int) (random/int)))

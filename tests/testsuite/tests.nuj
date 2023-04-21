@@ -1,592 +1,592 @@
-[3 [def eins 1] [def zwei 2] [+ eins zwei]]
-[-3 [def eins 1] [def zwei 2] [def drei [+ eins zwei]] [set! eins [- drei drei drei]]]
-[1073741824 [bit-shift-left 1 30]]
-[-2147483649 [bit-not [bit-shift-left 1 31]]]
-[128 [def zahl 1_2_8] zahl]
-[10 [let [[a 10]] a]]
-[20 [def b 20] [let [[a b]] a]]
-[10 [def b 20] [let [[a b]] [set! a 10] a]]
-[20 [def b 20] [let [[a b]] [set! a 10] b]]
-[42 [let [[a 12] [b 30]] [+ a b]]]
-[16 [def square [fn [a] [* a a]]] [square 4]]
-[0  [- -1 -1]]
-[11 [length "Hallo, Welt"]]
-[#t [and [or #f #t] [and #t #t]]]
-[12340 [- [read/int [cat 12 "3" "45 Test"]] 5]]
-[12340 [let [[a [cat 12 "3" 45]]] [- [read/int a] [length a]]]]
-[:read-error [try car [read/int [cat "123" "abc" 456]]]]
-[123 [read/int [cat "123" " abc" 456]]]
-[28 [+ [int 10] [int 10.23] [read/int "8"]]]
-[#t [and [pair? [cons 1 '[2]]] [not [pair? 1]]]]
-[1 [car [cons 1 '[2]]]]
-[3 [+ [cadr '[1 2]] [car '[1]]]]
-[3 [+ 1 [- [length '[1 2 3]] 1]]]
-[#t [and [= "asd" "asd"] [not [= "asd" "bsd"]] [not [= "asd" "asdasd"]]]]
-[#nil [list/ref '[1 2] 3]]
-[1  [list/ref '[1 2] 0]]
-[2  [list/ref '[1 2 3 4] 1]]
-[#nil [ref '[1 2] 3]]
-[1  [ref '[1 2] 0]]
-[2  [ref '[1 2 3 4] 1]]
-[4 [let [[a 10]] [when [when #t [set! a [+ 2 2]] #f] [set! a -1]] a]]
-[6 [eval '[+ 1 2 3]]]
-[10 [try car [+ [sum '[1 2 3]] [apply [fn [α] [+ 1 α]] '[3]]]]]
-[7 [+ [+ 1 2] [reduce '[3] [fn [a b] [+ 1 a b]] 0]]]
-[0 [+]]
-[0 [def cb +] [cb]]
-[2 [reduce '[1] [fn [α β] [+ 1 α β]] 0]]
-[1 [def cb [fn [α β] [+ 1 α β]]] [reduce '[0] cb 0]]
-[1 [let [[cb [fn [α β] [+ 1 α β]]]] [reduce '[0] cb 0]]]
-[1 [let* [def cb [fn [α β] [+ 1 α β]]] [reduce '[0]  cb 0]]]
-[5 [length "12345"]]
-[0 [or 0 0]]
-[2  [and 1 2]]
-[#t [boolean [and 1 1]]]
-[#t [boolean 1]]
-[6 [[fn [a] [+ a 4]] 2]]
-[2 [def test 1] [def test 2] test]
-[1 [def a 1] [when-not [= 2 2] [set! a 4]] a]
-[4 [def a 1] [when-not [= 2 3] [set! a 4]] a]
-[4 [def a 1] [when     [= 2 2] [set! a 4]] a]
-[1 [def a 1] [when     [= 2 3] [set! a 4]] a]
-[-1 [bit-not 0]]
-[0 [bit-not -1]]
-[16 [bit-shift-left 1 4]]
-[1 [bit-shift-left 16 -4]]
-[65536 [bit-shift-left 1 16]]
-[-16 [bit-shift-left -1 4]]
-[6 [eval [read/single "[+ 1 2 3]"]]]
-["" [string/cut "\n" 1 1]]
-["" [string/cut "\n" 1 -1]]
-["" [string/cut "Hallo, Welt!" 0 -5]]
-["" [string/cut "Hallo, Welt!" 15 5]]
-["Hallo" [string/cut "Hallo, Welt!" 0 5]]
-["Welt" [string/cut "Hallo, Welt!" 7 11]]
-["" [cut "asd" 0 -1]]
-["a" [cut "asd" -10 1]]
-["a" [cut "asd" 0 1]]
-["s" [cut "asd" 1 2]]
-["sd" [cut "asd" 1 3]]
-["d" [cut "asd" 2 3]]
-[""  [cut "asd" 3 4]]
-[#nil [cut '[:a :s :d] 0 -1]]
-[#nil [cut '[:a :s :d] -10 -1]]
-['[:a] [cut '[:a :s :d] -10 1]]
-['[:a] [cut '[:a :s :d] 0 1]]
-['[:s] [cut '[:a :s :d] 1 2]]
-['[:s :d] [cut '[:a :s :d] 1 3]]
-['[:d] [cut '[:a :s :d] 2 3]]
-['[]  [cut '[:a :s :d] 3 4]]
-[#[] [cut #[:a :s :d] 0 -1]]
-[#[] [cut #[:a :s :d] -10 -1]]
-[#[:a] [cut #[:a :s :d] -10 1]]
-[#[:a] [cut #[:a :s :d] 0 1]]
-[#[:s] [cut #[:a :s :d] 1 2]]
-[#[:s :d] [cut #[:a :s :d] 1 3]]
-[#[:d] [cut #[:a :s :d] 2 3]]
-[#[]  [cut #[:a :s :d] 3 4]]
-["Test" [def a "Test"] a]
-['[] [cons #nil #nil]]
-['[1] [cons 1 #nil]]
-[1 [car [cons 1 2]]]
-[2 [cdr [cons 1 2]]]
-['[1 2 3] [read/single "[1 2 3]"]]
-['[1 2 . 3] [read/single "[1 2 . 3]"]]
-['[4 3 2 1] [reverse '[1 2 3 4]]]
-['[1 4] [filter '[1 2.0 #t 4] int?]]
-['[#t]  [filter '[1 2.0 #t 4] bool?]]
-['[1 3 5] [filter '[1 2 3 4 5 6] odd?]]
-[3 [count '[1 2 3 4 5 6] odd?]]
-[3 [count '[1 2 3 4 5 6] even?]]
-[6 [count '[1 2 3 4 5 6] int?]]
-[#t [every? '[1 2 3 4 5 6] int?]]
-[#f [every? '[1 2 3 4 5 6.0] int?]]
-[#t [every? '[1.0 6.0] float?]]
-[#f [every? '[] float?]]
-[#t [every? #[1 2 3 4 5 6] int?]]
-[#f [every? #[1 2 3 4 5 6.0] int?]]
-[#t [every? #[1.0 6.0] float?]]
-[#t [every? #[] float?]]
-[0 [count '[1 2 3 4 5 6] float?]]
-['[2 4 6] [filter '[1 2 3 4 5 6] even?]]
-['["vier"] [filter '[1 2 3 "vier" 5 6] string?]]
-['[1 2 3 5 6] [filter '[1 2 3 "vier" 5 6] int?]]
-['[3] [last-pair [list 1 2 3]]]
-['[1 2] [except-last-pair '[1 2 3]]]
-["[1.0 #t \"a\"]" [string/write [let [[l '[1.0 #t "a"]]] [append [except-last-pair l] [last-pair l]]]]]
-["11.0" [cat 1 1.0]]
-[:type-error [try car [map '[0] #nil]]]
-[3 [def fib [fn [a] [cond [[zero? a] 0] [[= a 1] 1] [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 4]]
-[21 [def fib [fn [a] [cond [[zero? a] 0] [[= a 1] 1] [#t [+ [fib [- a 1]] [fib [- a 2]]]]]]] [fib 8]]
-["ASD123" [upper-case "asD123"]]
-["asd123" [lower-case "aSD123"]]
-["Asd123" [capitalize "aSD123"]]
-["123" [string 123]]
-[:unbound-variable [try car testerle]]
-[:testerle :testerle]
-["[1 . 2]" [def test [cons 1 2]] [string/write test]]
-["asd" [cat "a" "s" "d"]]
-["a" [cat "a"]]
+(3 (def eins 1) (def zwei 2) (+ eins zwei))
+(-3 (def eins 1) (def zwei 2) (def drei (+ eins zwei)) (set! eins (- drei drei drei)))
+(1073741824 (bit-shift-left 1 30))
+(-2147483649 (bit-not (bit-shift-left 1 31)))
+(128 (def zahl 1_2_8) zahl)
+(10 (let ((a 10)) a))
+(20 (def b 20) (let ((a b)) a))
+(10 (def b 20) (let ((a b)) (set! a 10) a))
+(20 (def b 20) (let ((a b)) (set! a 10) b))
+(42 (let ((a 12) (b 30)) (+ a b)))
+(16 (def square (fn (a) (* a a))) (square 4))
+(0  (- -1 -1))
+(11 (length "Hallo, Welt"))
+(#t (and (or #f #t) (and #t #t)))
+(12340 (- (read/int (cat 12 "3" "45 Test")) 5))
+(12340 (let ((a (cat 12 "3" 45))) (- (read/int a) (length a))))
+(:read-error (try car (read/int (cat "123" "abc" 456))))
+(123 (read/int (cat "123" " abc" 456)))
+(28 (+ (int 10) (int 10.23) (read/int "8")))
+(#t (and (pair? (cons 1 '(2))) (not (pair? 1))))
+(1 (car (cons 1 '(2))))
+(3 (+ (cadr '(1 2)) (car '(1))))
+(3 (+ 1 (- (length '(1 2 3)) 1)))
+(#t (and (= "asd" "asd") (not (= "asd" "bsd")) (not (= "asd" "asdasd"))))
+(#nil (list/ref '(1 2) 3))
+(1  (list/ref '(1 2) 0))
+(2  (list/ref '(1 2 3 4) 1))
+(#nil (ref '(1 2) 3))
+(1  (ref '(1 2) 0))
+(2  (ref '(1 2 3 4) 1))
+(4 (let ((a 10)) (when (when #t (set! a (+ 2 2)) #f) (set! a -1)) a))
+(6 (eval '(+ 1 2 3)))
+(10 (try car (+ (sum '(1 2 3)) (apply (fn (α) (+ 1 α)) '(3)))))
+(7 (+ (+ 1 2) (reduce '(3) (fn (a b) (+ 1 a b)) 0)))
+(0 (+))
+(0 (def cb +) (cb))
+(2 (reduce '(1) (fn (α β) (+ 1 α β)) 0))
+(1 (def cb (fn (α β) (+ 1 α β))) (reduce '(0) cb 0))
+(1 (let ((cb (fn (α β) (+ 1 α β)))) (reduce '(0) cb 0)))
+(1 (let* (def cb (fn (α β) (+ 1 α β))) (reduce '(0)  cb 0)))
+(5 (length "12345"))
+(0 (or 0 0))
+(2  (and 1 2))
+(#t (boolean (and 1 1)))
+(#t (boolean 1))
+(6 ((fn (a) (+ a 4)) 2))
+(2 (def test 1) (def test 2) test)
+(1 (def a 1) (when-not (= 2 2) (set! a 4)) a)
+(4 (def a 1) (when-not (= 2 3) (set! a 4)) a)
+(4 (def a 1) (when     (= 2 2) (set! a 4)) a)
+(1 (def a 1) (when     (= 2 3) (set! a 4)) a)
+(-1 (bit-not 0))
+(0 (bit-not -1))
+(16 (bit-shift-left 1 4))
+(1 (bit-shift-left 16 -4))
+(65536 (bit-shift-left 1 16))
+(-16 (bit-shift-left -1 4))
+(6 (eval (read/single "(+ 1 2 3)")))
+("" (string/cut "\n" 1 1))
+("" (string/cut "\n" 1 -1))
+("" (string/cut "Hallo, Welt!" 0 -5))
+("" (string/cut "Hallo, Welt!" 15 5))
+("Hallo" (string/cut "Hallo, Welt!" 0 5))
+("Welt" (string/cut "Hallo, Welt!" 7 11))
+("" (cut "asd" 0 -1))
+("a" (cut "asd" -10 1))
+("a" (cut "asd" 0 1))
+("s" (cut "asd" 1 2))
+("sd" (cut "asd" 1 3))
+("d" (cut "asd" 2 3))
+(""  (cut "asd" 3 4))
+(#nil (cut '(:a :s :d) 0 -1))
+(#nil (cut '(:a :s :d) -10 -1))
+('(:a) (cut '(:a :s :d) -10 1))
+('(:a) (cut '(:a :s :d) 0 1))
+('(:s) (cut '(:a :s :d) 1 2))
+('(:s :d) (cut '(:a :s :d) 1 3))
+('(:d) (cut '(:a :s :d) 2 3))
+('()  (cut '(:a :s :d) 3 4))
+(#() (cut #(:a :s :d) 0 -1))
+(#() (cut #(:a :s :d) -10 -1))
+(#(:a) (cut #(:a :s :d) -10 1))
+(#(:a) (cut #(:a :s :d) 0 1))
+(#(:s) (cut #(:a :s :d) 1 2))
+(#(:s :d) (cut #(:a :s :d) 1 3))
+(#(:d) (cut #(:a :s :d) 2 3))
+(#()  (cut #(:a :s :d) 3 4))
+("Test" (def a "Test") a)
+('() (cons #nil #nil))
+('(1) (cons 1 #nil))
+(1 (car (cons 1 2)))
+(2 (cdr (cons 1 2)))
+('(1 2 3) (read/single "(1 2 3)"))
+('(1 2 . 3) (read/single "(1 2 . 3)"))
+('(4 3 2 1) (reverse '(1 2 3 4)))
+('(1 4) (filter '(1 2.0 #t 4) int?))
+('(#t)  (filter '(1 2.0 #t 4) bool?))
+('(1 3 5) (filter '(1 2 3 4 5 6) odd?))
+(3 (count '(1 2 3 4 5 6) odd?))
+(3 (count '(1 2 3 4 5 6) even?))
+(6 (count '(1 2 3 4 5 6) int?))
+(#t (every? '(1 2 3 4 5 6) int?))
+(#f (every? '(1 2 3 4 5 6.0) int?))
+(#t (every? '(1.0 6.0) float?))
+(#f (every? '() float?))
+(#t (every? #(1 2 3 4 5 6) int?))
+(#f (every? #(1 2 3 4 5 6.0) int?))
+(#t (every? #(1.0 6.0) float?))
+(#t (every? #() float?))
+(0 (count '(1 2 3 4 5 6) float?))
+('(2 4 6) (filter '(1 2 3 4 5 6) even?))
+('("vier") (filter '(1 2 3 "vier" 5 6) string?))
+('(1 2 3 5 6) (filter '(1 2 3 "vier" 5 6) int?))
+('(3) (last-pair (list 1 2 3)))
+('(1 2) (except-last-pair '(1 2 3)))
+("(1.0 #t \"a\")" (string/write (let ((l '(1.0 #t "a"))) (append (except-last-pair l) (last-pair l)))))
+("11.0" (cat 1 1.0))
+(:type-error (try car (map '(0) #nil)))
+(3 (def fib (fn (a) (cond ((zero? a) 0) ((= a 1) 1) (#t (+ (fib (- a 1)) (fib (- a 2))))))) (fib 4))
+(21 (def fib (fn (a) (cond ((zero? a) 0) ((= a 1) 1) (#t (+ (fib (- a 1)) (fib (- a 2))))))) (fib 8))
+("ASD123" (upper-case "asD123"))
+("asd123" (lower-case "aSD123"))
+("Asd123" (capitalize "aSD123"))
+("123" (string 123))
+(:unbound-variable (try car testerle))
+(:testerle :testerle)
+("(1 . 2)" (def test (cons 1 2)) (string/write test))
+("asd" (cat "a" "s" "d"))
+("a" (cat "a"))
 
-["1,asd,3.0" [join '[1 "asd" 3.0] ","]]
-["[\"dies ist\" \"ein\" \"test\"]" [string/write [split "dies ist/ein/test" "/"]]]
-[1 [index-of "1,2,3" ","]]
-[#x123 [car [read [join [cons "#x" [split "123" ""]]]]]]
-[7 [buffer/ref "\a" 0]]
-[5 [buffer/ref [cat [from-char-code 5] [from-char-code 10] [from-char-code 20]] 0]]
-[2600 [read/int [cat [from-char-code [buffer/ref "2" 0]] [from-char-code #\6] [from-char-code 48] [from-char-code 48]]]]
-[2600 [read/int [from-char-code [buffer/ref "2" 0] #\6 48 48]]]
-[#t [= 32 #\ ]]
-[#t [= #\Backspace 8]]
-[#t [= #\Tab [buffer/ref "\t" 0]]]
-[#t [and [= #\cr 13] [= #\Return 13]]]
-[#t [and [= #\lf 10] [= 10 #\Linefeed]]]
-[#x07 [buffer/ref "\a" 0]]
-[#x08 [buffer/ref "\b" 0]]
-[#x1B [buffer/ref "\e" 0]]
-[#x0c [buffer/ref "\f" 0]]
-[#\lf [buffer/ref "\n" 0]]
-[#\cr [buffer/ref "\r" 0]]
-[#x09 [buffer/ref "\t" 0]]
-[#x0B [buffer/ref "\v" 0]]
-[#x27 [buffer/ref "'" 0]]
-[#x22 [buffer/ref "\"" 0]]
-[#t [= + +]]
-[#t [= min min]]
-[#t [let [[some-value #f]] [not some-value]]]
-[9 [- 10 1]]
-[5 [div/int 10 2]]
-["5.0" [string/write [/ 10 2]]]
-[256 [bit-shift-left 1 8]]
-["\n" "\n"]
-[#t [= 4 [+ 2 2]]]
-[:int [type-of [+ 2 2]]]
-[:float [type-of [+ 2.0 2.1]]]
-[:float [type-of [+ 2 2.1]]]
-[-1 [do -1]]
-[-1 [- 1]]
-[0 [let [[tmp 0]] [+ tmp 1] tmp]]
-[#nil [and #nil #nil]]
-[10,000 [let [] [def i 0] [while [< i 10,000] [set! i [+ 1 i]]]]]
-['[1 :a "q"] '[1 :a "q"]]
-[4 [macroexpand '[do "Test" 4]]]
-['[do [display "Test"] 4] [macroexpand '[do [display "Test"] 4]]]
-['[do [display "Test"] 4] [macroexpand '[do [display "Test"] 9 4]]]
-['[1 2] [except-last-pair '[1 2 3]]]
-['[3] [last-pair '[1 2 3]]]
-['[2 3 4] [map '[1 2 3] [fn [v] [+ 1 v]]]]
-['[2 4 6] [map '[1 2 3] [fn [v] [* 2 v]]]]
-['["1" "2" "3"] [map '[1 2 3] string/write]]
-[0 [tree/size @[]]]
-[1 [tree/size @[:a 1]]]
-[3 [tree/size @[:a 1 :b 2 :c 3]]]
-[#f [tree/has? @[:a 123] :b]]
-[#t [tree/has? @[:a 123] :a]]
-[123 [tree/ref @[:a 123] :a]]
-[123 [tree/ref @[b: 2, a: 123] :a]]
-[2 [tree/ref @[b: 2, a: 123] :b:]]
-[9 [tree/ref [tree/set! @[:b 2 :a 123] :a 9] :a]]
-[:type-error [try car [tree/set! #@[:b 2 :a 123] :a 9]]]
-[2 [tree/ref @[:b 2 :a 123] :b]]
-[2 [tree/ref @['b 2 'a 123] :b]]
-[2 [tree/ref #@[:b 2 :a 123] :b]]
-[2 [tree/ref #@[b 2 a: 123] :b]]
-[#t [let* [def keys [tree/keys @[:b 2 :a 123]]] [or [list/equal? keys '[:b :a]] [list/equal? keys '[:a :b]]]]]
-[#t [let* [def vals [tree/values @[:b 2 :a 123]]] [or [list/equal? vals '[2 123]] [list/equal? vals '[123 2]]]]]
-[2 [length [tree/keys @[:b 2 :a 123]]]]
-[2 [length [tree/values @[:b 2 :a 123]]]]
-[3 [length [tree/keys @[:b 2 :a 123 :c 7]]]]
-['[:asd 123]   [car [read "[:asd 123]"]]]
-['[123 [:asd]] [car [read "[123[:asd]]"]]]
-['[123 [:asd]] [car [read "(123(:asd))"]]]
-['[123 [:asd]] [car [read "(123[:asd])"]]]
-['[:asd [123]] [car [read "(:asd[123])"]]]
-[#x123 [car '[#x123[#o234]]]]
-['[#o234] [cadr '[#x123[#o234]]]]
-[#o234 [cadr '[#x123#o234]]]
-[#b101 [car '[#b101"asd"]]]
-["asd" [cadr '[#b101"asd"]]]
-[#t [pair? [symbol-table]]]
-[#t [> [length [symbol-table]] 200]]
-[:one [car '[:one :two :three]]]
-[:two [cadr '[:one :two :three]]]
-[:three [caddr '[:one :two :three]]]
-['[:two :three] [cdr '[:one :two :three]]]
-['[:three] [cddr '[:one :two :three]]]
-['two [cadr '[:one two :three]]]
-[102334155 [let* [def i 1] [def a 0] [def b 1] [while [< i 40] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i]]]] b]]
-[832040 [let* [def i 1] [def a 0] [def b 1] [while [< i 30] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i]]]] b]]
-[17711 [let* [def i 1] [def a 0] [def b 1] [while [< i 22] [let [[new [+ a b]]] [set! a b] [set! b new] [set! i [+ 1 i]]]] b]]
-[6765  [let* [def fib-slow [fn [v] [if [< v 2] v [+ [fib-slow [- v 2]] [fib-slow [- v 1]]]]]] [fib-slow 20]]]
-[10946 [let* [def fib-slow [fn [v] [if [< v 2] v [+ [fib-slow [- v 1]] [fib-slow [- v 2]]]]]] [fib-slow 21]]]
-[4 [[fn [v] [+ v 2]] 2]]
-[4 [[fn [fn] [+ fn 2]] 2]]
-[4 [[fn [+ *] [- + *]] 6 2]]
-[246 [let* [def - 123] [+ - -]]]
-['v [car '[v]]]
-['+ [car '[+]]]
-[#t [= '+ [string->symbol "+"]]]
-['dec! [car '[dec!]]]
-['- [car '[-]]]
-[-1 [let* [def + -] [[resolve '+] 1 2]]]
-[#t [procedure? [let* [def t -] t]]]
-[#nil [when #f 1]]
-[1 [when #t 1]]
-['[1 . 2] [cons 1 2]]
-['[1 . 2] '[1 . 2]]
-[1 [car '[1 . 2]]]
-[2 [cdr '[1 . 2]]]
-[2 [tree/ref @[:asd 1 :bsd 2] :bsd]]
-[0 [+]]
-[1 [*]]
-[:unresolved-procedure [try [fn [err] [if [= [caddr err] 'asdqwe] [if [= [car err] :unbound-variable] :unresolved-procedure [car err]] #nil]] [asdqwe qweasdzxc]]]
-[#t [try [fn [error] [string? [cadr error]]] [/ 3 0]]]
-[:success [try [fn [error] error] [throw :success] :failure]]
-[123 [try [fn [error] error] [throw 123] 0]]
-[#t [try [fn [error] error] [throw #t] #f]]
-["asd" [try [fn [error] error] [throw "asd"] #nil]]
-[:test-exception [try [fn [error] [car error]] [throw [list :test-exception "Testing the exception system"]] #nil]]
-[#t [try [fn [error] [string? [cadr error]]] [throw [list :test-exception "Testing the exception system"]] #nil]]
-[:test [[fn [e] [car e]] [cons :test "Test"]]]
-[10 #d10]
-[-31 #x-1F]
-[-15 #o-17]
-[-3 #b-11]
-[:float-inf [try [fn [err] [car err]] [try [fn [err] [/ 3 0] err] [throw :test-exception]]]]
-[:float-inf [try [fn [error] [car error]] [/ 3 0]]]
-[:float-inf [try [fn [error] [car error]] [try [fn [error] [/ 3 0] error] [throw :test-exception]]]]
-[:float-inf [try [fn [err] [car err]] [/  1.0 0.0]]]
-[:float-nan [try [fn [err] [car err]] [/  0.0 0.0]]]
-[:float-inf [try [fn [err] [car err]] [/ -1.0 0.0]]]
-[1 `1]
-['[1] `[1]]
-['[1 2] `[1 2]]
-['[1 "asd"] `[1 "asd"]]
-['[1 :asd] `[1 :asd]]
-['[@[:asd 123]] `[@[:asd 123]]]
-['[#[1 2 3]] `[#[1 2 3]]]
-['["1.0001"] `["1.0001"]]
-['[:asd] `[:asd]]
-['[1 2 3] `[1 ~[+ 1 1] 3]]
-['[1 2 3 4] `[1 ~[+ 1 1] ~@[read "3 4"]]]
-['[1 2 3] [let* [def v 2] `[1 ~v 3]]]
-['[resolve 123] [do [let [[source [cons 123 #nil] #nil]] `[resolve ~[car source]]]]]
-['[resolve asd] [do [let [[source [cons 'asd #nil]]] `[resolve ~[car source]]]]]
-[4 [let* [defn double [α] [* α 2]] [double 2]]]
-[6 [let* [def sum 0] [for-each '[1 2 3] [fn [a] [set! sum [+ sum a]]]] sum]]
-['source [car [closure/arguments macroexpand]]]
-['[1 2 3] `[1 ~@`[2 3]]]
-['[1 [2 [3 4]]] `[1 `[2 ~[3 ~[+ 2 2]]]]]
-[2 [cadar '[[1 2 3] 4 5]]]
-[#f [bit-test? 0 0]]
-[#t [bit-test? #b1 0]]
-[#f [bit-test? #b1 1]]
-[#f [bit-test? #b1011 2]]
-[#t [bit-test? #b1111 2]]
-[#t [bit-test? #b1111 3]]
-[#f [bit-test? #b1111 4]]
-[#nil [when-not #t 123]]
-[123 [when-not #f 123]]
-[:invalid-let-form [try [fn [err] [car err]] [macroexpand '[let [1] 1]]]]
-[:invalid-let-form [try [fn [err] [car err]] [macroexpand '[let [[] 1] 1]]]]
-[1 [if #t 1 2]]
-[2 [if-not :test 1 2]]
-[1 [if-not #f 1 2]]
-['[4 5 6] [map '[1 2 3] [+x 3]]]
-[4 [def α 3] [inc! α] α]
-[#t [case "1" [[1] #f] [['1] #f] [["1"] #t]]]
-[#t [case "asd" [["as"] #f] [["qwe"] #f] [["asd"] #t]]]
-[#t [case [+ 1 2] [[3.1] #f] [[3.0] #t] [3 #t]]]
-[#t [< 3 3.1]]
-[#t [< 3.0 3.1]]
-[#t [< 3.2 4]]
-[#t [> 4 3.1]]
-[#t [> 4 3.9]]
-[#t [> 4.0 3.9]]
-[#t [> 3.1 3]]
-[#f [> 4.0 4]]
-[#f [< 4.0 4]]
-[#f [< 4 4.0]]
-[#f [> 4 4.0]]
-[#f [> -14 -14.0]]
-[#f [< -14 -14.0]]
-[#t [= -4 -4.0]]
-[#t [= -3.0 -3]]
-[#t [= 4 4.0]]
-[#t [= 4.0 4]]
-[#t [case [+ 1 2] [[1] #f] [[2 3] #t]]]
-[#t [case [+ 1 1] [[1] #f] [[2 3] #t]]]
-[#f [case [+ 0 1] [[1] #f] [[2 3] #t]]]
-[#nil [case [+ 2 2] [[1] #f] [[2 3] #t]]]
-[123 [case [+ 2 2] [[1] #f] [[2 3] #t] [otherwise 123]]]
-[#t [def i 1] [case [inc! i] [[9] #f] [[4] #f] [[2] #t]]]
-[:arity-error [try [fn [err] [car err]] [compile '[cons 123 234 345]]]]
-[#t [= car [resolve [car '[car asd]]]]]
-[#t [pos? [index-of [describe/closure [[defn stackTraceTest [] [current-lambda]]]] "stackTraceTest"]]]
-[2 [case 'asd [['qwe] 1] [['asd] 2] [otherwise 3]]]
-[10 [reduce #[1 2 3 4] add/int 0]]
-["1,2,3,4" [join #[1 2 3 4] ","]]
-[2 [count #[1 2 3 4] even?]]
-[14 [reduce [map #[1 2 3 4] [+x 1]] + 0]]
-[3 [length #[1 2 3]]]
-['["123"] [split "123" "\n"]]
-['["" ""] [split "\n" "\n"]]
-['["123" "456"] [split "123\n456" "\n"]]
-['["" "" ""] [split "\n\n" "\n"]]
-['["1" "2" "3"] [split "1\n2\n3" "\n"]]
-['["" "" "" ""] [split "\n\n\n" "\n"]]
-['["1" "2" "3" "4"] [split "1\n2\n3\n4" "\n"]]
-["#@[a: 1 b: 2]" [string/write [tree/zip '[:a :b] '[1 2]]]]
-["#@[a: #nil b: #nil]" [string/write [tree/zip '[:a :b] '[]]]]
-["#@[a: 1 b: #nil]" [string/write [tree/zip '[:a :b] '[1]]]]
-["#@[]" [string/write [tree/zip #nil '[1 2]]]]
-["123" [string/write [read/single "123;asd"]]]
-['[123] [read "123"]]
-['[123] [read "123;asd"]]
-['[123 234] [read "123;asd\n234"]]
-['[234] [read ";asd\n;qwe\n234;asd"]]
-['[2 1 0] [let [[ret #nil]] [dotimes [i 3] [set! ret [cons i ret]]] ret]]
-["#@[a: 1 b: 2]" [string/write [-> [tree/new] [tree/set! :a 1] [tree/set! :b 2]]]]
-[2 [-> 2]]
-[10 [sum '[1 2 3 4]]]
-[0 [popcount 0]]
-[:type-error [try car [popcount #nil]]]
-[:type-error [try car [popcount ""]]]
-[1 [popcount 1]]
-[1 [popcount 2]]
-[2 [popcount 3]]
-[4 [popcount 15]]
-["##[]" [string/write [sort #[]]]]
-["##[1]" [string/write [sort #[1]]]]
-["##[1 2 3]" [string/write [sort #[3 2 1]]]]
-["##[1 2 3 9]" [string/write [sort #[3 9 2 1]]]]
-['[1 2 3] [list/sort '[2 1 3]]]
-['[1 2 3] [list/sort '[2 1 3]]]
-['[1] [list/sort '[1]]]
-['[] [list/sort '[]]]
-['[1 2 3] [sort '[1 2 3]]]
-['[1 3 9] [sort '[1 3 9]]]
-['[1 9] [sort '[1 9]]]
-['[1 1 2 9] [sort '[1 1 2 9]]]
-['[1.0 2.0 3.0] [sort '[3.0 1.0 2.0]]]
-['["a" "m" "z"] [sort '["m" "a" "z"]]]
-['["a" "m" "z"] [sort '["z" "m" "a"]]]
-['["a" "m" "z"] [sort '["a" "z" "m"]]]
-['["Z" "a" "m" "z"] [sort '["a" "Z" "m" "z"]]]
-['["aggressionen" "mit" "zauberer"] [sort '["zauberer" "aggressionen" "mit"]]]
-['[1 2 3] [list-merge-sort '[1 2 3]]]
-['[1 2 3] [list-merge-sort '[3 2 1]]]
-['[1] [list-merge-sort '[1]]]
-['[] [list-merge-sort '[]]]
-['[-2 3 4 5 9 333 1000] [list-merge-sort '[9 3 5 1000 333 4 -2]]]
-['[1.0 2.0 3.0] [list-merge-sort '[3.0 1.0 2.0]]]
-['["a" "m" "z"] [list-merge-sort '["m" "a" "z"]]]
-['["a" "m" "z"] [list-merge-sort '["z" "m" "a"]]]
-['["a" "m" "z"] [list-merge-sort '["a" "z" "m"]]]
-['["Z" "a" "m"] [list-merge-sort '["a" "Z" "m"]]]
-[#\( [buffer/ref "([{<>}])" 0]]
-[#\[ [buffer/ref "([{<>}])" 1]]
-[#\{ [buffer/ref "([{<>}])" 2]]
-[#\< [buffer/ref "([{<>}])" 3]]
-[#\> [buffer/ref "([{<>}])" 4]]
-[#\} [buffer/ref "([{<>}])" 5]]
-[#\] [buffer/ref "([{<>}])" 6]]
-[#\) [buffer/ref "([{<>}])" 7]]
-[#t [< 1442693 12049880844]]
-[12051323537 [+ 1442693 12049880844]]
-["#@[a: 1]" [def t @[a: 1]] [-> [tree/dup @[:a 1]] [tree/++ :a]] [string/write t]]
-["#@[a: 2]" [def t @[a: 1]] [string/write [-> [tree/dup @[:a 1]] [tree/++ :a]]]]
-['[1 2 3] [nreverse [list 3 2 1]]]
-['[1 2 3 4 5 6 7 8 9] [nreverse [list 9 8 7 6 5 4 3 2 1]]]
-['[1] [nreverse [list 1]]]
-['[2 1] [nreverse [cons 1 [cons 2 #nil]]]]
-[#nil [nreverse #nil]]
-[:tree [type-of @[]]]
-[#nil [tree/keys @[]]]
-[#nil [tree/values @[]]]
-['[123] [tree/values @[:asd 123]]]
-['[:asd] [tree/keys @[:asd 123]]]
-[:tree [type-of @[:asd 123]]]
-["asd" [string "asd"]]
-["123" [string 123]]
-["asd" [cat "a" #nil "s" "" "d"]]
-['[1 2 3] [append '[1 2] '[3] ]]
-['[1 2 3] [append '[1] '[2 3]]]
-['[1 2 3] [append '[1 2 3] #nil]]
-[:unbound-variable [try car [case 'asd [[asd] #f] [['asd] #t]]]]
-[:unbound-variable [try car [case 'asd [[asd] #f] ['asd #t]]]]
-[:float-inf [try car [/ 1 0]]]
-['[1 2 3 4] [[fn a a] 1 2 3 4]]
-[1 [[fn [a . b] a] 1 2 3]]
-['[2 3] [[fn [a . b] b] 1 2 3]]
-['[3] [[fn [a b . c] c] 1 2 3]]
-[2 [[fn [a b . c] b] 1 2 3]]
-[1 [[fn [a b . c] a] 1 2 3]]
-[#nil [[fn [a b c . d] d] 1 2 3]]
-[3 [[fn [a b c . d] c] 1 2 3]]
-[2 [[fn [a b c . d] b] 1 2 3]]
-[1 [[fn [a b c . d] a] 1 2 3]]
-[122 [-> @[:asd 123] [tree/-- :asd] [tree/ref :asd]]]
-[124 [-> @[:asd 123] [tree/++ :asd] [tree/ref :asd]]]
-[#t [do [dotimes [i 10] [set! i 20] [when [> i 30] [throw [list :error]]]] #t]]
-[#f [= @[:a 1] #[:a 1]]]
-[#f [= @[:a 1] #[:b 1]]]
-[#t [let [[a @[:a 1]]] [= a a]]]
-['[2 3 4] [-> '[1 2 3 4] [delete 1]]]
-['[1 2 3 4 5] [flatten #[1 2 3 4 5]]]
-['[1 2 3 4 5] [flatten '[1 2 3 4 5]]]
-['[1 2 3 4 5] [flatten '[[1 2] [3] [[[4] 5]]]]]
-['[1 2 3 4 5] [flatten [list '[1 2] #[3] #['[[4] 5]]]]]
-["abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" [cat "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"]]
-[6 [- 7 1]]
-['[:asd "Test"] [list :asd "Test"]]
-[10 [let [[t 0]] [doseq [l [list 1 2 3 4]] [+= t l]] t]]
-[1 [let [[t 0]] [doseq [l [list 1]] [+= t l]] t]]
-[0 [let [[t 0]] [doseq [l [list]] [+= t l]] t]]
-[#t [symbol? [gensym]]]
-[1 [car '[1 . 2]]]
-[1 [car '[1 2]]]
-[2 [cdr '[1 . 2]]]
-['[2] [cdr '[1 2]]]
-[22 [[resolve [string->symbol "+"]] 10 12]]
-[1 [length '[1]]]
-[2 [length '[1 #nil]]]
-[3 [length '[1 #nil 2]]]
-[3 [length '[1 1 2]]]
-[4 [length '[1 1 2 #nil]]]
-[4 [length '[1 #nil 2 #nil]]]
-[4 [length '[#nil #nil 2 #nil]]]
-[4 [length '[#nil #nil #nil #nil]]]
-[5 [length '[#nil #nil #nil #nil 5]]]
-[:type-error [try car [tree/values]]]
-[:type-error [try car [tree/keys #nil]]]
-[:type-error [try car [tree/has? #nil]]]
-[:type-error [try car [tree/has?]]]
-[5 [eval [read/single "[+ 2 3]"]]]
-[5 [eval [read/single "[+ 2 ; 5\n 3]"]]]
-[5 [eval [read/single "[+ 2 #! 5\n 3]"]]]
-['[1 3] [read/single "[1 #| 2 |# 3]"]]
-[5 [eval [read/single "[+ 2 #| 5 |# 3]"]]]
-[5 [eval [read/single "[+ 2 #| #| 5 |# |# 3]"]]]
-[#t [let [[ret #t]] [doseq [l #nil] [set! ret #f]] ret]]
-[#f [let [[ret #t]] [doseq [l '[]] [set! ret #f]] ret]]
-[0 [buffer/length ""]]
-[1 [buffer/length "1"]]
-[2 [buffer/length "  "]]
-[2 [buffer/length "λ"]]
-[:type-error [try car [pad-start 123 4 #\0]]]
-[:type-error [try car [pad-start "123" 4 #\0]]]
-[:type-error [try car [pad-end 123 4 #\0]]]
-[:type-error [try car [string->symbol 4]]]
-["4" [string [string->symbol "4"]]]
-[#t [= [string->symbol "3"] [string->symbol "3"]]]
-[#f [= [string->symbol "3"] [string->symbol "2"]]]
-["asd" [string 'asd]]
-[:type-error [try car [buffer/ref]]]
-[:type-error [try car [buffer/ref "" -1]]]
-[:out-of-bounds [try car [buffer/ref "" 1]]]
-[:type-error [try car [buffer/ref "" :asd]]]
-[#t [case 3 [otherwise #t] [2 #f]]]
-[0 [+]]
-[1 [*]]
-[:arity-error [try car [-]]]
-[:arity-error [try car [/]]]
-[0 [popcount 0]]
-[8 [popcount 255]]
-[15 [popcount #b1100001000010000101101011010101101]]
-[64 [popcount [bit-not 0]]]
-[#nil [tree/key* @[]]]
-[:a [tree/key* @[:a 1]]]
-[1 [tree/value* @[:a 1]]]
-[0 [count #nil]]
-[0 [count #[]]]
-[1 [count '[1]]]
-[1 [count #[1]]]
-[3 [count '[1 2 3]]]
-[3 [count #[1 2 3]]]
-[0 [+]]
-[3 [+ 1 2]]
-[1 [*]]
-[#t [symbol? [car [symbol-table]]]]
-[#f [keyword? [car [symbol-table]]]]
-['[1 3] [remove '[0 1 2 3] even?]]
-[#[1 3] [remove #[0 1 2 3] even?]]
-[6 [reduce @[:a 1 :b 2 :c 3] + 0]]
-[@[] [filter @[:a 1] even?]]
-[@[:b 2] [filter @[:a 1 :b 2 :c 3] even?]]
-[@[:a 1 :c 3] [remove @[:a 1 :b 2 :c 3] even?]]
-[4 [identity 4]]
-["4" [identity "4"]]
-[#[1 2 3] [identity #[1 2 3]]]
-[11 [def counter [let [[a 0]] [fn [b] [set! a [+ a [or b 1]]]]]] [counter 10] [counter]]
-['[0 1 2 3 4] [range 5]]
-[#nil [range 0]]
-[#nil [range -1 1]]
-['[0] [range 1]]
-['[-1 0] [range 1 -1]]
-['[1 0 -1] [range -2 1 -1]]
-[19 [int [reduce [range 2.0 0.0 0.1] +]]]
-[45 [reduce [range 10] +]]
-[123456789 [read/single [reduce [range 10] cat]]]
-[30 [reduce [map [range 5] [fn [α] [* α α]]] +]]
-[@[:asd 123] [tree/set! #nil :asd 123]]
-[#t [> :b :a]]
-[#f [< :b :a]]
-[#t [> 'b 'a]]
-[#f [< 'b 'a]]
-['[:a :b :c] [sort '[:b :c :a]]]
-['[a b c] [sort '[b c a]]]
-[#t [[path/ext?! "asd"] "qwe.asd"]]
-[#f [[path/ext?! "as"] "qwe.asd"]]
-[#f [[path/ext?! "asd"] "qwe.as"]]
-[#t [[path/ext?! '["as" "asd"]] "qwe.as"]]
-[#t [[path/ext?! '["as" "asd"]] "qwe.asd"]]
-[:a [let [[list '[:a :b :c]]] [car list]]]
-[15 [bit-or 1 2 4 8]]
-[65536 [+ 1 [reduce [map [range 16] [fn [a] [bit-shift-left 1 a]]] bit-or 0]]]
-[300425737571 [div/int 600851475143 2]]
-[1201702950286 [* 600851475143 2]]
-[1 [rem 600851475143 2]]
-[600851475145 [+ 600851475143 2]]
-[600851475141 [- 600851475143 2]]
-[5 [dotimes [i 5 i]]]
-[10 [let [[x 0]] [dotimes [i 5] [set! x [+ x i]]] x]]
-[10 [let [[x 0]] [dotimes [i 5 x] [set! x [+ x i]]]]]
-[0 [let [[x 0]] [dotimes [i -4] [set! x [+ x i]]] x]]
-[0 [let [[x 0]] [dotimes [i -4] [set! x 9]] x]]
-[0 [let [[x 0]] [dotimes [i 0] [set! x 9]] x]]
-[6 [let [[+5 [+x 5]]] [+5 1]]]
-[7 [let [[+5 [+x 5]]] [int [ceil [car [map '[1.8] +5]]]]]]
-[125 [def +123 [+x 123]] [+123 2]]
-['[:a :b] [let [[l '[:b]]] [cons! :a l] l]]
-[#nil [meta #nil :asd]]
-[:type-error [try car [meta #nil]]]
-[:type-error [try car [eval '[]]]]
-[:type-error [try car [compile '[]]]]
-[:type-error [try car [compile '[123]]]]
-[:type-error [try car [compile '[:asd]]]]
-[:type-error [try car [compile '["asd"]]]]
-[:type-error [try car [compile '[##[]]]]]
-[:type-error [try car [compile '[#@[]]]]]
-[:type-error [try car [compile '[fn]]]]
-[:type-error [try car [compile '[fn 123]]]]
-[:type-error [try car [sum 123]]]
-[:type-error [try car [sum '[1 2 3 . 4]]]]
-[10 [sum '[1 2 3 4]]]
-[0 [length [let* [defn a l l] [a]]]]
-[:float-inf [try car [/ 4 0.0]]]
-[:float-nan [try car [/ 0.0 0.0]]]
-[:type-error [try car [apply [environment*] #{##[] 2401}]]]
-[#t [bytecode-eval* #{##[] 1B01} [environment*]]]
-[0 [apply + '[]]]
-[1 [apply + '[1]]]
-[3 [apply + '[1 2]]]
-[3 [inc/int 2]]
-[-1 [inc/int -2]]
-[@[] [tree/merge #nil #nil]]
-[@[a: 1 b: 9] [tree/merge @[a: 1 b: 9] #nil]]
-[@[b: 2 c: 3] [tree/merge #nil @[b: 2 c: 3]]]
-[@[a: 1 b: 2 c: 3] [tree/merge @[a: 1 b: 9] @[b: 2 c: 3]]]
-[:divide-by-zero [try car [div/int 10 0]]]
-[:arity-error [try car [div/int]]]
-[:arity-error [try car [div/int 10]]]
+("1,asd,3.0" (join '(1 "asd" 3.0) ","))
+("(\"dies ist\" \"ein\" \"test\")" (string/write (split "dies ist/ein/test" "/")))
+(1 (index-of "1,2,3" ","))
+(#x123 (car (read (join (cons "#x" (split "123" ""))))))
+(7 (buffer/ref "\a" 0))
+(5 (buffer/ref (cat (from-char-code 5) (from-char-code 10) (from-char-code 20)) 0))
+(2600 (read/int (cat (from-char-code (buffer/ref "2" 0)) (from-char-code #\6) (from-char-code 48) (from-char-code 48))))
+(2600 (read/int (from-char-code (buffer/ref "2" 0) #\6 48 48)))
+(#t (= 32 #\ ))
+(#t (= #\Backspace 8))
+(#t (= #\Tab (buffer/ref "\t" 0)))
+(#t (and (= #\cr 13) (= #\Return 13)))
+(#t (and (= #\lf 10) (= 10 #\Linefeed)))
+(#x07 (buffer/ref "\a" 0))
+(#x08 (buffer/ref "\b" 0))
+(#x1B (buffer/ref "\e" 0))
+(#x0c (buffer/ref "\f" 0))
+(#\lf (buffer/ref "\n" 0))
+(#\cr (buffer/ref "\r" 0))
+(#x09 (buffer/ref "\t" 0))
+(#x0B (buffer/ref "\v" 0))
+(#x27 (buffer/ref "'" 0))
+(#x22 (buffer/ref "\"" 0))
+(#t (= + +))
+(#t (= min min))
+(#t (let ((some-value #f)) (not some-value)))
+(9 (- 10 1))
+(5 (div/int 10 2))
+("5.0" (string/write (/ 10 2)))
+(256 (bit-shift-left 1 8))
+("\n" "\n")
+(#t (= 4 (+ 2 2)))
+(:int (type-of (+ 2 2)))
+(:float (type-of (+ 2.0 2.1)))
+(:float (type-of (+ 2 2.1)))
+(-1 (do -1))
+(-1 (- 1))
+(0 (let ((tmp 0)) (+ tmp 1) tmp))
+(#nil (and #nil #nil))
+(10,000 (let () (def i 0) (while (< i 10,000) (set! i (+ 1 i)))))
+('(1 :a "q") '(1 :a "q"))
+(4 (macroexpand '(do "Test" 4)))
+('(do (display "Test") 4) (macroexpand '(do (display "Test") 4)))
+('(do (display "Test") 4) (macroexpand '(do (display "Test") 9 4)))
+('(1 2) (except-last-pair '(1 2 3)))
+('(3) (last-pair '(1 2 3)))
+('(2 3 4) (map '(1 2 3) (fn (v) (+ 1 v))))
+('(2 4 6) (map '(1 2 3) (fn (v) (* 2 v))))
+('("1" "2" "3") (map '(1 2 3) string/write))
+(0 (tree/size @()))
+(1 (tree/size @(:a 1)))
+(3 (tree/size @(:a 1 :b 2 :c 3)))
+(#f (tree/has? @(:a 123) :b))
+(#t (tree/has? @(:a 123) :a))
+(123 (tree/ref @(:a 123) :a))
+(123 (tree/ref @(b: 2, a: 123) :a))
+(2 (tree/ref @(b: 2, a: 123) :b:))
+(9 (tree/ref (tree/set! @(:b 2 :a 123) :a 9) :a))
+(:type-error (try car (tree/set! #@(:b 2 :a 123) :a 9)))
+(2 (tree/ref @(:b 2 :a 123) :b))
+(2 (tree/ref @('b 2 'a 123) :b))
+(2 (tree/ref #@(:b 2 :a 123) :b))
+(2 (tree/ref #@(b 2 a: 123) :b))
+(#t (let* (def keys (tree/keys @(:b 2 :a 123))) (or (list/equal? keys '(:b :a)) (list/equal? keys '(:a :b)))))
+(#t (let* (def vals (tree/values @(:b 2 :a 123))) (or (list/equal? vals '(2 123)) (list/equal? vals '(123 2)))))
+(2 (length (tree/keys @(:b 2 :a 123))))
+(2 (length (tree/values @(:b 2 :a 123))))
+(3 (length (tree/keys @(:b 2 :a 123 :c 7))))
+('(:asd 123)   (car (read "(:asd 123)")))
+('(123 (:asd)) (car (read "(123(:asd))")))
+('(123 (:asd)) (car (read "(123(:asd))")))
+('(123 (:asd)) (car (read "(123(:asd))")))
+('(:asd (123)) (car (read "(:asd(123))")))
+(#x123 (car '(#x123(#o234))))
+('(#o234) (cadr '(#x123(#o234))))
+(#o234 (cadr '(#x123#o234)))
+(#b101 (car '(#b101"asd")))
+("asd" (cadr '(#b101"asd")))
+(#t (pair? (symbol-table)))
+(#t (> (length (symbol-table)) 200))
+(:one (car '(:one :two :three)))
+(:two (cadr '(:one :two :three)))
+(:three (caddr '(:one :two :three)))
+('(:two :three) (cdr '(:one :two :three)))
+('(:three) (cddr '(:one :two :three)))
+('two (cadr '(:one two :three)))
+(102334155 (let* (def i 1) (def a 0) (def b 1) (while (< i 40) (let ((new (+ a b))) (set! a b) (set! b new) (set! i (+ 1 i)))) b))
+(832040 (let* (def i 1) (def a 0) (def b 1) (while (< i 30) (let ((new (+ a b))) (set! a b) (set! b new) (set! i (+ 1 i)))) b))
+(17711 (let* (def i 1) (def a 0) (def b 1) (while (< i 22) (let ((new (+ a b))) (set! a b) (set! b new) (set! i (+ 1 i)))) b))
+(6765  (let* (def fib-slow (fn (v) (if (< v 2) v (+ (fib-slow (- v 2)) (fib-slow (- v 1)))))) (fib-slow 20)))
+(10946 (let* (def fib-slow (fn (v) (if (< v 2) v (+ (fib-slow (- v 1)) (fib-slow (- v 2)))))) (fib-slow 21)))
+(4 ((fn (v) (+ v 2)) 2))
+(4 ((fn (fn) (+ fn 2)) 2))
+(4 ((fn (+ *) (- + *)) 6 2))
+(246 (let* (def - 123) (+ - -)))
+('v (car '(v)))
+('+ (car '(+)))
+(#t (= '+ (string->symbol "+")))
+('dec! (car '(dec!)))
+('- (car '(-)))
+(-1 (let* (def + -) ((resolve '+) 1 2)))
+(#t (procedure? (let* (def t -) t)))
+(#nil (when #f 1))
+(1 (when #t 1))
+('(1 . 2) (cons 1 2))
+('(1 . 2) '(1 . 2))
+(1 (car '(1 . 2)))
+(2 (cdr '(1 . 2)))
+(2 (tree/ref @(:asd 1 :bsd 2) :bsd))
+(0 (+))
+(1 (*))
+(:unresolved-procedure (try (fn (err) (if (= (caddr err) 'asdqwe) (if (= (car err) :unbound-variable) :unresolved-procedure (car err)) #nil)) (asdqwe qweasdzxc)))
+(#t (try (fn (error) (string? (cadr error))) (/ 3 0)))
+(:success (try (fn (error) error) (throw :success) :failure))
+(123 (try (fn (error) error) (throw 123) 0))
+(#t (try (fn (error) error) (throw #t) #f))
+("asd" (try (fn (error) error) (throw "asd") #nil))
+(:test-exception (try (fn (error) (car error)) (throw (list :test-exception "Testing the exception system")) #nil))
+(#t (try (fn (error) (string? (cadr error))) (throw (list :test-exception "Testing the exception system")) #nil))
+(:test ((fn (e) (car e)) (cons :test "Test")))
+(10 #d10)
+(-31 #x-1F)
+(-15 #o-17)
+(-3 #b-11)
+(:float-inf (try (fn (err) (car err)) (try (fn (err) (/ 3 0) err) (throw :test-exception))))
+(:float-inf (try (fn (error) (car error)) (/ 3 0)))
+(:float-inf (try (fn (error) (car error)) (try (fn (error) (/ 3 0) error) (throw :test-exception))))
+(:float-inf (try (fn (err) (car err)) (/  1.0 0.0)))
+(:float-nan (try (fn (err) (car err)) (/  0.0 0.0)))
+(:float-inf (try (fn (err) (car err)) (/ -1.0 0.0)))
+(1 `1)
+('(1) `(1))
+('(1 2) `(1 2))
+('(1 "asd") `(1 "asd"))
+('(1 :asd) `(1 :asd))
+('(@(:asd 123)) `(@(:asd 123)))
+('(#(1 2 3)) `(#(1 2 3)))
+('("1.0001") `("1.0001"))
+('(:asd) `(:asd))
+('(1 2 3) `(1 ~(+ 1 1) 3))
+('(1 2 3 4) `(1 ~(+ 1 1) ~@(read "3 4")))
+('(1 2 3) (let* (def v 2) `(1 ~v 3)))
+('(resolve 123) (do (let ((source (cons 123 #nil) #nil)) `(resolve ~(car source)))))
+('(resolve asd) (do (let ((source (cons 'asd #nil))) `(resolve ~(car source)))))
+(4 (let* (defn double (α) (* α 2)) (double 2)))
+(6 (let* (def sum 0) (for-each '(1 2 3) (fn (a) (set! sum (+ sum a)))) sum))
+('source (car (closure/arguments macroexpand)))
+('(1 2 3) `(1 ~@`(2 3)))
+('(1 (2 (3 4))) `(1 `(2 ~(3 ~(+ 2 2)))))
+(2 (cadar '((1 2 3) 4 5)))
+(#f (bit-test? 0 0))
+(#t (bit-test? #b1 0))
+(#f (bit-test? #b1 1))
+(#f (bit-test? #b1011 2))
+(#t (bit-test? #b1111 2))
+(#t (bit-test? #b1111 3))
+(#f (bit-test? #b1111 4))
+(#nil (when-not #t 123))
+(123 (when-not #f 123))
+(:invalid-let-form (try (fn (err) (car err)) (macroexpand '(let (1) 1))))
+(:invalid-let-form (try (fn (err) (car err)) (macroexpand '(let (() 1) 1))))
+(1 (if #t 1 2))
+(2 (if-not :test 1 2))
+(1 (if-not #f 1 2))
+('(4 5 6) (map '(1 2 3) (+x 3)))
+(4 (def α 3) (inc! α) α)
+(#t (case "1" ((1) #f) (('1) #f) (("1") #t)))
+(#t (case "asd" (("as") #f) (("qwe") #f) (("asd") #t)))
+(#t (case (+ 1 2) ((3.1) #f) ((3.0) #t) (3 #t)))
+(#t (< 3 3.1))
+(#t (< 3.0 3.1))
+(#t (< 3.2 4))
+(#t (> 4 3.1))
+(#t (> 4 3.9))
+(#t (> 4.0 3.9))
+(#t (> 3.1 3))
+(#f (> 4.0 4))
+(#f (< 4.0 4))
+(#f (< 4 4.0))
+(#f (> 4 4.0))
+(#f (> -14 -14.0))
+(#f (< -14 -14.0))
+(#t (= -4 -4.0))
+(#t (= -3.0 -3))
+(#t (= 4 4.0))
+(#t (= 4.0 4))
+(#t (case (+ 1 2) ((1) #f) ((2 3) #t)))
+(#t (case (+ 1 1) ((1) #f) ((2 3) #t)))
+(#f (case (+ 0 1) ((1) #f) ((2 3) #t)))
+(#nil (case (+ 2 2) ((1) #f) ((2 3) #t)))
+(123 (case (+ 2 2) ((1) #f) ((2 3) #t) (otherwise 123)))
+(#t (def i 1) (case (inc! i) ((9) #f) ((4) #f) ((2) #t)))
+(:arity-error (try (fn (err) (car err)) (compile '(cons 123 234 345))))
+(#t (= car (resolve (car '(car asd)))))
+(#t (pos? (index-of (describe/closure ((defn stackTraceTest () (current-lambda)))) "stackTraceTest")))
+(2 (case 'asd (('qwe) 1) (('asd) 2) (otherwise 3)))
+(10 (reduce #(1 2 3 4) add/int 0))
+("1,2,3,4" (join #(1 2 3 4) ","))
+(2 (count #(1 2 3 4) even?))
+(14 (reduce (map #(1 2 3 4) (+x 1)) + 0))
+(3 (length #(1 2 3)))
+('("123") (split "123" "\n"))
+('("" "") (split "\n" "\n"))
+('("123" "456") (split "123\n456" "\n"))
+('("" "" "") (split "\n\n" "\n"))
+('("1" "2" "3") (split "1\n2\n3" "\n"))
+('("" "" "" "") (split "\n\n\n" "\n"))
+('("1" "2" "3" "4") (split "1\n2\n3\n4" "\n"))
+("#@(a: 1 b: 2)" (string/write (tree/zip '(:a :b) '(1 2))))
+("#@(a: #nil b: #nil)" (string/write (tree/zip '(:a :b) '())))
+("#@(a: 1 b: #nil)" (string/write (tree/zip '(:a :b) '(1))))
+("#@()" (string/write (tree/zip #nil '(1 2))))
+("123" (string/write (read/single "123;asd")))
+('(123) (read "123"))
+('(123) (read "123;asd"))
+('(123 234) (read "123;asd\n234"))
+('(234) (read ";asd\n;qwe\n234;asd"))
+('(2 1 0) (let ((ret #nil)) (dotimes (i 3) (set! ret (cons i ret))) ret))
+("#@(a: 1 b: 2)" (string/write (-> (tree/new) (tree/set! :a 1) (tree/set! :b 2))))
+(2 (-> 2))
+(10 (sum '(1 2 3 4)))
+(0 (popcount 0))
+(:type-error (try car (popcount #nil)))
+(:type-error (try car (popcount "")))
+(1 (popcount 1))
+(1 (popcount 2))
+(2 (popcount 3))
+(4 (popcount 15))
+("##()" (string/write (sort #())))
+("##(1)" (string/write (sort #(1))))
+("##(1 2 3)" (string/write (sort #(3 2 1))))
+("##(1 2 3 9)" (string/write (sort #(3 9 2 1))))
+('(1 2 3) (list/sort '(2 1 3)))
+('(1 2 3) (list/sort '(2 1 3)))
+('(1) (list/sort '(1)))
+('() (list/sort '()))
+('(1 2 3) (sort '(1 2 3)))
+('(1 3 9) (sort '(1 3 9)))
+('(1 9) (sort '(1 9)))
+('(1 1 2 9) (sort '(1 1 2 9)))
+('(1.0 2.0 3.0) (sort '(3.0 1.0 2.0)))
+('("a" "m" "z") (sort '("m" "a" "z")))
+('("a" "m" "z") (sort '("z" "m" "a")))
+('("a" "m" "z") (sort '("a" "z" "m")))
+('("Z" "a" "m" "z") (sort '("a" "Z" "m" "z")))
+('("aggressionen" "mit" "zauberer") (sort '("zauberer" "aggressionen" "mit")))
+('(1 2 3) (list-merge-sort '(1 2 3)))
+('(1 2 3) (list-merge-sort '(3 2 1)))
+('(1) (list-merge-sort '(1)))
+('() (list-merge-sort '()))
+('(-2 3 4 5 9 333 1000) (list-merge-sort '(9 3 5 1000 333 4 -2)))
+('(1.0 2.0 3.0) (list-merge-sort '(3.0 1.0 2.0)))
+('("a" "m" "z") (list-merge-sort '("m" "a" "z")))
+('("a" "m" "z") (list-merge-sort '("z" "m" "a")))
+('("a" "m" "z") (list-merge-sort '("a" "z" "m")))
+('("Z" "a" "m") (list-merge-sort '("a" "Z" "m")))
+(#\( (buffer/ref "(({<>}))" 0))
+(#\( (buffer/ref "(({<>}))" 1))
+(#\{ (buffer/ref "(({<>}))" 2))
+(#\< (buffer/ref "(({<>}))" 3))
+(#\> (buffer/ref "(({<>}))" 4))
+(#\} (buffer/ref "(({<>}))" 5))
+(#\) (buffer/ref "(({<>}))" 6))
+(#\) (buffer/ref "(({<>}))" 7))
+(#t (< 1442693 12049880844))
+(12051323537 (+ 1442693 12049880844))
+("#@(a: 1)" (def t @(a: 1)) (-> (tree/dup @(:a 1)) (tree/++ :a)) (string/write t))
+("#@(a: 2)" (def t @(a: 1)) (string/write (-> (tree/dup @(:a 1)) (tree/++ :a))))
+('(1 2 3) (nreverse (list 3 2 1)))
+('(1 2 3 4 5 6 7 8 9) (nreverse (list 9 8 7 6 5 4 3 2 1)))
+('(1) (nreverse (list 1)))
+('(2 1) (nreverse (cons 1 (cons 2 #nil))))
+(#nil (nreverse #nil))
+(:tree (type-of @()))
+(#nil (tree/keys @()))
+(#nil (tree/values @()))
+('(123) (tree/values @(:asd 123)))
+('(:asd) (tree/keys @(:asd 123)))
+(:tree (type-of @(:asd 123)))
+("asd" (string "asd"))
+("123" (string 123))
+("asd" (cat "a" #nil "s" "" "d"))
+('(1 2 3) (append '(1 2) '(3) ))
+('(1 2 3) (append '(1) '(2 3)))
+('(1 2 3) (append '(1 2 3) #nil))
+(:unbound-variable (try car (case 'asd ((asd) #f) (('asd) #t))))
+(:unbound-variable (try car (case 'asd ((asd) #f) ('asd #t))))
+(:float-inf (try car (/ 1 0)))
+('(1 2 3 4) ((fn a a) 1 2 3 4))
+(1 ((fn (a . b) a) 1 2 3))
+('(2 3) ((fn (a . b) b) 1 2 3))
+('(3) ((fn (a b . c) c) 1 2 3))
+(2 ((fn (a b . c) b) 1 2 3))
+(1 ((fn (a b . c) a) 1 2 3))
+(#nil ((fn (a b c . d) d) 1 2 3))
+(3 ((fn (a b c . d) c) 1 2 3))
+(2 ((fn (a b c . d) b) 1 2 3))
+(1 ((fn (a b c . d) a) 1 2 3))
+(122 (-> @(:asd 123) (tree/-- :asd) (tree/ref :asd)))
+(124 (-> @(:asd 123) (tree/++ :asd) (tree/ref :asd)))
+(#t (do (dotimes (i 10) (set! i 20) (when (> i 30) (throw (list :error)))) #t))
+(#f (= @(:a 1) #(:a 1)))
+(#f (= @(:a 1) #(:b 1)))
+(#t (let ((a @(:a 1))) (= a a)))
+('(2 3 4) (-> '(1 2 3 4) (delete 1)))
+('(1 2 3 4 5) (flatten #(1 2 3 4 5)))
+('(1 2 3 4 5) (flatten '(1 2 3 4 5)))
+('(1 2 3 4 5) (flatten '((1 2) (3) (((4) 5)))))
+('(1 2 3 4 5) (flatten (list '(1 2) #(3) #('((4) 5)))))
+("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz" (cat "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z" "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"))
+(6 (- 7 1))
+('(:asd "Test") (list :asd "Test"))
+(10 (let ((t 0)) (doseq (l (list 1 2 3 4)) (+= t l)) t))
+(1 (let ((t 0)) (doseq (l (list 1)) (+= t l)) t))
+(0 (let ((t 0)) (doseq (l (list)) (+= t l)) t))
+(#t (symbol? (gensym)))
+(1 (car '(1 . 2)))
+(1 (car '(1 2)))
+(2 (cdr '(1 . 2)))
+('(2) (cdr '(1 2)))
+(22 ((resolve (string->symbol "+")) 10 12))
+(1 (length '(1)))
+(2 (length '(1 #nil)))
+(3 (length '(1 #nil 2)))
+(3 (length '(1 1 2)))
+(4 (length '(1 1 2 #nil)))
+(4 (length '(1 #nil 2 #nil)))
+(4 (length '(#nil #nil 2 #nil)))
+(4 (length '(#nil #nil #nil #nil)))
+(5 (length '(#nil #nil #nil #nil 5)))
+(:type-error (try car (tree/values)))
+(:type-error (try car (tree/keys #nil)))
+(:type-error (try car (tree/has? #nil)))
+(:type-error (try car (tree/has?)))
+(5 (eval (read/single "(+ 2 3)")))
+(5 (eval (read/single "(+ 2 ; 5\n 3)")))
+(5 (eval (read/single "(+ 2 #! 5\n 3)")))
+('(1 3) (read/single "(1 #| 2 |# 3)"))
+(5 (eval (read/single "(+ 2 #| 5 |# 3)")))
+(5 (eval (read/single "(+ 2 #| #| 5 |# |# 3)")))
+(#t (let ((ret #t)) (doseq (l #nil) (set! ret #f)) ret))
+(#f (let ((ret #t)) (doseq (l '()) (set! ret #f)) ret))
+(0 (buffer/length ""))
+(1 (buffer/length "1"))
+(2 (buffer/length "  "))
+(2 (buffer/length "λ"))
+(:type-error (try car (pad-start 123 4 #\0)))
+(:type-error (try car (pad-start "123" 4 #\0)))
+(:type-error (try car (pad-end 123 4 #\0)))
+(:type-error (try car (string->symbol 4)))
+("4" (string (string->symbol "4")))
+(#t (= (string->symbol "3") (string->symbol "3")))
+(#f (= (string->symbol "3") (string->symbol "2")))
+("asd" (string 'asd))
+(:type-error (try car (buffer/ref)))
+(:type-error (try car (buffer/ref "" -1)))
+(:out-of-bounds (try car (buffer/ref "" 1)))
+(:type-error (try car (buffer/ref "" :asd)))
+(#t (case 3 (otherwise #t) (2 #f)))
+(0 (+))
+(1 (*))
+(:arity-error (try car (-)))
+(:arity-error (try car (/)))
+(0 (popcount 0))
+(8 (popcount 255))
+(15 (popcount #b1100001000010000101101011010101101))
+(64 (popcount (bit-not 0)))
+(#nil (tree/key* @()))
+(:a (tree/key* @(:a 1)))
+(1 (tree/value* @(:a 1)))
+(0 (count #nil))
+(0 (count #()))
+(1 (count '(1)))
+(1 (count #(1)))
+(3 (count '(1 2 3)))
+(3 (count #(1 2 3)))
+(0 (+))
+(3 (+ 1 2))
+(1 (*))
+(#t (symbol? (car (symbol-table))))
+(#f (keyword? (car (symbol-table))))
+('(1 3) (remove '(0 1 2 3) even?))
+(#(1 3) (remove #(0 1 2 3) even?))
+(6 (reduce @(:a 1 :b 2 :c 3) + 0))
+(@() (filter @(:a 1) even?))
+(@(:b 2) (filter @(:a 1 :b 2 :c 3) even?))
+(@(:a 1 :c 3) (remove @(:a 1 :b 2 :c 3) even?))
+(4 (identity 4))
+("4" (identity "4"))
+(#(1 2 3) (identity #(1 2 3)))
+(11 (def counter (let ((a 0)) (fn (b) (set! a (+ a (or b 1)))))) (counter 10) (counter))
+('(0 1 2 3 4) (range 5))
+(#nil (range 0))
+(#nil (range -1 1))
+('(0) (range 1))
+('(-1 0) (range 1 -1))
+('(1 0 -1) (range -2 1 -1))
+(19 (int (reduce (range 2.0 0.0 0.1) +)))
+(45 (reduce (range 10) +))
+(123456789 (read/single (reduce (range 10) cat)))
+(30 (reduce (map (range 5) (fn (α) (* α α))) +))
+(@(:asd 123) (tree/set! #nil :asd 123))
+(#t (> :b :a))
+(#f (< :b :a))
+(#t (> 'b 'a))
+(#f (< 'b 'a))
+('(:a :b :c) (sort '(:b :c :a)))
+('(a b c) (sort '(b c a)))
+(#t ((path/ext?! "asd") "qwe.asd"))
+(#f ((path/ext?! "as") "qwe.asd"))
+(#f ((path/ext?! "asd") "qwe.as"))
+(#t ((path/ext?! '("as" "asd")) "qwe.as"))
+(#t ((path/ext?! '("as" "asd")) "qwe.asd"))
+(:a (let ((list '(:a :b :c))) (car list)))
+(15 (bit-or 1 2 4 8))
+(65536 (+ 1 (reduce (map (range 16) (fn (a) (bit-shift-left 1 a))) bit-or 0)))
+(300425737571 (div/int 600851475143 2))
+(1201702950286 (* 600851475143 2))
+(1 (rem 600851475143 2))
+(600851475145 (+ 600851475143 2))
+(600851475141 (- 600851475143 2))
+(5 (dotimes (i 5 i)))
+(10 (let ((x 0)) (dotimes (i 5) (set! x (+ x i))) x))
+(10 (let ((x 0)) (dotimes (i 5 x) (set! x (+ x i)))))
+(0 (let ((x 0)) (dotimes (i -4) (set! x (+ x i))) x))
+(0 (let ((x 0)) (dotimes (i -4) (set! x 9)) x))
+(0 (let ((x 0)) (dotimes (i 0) (set! x 9)) x))
+(6 (let ((+5 (+x 5))) (+5 1)))
+(7 (let ((+5 (+x 5))) (int (ceil (car (map '(1.8) +5))))))
+(125 (def +123 (+x 123)) (+123 2))
+('(:a :b) (let ((l '(:b))) (cons! :a l) l))
+(#nil (meta #nil :asd))
+(:type-error (try car (meta #nil)))
+(:type-error (try car (eval '())))
+(:type-error (try car (compile '())))
+(:type-error (try car (compile '(123))))
+(:type-error (try car (compile '(:asd))))
+(:type-error (try car (compile '("asd"))))
+(:type-error (try car (compile '(##()))))
+(:type-error (try car (compile '(#@()))))
+(:type-error (try car (compile '(fn))))
+(:type-error (try car (compile '(fn 123))))
+(:type-error (try car (sum 123)))
+(:type-error (try car (sum '(1 2 3 . 4))))
+(10 (sum '(1 2 3 4)))
+(0 (length (let* (defn a l l) (a))))
+(:float-inf (try car (/ 4 0.0)))
+(:float-nan (try car (/ 0.0 0.0)))
+(:type-error (try car (apply (environment*) #{##() 2401})))
+(#t (bytecode-eval* #{##() 1B01} (environment*)))
+(0 (apply + '()))
+(1 (apply + '(1)))
+(3 (apply + '(1 2)))
+(3 (inc/int 2))
+(-1 (inc/int -2))
+(@() (tree/merge #nil #nil))
+(@(a: 1 b: 9) (tree/merge @(a: 1 b: 9) #nil))
+(@(b: 2 c: 3) (tree/merge #nil @(b: 2 c: 3)))
+(@(a: 1 b: 2 c: 3) (tree/merge @(a: 1 b: 9) @(b: 2 c: 3)))
+(:divide-by-zero (try car (div/int 10 0)))
+(:arity-error (try car (div/int)))
+(:arity-error (try car (div/int 10)))

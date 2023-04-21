@@ -1,70 +1,70 @@
-[#x0 [bytecode-op->int #$0]]   ;
-[#x9 [bytecode-op->int #$9]]
-[#xF [bytecode-op->int #$F]]
-[#x10 [bytecode-op->int #$10]]
-[#xFF [bytecode-op->int #$FF]]
-[:type-error [try car [bytecode-op->int]]]
-[:type-error [try car [bytecode-op->int 12]]]
-[:bytecode-op [type-of #$10]]
-[:bytecode-op [type-of [int->bytecode-op 255]]]
-["#{##[]\n00090F10FF\n}" [string/write [arr->bytecode-arr #[#$0 #$9 #$F #$10 #$FF] #[]]]]
-[:bytecode-array [type-of [arr->bytecode-arr #[#$0 #$9 #$F #$10 #$FF] #[]]]]
-[#$0 [array/ref [bytecode-arr->arr [arr->bytecode-arr #[#$0 #$9 #$F #$10 #$FF] #[]]] 0]]
-[0    [bytecode-eval* [arr->bytecode-arr #[#$2 #$0 #$1] #[]] [environment*]]]
-[127  [bytecode-eval* [arr->bytecode-arr #[#$2 #$7F #$1] #[]] [environment*]]]
-[-1   [bytecode-eval* [arr->bytecode-arr #[#$2 #$FF #$1] #[]] [environment*]]]
-[-128 [bytecode-eval* [arr->bytecode-arr #[#$2 #$80 #$1] #[]] [environment*]]]
-[5    [bytecode-eval* [assemble [$push/int 3] [$push/int 2] [$add/int] [$ret]] [environment*]]]
-[3    [bytecode-eval* [assemble [$push/int 3] [$ret]] [environment*]]]
-[0    [bytecode-eval* [assemble [$push/int 0] [$ret]] [environment*]]]
-[-3   [bytecode-eval* [assemble [$push/int -3] [$ret]] [environment*]]]
-[-128 [bytecode-eval* [assemble [$push/int -128] [$nop] [$ret]] [environment*]]]
-[127  [bytecode-eval* [assemble [$push/int 127] [$ret]] [environment*]]]
-['[123 asd] [asmrun [$push/val '[123 asd]] [$ret]]]
-['test [asmrun [$push/val 'test] [$ret]]]
-[2 [[asmrun [$push/val [fn [a] [+ 1 a]]] [$ret]] 1]]
-['[test list] [let [[code [assemble [$push/val [list 'test 'list]] [$ret]]]]                   [bytecode-eval* code [environment*]]]]
-['[test list] [let [[code [assemble [$push/val [list 'test 'list]] [$ret]]]] [garbage-collect] [bytecode-eval* code [environment*]]]]
-;;[5 [asmrun [$push/int 2] [$push/int 3] [$apply 2 add/int] [$ret]]]
-;;[4 [asmrun [$push/int 2] [$dup] [$apply 2 add/int] [$ret]]]
-[26 [asmrun [$nop] [$push/int 26] [$jmp :asd] [$push/int 99] [list :label :asd] [$ret]]]
-[26 [asmrun [$nop] [$push/int 26] [$push/val #t] [$jt :asd] [$push/int 99] [list :label :asd] [$ret]]]
-[99 [asmrun [$nop] [$push/int 26] [$push/val #f] [$jt :asd] [$push/int 99] [list :label :asd] [$ret]]]
-["#$0" [string/write [int->bytecode-op 0]]]
-["#$9" [string/write [int->bytecode-op 9]]]
-["#$F" [string/write [int->bytecode-op 15]]]
-["#$10" [string/write [int->bytecode-op 16]]]
-["#$FF" [string/write [int->bytecode-op 255]]]
-[:invalid-bc-op [try car [int->bytecode-op -129]]]
-[:invalid-bc-op [try car [int->bytecode-op 256]]]
-["#$0" [string/write #$]]
-["#$9" [string/write #$9]]
-["#$F" [string/write #$F]]
-["#$10" [string/write #$10]]
-["#$FF" [string/write #$FF]]
-[:read-error [try car [read/single "#$1FF"]]]
-[55 [+ 1 [+ 2 [+ 3 [+ 4 [+ 5 [+ 6 [+ 7 [+ 8 [+ 9 10]]]]]]]]]]
-[:asd [try [fn [a] [car a]] [throw '[:asd "Test"]] :error]]
-[:asd [try car [throw '[:asd "Test"]] :error]]
-[3 [asmrun [$jmp :start] [list :label :ret] [$push/int 3] [$ret] [list :label :start] [$push/int 2] [$jmp :ret] [$ret]]]
-[5 [asmrun [$jmp :start] [list :label :func] [$push/int 2] [$add/int] [$ret] [list :label :start] [$push/int 3] [$jmp :func]]]
-;;['[1 . 2] [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$ret]]]
-;;[1 [asmrun [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]
-;;[1 [apply [environment*] [apply assemble [list [$push/int 1] [$push/int 2] [$apply 2 cons] [$apply 1 car] [$ret]]]]]
-[37 [asmrun [$push/val +] [$push/int 12] [$push/int 25] [$apply 2] [$ret]]]
-[3 [bytecode-eval* [arr->bytecode-arr [apply array/new [flatten [list [$push/int 1] [$push/int 2] [$add/int] [$ret]]]] #[]] [environment*]]]
-[3 [bytecode-eval* #{##[] 020102020301} [environment*]]]
-["#{##[]\n020102020301\n}" [string/write #{##[] 020102020301}]]
-[3 [bytecode-eval* #{##[] 020102020301} [environment*]]]
-[3 [bytecode-eval* #{##[1 2] 1A001A010301} [environment*]]]
-["#{##[1 2]\n1A001A010301\n}" [string/write #{##[1 2] 1A001A010301}]]
-['test [asmrun [$push/val 'test] [$ret]]]
-[#nil [asmrun [$push/nil] [$ret]]]
-[:invalid-bc-op [try car [asmrun [$push/val #nil] [$ret]]]]
-[4 [def min* [fn [a b] [if [< a b] a b]]] [+ [min* 1 3] [min* 10 3]]]
-[:vm-error [try car [apply return '[:test]]]]
-[1 [[fn [] [return 1] 3]]]
-;;['[:a :b] [asmrun [$push/val :a] [$push/val '[:b]] [$apply 2 cons] [$ret]]]
-['[:a :b] [asmrun [$push/val :a] [$push/val '[:b]] [$cons] [$ret]]]
-[:a [asmrun [$push/val '[:a :b]] [$car] [$ret]]]
-['[:b] [asmrun [$push/val '[:a :b]] [$cdr] [$ret]]]
+(#x0 (bytecode-op->int #$0))   ;
+(#x9 (bytecode-op->int #$9))
+(#xF (bytecode-op->int #$F))
+(#x10 (bytecode-op->int #$10))
+(#xFF (bytecode-op->int #$FF))
+(:type-error (try car (bytecode-op->int)))
+(:type-error (try car (bytecode-op->int 12)))
+(:bytecode-op (type-of #$10))
+(:bytecode-op (type-of (int->bytecode-op 255)))
+("#{##()\n00090F10FF\n}" (string/write (arr->bytecode-arr #(#$0 #$9 #$F #$10 #$FF) #())))
+(:bytecode-array (type-of (arr->bytecode-arr #(#$0 #$9 #$F #$10 #$FF) #())))
+(#$0 (array/ref (bytecode-arr->arr (arr->bytecode-arr #(#$0 #$9 #$F #$10 #$FF) #())) 0))
+(0    (bytecode-eval* (arr->bytecode-arr #(#$2 #$0 #$1) #()) (environment*)))
+(127  (bytecode-eval* (arr->bytecode-arr #(#$2 #$7F #$1) #()) (environment*)))
+(-1   (bytecode-eval* (arr->bytecode-arr #(#$2 #$FF #$1) #()) (environment*)))
+(-128 (bytecode-eval* (arr->bytecode-arr #(#$2 #$80 #$1) #()) (environment*)))
+(5    (bytecode-eval* (assemble ($push/int 3) ($push/int 2) ($add/int) ($ret)) (environment*)))
+(3    (bytecode-eval* (assemble ($push/int 3) ($ret)) (environment*)))
+(0    (bytecode-eval* (assemble ($push/int 0) ($ret)) (environment*)))
+(-3   (bytecode-eval* (assemble ($push/int -3) ($ret)) (environment*)))
+(-128 (bytecode-eval* (assemble ($push/int -128) ($nop) ($ret)) (environment*)))
+(127  (bytecode-eval* (assemble ($push/int 127) ($ret)) (environment*)))
+('(123 asd) (asmrun ($push/val '(123 asd)) ($ret)))
+('test (asmrun ($push/val 'test) ($ret)))
+(2 ((asmrun ($push/val (fn (a) (+ 1 a))) ($ret)) 1))
+('(test list) (let ((code (assemble ($push/val (list 'test 'list)) ($ret))))                   (bytecode-eval* code (environment*))))
+('(test list) (let ((code (assemble ($push/val (list 'test 'list)) ($ret)))) (garbage-collect) (bytecode-eval* code (environment*))))
+;;(5 (asmrun ($push/int 2) ($push/int 3) ($apply 2 add/int) ($ret)))
+;;(4 (asmrun ($push/int 2) ($dup) ($apply 2 add/int) ($ret)))
+(26 (asmrun ($nop) ($push/int 26) ($jmp :asd) ($push/int 99) (list :label :asd) ($ret)))
+(26 (asmrun ($nop) ($push/int 26) ($push/val #t) ($jt :asd) ($push/int 99) (list :label :asd) ($ret)))
+(99 (asmrun ($nop) ($push/int 26) ($push/val #f) ($jt :asd) ($push/int 99) (list :label :asd) ($ret)))
+("#$0" (string/write (int->bytecode-op 0)))
+("#$9" (string/write (int->bytecode-op 9)))
+("#$F" (string/write (int->bytecode-op 15)))
+("#$10" (string/write (int->bytecode-op 16)))
+("#$FF" (string/write (int->bytecode-op 255)))
+(:invalid-bc-op (try car (int->bytecode-op -129)))
+(:invalid-bc-op (try car (int->bytecode-op 256)))
+("#$0" (string/write #$))
+("#$9" (string/write #$9))
+("#$F" (string/write #$F))
+("#$10" (string/write #$10))
+("#$FF" (string/write #$FF))
+(:read-error (try car (read/single "#$1FF")))
+(55 (+ 1 (+ 2 (+ 3 (+ 4 (+ 5 (+ 6 (+ 7 (+ 8 (+ 9 10))))))))))
+(:asd (try (fn (a) (car a)) (throw '(:asd "Test")) :error))
+(:asd (try car (throw '(:asd "Test")) :error))
+(3 (asmrun ($jmp :start) (list :label :ret) ($push/int 3) ($ret) (list :label :start) ($push/int 2) ($jmp :ret) ($ret)))
+(5 (asmrun ($jmp :start) (list :label :func) ($push/int 2) ($add/int) ($ret) (list :label :start) ($push/int 3) ($jmp :func)))
+;;('(1 . 2) (asmrun ($push/int 1) ($push/int 2) ($apply 2 cons) ($ret)))
+;;(1 (asmrun ($push/int 1) ($push/int 2) ($apply 2 cons) ($apply 1 car) ($ret)))
+;;(1 (apply (environment*) (apply assemble (list ($push/int 1) ($push/int 2) ($apply 2 cons) ($apply 1 car) ($ret)))))
+(37 (asmrun ($push/val +) ($push/int 12) ($push/int 25) ($apply 2) ($ret)))
+(3 (bytecode-eval* (arr->bytecode-arr (apply array/new (flatten (list ($push/int 1) ($push/int 2) ($add/int) ($ret)))) #()) (environment*)))
+(3 (bytecode-eval* #{##() 020102020301} (environment*)))
+("#{##()\n020102020301\n}" (string/write #{##() 020102020301}))
+(3 (bytecode-eval* #{##() 020102020301} (environment*)))
+(3 (bytecode-eval* #{##(1 2) 1A001A010301} (environment*)))
+("#{##(1 2)\n1A001A010301\n}" (string/write #{##(1 2) 1A001A010301}))
+('test (asmrun ($push/val 'test) ($ret)))
+(#nil (asmrun ($push/nil) ($ret)))
+(:invalid-bc-op (try car (asmrun ($push/val #nil) ($ret))))
+(4 (def min* (fn (a b) (if (< a b) a b))) (+ (min* 1 3) (min* 10 3)))
+(:vm-error (try car (apply return '(:test))))
+(1 ((fn () (return 1) 3)))
+;;('(:a :b) (asmrun ($push/val :a) ($push/val '(:b)) ($apply 2 cons) ($ret)))
+('(:a :b) (asmrun ($push/val :a) ($push/val '(:b)) ($cons) ($ret)))
+(:a (asmrun ($push/val '(:a :b)) ($car) ($ret)))
+('(:b) (asmrun ($push/val '(:a :b)) ($cdr) ($ret)))

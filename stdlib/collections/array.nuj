@@ -3,130 +3,130 @@
 ;;;
 ;;; Some functions dealing with arrays
 
-[defn array/+= [a i v]
+(defn array/+= (a i v)
       "Add V to the value in A at position I and store the result in A returning A"
-      [array/set! a i [+ v [array/ref a i]]]]
+      (array/set! a i (+ v (array/ref a i))))
 
-[defn array/++ [a i]
+(defn array/++ (a i)
       "Increment position I in A and return A"
-      [array/+= a i 1]]
+      (array/+= a i 1))
 
-[defn array/fill! [a v]
+(defn array/fill! (a v)
       "Fills array a with value v"
-      [def len [array/length a]]
-      [dotimes [i len a]
-               [array/set! a i v]]]
+      (def len (array/length a))
+      (dotimes (i len a)
+               (array/set! a i v)))
 
-[defn array/append [a b]
+(defn array/append (a b)
       "Append array A to array B"
-      [when-not [and [array? a] [array? b]]
-                [exception :type-error "array/append expects two arrays as its arguments"]]
-      [def ret [array/allocate [+ [array/length a] [array/length b]]]]
-      [dotimes [i [array/length a]]
-               [array/set! ret i [array/ref a i]]]
-      [let [[i [array/length a]]
-            [rl [array/length ret]]]
-           [while [< i rl]
-                  [array/set! ret i [array/ref b [- i [array/length a]]]]
-                  [set! i [add/int i 1]]]]
-      [return ret]]
+      (when-not (and (array? a) (array? b))
+                (exception :type-error "array/append expects two arrays as its arguments"))
+      (def ret (array/allocate (+ (array/length a) (array/length b))))
+      (dotimes (i (array/length a))
+               (array/set! ret i (array/ref a i)))
+      (let ((i (array/length a))
+            (rl (array/length ret)))
+           (while (< i rl)
+                  (array/set! ret i (array/ref b (- i (array/length a))))
+                  (set! i (add/int i 1))))
+      (return ret))
 
-[defn array/dup [a]
+(defn array/dup (a)
       "Duplicate Array A"
-      [def ret [array/allocate [array/length a]]]
-      [dotimes [i [array/length a] ret]
-               [array/set! ret i [array/ref a i]]]]
+      (def ret (array/allocate (array/length a)))
+      (dotimes (i (array/length a) ret)
+               (array/set! ret i (array/ref a i))))
 
-[defn array/reduce [arr fun α]
-      "Reduce an array, [reduce] should be preferred"
-      [def len [array/length arr]]
-      [dotimes [i len α]
-               [set! α [fun α [array/ref arr i]]]]]
+(defn array/reduce (arr fun α)
+      "Reduce an array, (reduce) should be preferred"
+      (def len (array/length arr))
+      (dotimes (i len α)
+               (set! α (fun α (array/ref arr i)))))
 
-[defn array/map [arr fun]
-      "Map an array, [map] should be preferred"
-      [def len [array/length arr]]
-      [dotimes [i len arr]
-               [array/set! arr i [fun [array/ref arr i]]]]]
+(defn array/map (arr fun)
+      "Map an array, (map) should be preferred"
+      (def len (array/length arr))
+      (dotimes (i len arr)
+               (array/set! arr i (fun (array/ref arr i)))))
 
-[defn array/filter [arr pred]
-      "Filter an array, [filter] should be preferred"
-      [def ri 0]
-      [def len [array/length arr]]
-      [def ret [array/allocate len]]
-      [dotimes [ai len [array/length! ret ri]]
-               [when [pred [array/ref arr ai]]
-                     [array/set! ret ri [array/ref arr ai]]
-                     [inc! ri]]]]
+(defn array/filter (arr pred)
+      "Filter an array, (filter) should be preferred"
+      (def ri 0)
+      (def len (array/length arr))
+      (def ret (array/allocate len))
+      (dotimes (ai len (array/length! ret ri))
+               (when (pred (array/ref arr ai))
+                     (array/set! ret ri (array/ref arr ai))
+                     (inc! ri))))
 
-[defn array/equal? [a b]
-      [if [or [not [array? a]]
-              [not [array? b]]
-              [not= [array/length a]
-                    [array/length b]]]
-          [return #f]
-          [dotimes [i [array/length a] #t]
-                   [when-not [equal? [array/ref a i]
-                                     [array/ref b i]]
-                             [return #f]]]]]
+(defn array/equal? (a b)
+      (if (or (not (array? a))
+              (not (array? b))
+              (not= (array/length a)
+                    (array/length b)))
+          (return #f)
+          (dotimes (i (array/length a) #t)
+                   (when-not (equal? (array/ref a i)
+                                     (array/ref b i))
+                             (return #f)))))
 
-[defn array/push [arr val]
+(defn array/push (arr val)
       "Append VAL to ARR"
-      [-> arr
-          [array/length! [+ 1 [array/length arr]]]
-          [array/set! [- [array/length arr] 1] val]]]
+      (-> arr
+          (array/length! (+ 1 (array/length arr)))
+          (array/set! (- (array/length arr) 1) val)))
 
-[defn array/swap [arr i j]
+(defn array/swap (arr i j)
       "Swap values at I and J in ARR"
-      [def tmp [array/ref arr i]]
-      [-> arr
-          [array/set! i [array/ref arr j]]
-          [array/set! j tmp]]]
+      (def tmp (array/ref arr i))
+      (-> arr
+          (array/set! i (array/ref arr j))
+          (array/set! j tmp)))
 
-[def array/heap-sort [let*
-                       [defn array/heapify [arr n at]
+(def array/heap-sort (let*
+                       (defn array/heapify (arr n at)
                              "bubble up the element from index AT to until the max-heap property is satisfied"
-                             [def top at]
-                             [def looping #t]
-                             [while looping
-                               [def l [+ [bit-shift-left at 1] 1]]
-                               [def r [+ [bit-shift-left at 1] 2]]
-                               [when [and [< l n] [> [array/ref arr l] [array/ref arr top]]]
-                                 [set! top l]]
-                               [when [and [< r n] [> [array/ref arr r] [array/ref arr top]]]
-                                 [set! top r]]
-                               [if [= top at]
-                                   [set! looping #f]
-                                   [do [array/swap arr at top]
-                                       [set! at top]]]]
-                             [return arr]]
+                             (def top at)
+                             (def looping #t)
+                             (while looping
+                               (def l (+ (bit-shift-left at 1) 1))
+                               (def r (+ (bit-shift-left at 1) 2))
+                               (when (and (< l n) (> (array/ref arr l) (array/ref arr top)))
+                                 (set! top l))
+                               (when (and (< r n) (> (array/ref arr r) (array/ref arr top)))
+                                 (set! top r))
+                               (if (= top at)
+                                   (set! looping #f)
+                                   (do (array/swap arr at top)
+                                       (set! at top))))
+                             (return arr))
 
-                       [defn array/make-heap [arr]
-                             [def l [array/length arr]]
-                             [def l2 [div/int l 2]]
-                             [while [>= l2 0]
-                               [array/heapify arr l l2]
-                               [dec! l2]]
-                             [return arr]]
+                       (defn array/make-heap (arr)
+                             (def l (array/length arr))
+                             (def l2 (div/int l 2))
+                             (while (>= l2 0)
+                               (array/heapify arr l l2)
+                               (dec! l2))
+                             (return arr))
 
-                       [defn array/heap-sort [arr]
-                             [array/make-heap arr]
-                             [def l [array/length arr]]
-                             [while [> l 0]
-                               [dec! l]
-                               [array/swap arr 0 l]
-                               [array/heapify arr l 0]]
-                             [return arr]]]]
+                       (defn array/heap-sort (arr)
+                             (array/make-heap arr)
+                             (def l (array/length arr))
+                             (while (> l 0)
+                               (dec! l)
+                               (array/swap arr 0 l)
+                               (array/heapify arr l 0))
+                             (return arr))))
 
-[def array/sort array/heap-sort]
+(def array/sort array/heap-sort)
 
-[defn array/cut [arr start end]
+(defn array/cut (arr start end)
       "Return a newly allocated array with the values of ARR from START to END"
-      [set! start [max 0 start]]
-      [set! end [min [array/length arr] end]]
-      [def ret [array/allocate [max 0 [- end start]]]]
-      [def i start]
-      [while [< i end]
-             [array/set! ret [- i start] [array/ref arr i]]
-             [set! i [add/int i 1]]]
-      [return ret]]
+      (set! start (max 0 start))
+      (set! end (min (array/length arr) end))
+      (def ret (array/allocate (max 0 (- end start))))
+      (def i start)
+      (while (< i end)
+             (array/set! ret (- i start) (array/ref arr i))
+             (set! i (add/int i 1)))
+      (return ret))

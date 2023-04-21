@@ -7,183 +7,183 @@
 | file for the viewer.
 |#
 
-[import [blue green yellow] :ansi]
-[import [serialize :as val->json] :serialization/json]
+(import (blue green yellow) :ansi)
+(import (serialize :as val->json) :serialization/json)
 
 
-[def time-path [popen/trim "which time"]]
+(def time-path (popen/trim "which time"))
 
-[def single-runs 8]
-[def nujel-runs  8]
-[def git-head [popen/trim "git rev-parse HEAD"]]
-[def git-branch [popen/trim "git rev-parse --abbrev-ref HEAD"]]
-[def uname-a [popen/trim "uname -a"]]
-[def date [popen/trim "git show -s --format=%cI"]] ; Would be nice if this could be done as easily in Nujel
-[def rough-date [popen/trim "git show -s --format=%cs"]]
-[def hostname [popen/trim "uname -n"]]
+(def single-runs 8)
+(def nujel-runs  8)
+(def git-head (popen/trim "git rev-parse HEAD"))
+(def git-branch (popen/trim "git rev-parse --abbrev-ref HEAD"))
+(def uname-a (popen/trim "uname -a"))
+(def date (popen/trim "git show -s --format=%cI")) ; Would be nice if this could be done as easily in Nujel
+(def rough-date (popen/trim "git show -s --format=%cs"))
+(def hostname (popen/trim "uname -n"))
 
-[defn bench/get-language [filename]
-      [case [lower-case [path/extension filename]]
-            ["lisp" :common-lisp]
-            ["newlisp" :newlisp]
-            ["el" :emacs-lisp]
-            ["be" :berry]
-            ["c" :c]
-            ["dart" :dart]
-            ["erl" :erlang]
-            ["jnt" :janet]
-            ["js" :javascript]
-            ["krk" :kuroko]
-            ["lua" :lua]
-            ["jl" :julia]
-            ["nuj" :nujel]
-            ["pl" :perl]
-            ["php" :php]
-            ["py" :python]
-            ["rkt" :racket]
-            ["zuo" :zuo]
-            ["rby" :ruby]
-            ["scm" :scheme]
-            [otherwise #nil]]]
+(defn bench/get-language (filename)
+      (case (lower-case (path/extension filename))
+            ("lisp" :common-lisp)
+            ("newlisp" :newlisp)
+            ("el" :emacs-lisp)
+            ("be" :berry)
+            ("c" :c)
+            ("dart" :dart)
+            ("erl" :erlang)
+            ("jnt" :janet)
+            ("js" :javascript)
+            ("krk" :kuroko)
+            ("lua" :lua)
+            ("jl" :julia)
+            ("nuj" :nujel)
+            ("pl" :perl)
+            ("php" :php)
+            ("py" :python)
+            ("rkt" :racket)
+            ("zuo" :zuo)
+            ("rby" :ruby)
+            ("scm" :scheme)
+            (otherwise #nil)))
 
-[defn bench/get-language-runtimes [language]
-      [case language
-            [:c '["tcc -run"]]
-            [:berry '["berry"]]
-            [:common-lisp '["ecl --shell" "clisp" "sbcl --script" "ccl -n -l"]]
-            [:newlisp '["newlisp"]]
-            [:emacs-lisp '["emacs -Q --script"]]
-            [:dart '["dart"]]
-            [:erlang '["escript"]]
-            [:janet '["janet"]]
-            [:javascript '["node" "qjs" "deno run" "duk" "mujs" "js78" "js91" "bun"]]
-            [:kuroko '["kuroko"]]
-            [:lua '["lua" "luajit" "luau"]]
-            [:julia '["julia"]]
-            [:nujel '["./nujel"]]
-            [:perl '["perl"]]
-            [:php '["php"]]
-            [:python '["python" "pypy"]]
-            [:racket '["racket"]]
-            [:zuo '["zuo"]]
-            [:ruby '["ruby" "mruby"]]
-            [:scheme '["guile" "stklos -f" "chibi-scheme -q" "gosh" "chez --script" "scheme48" "s7" "mit-scheme-script"]]
-            [otherwise '[]]]]
+(defn bench/get-language-runtimes (language)
+      (case language
+            (:c '("tcc -run"))
+            (:berry '("berry"))
+            (:common-lisp '("ecl --shell" "clisp" "sbcl --script" "ccl -n -l"))
+            (:newlisp '("newlisp"))
+            (:emacs-lisp '("emacs -Q --script"))
+            (:dart '("dart"))
+            (:erlang '("escript"))
+            (:janet '("janet"))
+            (:javascript '("node" "qjs" "deno run" "duk" "mujs" "js78" "js91" "bun"))
+            (:kuroko '("kuroko"))
+            (:lua '("lua" "luajit" "luau"))
+            (:julia '("julia"))
+            (:nujel '("./nujel"))
+            (:perl '("perl"))
+            (:php '("php"))
+            (:python '("python" "pypy"))
+            (:racket '("racket"))
+            (:zuo '("zuo"))
+            (:ruby '("ruby" "mruby"))
+            (:scheme '("guile" "stklos -f" "chibi-scheme -q" "gosh" "chez --script" "scheme48" "s7" "mit-scheme-script"))
+            (otherwise '())))
 
-[defn bench/get-runtime-version [runtime]
-      [case [car [split runtime " "]]
-            ["clisp" [popen/trim "bash -c \"clisp -q -norc --version 2>/dev/null\""]]
-            ["ecl" [popen/trim "bash -c \"ecl --version 2>&1\""]]
-            ["s9" [popen/trim "bash -c \"s9 -? 2>&1 | head -n 2\""]]
-            ["deno" [popen/trim "bash -c \"deno --version 2>&1\""]]
-            ["qjs" [popen/trim "bash -c \"qjs -h 2>&1\""]]
-            ["newlisp" [popen/trim "bash -c \"newlisp -v 2>&1\""]]
-            ["kuroko" [popen/trim "bash -c \"kuroko --version 2>&1\""]]
-            ["escript" [popen/trim "bash -c \"erl -version 2>&1\""]]
-            ["node" [popen/trim "bash -c \"node --version 2>&1\""]]
-            [["lua" "luajit"] [popen/trim [fmt "bash -c \"{runtime} -v 2>&1\""]]]
-            ["perl" [popen/trim "bash -c \"perl --version 2>&1\""]]
-            ["php" [popen/trim "bash -c \"php --version 2>&1\""]]
-            ["python" [popen/trim "bash -c \"python --version 2>&1\""]]
-            ["pypy" [popen/trim "bash -c \"pypy --version 2>&1\""]]
-            ["racket" [popen/trim "bash -c \"racket --version 2>&1\""]]
-            ["ruby" [popen/trim "bash -c \"ruby --version 2>&1\""]]
-            ["guile" [popen/trim "bash -c \"guile --version 2>&1\""]]
-            ["chibi-scheme" [popen/trim "bash -c \"chibi-scheme --version 2>&1\""]]
-            ["gosh" [popen/trim "bash -c \"gosh -V 2>&1\""]]
-            ["berry" [popen/trim "bash -c \"berry - 2>&1\""]]
-            [otherwise [fmt "{runtime}-unknown"]]]]
+(defn bench/get-runtime-version (runtime)
+      (case (car (split runtime " "))
+            ("clisp" (popen/trim "bash -c \"clisp -q -norc --version 2>/dev/null\""))
+            ("ecl" (popen/trim "bash -c \"ecl --version 2>&1\""))
+            ("s9" (popen/trim "bash -c \"s9 -? 2>&1 | head -n 2\""))
+            ("deno" (popen/trim "bash -c \"deno --version 2>&1\""))
+            ("qjs" (popen/trim "bash -c \"qjs -h 2>&1\""))
+            ("newlisp" (popen/trim "bash -c \"newlisp -v 2>&1\""))
+            ("kuroko" (popen/trim "bash -c \"kuroko --version 2>&1\""))
+            ("escript" (popen/trim "bash -c \"erl -version 2>&1\""))
+            ("node" (popen/trim "bash -c \"node --version 2>&1\""))
+            (("lua" "luajit") (popen/trim (fmt "bash -c \"{runtime} -v 2>&1\"")))
+            ("perl" (popen/trim "bash -c \"perl --version 2>&1\""))
+            ("php" (popen/trim "bash -c \"php --version 2>&1\""))
+            ("python" (popen/trim "bash -c \"python --version 2>&1\""))
+            ("pypy" (popen/trim "bash -c \"pypy --version 2>&1\""))
+            ("racket" (popen/trim "bash -c \"racket --version 2>&1\""))
+            ("ruby" (popen/trim "bash -c \"ruby --version 2>&1\""))
+            ("guile" (popen/trim "bash -c \"guile --version 2>&1\""))
+            ("chibi-scheme" (popen/trim "bash -c \"chibi-scheme --version 2>&1\""))
+            ("gosh" (popen/trim "bash -c \"gosh -V 2>&1\""))
+            ("berry" (popen/trim "bash -c \"berry - 2>&1\""))
+            (otherwise (fmt "{runtime}-unknown"))))
 
-[defn runtime/available? [runtime]
-      [def executable [car [split runtime " "]]]
-      [zero? [car [popen [fmt "command -v {executable}"]]]]]
+(defn runtime/available? (runtime)
+      (def executable (car (split runtime " ")))
+      (zero? (car (popen (fmt "command -v {executable}")))))
 
-[defn get-result [testcase]
-      [case testcase
-            ["for" "49999995000000"]
-            ["hello" "Hello"]
-            ["euler1" "23333331666668"]
-            ["euler4" "906609"]
-            [otherwise "チーズスイートホーム"]]]
+(defn get-result (testcase)
+      (case testcase
+            ("for" "49999995000000")
+            ("hello" "Hello")
+            ("euler1" "23333331666668")
+            ("euler4" "906609")
+            (otherwise "チーズスイートホーム")))
 
-[def time-template "#@[:user %U :system %S :elapsed \\\"%E\\\" :cpu \\\"%P\\\" :text %X :data %D :max-resident %M :inputs %I :outputs %O :pagefaults-major %F :pagefaults-minor %R :swaps %W]"]
-[defn bench/single [filename runtime i]
-      [def language [bench/get-language filename]]
-      [when-not [runtime/available? runtime]
-                [when [zero? i]
-                      [pfmt "{} {} Runtime not found"
-                            [blue [pad-end language 14]]
-                            [yellow [pad-end runtime 20]]]]
-                [return #nil]]
-      [when [zero? i]
-            [pfmt "{} {} "
-                  [blue [pad-end language 14]]
-                  [green [pad-end runtime 20]]]]
-      [when [>= i 0] [pfmt "{i} "]]
-      [when-not [file/file? filename]
-                [exception :io-error "Can't open the following file to benchmark it:" filename]]
-      [def result-file "nujel-benchmark.tmp"]
-      [def measurements #nil]
-      [def testcase [cadr [split filename "/"]]]
-      [try [fn [err]
-               [file/remove result-file]
-             [print/error err]
-             [throw err]]
-           [def ret [popen [fmt "{} -o {result-file} --format=\"{time-template}\" {runtime} {filename}" time-path]]]
-           [when-not [zero? [car ret]]
-                     [exception :benchmark-error "Benchmark returned non-zero exit code" [cons filename ret]]]
-           [when-not [>= [index-of [cdr ret] [get-result testcase]] 0]
-                     [exception :benchmark-error "Benchmark returned wrong result" [cons filename ret]]]
-           [set! measurements [tree/dup [read/single [file/read result-file]]]]
-           [tree/set! measurements :stdout [cdr ret]]
-           [file/remove result-file]]
-      [when-not measurements [return #nil]]
-      [-> measurements
-          [tree/set! :language [bench/get-language filename]]
-          [tree/set! :git-head git-head]
-          [tree/set! :git-branch git-branch]
-          [tree/set! :uname uname-a]
-          [tree/set! :architecture System/Architecture]
-          [tree/set! :hostname hostname]
-          [tree/set! :os System/OS]
-          [tree/set! :time [time]]
-          [tree/set! :triplet [fmt "{testcase}-{hostname}-{System/Architecture}"]]
-          [tree/set! :testcase testcase]
-          [tree/set! :total [+ [ref measurements :user] [ref measurements :system]]]
-          [tree/set! :date date]
-          [tree/set! :runtime runtime]
-          [tree/set! :runtime-version [bench/get-runtime-version runtime]]
-          [tree/set! :filename filename]]]
+(def time-template "#@(:user %U :system %S :elapsed \\\"%E\\\" :cpu \\\"%P\\\" :text %X :data %D :max-resident %M :inputs %I :outputs %O :pagefaults-major %F :pagefaults-minor %R :swaps %W)")
+(defn bench/single (filename runtime i)
+      (def language (bench/get-language filename))
+      (when-not (runtime/available? runtime)
+                (when (zero? i)
+                      (pfmt "{} {} Runtime not found"
+                            (blue (pad-end language 14))
+                            (yellow (pad-end runtime 20))))
+                (return #nil))
+      (when (zero? i)
+            (pfmt "{} {} "
+                  (blue (pad-end language 14))
+                  (green (pad-end runtime 20))))
+      (when (>= i 0) (pfmt "{i} "))
+      (when-not (file/file? filename)
+                (exception :io-error "Can't open the following file to benchmark it:" filename))
+      (def result-file "nujel-benchmark.tmp")
+      (def measurements #nil)
+      (def testcase (cadr (split filename "/")))
+      (try (fn (err)
+               (file/remove result-file)
+             (print/error err)
+             (throw err))
+           (def ret (popen (fmt "{} -o {result-file} --format=\"{time-template}\" {runtime} {filename}" time-path)))
+           (when-not (zero? (car ret))
+                     (exception :benchmark-error "Benchmark returned non-zero exit code" (cons filename ret)))
+           (when-not (>= (index-of (cdr ret) (get-result testcase)) 0)
+                     (exception :benchmark-error "Benchmark returned wrong result" (cons filename ret)))
+           (set! measurements (tree/dup (read/single (file/read result-file))))
+           (tree/set! measurements :stdout (cdr ret))
+           (file/remove result-file))
+      (when-not measurements (return #nil))
+      (-> measurements
+          (tree/set! :language (bench/get-language filename))
+          (tree/set! :git-head git-head)
+          (tree/set! :git-branch git-branch)
+          (tree/set! :uname uname-a)
+          (tree/set! :architecture System/Architecture)
+          (tree/set! :hostname hostname)
+          (tree/set! :os System/OS)
+          (tree/set! :time (time))
+          (tree/set! :triplet (fmt "{testcase}-{hostname}-{System/Architecture}"))
+          (tree/set! :testcase testcase)
+          (tree/set! :total (+ (ref measurements :user) (ref measurements :system)))
+          (tree/set! :date date)
+          (tree/set! :runtime runtime)
+          (tree/set! :runtime-version (bench/get-runtime-version runtime))
+          (tree/set! :filename filename)))
 
-[defn bench/file [ret filename]
-      [when-not filename [return ret]]
-      [def language [bench/get-language filename]]
-      [and [tree/has? init/options :only-nujel]
-           [not= language :nujel]
-           [return ret]]
-      [def cur-runs [if [= language :nujel]
+(defn bench/file (ret filename)
+      (when-not filename (return ret))
+      (def language (bench/get-language filename))
+      (and (tree/has? init/options :only-nujel)
+           (not= language :nujel)
+           (return ret))
+      (def cur-runs (if (= language :nujel)
                         nujel-runs
-                        single-runs]]
-      [doseq [runtime [bench/get-language-runtimes language]]
-             [when-not runtime [return ret]]
-             [when [> cur-runs 0]
-                   [bench/single filename runtime -1] ; Ignore the first run as a warm-up
-                   [dotimes [i cur-runs]
-                            [set! ret [cons [bench/single filename runtime i] ret]]]
-                   [println ""]]]
-      ret]
+                        single-runs))
+      (doseq (runtime (bench/get-language-runtimes language))
+             (when-not runtime (return ret))
+             (when (> cur-runs 0)
+                   (bench/single filename runtime -1) ; Ignore the first run as a warm-up
+                   (dotimes (i cur-runs)
+                            (set! ret (cons (bench/single filename runtime i) ret)))
+                   (println "")))
+      ret)
 
-[def res-name [fmt "{rough-date}-{hostname}-{git-head}"]]
-[def out-name [fmt "web/benchmark-results/{}.json" res-name]]
-[directory/make "web/benchmark-results"]
+(def res-name (fmt "{rough-date}-{hostname}-{git-head}"))
+(def out-name (fmt "web/benchmark-results/{}.json" res-name))
+(directory/make "web/benchmark-results")
 
-[and [tree/has? init/options :no-overwrite]
-     [file/file? out-name]
-     [do [pfmtln "{out-name} exists already, exiting."]
-         [exit 0]]]
+(and (tree/has? init/options :no-overwrite)
+     (file/file? out-name)
+     (do (pfmtln "{out-name} exists already, exiting.")
+         (exit 0)))
 
-[-> [directory/read-recursive "benchmark"]
-    [sort]
-    [reduce bench/file #nil]
-    [val->json]
-    [file/write out-name]]
+(-> (directory/read-recursive "benchmark")
+    (sort)
+    (reduce bench/file #nil)
+    (val->json)
+    (file/write out-name))

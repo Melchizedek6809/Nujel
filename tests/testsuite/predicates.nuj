@@ -1,177 +1,177 @@
-[#t [> 5 1]]
-[#t [>= 5 5]]
-[#t [<= 5 5]]
-[#t [= #t #t]]
-[#t [= 2 2]]
-[#t [neg? -1]]
-[#t [neg? -0.01]]
-[#t [pos? 0]]
-[#t [pos? 0.01]]
-[#t [not [neg? 0]]]
-[#t [not [pos? -0.01]]]
-[#f [pos? "asd"]]
-[#f [neg? "asd"]]
-[#f [pos? #t]]
-[#f [neg? #f]]
-[#t [zero? 0]]
-[#t [> 3.1 2.1]]
-[#t [> 3 2]]
-[#f [>= 4 "3"]]
-[#t [>= 3 3]]
-[#t [<= 3 3]]
-[#t [and [not [< 3 2]] [zero? 0] [> 3.1 2.1] [> 3 2] [not [>= 4 "3"]] [>= 3 3] [<= 3 3] [not [>= "2" 3]]]]
-[#t [even? 2]]
-[#f [even? 9]]
-[#t [odd? 7]]
-[#f [odd? 4]]
-[#t [zero-neg?    0]]
-[#t [zero-neg? -4.0]]
-[#f [zero-neg?  0.1]]
-[#t [list/equal? '[] '[]]]
-[#f [list/equal? '[] '[1]]]
-[#f [list/equal? '[1] '[]]]
-[#t [list/equal? '[1 "asd"] '[1 "asd"]]]
-[#f [list/equal? '[1 "asd"] '[1 "as"]]]
-[#f [list/equal? '[1 :asd] '[1 :as]]]
-[#t [list/equal? '[1 :asd] '[1 :asd]]]
-[#t [list/equal? '[1 asd] '[1 asd]]]
-[#t [list/equal? '[1 #f] '[1 #f]]]
-[#f [list/equal? '[1 #t] '[1 #f]]]
-[#t [list/equal? '[1 2 3] '[1 2 3]]]
-[#f [list/equal? '[1 2 3] '[1 2 4]]]
-[#f [list/equal? '[1 2 3] '[1 2]]]
-[#f [list/equal? '[1 2 3] '[1 2 [3 4]]]]
-[#t [list/equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
-[#t [list/equal? '[1 2 [3 4]] '[1 2 [3 4]]]]
-[#t [< 1 10]]
-[#f [> 1 10]]
-[#t [> 10 1]]
-[#f [< 10 1]]
-[#t [not= 1 10]]
-[#f [not= 1 1]]
-[#f [= 1 10]]
-[#t [= 1 1]]
-[#t [>= 1 1]]
-[#t [<= 1 1]]
-[#t [<= 1 4]]
-[#t [>= 4 1]]
-[#t [= #nil #nil]]
-[#t [= #t #t]]
-[#f [= #t #f]]
-[#t [= #f #f]]
-[#f [= '[] #f]]
-[#f [= #f '[]]]
-[#f [= '[] #t]]
-[#f [= #t '[]]]
-[#t [= '[] '[]]]
-[#f [= '[] '[1]]]
-[#f [= '[1] '[1]]]
-[#t [list/equal? '[1] '[1]]]
-[#f [= '[] #nil]]
-["test" [meta [fn [] :inline "test" [+ 1 2] "I hope"] :documentation]]
-["this\nis\na\n\ntest\nof\nmultiline\ndocstrings" [meta [fn [] "this" "is" "a" "" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :documentation]]
-[#t [meta [fn [] "this" "is" "a" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :inline]]
-[#nil [meta [fn [] "this" "is" "a" "test" :inline "of" "multiline" "docstrings" [+ 1 2] "I hope"] :outline]]
-[#t [macro? cond]]
-[#f [macro? min]]
-[#f [macro? 123]]
-[#t [in-range? 3 1 5]]
-[#f [in-range? -3 1 5]]
-[#f [in-range? 9 1 5]]
-[#t [in-range? -3 -10 5]]
-[#t [in-range? -3.0 -10.0 5.0]]
-[#t [[path/ext?! "nuj"] "tests.nuj"]]
-[#f [[path/ext?! "nuj"] "tests.nu"]]
-[#t [resolves? '+]]
-[#t [resolves? 'map]]
-[#t [resolves? 'π]]
-[#f [resolves? :asd]]
-[#f [resolves? 'asdqwe]]
-[#t [tree? @[:asd 123]]]
-[#f [tree? #[123]]]
-[#f [tree? '[:asd 123]]]
-[#f [tree? #nil]]
-[#f [tree? 123]]
-[#f [tree? "asd"]]
-[#f [tree? #t]]
-[#t [tree? [closure/data min]]]
-[#t [last? '[]]]
-[#t [last? '[1]]]
-[#f [last? '[1 2]]]
-[#t [native? +]]
-[#f [native? min]]
-[#f [lambda? +]]
-[#t [lambda? min]]
-[#f [> #nil 1.0]]
-[#f [> #nil 1]]
-[#f [> #nil 0]]
-[#f [> #nil -1]]
-[#f [> #nil -1.0]]
-[#f [< #nil 1.0]]
-[#f [< #nil 1]]
-[#f [< #nil 0]]
-[#f [< #nil -1]]
-[#f [< #nil -1.0]]
-[#f [= #nil 1]]
-[#f [= #nil 0]]
-[#f [= #nil -1]]
-[#t [case 'quote [['quote] #t] [otherwise #f]]]
-[#t [case 'quote ['quote #t] [otherwise #f]]]
-[#t [case 'otherwise [['otherwise] #t] [otherwise #f]]]
-[#t [case 'otherwise ['otherwise #t] [otherwise #f]]]
-[#f [= 0 'asd]]
-[#f [= 0 :asd]]
-[#f [= 0 "asd"]]
-[#f [= 0 #f]]
-[#f [= 0 #t]]
-[#f [= 0 0.1]]
-[#f [= 0 #[0]]]
-[#f [= 0 @[:asd 0]]]
-[#f [= 0.0 'asd]]
-[#f [= 0.0 :asd]]
-[#f [= 0.0 "asd"]]
-[#f [= 0.0 #f]]
-[#f [= 0.0 #t]]
-[#f [= 0.0 0.1]]
-[#f [= 0.0 #[0]]]
-[#f [= 0.0 @[:asd 0]]]
-[#t [tree/equal? @[:a 1] @[:a 1]]]
-[#t [tree/equal? @[:a 1 :b 2] @[:a 1 :b 2]]]
-[#f [tree/equal? @[:a 1 :b 2] @[:a 1 :b 3]]]
-[#f [tree/equal? @[:a 1 :b 2] @[:c 1 :b 2]]]
-[#f [tree/equal? @[:a 1 :b 2] @[:b 1 :b 2]]]
-[#t [procedure? car]]
-[#t [procedure? cos]]
-[#t [procedure? procedure?]]
-[#t [keyword? [read/single ":asd"]]]
-[#t [keyword? [read/single "asd:"]]]
-[#t [keyword? [read/single ":asd:"]]]
-[#t [= :asd asd:]]
-[#t [= :asd :asd:]]
-[#t [symbol? 'asd]]
-[#t [keyword? :asd]]
-[#t [symbol? [gensym]]]
-[#t [not= [gensym] [gensym]]]
-[#f [symbol? 123]]
-[#f [symbol? "asd"]]
-[#f [symbol? #[123 'asd]]]
-[#f [symbol? @[:a 123]]]
-[#t [= :asd :asd]]
-[#t [= :bool [type-of #f]]]
-[#t [= :int [type-of 123]]]
-[#f [= :int [type-of 123.123]]]
-[#t [= :float [type-of 123.123]]]
-[#t [= :native-function [type-of +]]]
-[#t [= :lambda [type-of describe]]]
-[#t [= :string [type-of "asd"]]]
-[#t [nil? #nil]]
-[#f [nil? "NotNil"]]
-[#t [not [nil? "NotNil"]]]
-[#t [list? '[]]]
-[#t [list? '[1]]]
-[#t [list? '[1 #t "asd"]]]
-[#t [list? '[1 #t "asd" '[]]]]
-[#f [list? '[1 . 3]]]
-[#f [list? #f]]
-[#f [list? #nil]]
-[#f [list? 123]]
+(#t (> 5 1))
+(#t (>= 5 5))
+(#t (<= 5 5))
+(#t (= #t #t))
+(#t (= 2 2))
+(#t (neg? -1))
+(#t (neg? -0.01))
+(#t (pos? 0))
+(#t (pos? 0.01))
+(#t (not (neg? 0)))
+(#t (not (pos? -0.01)))
+(#f (pos? "asd"))
+(#f (neg? "asd"))
+(#f (pos? #t))
+(#f (neg? #f))
+(#t (zero? 0))
+(#t (> 3.1 2.1))
+(#t (> 3 2))
+(#f (>= 4 "3"))
+(#t (>= 3 3))
+(#t (<= 3 3))
+(#t (and (not (< 3 2)) (zero? 0) (> 3.1 2.1) (> 3 2) (not (>= 4 "3")) (>= 3 3) (<= 3 3) (not (>= "2" 3))))
+(#t (even? 2))
+(#f (even? 9))
+(#t (odd? 7))
+(#f (odd? 4))
+(#t (zero-neg?    0))
+(#t (zero-neg? -4.0))
+(#f (zero-neg?  0.1))
+(#t (list/equal? '() '()))
+(#f (list/equal? '() '(1)))
+(#f (list/equal? '(1) '()))
+(#t (list/equal? '(1 "asd") '(1 "asd")))
+(#f (list/equal? '(1 "asd") '(1 "as")))
+(#f (list/equal? '(1 :asd) '(1 :as)))
+(#t (list/equal? '(1 :asd) '(1 :asd)))
+(#t (list/equal? '(1 asd) '(1 asd)))
+(#t (list/equal? '(1 #f) '(1 #f)))
+(#f (list/equal? '(1 #t) '(1 #f)))
+(#t (list/equal? '(1 2 3) '(1 2 3)))
+(#f (list/equal? '(1 2 3) '(1 2 4)))
+(#f (list/equal? '(1 2 3) '(1 2)))
+(#f (list/equal? '(1 2 3) '(1 2 (3 4))))
+(#t (list/equal? '(1 2 (3 4)) '(1 2 (3 4))))
+(#t (list/equal? '(1 2 (3 4)) '(1 2 (3 4))))
+(#t (< 1 10))
+(#f (> 1 10))
+(#t (> 10 1))
+(#f (< 10 1))
+(#t (not= 1 10))
+(#f (not= 1 1))
+(#f (= 1 10))
+(#t (= 1 1))
+(#t (>= 1 1))
+(#t (<= 1 1))
+(#t (<= 1 4))
+(#t (>= 4 1))
+(#t (= #nil #nil))
+(#t (= #t #t))
+(#f (= #t #f))
+(#t (= #f #f))
+(#f (= '() #f))
+(#f (= #f '()))
+(#f (= '() #t))
+(#f (= #t '()))
+(#t (= '() '()))
+(#f (= '() '(1)))
+(#f (= '(1) '(1)))
+(#t (list/equal? '(1) '(1)))
+(#f (= '() #nil))
+("test" (meta (fn () :inline "test" (+ 1 2) "I hope") :documentation))
+("this\nis\na\n\ntest\nof\nmultiline\ndocstrings" (meta (fn () "this" "is" "a" "" "test" :inline "of" "multiline" "docstrings" (+ 1 2) "I hope") :documentation))
+(#t (meta (fn () "this" "is" "a" "test" :inline "of" "multiline" "docstrings" (+ 1 2) "I hope") :inline))
+(#nil (meta (fn () "this" "is" "a" "test" :inline "of" "multiline" "docstrings" (+ 1 2) "I hope") :outline))
+(#t (macro? cond))
+(#f (macro? min))
+(#f (macro? 123))
+(#t (in-range? 3 1 5))
+(#f (in-range? -3 1 5))
+(#f (in-range? 9 1 5))
+(#t (in-range? -3 -10 5))
+(#t (in-range? -3.0 -10.0 5.0))
+(#t ((path/ext?! "nuj") "tests.nuj"))
+(#f ((path/ext?! "nuj") "tests.nu"))
+(#t (resolves? '+))
+(#t (resolves? 'map))
+(#t (resolves? 'π))
+(#f (resolves? :asd))
+(#f (resolves? 'asdqwe))
+(#t (tree? @(:asd 123)))
+(#f (tree? #(123)))
+(#f (tree? '(:asd 123)))
+(#f (tree? #nil))
+(#f (tree? 123))
+(#f (tree? "asd"))
+(#f (tree? #t))
+(#t (tree? (closure/data min)))
+(#t (last? '()))
+(#t (last? '(1)))
+(#f (last? '(1 2)))
+(#t (native? +))
+(#f (native? min))
+(#f (lambda? +))
+(#t (lambda? min))
+(#f (> #nil 1.0))
+(#f (> #nil 1))
+(#f (> #nil 0))
+(#f (> #nil -1))
+(#f (> #nil -1.0))
+(#f (< #nil 1.0))
+(#f (< #nil 1))
+(#f (< #nil 0))
+(#f (< #nil -1))
+(#f (< #nil -1.0))
+(#f (= #nil 1))
+(#f (= #nil 0))
+(#f (= #nil -1))
+(#t (case 'quote (('quote) #t) (otherwise #f)))
+(#t (case 'quote ('quote #t) (otherwise #f)))
+(#t (case 'otherwise (('otherwise) #t) (otherwise #f)))
+(#t (case 'otherwise ('otherwise #t) (otherwise #f)))
+(#f (= 0 'asd))
+(#f (= 0 :asd))
+(#f (= 0 "asd"))
+(#f (= 0 #f))
+(#f (= 0 #t))
+(#f (= 0 0.1))
+(#f (= 0 #(0)))
+(#f (= 0 @(:asd 0)))
+(#f (= 0.0 'asd))
+(#f (= 0.0 :asd))
+(#f (= 0.0 "asd"))
+(#f (= 0.0 #f))
+(#f (= 0.0 #t))
+(#f (= 0.0 0.1))
+(#f (= 0.0 #(0)))
+(#f (= 0.0 @(:asd 0)))
+(#t (tree/equal? @(:a 1) @(:a 1)))
+(#t (tree/equal? @(:a 1 :b 2) @(:a 1 :b 2)))
+(#f (tree/equal? @(:a 1 :b 2) @(:a 1 :b 3)))
+(#f (tree/equal? @(:a 1 :b 2) @(:c 1 :b 2)))
+(#f (tree/equal? @(:a 1 :b 2) @(:b 1 :b 2)))
+(#t (procedure? car))
+(#t (procedure? cos))
+(#t (procedure? procedure?))
+(#t (keyword? (read/single ":asd")))
+(#t (keyword? (read/single "asd:")))
+(#t (keyword? (read/single ":asd:")))
+(#t (= :asd asd:))
+(#t (= :asd :asd:))
+(#t (symbol? 'asd))
+(#t (keyword? :asd))
+(#t (symbol? (gensym)))
+(#t (not= (gensym) (gensym)))
+(#f (symbol? 123))
+(#f (symbol? "asd"))
+(#f (symbol? #(123 'asd)))
+(#f (symbol? @(:a 123)))
+(#t (= :asd :asd))
+(#t (= :bool (type-of #f)))
+(#t (= :int (type-of 123)))
+(#f (= :int (type-of 123.123)))
+(#t (= :float (type-of 123.123)))
+(#t (= :native-function (type-of +)))
+(#t (= :lambda (type-of describe)))
+(#t (= :string (type-of "asd")))
+(#t (nil? #nil))
+(#f (nil? "NotNil"))
+(#t (not (nil? "NotNil")))
+(#t (list? '()))
+(#t (list? '(1)))
+(#t (list? '(1 #t "asd")))
+(#t (list? '(1 #t "asd" '())))
+(#f (list? '(1 . 3)))
+(#f (list? #f))
+(#f (list? #nil))
+(#f (list? 123))

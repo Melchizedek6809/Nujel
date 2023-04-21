@@ -1,2 +1,2 @@
 #!/usr/bin/env nujel
-[println "Hello"]
+(println "Hello")

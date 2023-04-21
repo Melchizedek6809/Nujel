@@ -1,18 +1,18 @@
 #!/usr/bin/env nujel
 
-[import [serialize :as val->json] :serialization/json]
+(import (serialize :as val->json) :serialization/json)
 
-[def directories '["binlib" "stdlib" "tests" "testsuite" "tools"]]
-[def output-file "web/filesystem.json"]
+(def directories '("binlib" "stdlib" "tests" "testsuite" "tools"))
+(def output-file "web/filesystem.json")
 
-[-> directories
-    [map directory/read-recursive]
-    [flatten]
-    [filter [path/ext?! "nuj"]]
-    [reduce [fn [a b]
-                [tree/set! a
-                           [string->keyword b]
-                           @[name: b content: [file/read b]]]]]
-    [val->json]
-    [file/write output-file]]
-[println [cat [ref ansi-bg 2] "[JSON]" ansi-bg-reset " " output-file]]
+(-> directories
+    (map directory/read-recursive)
+    (flatten)
+    (filter (path/ext?! "nuj"))
+    (reduce (fn (a b)
+                (tree/set! a
+                           (string->keyword b)
+                           @(name: b content: (file/read b)))))
+    (val->json)
+    (file/write output-file))
+(println (cat (ref ansi-bg 2) "(JSON)" ansi-bg-reset " " output-file))

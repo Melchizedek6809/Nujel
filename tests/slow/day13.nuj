@@ -1,80 +1,80 @@
 #!/usr/bin/env nujel
 
-[require :array/2d]
+(require :array/2d)
 
-[defn fold/load [filename]
-       [def points #nil]
-       [def γ [reduce [split [file/read filename] "\n"]
-                       [fn [α β]
-                         [cond [[zero? [buffer/length β]] α]
-                               [[= [buffer/ref β 0] #\f]
-                                [tree/set! α :folds [cons [split [caddr [split β " "]] "="] [ref α :folds]]]]
-                               [#t [def τ [map [split β ","] read/single]]
-                                   [set! points [cons τ points]]
-                                   [tree/set! α :width  [max [ref α  :width] [+ 1 [car τ]]]]
-                                   [tree/set! α :height [max [ref α :height] [+ 1 [cadr τ]]]]]]]
-                      @[:width 0 :height 0 :folds #nil]]]
-       [tree/set! γ :data [-> [array/allocate [* [ref γ :width] [ref γ :height]]] [array/fill! 0]]]
-       [while points
-              [array/set! [ref γ :data] [+ [caar points] [* [ref γ :width] [cadar points]]] 1]
-              [cdr! points]]
-       [tree/set! γ :folds [reverse [ref γ :folds]]]]
+(defn fold/load (filename)
+       (def points #nil)
+       (def γ (reduce (split (file/read filename) "\n")
+                       (fn (α β)
+                         (cond ((zero? (buffer/length β)) α)
+                               ((= (buffer/ref β 0) #\f)
+                                (tree/set! α :folds (cons (split (caddr (split β " ")) "=") (ref α :folds))))
+                               (#t (def τ (map (split β ",") read/single))
+                                   (set! points (cons τ points))
+                                   (tree/set! α :width  (max (ref α  :width) (+ 1 (car τ))))
+                                   (tree/set! α :height (max (ref α :height) (+ 1 (cadr τ)))))))
+                      @(:width 0 :height 0 :folds #nil)))
+       (tree/set! γ :data (-> (array/allocate (* (ref γ :width) (ref γ :height))) (array/fill! 0)))
+       (while points
+              (array/set! (ref γ :data) (+ (caar points) (* (ref γ :width) (cadar points))) 1)
+              (cdr! points))
+       (tree/set! γ :folds (reverse (ref γ :folds))))
 
-[defn fold-y [data y]
-       [def ret [array/2d/allocate [ref data :width] [div/int [ref data :height] 2]]]
-       [def dh [ref data :height]]
-       [def rw [ref ret :width]]
-       [def rh [ref ret :height]]
+(defn fold-y (data y)
+       (def ret (array/2d/allocate (ref data :width) (div/int (ref data :height) 2)))
+       (def dh (ref data :height))
+       (def rw (ref ret :width))
+       (def rh (ref ret :height))
 
-       [dotimes [y rh]
-       [dotimes [x rw]
-            [array/2d/set! ret x y [+ [array/2d/ref data x y]
-                                      [array/2d/ref data x [- dh y 1]]]]]]
-       [tree/set! ret :folds [cdr [ref data :folds]]]]
+       (dotimes (y rh)
+       (dotimes (x rw)
+            (array/2d/set! ret x y (+ (array/2d/ref data x y)
+                                      (array/2d/ref data x (- dh y 1))))))
+       (tree/set! ret :folds (cdr (ref data :folds))))
 
-[defn fold-x [data y]
-       [def ret [array/2d/allocate [div/int [ref data :width] 2] [ref data :height]]]
-       [def dw [ref data :width]]
-       [def rw [ref ret :width]]
-       [def rh [ref ret :height]]
+(defn fold-x (data y)
+       (def ret (array/2d/allocate (div/int (ref data :width) 2) (ref data :height)))
+       (def dw (ref data :width))
+       (def rw (ref ret :width))
+       (def rh (ref ret :height))
 
-       [dotimes [y rh]
-       [dotimes [x rw]
-            [array/2d/set! ret x y [+ [array/2d/ref data x y]
-                                      [array/2d/ref data [- dw x 1] y]]]]]
-       [tree/set! ret :folds [cdr [ref data :folds]]]]
+       (dotimes (y rh)
+       (dotimes (x rw)
+            (array/2d/set! ret x y (+ (array/2d/ref data x y)
+                                      (array/2d/ref data (- dw x 1) y)))))
+       (tree/set! ret :folds (cdr (ref data :folds))))
 
-[defn do-fold [α]
-       [if [= [caar [ref α :folds]] "x"]
-           [fold-x α [cadr [ref α :folds]]]
-           [fold-y α [cadr [ref α :folds]]]]]
+(defn do-fold (α)
+       (if (= (caar (ref α :folds)) "x")
+           (fold-x α (cadr (ref α :folds)))
+           (fold-y α (cadr (ref α :folds)))))
 
-[defn do-all-folds [α]
-       [while [ref α :folds]
-              [set! α [do-fold α]]]
-       α]
+(defn do-all-folds (α)
+       (while (ref α :folds)
+              (set! α (do-fold α)))
+       α)
 
-[defn dot-count [α]
-       [def β [ref α :data]]
-       [def len [array/length β]]
-       [def ret 0]
-       [dotimes [i len ret]
-            [when [> [array/ref β i] 0] [inc! ret]]]]
+(defn dot-count (α)
+       (def β (ref α :data))
+       (def len (array/length β))
+       (def ret 0)
+       (dotimes (i len ret)
+            (when (> (array/ref β i) 0) (inc! ret))))
 
-[defn print-folded [α]
-       [dotimes [y [ref α :height]]
-       [dotimes [x [ref α :width]]
-            [if [zero? [array/2d/ref α x y]]
-                [display "."]
-                [display "#"]]]
-       [newline]]]
-[def res-p1 [dot-count [do-fold [fold/load "tests/slow/day13.input"]]]]
-[def final-map [do-all-folds [fold/load "tests/slow/day13.input"]]]
-[def res-p2 [dot-count final-map]]
+(defn print-folded (α)
+       (dotimes (y (ref α :height))
+       (dotimes (x (ref α :width))
+            (if (zero? (array/2d/ref α x y))
+                (display ".")
+                (display "#")))
+       (newline)))
+(def res-p1 (dot-count (do-fold (fold/load "tests/slow/day13.input"))))
+(def final-map (do-all-folds (fold/load "tests/slow/day13.input")))
+(def res-p2 (dot-count final-map))
 
-[when [not= res-p1 842]
-      [throw [list :wrong-result "Wrong result" res-p1]]]
-[when [not= res-p2 95]
-      [throw [list :wrong-result "Wrong result" res-p2]]]
+(when (not= res-p1 842)
+      (throw (list :wrong-result "Wrong result" res-p1)))
+(when (not= res-p2 95)
+      (throw (list :wrong-result "Wrong result" res-p2)))
 
-[return :success]
+(return :success)

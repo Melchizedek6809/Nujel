@@ -1,57 +1,57 @@
-["##[2 3 4]" [string/write [-> #[1 2 3 4] [delete 1]]]]
-["##[1 2 3 #nil]" [string/write [array/push #[1 2 3]]]]
-["##[1 2 3 \"4\"]" [string/write [array/push #[1 2 3] "4"]]]
-["##[1 2 3 4]" [string/write [array/push #[1 2 3] 4]]]
-["##[1 2 3 5.2]" [string/write [array/push #[1 2 3] 5.2]]]
-[0 [array/length #[]]]
-[1 [array/length #[1]]]
-[4 [array/length #[1 2 3 4]]]
-[2 [array/ref #[1 2 3 4] 1]]
-[3 [array/length [array/allocate 3]]]
-[#t [array/equal? #[1 2 3] #[1 2 3]]]
-[#f [array/equal? #[2 2 3] #[1 2 3]]]
-[#f [array/equal? #[1 2 3] #[1 2 3 4]]]
-[#f [array/equal? #[1 2 3 4] #[1 2 3]]]
-[#t [array/equal? #[1.0 2.0 3.0] #[1.0 2.0 3.0]]]
-[#t [array/equal? #[:a :b :c] #[:a :b :c]]]
-[#f [array/equal? #[:a :b :c] #[:a :b :d]]]
-[#f [array/equal? #["a" "b" "c"] #["a" "b" "d"]]]
-[#t [array/equal? #["a" "b" "c"] #["a" "b" "c"]]]
-[#t [array? #[1 2 3]]]
-[#t [array? [array/allocate 3]]]
-[#f [array? '[1 2 3]]]
-[#f [array? @[:a 1 :b 2 :c 3]]]
-[:type-error [try car [def ein-test-arr #[1 2 3]] [array/ref ein-test-arr 2.2]]]
-[#[99 2 3 4] [let [[cur-arr #[1 2 3 4]]] [array/set! cur-arr 0 99] cur-arr]]
-[#[42 42 42 42 42 42] [array/fill! [array/allocate 6] 42]]
-[3 [def ein-test-arr #[1 2 3]] [array/ref ein-test-arr 2]]
-[3 [def ein-test-arr #[1 2 3]] [array/ref ein-test-arr 2 9] [array/ref ein-test-arr 2]]
-[:out-of-bounds [try car [def testerle #[1 2 3]] [array/ref testerle 4]]]
-[:out-of-bounds [try car [def testerle #[1 2 3]] [array/ref testerle 40000]]]
-[#[1 2 3] [def testerle #[1 2 3]] testerle]
-[:type-error [try car [def testerle #[1 2 3]] [array/ref testerle #t]]]
-[1 [array/ref #[1 2 3] 0]]
-[2 [def arr #[1 2 3]] [array/length! arr 2] [length arr]]
-[3 [def arr #[1 2 3]] [array/length! arr 2] [reduce arr + 0]]
-["##[2 4]" [string/write [filter #[1 2 3 4] even?]]]
-["##[0 0 0]" [string/write [-> [array/allocate 3] [array/fill! 0]]]]
-["##[3 9 0]" [string/write [-> [array/allocate 3] [array/fill! 0] [array/set! 1 9] [array/set! 0 3]]]]
-[10 [def arr #[1 2 3]] [array/length! arr 4] [array/set! arr 3 4] [reduce arr + 0]]
-[10 [-> #[1 2 3] [array/length! 4] [array/set! 3 4] [reduce + 0]]]
-[10 [sum #[1 2 3 4]]]
-["##[#nil]" [string/write [array/set! #[1] 0 #nil]]]
-["##[2]" [string/write [array/set! #[1] 0 2]]]
-["##[#t]" [string/write [array/set! #[1] 0 #t]]]
-["##[#f]" [string/write [array/set! #[1] 0 #f]]]
-["##[1 2 3 4]" [string/write [array/append #[1 2] #[3 4]]]]
-["##[1 2 3]" [string/write [array/append #[1 2] #[3]]]]
-["##[1 2]" [string/write [array/append #[1 2] #[]]]]
-[:type-error [try car [array/append #[1] '[2]]]]
-[:type-error [try car [array/append '[1] #nil]]]
-[:type-error [try car [array/append #[1]]]]
-[:type-error [try car [array/append '[1]]]]
-[:type-error [try car [array/append]]]
-["##[1 2 3]" [string/write [let [[o #[2 2 3]]] [array/set! o 0 1] [array/set! [array/dup o] 0 3] o]]]
-[#f [= #[1] #[1]]]
-[#f [= #[1] #[2]]]
-[#t [let [[a #[1]]] [= a a]]]
+("##(2 3 4)" (string/write (-> #(1 2 3 4) (delete 1))))
+("##(1 2 3 #nil)" (string/write (array/push #(1 2 3))))
+("##(1 2 3 \"4\")" (string/write (array/push #(1 2 3) "4")))
+("##(1 2 3 4)" (string/write (array/push #(1 2 3) 4)))
+("##(1 2 3 5.2)" (string/write (array/push #(1 2 3) 5.2)))
+(0 (array/length #()))
+(1 (array/length #(1)))
+(4 (array/length #(1 2 3 4)))
+(2 (array/ref #(1 2 3 4) 1))
+(3 (array/length (array/allocate 3)))
+(#t (array/equal? #(1 2 3) #(1 2 3)))
+(#f (array/equal? #(2 2 3) #(1 2 3)))
+(#f (array/equal? #(1 2 3) #(1 2 3 4)))
+(#f (array/equal? #(1 2 3 4) #(1 2 3)))
+(#t (array/equal? #(1.0 2.0 3.0) #(1.0 2.0 3.0)))
+(#t (array/equal? #(:a :b :c) #(:a :b :c)))
+(#f (array/equal? #(:a :b :c) #(:a :b :d)))
+(#f (array/equal? #("a" "b" "c") #("a" "b" "d")))
+(#t (array/equal? #("a" "b" "c") #("a" "b" "c")))
+(#t (array? #(1 2 3)))
+(#t (array? (array/allocate 3)))
+(#f (array? '(1 2 3)))
+(#f (array? @(:a 1 :b 2 :c 3)))
+(:type-error (try car (def ein-test-arr #(1 2 3)) (array/ref ein-test-arr 2.2)))
+(#(99 2 3 4) (let ((cur-arr #(1 2 3 4))) (array/set! cur-arr 0 99) cur-arr))
+(#(42 42 42 42 42 42) (array/fill! (array/allocate 6) 42))
+(3 (def ein-test-arr #(1 2 3)) (array/ref ein-test-arr 2))
+(3 (def ein-test-arr #(1 2 3)) (array/ref ein-test-arr 2 9) (array/ref ein-test-arr 2))
+(:out-of-bounds (try car (def testerle #(1 2 3)) (array/ref testerle 4)))
+(:out-of-bounds (try car (def testerle #(1 2 3)) (array/ref testerle 40000)))
+(#(1 2 3) (def testerle #(1 2 3)) testerle)
+(:type-error (try car (def testerle #(1 2 3)) (array/ref testerle #t)))
+(1 (array/ref #(1 2 3) 0))
+(2 (def arr #(1 2 3)) (array/length! arr 2) (length arr))
+(3 (def arr #(1 2 3)) (array/length! arr 2) (reduce arr + 0))
+("##(2 4)" (string/write (filter #(1 2 3 4) even?)))
+("##(0 0 0)" (string/write (-> (array/allocate 3) (array/fill! 0))))
+("##(3 9 0)" (string/write (-> (array/allocate 3) (array/fill! 0) (array/set! 1 9) (array/set! 0 3))))
+(10 (def arr #(1 2 3)) (array/length! arr 4) (array/set! arr 3 4) (reduce arr + 0))
+(10 (-> #(1 2 3) (array/length! 4) (array/set! 3 4) (reduce + 0)))
+(10 (sum #(1 2 3 4)))
+("##(#nil)" (string/write (array/set! #(1) 0 #nil)))
+("##(2)" (string/write (array/set! #(1) 0 2)))
+("##(#t)" (string/write (array/set! #(1) 0 #t)))
+("##(#f)" (string/write (array/set! #(1) 0 #f)))
+("##(1 2 3 4)" (string/write (array/append #(1 2) #(3 4))))
+("##(1 2 3)" (string/write (array/append #(1 2) #(3))))
+("##(1 2)" (string/write (array/append #(1 2) #())))
+(:type-error (try car (array/append #(1) '(2))))
+(:type-error (try car (array/append '(1) #nil)))
+(:type-error (try car (array/append #(1))))
+(:type-error (try car (array/append '(1))))
+(:type-error (try car (array/append)))
+("##(1 2 3)" (string/write (let ((o #(2 2 3))) (array/set! o 0 1) (array/set! (array/dup o) 0 3) o)))
+(#f (= #(1) #(1)))
+(#f (= #(1) #(2)))
+(#t (let ((a #(1))) (= a a)))

@@ -3,93 +3,93 @@
 ;;;
 ;;; Introspection and procedures returning info about the runtime
 
-[defn describe/closure [c i]
+(defn describe/closure (c i)
       :cat :compiler
       :internal
-      [require :ansi]
-      [when c
-            [if [= c root-closure]
-                [cat [cat [int [or i 0]] "# <root environment>"]
-                     "\r\n"]
-                [do [def data [closure/data c]]
-                    [def l [length data]]
-                  [cat [ansi/blue [int [or i 0]] "# "]
-                       [ansi/green [string/write c]]
+      (require :ansi)
+      (when c
+            (if (= c root-closure)
+                (cat (cat (int (or i 0)) "# <root environment>")
+                     "\r\n")
+                (do (def data (closure/data c))
+                    (def l (length data))
+                  (cat (ansi/blue (int (or i 0)) "# ")
+                       (ansi/green (string/write c))
                        " - "
-                       [ansi/yellow [resolve '*module* c]]
+                       (ansi/yellow (resolve '*module* c))
                        " - "
-                       [if [< l 16]
-                           [string/write data]
-                           "-+- Very big tree structure -+-"]
+                       (if (< l 16)
+                           (string/write data)
+                           "-+- Very big tree structure -+-")
                        "\r\n"
-                       [describe/closure [closure/caller c] [+ [int [or i 0]] 1]]]]]]]
+                       (describe/closure (closure/caller c) (+ (int (or i 0)) 1)))))))
 
-[defn stacktrace []
-      [print [describe/closure [closure/caller [current-lambda]]]]]
+(defn stacktrace ()
+      (print (describe/closure (closure/caller (current-lambda)))))
 
-[def print/error [let*
-                   [defn print/error/wrap [i v]
-                         [require :ansi]
-                         [case i
-                               [0 [ansi/red v]]
-                               [2 [string/write v]]
-                               [3 [describe/closure v]]
-                               [otherwise [string v]]]]
+(def print/error (let*
+                   (defn print/error/wrap (i v)
+                         (require :ansi)
+                         (case i
+                               (0 (ansi/red v))
+                               (2 (string/write v))
+                               (3 (describe/closure v))
+                               (otherwise (string v))))
 
-                   [defn print/error/iter [error i]
-                         [if error
-                             [cons [print/error/wrap i [car error]]
-                                   [print/error/iter [cdr error] [+ 1 i]]]
-                             [cons "" #nil]]]
+                   (defn print/error/iter (error i)
+                         (if error
+                             (cons (print/error/wrap i (car error))
+                                   (print/error/iter (cdr error) (+ 1 i)))
+                             (cons "" #nil)))
 
-                   [defn print/error [error]
+                   (defn print/error (error)
                          "Display ERROR in a nice, human readable way"
-                         [print [join [print/error/iter error 0] "\r\n"]]]]]
+                         (print (join (print/error/iter error 0) "\r\n")))))
 
-[defn closure/documentation [o]
-      [meta o :documentation]]
+(defn closure/documentation (o)
+      (meta o :documentation))
 
-[defn closure/cat [o]
-      [or [meta o :cat] :unsorted]]
+(defn closure/cat (o)
+      (or (meta o :cat) :unsorted))
 
-[def describe [let*
-                [defn describe/thing [o]
+(def describe (let*
+                (defn describe/thing (o)
                       "Describe a specific value O"
-                      [import [white] :ansi]
-                      [def documentation [closure/documentation o]]
-                      [def name [closure/name o]]
-                      [pfmt "[{}" [white [closure/name o]]]
-                      [def arguments [closure/arguments o]]
-                      [if [pair? arguments]
-                          [doseq [arg arguments [println "]"]]
-                                 [when arg [pfmt " {arg}"]]]
-                          [pfmt " . {arguments}]"]]
-                      [pfmtln "  {documentation}"]
-                      #nil]
+                      (import (white) :ansi)
+                      (def documentation (closure/documentation o))
+                      (def name (closure/name o))
+                      (pfmt "({}" (white (closure/name o)))
+                      (def arguments (closure/arguments o))
+                      (if (pair? arguments)
+                          (doseq (arg arguments (println ")"))
+                                 (when arg (pfmt " {arg}")))
+                          (pfmt " . {arguments})"))
+                      (pfmtln "  {documentation}")
+                      #nil)
 
-                [defn describe/string [a]
+                (defn describe/string (a)
                       "Descibe whatever value string A resolves to"
-                      [describe/thing [resolve [string->symbol a]]]]
+                      (describe/thing (resolve (string->symbol a))))
 
-                [defn describe [fun] "Describe FUN, if there is documentation available"
-                      [if [string? fun]
-                          [describe/string fun]
-                          [describe/thing fun]]]]]
+                (defn describe (fun) "Describe FUN, if there is documentation available"
+                      (if (string? fun)
+                          (describe/string fun)
+                          (describe/thing fun)))))
 
-[def gensym [let [[gensym/counter 0]]
-                 [defn gensym [prefix]
-                       [inc! gensym/counter]
-                       [string->symbol [cat prefix "ΓεnΣym-" gensym/counter]]]]]
+(def gensym (let ((gensym/counter 0))
+                 (defn gensym (prefix)
+                       (inc! gensym/counter)
+                       (string->symbol (cat prefix "ΓεnΣym-" gensym/counter)))))
 
-[def root-closure [current-closure]]
+(def root-closure (current-closure))
 
-[defmacro deftest l #nil] ; Tests should be skipped when compiling
+(defmacro deftest l #nil) ; Tests should be skipped when compiling
 
-[defmacro comment body
+(defmacro comment body
           "Does nothing, mainly used for commenting out"
           "parts of an expression, but having the sub expressions"
           "be available so you can use them easily via nujel-mode."
           :cat :documentation
-          [deftest #nil [let [x #nil] [comment [set! x #t]] x]]
+          (deftest #nil (let (x #nil) (comment (set! x #t)) x))
 
-          #nil]
+          #nil)

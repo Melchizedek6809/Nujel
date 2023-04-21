@@ -4,44 +4,44 @@
 ;;; Can be used to create C source files for various binary/text files to be
 ;;; included in exceutables
 
-[def hex-cache [array/allocate 256]]
-[dotimes [i 256]
-  [array/set! hex-cache i [fmt "0x{i:02X}, "]]]
+(def hex-cache (array/allocate 256))
+(dotimes (i 256)
+  (array/set! hex-cache i (fmt "0x{i:02X}, ")))
 
-[defn create-c-asset [raw out symbol-name]
+(defn create-c-asset (raw out symbol-name)
       :export
-      [typecheck/only out :lambda]
-      [typecheck/only symbol-name :string]
+      (typecheck/only out :lambda)
+      (typecheck/only symbol-name :string)
 
-      [out 'block-write [fmt "unsigned char {symbol-name}[] = \""]]
-      [dotimes [i [buffer/length raw]]
-               [def c [buffer/ref raw i]]
-               [case c
-                     [#\lf [out 'block-write "\\n\"\n\""]]
-                     [#\cr [out 'block-write "\\r"]]
-                     [#\"  [out 'block-write "\\\""]]
-                     [#\\  [out 'block-write "\\\\"]]
-                     [otherwise [out 'char-write c]]]]
-      [out 'block-write "\";"]
-      [out 'close!]]
+      (out 'block-write (fmt "unsigned char {symbol-name}[] = \""))
+      (dotimes (i (buffer/length raw))
+               (def c (buffer/ref raw i))
+               (case c
+                     (#\lf (out 'block-write "\\n\"\n\""))
+                     (#\cr (out 'block-write "\\r"))
+                     (#\"  (out 'block-write "\\\""))
+                     (#\\  (out 'block-write "\\\\"))
+                     (otherwise (out 'char-write c))))
+      (out 'block-write "\";")
+      (out 'close!))
 
-[defn create-string-asset [in symbol-name]
+(defn create-string-asset (in symbol-name)
       :export
-      [with-string-port out [create-c-asset in out symbol-name]]]
+      (with-string-port out (create-c-asset in out symbol-name)))
 
-[defn main [args]
+(defn main (args)
       :export
-      [def filename [car args]]
-      [def output-file [cadr args]]
-      [def symbol-name [caddr args]]
-      [typecheck/only filename :string]
-      [typecheck/only output-file :string]
-      [typecheck/only symbol-name :string]
-      [def out [make-output-port [file/open-output* output-file :replace]]]
-      [out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n"]
-      [create-c-asset [slurp filename] out symbol-name]]
+      (def filename (car args))
+      (def output-file (cadr args))
+      (def symbol-name (caddr args))
+      (typecheck/only filename :string)
+      (typecheck/only output-file :string)
+      (typecheck/only symbol-name :string)
+      (def out (make-output-port (file/open-output* output-file :replace)))
+      (out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n")
+      (create-c-asset (slurp filename) out symbol-name))
 
-[deftest 2716273128 [import [hash] :crypto/adler32] [hash [compiler/c-asset-packer/create-string-asset "asd" "test"]]]
-[deftest 29 [buffer/length [compiler/c-asset-packer/create-string-asset "asd" "test"]]]
-[deftest 40 [buffer/length [compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret"]]]
-[deftest 535759991 [import [hash] :crypto/adler32] [hash [compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret"]]]
+(deftest 2716273128 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "asd" "test")))
+(deftest 29 (buffer/length (compiler/c-asset-packer/create-string-asset "asd" "test")))
+(deftest 40 (buffer/length (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))
+(deftest 535759991 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))

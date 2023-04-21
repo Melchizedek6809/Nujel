@@ -3,169 +3,169 @@
 ;;;
 ;;; Contains the module system
 
-[def module/cache @[]]
-[def module/store @[]]
-[def module/loader #nil]
+(def module/cache @())
+(def module/store @())
+(def module/loader #nil)
 
-[defn module/save-state []
+(defn module/save-state ()
       :cat :modules
       :internal
-      @[:cache module/cache :loader module/loader]]
+      @(:cache module/cache :loader module/loader))
 
-[defn module/restore-state [c]
+(defn module/restore-state (c)
       :cat :modules
       :internal
-      [set! module/cache [tree/ref c :cache]]
-      [set! module/loader [tree/ref c :loader]]]
+      (set! module/cache (tree/ref c :cache))
+      (set! module/loader (tree/ref c :loader)))
 
-[defn module/qualify-symbol [module-name symbol]
+(defn module/qualify-symbol (module-name symbol)
       :cat :modules
       :internal
-      [case [type-of module-name]
-            [:string [module/qualify-symbol [string->keyword module-name] symbol]]
-            [:keyword [string->symbol [cat [keyword->symbol module-name] "/" [string symbol]]]]
-            [otherwise [exception "Can't qualify that" module-name]]]]
+      (case (type-of module-name)
+            (:string (module/qualify-symbol (string->keyword module-name) symbol))
+            (:keyword (string->symbol (cat (keyword->symbol module-name) "/" (string symbol))))
+            (otherwise (exception "Can't qualify that" module-name))))
 
-[defn require* [module env qualify?]
+(defn require* (module env qualify?)
       :cat :modules
       :internal
-      [def mod [module/load module env]]
-      [when-not mod [exception "Can't load that module" module]]
-      [def exports [resolve 'exports mod]]
-      [doseq [k [tree/keys exports]]
-             [def-in! env
-               [if qualify?
-                   [module/qualify-symbol module [keyword->symbol k]]
-                   [keyword->symbol k]]
-               [tree/ref exports k]]]]
+      (def mod (module/load module env))
+      (when-not mod (exception "Can't load that module" module))
+      (def exports (resolve 'exports mod))
+      (doseq (k (tree/keys exports))
+             (def-in! env
+               (if qualify?
+                   (module/qualify-symbol module (keyword->symbol k))
+                   (keyword->symbol k))
+               (tree/ref exports k))))
 
-[defn module/load/cache [name]
+(defn module/load/cache (name)
       :cat :modules
       :internal
-      [tree/ref module/cache name]]
+      (tree/ref module/cache name))
 
-[defn module/load/store [name]
+(defn module/load/store (name)
       :cat :modules
       :internal
-      [def source [tree/ref module/store name]]
-      [when source
-        [eval-in [environment*] `[defmodule ~name ~@[read source]]]
-        [module/load/cache name]]]
+      (def source (tree/ref module/store name))
+      (when source
+        (eval-in (environment*) `(defmodule ~name ~@(read source)))
+        (module/load/cache name)))
 
-[defn module/load/external [name]
+(defn module/load/external (name)
       :cat :modules
       :internal
-      [doseq [loader module/loader]
-             [def mod [loader name]]
-             [when mod
-               [tree/set! module/cache name mod]
-               [return mod]]]]
+      (doseq (loader module/loader)
+             (def mod (loader name))
+             (when mod
+               (tree/set! module/cache name mod)
+               (return mod))))
 
-[defn module/insert/defer [name module-source]
+(defn module/insert/defer (name module-source)
       :cat :modules
       :internal
-      [tree/set! module/store name module-source]]
+      (tree/set! module/store name module-source))
 
-[defn module/insert [name module]
+(defn module/insert (name module)
       :cat :modules
       :internal
-      [tree/set! module/cache name module]]
+      (tree/set! module/cache name module))
 
-[defn module/resolve-string/join [parts ret]
+(defn module/resolve-string/join (parts ret)
       :cat :modules
       :internal
-      [cond [[not parts] ret]
-            [[or [== "" [car parts]]
-                 [== "." [car parts]]]
-             [module/resolve-string/join [cdr parts] ret]]
-            [[== ".." [car parts]]
-             [when-not [cadr parts]
-                       [exception "Invalid path" parts]]
-             [module/resolve-string/join [cddr parts] ret]]
-            [otherwise [module/resolve-string/join [cdr parts] [cons [car parts] ret]]]]]
+      (cond ((not parts) ret)
+            ((or (== "" (car parts))
+                 (== "." (car parts)))
+             (module/resolve-string/join (cdr parts) ret))
+            ((== ".." (car parts))
+             (when-not (cadr parts)
+                       (exception "Invalid path" parts))
+             (module/resolve-string/join (cddr parts) ret))
+            (otherwise (module/resolve-string/join (cdr parts) (cons (car parts) ret)))))
 
-[defn module/resolve-string [name wd]
+(defn module/resolve-string (name wd)
       :cat :modules
       :internal
-      [def mod-path wd]
-      [def parts [module/resolve-string/join [nreverse [append [split mod-path "/"] [split name "/"]]] #nil]]
-      [string->keyword [join [cons "" parts] "/"]]] ; The cons is for the leading /
+      (def mod-path wd)
+      (def parts (module/resolve-string/join (nreverse (append (split mod-path "/") (split name "/"))) #nil))
+      (string->keyword (join (cons "" parts) "/"))) ; The cons is for the leading /
 
-[defn module/load [name env]
+(defn module/load (name env)
       :cat :modules
       :internal
-      [case [type-of name]
-            [:environment name]
-            [:string [module/load [module/resolve-string name [resolve '*module-path* env]] env]]
-            [:keyword [or [module/load/cache name]
-                          [module/load/store name]
-                          [module/load/external name]]]
-            [otherwise [exception "Can't load that value as a module" name]]]]
+      (case (type-of name)
+            (:environment name)
+            (:string (module/load (module/resolve-string name (resolve '*module-path* env)) env))
+            (:keyword (or (module/load/cache name)
+                          (module/load/store name)
+                          (module/load/external name)))
+            (otherwise (exception "Can't load that value as a module" name))))
 
-[defn module/import-all [module symbol]
+(defn module/import-all (module symbol)
       :cat :modules
       :internal
-      [def exports [resolve 'exports module]]
-      [typecheck/only exports :tree]
-      [return exports]]
+      (def exports (resolve 'exports module))
+      (typecheck/only exports :tree)
+      (return exports))
 
-[defn module/import [module symbol]
+(defn module/import (module symbol)
       :cat :modules
       :internal
-      [def exports [module/import-all module symbol]]
-      [when-not [tree/has? exports symbol]
-                [exception :import-error [if [resolves? symbol module]
+      (def exports (module/import-all module symbol))
+      (when-not (tree/has? exports symbol)
+                (exception :import-error (if (resolves? symbol module)
                                              "That symbol was not exported"
-                                             "That symbol does not exist in that module"]]]
-      [tree/ref exports symbol]]
+                                             "That symbol does not exist in that module")))
+      (tree/ref exports symbol))
 
 
-[defn module/add-loader [f]
-      [set! module/loader [cons f module/loader]]]
+(defn module/add-loader (f)
+      (set! module/loader (cons f module/loader)))
 
-[defmacro module body
+(defmacro module body
           "Define a new module and return it"
-          [macroexpand [cons 'environment* [cons '[def exports @[]] body]]]]
+          (macroexpand (cons 'environment* (cons '(def exports @()) body))))
 
-[defmacro defmodule [name . body]
+(defmacro defmodule (name . body)
           "Define a new named module"
-          `[module/insert ~name [module [def *module* ~name] ~@body]]]
+          `(module/insert ~name (module (def *module* ~name) ~@body)))
 
-[defmacro defmodule/defer [name . body]
+(defmacro defmodule/defer (name . body)
           "Define a new named module"
-          `[module/insert/defer ~name [string/write ~[list 'quote [cons 'do body]]]]]
+          `(module/insert/defer ~name (string/write ~(list 'quote (cons 'do body)))))
 
-[defmacro export [name value]
-          `[tree/set! exports '~name ~value]]
+(defmacro export (name value)
+          `(tree/set! exports '~name ~value))
 
-[defmacro use [module]
-          `[require* ~module [current-closure] #f]]
+(defmacro use (module)
+          `(require* ~module (current-closure) #f))
 
-[defmacro require [module]
-          `[require* ~module [current-closure] #t]]
+(defmacro require (module)
+          `(require* ~module (current-closure) #t))
 
-[defmacro import* [local-symbol module module-symbol]
-          `[def ~local-symbol [module/import ~module '~module-symbol]]]
+(defmacro import* (local-symbol module module-symbol)
+          `(def ~local-symbol (module/import ~module '~module-symbol)))
 
-[defmacro import [names module]
-          [when-not [list? names]
-                    [return `[import* ~names [module/load ~module [current-closure]] ~names]]]
-          [def ret #nil]
-          [while names
-                 [if [= [cadr names] :as]
-                     [do [set! ret [cons `[import* ~[caddr names] [module/load ~module [current-closure]] ~[car names]] ret]]
-                         [set! names [cddr names]]]
-                     [set! ret [cons `[import* ~[car names] [module/load ~module [current-closure]] ~[car names]] ret]]]
-                 [cdr! names]]
-          [cons do [nreverse ret]]]
+(defmacro import (names module)
+          (when-not (list? names)
+                    (return `(import* ~names (module/load ~module (current-closure)) ~names)))
+          (def ret #nil)
+          (while names
+                 (if (= (cadr names) :as)
+                     (do (set! ret (cons `(import* ~(caddr names) (module/load ~module (current-closure)) ~(car names)) ret))
+                         (set! names (cddr names)))
+                     (set! ret (cons `(import* ~(car names) (module/load ~module (current-closure)) ~(car names)) ret)))
+                 (cdr! names))
+          (cons do (nreverse ret)))
 
-[defn module/main [module args]
+(defn module/main (module args)
       "Import and run MODULE's main function with ARGS"
-      [def mod [module/load module [current-closure]]]
-      [when-not mod [exception "Module not found" module]]
-      [def exports [resolve 'exports mod]]
-      [when-not exports [exception "Invalid module, can't resolve exports" module]]
-      [def main [tree/ref exports :main]]
-      [when-not main [exception "There is no symbol exported as main" module]]
-      [when-not [procedure? main] [exception "main is not a callable value" module]]
-      [main args]]
+      (def mod (module/load module (current-closure)))
+      (when-not mod (exception "Module not found" module))
+      (def exports (resolve 'exports mod))
+      (when-not exports (exception "Invalid module, can't resolve exports" module))
+      (def main (tree/ref exports :main))
+      (when-not main (exception "There is no symbol exported as main" module))
+      (when-not (procedure? main) (exception "main is not a callable value" module))
+      (main args))

@@ -3,10 +3,10 @@
 ;;;
 ;;; Contains some routines used in the Emscripten/WASM build
 
-[defn repl/wasm [line]
+(defn repl/wasm (line)
       "Evaluate LINE in the wasm context"
-      [string/write [try print/error
-                         [eval-in root-closure [cons do [read line]]]]]]
+      (string/write (try print/error
+                         (eval-in root-closure (cons do (read line))))))
 
-[defn init/wasm [args]
-      [repl/welcome]]
+(defn init/wasm (args)
+      (repl/welcome))

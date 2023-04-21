@@ -4,14 +4,14 @@
  | This is just a simple program that can be used to test the accuracy of the clock
  |#
 
-[def next-tick [+ [time/milliseconds] 1000]]
-[def tick-tock #t] ; Just a simple comment
-[def test @[]]
-[tree/set! test :asd 123]
-[while #t
-       [while [< [time/milliseconds] next-tick]]
-       [if tick-tock
-           [println "\"Tick\""]
-           [println "Tock"]]
-       [set! tick-tock [not tick-tock]]
-       [set! next-tick [+ [time/milliseconds] 1000]]]
+(def next-tick (+ (time/milliseconds) 1000))
+(def tick-tock #t) ; Just a simple comment
+(def test @())
+(tree/set! test :asd 123)
+(while #t
+       (while (< (time/milliseconds) next-tick))
+       (if tick-tock
+           (println "\"Tick\"")
+           (println "Tock"))
+       (set! tick-tock (not tick-tock))
+       (set! next-tick (+ (time/milliseconds) 1000)))
