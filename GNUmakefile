@@ -59,7 +59,7 @@ $(BIN_OBJS): lib/nujel.h lib/nujel-private.h bin/private.h
 $(LIB_OBJS): lib/nujel.h lib/nujel-private.h
 
 %.no: %.nuj | $(NUJEL)
-	@./$(NUJEL) -x "[file/compile/argv]" $^
+	@./$(NUJEL) -x "(file/compile/argv)" $^
 	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.o: %.c

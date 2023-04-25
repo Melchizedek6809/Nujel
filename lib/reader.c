@@ -10,11 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define isopenparen(v)  ((v=='[')||(v=='('))
-#define iscloseparen(v) ((v==']')||(v==')'))
-#define isparen(v) (isopenparen(v) || (iscloseparen(v)))
-#define isnonsymbol(v) (isparen(v)||(v=='#')||(v=='\'')||(v=='\"')||(v=='`')||(v==';'))
-#define isnumericseparator(v) ((v=='_') || (v==','))
+#define isparen(v) (((v) == '(') || ((v) == ')'))
+#define isbracket(v) (((v) == '[') || ((v) == ']'))
+#define isbrace(v) (((v) == '{') || ((v) == '}'))
+#define isnonsymbol(v) (isparen(v)||isbracket(v)||isbrace(v)||((v)=='#')||((v)=='\'')||((v)=='\"')||((v)=='`')||((v)==';'))
+#define isnumericseparator(v) (((v)=='_') || ((v)==','))
 
 typedef struct {
 	const char *buf, *bufEnd, *data;
@@ -22,7 +22,7 @@ typedef struct {
 } lReadContext;
 
 static lVal *lReadValue(lReadContext *s);
-static lVal *lReadList(lReadContext *s, bool rootForm);
+static lVal *lReadList(lReadContext *s, bool rootForm, char terminator);
 
 static NORETURN void lExceptionThrowReader(lReadContext *s, const char *msg){
 	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
@@ -430,18 +430,16 @@ static lVal *lParseSpecial(lReadContext *s){
 	case '{': return lParseBytecodeArray(s);
 	case '#':
 		s->data++;
-		return lnfArrNew(s->c, lReadList(s, false));
-	case '(':
-		return lCons(lValSymS(symArr), lReadList(s,false));
+		return lnfArrNew(s->c, lReadList(s, false, ')'));
 	case '@':{
 		s->data++;
-		lVal *ret = lnfTreeNew(s->c, lReadList(s,false));
+		lVal *ret = lnfTreeNew(s->c, lReadList(s,false,')'));
 		ret->vTree->flags |= TREE_IMMUTABLE;
 		return ret;
 	}}
 }
 
-static lVal *lReadList(lReadContext *s, bool rootForm){
+static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 	lVal *v = NULL, *ret = NULL;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
@@ -456,7 +454,7 @@ static lVal *lReadList(lReadContext *s, bool rootForm){
 		}else if(c == ';'){
 			lStringAdvanceToNextLine(s);
 			continue;
-		}else if(iscloseparen(c)){
+		}else if(c == terminator){
 			if(rootForm){
 				lExceptionThrowReader(s, "Unmatched closing bracket");
 			}
@@ -471,7 +469,7 @@ static lVal *lReadList(lReadContext *s, bool rootForm){
 				s->data++;
 				lVal *nv;
 				do {
-					if((s->data >= s->bufEnd) || (*s->data == 0) || iscloseparen(*s->data)){
+					if((s->data >= s->bufEnd) || (*s->data == 0) || (*s->data == ')')){
 						lExceptionThrowReader(s, "Missing cdr in dotted pair");
 					}
 					lStringAdvanceToNextCharacter(s);
@@ -507,9 +505,11 @@ static lVal *lReadValue(lReadContext *s){
 	case 0:
 		return NULL;
 	case '(':
+		s->data++;
+		return lReadList(s,false,')');
 	case '[':
 		s->data++;
-		return lReadList(s,false);
+		return lCons(lValSymS(symArr), lReadList(s,false, ']'));
 	case '~':
 		s->data++;
 		if(*s->data == '@'){
@@ -532,9 +532,9 @@ static lVal *lReadValue(lReadContext *s){
 			return NULL;
 		}else if(*s->data == ';'){
 			++s->data;
-			if((s->data < s->bufEnd) && isopenparen(*s->data)){
+			if((s->data < s->bufEnd) && (*s->data == '(')){
 				s->data++;
-				lReadList(s,false);
+				lReadList(s,false,')');
 				return lValComment();
 			}else{
 				lReadValue(s);
@@ -546,9 +546,9 @@ static lVal *lReadValue(lReadContext *s){
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
 	case '@':
-		if(isopenparen(s->data[1])){
+		if(s->data[1] == '('){
 			s->data+=2;
-			return lCons(lValSymS(symTreeNew), lReadList(s,false));
+			return lCons(lValSymS(symTreeNew), lReadList(s,false,')'));
 		} // fall through
 	default: {
 		const u8 n = s->data[1];
@@ -565,5 +565,5 @@ lVal *lRead(lClosure *c, const char *str){
 	ctx.c = c;
 	ctx.buf = ctx.data = str;
 	ctx.bufEnd = &str[strlen(str)];
-	return lReadList(&ctx, true);
+	return lReadList(&ctx, true, ')');
 }

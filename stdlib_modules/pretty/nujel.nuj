@@ -1,38 +1,38 @@
 (import (fg-reset ansi-fg) :ansi)
 
-(def ansi-colors #( fg-reset
-                    (array/ref ansi-fg 1)
-                    (array/ref ansi-fg 2)
-                    (array/ref ansi-fg 3)
-                    (array/ref ansi-fg 4)
-                    (array/ref ansi-fg 5)
-                    (array/ref ansi-fg 6)
-                    (array/ref ansi-fg 7)
-                    (array/ref ansi-fg 8)
-                    (array/ref ansi-fg 9)
-                    (array/ref ansi-fg 10)
-                    (array/ref ansi-fg 11)
-                    (array/ref ansi-fg 12)
-                    (array/ref ansi-fg 13)
-                    (array/ref ansi-fg 14)
-                    (array/ref ansi-fg 15)))
+(def ansi-colors [fg-reset
+                  (array/ref ansi-fg 1)
+                  (array/ref ansi-fg 2)
+                  (array/ref ansi-fg 3)
+                  (array/ref ansi-fg 4)
+                  (array/ref ansi-fg 5)
+                  (array/ref ansi-fg 6)
+                  (array/ref ansi-fg 7)
+                  (array/ref ansi-fg 8)
+                  (array/ref ansi-fg 9)
+                  (array/ref ansi-fg 10)
+                  (array/ref ansi-fg 11)
+                  (array/ref ansi-fg 12)
+                  (array/ref ansi-fg 13)
+                  (array/ref ansi-fg 14)
+                  (array/ref ansi-fg 15)])
 
-(def html-colors #( "</span>"
-                    "<span class=\"nujel-hl-1\">"
-                    "<span class=\"nujel-hl-2\">"
-                    "<span class=\"nujel-hl-3\">"
-                    "<span class=\"nujel-hl-4\">"
-                    "<span class=\"nujel-hl-5\">"
-                    "<span class=\"nujel-hl-6\">"
-                    "<span class=\"nujel-hl-7\">"
-                    "<span class=\"nujel-hl-8\">"
-                    "<span class=\"nujel-hl-9\">"
-                    "<span class=\"nujel-hl-10\">"
-                    "<span class=\"nujel-hl-11\">"
-                    "<span class=\"nujel-hl-12\">"
-                    "<span class=\"nujel-hl-13\">"
-                    "<span class=\"nujel-hl-14\">"
-                    "<span class=\"nujel-hl-15\">"))
+(def html-colors ["</span>"
+                  "<span class=\"nujel-hl-1\">"
+                  "<span class=\"nujel-hl-2\">"
+                  "<span class=\"nujel-hl-3\">"
+                  "<span class=\"nujel-hl-4\">"
+                  "<span class=\"nujel-hl-5\">"
+                  "<span class=\"nujel-hl-6\">"
+                  "<span class=\"nujel-hl-7\">"
+                  "<span class=\"nujel-hl-8\">"
+                  "<span class=\"nujel-hl-9\">"
+                  "<span class=\"nujel-hl-10\">"
+                  "<span class=\"nujel-hl-11\">"
+                  "<span class=\"nujel-hl-12\">"
+                  "<span class=\"nujel-hl-13\">"
+                  "<span class=\"nujel-hl-14\">"
+                  "<span class=\"nujel-hl-15\">"])
 
 (defn comment-block (source i pp colors)
       (def len (buffer/length source))

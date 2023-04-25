@@ -1,22 +1,22 @@
 #!/usr/bin/env nujel
 
 (defn step (a)
-       #((ref a 1)
-         (ref a 2)
-	 (ref a 3)
-	 (ref a 4)
-	 (ref a 5)
-	 (ref a 6)
-	 (+ (ref a 7) (ref a 0))
-	 (ref a 8)
-	 (ref a 0)))
+       [(ref a 1)
+        (ref a 2)
+	(ref a 3)
+	(ref a 4)
+	(ref a 5)
+	(ref a 6)
+	(+ (ref a 7) (ref a 0))
+	(ref a 8)
+	(ref a 0)])
 
 (defn do-steps (l count)
        (dotimes (i count l)
                 (set! l (step l))))
 
 (defn input/parse (l)
-       (def ret #(0 0 0 0 0 0 0 0 0))
+       (def ret [0 0 0 0 0 0 0 0 0])
        (while l
               (array/++ ret (car l))
               (cdr! l))

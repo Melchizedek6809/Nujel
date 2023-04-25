@@ -69,7 +69,7 @@ static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 	}
 	void *nBuf = realloc(buf->buf, length);
 	if (unlikely(nBuf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "[buffer/length!] couldn't allocate its buffer", v, c);
+		lExceptionThrowValClo("out-of-memory", "(buffer/length!) couldn't allocate its buffer", v, c);
 		return NULL;
 	}
 	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
@@ -99,7 +99,7 @@ static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, si
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	retBuf->buf = malloc(length);
 	if (unlikely(retBuf->buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "[buffer/length!] couldn't allocate its buffer", NULL, c);
+		lExceptionThrowValClo("out-of-memory", "(buffer/length!] couldn't allocate its buffer", NULL, c);
 		return NULL;
 	}
 	memcpy(retBuf->buf, data, length);
@@ -202,7 +202,7 @@ static lVal *lnfBufferViewRef(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error", "Can't ref that", car, c);
 	}
 	if(i >= length){
-		lExceptionThrowValClo("out-of-bounds","[buffer/view/ref] index provided is out of bounds", v, c);
+		lExceptionThrowValClo("out-of-bounds","(buffer/view/ref] index provided is out of bounds", v, c);
 	}
 	switch(viewType){
 	default:
@@ -254,7 +254,7 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error", "Can't set! in that", car, c);
 	}
 	if(i >= length){
-		lExceptionThrowValClo("out-of-bounds","[buffer/set!] index provided is out of bounds", v, c);
+		lExceptionThrowValClo("out-of-bounds","(buffer/set!] index provided is out of bounds", v, c);
 	}
 
 	switch(viewType){
@@ -299,27 +299,27 @@ static lVal *lnfBufferViewBuffer(lClosure *c, lVal *v){
 }
 
 void lOperationsBuffer(lClosure *c){
-	lAddNativeFunc(c, "buffer/allocate",        "[length]",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate);
-	lAddNativeFunc(c, "buffer/length!",         "[buf new-length]", "Set the size of BUF to NEW-LENGTH", lnfBufferLengthSet);
-	lAddNativeFunc(c, "buffer/dup",             "[buf immutable?]", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup);
-	lAddNativeFunc(c, "buffer/copy",            "[dest src dest-offset length]","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy);
+	lAddNativeFunc(c, "buffer/allocate",        "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate);
+	lAddNativeFunc(c, "buffer/length!",         "(buf new-length)", "Set the size of BUF to NEW-LENGTH", lnfBufferLengthSet);
+	lAddNativeFunc(c, "buffer/dup",             "(buf immutable?)", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup);
+	lAddNativeFunc(c, "buffer/copy",            "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy);
 
-	lAddNativeFunc(c, "string->buffer",         "[str immutable?]", "Copy STR into a buffer and return it", lnfStringToBuffer);
-	lAddNativeFunc(c, "buffer->string",         "[buf length]",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString);
+	lAddNativeFunc(c, "string->buffer",         "(str immutable?)", "Copy STR into a buffer and return it", lnfStringToBuffer);
+	lAddNativeFunc(c, "buffer->string",         "(buf length)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString);
 
-	lAddNativeFunc(c, "buffer/u8*",             "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewU8);
-	lAddNativeFunc(c, "buffer/s8*",             "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewS8);
-	lAddNativeFunc(c, "buffer/u16*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewU16);
-	lAddNativeFunc(c, "buffer/s16*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewS16);
-	lAddNativeFunc(c, "buffer/u32*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewU32);
-	lAddNativeFunc(c, "buffer/s32*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewS32);
-	lAddNativeFunc(c, "buffer/f32*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewF32);
-	lAddNativeFunc(c, "buffer/s64*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewS64);
-	lAddNativeFunc(c, "buffer/f64*",            "[buf immutable?]", "Create a new view for BUF spanning the entire area", lnfBufferViewF64);
-	lAddNativeFunc(c, "buffer-view->buffer",    "[view]",           "Return the buffer of VIEW", lnfBufferViewBuffer);
+	lAddNativeFunc(c, "buffer/u8*",             "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewU8);
+	lAddNativeFunc(c, "buffer/s8*",             "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewS8);
+	lAddNativeFunc(c, "buffer/u16*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewU16);
+	lAddNativeFunc(c, "buffer/s16*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewS16);
+	lAddNativeFunc(c, "buffer/u32*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewU32);
+	lAddNativeFunc(c, "buffer/s32*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewS32);
+	lAddNativeFunc(c, "buffer/f32*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF32);
+	lAddNativeFunc(c, "buffer/s64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewS64);
+	lAddNativeFunc(c, "buffer/f64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF64);
+	lAddNativeFunc(c, "buffer-view->buffer",    "(view)",           "Return the buffer of VIEW", lnfBufferViewBuffer);
 
-	lAddNativeFunc(c, "buffer/ref",             "[view off]",       "Return the value in VIEW at OFF", lnfBufferViewRef);
-	lAddNativeFunc(c, "buffer/set!",            "[view off val]",   "Set the value of VIEW at OFF to VAL", lnfBufferViewSet);
-	lAddNativeFunc(c, "buffer/length",          "[buf]",            "Return the size of BUF in bytes",   lnfBufferLengthGet);
-	lAddNativeFunc(c, "buffer/immutable?",      "[buf]",            "Return #t if BUF is immutable",     lnfBufferImmutableGet);
+	lAddNativeFunc(c, "buffer/ref",             "(view off)",       "Return the value in VIEW at OFF", lnfBufferViewRef);
+	lAddNativeFunc(c, "buffer/set!",            "(view off val)",   "Set the value of VIEW at OFF to VAL", lnfBufferViewSet);
+	lAddNativeFunc(c, "buffer/length",          "(buf)",            "Return the size of BUF in bytes",   lnfBufferLengthGet);
+	lAddNativeFunc(c, "buffer/immutable?",      "(buf)",            "Return #t if BUF is immutable",     lnfBufferImmutableGet);
 }

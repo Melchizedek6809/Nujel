@@ -1,7 +1,7 @@
 (import (start stop clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
 (import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line) :app/termed/buffer)
 
-(def buffers #())
+(def buffers [])
 (def screen-width #nil)
 (def screen-height #nil)
 (def last-char 0)

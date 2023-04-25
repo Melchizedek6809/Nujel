@@ -13,35 +13,31 @@
 (export fg-reset (def fg-reset "\e[0;39m"))
 (export bg-reset (def bg-reset "\e[49m"))
 
-(export ansi-fg (def ansi-fg #(
-                               "\e[0;30m"
-                               "\e[0;31m"
-                               "\e[0;32m"
-                               "\e[0;33m"
-                               "\e[0;34m"
-                               "\e[0;35m"
-                               "\e[0;36m"
-                               "\e[0;37m"
-                               "\e[1;30m"
-                               "\e[1;31m"
-                               "\e[1;32m"
-                               "\e[1;33m"
-                               "\e[1;34m"
-                               "\e[1;35m"
-                               "\e[1;36m"
-                               "\e[1;37m"
-                               )))
+(export ansi-fg (def ansi-fg ["\e[0;30m"
+                              "\e[0;31m"
+                              "\e[0;32m"
+                              "\e[0;33m"
+                              "\e[0;34m"
+                              "\e[0;35m"
+                              "\e[0;36m"
+                              "\e[0;37m"
+                              "\e[1;30m"
+                              "\e[1;31m"
+                              "\e[1;32m"
+                              "\e[1;33m"
+                              "\e[1;34m"
+                              "\e[1;35m"
+                              "\e[1;36m"
+                              "\e[1;37m"]))
 
-(export ansi-bg (def ansi-bg #(
-                               "\e[40m"
-                               "\e[41m"
-                               "\e[42m"
-                               "\e[43m"
-                               "\e[44m"
-                               "\e[45m"
-                               "\e[46m"
-                               "\e[47m"
-                               )))
+(export ansi-bg (def ansi-bg ["\e[40m"
+                              "\e[41m"
+                              "\e[42m"
+                              "\e[43m"
+                              "\e[44m"
+                              "\e[45m"
+                              "\e[46m"
+                              "\e[47m"]))
 
 
 (defn wrap (code string)

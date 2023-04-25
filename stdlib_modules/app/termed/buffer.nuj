@@ -10,7 +10,7 @@
 
 (defn new-buffer (filename)
       :export
-      (def lines #((buffer/allocate 16)))
+      (def lines [(buffer/allocate 16)])
       (def buf @( :lines lines
                   :filename filename
                   :changed #f

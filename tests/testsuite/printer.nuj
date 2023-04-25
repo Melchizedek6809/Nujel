@@ -109,3 +109,4 @@
 ("10.1" (string/write #d10.1))
 ("-10.1" (string/write #d-10.1))
 ("(a . b)" (string/write (cons 'a 'b)))
+("##()" (string/write []))

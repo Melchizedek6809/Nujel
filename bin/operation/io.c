@@ -206,7 +206,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 }
 #else
 static lVal *lnfPopen(lClosure *c, lVal *v){
-	lExceptionThrowValClo("not-available","[popen] is not implemented on your current platform, please try and work around that", v, c);
+	lExceptionThrowValClo("not-available","(popen) is not implemented on your current platform, please try and work around that", v, c);
 	return NULL;
 }
 #endif
@@ -299,14 +299,14 @@ static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"exit",                       "[a]",            "Quits with code a",                                 lnfQuit);
-	lAddNativeFunc(c,"popen",                      "[command]",      "Return a list of [exit-code stdout stderr]",        lnfPopen);
+	lAddNativeFunc(c,"exit",                       "(a)",                "Quits with code a",                                 lnfQuit);
+	lAddNativeFunc(c,"popen",                      "(command)",          "Return a list of [exit-code stdout stderr)",        lnfPopen);
 
-	lAddNativeFunc(c,"file/stat",                  "[path]",         "Return some stats about FILENAME",                  lnfFileStat);
-	lAddNativeFunc(c,"rm file/remove",             "[path]",         "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
-	lAddNativeFunc(c,"ls directory/read",          "[path show-hidden]", "Return all files within $PATH",               lnfDirectoryRead);
-	lAddNativeFunc(c,"rmdir directory/remove",     "[path]",             "Remove empty directory at PATH",              lnfDirectoryRemove);
-	lAddNativeFunc(c,"mkdir directory/make",       "[path]",             "Create a new empty directory at PATH",        lnfDirectoryMake);
-	lAddNativeFunc(c,"cd path/change",             "[path]",         "Change the current working directory to PATH",      lnfChangeDirectory);
-	lAddNativeFunc(c,"cwd path/working-directory", "[]",             "Return the current working directory",              lnfGetCurrentWorkingDirectory);
+	lAddNativeFunc(c,"file/stat",                  "(path)",             "Return some stats about FILENAME",                  lnfFileStat);
+	lAddNativeFunc(c,"rm file/remove",             "(path)",             "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
+	lAddNativeFunc(c,"ls directory/read",          "(path show-hidden)", "Return all files within $PATH",                     lnfDirectoryRead);
+	lAddNativeFunc(c,"rmdir directory/remove",     "(path)",             "Remove empty directory at PATH",                    lnfDirectoryRemove);
+	lAddNativeFunc(c,"mkdir directory/make",       "(path)",             "Create a new empty directory at PATH",              lnfDirectoryMake);
+	lAddNativeFunc(c,"cd path/change",             "(path)",             "Change the current working directory to PATH",      lnfChangeDirectory);
+	lAddNativeFunc(c,"cwd path/working-directory", "()",                 "Return the current working directory",              lnfGetCurrentWorkingDirectory);
 }

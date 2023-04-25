@@ -384,59 +384,59 @@ static lVal *lnfStrSym(lClosure *c, lVal *v){
 }
 
 void lOperationsCore(lClosure *c){
-	lAddNativeFuncPure(c,"quote", "[v]",   "Return v as is without evaluating", lnfQuote);
-	lAddNativeFuncPure(c,"read",  "[str]", "Read and Parses STR as an S-Expression", lnfRead);
-	lAddNativeFunc    (c,"throw", "[v]",   "Throw V to the closest exception handler", lnfThrow);
+	lAddNativeFuncPure(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote);
+	lAddNativeFuncPure(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead);
+	lAddNativeFunc    (c,"throw", "(v)",   "Throw V to the closest exception handler", lnfThrow);
 
-	lAddNativeFunc(c,"def-in!",        "[environment sym v]", "Define SYM to be V in ENVIRONMENT", lnfDefIn);
-	lAddNativeFunc(c,"resolve",        "[sym environment]", "Resolve SYM", lnfResolve);
-	lAddNativeFunc(c,"resolve-or-nil","[sym environment]", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull);
-	lAddNativeFunc(c,"resolves?",      "[sym environment]", "Check if SYM resolves to a value",           lnfResolvesPred);
+	lAddNativeFunc(c,"def-in!",        "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn);
+	lAddNativeFunc(c,"resolve",        "(sym environment)", "Resolve SYM", lnfResolve);
+	lAddNativeFunc(c,"resolve-or-nil","(sym environment)", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull);
+	lAddNativeFunc(c,"resolves?",      "(sym environment)", "Check if SYM resolves to a value",           lnfResolvesPred);
 
-	lAddNativeFunc(c,"val->id", "[v]",                "Generate some sort of ID value for V, mainly used in [write]", lnfValToId);
-	lAddNativeFunc(c,"meta",    "[v key]",            "Retrieve KEY from V's metadata", lnfMetaGet);
-	lAddNativeFunc(c,"meta!",   "[v key meta-value]", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
+	lAddNativeFunc(c,"val->id", "(v)",                "Generate some sort of ID value for V, mainly used in [write)", lnfValToId);
+	lAddNativeFunc(c,"meta",    "(v key)",            "Retrieve KEY from V's metadata", lnfMetaGet);
+	lAddNativeFunc(c,"meta!",   "(v key meta-value)", "Set KEY to META-VALUE in V's metadata", lnfMetaSet);
 
-	lAddNativeFunc(c,"closure/data",     "[clo]",  "Return the data of CLO",                     lnfClosureData);
-	lAddNativeFunc(c,"closure/code",     "[clo]",  "Return the code of CLO",                     lnfClosureCode);
-	lAddNativeFunc(c,"closure/name",     "[clo]",  "Return the name of CLO",                     lnfClosureName);
-	lAddNativeFunc(c,"closure/arguments","[clo]",  "Return the argument list of CLO",            lnfClosureArguments);
-	lAddNativeFunc(c,"closure/parent",   "[clo]",  "Return the parent of CLO",                   lnfClosureParent);
-	lAddNativeFunc(c,"closure/caller",   "[clo]",  "Return the caller of CLO",                   lnfClosureCaller);
+	lAddNativeFunc(c,"closure/data",     "(clo)",  "Return the data of CLO",                     lnfClosureData);
+	lAddNativeFunc(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode);
+	lAddNativeFunc(c,"closure/name",     "(clo)",  "Return the name of CLO",                     lnfClosureName);
+	lAddNativeFunc(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments);
+	lAddNativeFunc(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent);
+	lAddNativeFunc(c,"closure/caller",   "(clo)",  "Return the caller of CLO",                   lnfClosureCaller);
 
-	lAddNativeFunc(c,"current-closure",  "[]",     "Return the current closure as an object",    lnfCurrentClosure);
-	lAddNativeFunc(c,"current-lambda",   "[]",     "Return the current closure as a lambda",     lnfCurrentLambda);
+	lAddNativeFunc(c,"current-closure",  "()",     "Return the current closure as an object",    lnfCurrentClosure);
+	lAddNativeFunc(c,"current-lambda",   "()",     "Return the current closure as a lambda",     lnfCurrentLambda);
 
-	lAddNativeFunc(c,"symbol-table",  "[]",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
+	lAddNativeFunc(c,"symbol-table",  "()",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 
-	lAddNativeFunc(c,"apply",       "[func list]", "Evaluate FUNC with LIST as arguments",  lnfApply);
-	lAddNativeFunc(c,"macro-apply", "[macro list]","Evaluate MACRO with LIST as arguments", lnfMacroApply);
+	lAddNativeFunc(c,"apply",       "(func list)", "Evaluate FUNC with LIST as arguments",  lnfApply);
+	lAddNativeFunc(c,"macro-apply", "(macro list)","Evaluate MACRO with LIST as arguments", lnfMacroApply);
 
-	lAddNativeFuncPure(c,"car",     "[list]",    "Returs the head of LIST",          lnfCar);
-	lAddNativeFuncPure(c,"cdr",     "[list]",    "Return the rest of LIST",          lnfCdr);
-	lAddNativeFuncPure(c,"cons",    "[car cdr]", "Return a new pair of CAR and CDR", lnfCons);
-	lAddNativeFuncPure(c,"nreverse","[list]",    "Return LIST in reverse order, fast but mutates", lnfNReverse);
+	lAddNativeFuncPure(c,"car",     "(list)",    "Returs the head of LIST",          lnfCar);
+	lAddNativeFuncPure(c,"cdr",     "(list)",    "Return the rest of LIST",          lnfCdr);
+	lAddNativeFuncPure(c,"cons",    "(car cdr)", "Return a new pair of CAR and CDR", lnfCons);
+	lAddNativeFuncPure(c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse);
 
-	lAddNativeFunc(c,"time",   "          []", "Return the current unix time",lnfTime);
-	lAddNativeFunc(c,"time/milliseconds","[]", "Return monotonic msecs",lnfTimeMsecs);
+	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime);
+	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs);
 
-	lAddNativeFuncPure(c,"<",        "[α β]", "Return true if α is less than β",             lnfLess);
-	lAddNativeFuncPure(c,"<=",       "[α β]", "Return true if α is less or equal to β",      lnfLessEqual);
-	lAddNativeFuncPure(c,"= ==",     "[α β]", "Return true if α is equal to β",              lnfEqual);
-	lAddNativeFuncPure(c,"not=",     "[α β]", "Return true if α is not equal to  β",       lnfUnequal);
-	lAddNativeFuncPure(c,">=",       "[α β]", "Return true if α is greater or equal than β", lnfGreaterEqual);
-	lAddNativeFuncPure(c,">",        "[α β]", "Return true if α is greater than β",          lnfGreater);
-	lAddNativeFuncPure(c,"nil?",     "[α]",   "Return true if α is #nil",                    lnfNilPred);
-	lAddNativeFuncPure(c,"zero?",    "[α]",   "Return true if α is 0",                       lnfZeroPred);
+	lAddNativeFuncPure(c,"<",        "(α β)", "Return true if α is less than β",             lnfLess);
+	lAddNativeFuncPure(c,"<=",       "(α β)", "Return true if α is less or equal to β",      lnfLessEqual);
+	lAddNativeFuncPure(c,"= ==",     "(α β)", "Return true if α is equal to β",              lnfEqual);
+	lAddNativeFuncPure(c,"not=",     "(α β)", "Return true if α is not equal to  β",       lnfUnequal);
+	lAddNativeFuncPure(c,">=",       "(α β)", "Return true if α is greater or equal than β", lnfGreaterEqual);
+	lAddNativeFuncPure(c,">",        "(α β)", "Return true if α is greater than β",          lnfGreater);
+	lAddNativeFuncPure(c,"nil?",     "(α)",   "Return true if α is #nil",                    lnfNilPred);
+	lAddNativeFuncPure(c,"zero?",    "(α)",   "Return true if α is 0",                       lnfZeroPred);
 
-	lAddNativeFunc(c,"garbage-collect",         "[]", "Force the garbage collector to run", lnfGarbageCollect);
-	lAddNativeFunc(c,"garbage-collection-runs", "[]", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns);
+	lAddNativeFunc(c,"garbage-collect",         "()", "Force the garbage collector to run", lnfGarbageCollect);
+	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns);
 
-	lAddNativeFuncPure(c,"type-of",         "[α]",     "Return a symbol describing the type of α", lnfTypeOf);
-	lAddNativeFuncPure(c,"int",             "[α]",     "Convert α into an integer number", lnfInt);
-	lAddNativeFuncPure(c,"float",           "[α]",     "Convert α into a floating-point number", lnfFloat);
-	lAddNativeFuncPure(c,"string",          "[α]",     "Convert α into a printable and readable string", lnfString);
-	lAddNativeFuncPure(c,"symbol->keyword", "[α]",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
-	lAddNativeFuncPure(c,"keyword->symbol", "[α]",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
-	lAddNativeFuncPure(c,"string->symbol",  "[str]",   "Convert STR to a symbol",         lnfStrSym);
+	lAddNativeFuncPure(c,"type-of",         "(α)",     "Return a symbol describing the type of α", lnfTypeOf);
+	lAddNativeFuncPure(c,"int",             "(α)",     "Convert α into an integer number", lnfInt);
+	lAddNativeFuncPure(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat);
+	lAddNativeFuncPure(c,"string",          "(α)",     "Convert α into a printable and readable string", lnfString);
+	lAddNativeFuncPure(c,"symbol->keyword", "(α)",     "Convert symbol α into a keyword", lnfSymbolToKeyword);
+	lAddNativeFuncPure(c,"keyword->symbol", "(α)",     "Convert keyword α into a symbol", lnfKeywordToSymbol);
+	lAddNativeFuncPure(c,"string->symbol",  "(str)",   "Convert STR to a symbol",         lnfStrSym);
 }

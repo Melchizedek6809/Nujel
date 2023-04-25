@@ -89,7 +89,7 @@ static lVal *lnfStringCut(lClosure *c, lVal *v){
 	i64 start, slen, len;
 	lVal *str = lCar(v);
 	if((str == NULL) || (str->type != ltString)){
-		lExceptionThrowValClo("type-error","[string/cut] expects a string as its first and only argument", v, c);
+		lExceptionThrowValClo("type-error","(string/cut) expects a string as its first and only argument", v, c);
 		return NULL;
 	}
 
@@ -146,7 +146,7 @@ static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
 }
 
 void lOperationsString(lClosure *c){
-	lAddNativeFuncPure(c,"string/cut",    "[str start &stop]",        "Return STR starting at position START=0 and ending at &STOP=[str-len s]", lnfStringCut);
-	lAddNativeFuncPure(c,"index-of",      "[haystack needle &start]", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
-	lAddNativeFuncPure(c,"last-index-of", "[haystack needle &start]", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
+	lAddNativeFuncPure(c,"string/cut",    "(str start &stop)",        "Return STR starting at position START=0 and ending at &STOP=[str-len s)", lnfStringCut);
+	lAddNativeFuncPure(c,"index-of",      "(haystack needle &start)", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
+	lAddNativeFuncPure(c,"last-index-of", "(haystack needle &start)", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
 }
