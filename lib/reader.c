@@ -13,6 +13,7 @@
 #define isparen(v) (((v) == '(') || ((v) == ')'))
 #define isbracket(v) (((v) == '[') || ((v) == ']'))
 #define isbrace(v) (((v) == '{') || ((v) == '}'))
+#define isClosingChar(v) (((v)==')')||((v)==']')||((v)=='}'))
 #define isnonsymbol(v) (isparen(v)||isbracket(v)||isbrace(v)||((v)=='#')||((v)=='\'')||((v)=='\"')||((v)=='`')||((v)==';'))
 #define isnumericseparator(v) (((v)=='_') || ((v)==','))
 
@@ -460,6 +461,8 @@ static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 			}
 			s->data++;
 			return ret == NULL ? lCons(NULL,NULL) : ret;
+		}else if(isClosingChar(c)){
+			lExceptionThrowReader(s, "Unmatched closing char");
 		}else{
 			const u8 next = s->data[1];
 			if((c == '.') && (isspace(next) || isnonsymbol(next))){
@@ -510,6 +513,9 @@ static lVal *lReadValue(lReadContext *s){
 	case '[':
 		s->data++;
 		return lCons(lValSymS(symArr), lReadList(s,false, ']'));
+	case '{':
+		s->data++;
+		return lCons(lValSymS(symTreeNew), lReadList(s,false,'}'));
 	case '~':
 		s->data++;
 		if(*s->data == '@'){
@@ -545,11 +551,6 @@ static lVal *lReadValue(lReadContext *s){
 	case ';':
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
-	case '@':
-		if(s->data[1] == '('){
-			s->data+=2;
-			return lCons(lValSymS(symTreeNew), lReadList(s,false,')'));
-		} // fall through
 	default: {
 		const u8 n = s->data[1];
 		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){

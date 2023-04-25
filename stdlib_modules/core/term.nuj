@@ -23,39 +23,39 @@
       :export
       (stdout 'block-write (fmt "\e[{line};{column}H")))
 
-(def fg-colors @( :default "\e[0m"
+(def fg-colors { :default "\e[0m"
 
-                  :black "\e[30m"
-                  :red "\e[31m"
-                  :green "\e[32m"
-                  :yellow "\e[33m"
-                  :blue "\e[34m"
+                 :black "\e[30m"
+                 :red "\e[31m"
+                 :green "\e[32m"
+                 :yellow "\e[33m"
+                 :blue "\e[34m"
 
-                  :pink "\e[35m"
-                  :magenta "\e[35m"
-                  :purple "\e[35m"
+                 :pink "\e[35m"
+                 :magenta "\e[35m"
+                 :purple "\e[35m"
 
-                  :cyan "\e[36m"
-                  :teal "\e[36m"
+                 :cyan "\e[36m"
+                 :teal "\e[36m"
 
-                  :white "\e[37m"))
+                 :white "\e[37m"})
 
-(def bg-colors @( :default "\e[49m"
+(def bg-colors { :default "\e[49m"
 
-                  :black "\e[40m"
-                  :red "\e[41m"
-                  :green "\e[42m"
-                  :yellow "\e[43m"
-                  :blue "\e[44m"
+                 :black "\e[40m"
+                 :red "\e[41m"
+                 :green "\e[42m"
+                 :yellow "\e[43m"
+                 :blue "\e[44m"
 
-                  :pink "\e[45m"
-                  :magenta "\e[45m"
-                  :purple "\e[45m"
+                 :pink "\e[45m"
+                 :magenta "\e[45m"
+                 :purple "\e[45m"
 
-                  :cyan "\e[46m"
-                  :teal "\e[46m"
+                 :cyan "\e[46m"
+                 :teal "\e[46m"
 
-                  :white "\e[47m"))
+                 :white "\e[47m"})
 
 (defn set-fg-color (color-name)
       :export
@@ -87,8 +87,8 @@
         (when (= c #\R)
           (stdout 'block-write "\e 8")
           (def s (split (cut (buffer->string buf i) 2) ";"))
-          (return @( :width (read/int (cadr s))
-                     :height (read/int (car s)))))
+          (return { :width (read/int (cadr s))
+                    :height (read/int (car s))}))
         (buffer/set! buf i c)
         (inc! i)))
 

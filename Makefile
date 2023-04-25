@@ -42,7 +42,7 @@ $(BIN_OBJ): lib/nujel.h lib/nujel-private.h bin/private.h
 
 .SUFFIXES: .nuj .no
 .nuj.no: $(NUJEL)
-	@./$(NUJEL) -x "[file/compile/argv]" $<
+	@./$(NUJEL) -x "(file/compile/argv)" $<
 	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
 nujel.a: $(LIB_OBJS)

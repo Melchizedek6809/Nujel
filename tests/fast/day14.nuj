@@ -1,8 +1,8 @@
 #!/usr/bin/env nujel
 
 (defn polymer/read (line)
-      (def eles @())
-      (def pairs @())
+      (def eles {})
+      (def pairs {})
       (dotimes (i (buffer/length line))
                (def key-a (string->symbol (string/cut line i (+ i 1))))
                (if (tree/has? eles key-a)
@@ -13,7 +13,7 @@
                      (if (tree/has? pairs key-b)
                          (tree/++ pairs key-b)
                          (tree/set! pairs key-b 1))))
-      @(:pairs pairs :eles eles :combinations '()))
+      {:pairs pairs :eles eles :combinations '()})
 
 (defn combination/parse (recipe last-recipe)
       (def source (string->symbol (car recipe)))
@@ -41,7 +41,7 @@
       (combinations/read state (cddr input-raw)))
 
 (defn state/dup (α)
-      @(:combinations (ref α :combinations) :pairs (tree/dup (ref α :pairs)) :eles (tree/dup (ref α :eles))))
+      {:combinations (ref α :combinations) :pairs (tree/dup (ref α :pairs)) :eles (tree/dup (ref α :eles))})
 
 (defn state/run/once (α)
       ((ref α :combinations) α (state/dup α)))

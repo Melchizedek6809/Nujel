@@ -24,7 +24,7 @@
               (count-bits/single (car numbers) state bit-count)
               (cdr! numbers)
               (inc! count))
-       @(:bit-count bit-count :count count :zeroes state))
+       {:bit-count bit-count :count count :zeroes state})
 
 (defn calc-γε (state)
        (def i 0)
@@ -38,7 +38,7 @@
                   (set! ε (bit-or ε (bit-shift-left 1 i))))
               (inc! i))
 
-       @(:γ γ :ε ε :power-consumption (* ε γ)))
+       {:γ γ :ε ε :power-consumption (* ε γ)})
 
 (def result (calc-γε (count-bits (read-data example-data) 5)))
 (when (not= (ref result :power-consumption) 198)

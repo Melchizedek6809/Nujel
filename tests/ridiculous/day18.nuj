@@ -5,8 +5,8 @@
 
 (defn snail/parse-list (l d)
       (cond ((nil? l) #nil)
-            ((int? l) @(:v l))
-            (#t @(:r (snail/parse-list (cdr l)) :l (snail/parse-list (car l))))))
+            ((int? l) {:v l})
+            (#t {:r (snail/parse-list (cdr l)) :l (snail/parse-list (car l))})))
 
 (defn snail/read (line)
       (snail/parse-list (snail/read-line line)))
@@ -47,8 +47,8 @@
 (defn snail/split (t root)
       (def lv (div/int (ref t :v) 2))
       (-> t
-          (tree/set! :l @(:v lv))
-          (tree/set! :r @(:v (- (ref t :v) lv)))
+          (tree/set! :l {:v lv})
+          (tree/set! :r {:v (- (ref t :v) lv)})
           (tree/set! :v #nil)))
 
 (defn snail/explode/maybe (t root d)
@@ -68,7 +68,7 @@
                  (snail/split/maybe t t 0))) t)
 
 (defn snail/add (a b)
-      (snail/reduce @(:l a :r b)))
+      (snail/reduce {:l a :r b}))
 
 (defn snail/sum (lines)
       (def vals (map (split lines "\n") snail/read))

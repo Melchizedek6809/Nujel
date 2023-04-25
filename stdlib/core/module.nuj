@@ -3,14 +3,14 @@
 ;;;
 ;;; Contains the module system
 
-(def module/cache @())
-(def module/store @())
+(def module/cache {})
+(def module/store {})
 (def module/loader #nil)
 
 (defn module/save-state ()
       :cat :modules
       :internal
-      @(:cache module/cache :loader module/loader))
+      {:cache module/cache :loader module/loader})
 
 (defn module/restore-state (c)
       :cat :modules
@@ -125,7 +125,7 @@
 
 (defmacro module body
           "Define a new module and return it"
-          (macroexpand (cons 'environment* (cons '(def exports @()) body))))
+          (macroexpand (cons 'environment* (cons '(def exports {}) body))))
 
 (defmacro defmodule (name . body)
           "Define a new named module"

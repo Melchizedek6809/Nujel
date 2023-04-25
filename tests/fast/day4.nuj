@@ -12,7 +12,7 @@
        (reverse qq))
 
 (defn parse/board (board-raw)
-       @(:score 0 :order 0 :board (apply array/new (map board-raw (fn (row) (apply array/new (read row)))))))
+       {:score 0 :order 0 :board (apply array/new (map board-raw (fn (row) (apply array/new (read row)))))})
 
 (defn print/board/line/number (num marks)
        (if (marks num)

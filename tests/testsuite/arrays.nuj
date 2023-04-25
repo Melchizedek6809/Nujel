@@ -20,7 +20,7 @@
 (#t (array? [1 2 3]))
 (#t (array? (array/allocate 3)))
 (#f (array? '(1 2 3)))
-(#f (array? @(:a 1 :b 2 :c 3)))
+(#f (array? {:a 1 :b 2 :c 3}))
 (:type-error (try car (def ein-test-arr [1 2 3]) (array/ref ein-test-arr 2.2)))
 ([99 2 3 4] (let ((cur-arr [1 2 3 4])) (array/set! cur-arr 0 99) cur-arr))
 ([42 42 42 42 42 42] (array/fill! (array/allocate 6) 42))

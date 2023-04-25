@@ -22,13 +22,13 @@
 (defn calc-result (state)
        (* (ref state :depth) (ref state :horiz)))
 
-(def result (calc-result (step '(forward 5 down 5 forward 8 up 3 down 8 forward 2) @(:depth 0 :horiz 0) do-commands-1)))
+(def result (calc-result (step '(forward 5 down 5 forward 8 up 3 down 8 forward 2) {:depth 0 :horiz 0} do-commands-1)))
 (when (not= 150 result) (throw (list :wrong-result "Wrong result" result)))
 
-(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) @(:depth 0 :horiz 0) do-commands-1)))
+(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) {:depth 0 :horiz 0} do-commands-1)))
 (when (not= 1561344 result) (throw (list :wrong-result "Wrong result" result)))
 
-(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) @(:depth 0 :horiz 0 :aim 0) do-commands-2)))
+(def result (calc-result (step (read (file/read "tests/fast/day2.dat")) {:depth 0 :horiz 0 :aim 0} do-commands-2)))
 (when (not= 1848454425 result) (throw (list :wrong-result "Wrong result" result)))
 
 (return :success)

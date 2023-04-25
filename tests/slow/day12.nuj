@@ -1,7 +1,7 @@
 #!/usr/bin/env nujel
 
-(def cave-map @())
-(def big-caves @())
+(def cave-map {})
+(def big-caves {})
 (defn big-cave? (α) (ref big-caves α))
 (defn add-connections (line)
   (def parts (map (split line "-") string->symbol))
@@ -38,12 +38,12 @@
                   (calc-routes (car routes) s twice)
                   (cdr! routes)))))
 
-(calc-routes 'end @() #t)
+(calc-routes 'end {} #t)
 (when (not= valid-routes 4411)
   (throw (list :wrong-result "Wrong result" valid-routes)))
 
 (set! valid-routes 0)
-(calc-routes 'end @() #f)
+(calc-routes 'end {} #f)
 (when (not= valid-routes 136767)
   (throw (list :wrong-result "Wrong result" valid-routes)))
 

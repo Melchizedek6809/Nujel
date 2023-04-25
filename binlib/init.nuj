@@ -7,8 +7,8 @@
 
 (def init/executable-name "nujel")
 (def init/args #nil)
-(def init/options @())
-(def init/option-map @())
+(def init/options {})
+(def init/option-map {})
 
 (def init (let*
             (def init/parse-args/eval-next-module #f)

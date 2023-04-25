@@ -28,7 +28,7 @@
 		   (do (set! ret-pos i)
 		       (set! ret-fuel new-fuel)))
              (set! i (add/int i 1)))
-      @(:pos ret-pos :fuel ret-fuel))
+      {:pos ret-pos :fuel ret-fuel})
 
 (def result (calc/optimal real-data calc/fuel/simple))
 (when (not= (ref result :fuel) 355989)

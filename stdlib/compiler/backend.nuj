@@ -16,8 +16,8 @@
           assemble*))
 
 (def *active-backend* :bytecode)
-(def backend/tree @( :bytecode compile/backend/bytecode
-                     :none compile/backend/none))
+(def backend/tree { :bytecode compile/backend/bytecode
+                    :none compile/backend/none})
 
 (defn backend (expr)
       :cat :compiler

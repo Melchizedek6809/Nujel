@@ -6,7 +6,7 @@
 
 (def next-tick (+ (time/milliseconds) 1000))
 (def tick-tock #t) ; Just a simple comment
-(def test @())
+(def test {})
 (tree/set! test :asd 123)
 (while #t
        (while (< (time/milliseconds) next-tick))

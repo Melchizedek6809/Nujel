@@ -5,10 +5,10 @@
 
 (defn allocate (width height)
       :export
-      @( :data (-> (array/allocate (* width height))
-                   (array/fill! 0))
-         :width width
-         :height height))
+      { :data (-> (array/allocate (* width height))
+                  (array/fill! 0))
+        :width width
+        :height height})
 
 (defn fill! (data v)
       :export

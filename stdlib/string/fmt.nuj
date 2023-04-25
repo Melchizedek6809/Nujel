@@ -4,11 +4,11 @@
 ;;; Subroutines and macros for formatted text output
 
 (def fmt (let*
-           (def fmt/format-arg/default @( :align :right
+           (def fmt/format-arg/default {:align :right
                                :debug #f
                                :base #f
                                :width #nil
-                               :padding-char " "))
+                               :padding-char " "})
 
            (defn fmt/find-non-digit-from-right (s i)
                  (if (< i 0)
@@ -65,11 +65,11 @@
                        (:HEXADECIMAL (tree/set! opts :argument (list int->string/HEX     (tree/ref opts :argument))))
                        (otherwise opts)))
 
-           (def fmt/number-format-prefixex @( :binary "#b"
+           (def fmt/number-format-prefixex {:binary "#b"
                                    :octal "#o"
                                    :decimal "#d"
                                    :hexadecimal "#x"
-                                   :HEXADECIMAL "#x"))
+                                   :HEXADECIMAL "#x"})
 
            (defn fmt/number-format-prefix (opts)
                  (if (or (not (tree/ref opts :debug)) (not (tree/ref opts :base))) opts
@@ -170,7 +170,7 @@
                      (def last-pos (buffer/length format-string))
                      (def arguments-used (-> (array/allocate (length args)) (array/fill! #f)))
 
-                     (def opts @(:expr-count (array/length arguments-used)))
+                     (def opts {:expr-count (array/length arguments-used)})
                      (doseq (c cuts)
                             (def lit (string/cut format-string (+ (cdr c) 1) last-pos))
                             (when-not (= "" lit) (set! expr-list (cons lit expr-list)))

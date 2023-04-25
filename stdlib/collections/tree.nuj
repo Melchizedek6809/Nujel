@@ -5,7 +5,7 @@
 
 (defn tree/zip (keys values)
       "Return a tree where KEYS point to VALUES"
-      (def ret @())
+      (def ret {})
       (doseq (key keys ret)
 	     (tree/set! ret key (car values))
 	     (cdr! values)))
@@ -46,7 +46,7 @@
 
 (defn tree/filter (l f)
       "Return a new tree with all elements from L where F returns true"
-      (def ret @())
+      (def ret {})
       (doseq (e (tree/keys l) ret)
              (def t (tree/ref l e))
              (when (f t)
@@ -54,7 +54,7 @@
 
 (defn tree/merge (a b)
       "Merge two trees together, if a key is contained in both trees the on in B gets priority"
-      (when-not b (return (if a (tree/dup a) @())))
+      (when-not b (return (if a (tree/dup a) {})))
       (when-not a (return (tree/dup b)))
       (def ret (tree/dup a))
       (doseq (k (tree/keys b) ret)

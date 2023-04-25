@@ -11,8 +11,8 @@
 ;;; Some simple drawing routines (line/box/circle) and some simple
 ;;; filters (scale/blur) would also be good to have here.
 
-(def image/decoders @())
-(def image/encoders @())
+(def image/decoders {})
+(def image/encoders {})
 
 (defn add-encoder! (ext enc)
       :export
@@ -36,10 +36,10 @@
 (defn new (width height)
       :export
       (def buffer (buffer/allocate (* width height 4)))
-      @( :width width
+      { :width width
          :height height
          :buffer buffer
-         :pixels (buffer/u32* buffer)))
+         :pixels (buffer/u32* buffer)})
 
 (defn image/ref (img x y)
       :export-as ref

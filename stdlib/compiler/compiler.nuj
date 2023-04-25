@@ -29,7 +29,7 @@
       :cat :compiler
       :internal
       (def source body)
-      (def meta @())
+      (def meta {})
       (while body
         (def v (car body))
         (case (type-of v)

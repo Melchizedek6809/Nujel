@@ -70,8 +70,8 @@
 	    (otherwise (packet/operator p s offset))))
 
 (defn bits/parse/packet (s offset)
-      (-> @(:version (bits/read-value s offset 3)
-                     :type (bits/read-value s (+ 3 offset) 3))
+      (-> {:version (bits/read-value s offset 3)
+                     :type (bits/read-value s (+ 3 offset) 3)}
 	  (bits/parse/packet-contents s (+ offset 6))))
 
 (defn bits/parse/hex (s)

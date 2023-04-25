@@ -100,7 +100,7 @@
 ("(123 #nil)" (string/write '(123 #nil)))
 ('(123 #nil) '(123 #nil))
 ("#@(asd: 123)" (string/write (tree/new asd: 123)))
-("#@(asd: 123)" (string/write @(asd: 123)))
+("#@(asd: 123)" (string/write {asd: 123}))
 ("(#nil)" (string/write '()))
 ("(#nil)" (string/write '(#nil)))
 ("(#nil)" (string/write (cons #nil #nil)))

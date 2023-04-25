@@ -28,7 +28,7 @@
                   (set! γ (bit-or γ (bit-shift-left 1 i)))
                   (set! ε (bit-or ε (bit-shift-left 1 i))))
               (inc! i))
-       @(:γ γ :ε ε :power-consumption (* γ ε)))
+       {:γ γ :ε ε :power-consumption (* γ ε)})
 
 (defn calc-real (numbers bit p)
        (if (<= (length numbers) 1)
@@ -47,7 +47,7 @@
 (defn calc-oxy-co (numbers bit-count)
        (def oxy (calc-real numbers (- bit-count 1) >))
        (def co  (calc-real numbers (- bit-count 1) <))
-       @(:oxy oxy :co co :power-consumption (* oxy co)))
+       {:oxy oxy :co co :power-consumption (* oxy co)})
 
 (def result (calc-γε (read-data example-data) 5))
 (when (not= (ref result :power-consumption) 198)

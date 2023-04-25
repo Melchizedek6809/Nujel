@@ -11,13 +11,13 @@
 (defn new-buffer (filename)
       :export
       (def lines [(buffer/allocate 16)])
-      (def buf @( :lines lines
-                  :filename filename
-                  :changed #f
-                  :pos-x 0
-                  :pos-y 0
-                  :scroll-x 0
-                  :scroll-y 0))
+      (def buf { :lines lines
+                 :filename filename
+                 :changed #f
+                 :pos-x 0
+                 :pos-y 0
+                 :scroll-x 0
+                 :scroll-y 0})
       (return buf))
 
 (defn get-line (buf line-y)

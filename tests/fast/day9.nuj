@@ -42,7 +42,7 @@
                         ))
       (def bb (reverse (sort basins)))
       (def biggest-3-basins (list (car bb) (cadr bb) (caddr bb)))
-      @(:part1 low-point-sum :part2 (* (car bb) (cadr bb) (caddr bb))))
+      {:part1 low-point-sum :part2 (* (car bb) (cadr bb) (caddr bb))})
 
 (defn map/set/row (data y line w)
       (def cols (map (split line "") read/int))

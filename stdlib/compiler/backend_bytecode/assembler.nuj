@@ -462,8 +462,8 @@
                        "Assemble all arguments into a single :bytecode-array"
                        :cat :bytecode
                        :internal
-                       (def sym-map @())
-                       (def lit-arr #())
+                       (def sym-map {})
+                       (def lit-arr [])
                        (def tmp (-> (assemble/flatten code)
                                     (assemble/build-lit-arr lit-arr)))
                        (assemble/build-sym-map tmp sym-map 0)
