@@ -36,7 +36,9 @@
 
                    (defn disassemble/maybe-quote (v)
                          "Quotes symbols but just passes through every other value"
-                         (if (symbol? v) (list 'quote v) v))
+                         (cond ((symbol? v) (list 'quote v))
+                               ((bytecode-array? v) (disassemble/bytecode-array v))
+                               (#t v)))
 
                    (defn disassemble/op (a i literals)
                          "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
@@ -49,7 +51,7 @@
                                (#$5  `($set/val ~(disassemble/maybe-quote (ref literals (bytecode-op->int (ref a (+ i 1)))))))
                                (#$6  `($push/val/ext ~(ref literals (bit-or (bytecode-op->int (ref a (+ i 1)))
                                                                             (bit-shift-left (bytecode-op->int (ref a (+ i 2))) 8)))))
-                               (#$7  `($det/val ~(disassemble/maybe-quote (ref literals (bytecode-op->int (ref a (+ i 1)))))))
+                               (#$7  `($def/val ~(disassemble/maybe-quote (ref literals (bytecode-op->int (ref a (+ i 1)))))))
                                (#$8  `($def/val/ext ~(ref literals (bit-or (bytecode-op->int (ref a (+ i 1)))
                                                                            (bit-shift-left (bytecode-op->int (ref a (+ i 2))) 8)))))
                                (#$9  `($jmp*  ~(bytecode-arr->offset a (+ i 1))))
@@ -103,12 +105,7 @@
                          (disassemble/array (bytecode-arr->arr code) 0 (bytecode-literals code)))
 
                    (defn disassemble/to-string (bc)
-                         (-> (disassemble/bytecode-array bc)
-                             (map (fn (op) (cat "(" (pad-start (string (car op)) 5)
-                                              " "
-                                              (cdr op)
-                                              ")")))
-                             (join "\n")))
+                         (disassemble/bytecode-array bc))
 
                    (defn disassemble (bc)
                          "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
