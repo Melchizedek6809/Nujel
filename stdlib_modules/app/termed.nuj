@@ -94,9 +94,9 @@
 
 (defn read-escaped-input ()
       (def c (poll-input))
-      (when (= c #\()
+      (when (= c #\[)
         (return (read-bracketed-input)))
-      (return (insert-char #\()))
+      (return (insert-char #\[)))
 
 (defn read-cx-input ()
       (def c (poll-input))
