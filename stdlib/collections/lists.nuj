@@ -143,9 +143,9 @@
       (list-take (list-drop l (max 0 start)) (- end (max 0 start))))
 
 (defn list/replace (l search-for replace-with)
-      "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH"
-      ""
-      "Uses (equal?) so we can search/replace lists/trees and other complex data structures"
+      "Return a new list where every occurence of SEARCH-FOR is replaced with REPLACE-WITH
+
+      Uses (equal?) so we can search/replace lists/trees and other complex data structures"
       (cond ((not l) #nil)
             ((equal? l search-for)
              replace-with)

@@ -4,21 +4,21 @@
 ;;; Various functions dealing with strings of all sorts
 
 (defn pad-start (text pad-length padding)
-      "Pad a string to a certain length by prepending another string."
-      ""
-      "This function will, if necessary, prepend padding on to the beginning of"
-      "text repeatedly until the desired pad-length is reached."
-      ""
-      "Because of this the string in padding can be truncated if the amount of"
-      "characters that need to be added can't be evenly divided through the length of padding."
-      ""
-      "This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation."
-      ""
-      "text: The input string"
-      "pad-length: The minimum length of the result"
-      "padding: A string that will be used to pad text, defaults to a single space"
-      ""
-      "Returns the padded string"
+      "Pad a string to a certain length by prepending another string.
+
+      This function will, if necessary, prepend padding on to the beginning of
+      text repeatedly until the desired pad-length is reached.
+
+      Because of this the string in padding can be truncated if the amount of
+      characters that need to be added can't be evenly divided through the length of padding.
+
+      This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation.
+
+      text: The input string
+      pad-length: The minimum length of the result
+      padding: A string that will be used to pad text, defaults to a single space
+
+      Returns the padded string"
       :cat :string-manipulation
       :related pad-middle
       :related pad-end
@@ -39,21 +39,21 @@
           text))
 
 (defn pad-end (text pad-length padding)
-      "Pad a string to a certain length by appending another string."
-      ""
-      "This function will, if necessary, append padding on to the end of"
-      "text repeatedly until the desired pad-length is reached."
-      ""
-      "Because of this the string in padding can be truncated if the amount of"
-      "characters that need to be added can't be evenly divided through the length of padding."
-      ""
-      "This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation."
-      ""
-      "text: The input string"
-      "pad-length: The minimum length of the result"
-      "padding: A string that will be used to pad text, defaults to a single space"
-      ""
-      "Returns the padded string"
+      "Pad a string to a certain length by appending another string.
+
+      This function will, if necessary, append padding on to the end of
+      text repeatedly until the desired pad-length is reached.
+
+      Because of this the string in padding can be truncated if the amount of
+      characters that need to be added can't be evenly divided through the length of padding.
+
+      This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation.
+
+      text: The input string
+      pad-length: The minimum length of the result
+      padding: A string that will be used to pad text, defaults to a single space
+
+      Returns the padded string"
       :cat :string-manipulation
       :related pad-middle
       :related pad-start
@@ -74,21 +74,21 @@
           text))
 
 (defn pad-middle (text pad-length padding)
-      "Pad a string to a certain length by surrounding it with another string."
-      ""
-      "This function will, if necessary, append and prepend padding to the"
-      "beginning and end of text repeatedly until the desired pad-length is reached."
-      ""
-      "Because of this the string in padding can be truncated if the amount of"
-      "characters that need to be added can't be evenly divided through the length of padding."
-      ""
-      "This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation."
-      ""
-      "text: The input string"
-      "pad-length: The minimum length of the result"
-      "padding: A string that will be used to pad text, defaults to a single space"
-      ""
-      "Returns the padded string"
+      "Pad a string to a certain length by surrounding it with another string.
+
+      This function will, if necessary, append and prepend padding to the
+      beginning and end of text repeatedly until the desired pad-length is reached.
+
+      Because of this the string in padding can be truncated if the amount of
+      characters that need to be added can't be evenly divided through the length of padding.
+
+      This means that you have to be careful not to use unicode characters as a padding, or make sure that it can be used without truncation.
+
+      text: The input string
+      pad-length: The minimum length of the result
+      padding: A string that will be used to pad text, defaults to a single space
+
+      Returns the padded string"
       :cat :string-manipulation
       :related pad-start
       :related pad-end
@@ -110,13 +110,13 @@
           text))
 
 (defn trim (text)
-      "Remove all whitespace from the start and end of text"
-      ""
-      "Whitespace is determined by the whitespace? predicate."
-      ""
-      "text: The input string"
-      ""
-      "Returns a trimmed version of text"
+      "Remove all whitespace from the start and end of text
+
+      Whitespace is determined by the whitespace? predicate.
+
+      text: The input string
+
+      Returns a trimmed version of text"
       :cat :string-manipulation
       :related pad-start
       :related pad-middle
@@ -136,11 +136,11 @@
       (string/cut text start end))
 
 (defn upper-case (text)
-      "Convert text into a version using only capitals or uppercase letters."
-      ""
-      "text: The input string"
-      ""
-      "Returns the resulting upper-case version"
+      "Convert text into a version using only capitals or uppercase letters.
+
+      text: The input string
+
+      Returns the resulting upper-case version"
       :cat :string-manipulation
       :related lower-case
       :related capitalize
@@ -151,11 +151,11 @@
         (buffer/set! ret i (upper-case-char (buffer/ref text i)))))
 
 (defn lower-case (text)
-      "Convert text into a version using only lowercase letters."
-      ""
-      "text: The input string"
-      ""
-      "Returns the resulting lower-case version"
+      "Convert text into a version using only lowercase letters.
+
+      text: The input string
+
+      Returns the resulting lower-case version"
       :cat :string-manipulation
       :related upper-case
       :related capitalize
@@ -166,14 +166,14 @@
         (buffer/set! ret i (lower-case-char (buffer/ref text i)))))
 
 (defn capitalize (text)
-      "Convert text into a capitalized version."
-      ""
-      "This is simplified by having the first character be an upper-case version, as well"
-      "as any character following a whitespace character, and all other characters be in lower-case."
-      ""
-      "text: The input string"
-      ""
-      "Returns the capitalized version"
+      "Convert text into a capitalized version.
+
+      This is simplified by having the first character be an upper-case version, as well
+      as any character following a whitespace character, and all other characters be in lower-case.
+
+      text: The input string
+
+      Returns the capitalized version"
       :cat :string-manipulation
       :related upper-case
       :related lower-case

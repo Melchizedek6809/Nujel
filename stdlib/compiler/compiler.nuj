@@ -51,7 +51,11 @@
                               (otherwise (tree/set! meta v #t)))))
         (cdr! body))
       (when (tree/ref meta :documentation)
-        (tree/set! meta :documentation (trim (tree/ref meta :documentation))))
+        (tree/set! meta :documentation (-> (tree/ref meta :documentation)
+                                           (split "\n")
+                                           (map trim)
+                                           (join "\n")
+                                           (trim))))
       (return meta))
 
 (defmacro defmacro (name args . body)
@@ -95,9 +99,9 @@
               def-form))
 
 (defn eval-in (closure expr)
-      "Compile and the immediatly evaluate the result"
-      ""
-      "Mostly used by lRun() and (eval)"
+      "Compile and the immediatly evaluate the result
+
+      Mostly used by lRun() and (eval)"
       (bytecode-eval* (compile* expr closure) closure))
 
 (defmacro eval (expr)
@@ -105,4 +109,10 @@
           `(eval-in (current-closure) ~expr))
 
 (defmacro typecheck/only (v t)
-          `(when-not (= (type-of ~v) ~t) (throw (list :type-error ~(fmt "Expected a value of type {t}") ~v (current-lambda)))))
+          `(when-not (= (type-of ~v) ~t)
+                     (throw (list :type-error ~(fmt "Expected a value of type {t}") ~v (current-lambda)))))
+
+(def gensym (let ((gensym/counter 0))
+                 (defn gensym (prefix)
+                       (inc! gensym/counter)
+                       (string->symbol (cat prefix "ΓεnΣym-" gensym/counter)))))

@@ -6,17 +6,16 @@
 (defn describe/closure (c i)
       :cat :compiler
       :internal
-      (require :ansi)
       (when c
             (if (= c root-closure)
                 (cat (cat (int (or i 0)) "# <root environment>")
                      "\r\n")
                 (do (def data (closure/data c))
                     (def l (length data))
-                  (cat (ansi/blue (int (or i 0)) "# ")
-                       (ansi/green (string/write c))
+                  (cat (int (or i 0)) "# "
+                       (string/write c)
                        " - "
-                       (ansi/yellow (resolve '*module* c))
+                       (resolve '*module* c)
                        " - "
                        (if (< l 16)
                            (string/write data)
@@ -29,9 +28,8 @@
 
 (def print/error (let*
                    (defn print/error/wrap (i v)
-                         (require :ansi)
                          (case i
-                               (0 (ansi/red v))
+                               (0 v)
                                (2 (string/write v))
                                (3 (describe/closure v))
                                (otherwise (string v))))
@@ -55,16 +53,15 @@
 (def describe (let*
                 (defn describe/thing (o)
                       "Describe a specific value O"
-                      (import (white) :ansi)
                       (def documentation (closure/documentation o))
                       (def name (closure/name o))
-                      (pfmt "({}" (white (closure/name o)))
+                      (pfmt "({}" (closure/name o))
                       (def arguments (closure/arguments o))
                       (if (pair? arguments)
                           (doseq (arg arguments (println ")"))
                                  (when arg (pfmt " {arg}")))
                           (pfmt " . {arguments})"))
-                      (pfmtln "  {documentation}")
+                      (pfmtln "\n{documentation}")
                       #nil)
 
                 (defn describe/string (a)
@@ -76,19 +73,14 @@
                           (describe/string fun)
                           (describe/thing fun)))))
 
-(def gensym (let ((gensym/counter 0))
-                 (defn gensym (prefix)
-                       (inc! gensym/counter)
-                       (string->symbol (cat prefix "ΓεnΣym-" gensym/counter)))))
-
 (def root-closure (current-closure))
 
 (defmacro deftest l #nil) ; Tests should be skipped when compiling
 
 (defmacro comment body
-          "Does nothing, mainly used for commenting out"
-          "parts of an expression, but having the sub expressions"
-          "be available so you can use them easily via nujel-mode."
+          "Does nothing, mainly used for commenting out
+          parts of an expression, but having the sub expressions
+          be available so you can use them easily via nujel-mode."
           :cat :documentation
           (deftest #nil (let (x #nil) (comment (set! x #t)) x))
 

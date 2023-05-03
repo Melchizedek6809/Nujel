@@ -4,56 +4,56 @@
 ;;; Some functions manipulating binary date
 
 (defn bit-shift-right (cur-val shift-amount)
-      "Shift all the bits in cur-val to the right by shift-amount"
-      ""
-      "cur-val: The integer val whose bits we want to shift"
-      "shift-amount: The amount of digits we want to shift the value by"
-      ""
-      "A shifted integer"
+      "Shift all the bits in cur-val to the right by shift-amount
+
+      cur-val: The integer val whose bits we want to shift
+      shift-amount: The amount of digits we want to shift the value by
+
+      A shifted integer"
+      :cat :bitwise-operations
       (deftest 0 (bit-shift-right 16 8))
       (deftest 1 (bit-shift-right 16 4))
       (deftest 16 (bit-shift-right 16 0))
-      :cat :bitwise-operations
 
       (bit-shift-left cur-val (- shift-amount)))
 
 (defn bit-test? (test-val bit-pos)
-      "Test bit at position i"
-      ""
-      "We check if test-val has a 1 at bit-pos and return #t if that is the case"
-      ""
-      "test-val: The integer in which to look for the bit"
-      "bit-pos: Which bit to look for, with 0 being the least significant digit"
-      ""
-      "A boolean signifying whether the bit is set or not"
+      "Test bit at position i
+
+      We check if test-val has a 1 at bit-pos and return #t if that is the case
+
+      test-val: The integer in which to look for the bit
+      bit-pos: Which bit to look for, with 0 being the least significant digit
+
+      A boolean signifying whether the bit is set or not"
+      :cat :bitwise-operations
       (deftest #t (bit-test? #b1001 0))
       (deftest #f (bit-test? #b1001 1))
       (deftest #f (bit-test? #b1001 7))
-      :cat :bitwise-operations
 
       (typecheck/only test-val :int)
       (typecheck/only bit-pos :int)
       (not (zero? (bit-and test-val (bit-shift-left 1 bit-pos)))))
 
 (defn bit-set (cur-val bit-pos)
-      "Set bit-pos within cur-val to 1"
-      ""
-      "cur-val: The integer where we set the bit in"
-      "bit-pos: The index of the bit we want to change, with 0 being the least significant digit"
-      ""
-      "An integer cur-val but with a guaranteed 1 at bit-pos"
-      (deftest #b1111 (bit-set #b1011 2))
+      "Set bit-pos within cur-val to 1
+
+      cur-val: The integer where we set the bit in
+      bit-pos: The index of the bit we want to change, with 0 being the least significant digit
+
+      An integer cur-val but with a guaranteed 1 at bit-pos"
       :cat :bitwise-operations
+      (deftest #b1111 (bit-set #b1011 2))
 
       (bit-or cur-val (bit-shift-left 1 bit-pos)))
 
 (defn bit-flip (cur-val bit-pos)
-      "Flip the bit at bit-pos within cur-val"
-      ""
-      "cur-val: The integer where we flip the bit in"
-      "bit-pos: The index of the bit we want to flip, with 0 being the least significant digit"
-      ""
-      "An integer cur-val but with the bit at position bit-pos flipped"
+      "Flip the bit at bit-pos within cur-val
+
+      cur-val: The integer where we flip the bit in
+      bit-pos: The index of the bit we want to flip, with 0 being the least significant digit
+
+      An integer cur-val but with the bit at position bit-pos flipped"
       :cat :bitwise-operations
       (deftest #b1111 (bit-flip #b1011 2))
       (deftest #b1011 (bit-flip #b1111 2))
@@ -61,12 +61,12 @@
       (bit-xor cur-val (bit-shift-left 1 bit-pos)))
 
 (defn bit-clear (cur-val bit-pos)
-      "Clear the bit at bit-pos within cur-val"
-      ""
-      "cur-val: The integer where we clear the bit in"
-      "bit-pos: The index of the bit we want to clear, with 0 being the least significant digit"
-      ""
-      "An integer cur-val but with the bit at position bit-pos forced to 0"
+      "Clear the bit at bit-pos within cur-val
+
+      cur-val: The integer where we clear the bit in
+      bit-pos: The index of the bit we want to clear, with 0 being the least significant digit
+
+      An integer cur-val but with the bit at position bit-pos forced to 0"
       :cat :bitwise-operations
       (deftest #b1001 (bit-clear #b1011 1))
       (deftest #b1011 (bit-clear #b1011 2))

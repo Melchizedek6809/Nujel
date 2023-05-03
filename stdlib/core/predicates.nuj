@@ -32,15 +32,15 @@
       (not= 0 val))
 
 (defn equal? (val-a val-b)
-      "Test whether two values are equal"
-      ""
-      "Unlike = this is actually comparing the contents of compound data,"
-      "which can be very slow."
-      ""
-      "val-a: The first argument"
-      "val-b: The second argument"
-      ""
-      "Whether the two arguments are equal?"
+      "Test whether two values are equal
+
+      Unlike = this is actually comparing the contents of compound data,
+      which can be very slow.
+
+      val-a: The first argument
+      val-b: The second argument
+
+      Whether the two arguments are equal?"
       :cat :predicate
       (deftest #t (equal? 1 1))
       (deftest #t (equal? 2.0 2.0))
@@ -62,15 +62,15 @@
                 (otherwise (= val-a val-b)))))
 
 (defn not-equal? (val-a val-b)
-      "Test whether two values are not equal"
-      ""
-      "This is using equal? under the hood, meaning it can be quite slow since"
-      "it actually compares the contents of complex data structures."
-      ""
-      "val-a: The first argument"
-      "val-b: The second argument"
-      ""
-      "Whether the two arguments are not equal?"
+      "Test whether two values are not equal
+
+      This is using equal? under the hood, meaning it can be quite slow since
+      it actually compares the contents of complex data structures.
+
+      val-a: The first argument
+      val-b: The second argument
+
+      Whether the two arguments are not equal?"
       :cat :predicate
       (deftest #t (not-equal? ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :b 2}) '("7" [8 88] :9)] ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :a 2}) '("7" [8 88] :9)]))
       (deftest #f (not-equal? :a :a))
@@ -81,13 +81,13 @@
       (not (equal? val-a val-b)))
 
 (defn int? (val)
-      "Test whether val is an integer"
-      ""
-      "Integer are sometimes called fixnum's as well"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is an integer"
+      "Test whether val is an integer
+
+      Integer are sometimes called fixnum's as well
+
+      val: This argument is going to be tested
+
+      Whether val is an integer"
       :cat :type-predicate
       (deftest #t (int? 123))
       (deftest #f (int? 123.123))
@@ -97,13 +97,13 @@
       (= :int (type-of val)))
 
 (defn float? (val)
-      "Test whether val is a floating-point number"
-      ""
-      "Float's are sometimes called flonum's as well"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a floating-point number"
+      "Test whether val is a floating-point number
+
+      Float's are sometimes called flonum's as well
+
+      val: This argument is going to be tested
+
+      Whether val is a floating-point number"
       :cat :type-predicate
       (deftest #f (float? 123))
       (deftest #t (float? 123.123))
@@ -113,13 +113,13 @@
       (= :float (type-of val)))
 
 (defn number? (a)
-      "Test whether val is a number"
-      ""
-      "Right now this means either a floating-point or integer value."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a number"
+      "Test whether val is a number
+
+      Right now this means either a floating-point or integer value.
+
+      val: This argument is going to be tested
+
+      Whether val is a number"
       :cat :type-predicate
       (deftest #t (number? 123))
       (deftest #t (number? 123.123))
@@ -130,11 +130,11 @@
           (float? a)))
 
 (defn bool? (val)
-      "Test whether val is a boolean"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a boolean"
+      "Test whether val is a boolean
+
+      val: This argument is going to be tested
+
+      Whether val is a boolean"
       :cat :type-predicate
       (deftest #t (bool? #t))
       (deftest #t (bool? #f))
@@ -147,13 +147,13 @@
       (= :bool (type-of val)))
 
 (defn pair? (val)
-      "Test whether val is a pair"
-      ""
-      "A pair is sometimes also called a cons cell, which can be used to build lists and much more."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a pair"
+      "Test whether val is a pair
+
+      A pair is sometimes also called a cons cell, which can be used to build lists and much more.
+
+      val: This argument is going to be tested
+
+      Whether val is a pair"
       :cat :type-predicate
       (deftest #t (pair? '()))
       (deftest #t (pair? '(123)))
@@ -165,13 +165,13 @@
       (= :pair (type-of val)))
 
 (defn array? (val)
-      "Test whether val is an array"
-      ""
-      "Sometimes also called a vector."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is an array"
+      "Test whether val is an array
+
+      Sometimes also called a vector.
+
+      val: This argument is going to be tested
+
+      Whether val is an array"
       :cat :type-predicate
       (deftest #t (array? []))
       (deftest #f (array? '(123)))
@@ -183,11 +183,11 @@
       (= :array (type-of val)))
 
 (defn string? (val)
-      "Test whether val is a string"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a string"
+      "Test whether val is a string
+
+      val: This argument is going to be tested
+
+      Whether val is a string"
       :cat :type-predicate
       (deftest #t (string? "asd"))
       (deftest #f (string? []))
@@ -200,11 +200,11 @@
       (= :string (type-of val)))
 
 (defn symbol? (val)
-      "Test whether val is a symbol"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a symbol"
+      "Test whether val is a symbol
+
+      val: This argument is going to be tested
+
+      Whether val is a symbol"
       :cat :type-predicate
       (deftest #t (symbol? 'abc))
       (deftest #f (symbol? "asd"))
@@ -216,13 +216,13 @@
       (= :symbol (type-of val)))
 
 (defn environment? (val)
-      "Test whether val is an environment"
-      ""
-      "Sometimes also called a closure"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is an environment"
+      "Test whether val is an environment
+
+      Sometimes also called a closure
+
+      val: This argument is going to be tested
+
+      Whether val is an environment"
       :cat :type-predicate
       (deftest #t (environment? (current-closure)))
       (deftest #f (environment? []))
@@ -232,13 +232,13 @@
       (= :environment (type-of val)))
 
 (defn tree? (val)
-      "Test whether val is a binary tree"
-      ""
-      "Trees can also be used as maps, tuples or 'objects'."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a tree"
+      "Test whether val is a binary tree
+
+      Trees can also be used as maps, tuples or '
+
+      val: This argument is going to be tested
+
+      Whether val is a tree"
       :cat :type-predicate
       (deftest #t (tree? {}))
       (deftest #f (tree? (current-closure)))
@@ -252,11 +252,11 @@
       (= :tree (type-of val)))
 
 (defn collection? (l)
-      "Test whether val is a collection"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a collection"
+      "Test whether val is a collection
+
+      val: This argument is going to be tested
+
+      Whether val is a collection"
       :cat :type-predicate
       (deftest #t (collection? {}))
       (deftest #t (collection? []))
@@ -272,11 +272,11 @@
             (otherwise #f)))
 
 (defn keyword? (v)
-      "Test whether val is a keyword"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a keyword"
+      "Test whether val is a keyword
+
+      val: This argument is going to be tested
+
+      Whether val is a keyword"
       :cat :type-predicate
       (deftest #t (keyword? :abc))
       (deftest #f (keyword? 'abc))
@@ -290,11 +290,11 @@
       (= :keyword (type-of v)))
 
 (defn macro? (val)
-      "Test whether val is a macro"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a macro"
+      "Test whether val is a macro
+
+      val: This argument is going to be tested
+
+      Whether val is a macro"
       :cat :type-predicate
       (deftest #t (macro? case))
       (deftest #f (macro? :abc))
@@ -303,13 +303,13 @@
       (= :macro (type-of val)))
 
 (defn lambda? (val)
-      "Test whether val is a function"
-      ""
-      "Sometimes also called lambda or subroutine"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a function"
+      "Test whether val is a function
+
+      Sometimes also called lambda or subroutine
+
+      val: This argument is going to be tested
+
+      Whether val is a function"
       :cat :type-predicate
       (deftest #t (lambda? min))
       (deftest #f (lambda? case))
@@ -320,13 +320,13 @@
       (or (= :lambda (type-of val))))
 
 (defn native? (val)
-      "Test whether val is a native function"
-      ""
-      "Sometimes also called lambda or subroutine"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a native function"
+      "Test whether val is a native function
+
+      Sometimes also called lambda or subroutine
+
+      val: This argument is going to be tested
+
+      Whether val is a native function"
       :cat :type-predicate
       (deftest #t (native? sin))
       (deftest #f (native? (defn +123 (a) (+ a 123))))
@@ -336,13 +336,13 @@
       (= :native-function (type-of val)))
 
 (defn buffer? (v)
-      "Test whether val is a buffer"
-      ""
-      "Buffers are just modifiable chunks of memory"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a buffer"
+      "Test whether val is a buffer
+
+      Buffers are just modifiable chunks of memory
+
+      val: This argument is going to be tested
+
+      Whether val is a buffer"
       :cat :type-predicate
       (deftest #t (buffer? #m00))
       (deftest #f (buffer? "asd"))
@@ -353,11 +353,11 @@
       (= :buffer (type-of v)))
 
 (defn buffer-view? (v)
-      "Test whether val is a buffer view"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a buffer view"
+      "Test whether val is a buffer view
+
+      val: This argument is going to be tested
+
+      Whether val is a buffer view"
       :cat :type-predicate
       (deftest #t (buffer-view? (buffer/u8* #m00)))
       (deftest #f (buffer-view? #m00))
@@ -368,11 +368,11 @@
       (= :buffer-view (type-of v)))
 
 (defn bytecode-array? (v)
-      "Test whether val is a bytecode-array"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a buffer view"
+      "Test whether val is a bytecode-array
+
+      val: This argument is going to be tested
+
+      Whether val is a buffer view"
       :cat :type-predicate
       (deftest #t (bytecode-array? #{##()01}))
       (deftest #f (bytecode-array? (buffer/u8* #m00)))
@@ -384,11 +384,11 @@
       (= :bytecode-array (type-of v)))
 
 (defn bytecode-op? (v)
-      "Test whether val is a bytecode operation"
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a bytecode op"
+      "Test whether val is a bytecode operation
+
+      val: This argument is going to be tested
+
+      Whether val is a bytecode op"
       :cat :type-predicate
       (deftest #t (bytecode-op? (int->bytecode-op 01)))
       (deftest #f (bytecode-op? 01))
@@ -401,13 +401,13 @@
       (= :bytecode-op (type-of v)))
 
 (defn procedure? (val)
-      "Test whether val is a procedure"
-      ""
-      "Procedures in this context mean something you can use with map or put at the beginning of an expression."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is a procedure"
+      "Test whether val is a procedure
+
+      Procedures in this context mean something you can use with map or put at the beginning of an expression.
+
+      val: This argument is going to be tested
+
+      Whether val is a procedure"
       :cat :type-predicate
       (deftest #t (and (native? sin) (procedure? sin)))
       (deftest #t (and (lambda? min) (procedure? min)))
@@ -420,14 +420,14 @@
           (native? val)))
 
 (defn callable? (val)
-      "Test whether val is callable"
-      ""
-      "This means basically anything where procedure? returns true, as well as macros, since they are"
-      "just standard procedures, but ones who run during compile time."
-      ""
-      "val: This argument is going to be tested"
-      ""
-      "Whether val is callable"
+      "Test whether val is callable
+
+      This means basically anything where procedure? returns true, as well as macros, since they are
+      just standard procedures, but ones who run during compile time.
+
+      val: This argument is going to be tested
+
+      Whether val is callable"
       :cat :type-predicate
       (deftest #t (and (macro? case) (callable? case)))
       (deftest #t (callable? min))

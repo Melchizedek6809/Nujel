@@ -4,11 +4,11 @@
 ;;; Functions converting from one type to another
 
 (defn keyword->string (kw)
-      "Convert a keyword into a string"
-      ""
-      "kw: The input keyword"
-      ""
-      "Returns the string for kw"
+      "Convert a keyword into a string
+
+      kw: The input keyword
+
+      Returns the string for kw"
       :cat :type-conversion
       :related string->keyword
       (deftest "asd" (keyword->string :asd))
@@ -17,11 +17,11 @@
       (string (keyword->symbol kw)))
 
 (defn string->keyword (kw)
-      "Convert a string into a keyword"
-      ""
-      "kw: The input string"
-      ""
-      "Returns the keyword for kw"
+      "Convert a string into a keyword
+
+      kw: The input string
+
+      Returns the keyword for kw"
       :cat :type-conversion
       :related keyword->string
       (deftest :asd (string->keyword "asd"))
