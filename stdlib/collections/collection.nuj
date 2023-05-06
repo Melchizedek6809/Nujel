@@ -3,36 +3,67 @@
 ;;;
 ;;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
-(defn sum (c)
-      "Return the sum of every value in collection C"
-      (reduce c + 0))
+(defn sum (collection)
+      "Return the sum of every value in collection
 
-(defn every? (l p)
-      "Returns #t if P is true for every entry of collection L"
-      (reduce l (fn (a b) (and a (p b))) #t))
+      collection: The collection to sum, can be a List, Vector or something else supported by reduce.
 
-(defn join (l glue)
-      "Join every element of α together into a string with GLUE inbetween"
-      (when-not glue (set! glue ""))
-      (if-not l "" (reduce l (fn (a b) (if a (cat a glue b) b)) #nil)))
+      The numeric sum of all the elements of collection"
+      :cat :collection-operations
 
-(defn for-each (l f)
-      "Runs F over every item in collection L"
-      (reduce l (fn (a b) (f b)) #nil))
+      (deftest :type-error (try car (sum '(1 2 3 . 4))))
+      (deftest :type-error (try car (sum 123)))
+      (deftest 10 (+ (sum '(1 2 3)) (apply (fn (α) (+ 1 α)) '(3))))
+      (deftest 15 (sum [1 2 3 4 5]))
+      (deftest 6 (sum '(1 2 3)))
 
-(defn count (l p)
-      "Count the number of items in L where P is true"
-      (if p
-          (reduce l (fn (a b) (+ a (if (p b) 1 0))) 0)
-          (reduce l (fn (a b) (+ a 1)) 0)))
+      (reduce collection + 0))
 
-(defn min l
-      "Returns the minimum value of its arguments"
-      (reduce l (fn (a b) (if (< a b) a b))))
+(defn every? (collection predicate?)
+      "Returns whether predicate? is #t for every member of the collection
 
-(defn max l
-      "Returns the maximum value of its arguments"
-      (reduce l (fn (a b) (if (> a b) a b))))
+      collection: The collection to test, can be a List, Vector or something else supported by reduce.
+      predicate?: A function that takes a single argument and returns a bool.
+
+      Whether every invocation returned #t or not"
+      :cat :collection-operations
+
+      (deftest #t (every? '(1 2 3 4 5 6) int?))
+      (deftest #f (every? '(1 2 3 4 5 6.0) int?))
+      (deftest #t (every? '(1.0 6.0) float?))
+      (deftest #f (every? '() float?))
+      (deftest #t (every? [1 2 3 4 5 6] int?))
+      (deftest #f (every? [1 2 3 4 5 6.0] int?))
+      (deftest #t (every? [1.0 6.0] float?))
+      (deftest #t (every? [] float?))
+
+      (reduce collection (fn (a b) (and a (predicate? b))) #t))
+
+(defn count (collection predicate?)
+      "Count the number of items in the collection where predicate? is #t.
+      If no predicate is provided, it will count the number of elements instead.
+
+      collection: The collection to count in
+      predicate?: Optional, a function that takes a single argument which is then called for every item.
+
+      The number of times predicate? returned #t"
+      :cat :collection-operations
+
+      (deftest 0 (count #nil))
+      (deftest 0 (count []))
+      (deftest 1 (count '(1)))
+      (deftest 1 (count [1]))
+      (deftest 3 (count '(1 2 3)))
+      (deftest 3 (count [1 2 3]))
+      (deftest 2 (count [1 2 3 4] even?))
+      (deftest 3 (count '(1 2 3 4 5 6) odd?))
+      (deftest 3 (count '(1 2 3 4 5 6) even?))
+      (deftest 6 (count '(1 2 3 4 5 6) int?))
+      (deftest 0 (count '(1 2 3 4 5 6) float?))
+
+      (if predicate?
+          (reduce collection (fn (a b) (+ a (if (predicate? b) 1 0))) 0)
+          (reduce collection (fn (a b) (+ a 1)) 0)))
 
 (defn delete (l e)
       "Returns a filtered list l with all elements equal to e omitted"
@@ -50,3 +81,12 @@
                      "Flatten a collection of collections into a simple list"
                      (if-not (collection? l) l
                              (nreverse (reduce l flatten-λ #nil))))))
+
+(defn join (l glue)
+      "Join every element of α together into a string with GLUE inbetween"
+      (when-not glue (set! glue ""))
+      (if-not l "" (reduce l (fn (a b) (if a (cat a glue b) b)) #nil)))
+
+(defn for-each (l f)
+      "Runs F over every item in collection L"
+      (reduce l (fn (a b) (f b)) #nil))

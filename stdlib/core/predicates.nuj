@@ -112,10 +112,10 @@
 
       (= :float (type-of val)))
 
-(defn number? (a)
+(defn number? (val)
       "Test whether val is a number
 
-      Right now this means either a floating-point or integer value.
+      Right now this means either a floating-point or integer number.
 
       val: This argument is going to be tested
 
@@ -126,8 +126,8 @@
       (deftest #f (number? 'abc))
       (deftest #f (number? "123"))
 
-      (or (int? a)
-          (float? a)))
+      (or (int? val)
+          (float? val)))
 
 (defn bool? (val)
       "Test whether val is a boolean
