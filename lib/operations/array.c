@@ -58,16 +58,6 @@ static lVal *lnfArrAllocate(lClosure *c, lVal *v){
 	return r;
 }
 
-static lVal *lnfArrRef(lClosure *c, lVal *v){
-	lArray *arr = requireArray(c,  lCar(v));
-	const int key = requireInt(c, lCadr(v));
-	if((key < 0) || (key >= arr->length)){
-		lExceptionThrowValClo("out-of-bounds","(array/ref] index provided is out of bounds", v, c);
-		return NULL;
-	}
-	return arr->data[key];
-}
-
 /* Return the length of the list V */
 static int lListLength(lVal *v){
 	int i = 0;
@@ -91,7 +81,6 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 void lOperationsArray(lClosure *c){
 	lAddNativeFunc(c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew);
 	lAddNativeFunc(c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate);
-	lAddNativeFunc(c,"array/ref",      "(array index)",       "Return value of ARRAY at position INDEX",  lnfArrRef);
 	lAddNativeFunc(c,"array/length",   "(array)",             "Return length of ARRAY",                   lnfArrLength);
 	lAddNativeFunc(c,"array/length!",  "(array size)",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet);
 	lAddNativeFunc(c,"array/set!",     "(array index value)", "Set ARRAY at INDEX to &...VALUES",         lnfArrSet);

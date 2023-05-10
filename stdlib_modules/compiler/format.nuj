@@ -1,0 +1,19 @@
+(defn format-form (source indent-level)
+      :export
+      (when-not indent-level (set! indent-level 0))
+      (cond ((not (pair? source)) (string/write source))
+            ((not (pair? (car source))) (string/write source))
+            (case (caar source)
+                  ('defn (cat "asd" (string/write source)))
+                  (else (string/write source)))))
+
+(defn main (args)
+      :export
+      (when-not (file/file? (car args))
+                (println "Usage: (...FILES)"))
+      (doseq (file args)
+             (-> (slurp file)
+                 (read)
+                 (map format-form)
+                 (join "\n\n")
+                 (println))))

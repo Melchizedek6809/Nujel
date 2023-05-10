@@ -142,6 +142,7 @@ void lOperationsBase(lClosure *c){
 	lOperationsSpecial(c);
 	lOperationsString(c);
 	lOperationsTree(c);
+	lOperationsGeneric(c);
 }
 
 /* Create a new root closure with the stdlib */

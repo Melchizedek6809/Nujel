@@ -376,11 +376,14 @@ void lOperationsCore       (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
 void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
+void lOperationsGeneric    (lClosure *c);
 
 lVal *lAdd(lClosure *c, lVal *a, lVal *b);
 lVal *lSub(lClosure *c, lVal *a, lVal *b);
 lVal *lMul(lClosure *c, lVal *a, lVal *b);
 lVal *lDiv(lClosure *c, lVal *a, lVal *b);
 lVal *lRem(lClosure *c, lVal *a, lVal *b);
+
+lVal *lValBytecodeOp(lBytecodeOp v);
 
 #endif

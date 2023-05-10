@@ -9,7 +9,7 @@
 (:bytecode-op (type-of (int->bytecode-op 255)))
 ("#{##()\n00090F10FF\n}" (string/write (arr->bytecode-arr [#$0 #$9 #$F #$10 #$FF] [])))
 (:bytecode-array (type-of (arr->bytecode-arr [#$0 #$9 #$F #$10 #$FF] [])))
-(#$0 (array/ref (bytecode-arr->arr (arr->bytecode-arr [#$0 #$9 #$F #$10 #$FF] [])) 0))
+(#$0 (ref (bytecode-arr->arr (arr->bytecode-arr [#$0 #$9 #$F #$10 #$FF] [])) 0))
 (0    (bytecode-eval* (arr->bytecode-arr [#$2 #$0 #$1] []) (environment*)))
 (127  (bytecode-eval* (arr->bytecode-arr [#$2 #$7F #$1] []) (environment*)))
 (-1   (bytecode-eval* (arr->bytecode-arr [#$2 #$FF #$1] []) (environment*)))

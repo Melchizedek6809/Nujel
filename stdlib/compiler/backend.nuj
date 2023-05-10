@@ -22,7 +22,7 @@
 (defn backend (expr)
       :cat :compiler
       :internal
-      ((tree/ref backend/tree *active-backend*) expr))
+      ((ref backend/tree *active-backend*) expr))
 
 (defn compile/for (backend expr environment)
       (def last-backend *active-backend*)

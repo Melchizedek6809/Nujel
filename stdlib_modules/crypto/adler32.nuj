@@ -11,7 +11,7 @@
       (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
       (def v (buffer/u8* data))
       (dotimes (i (buffer/length data))
-        (set! a (mod/int (add/int a (buffer/ref v i)) 65521))
+        (set! a (mod/int (add/int a (ref v i)) 65521))
         (set! b (mod/int (add/int a b) 65521)))
       (bit-or a (bit-shift-left b 16)))
 

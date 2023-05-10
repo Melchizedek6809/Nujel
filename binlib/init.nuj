@@ -43,7 +43,7 @@
                        (ref init/option-map :default)) option))
 
             (defn init/parse-options (options)
-                  (if (= (buffer/ref options 0) #\-)
+                  (if (= (ref options 0) #\-)
                       (init/parse-option (string->keyword (cut options 1)))
                       (for-each (map (split options "") string->symbol) init/parse-option)))
 
@@ -54,11 +54,11 @@
                         (init/parse-args/eval-next-module (try (fn (e)
                                                                    (print/error e)
                                                                  (exit 1))
-                                                               (when (= (buffer/ref arg 0) #\:)
+                                                               (when (= (ref arg 0) #\:)
                                                                  (set! arg (string/cut arg 1)))
                                                                (module/main (string->keyword arg) (cdr args))
                                                                (exit 0)))
-                        ((= (buffer/ref arg 0) #\-) (init/parse-options (string/cut arg 1)))
+                        ((= (ref arg 0) #\-) (init/parse-options (string/cut arg 1)))
                         (#t (try (fn (e)
                                      (print/error e)
                                    (exit 1))

@@ -20,10 +20,10 @@
 (defn encode (image)
       :export
       (require :image)
-      (def image-size (* (tree/ref image :height)
+      (def image-size (* (ref image :height)
                          3
-                         (+ (tree/ref image :width)
-                            (calc-row-padding (tree/ref image :width) 3))))
+                         (+ (ref image :width)
+                            (calc-row-padding (ref image :width) 3))))
       (def header-size (+ 14 40))
       (def file-size (+ image-size header-size))
 
@@ -36,8 +36,8 @@
       (set! i (buffer/view/le/set! b i 4 0))
       (set! i (buffer/view/le/set! b i 4 header-size))
       (set! i (buffer/view/le/set! b i 4 40)) ; BITMAPINFOHEADER
-      (set! i (buffer/view/le/set! b i 4 (tree/ref image :width)))
-      (set! i (buffer/view/le/set! b i 4 (tree/ref image :height)))
+      (set! i (buffer/view/le/set! b i 4 (ref image :width)))
+      (set! i (buffer/view/le/set! b i 4 (ref image :height)))
       (set! i (buffer/view/le/set! b i 2 1)) ; Planes
       (set! i (buffer/view/le/set! b i 2 24)) ; BPP
       (set! i (buffer/view/le/set! b i 4 0)) ; Compression method
@@ -47,11 +47,11 @@
       (set! i (buffer/view/le/set! b i 4 0)) ; Palette size, 0 for (^ 2 n)
       (set! i (buffer/view/le/set! b i 4 0)) ; Important colors, 0 for all
 
-      (def row-padding (calc-row-padding (tree/ref image :width) 3))
+      (def row-padding (calc-row-padding (ref image :width) 3))
       (def pixels (- header-size 1)) ; Pixel data comes immediatly after the header
-      (let ((y (- (tree/ref image :height) 1)))
+      (let ((y (- (ref image :height) 1)))
            (while (>= y 0)
-             (dotimes (x (tree/ref image :width))
+             (dotimes (x (ref image :width))
                (set! pixels (buffer/view/le/set! b pixels 3 (image/ref image x y))))
              (set! pixels (+ pixels row-padding))
              (set! y (add/int y -1))))

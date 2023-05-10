@@ -152,6 +152,7 @@ static lVal *lnfBufferToString(lClosure *c, lVal *v){
 	const i64 length = castToInt(lCadr(v), buf->length);
 	if(unlikely(length < 0)){
 		lExceptionThrowValClo("type-error", "Length has to be greater than 0", lCadr(v), c);
+		return NULL;
 	}
 	return lValStringLen(buf->buf, length);
 }
@@ -161,6 +162,7 @@ static lVal *bufferView(lClosure *c, lVal *v, lBufferViewType T){
 	const bool immutable = lCdr(v) ? castToBool(lCadr(v)) : buf->flags & BUFFER_IMMUTABLE;
 	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
 		lExceptionThrowValClo("type-error", "Can't create a mutable view for an immutable buffer", v, c);
+		return NULL;
 	}
 	const size_t length = buf->length / lBufferViewTypeSize(T);
 	lBufferView *bufView = lBufferViewAlloc(buf, T, 0, length, immutable);
@@ -178,56 +180,6 @@ static lVal *lnfBufferViewS32(lClosure *c, lVal *v){ return bufferView(c, v, lbv
 static lVal *lnfBufferViewF32(lClosure *c, lVal *v){ return bufferView(c, v, lbvtF32); }
 static lVal *lnfBufferViewS64(lClosure *c, lVal *v){ return bufferView(c, v, lbvtS64); }
 static lVal *lnfBufferViewF64(lClosure *c, lVal *v){ return bufferView(c, v, lbvtF64); }
-
-static lVal *lnfBufferViewRef(lClosure *c, lVal *v){
-	const size_t i  = requireNaturalInt(c, lCadr(v));
-	size_t length   = 0;
-	const void *buf = NULL;
-	lVal *car = lCar(v);
-	lBufferViewType viewType;
-	typeswitch(car){
-	case ltBufferView:
-		buf      = car->vBufferView->buf->buf;
-		length   = car->vBufferView->length;
-		viewType = car->vBufferView->type;
-		break;
-	case ltString:
-	case ltBuffer:
-		buf      = car->vBuffer->data;
-		length   = car->vBuffer->length;
-		viewType = lbvtU8;
-		break;
-	}
-	if(buf == NULL){
-		lExceptionThrowValClo("type-error", "Can't ref that", car, c);
-	}
-	if(i >= length){
-		lExceptionThrowValClo("out-of-bounds","(buffer/view/ref] index provided is out of bounds", v, c);
-	}
-	switch(viewType){
-	default:
-		exit(5);
-		return NULL;
-	case lbvtU8:
-		return lValInt(((u8 *)buf)[i]);
-	case lbvtS8:
-		return lValInt(((i8 *)buf)[i]);
-	case lbvtU16:
-		return lValInt(((u16 *)buf)[i]);
-	case lbvtS16:
-		return lValInt(((i16 *)buf)[i]);
-	case lbvtU32:
-		return lValInt(((u32 *)buf)[i]);
-	case lbvtS32:
-		return lValInt(((i32 *)buf)[i]);
-	case lbvtS64:
-		return lValInt(((i64 *)buf)[i]);
-	case lbvtF32:
-		return lValFloat(c, ((float *)buf)[i]);
-	case lbvtF64:
-		return lValFloat(c, ((double *)buf)[i]);
-	}
-}
 
 static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 	lVal *car = lCar(v);
@@ -250,11 +202,13 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 		break;
 	}
 
-	if(buf == NULL){
+	if(unlikely(buf == NULL)){
 		lExceptionThrowValClo("type-error", "Can't set! in that", car, c);
+		return NULL;
 	}
-	if(i >= length){
+	if(unlikely(i >= length)){
 		lExceptionThrowValClo("out-of-bounds","(buffer/set!] index provided is out of bounds", v, c);
+		return NULL;
 	}
 
 	switch(viewType){
@@ -318,7 +272,6 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeFunc(c, "buffer/f64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF64);
 	lAddNativeFunc(c, "buffer-view->buffer",    "(view)",           "Return the buffer of VIEW", lnfBufferViewBuffer);
 
-	lAddNativeFunc(c, "buffer/ref",             "(view off)",       "Return the value in VIEW at OFF", lnfBufferViewRef);
 	lAddNativeFunc(c, "buffer/set!",            "(view off val)",   "Set the value of VIEW at OFF to VAL", lnfBufferViewSet);
 	lAddNativeFunc(c, "buffer/length",          "(buf)",            "Return the size of BUF in bytes",   lnfBufferLengthGet);
 	lAddNativeFunc(c, "buffer/immutable?",      "(buf)",            "Return #t if BUF is immutable",     lnfBufferImmutableGet);

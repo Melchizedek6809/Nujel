@@ -26,11 +26,11 @@
 
 (defn get-encoder (path)
       (def ext (string->keyword (lower-case (path/extension path))))
-      (tree/ref image/encoders ext))
+      (ref image/encoders ext))
 
 (defn get-decoder (path)
       (def ext (string->keyword (lower-case (path/extension path))))
-      (tree/ref image/decoders ext))
+      (ref image/decoders ext))
 
 
 (defn new (width height)
@@ -43,34 +43,34 @@
 
 (defn image/ref (img x y)
       :export-as ref
-      (def i (+ (int x) (* (int y) (tree/ref img :width))))
-      (buffer/ref (tree/ref img :pixels) i))
+      (def i (+ (int x) (* (int y) (ref img :width))))
+      (ref (ref img :pixels) i))
 
 (defn image/set! (img x y value)
       :export-as set!
-      (def i (+ (int x) (* (int y) (tree/ref img :width))))
-      (buffer/set! (tree/ref img :pixels) i value))
+      (def i (+ (int x) (* (int y) (ref img :width))))
+      (buffer/set! (ref img :pixels) i value))
 
 (defn fill! (img value)
       :export
-      (def p (tree/ref img :pixels))
-      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
+      (def p (ref img :pixels))
+      (dotimes (i (* (ref img :width) (ref img :height)) img)
         (buffer/set! p i value)))
 
 (defn map! (img fun)
       :export
-      (def p (tree/ref img :pixels))
-      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
-        (buffer/set! p i (fun (buffer/ref p i)))))
+      (def p (ref img :pixels))
+      (dotimes (i (* (ref img :width) (ref img :height)) img)
+        (buffer/set! p i (fun (ref p i)))))
 
 (defn dup (img)
       :export
-      (def ret (image/new (tree/ref img :width)
-                          (tree/ref img :height)))
-      (def in (tree/ref img :pixels))
-      (def out (tree/ref ret :pixels))
-      (dotimes (i (* (tree/ref img :width) (tree/ref img :height)) img)
-        (buffer/set! out i (buffer/ref in i))))
+      (def ret (image/new (ref img :width)
+                          (ref img :height)))
+      (def in (ref img :pixels))
+      (def out (ref ret :pixels))
+      (dotimes (i (* (ref img :width) (ref img :height)) img)
+        (buffer/set! out i (ref in i))))
 
 (defn save! (img path)
       :export
@@ -82,7 +82,7 @@
 (defn adler32 (img)
       :export
       (import (hash) :crypto/adler32)
-      (hash (tree/ref img :buffer)))
+      (hash (ref img :buffer)))
 
 (defn test-image-xor ()
       :export

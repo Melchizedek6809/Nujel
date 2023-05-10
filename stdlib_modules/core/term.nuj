@@ -59,13 +59,13 @@
 
 (defn set-fg-color (color-name)
       :export
-      (def v (tree/ref fg-colors color-name))
+      (def v (ref fg-colors color-name))
       (when-not v (exception "Unknown color" color-name))
       (stdout 'block-write v))
 
 (defn set-bg-color (color-name)
       :export
-      (def v (tree/ref bg-colors color-name))
+      (def v (ref bg-colors color-name))
       (when-not v (exception "Unknown color" color-name))
       (stdout 'block-write v))
 
@@ -94,11 +94,11 @@
 
 (defn get-width ()
       :export
-      (tree/ref (get-size) :width))
+      (ref (get-size) :width))
 
 (defn get-height ()
       :export
-      (tree/ref (get-size) :height))
+      (ref (get-size) :height))
 
 (defn poll-input ()
       :export

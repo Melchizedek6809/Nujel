@@ -85,9 +85,9 @@
       (dotimes (a 100)
                (dotimes (b 100)
                         (when (not= a b)
-                              (def cs (snail/add (snail/read (array/ref vals a)) (snail/read (array/ref vals b))))
+                              (def cs (snail/add (snail/read (ref vals a)) (snail/read (ref vals b))))
                               (set! cmax (max cmax (snail/mag cs)))
-                              (def cs (snail/add (snail/read (array/ref vals b)) (snail/read (array/ref vals a))))
+                              (def cs (snail/add (snail/read (ref vals b)) (snail/read (ref vals a))))
                               (set! cmax (max cmax (snail/mag cs))))))
       cmax)
 

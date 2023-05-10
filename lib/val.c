@@ -181,3 +181,9 @@ lVal *lValFileHandle(FILE *fh){
 	ret->vFileHandle = fh;
 	return ret;
 }
+
+lVal *lValBytecodeOp(lBytecodeOp v){
+	lVal *ret = lValAlloc(ltBytecodeOp);
+	ret->vBytecodeOp = v;
+	return ret;
+}

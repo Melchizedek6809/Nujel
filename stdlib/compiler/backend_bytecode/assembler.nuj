@@ -367,7 +367,7 @@
                        (return pos))
 
                  (defn assemble/relocate-op (code sym-map pos out)
-                       (def target (tree/ref sym-map (cadr code)))
+                       (def target (ref sym-map (cadr code)))
                        (def off (- (+ target (cadddr code)) pos))
                        (array/set! out (inc! pos) (int->bytecode-op (bit-and (bit-shift-right off (caddr code)) #xFF)))
                        (return pos))
@@ -392,7 +392,7 @@
                          (exception :out-of-bounds "Can only store up to 255 literals per bytecode-arr" code))
                        (when (not= (type-of lit) :pair)
                          (dotimes (i (array/length lit-arr))
-                           (when (equal? (array/ref lit-arr i) lit)
+                           (when (equal? (ref lit-arr i) lit)
                              (return (literal-index->bytecode-op i)))))
                        (array/length! lit-arr (+ 1 (array/length lit-arr)))
                        (array/set! lit-arr (- (array/length lit-arr) 1) lit)
@@ -467,7 +467,7 @@
                        (def tmp (-> (assemble/flatten code)
                                     (assemble/build-lit-arr lit-arr)))
                        (assemble/build-sym-map tmp sym-map 0)
-                       (def out (array/allocate (tree/ref sym-map :last-op)))
+                       (def out (array/allocate (ref sym-map :last-op)))
                        (assemble/emit-relocated-ops tmp sym-map -1 out)
                        (arr->bytecode-arr out lit-arr))))
 

@@ -7,7 +7,7 @@
        (def γ (reduce (split (file/read filename) "\n")
                        (fn (α β)
                          (cond ((zero? (buffer/length β)) α)
-                               ((= (buffer/ref β 0) #\f)
+                               ((= (ref β 0) #\f)
                                 (tree/set! α :folds (cons (split (caddr (split β " ")) "=") (ref α :folds))))
                                (#t (def τ (map (split β ",") read/single))
                                    (set! points (cons τ points))
@@ -59,7 +59,7 @@
        (def len (array/length β))
        (def ret 0)
        (dotimes (i len ret)
-            (when (> (array/ref β i) 0) (inc! ret))))
+            (when (> (ref β i) 0) (inc! ret))))
 
 (defn print-folded (α)
        (dotimes (y (ref α :height))

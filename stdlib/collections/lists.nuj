@@ -45,13 +45,6 @@
       (doseq (e l s)
              (set! s (o s e))))
 
-(defn list/ref (l i)
-      "Returns the the element of list l at location i"
-      (while (and l (> i 0))
-             (dec! i)
-             (cdr! l))
-      (car l))
-
 (defn reverse (l)
       "Return the list l in reverse order"
       (def ret)

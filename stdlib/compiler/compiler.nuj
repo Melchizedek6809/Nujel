@@ -34,15 +34,15 @@
         (def v (car body))
         (case (type-of v)
               (:pair (if (== (car v) 'deftest)
-                         (tree/set! meta :tests (cons (cdr v) (tree/ref meta :tests)))
+                         (tree/set! meta :tests (cons (cdr v) (ref meta :tests)))
                          (set! body #nil)))
-              (:string (tree/set! meta :documentation (cat (string (tree/ref meta :documentation))
+              (:string (tree/set! meta :documentation (cat (string (ref meta :documentation))
                                                                  "\n"
                                                                  v)))
               (:keyword (case v
                               (:inline (tree/set! meta v #t)
                                        (tree/set! meta :source source))
-                              (:related (tree/set! meta :related (cons (cadr body) (tree/ref meta :related)))
+                              (:related (tree/set! meta :related (cons (cadr body) (ref meta :related)))
                                         (cdr! body))
                               (:export-as (tree/set! meta :export (cadr body))
                                           (cdr! body))
@@ -50,8 +50,8 @@
                                     (cdr! body))
                               (otherwise (tree/set! meta v #t)))))
         (cdr! body))
-      (when (tree/ref meta :documentation)
-        (tree/set! meta :documentation (-> (tree/ref meta :documentation)
+      (when (ref meta :documentation)
+        (tree/set! meta :documentation (-> (ref meta :documentation)
                                            (split "\n")
                                            (map trim)
                                            (join "\n")
@@ -92,9 +92,9 @@
                            '~args
                            ~fn-meta
                            '~(compile/do* body (current-closure)))))
-          (if (tree/ref fn-meta :export)
-              (list 'export (if (symbol? (tree/ref fn-meta :export))
-                                (tree/ref fn-meta :export)
+          (if (ref fn-meta :export)
+              (list 'export (if (symbol? (ref fn-meta :export))
+                                (ref fn-meta :export)
                                 name) def-form)
               def-form))
 

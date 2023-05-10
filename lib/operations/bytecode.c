@@ -33,12 +33,6 @@ lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals,
 	return ret;
 }
 
-static lVal *lValBytecodeOp(lBytecodeOp v){
-	lVal *ret = lValAlloc(ltBytecodeOp);
-	ret->vBytecodeOp = v;
-	return ret;
-}
-
 static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
 	const i64 val = requireInt(c, lCar(v));
 	if((val < -128) || (val > 255)){
@@ -92,16 +86,6 @@ static lVal *lnfBytecodeLiterals(lClosure *c, lVal *v){
 	return ret;
 }
 
-static lVal *lnfBytecodeArrRef(lClosure *c, lVal *v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	const i64 i = requireNaturalInt(c, lCadr(v));
-	if(i >= (arr->dataEnd - arr->data)){
-		lExceptionThrowValClo("out-of-bounds", "Bytecode array ref was out of bounds", lCadr(v), c);
-		return NULL;
-	}
-	return lValBytecodeOp(arr->data[i]);
-}
-
 static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	return lValInt(arr->dataEnd - arr->data);
@@ -114,6 +98,5 @@ void lOperationsBytecode(lClosure *c){
 	lAddNativeFunc(c,"bytecode-arr->arr",    "(a)", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
 	lAddNativeFunc(c,"bytecode-literals",    "(a)", "Return the literal section of a BCA", lnfBytecodeLiterals);
 
-	lAddNativeFunc(c,"bytecode-array/ref",   "(a i)", "Return the bytecode-op in A at position I", lnfBytecodeArrRef);
 	lAddNativeFunc(c,"bytecode-array/length","(a)", "Return the length of the bytecode-array A", lnfBytecodeArrLength);
 }

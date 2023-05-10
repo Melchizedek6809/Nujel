@@ -28,7 +28,7 @@
                        (cons :part1 (char-to-score (cadr ε)))
                        (throw ε)))
            (dotimes (i (buffer/length line))
-                    (def cc (buffer/ref line i))
+                    (def cc (ref line i))
                     (case cc
                           ((#\() (set! stack (cons #\) stack)))
                           ((#\{) (set! stack (cons #\} stack)))
@@ -43,7 +43,7 @@
 (def res (map lines find-first-syntax-error))
 (def p1-res (reduce res (fn (α β) (if (= :part1 (car β)) (+ α (cdr β)) α)) 0))
 (def incomplete-lines (list/sort (filter res (fn (α) (not= :part1 (car α))))))
-(def p2-res (list/ref incomplete-lines (div/int (length incomplete-lines) 2)))
+(def p2-res (ref incomplete-lines (div/int (length incomplete-lines) 2)))
 (when (not= p1-res 315693)
       (throw (list :wrong-result "Wrong result" p1-res)))
 (when (not= p2-res 1870887234)

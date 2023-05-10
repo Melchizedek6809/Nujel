@@ -15,7 +15,7 @@
 
       (out 'block-write (fmt "unsigned char {symbol-name}[] = \""))
       (dotimes (i (buffer/length raw))
-               (def c (buffer/ref raw i))
+               (def c (ref raw i))
                (case c
                      (#\lf (out 'block-write "\\n\"\n\""))
                      (#\cr (out 'block-write "\\r"))

@@ -64,25 +64,25 @@
                                                              (return :end-of-file))
                                                          (when-not (file/read* handle temporary-buffer-view 1)
                                                                    (return :end-of-file))
-                                                         (buffer/ref temporary-buffer-view 0 char))
+                                                         (ref temporary-buffer-view 0 char))
                                             :raw! (fn (handle)
                                                       (file/raw* handle #t))
-                                            :close! (tree/ref output-port-method-table :close!)
-                                            :position (tree/ref output-port-method-table :position)
-                                            :position! (tree/ref output-port-method-table :position!)
-                                            :file-handle (tree/ref output-port-method-table :file-handle)
+                                            :close! (ref output-port-method-table :close!)
+                                            :position (ref output-port-method-table :position)
+                                            :position! (ref output-port-method-table :position!)
+                                            :file-handle (ref output-port-method-table :file-handle)
                                             :methods (fn (handle) input-port-method-table)})
 
   (set! make-output-port (fn (handle)
                              "Create a new output port for HANDLE"
                            (fn (method . args)
-                               (apply (tree/ref output-port-method-table method) (cons handle args)))))
+                               (apply (ref output-port-method-table method) (cons handle args)))))
 
   (set! make-string-output-port (fn ()
                                     "Create a new string output port"
                                   (def self #nil)
                                   (set! self (fn (method . args)
-                                                 (apply (tree/ref string-out-methods method)
+                                                 (apply (ref string-out-methods method)
                                                         (cons self args))))
                                   (meta! self :buffer (buffer/allocate #x80))
                                   (meta! self :position 0)))
@@ -90,7 +90,7 @@
   (set! make-input-port (fn (handle)
                             "Create a new input port for HANDLE"
                           (fn (method . args)
-                              (apply (tree/ref input-port-method-table method) (cons handle args))))))
+                              (apply (ref input-port-method-table method) (cons handle args))))))
 
 (defmacro with-string-port (name . body)
           `(let ((~name (make-string-output-port)))

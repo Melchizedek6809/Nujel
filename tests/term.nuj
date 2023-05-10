@@ -12,14 +12,14 @@
 (core/term/draw-box :red
                     2
                     2
-                    (- (tree/ref size :width) 4)
-                    (- (tree/ref size :height) 4))
+                    (- (ref size :width) 4)
+                    (- (ref size :height) 4))
 
 (core/term/draw-box :blue
                     4
                     4
-                    (- (tree/ref size :width) 8)
-                    (- (tree/ref size :height) 8))
+                    (- (ref size :width) 8)
+                    (- (ref size :height) 8))
 
 (core/term/move-cursor 6 6)
 

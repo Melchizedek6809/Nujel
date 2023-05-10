@@ -23,7 +23,7 @@
 (defn find/six (vals numbers)
        (def ret (-> vals
                 (filter (fn (α) (= (popcount α) 6)))
-                (filter (fn (α) (= (popcount (bit-and α (array/ref numbers 1))) 1)))
+                (filter (fn (α) (= (popcount (bit-and α (ref numbers 1))) 1)))
        ))
        (when (> (length ret) 1) (stacktrace))
        (array/set! numbers 6 (car ret))
@@ -32,7 +32,7 @@
 (defn find/five (vals numbers)
        (def ret (-> vals
                 (filter (fn (α) (= (popcount α) 5)))
-                (filter (fn (α) (= α (bit-and α (array/ref numbers 6)))))))
+                (filter (fn (α) (= α (bit-and α (ref numbers 6)))))))
        (when (> (length ret) 1) (stacktrace))
        (array/set! numbers 5 (car ret))
        (filter vals (fn (α) (not= α (car ret)))))
@@ -40,7 +40,7 @@
 (defn find/nine (vals numbers)
        (def ret (-> vals
                 (filter (fn (α) (= (popcount α) 6)))
-                (filter (fn (α) (= α (bit-or α (array/ref numbers 4)))))))
+                (filter (fn (α) (= α (bit-or α (ref numbers 4)))))))
        (when (> (length ret) 1) (stacktrace))
        (array/set! numbers 9 (car ret))
        (filter vals (fn (α) (not= α (car ret)))))
@@ -55,7 +55,7 @@
 (defn find/three (vals numbers)
        (def ret (-> vals
                 (filter (fn (α) (= (popcount α) 5)))
-                (filter (fn (α) (= α (bit-or α (array/ref numbers 1)))))))
+                (filter (fn (α) (= α (bit-or α (ref numbers 1)))))))
        (when (> (length ret) 1) (stacktrace))
        (array/set! numbers 3 (car ret))
        (filter vals (fn (α) (not= α (car ret)))))
@@ -63,7 +63,7 @@
 (defn find/two (vals numbers)
        (def ret (-> vals
                 (filter (fn (α) (= (popcount α) 5)))
-                (filter (fn (α) (not= α (bit-or α (array/ref numbers 1)))))))
+                (filter (fn (α) (not= α (bit-or α (ref numbers 1)))))))
        (when (> (length ret) 1) (stacktrace))
        (array/set! numbers 2 (car ret))
        (filter vals (fn (α) (not= α (car ret)))))
@@ -97,7 +97,7 @@
        (defn translate/val (val i)
               (when-not i (def i 0))
               (when (> i 10) (throw (list :error "")))
-              (if (= (array/ref numbers i) val)
+              (if (= (ref numbers i) val)
                   i
                   (translate/val val (+ 1 i))))
        (reduce (map (map out-vals seven-seg->binary) translate/val) (fn (α β) (+ (* α 10) β)) 0))

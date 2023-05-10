@@ -5,7 +5,7 @@
 
 (defn array/+= (a i v)
       "Add V to the value in A at position I and store the result in A returning A"
-      (array/set! a i (+ v (array/ref a i))))
+      (array/set! a i (+ v (ref a i))))
 
 (defn array/++ (a i)
       "Increment position I in A and return A"
@@ -23,11 +23,11 @@
                 (exception :type-error "array/append expects two arrays as its arguments"))
       (def ret (array/allocate (+ (array/length a) (array/length b))))
       (dotimes (i (array/length a))
-               (array/set! ret i (array/ref a i)))
+               (array/set! ret i (ref a i)))
       (let ((i (array/length a))
             (rl (array/length ret)))
            (while (< i rl)
-                  (array/set! ret i (array/ref b (- i (array/length a))))
+                  (array/set! ret i (ref b (- i (array/length a))))
                   (set! i (add/int i 1))))
       (return ret))
 
@@ -35,19 +35,19 @@
       "Duplicate Array A"
       (def ret (array/allocate (array/length a)))
       (dotimes (i (array/length a) ret)
-               (array/set! ret i (array/ref a i))))
+               (array/set! ret i (ref a i))))
 
 (defn array/reduce (arr fun α)
       "Reduce an array, (reduce) should be preferred"
       (def len (array/length arr))
       (dotimes (i len α)
-               (set! α (fun α (array/ref arr i)))))
+               (set! α (fun α (ref arr i)))))
 
 (defn array/map (arr fun)
       "Map an array, (map) should be preferred"
       (def len (array/length arr))
       (dotimes (i len arr)
-               (array/set! arr i (fun (array/ref arr i)))))
+               (array/set! arr i (fun (ref arr i)))))
 
 (defn array/filter (arr pred)
       "Filter an array, (filter) should be preferred"
@@ -55,8 +55,8 @@
       (def len (array/length arr))
       (def ret (array/allocate len))
       (dotimes (ai len (array/length! ret ri))
-               (when (pred (array/ref arr ai))
-                     (array/set! ret ri (array/ref arr ai))
+               (when (pred (ref arr ai))
+                     (array/set! ret ri (ref arr ai))
                      (inc! ri))))
 
 (defn array/equal? (a b)
@@ -66,8 +66,8 @@
                     (array/length b)))
           (return #f)
           (dotimes (i (array/length a) #t)
-                   (when-not (equal? (array/ref a i)
-                                     (array/ref b i))
+                   (when-not (equal? (ref a i)
+                                     (ref b i))
                              (return #f)))))
 
 (defn array/push (arr val)
@@ -78,9 +78,9 @@
 
 (defn array/swap (arr i j)
       "Swap values at I and J in ARR"
-      (def tmp (array/ref arr i))
+      (def tmp (ref arr i))
       (-> arr
-          (array/set! i (array/ref arr j))
+          (array/set! i (ref arr j))
           (array/set! j tmp)))
 
 (def array/heap-sort (let*
@@ -91,9 +91,9 @@
                              (while looping
                                (def l (+ (bit-shift-left at 1) 1))
                                (def r (+ (bit-shift-left at 1) 2))
-                               (when (and (< l n) (> (array/ref arr l) (array/ref arr top)))
+                               (when (and (< l n) (> (ref arr l) (ref arr top)))
                                  (set! top l))
-                               (when (and (< r n) (> (array/ref arr r) (array/ref arr top)))
+                               (when (and (< r n) (> (ref arr r) (ref arr top)))
                                  (set! top r))
                                (if (= top at)
                                    (set! looping #f)
@@ -127,6 +127,6 @@
       (def ret (array/allocate (max 0 (- end start))))
       (def i start)
       (while (< i end)
-             (array/set! ret (- i start) (array/ref arr i))
+             (array/set! ret (- i start) (ref arr i))
              (set! i (add/int i 1)))
       (return ret))

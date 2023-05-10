@@ -12,7 +12,7 @@
 
 (defn tree/+= (t k v)
       "Increment value at K in T by V"
-      (tree/set! t k (+ v (int (or (tree/ref t k) 0)))))
+      (tree/set! t k (+ v (int (or (ref t k) 0)))))
 
 (defmacro tree/-= (t k v)
           "Decrement value at K in T by V"
@@ -48,7 +48,7 @@
       "Return a new tree with all elements from L where F returns true"
       (def ret {})
       (doseq (e (tree/keys l) ret)
-             (def t (tree/ref l e))
+             (def t (ref l e))
              (when (f t)
                    (tree/set! ret e t))))
 
@@ -58,4 +58,4 @@
       (when-not a (return (tree/dup b)))
       (def ret (tree/dup a))
       (doseq (k (tree/keys b) ret)
-             (tree/set! ret k (tree/ref b k))))
+             (tree/set! ret k (ref b k))))

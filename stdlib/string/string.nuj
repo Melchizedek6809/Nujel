@@ -131,8 +131,8 @@
 
       (def start 0)
       (def end (buffer/length text))
-      (while (and (< start end) (whitespace? (buffer/ref text start))) (set! start (+ start 1)))
-      (while (and (> end 0) (whitespace? (buffer/ref text (- end 1)))) (set! end (- end 1)))
+      (while (and (< start end) (whitespace? (ref text start))) (set! start (+ start 1)))
+      (while (and (> end 0) (whitespace? (ref text (- end 1)))) (set! end (- end 1)))
       (string/cut text start end))
 
 (defn upper-case (text)
@@ -148,7 +148,7 @@
 
       (def ret (buffer/allocate (buffer/length text)))
       (dotimes (i (buffer/length text) (buffer->string ret))
-        (buffer/set! ret i (upper-case-char (buffer/ref text i)))))
+        (buffer/set! ret i (upper-case-char (ref text i)))))
 
 (defn lower-case (text)
       "Convert text into a version using only lowercase letters.
@@ -163,7 +163,7 @@
 
       (def ret (buffer/allocate (buffer/length text)))
       (dotimes (i (buffer/length text) (buffer->string ret))
-        (buffer/set! ret i (lower-case-char (buffer/ref text i)))))
+        (buffer/set! ret i (lower-case-char (ref text i)))))
 
 (defn capitalize (text)
       "Convert text into a capitalized version.
@@ -182,8 +182,8 @@
       (def ret (buffer/allocate (buffer/length text)))
       (def caps? #t)
       (dotimes (i (buffer/length text) (buffer->string ret))
-         (buffer/set! ret i ((if caps? upper-case-char lower-case-char) (buffer/ref text i)))
-        (set! caps? (if (whitespace? (buffer/ref text i)) #t #f))))
+         (buffer/set! ret i ((if caps? upper-case-char lower-case-char) (ref text i)))
+        (set! caps? (if (whitespace? (ref text i)) #t #f))))
 
 (defn string/round (text decimal-digits)
       "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period"

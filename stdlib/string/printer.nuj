@@ -32,7 +32,7 @@
         (return "0"))
       (when (< α 0) (exception :type-error "Can't print negative numbers in hex for now" α ))
       (while (not-zero? α)
-             (set! ret (cat (array/ref int->string/hex/conversion-arr (bit-and α #b1111)) ret))
+             (set! ret (cat (ref int->string/hex/conversion-arr (bit-and α #b1111)) ret))
              (set! α (bit-shift-right α 4)))
       ret)
 
@@ -49,7 +49,7 @@
                  (defn write/raw/array (v port hr?)
                        (port 'block-write "##(")
                        (dotimes (i (array/length v))
-                         (write/raw (array/ref v i) port hr?)
+                         (write/raw (ref v i) port hr?)
                          (when (< i (- (array/length v) 1))
                            (port 'block-write " ")))
                        (port 'block-write ")"))
@@ -60,7 +60,7 @@
                            (do (port 'block-write "#m")
                                (def view (buffer/u8* v))
                              (dotimes (i (buffer/length v))
-                               (port 'block-write (pad-start (int->string/HEX (buffer/ref view i)) 2 "0"))))))
+                               (port 'block-write (pad-start (int->string/HEX (ref view i)) 2 "0"))))))
 
                  (defn write/raw/bytecode-array (v port hr?)
                        (port 'block-write "#{")
@@ -68,7 +68,7 @@
                        (dotimes (i (bytecode-array/length v))
                          (when (zero? (bit-and i #x1F))
                            (port 'block-write "\n"))
-                         (port 'block-write (pad-start (int->string/HEX (bytecode-op->int (bytecode-array/ref v i))) 2 "0")))
+                         (port 'block-write (pad-start (int->string/HEX (bytecode-op->int (ref v i))) 2 "0")))
                        (port 'block-write "\n}"))
 
                  (defn write/raw/tree/rec (v port hr? always-space?)
@@ -110,7 +110,7 @@
                        (when hr? (return (port 'block-write v)))
                        (port 'block-write "\"")
                        (dotimes (i (buffer/length v))
-                         (def c (buffer/ref v i))
+                         (def c (ref v i))
                          (case c
                                (0 (return (port 'block-write "\"")))
                                (#x07 (port 'block-write "\\a"))

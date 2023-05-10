@@ -13,7 +13,7 @@
            (defn fmt/find-non-digit-from-right (s i)
                  (if (< i 0)
                      -1
-                     (do (def char (buffer/ref s i))
+                     (do (def char (ref s i))
                          (if (and (>= char #\0) (<= char #\9))
                              (fmt/find-non-digit-from-right s (- i 1))
                              i))))
@@ -21,12 +21,12 @@
            (defn fmt/parse-spec (opts spec)
                  (if (zero? (buffer/length spec))
                      opts
-                     (case (buffer/ref spec (- (buffer/length spec) 1))
+                     (case (ref spec (- (buffer/length spec) 1))
                            ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9)
                             (def next-non-digit (fmt/find-non-digit-from-right spec (- (buffer/length spec) 1)))
                             (def number (string/cut spec (+ 1 next-non-digit) (buffer/length spec)))
                             (tree/set! opts :width (read/single number))
-                            (when (= #\0 (buffer/ref number 0))
+                            (when (= #\0 (ref number 0))
                               (tree/set! opts :padding-char "0"))
                             (fmt/parse-spec opts (string/cut spec 0 (+ 1 next-non-digit))))
                            (#\? (fmt/parse-spec (tree/set! opts :debug #t)
@@ -47,22 +47,22 @@
                                                 (string/cut spec 0 (- (buffer/length spec) 1))))
                            (#\> (fmt/parse-spec (tree/set! opts :align :right)
                                                 (string/cut spec 0 (- (buffer/length spec) 1))))
-                           (#\. (fmt/parse-spec (tree/set! opts :precision (tree/ref opts :width))
+                           (#\. (fmt/parse-spec (tree/set! opts :precision (ref opts :width))
                                                 (string/cut spec 0 (- (buffer/length spec) 1))))
                            (otherwise (throw (list :format-error "Unknown form-spec option" spec (current-closure)))))))
 
            (defn fmt/debug (opts)
-                 (if-not (tree/ref opts :debug)
+                 (if-not (ref opts :debug)
                          opts
-                         (tree/set! opts :argument (list string/write (tree/ref opts :argument)))))
+                         (tree/set! opts :argument (list string/write (ref opts :argument)))))
 
            (defn fmt/number-format (opts)
-                 (case (tree/ref opts :base)
-                       (:binary      (tree/set! opts :argument (list int->string/binary  (tree/ref opts :argument))))
-                       (:octal       (tree/set! opts :argument (list int->string/octal   (tree/ref opts :argument))))
-                       (:decimal     (tree/set! opts :argument (list int->string/decimal (tree/ref opts :argument))))
-                       (:hexadecimal (tree/set! opts :argument (list int->string/hex     (tree/ref opts :argument))))
-                       (:HEXADECIMAL (tree/set! opts :argument (list int->string/HEX     (tree/ref opts :argument))))
+                 (case (ref opts :base)
+                       (:binary      (tree/set! opts :argument (list int->string/binary  (ref opts :argument))))
+                       (:octal       (tree/set! opts :argument (list int->string/octal   (ref opts :argument))))
+                       (:decimal     (tree/set! opts :argument (list int->string/decimal (ref opts :argument))))
+                       (:hexadecimal (tree/set! opts :argument (list int->string/hex     (ref opts :argument))))
+                       (:HEXADECIMAL (tree/set! opts :argument (list int->string/HEX     (ref opts :argument))))
                        (otherwise opts)))
 
            (def fmt/number-format-prefixex {:binary "#b"
@@ -72,44 +72,44 @@
                                    :HEXADECIMAL "#x"})
 
            (defn fmt/number-format-prefix (opts)
-                 (if (or (not (tree/ref opts :debug)) (not (tree/ref opts :base))) opts
-                     (-> (if (tree/ref fmt/number-format-prefixex (tree/ref opts :base))
+                 (if (or (not (ref opts :debug)) (not (ref opts :base))) opts
+                     (-> (if (ref fmt/number-format-prefixex (ref opts :base))
                              (tree/set! opts :argument (list cat
-                                                             (tree/ref fmt/number-format-prefixex (tree/ref opts :base))
-                                                             (tree/ref opts :argument)))
+                                                             (ref fmt/number-format-prefixex (ref opts :base))
+                                                             (ref opts :argument)))
                              opts)
                          (tree/set! :debug #f))))
 
            (defn fmt/add-padding (opts)
-                 (if-not (tree/ref opts :width)
+                 (if-not (ref opts :width)
                          opts
-                         (tree/set! opts :argument (list (case (tree/ref opts :align)
+                         (tree/set! opts :argument (list (case (ref opts :align)
                                                                (:right   pad-start)
                                                                (:center pad-middle)
                                                                (:left  pad-end))
-                                                         (tree/ref opts :argument)
-                                                         (if (and (tree/ref opts :debug) (tree/ref opts :base))
-                                                             (- (tree/ref opts :width) 2)
-                                                             (tree/ref opts :width))
-                                                         (tree/ref opts :padding-char)))))
+                                                         (ref opts :argument)
+                                                         (if (and (ref opts :debug) (ref opts :base))
+                                                             (- (ref opts :width) 2)
+                                                             (ref opts :width))
+                                                         (ref opts :padding-char)))))
 
            (defn fmt/precision (opts)
-                 (if-not (tree/ref opts :precision)
+                 (if-not (ref opts :precision)
                          opts
                          (tree/set! opts :argument (list string/round
-                                                         (tree/ref opts :argument)
-                                                         (tree/ref opts :precision)))))
+                                                         (ref opts :argument)
+                                                         (ref opts :precision)))))
 
            (defn fmt/truncate (opts)
-                 (if-not (tree/ref opts :width)
+                 (if-not (ref opts :width)
                          opts
                          (tree/set! opts :argument (list string/cut
-                                                         (tree/ref opts :argument)
+                                                         (ref opts :argument)
                                                          0
-                                                         (+ 1 (tree/ref opts :width))))))
+                                                         (+ 1 (ref opts :width))))))
 
            (defn fmt/output (opts)
-                 (tree/ref opts :argument))
+                 (ref opts :argument))
 
            (defn fmt/format-arg (spec argument)
                  (-> (tree/set! (fmt/parse-spec (tree/dup fmt/format-arg/default) spec) :argument argument)
@@ -140,8 +140,8 @@
 
                  (if (= "" argument)
                      (do (tree/-- opts :expr-count)
-                         (array/set! arguments-used (tree/ref opts :expr-count) #t)
-                       (fmt/format-arg format-spec (fmt/arg-sym (tree/ref opts :expr-count))))
+                         (array/set! arguments-used (ref opts :expr-count) #t)
+                       (fmt/format-arg format-spec (fmt/arg-sym (ref opts :expr-count))))
                      (let ((read-vals (read argument)))
                           (when (cdr read-vals)
                             (throw (list :format-error "Format argument specifier contains more than a single atom" argument (current-lambda))))
@@ -160,7 +160,7 @@
                                (throw (list :type-error "fmt needs a string literal as a first argument, since it is implemented as a macro" format-string (current-lambda))))
                      (def cuts #nil)
                      (dotimes (i (buffer/length format-string))
-                       (case (buffer/ref format-string i)
+                       (case (ref format-string i)
                              (#\{ (do (when (int? (car cuts)) (throw (list :format-error "fmt placeholders can't be nested" format-string (current-lambda))))
                                       (set! cuts (cons i cuts))))
                              (#\} (do (when-not (int? (car cuts)) (throw (list :format-error "fmt expects all brackets to be closed" format-string (current-lambda))))
@@ -181,8 +181,8 @@
                        (def lit (string/cut format-string 0 last-pos))
                        (set! expr-list (cons lit expr-list)))
                      (dotimes (i (array/length arguments-used))
-                       (when-not (array/ref arguments-used i)
-                                 (throw (list :format-error "fmt expects all arguments to be used" (list format-string (list/ref args i)) (current-lambda)))))
+                       (when-not (ref arguments-used i)
+                                 (throw (list :format-error "fmt expects all arguments to be used" (list format-string (ref args i)) (current-lambda)))))
                      (def expr (if (cdr expr-list)
                                    (cons 'cat expr-list)
                                    (if (string? (car expr-list))

@@ -43,7 +43,7 @@
 (defn wrap (code string)
       "Wrap STRING in the ansi color CODE"
       :export
-      (cat (or disabled (array/ref ansi-fg code))
+      (cat (or disabled (ref ansi-fg code))
            string
            (or disabled reset)))
 
@@ -71,7 +71,7 @@
             (cat (join (map (split (join args) "")
                             (fn (a)
                                 (set! count (bit-and (+ 1 count) #x7))
-                              (cat (or disabled (array/ref ansi-fg (if (zero? count) 7 (+ count 8)))) a))) "")
+                              (cat (or disabled (ref ansi-fg (if (zero? count) 7 (+ count 8)))) a))) "")
                  (or disabled fg-reset))))
 
 (defn rainbow-bg args
@@ -81,7 +81,7 @@
       (def colored-list (map (split (join args) "")
                              (fn (a)
                                  (set! count (bit-and (+ 1 count) #x7))
-                               (cat (or disabled (array/ref ansi-fg (bit-xor count #x7))) (or disabled (array/ref ansi-bg count)) a))))
+                               (cat (or disabled (ref ansi-fg (bit-xor count #x7))) (or disabled (ref ansi-bg count)) a))))
       (cat (join colored-list "")
            (or disabled reset)))
 

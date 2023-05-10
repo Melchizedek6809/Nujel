@@ -17,10 +17,10 @@
       (draw-box :red 1 2 4 (- screen-height 2)))
 
 (defn get-modeline (buf)
-      (def x (tree/ref buf :pos-x))
-      (def y (inc (tree/ref buf :pos-y)))
+      (def x (ref buf :pos-x))
+      (def y (inc (ref buf :pos-y)))
       (def bufname (get-buf-name buf))
-      (def saved (if (tree/ref buf :changed) "*" ""))
+      (def saved (if (ref buf :changed) "*" ""))
       (fmt " L{y} - {bufname} - KeyCode: {last-char:X}"))
 
 (defn draw-modeline (buf)
@@ -33,7 +33,7 @@
 (defn draw-buffer-line (buf term-x term-y term-w line-y)
       (def line (get-line buf line-y))
       (when-not line (return))
-      (when (= line-y (tree/ref buf :pos-y))
+      (when (= line-y (ref buf :pos-y))
         (set-color :yellow :blue))
       (move-cursor term-x term-y)
       (def ln (fmt " {:4} " (inc line-y)))
@@ -44,7 +44,7 @@
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
-               (def line-y (+ cy (tree/ref buf :scroll-y)))
+               (def line-y (+ cy (ref buf :scroll-y)))
                (draw-buffer-line buf x (+ cy y) w line-y))
       (draw-modeline buf))
 
@@ -52,8 +52,8 @@
       (clear-screen)
       (def cur-buffer (get-cur-buffer))
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
-      (move-cursor (+ 1 1 6 (tree/ref cur-buffer :pos-x)) (- (inc (tree/ref cur-buffer :pos-y))
-                                                             (tree/ref cur-buffer :scroll-y))))
+      (move-cursor (+ 1 1 6 (ref cur-buffer :pos-x)) (- (inc (ref cur-buffer :pos-y))
+                                                             (ref cur-buffer :scroll-y))))
 
 (defn quit ()
       (stop)
@@ -64,20 +64,20 @@
 
 (defn end-of-line ()
       (def buf (get-cur-buffer))
-      (tree/set! buf :pos-x (inc (line-length (tree/ref buf :pos-y)))))
+      (tree/set! buf :pos-x (inc (line-length (ref buf :pos-y)))))
 
 (defn scroll-into-view ()
       (def buf (get-cur-buffer))
       (def frame-height (- screen-height 3))
-      (when (< (- (tree/ref buf :pos-y)
-                  (tree/ref buf :scroll-y)) 0)
-        (tree/set! buf :scroll-y (* scroll-interval (int (floor (/ (tree/ref buf :pos-y) scroll-interval))))))
+      (when (< (- (ref buf :pos-y)
+                  (ref buf :scroll-y)) 0)
+        (tree/set! buf :scroll-y (* scroll-interval (int (floor (/ (ref buf :pos-y) scroll-interval))))))
 
-      (when (> (- (tree/ref buf :pos-y)
-                  (tree/ref buf :scroll-y)) frame-height)
-        (tree/set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (tree/ref buf :pos-y) frame-height) scroll-interval))))))
+      (when (> (- (ref buf :pos-y)
+                  (ref buf :scroll-y)) frame-height)
+        (tree/set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (ref buf :pos-y) frame-height) scroll-interval))))))
 
-      (when (< (tree/ref buf :scroll-y) 0)
+      (when (< (ref buf :scroll-y) 0)
         (tree/set! buf :scroll-y)))
 
 (defn read-bracketed-input ()
@@ -139,12 +139,12 @@
       :export
       (start)
       (def s (get-size))
-      (set! screen-width (tree/ref s :width))
-      (set! screen-height (tree/ref s :height))
+      (set! screen-width (ref s :width))
+      (set! screen-height (ref s :height))
       (for-each args load-buffer)
       (when (zero? (array/length buffers))
         (new-buffer "*scratch*"))
-      (set-cur-buffer! (array/ref buffers (dec (array/length buffers))))
+      (set-cur-buffer! (ref buffers (dec (array/length buffers))))
       (while #t
         (scroll-into-view)
         (draw-screen)

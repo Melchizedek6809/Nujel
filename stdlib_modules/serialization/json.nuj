@@ -9,7 +9,7 @@
            (join (map (tree/keys v)
                       (fn (k)
                         (cat "\"" (keyword->string k) "\": "
-                             (val->json (tree/ref v k)))))
+                             (val->json (ref v k)))))
                  ",\n")
            "}"))
 

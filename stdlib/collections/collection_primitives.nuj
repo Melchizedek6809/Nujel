@@ -3,16 +3,6 @@
 ;;;
 ;;; A bunch of procedurs working on procedures, using type specialized λs
 
-(defn ref (l i)
-      "Return whatver is at position I in L"
-      (case (type-of l)
-            (:nil               #nil)
-            (:pair   (list/ref   l i))
-            (:array  (array/ref  l i))
-            (:tree   (tree/ref   l i))
-            ((:buffer :string :buffer-view) (buffer/ref l i))
-            (otherwise (exception :type-error "You can only ref a collection" l ))))
-
 (defn filter (l p)
       "Runs predicate p over every item in collection l and returns a list consiting solely of items where p is true"
       (case (type-of l)

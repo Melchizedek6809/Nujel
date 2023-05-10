@@ -199,10 +199,6 @@ static lVal* lnfTreeGetValues(lClosure* c, lVal* v) {
 	return lTreeValuesToList(requireTree(c, lCar(v)));
 }
 
-static lVal* lnfTreeGet(lClosure* c, lVal* v) {
-	return lTreeGet(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL);
-}
-
 static lVal* lnfTreeHas(lClosure* c, lVal* v) {
 	return lValBool(lTreeHas(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL));
 }
@@ -255,7 +251,6 @@ static lVal* lnfTreeRightAst(lClosure* c, lVal* v) {
 
 void lOperationsTree(lClosure* c) {
 	lAddNativeFunc(c, "tree/new",    "plist",          "Return a new tree", lnfTreeNew);
-	lAddNativeFunc(c, "tree/ref",    "(tree sym)",     "Return the value of SYM in TREE, or #nil if not found", lnfTreeGet);
 	lAddNativeFunc(c, "tree/keys",   "(tree)",         "Return each key of TREE in a list", lnfTreeGetKeys);
 	lAddNativeFunc(c, "tree/values", "(tree)",         "Return each value of TREE in a list", lnfTreeGetValues);
 	lAddNativeFunc(c, "tree/size",   "(tree)",         "Return the amount of entries in TREE", lnfTreeSize);

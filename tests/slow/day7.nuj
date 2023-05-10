@@ -11,11 +11,11 @@
       ret)
 (def fancy (fancy/calc))
 
-(defn calc/mm (data pred) (reduce data (fn (a b) (if (pred b a) b a)) (array/ref data 0)))
+(defn calc/mm (data pred) (reduce data (fn (a b) (if (pred b a) b a)) (ref data 0)))
 (defn calc/min (data) (calc/mm data <))
 (defn calc/max (data) (calc/mm data >))
 (defn calc/fuel/simple (data pos) (reduce data (fn (a b) (+ a (abs (- b pos)))) 0))
-(defn calc/fuel/complex (data pos) (reduce data (fn (a b) (+ a (array/ref fancy (abs (- b pos))))) 0))
+(defn calc/fuel/complex (data pos) (reduce data (fn (a b) (+ a (ref fancy (abs (- b pos))))) 0))
 (defn calc/optimal (data calc/fuel)
       (def cmin (calc/min data))
       (def cmax (calc/max data))

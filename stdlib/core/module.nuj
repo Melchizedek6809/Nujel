@@ -15,8 +15,8 @@
 (defn module/restore-state (c)
       :cat :modules
       :internal
-      (set! module/cache (tree/ref c :cache))
-      (set! module/loader (tree/ref c :loader)))
+      (set! module/cache (ref c :cache))
+      (set! module/loader (ref c :loader)))
 
 (defn module/qualify-symbol (module-name symbol)
       :cat :modules
@@ -37,17 +37,17 @@
                (if qualify?
                    (module/qualify-symbol module (keyword->symbol k))
                    (keyword->symbol k))
-               (tree/ref exports k))))
+               (ref exports k))))
 
 (defn module/load/cache (name)
       :cat :modules
       :internal
-      (tree/ref module/cache name))
+      (ref module/cache name))
 
 (defn module/load/store (name)
       :cat :modules
       :internal
-      (def source (tree/ref module/store name))
+      (def source (ref module/store name))
       (when source
         (eval-in (environment*) `(defmodule ~name ~@(read source)))
         (module/load/cache name)))
@@ -117,7 +117,7 @@
                 (exception :import-error (if (resolves? symbol module)
                                              "That symbol was not exported"
                                              "That symbol does not exist in that module")))
-      (tree/ref exports symbol))
+      (ref exports symbol))
 
 
 (defn module/add-loader (f)
@@ -165,7 +165,7 @@
       (when-not mod (exception "Module not found" module))
       (def exports (resolve 'exports mod))
       (when-not exports (exception "Invalid module, can't resolve exports" module))
-      (def main (tree/ref exports :main))
+      (def main (ref exports :main))
       (when-not main (exception "There is no symbol exported as main" module))
       (when-not (procedure? main) (exception "main is not a callable value" module))
       (main args))

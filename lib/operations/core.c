@@ -412,10 +412,10 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"apply",       "(func list)", "Evaluate FUNC with LIST as arguments",  lnfApply);
 	lAddNativeFunc(c,"macro-apply", "(macro list)","Evaluate MACRO with LIST as arguments", lnfMacroApply);
 
-	lAddNativeFuncPure(c,"car",     "(list)",    "Returs the head of LIST",          lnfCar);
-	lAddNativeFuncPure(c,"cdr",     "(list)",    "Return the rest of LIST",          lnfCdr);
-	lAddNativeFuncPure(c,"cons",    "(car cdr)", "Return a new pair of CAR and CDR", lnfCons);
-	lAddNativeFuncPure(c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse);
+	lAddNativeFuncPure(c,"car",     "(list)",       "Return the head of LIST",          lnfCar);
+	lAddNativeFuncPure(c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr);
+	lAddNativeFuncPure(c,"cons",    "(car cdr)",    "Return a new pair of CAR and CDR", lnfCons);
+	lAddNativeFunc    (c,"nreverse","(list)",       "Return LIST in reverse order, fast but mutates", lnfNReverse);
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime);
 	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs);
@@ -423,7 +423,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"<",        "(α β)", "Return true if α is less than β",             lnfLess);
 	lAddNativeFuncPure(c,"<=",       "(α β)", "Return true if α is less or equal to β",      lnfLessEqual);
 	lAddNativeFuncPure(c,"= ==",     "(α β)", "Return true if α is equal to β",              lnfEqual);
-	lAddNativeFuncPure(c,"not=",     "(α β)", "Return true if α is not equal to  β",       lnfUnequal);
+	lAddNativeFuncPure(c,"not=",     "(α β)", "Return true if α is not equal to  β",         lnfUnequal);
 	lAddNativeFuncPure(c,">=",       "(α β)", "Return true if α is greater or equal than β", lnfGreaterEqual);
 	lAddNativeFuncPure(c,">",        "(α β)", "Return true if α is greater than β",          lnfGreater);
 	lAddNativeFuncPure(c,"nil?",     "(α)",   "Return true if α is #nil",                    lnfNilPred);
