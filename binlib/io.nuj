@@ -98,15 +98,17 @@
       (map (directory/read path)
            (fn (a) (cat path "/" a))))
 
-(defn directory/read-recursive/fn (A)
-      (if (file/dir? A)
-          (directory/read-recursive A)
-          A))
+(def directory/read-recursive
+  (let*
+    (defn directory/read-recursive/fn (A)
+          (if (file/dir? A)
+              (directory/read-recursive A)
+              A))
 
-(defn directory/read-recursive (path)
-       (flatten (filter (map (directory/read-relative path)
-                             directory/read-recursive/fn)
-                        identity)))
+    (defn directory/read-recursive (path)
+          (flatten (filter (map (directory/read-relative path)
+                                directory/read-recursive/fn)
+                           identity)))))
 
 (defn load (filename)
   (try (fn (err)
@@ -148,6 +150,7 @@
            (file/write* fh content)
            (file/close* fh))
       (return #t))
+
 (defn file/write (content pathname)
       "Writes CONTENT into PATHNAME"
       (spit pathname content))

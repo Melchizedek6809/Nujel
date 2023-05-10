@@ -65,8 +65,6 @@
           (def symbol-name (gensym))
           `(let ((~symbol-name ~(cadr for-loop)))
                 (while ~symbol-name
-                  (when-not (pair? ~symbol-name) (exception :type-error "Improper list detected, please provide a proper list instead" ~(cadr for-loop)))
-                  (typecheck/only ~symbol-name :pair)
                   (def ~(car for-loop) (car ~symbol-name))
                   ~@body
                   (cdr! ~symbol-name))

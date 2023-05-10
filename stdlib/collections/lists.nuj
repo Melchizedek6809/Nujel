@@ -26,7 +26,7 @@
       "Return the last pair of LIST"
       (while (cdr list)
              (cdr! list))
-      list)
+      (return list))
 
 (defn range (end start step)
       "Return a list containing values from START (inclusive) to END (exclusive) by STEP"

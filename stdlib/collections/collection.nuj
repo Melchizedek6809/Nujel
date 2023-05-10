@@ -11,7 +11,6 @@
       The numeric sum of all the elements of collection"
       :cat :collection-operations
 
-      (deftest :type-error (try car (sum '(1 2 3 . 4))))
       (deftest :type-error (try car (sum 123)))
       (deftest 10 (+ (sum '(1 2 3)) (apply (fn (α) (+ 1 α)) '(3))))
       (deftest 15 (sum [1 2 3 4 5]))
@@ -85,8 +84,11 @@
 (defn join (l glue)
       "Join every element of α together into a string with GLUE inbetween"
       (when-not glue (set! glue ""))
-      (if-not l "" (reduce l (fn (a b) (if a (cat a glue b) b)) #nil)))
+      (when-not l (return ""))
+      (reduce l (fn (a b) (if a (cat a glue b) b)) #nil))
 
 (defn for-each (l f)
       "Runs F over every item in collection L"
-      (reduce l (fn (a b) (f b)) #nil))
+      (def ret #nil)
+      (doseq (i l ret)
+             (set! ret (f i))))
