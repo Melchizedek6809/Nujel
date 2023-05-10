@@ -464,7 +464,7 @@
 (#t (= (string->symbol "3") (string->symbol "3")))
 (#f (= (string->symbol "3") (string->symbol "2")))
 ("asd" (string 'asd))
-(:type-error (try car (ref)))
+(:vm-error (try car (ref)))
 (:type-error (try car (ref "" -1)))
 (:out-of-bounds (try car (ref "" 1)))
 (:type-error (try car (ref "" :asd)))

@@ -1,7 +1,7 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #ifndef NUJEL_AMALGAMATION
-#include "../nujel-private.h"
+#include "nujel-private.h"
 #endif
 
 static lVal *lBufferViewRef(lClosure *c, lVal *car, size_t i){
@@ -41,48 +41,43 @@ static lVal *lBufferViewRef(lClosure *c, lVal *car, size_t i){
 	}
 }
 
-static lVal *lnfGenericRef(lClosure *c, lVal *v){
-	lVal *col = lCar(v);
+lVal *lGenericRef(lClosure *c, lVal *col, lVal *key){
 	typeswitch(col){
 	case ltPair: {
-		const int index = requireNaturalInt(c, lCadr(v));
+		const int index = requireNaturalInt(c, key);
 		for(int i=0;i<index;i++){
 			col = lCdr(col);
 		}
 		return lCar(col); }
 	case ltBytecodeArr: {
 		const lBytecodeArray *arr = requireBytecodeArray(c, col);
-		const int i = requireNaturalInt(c, lCadr(v));
+		const int i = requireNaturalInt(c, key);
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
-			lExceptionThrowValClo("out-of-bounds","(ref) bytecode-array index provided is out of bounds", v, c);
+			lExceptionThrowValClo("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col, c);
 		}
 		return lValBytecodeOp(arr->data[i]); }
 	case ltArray: {
 		lArray *arr = requireArray(c, col);
-		const int i = requireNaturalInt(c, lCadr(v));
+		const int i = requireNaturalInt(c, key);
 		if(unlikely(arr->length <= i)){
-			lExceptionThrowValClo("out-of-bounds","(ref) array index provided is out of bounds", v, c);
+			lExceptionThrowValClo("out-of-bounds","(ref) array index provided is out of bounds", col, c);
 		}
 		return arr->data[i]; }
 	case ltString:
 	case ltBuffer: {
 		const char *buf = col->vBuffer->data;
 		const size_t len = col->vBuffer->length;
-		const size_t i = requireNaturalInt(c, lCadr(v));
+		const size_t i = requireNaturalInt(c, key);
 		if(unlikely(len <= i)){
-			lExceptionThrowValClo("out-of-bounds","(ref) buffer index provided is out of bounds", v, c);
+			lExceptionThrowValClo("out-of-bounds","(ref) buffer index provided is out of bounds", col, c);
 		}
 		return lValInt(buf[i]); }
 	case ltBufferView:
-		return lBufferViewRef(c, col, requireNaturalInt(c, lCadr(v)));
+		return lBufferViewRef(c, col, requireNaturalInt(c, key));
 	case ltTree:
-		return lTreeGet(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL);
+		return lTreeGet(requireTree(c, col), requireSymbolic(c, key), NULL);
 	default:
 		lExceptionThrowValClo("type-error", "Can't ref that", col, c);
 		return NULL;
 	}
-}
-
-void lOperationsGeneric(lClosure *c){
-	lAddNativeFuncPure(c,"ref","(collection key)", "Look up key in collection", lnfGenericRef);
 }

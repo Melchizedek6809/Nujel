@@ -74,7 +74,7 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	if(unlikely(closureSizeLeft < ctx->text->closureStackUsage)){
 		ctx->closureStackSize += (((ctx->text->closureStackUsage >> 8) | 1) << 8);
 		lClosure **t = realloc(ctx->closureStack, ctx->closureStackSize * sizeof(lClosure *));
-		if(t == NULL){ exit(56); }
+		if(unlikely(t == NULL)){ exit(56); }
 		ctx->closureStack = t;
 	}
 
@@ -82,7 +82,7 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	if(unlikely(valueSizeLeft < ctx->text->valueStackUsage)){
 		ctx->valueStackSize += (((ctx->text->valueStackUsage >> 8) | 1) << 8);
 		lVal **t = realloc(ctx->valueStack, ctx->valueStackSize * sizeof(lVal *));
-		if(t == NULL){ exit(57); }
+		if(unlikely(t == NULL)){ exit(57); }
 		ctx->valueStack = t;
 	}
 }
@@ -151,11 +151,12 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopMul,
 		&&llopDiv,
 		&&llopRem,
-		&&llopZeroPred
+		&&llopZeroPred,
+		&&llopRef
 	};
 	#endif
 
-	if(++exceptionTargetDepth > RECURSION_DEPTH_MAX){
+	if(unlikely(++exceptionTargetDepth > RECURSION_DEPTH_MAX)){
 		exceptionTargetDepth--;
 		lExceptionThrowValClo("too-deep", "Recursing too deep", NULL, NULL);
 		return NULL;
@@ -182,7 +183,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.csp--;
 			c = ctx.closureStack[ctx.csp];
 		}
-		if((ctx.csp > 0) && (++exceptionCount < 1000)){
+		if(unlikely((ctx.csp > 0) && (++exceptionCount < 1000))){
 			lVal *handler = c->exceptionHandler;
 
 			c = ctx.closureStack[--ctx.csp];
@@ -305,6 +306,10 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		getValBody:
 		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, ops->literals->data[v]->vSymbol);
 		vmbreak; }
+	vmcase(lopRef)
+		ctx.valueStack[ctx.sp-2] = lGenericRef(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopSetValExt) {
 		uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
@@ -397,7 +402,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal *cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal *fun = ctx.valueStack[--ctx.sp];
-		if(fun && (fun->type == ltLambda)){
+		if(likely(fun && (fun->type == ltLambda))){
 			c->text = ops;
 			c->sp   = ctx.sp;
 			c->ip   = ip;
@@ -415,7 +420,7 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopRet)
 		if(likely(ctx.csp > 0)){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
-				if(--ctx.csp <= 0){goto topLevelReturn;}
+				if(unlikely(--ctx.csp <= 0)){goto topLevelReturn;}
 			}
 			lVal *ret = ctx.valueStack[ctx.sp-1];
 			c   = ctx.closureStack[--ctx.csp];

@@ -25,6 +25,13 @@
       :inline
       '(#$03))
 
+(defn $ref ()
+      "(col key) -> (result) --- Looks up key in col"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#$2B))
+
 (defn $dup ()
       "(a) -> (a a) --- Duplicates the value that is on the top of the stack"
       :cat :bytecode
@@ -230,7 +237,7 @@
       :cat :bytecode
       :internal
       (case fun
-            ((+ - * / rem bytecode-eval*) (= arg-count 2))
+            ((+ - * / rem bytecode-eval* ref) (= arg-count 2))
             ((zero? car cdr add/int inc/int cons < <= = >= >) #t)))
 
 (defn $apply/optimized (arg-count fun)
@@ -246,6 +253,7 @@
                      (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
             (2 (case fun
                      (add/int ($add/int))
+                     (ref ($ref))
                      (+ ($add))
                      (- ($sub))
                      (* ($mul))

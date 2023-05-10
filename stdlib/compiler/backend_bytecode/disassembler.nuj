@@ -90,6 +90,7 @@
                                (#$28 '($div))
                                (#$29 '($rem))
                                (#$2A '($zero?))
+                               (#$2B '($ref))
                                (otherwise :unknown-op)))
 
                    (defn disassemble/array (a i literals)

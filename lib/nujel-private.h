@@ -218,7 +218,8 @@ typedef enum lOpcode {
 	lopMul             = 0x27,
 	lopDiv             = 0x28,
 	lopRem             = 0x29,
-	lopZeroPred        = 0x2A
+	lopZeroPred        = 0x2A,
+	lopGenericRef      = 0x2B
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
@@ -385,5 +386,6 @@ lVal *lDiv(lClosure *c, lVal *a, lVal *b);
 lVal *lRem(lClosure *c, lVal *a, lVal *b);
 
 lVal *lValBytecodeOp(lBytecodeOp v);
+lVal *lGenericRef(lClosure *c, lVal *col, lVal *key);
 
 #endif

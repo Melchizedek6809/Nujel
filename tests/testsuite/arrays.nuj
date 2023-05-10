@@ -25,7 +25,7 @@
 ([99 2 3 4] (let ((cur-arr [1 2 3 4])) (array/set! cur-arr 0 99) cur-arr))
 ([42 42 42 42 42 42] (array/fill! (array/allocate 6) 42))
 (3 (def ein-test-arr [1 2 3]) (ref ein-test-arr 2))
-(3 (def ein-test-arr [1 2 3]) (ref ein-test-arr 2 9) (ref ein-test-arr 2))
+(2 (def ein-test-arr [1 2 3]) (ref ein-test-arr 1))
 (:out-of-bounds (try car (def testerle [1 2 3]) (ref testerle 4)))
 (:out-of-bounds (try car (def testerle [1 2 3]) (ref testerle 40000)))
 ([1 2 3] (def testerle [1 2 3]) testerle)

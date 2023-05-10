@@ -1,4 +1,4 @@
- /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
+/* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
 #ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
@@ -142,7 +142,6 @@ void lOperationsBase(lClosure *c){
 	lOperationsSpecial(c);
 	lOperationsString(c);
 	lOperationsTree(c);
-	lOperationsGeneric(c);
 }
 
 /* Create a new root closure with the stdlib */
