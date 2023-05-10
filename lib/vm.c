@@ -152,7 +152,8 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopDiv,
 		&&llopRem,
 		&&llopZeroPred,
-		&&llopRef
+		&&llopRef,
+		&&llopCadr
 	};
 	#endif
 
@@ -341,6 +342,9 @@ lVal *lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmbreak;
 	vmcase(lopCdr)
 		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
+		vmbreak;
+	vmcase(lopCadr)
+		ctx.valueStack[ctx.sp-1] = lCadr(ctx.valueStack[ctx.sp-1]);
 		vmbreak;
 	vmcase(lopClosurePush)
 		ctx.valueStack[ctx.sp++] = lValEnvironment(c);

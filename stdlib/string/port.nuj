@@ -64,7 +64,7 @@
                                                              (return :end-of-file))
                                                          (when-not (file/read* handle temporary-buffer-view 1)
                                                                    (return :end-of-file))
-                                                         (ref temporary-buffer-view 0 char))
+                                                         (ref temporary-buffer-view 0))
                                             :raw! (fn (handle)
                                                       (file/raw* handle #t))
                                             :close! (ref output-port-method-table :close!)

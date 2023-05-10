@@ -27,6 +27,7 @@ lVMErrorPlaceholder(lnfMacro)
 lVMErrorPlaceholder(lnfEnvironment)
 lVMErrorPlaceholder(lnfBytecodeEval)
 lVMErrorPlaceholder(lnfRef)
+lVMErrorPlaceholder(lnfCadr)
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",              "body",                    "Evaluate body in order and returns the last result", lnfDo);
@@ -44,4 +45,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"environment*",    "()",                      "Create a new object",       lnfEnvironment);
 	lAddNativeFunc(c,"bytecode-eval*",  "(bc-arr env)",            "Evaluate BC-ARR in ENV", lnfBytecodeEval);
 	lAddNativeFuncPure(c,"ref",         "(collection key)",        "Look up key in collection", lnfRef);
+	lAddNativeFuncPure(c,"cadr",        "(list)",                  "Look up the cadr of list", lnfCadr);
 }

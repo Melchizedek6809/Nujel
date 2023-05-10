@@ -74,17 +74,6 @@
 
       (car (car p)))
 
-(defn cadr (p)
-      "(car (cdr p))"
-      :inline
-      :cat :list-manipulation
-      :related caar
-      :related car
-      :related cdr
-      (deftest #t (cadr '(#f #t #f)))
-
-      (car (cdr p)))
-
 (defn cdar (p)
       "(cdr (car p))"
       :inline

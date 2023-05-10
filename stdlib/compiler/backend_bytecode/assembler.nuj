@@ -123,6 +123,13 @@
       :inline
       '(#$12))
 
+(defn $cadr ()
+      "(l) -> (cadr) --- Replace L with its cadr"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#$2C))
+
 (defn $cons ()
       "(car cdr) -> (pair) --- Cons CAR and CDR together and put it on the stack"
       :cat :bytecode
@@ -237,8 +244,8 @@
       :cat :bytecode
       :internal
       (case fun
-            ((+ - * / rem bytecode-eval* ref) (= arg-count 2))
-            ((zero? car cdr add/int inc/int cons < <= = >= >) #t)))
+            ((+ - * / rem bytecode-eval*) (= arg-count 2))
+            ((zero? car cdr cadr add/int inc/int ref cons < <= = >= >) #t)))
 
 (defn $apply/optimized (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
@@ -248,6 +255,7 @@
             (1 (case fun
                      (car ($car))
                      (cdr ($cdr))
+                     (cadr ($cadr))
                      (zero? ($zero?))
                      (inc/int ($inc/int))
                      (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
@@ -404,9 +412,6 @@
                              (return (literal-index->bytecode-op i)))))
                        (array/length! lit-arr (+ 1 (array/length lit-arr)))
                        (array/set! lit-arr (- (array/length lit-arr) 1) lit)
-                       #;(when (> (array/length lit-arr) *max-literal-arr*)
-                       (set! *max-literal-arr* (array/length lit-arr))
-                       (pfmtln "Max: {*max-literal-arr*}"))
                        (literal-index->bytecode-op (- (array/length lit-arr) 1)))
 
                  (defn assemble/build-lit-arr (code lit-arr)
