@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 
-lClosure *lClosureNew(lClosure *parent, closureType t){
+lClosure *lClosureNew(lClosure *parent, closureType t) {
 	lClosure *c = lClosureAllocRaw();
 	c->parent = parent;
 	c->type = t;
@@ -18,26 +18,27 @@ lClosure *lClosureNew(lClosure *parent, closureType t){
 	return c;
 }
 
-static const lSymbol *lGetSymbol(const lVal *v){
+static const lSymbol *lGetSymbol(const lVal *v) {
 	return ((v == NULL) || (v->type != ltSymbol)) ? symNull : v->vSymbol;
 }
 
-lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda){
+lClosure *lClosureNewFunCall(lClosure *parent, lVal *args, lVal *lambda) {
 	lClosure *tmpc = lClosureNew(lambda->vClosure, closureCall);
-	tmpc->text = lambda->vClosure->text;
-	tmpc->name = lambda->vClosure->name;
+	tmpc->text   = lambda->vClosure->text;
+	tmpc->name   = lambda->vClosure->name;
 	tmpc->caller = parent;
-	tmpc->ip   = tmpc->text->data;
-	for(lVal *n = lambda->vClosure->args; n; n = n->vList.cdr){
-		if(likely(n->type == ltPair)){
+	tmpc->ip     = tmpc->text->data;
+	for (lVal *n = lambda->vClosure->args; n; n = n->vList->cdr) {
+		if (likely(n->type == ltPair)) {
 			lVal *car = lCar(n);
 			if(likely(car)){
 				lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));
 			}
 			args = lCdr(args);
-		}else if(n->type == ltSymbol){
+		} else if(likely(n->type == ltSymbol)) {
 			lDefineClosureSym(tmpc, lGetSymbol(n), args);
-		}else{
+			break;
+		} else {
 			lExceptionThrowValClo("invalid-lambda", "Incorrect type in argument list", lambda, parent);
 		}
 	}
@@ -62,7 +63,7 @@ lVal *lDefineAliased(lClosure *c, lVal *lNF, const char *sym){
 		lDefineClosureSym(c,name,lNF);
 		if(lNF->vNFunc->name == NULL){lNF->vNFunc->name = name;}
 		for(;len<32;len++){ // Advance to the next non whitespace character
-			if(cur[len] == 0)     {return lNF;} // Or return if we reached the final 0 byte
+			if(cur[len] == 0)    {return lNF;} // Or return if we reached the final 0 byte
 			if(!isspace((u8)cur[len])){break;}
 		}
 		cur += len;

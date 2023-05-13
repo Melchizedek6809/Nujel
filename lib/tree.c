@@ -220,8 +220,8 @@ static lVal* lnfTreeDup(lClosure* c, lVal* v) {
 	(void)c;
 	if ((v == NULL)
 		|| (v->type != ltPair)
-		|| (v->vList.car == NULL)
-		|| (v->vList.car->type != ltTree)) {
+		|| (v->vList->car == NULL)
+		|| (v->vList->car->type != ltTree)) {
 		lExceptionThrowValClo("type-error", "tree/dup can only be called with a tree as an argument", v, c);
 	}
 	lTree* tree = requireTree(c, lCar(v));

@@ -478,7 +478,7 @@ static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 					lStringAdvanceToNextCharacter(s);
 					nv = lReadValue(s);
 				} while(isComment(nv));
-				v->vList.cdr = isComment(nv) ? NULL : nv;
+				v->vList->cdr = isComment(nv) ? NULL : nv;
 				continue;
 			}else{
 				lVal *nv = lReadValue(s);
@@ -486,8 +486,8 @@ static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 				if(v == NULL){
 					v = ret = lCons(nv,NULL);
 				}else{
-					v->vList.cdr = lCons(nv,NULL);
-					v = v->vList.cdr;
+					v->vList->cdr = lCons(nv,NULL);
+					v = v->vList->cdr;
 				}
 			}
 		}

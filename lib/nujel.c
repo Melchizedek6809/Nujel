@@ -66,8 +66,10 @@ void simplePrintVal(lVal *v){
 		fprintf(stderr, "%s ", v->vSymbol->c);
 		break;
 	case ltPair:
-		simplePrintVal(v->vList.car);
-		simplePrintVal(v->vList.cdr);
+		if(likely(v->vList)){
+			simplePrintVal(v->vList->car);
+			simplePrintVal(v->vList->cdr);
+		}
 		break;
 	case ltArray:
 		fprintf(stderr, "##(");
@@ -119,9 +121,9 @@ lVal *lApply(lClosure *c, lVal *args, lVal *fun){
 lClosure *lLoad(lClosure *c, const char *expr){
 	lVal *v = lRead(c, expr);
 	const int RSP = lRootsGet();
-	for(lVal *n=v; n && n->type == ltPair; n = n->vList.cdr){
+	for(lVal *n=v; n && n->type == ltPair; n = n->vList->cdr){
 		c->args = n; // We need a reference to make sure that n won't be collected by the GC
-		lVal *car = n->vList.car;
+		lVal *car = n->vList->car;
 		if(unlikely((car == NULL) || (car->type != ltBytecodeArr))){
 			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
 		}else{
@@ -157,7 +159,9 @@ lClosure *lNewRoot(){
 
 lVal *lCons(lVal *car, lVal *cdr){
 	lVal *v = lValAlloc(ltPair);
-	v->vList.car = car;
-	v->vList.cdr = cdr;
+	lPair *cons = lPairAllocRaw();
+	cons->car = car;
+	cons->cdr = cdr;
+	v->vList = cons;
 	return v;
 }

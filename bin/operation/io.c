@@ -264,9 +264,9 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 		if(cur == NULL){
 			ret = cur = lCons(NULL,NULL);
 		}else{
-			cur = cur->vList.cdr = lCons(NULL,NULL);
+			cur = cur->vList->cdr = lCons(NULL,NULL);
 		}
-		cur->vList.car = lValString(de->d_name);
+		cur->vList->car = lValString(de->d_name);
 	}
 
 	closedir(dp);

@@ -74,13 +74,19 @@ void lNFuncGCMark(const lNFunc *v){
 	lTreeGCMark(v->meta);
 }
 
+void lPairGCMark(const lPair *v){
+	markerPrefix(lPair);
+
+	lValGCMark(v->car);
+	lValGCMark(v->cdr);
+}
+
 void lValGCMark(lVal *v){
 	markerPrefix(lVal);
 
 	switch(v->type){
 	case ltPair:
-		lValGCMark(v->vList.car);
-		lValGCMark(v->vList.cdr);
+		lPairGCMark(v->vList);
 		break;
 	case ltMacro:
 	case ltEnvironment:

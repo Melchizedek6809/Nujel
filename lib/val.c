@@ -117,7 +117,7 @@ bool lValEqual(const lVal *a, const lVal *b){
 	default:
 		return false;
 	case ltPair:
-		return (a->vList.car == b->vList.car) && (a->vList.cdr == b->vList.cdr);
+		return (a->vList->car == b->vList->car) && (a->vList->cdr == b->vList->cdr);
 	case ltArray:
 		return a->vArray == b->vArray;
 	case ltTree:

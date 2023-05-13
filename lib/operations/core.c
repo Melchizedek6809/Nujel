@@ -159,8 +159,8 @@ static lVal *lnfNReverse(lClosure *c, lVal *v){
 	(void)c;
 	lVal *t = NULL, *l = lCar(v);
 	while((l != NULL) && (l->type == ltPair)){
-		lVal *next = l->vList.cdr;
-		l->vList.cdr = t;
+		lVal *next = l->vList->cdr;
+		l->vList->cdr = t;
 		t = l;
 		l = next;
 	}

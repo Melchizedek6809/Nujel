@@ -32,8 +32,8 @@ static lVal *lStackBuildList(lVal **stack, int sp, int len){
 	const int nsp = sp - len;
 	lVal *t = stack[nsp] = lCons(stack[nsp], NULL);
 	for(int i = len-1; i > 0; i--){
-		t->vList.cdr = lCons(stack[sp - i], NULL);
-		t = t->vList.cdr;
+		t->vList->cdr = lCons(stack[sp - i], NULL);
+		t = t->vList->cdr;
 	}
 	return stack[nsp];
 }

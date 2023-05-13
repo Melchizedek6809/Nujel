@@ -43,7 +43,7 @@ static lVal *lnfArrSet(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-mismatch","(array/set!] needs a third argument", v, c);
 		return NULL;
 	}
-	arr->data[key] = vt->vList.car;
+	arr->data[key] = vt->vList->car;
 	return car;
 }
 
@@ -71,9 +71,9 @@ lVal *lnfArrNew(lClosure *c, lVal *v){
 	lVal *r = lValAlloc(ltArray);
 	r->vArray = lArrayAlloc(length);
 	int key = 0;
-	for(lVal *n = v; n && n->type == ltPair; n = n->vList.cdr){
+	for(lVal *n = v; n && n->type == ltPair; n = n->vList->cdr){
 		if(key >= length){break;}
-		r->vArray->data[key++] = n->vList.car;
+		r->vArray->data[key++] = n->vList->car;
 	}
 	return r;
 }

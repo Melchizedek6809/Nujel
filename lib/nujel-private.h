@@ -289,6 +289,7 @@ static inline void lGarbageCollectIfNecessary(){
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
 #define BFV_MAX (1<<14)
+#define CON_MAX (1<<18)
 
 #define allocatorTypes() \
 	defineAllocator(lArray, ARR_MAX) \
@@ -297,7 +298,8 @@ static inline void lGarbageCollectIfNecessary(){
 	defineAllocator(lVal, VAL_MAX) \
 	defineAllocator(lBytecodeArray, BCA_MAX) \
 	defineAllocator(lBuffer, BUF_MAX) \
-	defineAllocator(lBufferView, BFV_MAX)
+	defineAllocator(lBufferView, BFV_MAX) \
+	defineAllocator(lPair, CON_MAX)
 
 #define defineAllocator(T, typeMax) \
 extern T T##List[typeMax]; \

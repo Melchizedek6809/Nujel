@@ -121,41 +121,41 @@ static lVal *lnfPow(lClosure *c, lVal *v){
 }
 
 static lVal *lnfIncAstI(lClosure *c, lVal *v){
-	if(unlikely(v == NULL) || unlikely(v->vList.car == NULL)){
+	if(unlikely(v == NULL) || unlikely(v->vList->car == NULL)){
 		return exceptionThrow(c, v, "inc/int");
 	}
-	const i64 a = v->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
 	return lValInt(a + 1);
 }
 
 static lVal *lnfAddAstI(lClosure *c, lVal *v){
 	(void)c;
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	return lValInt(a + b);
 }
 
 static lVal *lnfSubAstI(lClosure *c, lVal *v){
 	(void)c;
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	return lValInt(a - b);
 }
 
 static lVal *lnfMulAstI(lClosure *c, lVal *v){
 	(void)c;
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	return lValInt(a * b);
 }
 
 static lVal *lnfDivAstI(lClosure *c, lVal *v){
 	(void)c;
-	if(unlikely(((v == NULL) || (v->vList.car == NULL) || (v->vList.cdr == NULL) || (v->vList.cdr->vList.car == NULL)))){
+	if(unlikely(((v == NULL) || (v->vList->car == NULL) || (v->vList->cdr == NULL) || (v->vList->cdr->vList->car == NULL)))){
 		lExceptionThrowValClo("arity-error", "Expected 2 arguments", v, c);
 	}
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	if(unlikely(b == 0)){
 		lExceptionThrowValClo("divide-by-zero", "Can't divide by zero", v, c);
 	}
@@ -164,15 +164,15 @@ static lVal *lnfDivAstI(lClosure *c, lVal *v){
 
 static lVal *lnfModAstI(lClosure *c, lVal *v){
 	(void)c;
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	return lValInt(a % b);
 }
 
 static lVal *lnfPowAstI(lClosure *c, lVal *v){
 	(void)c;
-	const i64 a = v->vList.car->vInt;
-	const i64 b = v->vList.cdr->vList.car->vInt;
+	const i64 a = v->vList->car->vInt;
+	const i64 b = v->vList->cdr->vList->car->vInt;
 	return lValInt(pow(a,b));
 }
 

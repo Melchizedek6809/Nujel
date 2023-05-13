@@ -169,6 +169,14 @@ void lTreeFree(lTree *t){
 	lTreeActive--;
 }
 
+void lPairFree(lPair *cons){
+	if(unlikely(cons == NULL)){return;}
+	cons->car = NULL;
+	cons->nextFree = lPairFFree;
+	lPairFFree = cons;
+	lPairActive--;
+}
+
 lVal *lValAlloc(lType t){
 	lVal *ret = lValAllocRaw();
 	ret->type = t;

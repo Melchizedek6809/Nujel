@@ -90,29 +90,34 @@ typedef struct lSymbol  lSymbol;
 typedef struct lTree    lTree;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
+typedef struct lPair    lPair;
 typedef struct lBytecodeArray lBytecodeArray;
 typedef uint8_t lBytecodeOp;
 typedef lBuffer lString;
 
 
-typedef struct {
-	lVal *car,*cdr;
-} lPair;
+struct lPair {
+	lVal *car;
+	union {
+		lPair *nextFree;
+		lVal *cdr;
+	};
+};
 
 struct lVal {
 	u32 type;
 	union {
 		bool            vBool;
-		lPair           vList;
 		i64             vInt;
 		double          vFloat;
 		lBytecodeOp     vBytecodeOp;
+		lPair*          vList;
+		const lSymbol * vSymbol;
 		FILE *          vFileHandle;
 		lBytecodeArray *vBytecodeArr;
 		lArray *        vArray;
 		lTree *         vTree;
 		lString *       vString;
-		const lSymbol * vSymbol;
 		lClosure *      vClosure;
 		lNFunc *        vNFunc;
 		void *          vPointer;
@@ -142,11 +147,11 @@ size_t               lBufferViewLength      (const lBufferView *v);
 lVal *lCons(lVal *car, lVal *cdr);
 
 static inline lVal *lCar(lVal *v){
-	return (v != NULL) && likely(v->type == ltPair) ? v->vList.car : NULL;
+	return (v != NULL) && likely(v->type == ltPair) ? v->vList->car : NULL;
 }
 
 static inline lVal *lCdr(lVal *v){
-	return (v != NULL) && likely(v->type == ltPair) ? v->vList.cdr : NULL;
+	return (v != NULL) && likely(v->type == ltPair) ? v->vList->cdr : NULL;
 }
 
 static inline lVal *lCaar  (lVal *v){return lCar(lCar(v));}
