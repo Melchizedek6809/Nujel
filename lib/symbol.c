@@ -232,7 +232,7 @@ lSymbol *lSymS(const char *str){
 lSymbol *getTypeSymbolT(const lType T){
 	switch(T){
 		default:            return lSymLTUnknownType;
-		case ltNoAlloc:     return lSymLTNoAlloc;
+		case ltNil:         return lSymLTNil;
 		case ltBool:        return lSymLTBool;
 		case ltPair:        return lSymLTPair;
 		case ltEnvironment: return lSymLTEnvironment;

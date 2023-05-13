@@ -45,7 +45,7 @@ void simplePrintVal(lVal *v){
 	case ltTree:
 		fprintf(stderr, "#<tree> ");
 		break;
-	case ltNoAlloc:
+	case ltNil:
 		fprintf(stderr, "#nil ");
 		break;
 	case ltBool:
@@ -107,7 +107,7 @@ lVal *lLambda(lClosure *c, lVal *args, lVal *lambda){
 
 /* Run fun with args, evaluating args if necessary  */
 lVal *lApply(lClosure *c, lVal *args, lVal *fun){
-	switch(fun ? fun->type : ltNoAlloc){
+	switch(fun ? fun->type : ltNil){
 	case ltLambda:     return lLambda(c,args,fun);
 	case ltNativeFunc: return fun->vNFunc->fp(c,args);
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);

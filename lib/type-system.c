@@ -53,7 +53,7 @@ lType lTypecast(const lType a, const lType b){
 	if (a == b){ return a;}
 	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
 	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
-	return ltNoAlloc;
+	return ltNil;
 }
 
 i64 requireInt(lClosure *c, lVal *v){

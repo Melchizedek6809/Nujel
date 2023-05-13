@@ -140,7 +140,7 @@ void lNFuncFree(lNFunc *n){
 }
 
 void lValFree(lVal *v){
-	v->type     = ltNoAlloc;
+	v->type     = ltNil;
 	v->nextFree = lValFFree;
 	lValFFree   = v;
 	lValActive--;

@@ -350,7 +350,7 @@ static lVal *lnfString(lClosure *c, lVal *v){
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert that into a string", a, c);
 		return NULL;
-	case ltNoAlloc:
+	case ltNil:
 		return lValString("");
 	case ltBuffer:
 		return lValStringLen(a->vBuffer->data, a->vBuffer->length);

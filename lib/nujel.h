@@ -26,7 +26,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
-#define typeswitch(v) switch(v ? v->type : ltNoAlloc)
+#define typeswitch(v) switch(v ? v->type : ltNil)
 
 /*
  | Now for some type/struct definitions
@@ -52,7 +52,7 @@ typedef  int64_t ssize_t;
 #endif
 
 typedef enum {
-	ltNoAlloc = 0,
+	ltNil = 0,
 
 	ltSymbol,
 	ltKeyword,
