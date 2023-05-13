@@ -20,33 +20,33 @@ static bool lBytecodeArrayCheckIfValid(const lBytecodeOp *ops, int opsLength, lA
 	return true;
 }
 
-lVal *lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure){
+lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure){
 	if(!lBytecodeArrayCheckIfValid(ops, opsLength, literals)){
-		lExceptionThrowValClo("invalid-bc-array", "Invalid bytecode array", NULL, errorClosure);
-		return NULL;
+		lExceptionThrowValClo("invalid-bc-array", "Invalid bytecode array", NIL, errorClosure);
+		return NIL;
 	}
-	lVal *ret = lValAlloc(ltBytecodeArr);
-	ret->vBytecodeArr = lBytecodeArrayAlloc(opsLength);
-	ret->vBytecodeArr->literals = literals;
-	ret->vBytecodeArr->literals->flags |= ARRAY_IMMUTABLE;
-	memcpy(ret->vBytecodeArr->data, ops, opsLength);
+	lVal ret = lValAlloc(ltBytecodeArr);
+	ret.vBytecodeArr = lBytecodeArrayAlloc(opsLength);
+	ret.vBytecodeArr->literals = literals;
+	ret.vBytecodeArr->literals->flags |= ARRAY_IMMUTABLE;
+	memcpy(ret.vBytecodeArr->data, ops, opsLength);
 	return ret;
 }
 
-static lVal *lnfIntBytecodeOp(lClosure *c, lVal *v){
+static lVal lnfIntBytecodeOp(lClosure *c, lVal v){
 	const i64 val = requireInt(c, lCar(v));
 	if((val < -128) || (val > 255)){
 		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range -128 - 255", lCar(v), c);
-		return NULL;
+		return NIL;
 	}
 	return lValBytecodeOp(val);
 }
 
-static lVal *lnfBytecodeOpInt(lClosure *c, lVal *v){
+static lVal lnfBytecodeOpInt(lClosure *c, lVal v){
 	return lValInt(requireBytecodeOp(c, lCar(v)));
 }
 
-static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
+static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
 	lArray *arr = requireArray(c, lCar(v));
 	const int len = arr->length;
 	lArray *literals = requireArray(c, lCadr(v));
@@ -56,37 +56,35 @@ static lVal *lnfArrBytecodeArr(lClosure *c, lVal *v){
 	}
 	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
 		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
-		return NULL;
+		return NIL;
 	}
-	lVal *ret = lValBytecodeArray(ops,len,literals,c);
+	lVal ret = lValBytecodeArray(ops,len,literals,c);
 	free(ops);
 	return ret;
 }
 
-static lVal *lnfBytecodeArrArr(lClosure *c, lVal *v){
+static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	const int len = arr->dataEnd - arr->data;
 
-	lVal *ret = lValAlloc(ltArray);
-	ret->vArray = lArrayAlloc(len);
+	lVal ret = lValAlloc(ltArray);
+	ret.vArray = lArrayAlloc(len);
 
 	for(int i=0;i<len;i++){
-		ret->vArray->data[i] = lValBytecodeOp(arr->data[i]);
+		ret.vArray->data[i] = lValBytecodeOp(arr->data[i]);
 	}
-
 	return ret;
 }
 
-static lVal *lnfBytecodeLiterals(lClosure *c, lVal *v){
+static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	if(arr->literals == NULL){return NULL;}
-	lVal *ret = lValAlloc(ltArray);
-	ret->vArray = arr->literals;
-
+	if(arr->literals == NULL){return NIL;}
+	lVal ret = lValAlloc(ltArray);
+	ret.vArray = arr->literals;
 	return ret;
 }
 
-static lVal *lnfBytecodeArrLength(lClosure *c, lVal *v){
+static lVal lnfBytecodeArrLength(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	return lValInt(arr->dataEnd - arr->data);
 }

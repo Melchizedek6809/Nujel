@@ -35,34 +35,34 @@ lString *lStringDup(const lString *os){
 }
 
 /* Create a new string value out of S */
-lVal *lValStringLen(const char *c, int len){
-	if(unlikely(c == NULL)){return NULL;}
-	lVal *t = lValAlloc(ltString);
-	t->vString = lStringNew(c,len);
-	return t->vString == NULL ? NULL : t;
+lVal lValStringLen(const char *c, int len){
+	if(unlikely(c == NULL)){return NIL;}
+	lVal t = lValAlloc(ltString);
+	t.vString = lStringNew(c,len);
+	return unlikely(t.vString == NULL) ? NIL : t;
 }
 
 /* Create a new string value out of S */
-lVal *lValString(const char *c){
-	return lValStringLen(c, c == NULL ? 0 : strlen(c));
+lVal lValString(const char *c){
+	return lValStringLen(c, unlikely(c == NULL) ? 0 : strlen(c));
 }
 
 /* Create a new string value out of S, using C directly, which will be
  * freed once the value leaves scope  */
-lVal *lValStringNoCopy(const char *c,int len){
-	if(unlikely(c == NULL)){return NULL;}
-	lVal *t = lValAlloc(ltString);
-	t->vString = lStringNewNoCopy(c,len);
+lVal lValStringNoCopy(const char *c,int len){
+	if(unlikely(c == NULL)){return NIL;}
+	lVal t = lValAlloc(ltString);
+	t.vString = lStringNewNoCopy(c,len);
 	return t;
 }
 
 /* Return a string value, containing a mark from ERR to ERREND,
  * which has to be within BUF and BUFSTART */
-lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd){
+lVal lValStringError(const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd){
 	const char *lineStart, *lineEnd;
-	if(bufEnd <= bufStart){return NULL;}
-	if(errStart > err){return NULL;}
-	if(errEnd < err){return NULL;}
+	if(bufEnd <= bufStart){return NIL;}
+	if(errStart > err){return NIL;}
+	if(errEnd < err){return NIL;}
 
 	for(lineStart = errStart; (lineStart > bufStart) && (*lineStart != '\n'); lineStart--){}
 	if(*lineStart == '\n'){lineStart++;}
@@ -74,7 +74,7 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	const size_t bufSize = (msgEnd - msgStart) + 3 + 3 + 1;
 	char *outbuf    = malloc(bufSize);
 	if (unlikely(outbuf == NULL)) {
-		return NULL;
+		return NIL;
 	}
 	char *data      = outbuf;
 
@@ -84,26 +84,26 @@ lVal *lValStringError(const char *bufStart, const char *bufEnd, const char *errS
 	return lValStringNoCopy(outbuf, data - outbuf);
 }
 
-static lVal *lnfStringCut(lClosure *c, lVal *v){
+static lVal lnfStringCut(lClosure *c, lVal v){
 	(void)c;
 	i64 start, slen, len;
-	lVal *str = lCar(v);
-	if((str == NULL) || (str->type != ltString)){
+	lVal str = lCar(v);
+	if(unlikely(str.type != ltString)){
 		lExceptionThrowValClo("type-error","(string/cut) expects a string as its first and only argument", v, c);
-		return NULL;
+		return NIL;
 	}
 
-	const char *buf = str->vString->data;
-	slen = len = lStringLength(str->vString);
+	const char *buf = str.vString->data;
+	slen = len = lStringLength(str.vString);
 	start = MAX(0, requireInt(c, lCadr(v)));
-	lVal *lenV = lCaddr(v);
-	len   = MIN(slen - start, ((lenV && (lenV->type == ltInt)) ? lenV->vInt : len) - start);
+	lVal lenV = lCaddr(v);
+	len = MIN(slen - start, (((lenV.type == ltInt)) ? lenV.vInt : len) - start);
 
-	if(len <= 0){return lValString("");}
+	if(unlikely(len <= 0)){return lValString("");}
 	return lValStringLen(&buf[start], len);
 }
 
-static lVal *lnfIndexOf(lClosure *c, lVal *v){
+static lVal lnfIndexOf(lClosure *c, lVal v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
 	const char *needle   = castToString(lCadr(v),NULL);
@@ -126,7 +126,7 @@ static lVal *lnfIndexOf(lClosure *c, lVal *v){
 	return lValInt(-4);
 }
 
-static lVal *lnfLastIndexOf(lClosure *c, lVal *v){
+static lVal lnfLastIndexOf(lClosure *c, lVal v){
 	(void)c;
 	const char *haystack = castToString(lCar(v),NULL);
 	if(haystack == NULL) {return lValInt(-1);}

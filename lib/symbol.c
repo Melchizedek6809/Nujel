@@ -44,7 +44,6 @@ lSymbol *symCode;
 lSymbol *symData;
 
 lSymbol *lSymLTNil;
-lSymbol *lSymLTNoAlloc;
 lSymbol *lSymLTBool;
 lSymbol *lSymLTPair;
 lSymbol *lSymLTLambda;
@@ -96,7 +95,6 @@ void lSymbolInit(){
 	symData              = lSymSM("data");
 
 	lSymLTNil            = lSymSM("nil");
-	lSymLTNoAlloc        = lSymSM("no-alloc");
 	lSymLTBool           = lSymSM("bool");
 	lSymLTPair           = lSymSM("pair");
 	lSymLTEnvironment    = lSymSM("environment");
@@ -254,6 +252,6 @@ lSymbol *getTypeSymbolT(const lType T){
 	}
 }
 
-lSymbol *getTypeSymbol(const lVal *v){
-	return likely(v) ? getTypeSymbolT(v->type) : lSymLTNil;
+lSymbol *getTypeSymbol(const lVal v){
+	return getTypeSymbolT(v.type);
 }

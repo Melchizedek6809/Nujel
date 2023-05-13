@@ -56,7 +56,7 @@ u64 getMSecs(){
 
 /* Add all the platform specific constants to C */
 void lAddPlatformVars(lClosure *c){
-	lVal *valOS, *valArch;
+	lVal valOS, valArch;
 	#if defined(__HAIKU__)
 	valOS = lValSym("Haiku");
 	#elif defined(__APPLE__)

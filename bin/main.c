@@ -37,7 +37,7 @@ static lClosure *createRootClosure(){
 /* Initialize the Nujel context with an stdlib as well
  * as parsing arguments passed to the runtime */
 int initNujel(int argc, char *argv[], lClosure *c){
-	lVal * volatile ret = NULL;
+	lVal volatile ret = NIL;
 	initEnvironmentMap(c);
 	for(int i = argc-1; i >= 0; i--){
 		ret = lCons(lValString(argv[i]), ret);

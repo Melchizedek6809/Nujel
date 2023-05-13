@@ -38,30 +38,30 @@ size_t lBufferViewLength(const lBufferView *v){
 	return v->length * lBufferViewTypeSize(v->type);
 }
 
-static lVal *lnfBufferAllocate(lClosure *c, lVal *v) {
+static lVal lnfBufferAllocate(lClosure *c, lVal v) {
 	const i64 size = requireNaturalInt(c, lCar(v));
 	lBuffer *buf = lBufferAlloc(size, false);
-	lVal *ret = lValAlloc(ltBuffer);
-	ret->vBuffer = buf;
+	lVal ret = lValAlloc(ltBuffer);
+	ret.vBuffer = buf;
 	return ret;
 }
 
-static lVal *lnfBufferLengthGet(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfBufferLengthGet(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	typeswitch(car){
 	default:
 		lExceptionThrowValClo("type-error", "Expected a buffer or something compatible", car, c);
-		return NULL;
+		return NIL;
 	case ltString:
 	case ltBuffer:
-		return lValInt(car->vBuffer->length);
+		return lValInt(car.vBuffer->length);
 	case ltBufferView:
-		return lValInt(car->vBufferView->length);
+		return lValInt(car.vBufferView->length);
 	}
 }
 
-static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
-	lVal *bufv = lCar(v);
+static lVal lnfBufferLengthSet(lClosure *c, lVal v){
+	lVal bufv = lCar(v);
 	lBuffer *buf = requireMutableBuffer(c, bufv);
 	const int length = requireNaturalInt(c, lCadr(v));
 	if(length < buf->length){
@@ -70,7 +70,7 @@ static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 	void *nBuf = realloc(buf->buf, length);
 	if (unlikely(nBuf == NULL)) {
 		lExceptionThrowValClo("out-of-memory", "(buffer/length!) couldn't allocate its buffer", v, c);
-		return NULL;
+		return NIL;
 	}
 	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
 	buf->buf = nBuf;
@@ -78,46 +78,46 @@ static lVal *lnfBufferLengthSet(lClosure *c, lVal *v){
 	return bufv;
 }
 
-static lVal *lnfBufferImmutableGet(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfBufferImmutableGet(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	typeswitch(car){
 	case ltBufferView:
-		return lValBool(car->vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
+		return lValBool(car.vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
 	case ltString:
 		return lValBool(true);
 	case ltBuffer:
-		return lValBool(car->vBuffer->flags & BUFFER_IMMUTABLE);
+		return lValBool(car.vBuffer->flags & BUFFER_IMMUTABLE);
 	}
 	lExceptionThrowValClo("type-error", "Can't get immutability info from that: ", car, c);
-	return NULL;
+	return NIL;
 }
 
-static lVal *bufferFromPointer(lClosure *c, bool immutable, const void *data, size_t length){
+static lVal bufferFromPointer(lClosure *c, bool immutable, const void *data, size_t length){
 	(void)c;
 	lBuffer *retBuf = lBufferAllocRaw();
 	retBuf->length = length;
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	retBuf->buf = malloc(length);
 	if (unlikely(retBuf->buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "(buffer/length!] couldn't allocate its buffer", NULL, c);
-		return NULL;
+		lExceptionThrowValClo("out-of-memory", "(buffer/length!] couldn't allocate its buffer", NIL, c);
+		return NIL;
 	}
 	memcpy(retBuf->buf, data, length);
 
-	lVal *retV = lValAlloc(ltBuffer);
-	retV->vBuffer = retBuf;
+	lVal retV = lValAlloc(ltBuffer);
+	retV.vBuffer = retBuf;
 	return retV;
 }
 
-static lVal *lnfBufferDup(lClosure *c, lVal *v){
+static lVal lnfBufferDup(lClosure *c, lVal v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
 	return bufferFromPointer(c, castToBool(lCadr(v)), buf->buf, buf->length);
 }
 
-static lVal *lnfBufferCopy(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfBufferCopy(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	lBuffer *dest = requireMutableBuffer(c, car);
-	lVal *vSrc = lCadr(v);
+	lVal vSrc = lCadr(v);
 	const int destOffset = requireNaturalInt(c, lCaddr(v));
 	const void *buf = NULL;
 	int length = 0;
@@ -125,64 +125,64 @@ static lVal *lnfBufferCopy(lClosure *c, lVal *v){
 	typeswitch(vSrc){
 	case ltString:
 	case ltBuffer:
-		buf = vSrc->vBuffer->data;
-		length = castToInt(lCadddr(v), vSrc->vBuffer->length);
+		buf = vSrc.vBuffer->data;
+		length = castToInt(lCadddr(v), vSrc.vBuffer->length);
 		break;
 	}
 
 	if(unlikely((buf == NULL) || (length < 0))){
 		lExceptionThrowValClo("type-error", "Can't copy from that", vSrc, c);
-		return NULL;
+		return NIL;
 	}
-	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc->vBuffer->length))){
+	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc.vBuffer->length))){
 		lExceptionThrowValClo("out-of-bounds", "Can't fit everything in that buffer", v, c);
-		return NULL;
+		return NIL;
 	}
 	memcpy(&((u8*)dest->buf)[destOffset], buf, length);
 	return car;
 }
 
-static lVal *lnfStringToBuffer(lClosure *c, lVal *v){
+static lVal lnfStringToBuffer(lClosure *c, lVal v){
 	lString *str = requireString(c, lCar(v));
 	return bufferFromPointer(c, castToBool(lCadr(v)), str->data, str->length);
 }
 
-static lVal *lnfBufferToString(lClosure *c, lVal *v){
+static lVal lnfBufferToString(lClosure *c, lVal v){
 	lBuffer *buf = requireBuffer(c, lCar(v));
 	const i64 length = castToInt(lCadr(v), buf->length);
 	if(unlikely(length < 0)){
 		lExceptionThrowValClo("type-error", "Length has to be greater than 0", lCadr(v), c);
-		return NULL;
+		return NIL;
 	}
 	return lValStringLen(buf->buf, length);
 }
 
-static lVal *bufferView(lClosure *c, lVal *v, lBufferViewType T){
+static lVal bufferView(lClosure *c, lVal v, lBufferViewType T){
 	lBuffer *buf = requireBuffer(c, lCar(v));
-	const bool immutable = lCdr(v) ? castToBool(lCadr(v)) : buf->flags & BUFFER_IMMUTABLE;
+	const bool immutable = lCdr(v).type != ltNil ? castToBool(lCadr(v)) : buf->flags & BUFFER_IMMUTABLE;
 	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
 		lExceptionThrowValClo("type-error", "Can't create a mutable view for an immutable buffer", v, c);
-		return NULL;
+		return NIL;
 	}
 	const size_t length = buf->length / lBufferViewTypeSize(T);
 	lBufferView *bufView = lBufferViewAlloc(buf, T, 0, length, immutable);
-	lVal *ret = lValAlloc(ltBufferView);
-	ret->vBufferView = bufView;
+	lVal ret = lValAlloc(ltBufferView);
+	ret.vBufferView = bufView;
 	return ret;
 }
 
-static lVal  *lnfBufferViewU8(lClosure *c, lVal *v){ return bufferView(c, v,  lbvtU8); }
-static lVal  *lnfBufferViewS8(lClosure *c, lVal *v){ return bufferView(c, v,  lbvtS8); }
-static lVal *lnfBufferViewU16(lClosure *c, lVal *v){ return bufferView(c, v, lbvtU16); }
-static lVal *lnfBufferViewS16(lClosure *c, lVal *v){ return bufferView(c, v, lbvtS16); }
-static lVal *lnfBufferViewU32(lClosure *c, lVal *v){ return bufferView(c, v, lbvtU32); }
-static lVal *lnfBufferViewS32(lClosure *c, lVal *v){ return bufferView(c, v, lbvtS32); }
-static lVal *lnfBufferViewF32(lClosure *c, lVal *v){ return bufferView(c, v, lbvtF32); }
-static lVal *lnfBufferViewS64(lClosure *c, lVal *v){ return bufferView(c, v, lbvtS64); }
-static lVal *lnfBufferViewF64(lClosure *c, lVal *v){ return bufferView(c, v, lbvtF64); }
+static lVal  lnfBufferViewU8(lClosure *c, lVal v){ return bufferView(c, v,  lbvtU8); }
+static lVal  lnfBufferViewS8(lClosure *c, lVal v){ return bufferView(c, v,  lbvtS8); }
+static lVal lnfBufferViewU16(lClosure *c, lVal v){ return bufferView(c, v, lbvtU16); }
+static lVal lnfBufferViewS16(lClosure *c, lVal v){ return bufferView(c, v, lbvtS16); }
+static lVal lnfBufferViewU32(lClosure *c, lVal v){ return bufferView(c, v, lbvtU32); }
+static lVal lnfBufferViewS32(lClosure *c, lVal v){ return bufferView(c, v, lbvtS32); }
+static lVal lnfBufferViewF32(lClosure *c, lVal v){ return bufferView(c, v, lbvtF32); }
+static lVal lnfBufferViewS64(lClosure *c, lVal v){ return bufferView(c, v, lbvtS64); }
+static lVal lnfBufferViewF64(lClosure *c, lVal v){ return bufferView(c, v, lbvtF64); }
 
-static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfBufferViewSet(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	void *buf = NULL;
 	size_t length = 0;
 	lBufferViewType viewType;
@@ -190,25 +190,25 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 
 	typeswitch(car){
 	case ltBufferView:
-		buf      = car->vBufferView->buf->buf;
-		length   = car->vBufferView->length;
-		viewType = car->vBufferView->type;
+		buf      = car.vBufferView->buf->buf;
+		length   = car.vBufferView->length;
+		viewType = car.vBufferView->type;
 		break;
 	case ltBuffer:
-		if(car->vBuffer->flags & BUFFER_IMMUTABLE){break;}
-		buf      = car->vBuffer->buf;
-		length   = car->vBuffer->length;
+		if(car.vBuffer->flags & BUFFER_IMMUTABLE){break;}
+		buf      = car.vBuffer->buf;
+		length   = car.vBuffer->length;
 		viewType = lbvtU8;
 		break;
 	}
 
 	if(unlikely(buf == NULL)){
 		lExceptionThrowValClo("type-error", "Can't set! in that", car, c);
-		return NULL;
+		return NIL;
 	}
 	if(unlikely(i >= length)){
 		lExceptionThrowValClo("out-of-bounds","(buffer/set!] index provided is out of bounds", v, c);
-		return NULL;
+		return NIL;
 	}
 
 	switch(viewType){
@@ -245,10 +245,10 @@ static lVal *lnfBufferViewSet(lClosure *c, lVal *v){
 	return car;
 }
 
-static lVal *lnfBufferViewBuffer(lClosure *c, lVal *v){
+static lVal lnfBufferViewBuffer(lClosure *c, lVal v){
 	lBufferView *view = requireBufferView(c, lCar(v));
-	lVal *ret = lValAlloc(ltBuffer);
-	ret->vBuffer = view->buf;
+	lVal ret = lValAlloc(ltBuffer);
+	ret.vBuffer = view->buf;
 	return ret;
 }
 

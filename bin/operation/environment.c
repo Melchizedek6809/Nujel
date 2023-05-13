@@ -14,7 +14,7 @@ static lTree *addVar(const char *e, lTree *t){
 	for(endOfKey=0;e[endOfKey] != '=';endOfKey++){}
 	for(endOfString=endOfKey+1;e[endOfString];endOfString++){}
 	lSymbol *sym = lSymSL(e,endOfKey);
-	lVal *v = lValStringNoCopy(&e[endOfKey+1], endOfString);
+	lVal v = lValStringNoCopy(&e[endOfKey+1], endOfString);
 	return lTreeInsert(t, sym, v);
 }
 

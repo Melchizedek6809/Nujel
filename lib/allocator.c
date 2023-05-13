@@ -119,7 +119,7 @@ void lBytecodeArrayFree(lBytecodeArray *v){
 
 lArray *lArrayAlloc(size_t len){
 	lArray *ret = lArrayAllocRaw();
-	ret->data = calloc(len, sizeof(lVal *));
+	ret->data = calloc(len, sizeof(lVal));
 	if(unlikely(ret->data == NULL)){
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a new array", lValInt(len), NULL);
 	}
@@ -137,13 +137,6 @@ lNFunc *lNFuncAlloc(){
 
 void lNFuncFree(lNFunc *n){
 	(void)n;
-}
-
-void lValFree(lVal *v){
-	v->type     = ltNil;
-	v->nextFree = lValFFree;
-	lValFFree   = v;
-	lValActive--;
 }
 
 void lArrayFree(lArray *v){
@@ -171,14 +164,8 @@ void lTreeFree(lTree *t){
 
 void lPairFree(lPair *cons){
 	if(unlikely(cons == NULL)){return;}
-	cons->car = NULL;
+	cons->car = NIL;
 	cons->nextFree = lPairFFree;
 	lPairFFree = cons;
 	lPairActive--;
-}
-
-lVal *lValAlloc(lType t){
-	lVal *ret = lValAllocRaw();
-	ret->type = t;
-	return ret;
 }
