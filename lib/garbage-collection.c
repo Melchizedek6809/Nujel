@@ -81,40 +81,38 @@ void lPairGCMark(const lPair *v){
 	lValGCMark(v->cdr);
 }
 
-void lValGCMark(lVal *v){
-	markerPrefix(lVal);
-
-	switch(v->type){
+void lValGCMark(lVal v){
+	switch(v.type){
 	case ltPair:
-		lPairGCMark(v->vList);
+		lPairGCMark(v.vList);
 		break;
 	case ltMacro:
 	case ltEnvironment:
 	case ltLambda:
-		lClosureGCMark(v->vClosure);
+		lClosureGCMark(v.vClosure);
 		break;
 	case ltArray:
-		lArrayGCMark(v->vArray);
+		lArrayGCMark(v.vArray);
 		break;
 	case ltNativeFunc:
-		lNFuncGCMark(v->vNFunc);
+		lNFuncGCMark(v.vNFunc);
 		break;
 	case ltKeyword:
 	case ltSymbol:
-		lSymbolGCMark(v->vSymbol);
+		lSymbolGCMark(v.vSymbol);
 		break;
 	case ltTree:
-		lTreeGCMark(v->vTree);
+		lTreeRootGCMark(v.vTree);
 		break;
 	case ltBytecodeArr:
-		lBytecodeArrayMark(v->vBytecodeArr);
+		lBytecodeArrayMark(v.vBytecodeArr);
 		break;
 	case ltString:
 	case ltBuffer:
-		lBufferGCMark(v->vBuffer);
+		lBufferGCMark(v.vBuffer);
 		break;
 	case ltBufferView:
-		lBufferViewGCMark(v->vBufferView);
+		lBufferViewGCMark(v.vBufferView);
 		break;
 	default:
 		break;
@@ -129,6 +127,11 @@ void lTreeGCMark(const lTree *v){
 
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
+}
+
+void lTreeRootGCMark(const lTreeRoot *v){
+	markerPrefix(lTreeRoot);
+	lTreeGCMark(v->root);
 }
 
 void lClosureGCMark(const lClosure *v){

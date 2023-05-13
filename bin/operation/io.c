@@ -74,14 +74,14 @@ void setIOSymbols(){
 	lSymAppend         = lSymSM("append");
 }
 
-static lVal *lnfQuit(lClosure *c, lVal *v){
+static lVal lnfQuit(lClosure *c, lVal v){
 	(void)c;
 	exit(castToInt(lCar(v), 0));
-	return NULL;
+	return NIL;
 }
 
-static lVal *lnfFileRemove(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfFileRemove(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	lString *filename = requireString(c, car);
 	unlink(lStringData(filename));
 	return car;
@@ -98,7 +98,7 @@ LONGLONG FileTime_to_POSIX(FILETIME ft) {
 }
 #endif
 
-static lVal *lnfFileStat(lClosure *c, lVal *v){
+static lVal lnfFileStat(lClosure *c, lVal v){
 	lString* filename = requireString(c, lCar(v));
 #ifdef _MSC_VER
 	WIN32_FIND_DATA ffd;
@@ -107,7 +107,7 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 	HANDLE hFind = INVALID_HANDLE_VALUE;
 	DWORD dwError = 0;
 
-	if (lStringLength(filename) >= MAX_PATH) {
+	if (unlikely(lStringLength(filename) >= MAX_PATH)) {
 		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
 		return NULL;
 	}
@@ -115,53 +115,55 @@ static lVal *lnfFileStat(lClosure *c, lVal *v){
 	hFind = FindFirstFile(lStringData(filename), &ffd);
 
 
-	lVal* ret = lValTree(NULL);
-	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
-	if (INVALID_HANDLE_VALUE != hFind) {
+	lVal ret = lValTree(NULL);
+	lTreeRoot *t = ret.vTree;
+	t->root = lTreeInsert(t->root, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
+	if (likely(INVALID_HANDLE_VALUE != hFind)) {
 		LARGE_INTEGER filesize;
 		filesize.LowPart = ffd.nFileSizeLow;
 		filesize.HighPart = ffd.nFileSizeHigh;
-		ret->vTree = lTreeInsert(ret->vTree, lsSize, lValInt(filesize.QuadPart));
-		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
-		ret->vTree = lTreeInsert(ret->vTree, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
-		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
-		ret->vTree = lTreeInsert(ret->vTree, lsUserID, lValInt(1000));
-		ret->vTree = lTreeInsert(ret->vTree, lsGroupID, lValInt(1000));
+		t->root = lTreeInsert(t->root, lsSize, lValInt(filesize.QuadPart));
+		t->root = lTreeInsert(t->root, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
+		t->root = lTreeInsert(t->root, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
+		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
+		t->root = lTreeInsert(t->root, lsUserID, lValInt(1000));
+		t->root = lTreeInsert(t->root, lsGroupID, lValInt(1000));
 
-		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
-		ret->vTree = lTreeInsert(ret->vTree, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice, lValBool(false));
-		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice, lValBool(false));
-		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe, lValBool(false));
+		t->root = lTreeInsert(t->root, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
+		t->root = lTreeInsert(t->root, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+		t->root = lTreeInsert(t->root, lsCharacterDevice, lValBool(false));
+		t->root = lTreeInsert(t->root, lsBlockDevice, lValBool(false));
+		t->root = lTreeInsert(t->root, lsNamedPipe, lValBool(false));
 	}
 	return ret;
 #else
 	struct stat statbuf;
 	int err = stat(lStringData(filename), &statbuf);
-	lVal *ret = lValTree(NULL);
-	ret->vTree = lTreeInsert(ret->vTree, lsError, lValBool(err));
+	lVal ret = lValTree(NULL);
+	lTreeRoot *t = ret.vTree;
+	t->root = lTreeInsert(t->root, lsError, lValBool(err));
 	if(err){
-		ret->vTree = lTreeInsert(ret->vTree, lsErrorNumber,      lValInt(errno));
-		ret->vTree = lTreeInsert(ret->vTree, lsErrorText,        lValString(strerror(errno)));
+		t->root = lTreeInsert(t->root, lsErrorNumber,      lValInt(errno));
+		t->root = lTreeInsert(t->root, lsErrorText,        lValString(strerror(errno)));
 	}else{
-		ret->vTree = lTreeInsert(ret->vTree, lsUserID,           lValInt(statbuf.st_uid));
-		ret->vTree = lTreeInsert(ret->vTree, lsGroupID,          lValInt(statbuf.st_gid));
-		ret->vTree = lTreeInsert(ret->vTree, lsSize,             lValInt(statbuf.st_size));
-		ret->vTree = lTreeInsert(ret->vTree, lsAccessTime,       lValInt(statbuf.st_atime));
-		ret->vTree = lTreeInsert(ret->vTree, lsModificationTime, lValInt(statbuf.st_mtime));
+		t->root = lTreeInsert(t->root, lsUserID,           lValInt(statbuf.st_uid));
+		t->root = lTreeInsert(t->root, lsGroupID,          lValInt(statbuf.st_gid));
+		t->root = lTreeInsert(t->root, lsSize,             lValInt(statbuf.st_size));
+		t->root = lTreeInsert(t->root, lsAccessTime,       lValInt(statbuf.st_atime));
+		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(statbuf.st_mtime));
 
-		ret->vTree = lTreeInsert(ret->vTree, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
-		ret->vTree = lTreeInsert(ret->vTree, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
-		ret->vTree = lTreeInsert(ret->vTree, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
-		ret->vTree = lTreeInsert(ret->vTree, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
-		ret->vTree = lTreeInsert(ret->vTree, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
 	}
 	return ret;
 #endif
 }
 
 #ifdef ENABLE_POPEN
-static lVal *lnfPopen(lClosure *c, lVal *v){
+static lVal lnfPopen(lClosure *c, lVal v){
 	lString *command = requireString(c, lCar(v));
 
 	const int readSize = 1<<12;
@@ -172,7 +174,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	FILE *child = popen(lStringData(command), "r");
 	if(child == NULL){
 		free(buf);
-		return NULL;
+		return NIL;
 	}
 	while(1){
 		const int ret = fread(&buf[len],1,readSize,child);
@@ -182,7 +184,7 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 				break;
 			}else if(ferror(child)){
 				pclose(child);
-				return NULL;
+				return NIL;
 			}
 		}
 		if(ret > 0){len += ret;}
@@ -205,13 +207,13 @@ static lVal *lnfPopen(lClosure *c, lVal *v){
 	return lCons(lValInt(exitCode),lValStringNoCopy(buf,len));
 }
 #else
-static lVal *lnfPopen(lClosure *c, lVal *v){
+static lVal lnfPopen(lClosure *c, lVal v){
 	lExceptionThrowValClo("not-available","(popen) is not implemented on your current platform, please try and work around that", v, c);
 	return NULL;
 }
 #endif
 
-static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
+static lVal lnfDirectoryRead(lClosure *c, lVal v){
 	(void)c;
 	const char *path = castToString(lCar(v), "./");
 	const bool showHidden = castToBool(lCadr(v));
@@ -240,7 +242,7 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 		return NULL;
 	}
 
-	lVal* ret = NULL;
+	lVal ret = NULL;
 	do {
 		if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && !showHidden){
 			continue;
@@ -252,21 +254,21 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
    return ret;
 #else
 	DIR *dp = opendir(path);
-	if(dp == NULL){return NULL;}
-	lVal *ret = NULL;
-	lVal *cur = NULL;
+	if(dp == NULL){return NIL;}
+	lVal ret = NIL;
+	lVal cur = NIL;
 	for(struct dirent *de = readdir(dp); de ; de = readdir(dp)){
 		if(!showHidden){
 			if(de->d_name[0] == '.'){continue;}
 		}
 		if((de->d_name[0] == '.') && (de->d_name[1] == 0)){continue;}
 		if((de->d_name[0] == '.') && (de->d_name[1] == '.') && (de->d_name[2] == 0)){continue;}
-		if(cur == NULL){
-			ret = cur = lCons(NULL,NULL);
+		if(cur.type == ltNil){
+			ret = cur = lCons(NIL, NIL);
 		}else{
-			cur = cur->vList->cdr = lCons(NULL,NULL);
+			cur = cur.vList->cdr = lCons(NIL, NIL);
 		}
-		cur->vList->car = lValString(de->d_name);
+		cur.vList->car = lValString(de->d_name);
 	}
 
 	closedir(dp);
@@ -274,26 +276,26 @@ static lVal *lnfDirectoryRead(lClosure *c, lVal *v){
 #endif
 }
 
-static lVal *lnfDirectoryMake(lClosure *c, lVal *v){
+static lVal lnfDirectoryMake(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
 	return lValBool(makeDir(lStringData(path)) == 0);
 }
 
-static lVal *lnfDirectoryRemove(lClosure *c, lVal *v){
+static lVal lnfDirectoryRemove(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
 	return lValBool(rmdir(lStringData(path)) == 0);
 }
 
-static lVal *lnfChangeDirectory(lClosure *c, lVal *v){
+static lVal lnfChangeDirectory(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
 	return lValBool(chdir(lStringData(path)) == 0);
 }
 
-static lVal *lnfGetCurrentWorkingDirectory(lClosure *c, lVal *v){
+static lVal lnfGetCurrentWorkingDirectory(lClosure *c, lVal v){
 	(void)c;(void)v;
 	char path[512];
 	if(!getcwd(path, sizeof(path))){
-		return NULL;
+		return NIL;
 	}
 	return lValString(path);
 }

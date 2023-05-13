@@ -9,43 +9,44 @@
 #include "nujel-private.h"
 #endif
 
-NORETURN void throwTypeError(lClosure *c, lVal *v, lType T){
+NORETURN void throwTypeError(lClosure *c, lVal v, lType T){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "expected argument of type %s, not: ", getTypeSymbolT(T)->c);
 	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("type-error", buf, v, c);
 }
 
-NORETURN void throwArityError(lClosure *c, lVal *v, int arity){
+NORETURN void throwArityError(lClosure *c, lVal v, int arity){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "This subroutine needs %i arguments", arity);
 	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("arity-error", buf, v, c);
 }
 
-static lVal *requireCertainType(lClosure *c, lVal *v, lType T){
-	if(unlikely((v == NULL) || (v->type != T))){
+static lVal requireCertainType(lClosure *c, lVal v, lType T){
+	if(unlikely(v.type != T)){
 		throwTypeError(c, v, T);
+	} else {
+		return v;
 	}
-	return v;
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
-i64 castToInt(const lVal *v, i64 fallback){
+i64 castToInt(const lVal v, i64 fallback){
 	typeswitch(v){
-		case ltFloat: return v->vFloat;
-		case ltInt:   return v->vInt;
+		case ltFloat: return v.vFloat;
+		case ltInt:   return v.vInt;
 		default:      return fallback;
 	}
 }
 
 /* Cast v to be a bool without memory allocations, or return false */
-bool castToBool(const lVal *v){
-	return !v ? false : (v->type == ltBool ? v->vBool : true);
+bool castToBool(const lVal v){
+	return (v.type == ltBool ? v.vBool : likely(v.type != ltNil));
 }
 
-const char *castToString(const lVal *v, const char *fallback){
-	return ((v == NULL) || (v->type != ltString)) ? fallback : v->vString->data;
+const char *castToString(const lVal v, const char *fallback){
+	return (v.type != ltString) ? fallback : v.vString->data;
 }
 
 /* Determine which type has the highest precedence between a and b */
@@ -56,132 +57,142 @@ lType lTypecast(const lType a, const lType b){
 	return ltNil;
 }
 
-i64 requireInt(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltInt)->vInt;
+i64 requireInt(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltInt).vInt;
 }
 
-i64 requireNaturalInt(lClosure *c, lVal *v){
+i64 requireNaturalInt(lClosure *c, lVal v){
 	i64 ret = requireInt(c,v);
-	if(unlikely(ret < 0)){ lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c); }
+	if(unlikely(ret < 0)){
+		lExceptionThrowValClo("type-error", "Expected a Natural int, not: ", v, c);
+	}
 	return ret;
 }
 
-lBytecodeOp requireBytecodeOp(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltBytecodeOp)->vBytecodeOp;
+lBytecodeOp requireBytecodeOp(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltBytecodeOp).vBytecodeOp;
 }
 
-lBytecodeArray *requireBytecodeArray(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltBytecodeArr)->vBytecodeArr;
+lBytecodeArray *requireBytecodeArray(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltBytecodeArr).vBytecodeArr;
 }
 
-double requireFloat(lClosure *c, lVal *v){
+double requireFloat(lClosure *c, lVal v){
 	typeswitch(v){
 	default:      throwTypeError(c, v, ltFloat);
-	case ltFloat: return v->vFloat;
-	case ltInt:   return v->vInt;
+	case ltFloat: return v.vFloat;
+	case ltInt:   return v.vInt;
 	}
 }
 
-lArray *requireArray(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltArray)->vArray;
+lArray *requireArray(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltArray).vArray;
 }
-lArray *requireMutableArray(lClosure *c, lVal *v){
-	lArray *ret = requireCertainType(c, v, ltArray)->vArray;
-	if((v->vArray->flags & ARRAY_IMMUTABLE)){
+lArray *requireMutableArray(lClosure *c, lVal v){
+	lArray *ret = requireCertainType(c, v, ltArray).vArray;
+	if(unlikely(v.vArray->flags & ARRAY_IMMUTABLE)){
 		lExceptionThrowValClo("type-error", "The provided array is immutable", v, c);
 	}
 	return ret;
 }
 
-lString *requireString(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltString)->vString;
+lString *requireString(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltString).vString;
 }
 
-lBuffer *requireBuffer(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltBuffer)->vBuffer;
+lBuffer *requireBuffer(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltBuffer).vBuffer;
 }
 
-lBuffer *requireMutableBuffer(lClosure *c, lVal *v){
+lBuffer *requireMutableBuffer(lClosure *c, lVal v){
 	lBuffer *ret = requireBuffer(c, v);
-	if(unlikely(ret->flags & BUFFER_IMMUTABLE)){ lExceptionThrowValClo("type-error", "Buffer is immutable", v, c); }
-	return ret;
-}
-
-lBufferView *requireBufferView(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltBufferView)->vBufferView;
-}
-
-lBufferView *requireMutableBufferView(lClosure *c, lVal *v){
-	lBufferView *ret = requireBufferView(c, v);
-	if(unlikely(ret->flags & BUFFER_VIEW_IMMUTABLE)){ lExceptionThrowValClo("type-error", "BufferView is immutable", v, c); }
-	return ret;
-}
-
-lTree *requireTree(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltTree)->vTree;
-}
-
-lTree *requireMutableTree(lClosure *c, lVal *v){
-	lTree *ret = requireTree(c,v);
-	if(unlikely(ret->flags & TREE_IMMUTABLE)){ lExceptionThrowValClo("type-error", "Tree is immutable", v, c); }
-	return ret;
-}
-
-const lSymbol *requireSymbol(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltSymbol)->vSymbol;
-}
-
-const lSymbol *requireKeyword(lClosure *c, lVal *v){
-	return requireCertainType(c, v, ltKeyword)->vSymbol;
-}
-
-const lSymbol *requireSymbolic(lClosure *c, lVal *v){
-	if(unlikely((v == NULL) || ((v->type != ltSymbol) && (v->type != ltKeyword)))){
-		throwTypeError(c, v, ltSymbol);
+	if(unlikely(ret->flags & BUFFER_IMMUTABLE)){
+		lExceptionThrowValClo("type-error", "Buffer is immutable", v, c);
 	}
-	return v->vSymbol;
+	return ret;
 }
 
-const lSymbol *optionalSymbolic(lClosure *c, lVal *v, const lSymbol *fallback){
-	if(likely(v == NULL)){
+lBufferView *requireBufferView(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltBufferView).vBufferView;
+}
+
+lBufferView *requireMutableBufferView(lClosure *c, lVal v){
+	lBufferView *ret = requireBufferView(c, v);
+	if(unlikely(ret->flags & BUFFER_VIEW_IMMUTABLE)){
+		lExceptionThrowValClo("type-error", "BufferView is immutable", v, c);
+	}
+	return ret;
+}
+
+lTreeRoot *requireTree(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltTree).vTree;
+}
+
+lTreeRoot *requireMutableTree(lClosure *c, lVal v){
+	lTreeRoot *t = requireTree(c, v);
+	if(unlikely(t->root && t->root->flags & TREE_IMMUTABLE)){
+		lExceptionThrowValClo("type-error", "Tree is immutable", v, c);
+	}
+	return t;
+}
+
+const lSymbol *requireSymbol(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltSymbol).vSymbol;
+}
+
+const lSymbol *requireKeyword(lClosure *c, lVal v){
+	return requireCertainType(c, v, ltKeyword).vSymbol;
+}
+
+const lSymbol *requireSymbolic(lClosure *c, lVal v){
+	if(unlikely((v.type != ltSymbol) && (v.type != ltKeyword))){
+		throwTypeError(c, v, ltSymbol);
+	} else {
+		return v.vSymbol;
+	}
+}
+
+const lSymbol *optionalSymbolic(lClosure *c, lVal v, const lSymbol *fallback){
+	if(likely(v.type == ltNil)){
 		return fallback;
 	}
-	if(unlikely(((v->type != ltSymbol) && (v->type != ltKeyword)))){
+	if(unlikely((v.type != ltSymbol) && (v.type != ltKeyword))){
 		throwTypeError(c, v, ltSymbol);
+	} else {
+		return v.vSymbol;
 	}
-	return v->vSymbol;
 }
 
-lClosure *requireClosure(lClosure *c, lVal *v){
-	if((v == NULL)
-		|| !((v->type == ltLambda)
-		||   (v->type == ltEnvironment)
-		||   (v->type == ltMacro))){
+lClosure *requireClosure(lClosure *c, lVal v){
+	if(unlikely(!((v.type == ltLambda)
+		|| (v.type == ltEnvironment)
+		|| (v.type == ltMacro))))
+	{
 			lExceptionThrowValClo("type-error", "Need a closure, not: ", v, c);
 			return NULL;
 	}
-	return v->vClosure;
+	return v.vClosure;
 }
 
-lVal *requireCallable(lClosure *c, lVal *v){
-	if((v == NULL)
-		|| !((v->type == ltLambda)
-		||   (v->type == ltNativeFunc)
-		||   (v->type == ltMacro))){
+lVal requireCallable(lClosure *c, lVal v){
+	if(unlikely(!((v.type == ltLambda)
+		|| (v.type == ltNativeFunc)
+		|| (v.type == ltMacro))))
+	{
 			lExceptionThrowValClo("type-error", "Need sometihng callable, not: ", v, c);
 	}
 	return v;
 }
 
-lVal *requireEnvironment(lClosure *c, lVal *v){
+lVal requireEnvironment(lClosure *c, lVal v){
 	return requireCertainType(c, v, ltEnvironment);
 }
 
-FILE *requireFileHandle(lClosure *c, lVal *v){
+FILE *requireFileHandle(lClosure *c, lVal v){
 	requireCertainType(c, v, ltFileHandle);
-	return v->vFileHandle;
+	return v.vFileHandle;
 }
 
-lVal *requirePair(lClosure *c, lVal *v){
+lVal requirePair(lClosure *c, lVal v){
 	return requireCertainType(c, v, ltPair);
 }

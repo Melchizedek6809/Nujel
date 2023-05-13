@@ -4,7 +4,7 @@
 #include "nujel-private.h"
 #endif
 
-lTree *lTreeNew(const lSymbol *s, lVal *v){
+lTree *lTreeNew(const lSymbol *s, lVal v){
 	lTree *ret  = lTreeAllocRaw();
 	ret->key    = s;
 	ret->height = 1;
@@ -28,12 +28,14 @@ static int lTreeGetBalance(const lTree *t){
 
 /* Reset S to be associated to V if it has already been bound, storing TRUE in
  * FOUND on success */
-void lTreeSet(lTree *t, const lSymbol *s, lVal *v, bool *found){
+void lTreeSet(lTree *t, const lSymbol *s, lVal v, bool *found){
 	if(unlikely(t == NULL)){
 		return;
-	}else if(s == t->key){
+	}else if(unlikely(s == t->key)){
 		t->value = v;
-		if(found){*found = true;}
+		if(likely(found)){
+			*found = true;
+		}
 	}else if(s > t->key){
 		lTreeSet(t->right,s,v,found);
 	}else{
@@ -92,14 +94,14 @@ static lTree *lTreeBalance(lTree *t, const lSymbol *s){
 
 /* Insert an association S -> V in the tree T, creating a new segment if
  * necessary, otherwise the old segment will be mutated */
-lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
-	if(t == NULL){
+lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal v){
+	if(unlikely(t == NULL)){
 		return lTreeNew(s,v);
 	}else if(unlikely(t->key == NULL)){
 		t->key = s;
 		t->value = v;
 		return t;
-	}else if(t->key == s){
+	}else if(unlikely(t->key == s)){
 		t->value = v;
 		return t;
 	}else{
@@ -116,36 +118,36 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal *v){
 
 /* Get whatever value is associated in T to S,
  * setting FOUND to true if successful */
-lVal *lTreeGet(const lTree *t, const lSymbol *s, bool *found){
+lVal lTreeGet(const lTree *t, const lSymbol *s, bool *found){
 	const lTree *c = t;
-	while(c){
+	while(likely(c)){
 		if(unlikely(s == c->key)){
 			if(likely(found != NULL)){*found = true;}
 			return c->value;
 		}
 		c = s > c->key ? c->right : c->left;
 	}
-	return NULL;
+	return NIL;
 }
 
 /* Return true if there is an association for S in T, storing the value
  * in values, if found. */
-bool lTreeHas(const lTree *t, const lSymbol *s, lVal **value){
+bool lTreeHas(const lTree *t, const lSymbol *s, lVal *value){
 	bool found = false;
-	lVal *v = lTreeGet(t, s, &found);
+	lVal v = lTreeGet(t, s, &found);
 	if(found && value){*value = v;}
 	return found;
 }
 
 /* Add all the keys within T to the beginning LIST */
-static lVal *lTreeAddKeysToList(const lTree *t, lVal *list){
+static lVal lTreeAddKeysToList(const lTree *t, lVal list){
 	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	list = lTreeAddKeysToList(t->right, list);
 	list = lCons(lValKeywordS(t->key), list);
 	return lTreeAddKeysToList(t->left, list);
 }
 /* Add all the values within T to the beginning LIST */
-static lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
+static lVal lTreeAddValuesToList(const lTree *t, lVal list){
 	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	list = lTreeAddValuesToList(t->right, list);
 	list = lCons(t->value, list);
@@ -153,13 +155,13 @@ static lVal *lTreeAddValuesToList(const lTree *t, lVal *list){
 }
 
 /* Create a list of all the keys within T */
-static lVal *lTreeKeysToList(const lTree *t){
-	return t ? lTreeAddKeysToList(t,NULL) : NULL;
+static lVal lTreeKeysToList(const lTree *t){
+	return t ? lTreeAddKeysToList(t,NIL) : NIL;
 }
 
 /* Create a list of all the values within T */
-static lVal *lTreeValuesToList(const lTree *t){
-	return t ? lTreeAddValuesToList(t,NULL) : NULL;
+static lVal lTreeValuesToList(const lTree *t){
+	return t ? lTreeAddValuesToList(t, NIL) : NIL;
 }
 
 /* Return the total size of the tree T */
@@ -179,74 +181,74 @@ lTree *lTreeDup(const lTree *t){
 	return ret;
 }
 
-lVal* lnfTreeNew(lClosure* c, lVal* v) {
-	lVal* ret = lValAlloc(ltTree);
-	ret->vTree = lTreeNew(NULL, NULL);
+lVal lnfTreeNew(lClosure* c, lVal v) {
+	lVal ret = lValAlloc(ltTree);
+	lTreeRoot *t = ret.vTree = lTreeRootAllocRaw();
 
-	for (lVal* n = v; n; n = lCddr(n)) {
-		lVal* car = lCar(n);
-		if (car == NULL) { break; }
-		ret->vTree = lTreeInsert(ret->vTree, requireSymbolic(c, car), lCadr(n));
+	for (lVal n = v; n.type == ltPair; n = lCddr(n)) {
+		lVal car = lCar(n);
+		if (car.type == ltNil) { break; }
+		t->root = lTreeInsert(t->root, requireSymbolic(c, car), lCadr(n));
 	}
 	return ret;
 }
 
-static lVal* lnfTreeGetKeys(lClosure* c, lVal* v) {
-	return lTreeKeysToList(requireTree(c, lCar(v)));
+static lVal lnfTreeGetKeys(lClosure* c, lVal v) {
+	return lTreeKeysToList(requireTree(c, lCar(v))->root);
 }
 
-static lVal* lnfTreeGetValues(lClosure* c, lVal* v) {
-	return lTreeValuesToList(requireTree(c, lCar(v)));
+static lVal lnfTreeGetValues(lClosure* c, lVal v) {
+	return lTreeValuesToList(requireTree(c, lCar(v))->root);
 }
 
-static lVal* lnfTreeHas(lClosure* c, lVal* v) {
-	return lValBool(lTreeHas(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL));
+static lVal lnfTreeHas(lClosure* c, lVal v) {
+	return lValBool(lTreeHas(requireTree(c, lCar(v))->root, requireSymbolic(c, lCadr(v)), NULL));
 }
 
-static lVal* lnfTreeSet(lClosure* c, lVal* v) {
-	lVal* car = lCar(v);
-	if(unlikely(car == NULL)){ car = lValTree(NULL); }
-	lTree* tre = requireMutableTree(c, car);
+static lVal lnfTreeSet(lClosure* c, lVal v) {
+	lVal car = lCar(v);
+	if(unlikely(car.type == ltNil)){
+		car = lValTree(NULL);
+	}
+	lTreeRoot* t = requireMutableTree(c, car);
 	const lSymbol* key = requireSymbolic(c, lCadr(v));
-	car->vTree = lTreeInsert(tre, key, lCaddr(v));
+	t->root = lTreeInsert(t->root, key, lCaddr(v));
 	return car;
 }
 
-static lVal* lnfTreeSize(lClosure* c, lVal* v) {
-	return lValInt(lTreeSize(requireTree(c, lCar(v))));
+static lVal lnfTreeSize(lClosure* c, lVal v) {
+	return lValInt(lTreeSize(requireTree(c, lCar(v))->root));
 }
 
-static lVal* lnfTreeDup(lClosure* c, lVal* v) {
+static lVal lnfTreeDup(lClosure* c, lVal v) {
 	(void)c;
-	if ((v == NULL)
-		|| (v->type != ltPair)
-		|| (v->vList->car == NULL)
-		|| (v->vList->car->type != ltTree)) {
+	if (unlikely((v.type != ltPair)
+		|| (v.vList->car.type != ltTree))) {
 		lExceptionThrowValClo("type-error", "tree/dup can only be called with a tree as an argument", v, c);
 	}
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	tree = lTreeDup(tree);
 	return lValTree(tree);
 }
 
-static lVal* lnfTreeKeyAst(lClosure* c, lVal* v) {
-	lTree* tree = requireTree(c, lCar(v));
-	return tree ? lValKeywordS(tree->key) : NULL;
+static lVal lnfTreeKeyAst(lClosure* c, lVal v) {
+	lTree* tree = requireTree(c, lCar(v))->root;
+	return tree ? lValKeywordS(tree->key) : NIL;
 }
 
-static lVal* lnfTreeValueAst(lClosure* c, lVal* v) {
-	lTree* tree = requireTree(c, lCar(v));
-	return tree ? tree->value : NULL;
+static lVal lnfTreeValueAst(lClosure* c, lVal v) {
+	lTree* tree = requireTree(c, lCar(v))->root;
+	return tree ? tree->value : NIL;
 }
 
-static lVal* lnfTreeLeftAst(lClosure* c, lVal* v) {
-	lTree* tree = requireTree(c, lCar(v));
-	return (tree && tree->left) ? lValTree(tree->left) : NULL;
+static lVal lnfTreeLeftAst(lClosure* c, lVal v) {
+	lTree* tree = requireTree(c, lCar(v))->root;
+	return (tree && tree->left) ? lValTree(tree->left) : NIL;
 }
 
-static lVal* lnfTreeRightAst(lClosure* c, lVal* v) {
-	lTree* tree = requireTree(c, lCar(v));
-	return (tree && tree->right) ? lValTree(tree->right) : NULL;
+static lVal lnfTreeRightAst(lClosure* c, lVal v) {
+	lTree* tree = requireTree(c, lCar(v))->root;
+	return (tree && tree->right) ? lValTree(tree->right) : NIL;
 }
 
 void lOperationsTree(lClosure* c) {

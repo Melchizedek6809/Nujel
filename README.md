@@ -28,10 +28,10 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Module system
 - [X] Printer written in Nujel
 - [X] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
+- [X] Value types
 - [ ] Proper object system
 - [ ] Tail-call optimization
-- [ ] Co-routines
-- [ ] Value types
+- [ ] Fibers
 - [ ] Simple HTTP 1.1 client/server
 - [ ] Binary/FASL format
 - [ ] Reader written in Nujel

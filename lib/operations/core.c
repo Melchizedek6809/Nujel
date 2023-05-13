@@ -7,366 +7,372 @@
 #include <time.h>
 #include <inttypes.h>
 
-static lVal *lTreeAddSymbolsToList(const lTree *t, lVal *list){
+static lVal lTreeAddSymbolsToList(const lTree *t, lVal list){
 	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
 	list = lTreeAddSymbolsToList(t->right, list);
 	list = lCons(lValSymS(t->key), list);
 	return lTreeAddSymbolsToList(t->left, list);
 }
 
-static lVal *lSymbolTable(lClosure *c, lVal *ret){
+static lVal lSymbolTable(lClosure *c, lVal ret){
 	if(unlikely(c == NULL)){return ret;}
 	return lSymbolTable(c->parent, lTreeAddSymbolsToList(c->data, ret));
 }
 
-static lVal *lnfSymbolTable(lClosure *c, lVal *v){
+static lVal lnfSymbolTable(lClosure *c, lVal v){
 	(void)v;
-	return lSymbolTable(c, NULL);
+	return lSymbolTable(c, NIL);
 }
 
-static lVal *lnfClosureParent(lClosure *c, lVal *v){
+static lVal lnfClosureParent(lClosure *c, lVal v){
 	lClosure *cc = requireClosure(c, lCar(v));
 	if(cc->parent == NULL){
-		return NULL;
+		return NIL;
 	}else{
-		lVal *ret = lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda);
-		ret->vClosure = cc->parent;
+		lVal ret = lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda);
+		ret.vClosure = cc->parent;
 		return ret;
 	}
 }
 
-static lVal *lnfClosureCaller(lClosure *c, lVal *v){
+static lVal lnfClosureCaller(lClosure *c, lVal v){
 	lClosure *cc = requireClosure(c, lCar(v));
 	if((cc == NULL) || (cc->caller == NULL)){
-		return NULL;
+		return NIL;
 	}else{
-		lVal *ret = lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda);
-		ret->vClosure = cc->caller;
+		lVal ret = lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda);
+		ret.vClosure = cc->caller;
 		return ret;
 	}
 }
 
-static lVal *lnfClosureArguments(lClosure *c, lVal *v){
-	lVal *cc = requireCallable(c, lCar(v));
-	if(cc->type == ltNativeFunc){
-		return cc->vNFunc->args;
+static lVal lnfClosureArguments(lClosure *c, lVal v){
+	lVal cc = requireCallable(c, lCar(v));
+	if(cc.type == ltNativeFunc){
+		return cc.vNFunc->args;
 	}else{
-		return cc->vClosure->args;
+		return cc.vClosure->args;
 	}
 }
 
-static lVal *lnfClosureCode(lClosure *c, lVal *v){
+static lVal lnfClosureCode(lClosure *c, lVal v){
 	lClosure *clo = requireClosure(c, lCar(v));
-	lVal *text = lValAlloc(ltBytecodeArr);
-	text->vBytecodeArr = clo->text;
+	lVal text = lValAlloc(ltBytecodeArr);
+	text.vBytecodeArr = clo->text;
 	return text;
 }
 
-static lVal *lnfClosureData(lClosure *c, lVal *v){
+static lVal lnfClosureData(lClosure *c, lVal v){
 	lClosure *clo = requireClosure(c, lCar(v));
-	return clo ? lValTree(clo->data) : NULL;
+	return clo ? lValTree(clo->data) : NIL;
 }
 
-static lVal *lnfClosureName(lClosure *c, lVal *v){
-	lVal *cc = requireCallable(c, lCar(v));
-	return lValSymS((cc->type == ltNativeFunc) ? cc->vNFunc->name : cc->vClosure->name);
+static lVal lnfClosureName(lClosure *c, lVal v){
+	lVal cc = requireCallable(c, lCar(v));
+	return lValSymS((cc.type == ltNativeFunc) ? cc.vNFunc->name : cc.vClosure->name);
 }
 
-static lVal *lnfDefIn(lClosure *c, lVal *v){
+static lVal lnfDefIn(lClosure *c, lVal v){
 	const lSymbol *sym = requireSymbol(c, lCadr(v));
-	lVal *env = lCar(v);
-	if(!env || ((env->type != ltLambda) && (env->type != ltEnvironment))){
-		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+	lVal env = lCar(v);
+	if(unlikely((env.type != ltLambda) && (env.type != ltEnvironment))){
+		lExceptionThrowValClo("invalid-environment", "You can only define symbols in Lambdas or Objects", env, c);
 	}
-	lDefineClosureSym(env->vClosure, sym, lCaddr(v));
+	lDefineClosureSym(env.vClosure, sym, lCaddr(v));
 	return env;
 }
 
-static lVal *lnfResolve(lClosure *c, lVal *v){
+static lVal lnfResolve(lClosure *c, lVal v){
 	const lSymbol *sym = requireSymbol(c, lCar(v));
-	lVal *env = lCadr(v);
-	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
+	lVal env = lCadr(v);
+	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
 		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
 	}
-	return lGetClosureSym(env ? env->vClosure : c, sym);
+	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
 }
 
-static lVal *lnfResolveOrNull(lClosure *c, lVal *v){
+static lVal lnfResolveOrNull(lClosure *c, lVal v){
 	const lSymbol *sym = requireSymbol(c, lCar(v));
-	lVal *env = lCadr(v);
-	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
-		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+	lVal env = lCadr(v);
+	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
+		lExceptionThrowValClo("invalid-environment", "You can only resolve-or-nil symbols in Lambdas or Objects", env, c);
 	}
-	lVal *ret;
-	if(lHasClosureSym(c, sym, &ret)){
+	lVal ret;
+	if(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym, &ret)){
 		return ret;
 	}else{
-		return NULL;
+		return NIL;
 	}
 }
 
-static lVal *lnfResolvesPred(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
-	if(!car || (car->type != ltSymbol)){return lValBool(false);}
-	const lSymbol *sym = car->vSymbol;
-	lVal *env = lCadr(v);
-	if(env && (env->type != ltLambda) && (env->type != ltEnvironment)){
-		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+static lVal lnfResolvesPred(lClosure *c, lVal v){
+	lVal car = lCar(v);
+	if(car.type != ltSymbol){return lValBool(false);}
+	const lSymbol *sym = car.vSymbol;
+	lVal env = lCadr(v);
+	if((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment)){
+		lExceptionThrowValClo("invalid-environment", "You can only check symbols in Lambdas or Objects", env, c);
 	}
-	return lValBool(lHasClosureSym(env ? env->vClosure : c, sym,NULL));
+	return lValBool(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym,NULL));
 }
 
-static lVal *lnfCurrentClosure(lClosure *c, lVal *v){
+static lVal lnfCurrentClosure(lClosure *c, lVal v){
 	(void)v;
-	lVal *ret = lValAlloc(ltEnvironment);
-	ret->vClosure = c;
+	lVal ret = lValAlloc(ltEnvironment);
+	ret.vClosure = c;
 	return ret;
 }
 
-static lVal *lnfCurrentLambda(lClosure *c, lVal *v){
+static lVal lnfCurrentLambda(lClosure *c, lVal v){
 	(void)v;
-	lVal *ret = lValAlloc(ltLambda);
-	ret->vClosure = c;
+	lVal ret = lValAlloc(ltLambda);
+	ret.vClosure = c;
 	return ret;
 }
 
-static lVal *lnfApply(lClosure *c, lVal *v){
+static lVal lnfApply(lClosure *c, lVal v){
 	return lApply(c, requirePair(c, lCadr(v)), lCar(v));
 }
 
-static lVal *lnfMacroApply(lClosure *c, lVal *v){
-	lVal *fun = lCar(v);
-	if((fun == NULL) || (fun->type != ltMacro)){ lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c); }
+static lVal lnfMacroApply(lClosure *c, lVal v){
+	lVal fun = lCar(v);
+	if(unlikely(fun.type != ltMacro)){
+		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
+	}
 	return lLambda(c, lCadr(v), fun);
 }
 
-static lVal *lnfCar(lClosure *c, lVal *v){
+static lVal lnfCar(lClosure *c, lVal v){
 	(void)c;
 	return lCaar(v);
 }
 
-static lVal *lnfCdr(lClosure *c, lVal *v){
+static lVal lnfCdr(lClosure *c, lVal v){
 	(void)c;
 	return lCdar(v);
 }
 
-static lVal *lnfCons(lClosure *c, lVal *v){
-	if(lCddr(v) != NULL){ lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c); }
+static lVal lnfCons(lClosure *c, lVal v){
+	if(unlikely(lCddr(v).type != ltNil)){
+		lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c);
+	}
 	return lCons(lCar(v),lCadr(v));
 }
 
-static lVal *lnfNReverse(lClosure *c, lVal *v){
+static lVal lnfNReverse(lClosure *c, lVal v){
 	(void)c;
-	lVal *t = NULL, *l = lCar(v);
-	while((l != NULL) && (l->type == ltPair)){
-		lVal *next = l->vList->cdr;
-		l->vList->cdr = t;
+	lVal t = NIL, l = lCar(v);
+	while(l.type == ltPair){
+		lVal next = l.vList->cdr;
+		l.vList->cdr = t;
 		t = l;
 		l = next;
 	}
 	return t;
 }
 
-static lVal *lnfTime(lClosure *c, lVal *v){
+static lVal lnfTime(lClosure *c, lVal v){
 	(void)c;(void)v;
 	return lValInt(time(NULL));
 }
 
-static lVal *lnfTimeMsecs(lClosure *c, lVal *v){
+static lVal lnfTimeMsecs(lClosure *c, lVal v){
 	(void)c; (void)v;
 	return lValInt(getMSecs());
 }
 
-static lVal *lnfLess(lClosure *c, lVal *v){
+static lVal lnfLess(lClosure *c, lVal v){
 	(void)c;
 	return lValBool(lValGreater(lCar(v), lCadr(v)) < 0);
 }
 
-static lVal *lnfUnequal(lClosure *c, lVal *v){
+static lVal lnfUnequal(lClosure *c, lVal v){
 	(void)c;
 	return lValBool(!lValEqual(lCar(v), lCadr(v)));
 }
 
-static lVal *lnfEqual(lClosure *c, lVal *v){
+static lVal lnfEqual(lClosure *c, lVal v){
 	(void)c;
 	return lValBool(lValEqual(lCar(v), lCadr(v)));
 }
 
-static lVal *lnfLessEqual(lClosure *c, lVal *v){
+static lVal lnfLessEqual(lClosure *c, lVal v){
 	(void)c;
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
+	lVal a = lCar(v);
+	lVal b = lCadr(v);
 	return lValBool(lValEqual(a,b) || (lValGreater(a, b) < 0));
 }
 
-static lVal *lnfGreater(lClosure *c, lVal *v){
+static lVal lnfGreater(lClosure *c, lVal v){
 	(void)c;
 	return lValBool(lValGreater(lCar(v), lCadr(v)) > 0);
 }
 
-static lVal *lnfGreaterEqual(lClosure *c, lVal *v){
+static lVal lnfGreaterEqual(lClosure *c, lVal v){
 	(void)c;
-	lVal *a = lCar(v);
-	lVal *b = lCadr(v);
+	lVal a = lCar(v);
+	lVal b = lCadr(v);
 	return lValBool(lValEqual(a, b) || (lValGreater(a, b) > 0));
 }
 
-static lVal *lnfNilPred(lClosure *c, lVal *v){
+static lVal lnfNilPred(lClosure *c, lVal v){
 	(void)c;
-	return lValBool(lCar(v) == NULL);
+	return lValBool(lCar(v).type == ltNil);
 }
 
-static lVal *lnfZeroPred(lClosure *c, lVal *v){
+static lVal lnfZeroPred(lClosure *c, lVal v){
 	(void)c;
-	lVal *a = lCar(v);
+	lVal a = lCar(v);
 	bool p = false;
-	if(a){
-		if(a->type == ltInt){
-			p = a->vInt == 0;
-		}else if(a->type == ltFloat){
-			p = a->vFloat == 0.0;
-		}
+
+	if(a.type == ltInt){
+		p = a.vInt == 0;
+	}else if(a.type == ltFloat){
+		p = a.vFloat == 0.0;
 	}
+
 	return lValBool(p);
 }
 
-static lVal *lnfQuote(lClosure *c, lVal *v){
-	if(v->type != ltPair){ lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c); }
+static lVal lnfQuote(lClosure *c, lVal v){
+	if(unlikely(v.type != ltPair)){
+		lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c);
+	}
 	return lCar(v);
 }
 
-static lVal *lnfThrow(lClosure *c, lVal *v){
+static lVal lnfThrow(lClosure *c, lVal v){
 	(void)c;
 	lExceptionThrowRaw(lCar(v));
-	return NULL;
+	return NIL;
 }
 
-static lVal *lnfRead(lClosure *c, lVal *v){
+static lVal lnfRead(lClosure *c, lVal v){
 	return lRead(c, requireString(c, lCar(v))->data);
 }
 
-static lVal *lnfTypeOf(lClosure *c, lVal *v){
+static lVal lnfTypeOf(lClosure *c, lVal v){
 	(void)c;
 	return lValKeywordS(getTypeSymbol(lCar(v)));
 }
 
-static lVal *lnfGarbageCollect(lClosure *c, lVal *v){
+static lVal lnfGarbageCollect(lClosure *c, lVal v){
 	(void)c; (void)v;
 	lGarbageCollect();
-	return NULL;
+	return NIL;
 }
 
-static lVal *lnfGarbageCollectRuns(lClosure *c, lVal *v){
+static lVal lnfGarbageCollectRuns(lClosure *c, lVal v){
 	(void)c; (void)v;
 	return lValInt(lGCRuns);
 }
 
-static lVal *lnfMetaGet(lClosure *c, lVal *v){
+static lVal lnfMetaGet(lClosure *c, lVal v){
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
-	lVal *l = lCar(v);
+	lVal l = lCar(v);
 	typeswitch(l){
 	case ltNativeFunc:
-		return lTreeGet(l->vNFunc->meta, key, NULL);
+		return lTreeGet(l.vNFunc->meta, key, NULL);
 	case ltLambda:
 	case ltEnvironment:
-		return lTreeGet(l->vClosure->meta, key, NULL);
+		return lTreeGet(l.vClosure->meta, key, NULL);
 	default:
-		return NULL;
+		return NIL;
 	}
 }
 
-static lVal *lnfMetaSet(lClosure *c, lVal *v){
+static lVal lnfMetaSet(lClosure *c, lVal v){
 	const lSymbol *key = requireSymbolic(c, lCadr(v));
-	lVal *car = requireCallable(c, lCar(v));
+	lVal car = requireCallable(c, lCar(v));
 
-	if(car->type == ltNativeFunc){
+	if(car.type == ltNativeFunc){
 		lExceptionThrowValClo("type-error", "Can't add new metadata to native functions", car, c);
 	}else{
-		car->vClosure->meta = lTreeInsert(car->vClosure->meta, key, lCaddr(v));
+		car.vClosure->meta = lTreeInsert(car.vClosure->meta, key, lCaddr(v));
 	}
 
 	return car;
 }
 
-static lVal *lCastFloat(lClosure *c, lVal *v){
+static lVal lCastFloat(lClosure *c, lVal v){
 	typeswitch(v){
 	default:      throwTypeError(c, v, ltFloat);
 	case ltFloat: return v;
-	case ltInt:   return lValFloat(c, v->vInt);
+	case ltInt:   return lValFloat(c, v.vInt);
 	}
 }
-static lVal *lnfFloat(lClosure *c, lVal *v){
+static lVal lnfFloat(lClosure *c, lVal v){
 	return lCastFloat(c,lCar(v));
 }
 
-static lVal *lCastInt(lClosure *c, lVal *v){
+static lVal lCastInt(lClosure *c, lVal v){
 	typeswitch(v){
 	default:      throwTypeError(c, v, ltInt);
 	case ltInt:   return v;
-	case ltFloat: return lValInt(v->vFloat);
+	case ltFloat: return lValInt(v.vFloat);
 	}
 }
-static lVal *lnfInt(lClosure *c, lVal *v){
+static lVal lnfInt(lClosure *c, lVal v){
 	return lCastInt(c, lCar(v));
 }
 
-static lVal *lnfSymbolToKeyword(lClosure *c, lVal *v){
+static lVal lnfSymbolToKeyword(lClosure *c, lVal v){
 	return lValKeywordS(requireSymbol(c, lCar(v)));
 }
 
-static lVal *lnfKeywordToSymbol(lClosure *c, lVal *v){
+static lVal lnfKeywordToSymbol(lClosure *c, lVal v){
 	return lValSymS(requireKeyword(c, lCar(v)));
 }
 
-static i64 lValToId(lVal *v){
+static i64 lValToId(lVal v){
 	typeswitch(v){
 	default:      return 0;
 	case ltEnvironment:
 	case ltMacro:
-	case ltLambda: return v->vClosure - lClosureList;
-	case ltBufferView: return v->vBufferView - lBufferViewList;
+	case ltLambda: return v.vClosure - lClosureList;
+	case ltBufferView: return v.vBufferView - lBufferViewList;
 	case ltString:
-	case ltBuffer: return v->vBuffer - lBufferList;
-	case ltArray: return v->vArray - lArrayList;
-	case ltTree: return v->vTree - lTreeList;
-	case ltBytecodeArr: return v->vBytecodeArr - lBytecodeArrayList;
+	case ltBuffer: return v.vBuffer - lBufferList;
+	case ltArray: return v.vArray - lArrayList;
+	case ltTree: return v.vTree - lTreeRootList;
+	case ltBytecodeArr: return v.vBytecodeArr - lBytecodeArrayList;
 	case ltKeyword:
-	case ltSymbol: return v->vSymbol - lSymbolList;
-	case ltFileHandle: return fileno(v->vFileHandle);
-	case ltNativeFunc: return v->vNFunc - lNFuncList;
+	case ltSymbol: return v.vSymbol - lSymbolList;
+	case ltFileHandle: return fileno(v.vFileHandle);
+	case ltNativeFunc: return v.vNFunc - lNFuncList;
 	}
 }
 
-static lVal *lnfValToId(lClosure *c, lVal *v){
+static lVal lnfValToId(lClosure *c, lVal v){
 	(void)c;
 	return lValInt(lValToId(lCar(v)));
 }
 
-static lVal *lnfString(lClosure *c, lVal *v){
+static lVal lnfString(lClosure *c, lVal v){
 	char buf[64];
 	int snret;
-	lVal *a = lCar(v);
+	lVal a = lCar(v);
 	typeswitch(a){
 	default:
 		lExceptionThrowValClo("type-error", "Can't convert that into a string", a, c);
-		return NULL;
+		return NIL;
 	case ltNil:
 		return lValString("");
 	case ltBuffer:
-		return lValStringLen(a->vBuffer->data, a->vBuffer->length);
+		return lValStringLen(a.vBuffer->data, a.vBuffer->length);
 	case ltString:
 		return a;
 	case ltKeyword:
-		snret = snprintf(buf,sizeof(buf),":%s",a->vSymbol->c);
+		snret = snprintf(buf,sizeof(buf),":%s",a.vSymbol->c);
 		break;
 	case ltSymbol:
-		snret = snprintf(buf,sizeof(buf),"%s",a->vSymbol->c);
+		snret = snprintf(buf,sizeof(buf),"%s",a.vSymbol->c);
 		break;
 	case ltInt:
-		snret = snprintf(buf,sizeof(buf),"%" PRId64, a->vInt);
+		snret = snprintf(buf,sizeof(buf),"%" PRId64, a.vInt);
 		break;
 	case ltFloat: {
-		snret = snprintf(buf,sizeof(buf),"%f", a->vFloat);
+		snret = snprintf(buf,sizeof(buf),"%f", a.vFloat);
 		if(snret < 0){exit(5);}
 		buf[snret--] = 0;
 		for(;(snret > 0) && (buf[snret] == '0');snret--){}
@@ -379,7 +385,7 @@ static lVal *lnfString(lClosure *c, lVal *v){
 	return lValStringLen(buf,snret);
 }
 
-static lVal *lnfStrSym(lClosure *c, lVal *v){
+static lVal lnfStrSym(lClosure *c, lVal v){
 	return lValSym(requireString(c, lCar(v))->data);
 }
 

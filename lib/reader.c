@@ -22,16 +22,16 @@ typedef struct {
 	lClosure *c;
 } lReadContext;
 
-static lVal *lReadValue(lReadContext *s);
-static lVal *lReadList(lReadContext *s, bool rootForm, char terminator);
+static lVal lReadValue(lReadContext *s);
+static lVal lReadList(lReadContext *s, bool rootForm, char terminator);
 
 static NORETURN void lExceptionThrowReader(lReadContext *s, const char *msg){
-	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+	lVal err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
 	lExceptionThrowValClo("read-error", msg, err, s->c);
 }
 
 static NORETURN void lExceptionThrowReaderCustom(lReadContext *s, const char *msg, const char *customError){
-	lVal *err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
+	lVal err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
 	lExceptionThrowValClo(customError, msg, err, s->c);
 }
 
@@ -83,7 +83,7 @@ static void lStringAdvanceUntilEndOfBlockComment(lReadContext *s){
 }
 
 /* Parse the string literal in s and return the resulting ltString lVal */
-static lVal *lParseString(lReadContext *s){
+static lVal lParseString(lReadContext *s){
 	static char *buf = NULL;
 	static uint bufSize = 1<<12; // Start with 4K
 	if(buf == NULL){buf = malloc(bufSize);}
@@ -144,15 +144,15 @@ static lVal *lParseString(lReadContext *s){
 			s->data++;
 		}else if(unlikely(*s->data == '"')){
 			s->data++;
-			lVal *v = lValAlloc(ltString);
-			v->vString = lStringNew(buf,b-buf);
+			lVal v = lValAlloc(ltString);
+			v.vString = lStringNew(buf,b-buf);
 			return v;
 		}else if(unlikely(*s->data == 0)){
 			if (likely(i < bufSize)) {
 				buf[i] = 0;
 			}
 			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
-			return NULL;
+			return NIL;
 		}else{
 			*b++ = *s->data++;
 		}
@@ -161,11 +161,11 @@ static lVal *lParseString(lReadContext *s){
 		buf[i] = 0;
 	}
 	lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
-	return NULL;
+	return NIL;
 }
 
 /* Parse s as a symbol and return the ltSymbol lVal */
-static lVal *lParseSymbol(lReadContext *s){
+static lVal lParseSymbol(lReadContext *s){
 	uint i;
 	char buf[128];
 	bool keyword = false;
@@ -196,7 +196,7 @@ static lVal *lParseSymbol(lReadContext *s){
 	}
 
 	char *kwstart = buf;
-	if((i > 0) && (buf[i-1] == ':')){
+	if(unlikely(i > 0) && (buf[i-1] == ':')){
 		buf[i-1] = 0;
 	}
 	if(buf[0] == ':'){
@@ -243,7 +243,7 @@ static i64 lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int m
 	return ret;
 }
 
-static lVal *lParseNumber(lReadContext *s, int base, int maxDigits){
+static lVal lParseNumber(lReadContext *s, int base, int maxDigits){
 	const char *start = s->data;
 	bool negative = false;
 	if(*start == '-'){
@@ -265,7 +265,7 @@ static lVal *lParseNumber(lReadContext *s, int base, int maxDigits){
 	return lValInt(negative ? -val : val);
 }
 
-static lVal *lParseCharacter(lReadContext *s){
+static lVal lParseCharacter(lReadContext *s){
 	int ret = s->data[0];
 	if((s->data[0] == 'B') && (s->data[1] == 'a')){ret = '\b';}
 	else if((s->data[0] == 'T') && (s->data[1] == 'a')){ret = '\t';}
@@ -278,35 +278,35 @@ static lVal *lParseCharacter(lReadContext *s){
 	return lValInt(ret);
 }
 
-static lVal *lParseBytecodeOp(lReadContext *s){
-	lVal *ret = lParseNumber(s, 16, 2);
-	if((ret->vInt < 0) || (ret->vInt > 255)){
+static lVal lParseBytecodeOp(lReadContext *s){
+	lVal ret = lParseNumber(s, 16, 2);
+	if((ret.vInt < 0) || (ret.vInt > 255)){
 		lExceptionThrowReaderStartEnd(s, "Out of bound op");
 	}
-	const i64 code = ret->vInt;
-	ret->type = ltBytecodeOp;
-	ret->vBytecodeOp = code;
+	const i64 code = ret.vInt;
+	ret.type = ltBytecodeOp;
+	ret.vBytecodeOp = code;
 	return ret;
 }
 
-static NORETURN void throwBCReadError(lReadContext *s, lVal *v, const char *msg){
+static NORETURN void throwBCReadError(lReadContext *s, lVal v, const char *msg){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
 	buf[sizeof(buf)-1] = 0;
 	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), s->c);
 }
 
-static lVal *lParseBytecodeArray(lReadContext *s){
-	u8 *d    = NULL;
+static lVal lParseBytecodeArray(lReadContext *s){
+	u8 *d    = NULL; // ToDo: make this buffer static / move to stack
 	int size = 0;
 	int len  = 0;
 	lArray *literals = NULL;
 
-	lVal *v = lReadValue(s);
-	if(!v || (v->type != ltArray)){
+	lVal v = lReadValue(s);
+	if(v.type != ltArray){
 		throwBCReadError(s, v, "Invalid literal array in BCA");
 	}
-	literals = v->vArray;
+	literals = v.vArray;
 	literals->flags = ARRAY_IMMUTABLE;
 
 	while(s->data < s->bufEnd){
@@ -315,8 +315,8 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 			u8 *newD = realloc(d, size);
 			if(unlikely(newD == NULL)){
 				free(d);
-				lExceptionThrowValClo("out-of-memory", "OOM during BC Arr Parse", NULL, s->c);
-				return NULL;
+				lExceptionThrowValClo("out-of-memory", "OOM during BC Arr Parse", NIL, s->c);
+				return NIL;
 			}
 			d = newD;
 		}
@@ -330,7 +330,7 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
-			throwBCReadError(s, NULL, "sudden end");
+			throwBCReadError(s, NIL, "sudden end");
 		}
 		c = *s->data++;
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
@@ -341,7 +341,7 @@ static lVal *lParseBytecodeArray(lReadContext *s){
 		storeOP:
 		d[len++] = (u8)t;
 	}
-	lVal *ret = lValBytecodeArray(d,len,literals,s->c);
+	lVal ret = lValBytecodeArray(d,len,literals,s->c);
 	free(d);
 	return ret;
 }
@@ -358,7 +358,7 @@ static u8 lReadNibble(lReadContext *s, const u8 c){
 	}
 }
 
-static lVal *lParseBuffer(lReadContext *s){
+static lVal lParseBuffer(lReadContext *s){
 	u8 *buf = NULL;
 	size_t len = 0;
 	size_t bufSize = 0;
@@ -385,8 +385,8 @@ static lVal *lParseBuffer(lReadContext *s){
 			u8 *newBuf = realloc(buf, bufSize);
 			if(unlikely(newBuf == NULL)){
 				free(buf);
-				lExceptionThrowValClo("out-of-memory", "OOM during buffer parse", NULL, s->c);
-				return NULL;
+				lExceptionThrowValClo("out-of-memory", "OOM during buffer parse", NIL, s->c);
+				return NIL;
 			}
 			buf = newBuf;
 		}
@@ -396,17 +396,17 @@ static lVal *lParseBuffer(lReadContext *s){
 
 	u8* newBuf = realloc(buf, len);
 	if (unlikely(newBuf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "OOM during buffer parse outtro", NULL, s->c);
-		return NULL;
+		lExceptionThrowValClo("out-of-memory", "OOM during buffer parse outtro", NIL, s->c);
+		return NIL;
 	}
-	lVal *ret = lValAlloc(ltBuffer);
-	ret->vBuffer = lBufferAlloc(len, true);
-	ret->vBuffer->buf = newBuf;
+	lVal ret = lValAlloc(ltBuffer);
+	ret.vBuffer = lBufferAlloc(len, true);
+	ret.vBuffer->buf = newBuf;
 	return ret;
 }
 
-static lVal *lParseSpecial(lReadContext *s){
-	if(s->data >= s->bufEnd){return NULL;}
+static lVal lParseSpecial(lReadContext *s){
+	if(s->data >= s->bufEnd){return NIL;}
 	switch(*s->data++){
 	default: lExceptionThrowReaderStartEnd(s, "Wrong char in special lit.");
 	case '|': // SRFI-30
@@ -425,7 +425,7 @@ static lVal *lParseSpecial(lReadContext *s){
 	case '$': return lParseBytecodeOp(s);
 	case 'n':
 		lStringAdvanceToNextSpaceOrSpecial(s);
-		return NULL;
+		return NIL;
 	case 't': return lValBool(true);
 	case 'f': return lValBool(false);
 	case '{': return lParseBytecodeArray(s);
@@ -434,14 +434,16 @@ static lVal *lParseSpecial(lReadContext *s){
 		return lnfArrNew(s->c, lReadList(s, false, ')'));
 	case '@':{
 		s->data++;
-		lVal *ret = lnfTreeNew(s->c, lReadList(s,false,')'));
-		ret->vTree->flags |= TREE_IMMUTABLE;
+		lVal ret = lnfTreeNew(s->c, lReadList(s,false,')'));
+		if(ret.vTree->root){
+			ret.vTree->root->flags |= TREE_IMMUTABLE;
+		}
 		return ret;
 	}}
 }
 
-static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
-	lVal *v = NULL, *ret = NULL;
+static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
+	lVal v = NIL, ret = NIL;
 	while(1){
 		lStringAdvanceToNextCharacter(s);
 
@@ -451,7 +453,7 @@ static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 				lExceptionThrowReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
 			}
 			s->data++;
-			return ret == NULL ? lCons(NULL,NULL) : ret;
+			return ret.type == ltNil ? lCons(NIL,NIL) : ret;
 		}else if(c == ';'){
 			lStringAdvanceToNextLine(s);
 			continue;
@@ -460,53 +462,53 @@ static lVal *lReadList(lReadContext *s, bool rootForm, char terminator){
 				lExceptionThrowReader(s, "Unmatched closing bracket");
 			}
 			s->data++;
-			return ret == NULL ? lCons(NULL,NULL) : ret;
+			return ret.type == ltNil ? lCons(NIL, NIL) : ret;
 		}else if(isClosingChar(c)){
 			lExceptionThrowReader(s, "Unmatched closing char");
 		}else{
 			const u8 next = s->data[1];
 			if((c == '.') && (isspace(next) || isnonsymbol(next))){
-				if(v == NULL){
+				if(unlikely(v.type == ltNil)){
 					lExceptionThrowReader(s, "Missing car in dotted pair");
 				}
 				s->data++;
-				lVal *nv;
+				lVal nv;
 				do {
-					if((s->data >= s->bufEnd) || (*s->data == 0) || (*s->data == ')')){
+					if(unlikely((s->data >= s->bufEnd) || (*s->data == 0) || (*s->data == ')'))){
 						lExceptionThrowReader(s, "Missing cdr in dotted pair");
 					}
 					lStringAdvanceToNextCharacter(s);
 					nv = lReadValue(s);
 				} while(isComment(nv));
-				v->vList->cdr = isComment(nv) ? NULL : nv;
+				v.vList->cdr = isComment(nv) ? NIL : nv;
 				continue;
 			}else{
-				lVal *nv = lReadValue(s);
+				lVal nv = lReadValue(s);
 				if(isComment(nv)){continue;}
-				if(v == NULL){
-					v = ret = lCons(nv,NULL);
+				if(v.type == ltNil){
+					v = ret = lCons(nv, NIL);
 				}else{
-					v->vList->cdr = lCons(nv,NULL);
-					v = v->vList->cdr;
+					v.vList->cdr = lCons(nv, NIL);
+					v = v.vList->cdr;
 				}
 			}
 		}
 	}
 }
 
-static lVal *lReadQuote(lReadContext *s, lSymbol *carSym){
-	return lCons(lValSymS(carSym), lCons(lReadValue(s),NULL));
+static lVal lReadQuote(lReadContext *s, lSymbol *carSym){
+	return lCons(lValSymS(carSym), lCons(lReadValue(s), NIL));
 }
 
-static lVal *lReadValue(lReadContext *s){
+static lVal lReadValue(lReadContext *s){
 	if(s->data >= s->bufEnd){
-		return NULL;
+		return NIL;
 	}
 	const char c = *s->data;
 
 	switch(c){
 	case 0:
-		return NULL;
+		return NIL;
 	case '(':
 		s->data++;
 		return lReadList(s,false,')');
@@ -535,7 +537,7 @@ static lVal *lReadValue(lReadContext *s){
 	case '#':
 		s->data++;
 		if(s->data >= s->bufEnd){
-			return NULL;
+			return NIL;
 		}else if(*s->data == ';'){
 			++s->data;
 			if((s->data < s->bufEnd) && (*s->data == '(')){
@@ -561,7 +563,7 @@ static lVal *lReadValue(lReadContext *s){
 	}
 }
 
-lVal *lRead(lClosure *c, const char *str){
+lVal lRead(lClosure *c, const char *str){
 	lReadContext ctx;
 	ctx.c = c;
 	ctx.buf = ctx.data = str;

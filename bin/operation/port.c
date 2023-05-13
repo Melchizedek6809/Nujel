@@ -15,7 +15,7 @@ static void disableRawMode() {
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-static lVal *lnfFileRaw(lClosure *c, lVal *v){
+static lVal lnfFileRaw(lClosure *c, lVal v){
 	struct termios raw;
 	FILE *fh = requireFileHandle(c, lCar(v));
 
@@ -31,13 +31,13 @@ static lVal *lnfFileRaw(lClosure *c, lVal *v){
 	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 	tcsetattr(fileno(fh), TCSAFLUSH, &raw);
 
-	return NULL;
+	return NIL;
 }
 
 #endif
 
 
-static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
+static lVal lnfFileOpenOutput(lClosure *c, lVal v){
 	lString *pathname = requireString(c, lCar(v));
 	const char *path = lStringData(pathname);
 	const lSymbol *mode = optionalSymbolic(c, lCadr(v), lSymError);
@@ -58,24 +58,24 @@ static lVal *lnfFileOpenOutput(lClosure *c, lVal *v){
 		lExceptionThrowValClo("type-error", "Don't know that particular behaviour: ", lCadr(v), c);
 	}
 
-	return fh ? lValFileHandle(fh) : NULL;
+	return fh ? lValFileHandle(fh) : NIL;
 }
 
-static lVal *lnfFileOpenInput(lClosure *c, lVal *v){
+static lVal lnfFileOpenInput(lClosure *c, lVal v){
 	lString *pathname = requireString(c, lCar(v));
 	FILE *fh = fopen(lStringData(pathname), "rb");
-	return fh ? lValFileHandle(fh) : NULL;
+	return fh ? lValFileHandle(fh) : NIL;
 }
 
-static lVal *lnfFileClose(lClosure *c, lVal *v){
+static lVal lnfFileClose(lClosure *c, lVal v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	fclose(fh);
-	return NULL;
+	return NIL;
 }
 
-static lVal *lnfFileReadAst(lClosure *c, lVal *v){
+static lVal lnfFileReadAst(lClosure *c, lVal v){
 	FILE *fh = requireFileHandle(c, lCar(v));
-	lVal *contentV = lCadr(v);
+	lVal contentV = lCadr(v);
 	const i64 size = requireNaturalInt(c, lCaddr(v));
 	const i64 offset = castToInt(lCadddr(v), 0);
 
@@ -85,14 +85,14 @@ static lVal *lnfFileReadAst(lClosure *c, lVal *v){
 	typeswitch(contentV){
 	default:
 		lExceptionThrowValClo("type-error", "Can't read into that", contentV, c);
-		return NULL;
+		return NIL;
 	case ltBuffer:
-		buf = lBufferDataMutable(contentV->vBuffer);
-		bufSize = lBufferLength(contentV->vBuffer);
+		buf = lBufferDataMutable(contentV.vBuffer);
+		bufSize = lBufferLength(contentV.vBuffer);
 		break;
 	case ltBufferView:{
-		buf = lBufferViewDataMutable(contentV->vBufferView);
-		bufSize = lBufferViewLength(contentV->vBufferView);
+		buf = lBufferViewDataMutable(contentV.vBufferView);
+		bufSize = lBufferViewLength(contentV.vBufferView);
 		break;
 	}}
 	if(buf == NULL){
@@ -107,16 +107,16 @@ static lVal *lnfFileReadAst(lClosure *c, lVal *v){
 			lExceptionThrowValClo("io-error", "IO Error occured during read", lCar(v), c);
 		}
 		if(feof(fh)){
-			return NULL;
+			return NIL;
 		}
 		if(r > 0){ bytesRead += r; }
 	}
 	return lCar(v);
 }
 
-static lVal *lnfFileWriteAst(lClosure *c, lVal *v){
+static lVal lnfFileWriteAst(lClosure *c, lVal v){
 	FILE *fh = requireFileHandle(c, lCar(v));
-	lVal *contentV = lCadr(v);
+	lVal contentV = lCadr(v);
 	i64 size = castToInt(lCaddr(v), -1);
 	const i64 offset = castToInt(lCadddr(v), 0);
 
@@ -126,18 +126,18 @@ static lVal *lnfFileWriteAst(lClosure *c, lVal *v){
 	typeswitch(contentV){
 	default:
 		lExceptionThrowValClo("type-error", "Can't read into that", contentV, c);
-		return NULL;
+		return NIL;
 	case ltString:
-		buf = lStringData(contentV->vBuffer);
-		bufSize = lStringLength(contentV->vBuffer);
+		buf = lStringData(contentV.vBuffer);
+		bufSize = lStringLength(contentV.vBuffer);
 		break;
 	case ltBuffer:
-		buf = lBufferData(contentV->vBuffer);
-		bufSize = lBufferLength(contentV->vBuffer);
+		buf = lBufferData(contentV.vBuffer);
+		bufSize = lBufferLength(contentV.vBuffer);
 		break;
 	case ltBufferView:{
-		buf = lBufferViewData(contentV->vBufferView);
-		bufSize = lBufferViewLength(contentV->vBufferView);
+		buf = lBufferViewData(contentV.vBufferView);
+		bufSize = lBufferViewLength(contentV.vBufferView);
 		break;
 	}}
 	if(buf == NULL){
@@ -160,21 +160,21 @@ static lVal *lnfFileWriteAst(lClosure *c, lVal *v){
 	return lCar(v);
 }
 
-static lVal *lnfFileFlush(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfFileFlush(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	FILE *fh = requireFileHandle(c, car);
 	fflush(fh);
 	return car;
 }
 
-static lVal *lnfFileTell(lClosure *c, lVal *v){
+static lVal lnfFileTell(lClosure *c, lVal v){
 	FILE *fh = requireFileHandle(c, lCar(v));
 	const i64 pos = ftell(fh);
 	return lValInt(pos);
 }
 
-static lVal *lnfFileSeek(lClosure *c, lVal *v){
-	lVal *car = lCar(v);
+static lVal lnfFileSeek(lClosure *c, lVal v){
+	lVal car = lCar(v);
 	FILE *fh = requireFileHandle(c, car);
 	const i64 offset = requireInt(c, lCadr(v));
 	const i64 whenceRaw = requireInt(c, lCaddr(v));
@@ -186,11 +186,11 @@ static lVal *lnfFileSeek(lClosure *c, lVal *v){
 	return car;
 }
 
-static lVal *lnfFileEof(lClosure *c, lVal *v){
+static lVal lnfFileEof(lClosure *c, lVal v){
 	return lValBool(feof(requireFileHandle(c, lCar(v))));
 }
 
-static lVal *lnfFileError(lClosure *c, lVal *v){
+static lVal lnfFileError(lClosure *c, lVal v){
 	return lValBool(ferror(requireFileHandle(c, lCar(v))));
 }
 

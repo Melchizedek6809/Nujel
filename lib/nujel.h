@@ -26,7 +26,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
-#define typeswitch(v) switch(v ? v->type : ltNil)
+#define typeswitch(v) switch(v.type)
 
 /*
  | Now for some type/struct definitions
@@ -88,6 +88,7 @@ typedef struct lThread  lThread;
 typedef struct lNFunc   lNFunc;
 typedef struct lSymbol  lSymbol;
 typedef struct lTree    lTree;
+typedef struct lTreeRoot lTreeRoot;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 typedef struct lPair    lPair;
@@ -95,17 +96,15 @@ typedef struct lBytecodeArray lBytecodeArray;
 typedef uint8_t lBytecodeOp;
 typedef lBuffer lString;
 
-
-struct lPair {
-	lVal *car;
+struct lTreeRoot {
 	union {
-		lPair *nextFree;
-		lVal *cdr;
+		lTree *root;
+		lTreeRoot *nextFree;
 	};
 };
 
 struct lVal {
-	u8 type;
+	u32 type;
 	union {
 		bool            vBool;
 		i64             vInt;
@@ -116,14 +115,29 @@ struct lVal {
 		FILE *          vFileHandle;
 		lBytecodeArray *vBytecodeArr;
 		lArray *        vArray;
-		lTree *         vTree;
+		lTreeRoot *     vTree;
 		lString *       vString;
 		lClosure *      vClosure;
 		lNFunc *        vNFunc;
 		void *          vPointer;
-		lVal *          nextFree;
 		lBuffer *       vBuffer;
 		lBufferView *   vBufferView;
+	};
+};
+
+extern lVal NIL;
+
+static inline lVal lValAlloc(lType T){
+	lVal ret;
+	ret.type = T;
+	return ret;
+}
+
+struct lPair {
+	lVal car;
+	union {
+		lPair *nextFree;
+		lVal cdr;
 	};
 };
 
@@ -132,7 +146,7 @@ struct lVal {
  */
 void      lInit    ();
 lClosure *lNewRoot ();
-lVal     *lApply   (lClosure *c, lVal *args, lVal *fun);
+lVal      lApply   (lClosure *c, lVal args, lVal fun);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
 const char *         lStringData            (const lString *v);
@@ -144,110 +158,109 @@ const void *         lBufferViewData        (lBufferView *v);
 void *               lBufferViewDataMutable (lBufferView *v);
 size_t               lBufferViewLength      (const lBufferView *v);
 
-lVal *lCons(lVal *car, lVal *cdr);
+lVal lCons(lVal car, lVal cdr);
 
-static inline lVal *lCar(lVal *v){
-	return (v != NULL) && likely(v->type == ltPair) ? v->vList->car : NULL;
+static inline lVal lCar(lVal v){
+	return likely(v.type == ltPair) ? v.vList->car : NIL;
 }
 
-static inline lVal *lCdr(lVal *v){
-	return (v != NULL) && likely(v->type == ltPair) ? v->vList->cdr : NULL;
+static inline lVal lCdr(lVal v){
+	return likely(v.type == ltPair) ? v.vList->cdr : NIL;
 }
 
-static inline lVal *lCaar  (lVal *v){return lCar(lCar(v));}
-static inline lVal *lCadr  (lVal *v){return lCar(lCdr(v));}
-static inline lVal *lCdar  (lVal *v){return lCdr(lCar(v));}
-static inline lVal *lCddr  (lVal *v){return lCdr(lCdr(v));}
-static inline lVal *lCaddr (lVal *v){return lCar(lCdr(lCdr(v)));}
-static inline lVal *lCadddr(lVal *v){return lCar(lCdr(lCdr(lCdr(v))));}
+static inline lVal lCaar  (lVal v){return lCar(lCar(v));}
+static inline lVal lCadr  (lVal v){return lCar(lCdr(v));}
+static inline lVal lCdar  (lVal v){return lCdr(lCar(v));}
+static inline lVal lCddr  (lVal v){return lCdr(lCdr(v));}
+static inline lVal lCaddr (lVal v){return lCar(lCdr(lCdr(v)));}
+static inline lVal lCadddr(lVal v){return lCar(lCdr(lCdr(lCdr(v))));}
 
-void  lExceptionThrowRaw    (lVal *v) NORETURN;
-void  lExceptionThrowValClo (const char *symbol, const char *error, lVal *v, lClosure *c) NORETURN;
+void  lExceptionThrowRaw    (lVal v) NORETURN;
+void  lExceptionThrowValClo (const char *symbol, const char *error, lVal v, lClosure *c) NORETURN;
 
 /*
  | Reader/Printer
  */
-lVal *lRead(lClosure *c, const char *str);
+lVal lRead(lClosure *c, const char *str);
 
 /*
  | Type related procedores
  */
-i64             castToInt        (const lVal *v, i64 fallback);
-bool            castToBool       (const lVal *v);
-const char *    castToString     (const lVal *v, const char *fallback);
-const lSymbol * optionalSymbolic (lClosure *c, lVal *v, const lSymbol *fallback);
+i64             castToInt        (const lVal v, i64 fallback);
+bool            castToBool       (const lVal v);
+const char *    castToString     (const lVal v, const char *fallback);
+const lSymbol * optionalSymbolic (lClosure *c, lVal v, const lSymbol *fallback);
 
-NORETURN void   throwTypeError          (lClosure *c, lVal *v, lType T);
-NORETURN void   throwArityError         (lClosure *c, lVal *v, int arity);
-i64             requireInt              (lClosure *c, lVal *v);
-i64             requireNaturalInt       (lClosure *c, lVal *v);
-double          requireFloat            (lClosure *c, lVal *v);
-FILE *          requireFileHandle       (lClosure *c, lVal *v);
-lArray *        requireArray            (lClosure *c, lVal *v);
-lArray *        requireMutableArray     (lClosure *c, lVal *v);
-const lSymbol * requireSymbol           (lClosure *c, lVal *v);
-const lSymbol * requireKeyword          (lClosure *c, lVal *v);
-const lSymbol * requireSymbolic         (lClosure *c, lVal *v);
-lString *       requireString           (lClosure *c, lVal *v);
-lTree *         requireTree             (lClosure *c, lVal *v);
-lTree *         requireMutableTree      (lClosure *c, lVal *v);
-lVal *          requireCallable         (lClosure *c, lVal *v);
-lVal *          requirePair             (lClosure *c, lVal *v);
-lBuffer *       requireBuffer           (lClosure *c, lVal *v);
-lBuffer *       requireMutableBuffer    (lClosure *c, lVal *v);
-lBufferView *   requireBufferView       (lClosure *c, lVal *v);
-lBufferView *   requireMutableBufferView(lClosure *c, lVal *v);
+NORETURN void   throwTypeError          (lClosure *c, lVal v, lType T);
+NORETURN void   throwArityError         (lClosure *c, lVal v, int arity);
+i64             requireInt              (lClosure *c, lVal v);
+i64             requireNaturalInt       (lClosure *c, lVal v);
+double          requireFloat            (lClosure *c, lVal v);
+FILE *          requireFileHandle       (lClosure *c, lVal v);
+lArray *        requireArray            (lClosure *c, lVal v);
+lArray *        requireMutableArray     (lClosure *c, lVal v);
+const lSymbol * requireSymbol           (lClosure *c, lVal v);
+const lSymbol * requireKeyword          (lClosure *c, lVal v);
+const lSymbol * requireSymbolic         (lClosure *c, lVal v);
+lString *       requireString           (lClosure *c, lVal v);
+lTreeRoot *     requireTree             (lClosure *c, lVal v);
+lTreeRoot *     requireMutableTree      (lClosure *c, lVal v);
+lVal            requireCallable         (lClosure *c, lVal v);
+lVal            requirePair             (lClosure *c, lVal v);
+lBuffer *       requireBuffer           (lClosure *c, lVal v);
+lBuffer *       requireMutableBuffer    (lClosure *c, lVal v);
+lBufferView *   requireBufferView       (lClosure *c, lVal v);
+lBufferView *   requireMutableBufferView(lClosure *c, lVal v);
 
 /*
  | Closure related procedores
  */
-lVal     *lDefineAliased     (lClosure *c, lVal *lNF, const char *sym);
+lVal      lDefineAliased     (lClosure *c, lVal lNF, const char *sym);
 
-lVal     *lGetClosureSym     (lClosure *c, const lSymbol *s);
-void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal *v);
-bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
-void      lDefineVal         (lClosure *c, const char *str,  lVal *v);
+lVal      lGetClosureSym     (lClosure *c, const lSymbol *s);
+void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal v);
+bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal v);
+void      lDefineVal         (lClosure *c, const char *str,  lVal v);
 
-lVal     *lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
-lVal     *lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
-lVal     *lAddNativeFuncPure (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
-lVal     *lAddNativeFuncPureFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal *(*func)(lClosure *,lVal *));
+lVal     lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
+lVal     lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
+lVal     lAddNativeFuncPure (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
+lVal     lAddNativeFuncPureFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
 
 /*
  | Tree related procedures
  */
-lTree *lTreeNew             (const lSymbol *s, lVal *v);
+lTree *lTreeNew             (const lSymbol *s, lVal v);
 lTree *lTreeDup             (const lTree *t);
 
-lVal  *lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
-bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal **value);
+lVal   lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
+bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal *value);
 
-void   lTreeSet             (      lTree *t, const lSymbol *s, lVal *v, bool *found);
-lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal *v);
+void   lTreeSet             (      lTree *t, const lSymbol *s, lVal v, bool *found);
+lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
 
 /*
  | lVal related procedures
  */
-lVal     *lValSymS      (const lSymbol *s);
-lVal     *lValKeywordS  (const lSymbol *s);
-lVal     *lValSym       (const char    *s);
-lVal     *lValKeyword   (const char    *s);
+lVal     lValSymS      (const lSymbol *s);
+lVal     lValKeywordS  (const lSymbol *s);
+lVal     lValSym       (const char    *s);
+lVal     lValKeyword   (const char    *s);
 
-lVal     *lValBool         (bool v);
-lVal     *lValInt          (i64 v);
-lVal     *lValFloat        (lClosure *c, double v);
-lVal     *lValTree         (lTree *v);
-lVal     *lValEnvironment  (lClosure *v);
-lVal     *lValLambda       (lClosure *v);
-lVal     *lValString       (const char *s);
-lVal     *lValStringLen    (const char *s, int len);
-lVal     *lValStringNoCopy (const char *s, int len);
-lVal     *lValFileHandle   (FILE *fh);
+lVal     lValBool         (bool v);
+lVal     lValInt          (i64 v);
+lVal     lValFloat        (lClosure *c, double v);
+lVal     lValTree         (lTree *v);
+lVal     lValEnvironment  (lClosure *v);
+lVal     lValLambda       (lClosure *v);
+lVal     lValString       (const char *s);
+lVal     lValStringLen    (const char *s, int len);
+lVal     lValStringNoCopy (const char *s, int len);
+lVal     lValFileHandle   (FILE *fh);
 
 /*
  | Allocator related procedures
  */
-lVal *           lValAlloc    (lType t);
 lArray *         lArrayAlloc  (size_t len);
 lBuffer *        lBufferAlloc (size_t length, bool immutable);
 lString *        lStringNew   (const char *str, uint len);

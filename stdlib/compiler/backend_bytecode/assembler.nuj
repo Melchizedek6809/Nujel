@@ -471,7 +471,7 @@
                            (assemble/flatten (car code) ret)
                            (cons (car code) ret)))
 
-                 (defn assemble* (code verbose)
+                 (defn assemble* (code)
                        "Assemble all arguments into a single :bytecode-array"
                        :cat :bytecode
                        :internal
@@ -479,12 +479,9 @@
                        (def lit-arr [])
                        (def tmp (-> (assemble/flatten code)
                                     (assemble/build-lit-arr lit-arr)))
-                       (when verbose (pfmtln "Tmp: {tmp:?}\n\n"))
                        (assemble/build-sym-map tmp sym-map 0)
-                       (when verbose (pfmtln "SymMap: {sym-map:?}\n\n"))
                        (def out (array/allocate (ref sym-map :last-op)))
                        (assemble/emit-relocated-ops tmp sym-map -1 out)
-                       (when verbose (pfmtln "Out: {out:?}\n\n"))
                        (arr->bytecode-arr out lit-arr))))
 
 (defn assemble l

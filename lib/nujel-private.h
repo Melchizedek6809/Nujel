@@ -25,16 +25,20 @@
 #define PI    (3.1415926535897932384626433832795)
 
 extern jmp_buf exceptionTarget;
-extern lVal   *exceptionValue;
+extern lVal    exceptionValue;
 extern int     exceptionTargetDepth;
 
-static inline bool isComment(lVal *v){return v && v->type == ltComment;}
-static inline lVal *lValComment(){return lValAlloc(ltComment);}
+static inline bool isComment(lVal v){
+	return v.type == ltComment;
+}
+static inline lVal lValComment(){
+	return lValAlloc(ltComment);
+}
 lType lTypecast(const lType a, const lType b);
 
 
 struct lArray {
-	lVal **data;
+	lVal *data;
 	union {
 		lArray *nextFree;
 		struct {
@@ -110,9 +114,9 @@ typedef enum closureType {
 } closureType;
 
 struct lNFunc {
-	lVal *(*fp)(lClosure *, lVal *);
+	lVal (*fp)(lClosure *, lVal);
 	lTree *meta;
-	lVal *args;
+	lVal args;
 	lSymbol *name;
 };
 
@@ -123,7 +127,7 @@ struct lTree {
 		const lSymbol *key;
 		lTree *nextFree;
 	};
-	lVal *value;
+	lVal value;
 	i16 height;
 	u8 flags;
 };
@@ -136,8 +140,8 @@ struct lClosure {
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
 	union {
-		lVal *args;
-		lVal *exceptionHandler;
+		lVal args;
+		lVal exceptionHandler;
 	};
 	const lSymbol *name;
 	lClosure *caller;
@@ -146,7 +150,7 @@ struct lClosure {
 };
 
 struct lThread {
-	lVal **valueStack;
+	lVal *valueStack;
 	lClosure **closureStack;
 	lBytecodeArray *text;
 	int valueStackSize;
@@ -159,18 +163,18 @@ struct lThread {
  | Closure related procedures
  */
 lClosure *lClosureNew        (lClosure *parent, closureType t);
-lClosure *lClosureNewFunCall (lClosure *parent, lVal *args, lVal *lambda);
-void      lClosureSetMeta    (lClosure *c, lVal *doc);
-bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal **v);
-lVal     *lLambdaNew         (lClosure *parent, lVal *name, lVal *args, lVal *body);
+lClosure *lClosureNewFunCall (lClosure *parent, lVal args, lVal lambda);
+void      lClosureSetMeta    (lClosure *c, lVal doc);
+bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
+lVal      lLambdaNew         (lClosure *parent, lVal name, lVal args, lVal body);
 
 /*
  | lVal related procedures
  */
-int       lValCompare      (const lVal *a, const lVal *b);
-bool      lValEqual        (const lVal *a, const lVal *b);
-i64       lValGreater      (const lVal *a, const lVal *b);
-lVal     *lValStringError  (const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd);
+int       lValCompare      (const lVal a, const lVal b);
+bool      lValEqual        (const lVal a, const lVal b);
+i64       lValGreater      (const lVal a, const lVal b);
+lVal      lValStringError  (const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd);
 
 /*
  | Bytecode related definitions
@@ -224,10 +228,11 @@ typedef enum lOpcode {
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
-lVal *lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
-lVal *lLambda              (lClosure *c, lVal *args, lVal *lambda);
-lVal *lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
-void  simplePrintVal(lVal *v);
+lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
+lVal  lLambda              (lClosure *c, lVal args, lVal lambda);
+lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
+void  simplePrintVal       (lVal v);
+void  simplePrintTree      (lTree *t);
 
 /*
  | Workarounds for missing builtins
@@ -259,10 +264,11 @@ static inline int  lRootsGet(){ return rootSP; }
 
 extern bool lGCShouldRunSoon;
 
-void lValGCMark         (lVal *v);
+void lValGCMark         (lVal v);
 void lBufferGCMark      (const lBuffer *v);
 void lBufferViewGCMark  (const lBufferView *v);
 void lTreeGCMark        (const lTree *v);
+void lTreeRootGCMark    (const lTreeRoot *v);
 void lClosureGCMark     (const lClosure *c);
 void lArrayGCMark       (const lArray *v);
 void lNFuncGCMark       (const lNFunc *f);
@@ -272,7 +278,7 @@ void lBytecodeArrayMark (const lBytecodeArray *v);
 
 void lGarbageCollect();
 static inline void lGarbageCollectIfNecessary(){
-	if(lGCShouldRunSoon){
+	if(unlikely(lGCShouldRunSoon)){
 		lGarbageCollect();
 	}
 }
@@ -285,7 +291,7 @@ static inline void lGarbageCollectIfNecessary(){
 #define ARR_MAX (1<<14)
 #define CLO_MAX (1<<16)
 #define TRE_MAX (1<<19)
-#define VAL_MAX (1<<21)
+#define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
 #define BFV_MAX (1<<14)
@@ -295,7 +301,7 @@ static inline void lGarbageCollectIfNecessary(){
 	defineAllocator(lArray, ARR_MAX) \
 	defineAllocator(lClosure, CLO_MAX) \
 	defineAllocator(lTree, TRE_MAX) \
-	defineAllocator(lVal, VAL_MAX) \
+	defineAllocator(lTreeRoot, TRR_MAX) \
 	defineAllocator(lBytecodeArray, BCA_MAX) \
 	defineAllocator(lBuffer, BUF_MAX) \
 	defineAllocator(lBufferView, BFV_MAX) \
@@ -350,13 +356,13 @@ extern lSymbol *symFold;
 
 void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);
-lSymbol  *getTypeSymbol (const lVal *a);
+lSymbol  *getTypeSymbol (const lVal a);
 lSymbol  *getTypeSymbolT(const lType T);
 
-lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal *v);
-lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal *v);
-lClosure       *requireClosure          (lClosure *c, lVal *v);
-lVal           *requireEnvironment      (lClosure *c, lVal *v);
+lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal v);
+lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal v);
+lClosure       *requireClosure          (lClosure *c, lVal v);
+lVal            requireEnvironment      (lClosure *c, lVal v);
 
 lNFunc *         lNFuncAlloc         ();
 void             lNFuncFree          (lNFunc *n);
@@ -364,9 +370,9 @@ lBytecodeArray * lBytecodeArrayAlloc (size_t len);
 lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
 int              lBufferViewTypeSize (lBufferViewType T);
 
-lVal *lnfCat     (lClosure *c, lVal *v);
-lVal *lnfArrNew  (lClosure *c, lVal *v);
-lVal *lnfTreeNew (lClosure *c, lVal *v);
+lVal lnfCat     (lClosure *c, lVal v);
+lVal lnfArrNew  (lClosure *c, lVal v);
+lVal lnfTreeNew (lClosure *c, lVal v);
 
 /*
  | Operations
@@ -382,13 +388,13 @@ void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
 
-lVal *lAdd(lClosure *c, lVal *a, lVal *b);
-lVal *lSub(lClosure *c, lVal *a, lVal *b);
-lVal *lMul(lClosure *c, lVal *a, lVal *b);
-lVal *lDiv(lClosure *c, lVal *a, lVal *b);
-lVal *lRem(lClosure *c, lVal *a, lVal *b);
+lVal lAdd(lClosure *c, lVal a, lVal b);
+lVal lSub(lClosure *c, lVal a, lVal b);
+lVal lMul(lClosure *c, lVal a, lVal b);
+lVal lDiv(lClosure *c, lVal a, lVal b);
+lVal lRem(lClosure *c, lVal a, lVal b);
 
-lVal *lValBytecodeOp(lBytecodeOp v);
-lVal *lGenericRef(lClosure *c, lVal *col, lVal *key);
+lVal lValBytecodeOp(lBytecodeOp v);
+lVal lGenericRef(lClosure *c, lVal col, lVal key);
 
 #endif

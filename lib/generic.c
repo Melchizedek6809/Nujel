@@ -4,10 +4,10 @@
 #include "nujel-private.h"
 #endif
 
-static lVal *lBufferViewRef(lClosure *c, lVal *car, size_t i){
-	const void *buf = car->vBufferView->buf->buf;
-	const size_t length = car->vBufferView->length;
-	const lBufferViewType viewType = car->vBufferView->type;
+static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
+	const void *buf = car.vBufferView->buf->buf;
+	const size_t length = car.vBufferView->length;
+	const lBufferViewType viewType = car.vBufferView->type;
 
 	if(unlikely(buf == NULL)){
 		lExceptionThrowValClo("type-error", "Can't ref that", car, c);
@@ -19,7 +19,7 @@ static lVal *lBufferViewRef(lClosure *c, lVal *car, size_t i){
 	switch(viewType){
 	default:
 		exit(5);
-		return NULL;
+		return NIL;
 	case lbvtU8:
 		return lValInt(((u8 *)buf)[i]);
 	case lbvtS8:
@@ -41,7 +41,7 @@ static lVal *lBufferViewRef(lClosure *c, lVal *car, size_t i){
 	}
 }
 
-lVal *lGenericRef(lClosure *c, lVal *col, lVal *key){
+lVal lGenericRef(lClosure *c, lVal col, lVal key){
 	typeswitch(col){
 	case ltPair: {
 		const int index = requireNaturalInt(c, key);
@@ -65,8 +65,8 @@ lVal *lGenericRef(lClosure *c, lVal *col, lVal *key){
 		return arr->data[i]; }
 	case ltString:
 	case ltBuffer: {
-		const char *buf = col->vBuffer->data;
-		const size_t len = col->vBuffer->length;
+		const char *buf = col.vBuffer->data;
+		const size_t len = col.vBuffer->length;
 		const size_t i = requireNaturalInt(c, key);
 		if(unlikely(len <= i)){
 			lExceptionThrowValClo("out-of-bounds","(ref) buffer index provided is out of bounds", col, c);
@@ -75,9 +75,9 @@ lVal *lGenericRef(lClosure *c, lVal *col, lVal *key){
 	case ltBufferView:
 		return lBufferViewRef(c, col, requireNaturalInt(c, key));
 	case ltTree:
-		return lTreeGet(requireTree(c, col), requireSymbolic(c, key), NULL);
+		return lTreeGet(requireTree(c, col)->root, requireSymbolic(c, key), NULL);
 	default:
 		lExceptionThrowValClo("type-error", "Can't ref that", col, c);
-		return NULL;
+		return NIL;
 	}
 }

@@ -18,6 +18,7 @@ T * T##AllocRaw (){\
 	T *ret;\
 	if((T##FFree) == NULL){			\
 		if(unlikely(T##Max >= typeMax-1)){	\
+			fprintf(stderr, "OOM: static %s heap exhausted \n", #T);\
 			exit(123);\
 		}else{\
 			ret = &(T##List)[(T##Max)++];	\
@@ -119,7 +120,7 @@ void lBytecodeArrayFree(lBytecodeArray *v){
 
 lArray *lArrayAlloc(size_t len){
 	lArray *ret = lArrayAllocRaw();
-	ret->data = calloc(len, sizeof(lVal *));
+	ret->data = calloc(len, sizeof(lVal));
 	if(unlikely(ret->data == NULL)){
 		lExceptionThrowValClo("out-of-memory", "Couldn't allocate a new array", lValInt(len), NULL);
 	}
@@ -137,13 +138,6 @@ lNFunc *lNFuncAlloc(){
 
 void lNFuncFree(lNFunc *n){
 	(void)n;
-}
-
-void lValFree(lVal *v){
-	v->type     = ltNil;
-	v->nextFree = lValFFree;
-	lValFFree   = v;
-	lValActive--;
 }
 
 void lArrayFree(lArray *v){
@@ -169,16 +163,17 @@ void lTreeFree(lTree *t){
 	lTreeActive--;
 }
 
+void lTreeRootFree(lTreeRoot *t){
+	if(unlikely(t == NULL)){return;}
+	t->nextFree = lTreeRootFFree;
+	lTreeRootFFree = t;
+	lTreeRootActive--;
+}
+
 void lPairFree(lPair *cons){
 	if(unlikely(cons == NULL)){return;}
-	cons->car = NULL;
+	cons->car = NIL;
 	cons->nextFree = lPairFFree;
 	lPairFFree = cons;
 	lPairActive--;
-}
-
-lVal *lValAlloc(lType t){
-	lVal *ret = lValAllocRaw();
-	ret->type = t;
-	return ret;
 }
