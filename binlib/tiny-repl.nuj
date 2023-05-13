@@ -1,0 +1,67 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; A very simple REPL, only to be used in emergencies if for some reasons
+;;; you can't use the full REPL module
+
+(def tiny-repl (let*
+                 (def *1 #nil)
+                 (def *2 #nil)
+                 (def *3 #nil)
+                 (def line-history #nil)
+                 (def ctx (environment*))
+
+                 (defn exception-handler (error)
+                       (print/error error))
+
+                 (defn push-result (result)
+                       (set! *3 *2)
+                       (set! *2 *1)
+                       (set! *1 result)
+                       (return result))
+
+                 (defn cmd/raw (line)
+                       :export
+                       (try (fn (err)
+                                (if (= (car err) :unmatched-opening-bracket)
+                                    (cmd/raw ctx (cat line (readline "... ")))
+                                    (throw err)))
+                            (def expr (read line))
+                            (when (equal? '() expr)
+                              (print "\r")
+                              (return))
+                            (try exception-handler
+                                 (def result (eval-in ctx (cons do expr)))
+                                 (push-result result)
+                                 (println (if (nil? result) "" (string/display result))))))
+
+                 (defn cmd ()
+                       (def buf "")
+                       (def line "")
+                       (while (not= (trim line) "[/cmd]")
+                         (set! buf (cat buf line))
+                         (set! line (readline)))
+                       (def expr (cons do (read buf)))
+                       (def result (eval-in ctx expr))
+                       (push-result result)
+                       (println (if (nil? result) "" (string/display result))))
+
+                 (defn prompt ()
+                       "> ")
+
+                 (defn read-cmd ()
+                       (def line (readline (prompt)))
+                       (cons! line line-history)
+                       (when (nil? line)
+                         (println "Adios, cowboy...")
+                         (exit 0))
+                       (if (= (trim line) "[cmd]")
+                           (cmd)
+                           (cmd/raw line)))
+
+                 (defn tiny-repl ()
+                       (println (cat "Nujel TinyREPL is ready for service!"))
+                       (while #t
+                         (try exception-handler
+                              (read-cmd))))
+))

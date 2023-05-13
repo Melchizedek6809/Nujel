@@ -15,6 +15,10 @@
             (def init/parse-args/eval-next #f)
             (def init/parse-args/run-repl #t)
 
+            (tree/set! init/option-map 'r
+                       (fn (option)
+                           (tiny-repl)
+                         (exit 0)))
             (tree/set! init/option-map 'm
                        (fn (option)
                            (set! init/parse-args/eval-next-module #t)))
