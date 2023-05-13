@@ -67,13 +67,13 @@ typedef enum {
 
 	ltLambda,
 	ltMacro,
-	ltEnvironment,
 	ltNativeFunc,
-	ltBytecodeOp,
 
 	ltBuffer,
 	ltBufferView,
 
+	ltEnvironment,
+	ltBytecodeOp,
 	ltBytecodeArr,
 	ltFileHandle,
 	ltThread,
@@ -105,7 +105,7 @@ struct lPair {
 };
 
 struct lVal {
-	u32 type;
+	u8 type;
 	union {
 		bool            vBool;
 		i64             vInt;

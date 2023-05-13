@@ -38,3 +38,6 @@
 (deftest "\"asd\"" (serialization/json/serialize :asd))
 (deftest "\"asd\"" (serialization/json/serialize "asd"))
 (deftest "\"asd\"" (serialization/json/serialize "asd"))
+(deftest "{\"asd\": null}" (serialization/json/serialize {:asd #nil}))
+(deftest "{\"asd\": \"asd\"}" (serialization/json/serialize {:asd :asd}))
+(deftest "{\"asd\": 123}" (serialization/json/serialize {:asd 123}))
