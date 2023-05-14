@@ -25,7 +25,7 @@ jobs:
         install: base-devel
         pacboy: toolchain:p
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Compile runtime
       run: make nujel.exe
     - name: Test runtime
@@ -49,13 +49,13 @@ jobs:
         install: base-devel
         pacboy: toolchain:p
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Compile release
       run: make release
     - name: Run Tests
       run: ./nujel.exe --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Nujel-windows-${{ matrix.sys }}-release-${{ github.ref_name }}
         path: "./nujel.exe"
@@ -69,7 +69,7 @@ jobs:
         os: [macos-12, macos-11]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Compile runtime
       run: make nujel
     - name: Test runtime
@@ -84,13 +84,13 @@ jobs:
     runs-on: macos-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Build Release
       run: make ${{ matrix.buildtype }}
     - name: Test runtime
       run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Nujel-macos-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
@@ -110,7 +110,7 @@ jobs:
           make: bmake
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install compiler
       run: |
         sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
@@ -128,7 +128,7 @@ jobs:
         make: [make, bmake]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install compiler
       run: sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
     - name: Test runtime
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install compiler
       run: |
         sudo apt-get -y install clang clang-tools make
@@ -149,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install compiler
       run: |
         sudo apt-get -y install valgrind
@@ -161,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
   release-linux:
     name: ${{ matrix.buildtype }}-linux
     runs-on: ubuntu-latest
@@ -172,7 +172,7 @@ jobs:
         buildtype: [release, release.musl]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Dependencies
       run: sudo apt-get install -y musl-dev musl-tools
     - name: Build release
@@ -180,7 +180,7 @@ jobs:
     - name: Test runtime
       run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Nujel-linux-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
@@ -190,13 +190,13 @@ jobs:
     needs: static-checks
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Compile
       run: make
     - name: Compile WASM REPL
       run: bash tools/buildwasm
     - name: Upload release
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Nujel-Web-${{ github.ref_name }}
         path: "./web/"
