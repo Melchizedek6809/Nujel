@@ -18,6 +18,7 @@ T * T##AllocRaw (){\
 	T *ret;\
 	if((T##FFree) == NULL){			\
 		if(unlikely(T##Max >= typeMax-1)){	\
+			fprintf(stderr, "OOM: static %s heap exhausted \n", #T);\
 			exit(123);\
 		}else{\
 			ret = &(T##List)[(T##Max)++];	\
