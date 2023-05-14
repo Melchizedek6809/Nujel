@@ -67,10 +67,6 @@ i64 lValGreater(const lVal a, const lVal b){
 	switch(a.type){
 	default:
 		return 0;
-	case ltInt:
-		return a.vInt - b.vInt;
-	case ltFloat:
-		return a.vFloat < b.vFloat ? -1 : 1;
 	case ltKeyword:
 	case ltSymbol: {
 		const uint alen = strnlen(a.vSymbol->c, sizeof(a.vSymbol->c));
@@ -87,6 +83,10 @@ i64 lValGreater(const lVal a, const lVal b){
 		}
 		return alen - blen;
 	}
+	case ltInt:
+		return a.vInt - b.vInt;
+	case ltFloat:
+		return a.vFloat < b.vFloat ? -1 : 1;
 	case ltString: {
 		const uint alen = lStringLength(a.vString);
 		const uint blen = lStringLength(b.vString);
@@ -106,6 +106,9 @@ i64 lValGreater(const lVal a, const lVal b){
 
 /* Check two values for equality */
 bool lValEqual(const lVal a, const lVal b){
+	if(unlikely((a.type == ltNil) || (b.type == ltNil))){
+		return a.type == b.type;
+	}
 	if(unlikely(a.type != b.type)){
 		if(likely(((a.type == ltInt) || (a.type == ltFloat)) && ((b.type == ltInt) || (b.type == ltFloat)))){
 			return ((a.type == ltInt) ? (float)a.vInt : a.vFloat) == ((b.type == ltInt) ? (float)b.vInt : b.vFloat);
@@ -114,31 +117,39 @@ bool lValEqual(const lVal a, const lVal b){
 		}
 	}
 	switch(a.type){
+	default:
+		return false;
 	case ltPair:
+		return a.vList == b.vList;
 	case ltArray:
+		return a.vArray == b.vArray;
 	case ltTree:
+		return a.vTree == b.vTree;
 	case ltKeyword:
 	case ltSymbol:
+		return a.vSymbol == b.vSymbol;
 	case ltEnvironment:
 	case ltMacro:
 	case ltLambda:
+		return a.vClosure == b.vClosure;
 	case ltNativeFunc:
+		return a.vNFunc == b.vNFunc;
 	case ltBytecodeOp:
+		return a.vBytecodeOp == b.vBytecodeOp;
 	case ltBuffer:
+		return a.vBuffer == b.vBuffer;
 	case ltBufferView:
+		return a.vBufferView == b.vBufferView;
 	case ltBool:
+		return a.vBool == b.vBool;
 	case ltInt:
-		return a.vPointer == b.vPointer;
-	case ltNil:
-		return b.type == ltNil;
+		return a.vInt == b.vInt;
 	case ltFloat:
 		return a.vFloat == b.vFloat;
 	case ltString: {
 		const uint alen = lStringLength(a.vString);
 		const uint blen = lStringLength(b.vString);
 		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
-	default:
-		return false;
 	}}
 }
 
