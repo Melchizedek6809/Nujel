@@ -166,7 +166,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStackSize = text->closureStackUsage;
 	ctx.valueStackSize   = text->valueStackUsage;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
-	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal *));
+	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
 	ctx.csp              = 0;
 	ctx.sp               = 0;
 	ctx.closureStack[0]  = c;
