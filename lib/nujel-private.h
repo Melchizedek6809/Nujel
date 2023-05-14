@@ -289,13 +289,13 @@ static inline void lGarbageCollectIfNecessary(){
  */
 #define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
-#define CLO_MAX (1<<16)
+#define CLO_MAX (1<<17)
 #define TRE_MAX (1<<19)
 #define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
 #define BFV_MAX (1<<14)
-#define CON_MAX (1<<18)
+#define CON_MAX (1<<19)
 
 #define allocatorTypes() \
 	defineAllocator(lArray, ARR_MAX) \
