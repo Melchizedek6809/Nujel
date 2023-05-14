@@ -287,14 +287,14 @@ static inline void lGarbageCollectIfNecessary(){
 /*
  | Alocator related definitions
  */
-#define NFN_MAX (1<< 9)
+#define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
-#define CLO_MAX (1<<15)
-#define TRE_MAX (1<<18)
-#define TRR_MAX (1<<14)
+#define CLO_MAX (1<<16)
+#define TRE_MAX (1<<19)
+#define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
-#define BUF_MAX (1<<14)
-#define BFV_MAX (1<<12)
+#define BUF_MAX (1<<15)
+#define BFV_MAX (1<<14)
 #define CON_MAX (1<<18)
 
 #define allocatorTypes() \
