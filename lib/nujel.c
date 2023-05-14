@@ -20,6 +20,16 @@ void lInit(){
 	lSymbolInit();
 }
 
+void simplePrintTree(lTree *t){
+	if(!t){return;}
+	simplePrintTree(t->left);
+	if(t->key){
+		fprintf(stderr, ":%s ", t->key->c);
+		simplePrintVal(t->value);
+	}
+	simplePrintTree(t->right);
+}
+
 /* Super simple printer, not meant for production use, but only as a tool of last resort, for example when
  * we throw past the root exception handler.
  */
@@ -29,7 +39,7 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "#<not-printable-from-c %i> ", v.type);
 		break;
 	case ltEnvironment:
-		fprintf(stderr, "#<env> ");
+		fprintf(stderr, "#<env %s> ", v.vClosure->name->c);
 		break;
 	case ltBytecodeArr:
 		fprintf(stderr, "#<bc-arr> ");
@@ -38,13 +48,15 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "#<bc-op %x> ", v.vBytecodeOp);
 		break;
 	case ltLambda:
-		fprintf(stderr, "#<fn> ");
+		fprintf(stderr, "#<fn %s> ", v.vClosure->name->c);
 		break;
 	case ltNativeFunc:
-		fprintf(stderr, "#<NFn> ");
+		fprintf(stderr, "#<NFn %s> ", v.vNFunc->name->c);
 		break;
 	case ltTree:
-		fprintf(stderr, "#<tree> ");
+		fprintf(stderr, " { ");
+		simplePrintTree(v.vTree->root);
+		fprintf(stderr, " } ");
 		break;
 	case ltNil:
 		fprintf(stderr, "#nil ");

@@ -18,10 +18,6 @@ lClosure *lClosureNew(lClosure *parent, closureType t) {
 	return c;
 }
 
-static const lSymbol *lGetSymbol(const lVal v) {
-	return (v.type != ltSymbol) ? symNull : v.vSymbol;
-}
-
 lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
 	lClosure *tmpc = lClosureNew(lambda.vClosure, closureCall);
 	tmpc->text   = lambda.vClosure->text;
@@ -31,12 +27,12 @@ lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
 	for (lVal n = lambda.vClosure->args; ; n = n.vList->cdr) {
 		if (likely(n.type == ltPair)) {
 			lVal car = lCar(n);
-			if(likely(car.type != ltNil)){
-				lDefineClosureSym(tmpc, lGetSymbol(car), lCar(args));
+			if(likely(car.type == ltSymbol)){
+				lDefineClosureSym(tmpc, car.vSymbol, lCar(args));
 			}
 			args = lCdr(args);
 		} else if(likely(n.type == ltSymbol)) {
-			lDefineClosureSym(tmpc, lGetSymbol(n), args);
+			lDefineClosureSym(tmpc, n.vSymbol, args);
 			break;
 		} else {
 			return tmpc;
@@ -89,7 +85,7 @@ bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal *v){
 }
 
 lVal lGetClosureSym(lClosure *c, const lSymbol *s){
-	for(lClosure *cc = c; cc; cc = cc->parent){
+	for (lClosure *cc = c; cc; cc = cc->parent) {
 		lVal ret;
 		if(lTreeHas(cc->data,s,&ret)){
 			return ret;

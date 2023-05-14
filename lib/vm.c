@@ -376,8 +376,10 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal cName = ctx.valueStack[--ctx.sp];
 		lVal fun = lLambdaNew(c, cName, cArgs, cBody);
 		lClosureSetMeta(fun.vClosure, cDocs);
+		if(unlikely(curOp == lopMacroDynamic)){
+			fun.type = ltMacro;
+		}
 		ctx.valueStack[ctx.sp++] = fun;
-		if(unlikely(curOp == lopMacroDynamic)){ fun.type = ltMacro; }
 		vmbreak; }
 	vmcase(lopEval) {
 		lVal env = ctx.valueStack[--ctx.sp];

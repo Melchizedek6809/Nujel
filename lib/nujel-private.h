@@ -232,6 +232,7 @@ lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lLambda              (lClosure *c, lVal args, lVal lambda);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
 void  simplePrintVal       (lVal v);
+void  simplePrintTree      (lTree *t);
 
 /*
  | Workarounds for missing builtins
