@@ -124,16 +124,16 @@ lBufferView *requireMutableBufferView(lClosure *c, lVal v){
 	return ret;
 }
 
-lTree *requireTree(lClosure *c, lVal v){
+lTreeRoot *requireTree(lClosure *c, lVal v){
 	return requireCertainType(c, v, ltTree).vTree;
 }
 
-lTree *requireMutableTree(lClosure *c, lVal v){
-	lTree *ret = requireTree(c,v);
-	if(unlikely(ret->flags & TREE_IMMUTABLE)){
+lTreeRoot *requireMutableTree(lClosure *c, lVal v){
+	lTreeRoot *t = requireTree(c, v);
+	if(unlikely(t->root && t->root->flags & TREE_IMMUTABLE)){
 		lExceptionThrowValClo("type-error", "Tree is immutable", v, c);
 	}
-	return ret;
+	return t;
 }
 
 const lSymbol *requireSymbol(lClosure *c, lVal v){

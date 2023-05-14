@@ -88,6 +88,7 @@ typedef struct lThread  lThread;
 typedef struct lNFunc   lNFunc;
 typedef struct lSymbol  lSymbol;
 typedef struct lTree    lTree;
+typedef struct lTreeRoot lTreeRoot;
 typedef struct lVec     lVec;
 typedef struct lVal     lVal;
 typedef struct lPair    lPair;
@@ -95,6 +96,12 @@ typedef struct lBytecodeArray lBytecodeArray;
 typedef uint8_t lBytecodeOp;
 typedef lBuffer lString;
 
+struct lTreeRoot {
+	union {
+		lTree *root;
+		lTreeRoot *nextFree;
+	};
+};
 
 struct lVal {
 	u32 type;
@@ -108,7 +115,7 @@ struct lVal {
 		FILE *          vFileHandle;
 		lBytecodeArray *vBytecodeArr;
 		lArray *        vArray;
-		lTree *         vTree;
+		lTreeRoot *     vTree;
 		lString *       vString;
 		lClosure *      vClosure;
 		lNFunc *        vNFunc;
@@ -196,8 +203,8 @@ const lSymbol * requireSymbol           (lClosure *c, lVal v);
 const lSymbol * requireKeyword          (lClosure *c, lVal v);
 const lSymbol * requireSymbolic         (lClosure *c, lVal v);
 lString *       requireString           (lClosure *c, lVal v);
-lTree *         requireTree             (lClosure *c, lVal v);
-lTree *         requireMutableTree      (lClosure *c, lVal v);
+lTreeRoot *     requireTree             (lClosure *c, lVal v);
+lTreeRoot *     requireMutableTree      (lClosure *c, lVal v);
 lVal            requireCallable         (lClosure *c, lVal v);
 lVal            requirePair             (lClosure *c, lVal v);
 lBuffer *       requireBuffer           (lClosure *c, lVal v);

@@ -165,5 +165,6 @@ void lClosureSetMeta(lClosure *c, lVal doc){
 	if(unlikely(doc.type != ltTree)){
 		return;
 	}
-	c->meta = (doc.vTree->flags & TREE_IMMUTABLE) ? lTreeDup(doc.vTree) : doc.vTree;
+	lTree *t = doc.vTree->root;
+	c->meta = (t && t->flags & TREE_IMMUTABLE) ? lTreeDup(t) : t;
 }

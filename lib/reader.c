@@ -435,7 +435,9 @@ static lVal lParseSpecial(lReadContext *s){
 	case '@':{
 		s->data++;
 		lVal ret = lnfTreeNew(s->c, lReadList(s,false,')'));
-		ret.vTree->flags |= TREE_IMMUTABLE;
+		if(ret.vTree->root){
+			ret.vTree->root->flags |= TREE_IMMUTABLE;
+		}
 		return ret;
 	}}
 }

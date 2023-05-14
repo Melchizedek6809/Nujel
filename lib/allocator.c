@@ -162,6 +162,13 @@ void lTreeFree(lTree *t){
 	lTreeActive--;
 }
 
+void lTreeRootFree(lTreeRoot *t){
+	if(unlikely(t == NULL)){return;}
+	t->nextFree = lTreeRootFFree;
+	lTreeRootFFree = t;
+	lTreeRootActive--;
+}
+
 void lPairFree(lPair *cons){
 	if(unlikely(cons == NULL)){return;}
 	cons->car = NIL;

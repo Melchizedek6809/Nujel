@@ -75,7 +75,7 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 	case ltBufferView:
 		return lBufferViewRef(c, col, requireNaturalInt(c, key));
 	case ltTree:
-		return lTreeGet(requireTree(c, col), requireSymbolic(c, key), NULL);
+		return lTreeGet(requireTree(c, col)->root, requireSymbolic(c, key), NULL);
 	default:
 		lExceptionThrowValClo("type-error", "Can't ref that", col, c);
 		return NIL;

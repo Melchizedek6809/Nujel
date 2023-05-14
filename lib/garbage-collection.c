@@ -102,7 +102,7 @@ void lValGCMark(lVal v){
 		lSymbolGCMark(v.vSymbol);
 		break;
 	case ltTree:
-		lTreeGCMark(v.vTree);
+		lTreeRootGCMark(v.vTree);
 		break;
 	case ltBytecodeArr:
 		lBytecodeArrayMark(v.vBytecodeArr);
@@ -127,6 +127,11 @@ void lTreeGCMark(const lTree *v){
 
 	lTreeGCMark(v->left);
 	lTreeGCMark(v->right);
+}
+
+void lTreeRootGCMark(const lTreeRoot *v){
+	markerPrefix(lTreeRoot);
+	lTreeGCMark(v->root);
 }
 
 void lClosureGCMark(const lClosure *v){

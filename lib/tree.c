@@ -183,26 +183,26 @@ lTree *lTreeDup(const lTree *t){
 
 lVal lnfTreeNew(lClosure* c, lVal v) {
 	lVal ret = lValAlloc(ltTree);
-	ret.vTree = lTreeNew(NULL, NIL);
+	lTreeRoot *t = ret.vTree = lTreeRootAllocRaw();
 
 	for (lVal n = v; n.type == ltPair; n = lCddr(n)) {
 		lVal car = lCar(n);
 		if (car.type == ltNil) { break; }
-		ret.vTree = lTreeInsert(ret.vTree, requireSymbolic(c, car), lCadr(n));
+		t->root = lTreeInsert(t->root, requireSymbolic(c, car), lCadr(n));
 	}
 	return ret;
 }
 
 static lVal lnfTreeGetKeys(lClosure* c, lVal v) {
-	return lTreeKeysToList(requireTree(c, lCar(v)));
+	return lTreeKeysToList(requireTree(c, lCar(v))->root);
 }
 
 static lVal lnfTreeGetValues(lClosure* c, lVal v) {
-	return lTreeValuesToList(requireTree(c, lCar(v)));
+	return lTreeValuesToList(requireTree(c, lCar(v))->root);
 }
 
 static lVal lnfTreeHas(lClosure* c, lVal v) {
-	return lValBool(lTreeHas(requireTree(c, lCar(v)), requireSymbolic(c, lCadr(v)), NULL));
+	return lValBool(lTreeHas(requireTree(c, lCar(v))->root, requireSymbolic(c, lCadr(v)), NULL));
 }
 
 static lVal lnfTreeSet(lClosure* c, lVal v) {
@@ -210,14 +210,14 @@ static lVal lnfTreeSet(lClosure* c, lVal v) {
 	if(unlikely(car.type == ltNil)){
 		car = lValTree(NULL);
 	}
-	lTree* tre = requireMutableTree(c, car);
+	lTreeRoot* t = requireMutableTree(c, car);
 	const lSymbol* key = requireSymbolic(c, lCadr(v));
-	car.vTree = lTreeInsert(tre, key, lCaddr(v));
+	t->root = lTreeInsert(t->root, key, lCaddr(v));
 	return car;
 }
 
 static lVal lnfTreeSize(lClosure* c, lVal v) {
-	return lValInt(lTreeSize(requireTree(c, lCar(v))));
+	return lValInt(lTreeSize(requireTree(c, lCar(v))->root));
 }
 
 static lVal lnfTreeDup(lClosure* c, lVal v) {
@@ -226,28 +226,28 @@ static lVal lnfTreeDup(lClosure* c, lVal v) {
 		|| (v.vList->car.type != ltTree))) {
 		lExceptionThrowValClo("type-error", "tree/dup can only be called with a tree as an argument", v, c);
 	}
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	tree = lTreeDup(tree);
 	return lValTree(tree);
 }
 
 static lVal lnfTreeKeyAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	return tree ? lValKeywordS(tree->key) : NIL;
 }
 
 static lVal lnfTreeValueAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	return tree ? tree->value : NIL;
 }
 
 static lVal lnfTreeLeftAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	return (tree && tree->left) ? lValTree(tree->left) : NIL;
 }
 
 static lVal lnfTreeRightAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v));
+	lTree* tree = requireTree(c, lCar(v))->root;
 	return (tree && tree->right) ? lValTree(tree->right) : NIL;
 }
 

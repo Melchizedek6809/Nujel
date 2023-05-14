@@ -116,45 +116,47 @@ static lVal lnfFileStat(lClosure *c, lVal v){
 
 
 	lVal ret = lValTree(NULL);
-	ret.vTree = lTreeInsert(ret.vTree, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
+	lTreeRoot *t = ret.vTree;
+	t->root = lTreeInsert(t->root, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
 	if (likely(INVALID_HANDLE_VALUE != hFind)) {
 		LARGE_INTEGER filesize;
 		filesize.LowPart = ffd.nFileSizeLow;
 		filesize.HighPart = ffd.nFileSizeHigh;
-		ret.vTree = lTreeInsert(ret.vTree, lsSize, lValInt(filesize.QuadPart));
-		ret.vTree = lTreeInsert(ret.vTree, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
-		ret.vTree = lTreeInsert(ret.vTree, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
-		ret.vTree = lTreeInsert(ret.vTree, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
-		ret.vTree = lTreeInsert(ret.vTree, lsUserID, lValInt(1000));
-		ret.vTree = lTreeInsert(ret.vTree, lsGroupID, lValInt(1000));
+		t->root = lTreeInsert(t->root, lsSize, lValInt(filesize.QuadPart));
+		t->root = lTreeInsert(t->root, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
+		t->root = lTreeInsert(t->root, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
+		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
+		t->root = lTreeInsert(t->root, lsUserID, lValInt(1000));
+		t->root = lTreeInsert(t->root, lsGroupID, lValInt(1000));
 
-		ret.vTree = lTreeInsert(ret.vTree, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
-		ret.vTree = lTreeInsert(ret.vTree, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-		ret.vTree = lTreeInsert(ret.vTree, lsCharacterDevice, lValBool(false));
-		ret.vTree = lTreeInsert(ret.vTree, lsBlockDevice, lValBool(false));
-		ret.vTree = lTreeInsert(ret.vTree, lsNamedPipe, lValBool(false));
+		t->root = lTreeInsert(t->root, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
+		t->root = lTreeInsert(t->root, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+		t->root = lTreeInsert(t->root, lsCharacterDevice, lValBool(false));
+		t->root = lTreeInsert(t->root, lsBlockDevice, lValBool(false));
+		t->root = lTreeInsert(t->root, lsNamedPipe, lValBool(false));
 	}
 	return ret;
 #else
 	struct stat statbuf;
 	int err = stat(lStringData(filename), &statbuf);
 	lVal ret = lValTree(NULL);
-	ret.vTree = lTreeInsert(ret.vTree, lsError, lValBool(err));
+	lTreeRoot *t = ret.vTree;
+	t->root = lTreeInsert(t->root, lsError, lValBool(err));
 	if(err){
-		ret.vTree = lTreeInsert(ret.vTree, lsErrorNumber,      lValInt(errno));
-		ret.vTree = lTreeInsert(ret.vTree, lsErrorText,        lValString(strerror(errno)));
+		t->root = lTreeInsert(t->root, lsErrorNumber,      lValInt(errno));
+		t->root = lTreeInsert(t->root, lsErrorText,        lValString(strerror(errno)));
 	}else{
-		ret.vTree = lTreeInsert(ret.vTree, lsUserID,           lValInt(statbuf.st_uid));
-		ret.vTree = lTreeInsert(ret.vTree, lsGroupID,          lValInt(statbuf.st_gid));
-		ret.vTree = lTreeInsert(ret.vTree, lsSize,             lValInt(statbuf.st_size));
-		ret.vTree = lTreeInsert(ret.vTree, lsAccessTime,       lValInt(statbuf.st_atime));
-		ret.vTree = lTreeInsert(ret.vTree, lsModificationTime, lValInt(statbuf.st_mtime));
+		t->root = lTreeInsert(t->root, lsUserID,           lValInt(statbuf.st_uid));
+		t->root = lTreeInsert(t->root, lsGroupID,          lValInt(statbuf.st_gid));
+		t->root = lTreeInsert(t->root, lsSize,             lValInt(statbuf.st_size));
+		t->root = lTreeInsert(t->root, lsAccessTime,       lValInt(statbuf.st_atime));
+		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(statbuf.st_mtime));
 
-		ret.vTree = lTreeInsert(ret.vTree, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
-		ret.vTree = lTreeInsert(ret.vTree, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
-		ret.vTree = lTreeInsert(ret.vTree, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
-		ret.vTree = lTreeInsert(ret.vTree, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
-		ret.vTree = lTreeInsert(ret.vTree, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
+		t->root = lTreeInsert(t->root, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
 	}
 	return ret;
 #endif

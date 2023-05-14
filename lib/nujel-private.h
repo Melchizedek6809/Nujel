@@ -267,6 +267,7 @@ void lValGCMark         (lVal v);
 void lBufferGCMark      (const lBuffer *v);
 void lBufferViewGCMark  (const lBufferView *v);
 void lTreeGCMark        (const lTree *v);
+void lTreeRootGCMark    (const lTreeRoot *v);
 void lClosureGCMark     (const lClosure *c);
 void lArrayGCMark       (const lArray *v);
 void lNFuncGCMark       (const lNFunc *f);
@@ -289,6 +290,7 @@ static inline void lGarbageCollectIfNecessary(){
 #define ARR_MAX (1<<14)
 #define CLO_MAX (1<<16)
 #define TRE_MAX (1<<19)
+#define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
 #define BFV_MAX (1<<14)
@@ -298,6 +300,7 @@ static inline void lGarbageCollectIfNecessary(){
 	defineAllocator(lArray, ARR_MAX) \
 	defineAllocator(lClosure, CLO_MAX) \
 	defineAllocator(lTree, TRE_MAX) \
+	defineAllocator(lTreeRoot, TRR_MAX) \
 	defineAllocator(lBytecodeArray, BCA_MAX) \
 	defineAllocator(lBuffer, BUF_MAX) \
 	defineAllocator(lBufferView, BFV_MAX) \

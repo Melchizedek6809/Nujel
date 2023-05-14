@@ -334,7 +334,7 @@ static i64 lValToId(lVal v){
 	case ltString:
 	case ltBuffer: return v.vBuffer - lBufferList;
 	case ltArray: return v.vArray - lArrayList;
-	case ltTree: return v.vTree - lTreeList;
+	case ltTree: return v.vTree - lTreeRootList;
 	case ltBytecodeArr: return v.vBytecodeArr - lBytecodeArrayList;
 	case ltKeyword:
 	case ltSymbol: return v.vSymbol - lSymbolList;

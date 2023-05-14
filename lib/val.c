@@ -33,7 +33,8 @@ lVal lValBool(bool v){
 
 lVal lValTree(lTree *v){
 	lVal ret = lValAlloc(ltTree);
-	ret.vTree = v ? v : lTreeNew(NULL, NIL);
+	ret.vTree = lTreeRootAllocRaw();
+	ret.vTree->root = v;
 	return ret;
 }
 
