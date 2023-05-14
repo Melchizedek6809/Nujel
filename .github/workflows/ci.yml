@@ -117,7 +117,7 @@ jobs:
     - name: Compile runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} nujel
     - name: Test runtime
-      run: ${{matrix.make}} test
+      run: ${{matrix.make}} CC=${{ matrix.cc }} test
   build-stdlib:
     name: Build stdlib from source
     runs-on: ubuntu-latest
