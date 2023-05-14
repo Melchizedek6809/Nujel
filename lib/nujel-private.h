@@ -289,7 +289,7 @@ static inline void lGarbageCollectIfNecessary(){
  */
 #define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
-#define CLO_MAX (1<<18)
+#define CLO_MAX (1<<17)
 #define TRE_MAX (1<<19)
 #define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
