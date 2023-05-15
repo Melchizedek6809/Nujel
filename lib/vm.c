@@ -416,7 +416,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
 		lVal fun = ctx.valueStack[--ctx.sp];
-		if(likely(fun.type == ltLambda)){
+		switch(fun.type){
+		case ltLambda:
 			c->text = ops;
 			c->sp   = ctx.sp;
 			c->ip   = ip;
@@ -427,8 +428,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.text = ops = c->text;
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
-		}else{
-			ctx.valueStack[ctx.sp++] = lApply(c, cargs, fun);
+			break;
+		case ltNativeFunc:
+			ctx.valueStack[ctx.sp++] = fun.vNFunc->fp(c, cargs);
+			break;
+		default:
+			lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
+			break;
 		}
 		vmbreak; }
 	vmcase(lopRet)

@@ -29,7 +29,7 @@ T * T##AllocRaw (){\
 	}\
 	(T##Active)++;							\
 	if(unlikely((typeMax - (T##Active)) < 32)){lGCShouldRunSoon = true;} \
-	memset(ret, 0, sizeof(T));\
+	*ret = (T){0};\
 	return ret;\
 }
 allocatorTypes()

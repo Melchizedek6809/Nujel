@@ -11,26 +11,25 @@ lClosure *lClosureNew(lClosure *parent, closureType t) {
 	lClosure *c = lClosureAllocRaw();
 	c->parent = parent;
 	c->type = t;
-	if(likely(parent)){
-		c->caller = parent->caller;
-		c->name = parent->name;
-	}
 	return c;
 }
 
 lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
-	lClosure *tmpc = lClosureNew(lambda.vClosure, closureCall);
+	lClosure *tmpc = lClosureAllocRaw();
+	tmpc->parent = lambda.vClosure;
+	tmpc->type   = closureCall;
 	tmpc->text   = lambda.vClosure->text;
 	tmpc->name   = lambda.vClosure->name;
 	tmpc->caller = parent;
 	tmpc->ip     = tmpc->text->data;
 	for (lVal n = lambda.vClosure->args; ; n = n.vList->cdr) {
 		if (likely(n.type == ltPair)) {
-			lVal car = lCar(n);
-			if(likely(car.type == ltSymbol)){
-				lDefineClosureSym(tmpc, car.vSymbol, lCar(args));
+			if(unlikely(args.type != ltPair)){
+				lDefineClosureSym(tmpc, n.vList->car.vSymbol, NIL);
+			} else {
+				lDefineClosureSym(tmpc, n.vList->car.vSymbol, args.vList->car);
+				args = args.vList->cdr;
 			}
-			args = lCdr(args);
 		} else if(likely(n.type == ltSymbol)) {
 			lDefineClosureSym(tmpc, n.vSymbol, args);
 			break;
