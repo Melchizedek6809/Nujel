@@ -98,11 +98,9 @@
                                 name) def-form)
               def-form))
 
-(defn eval-in (closure expr)
-      "Compile and the immediatly evaluate the result
-
-      Mostly used by lRun() and (eval)"
-      (bytecode-eval* (compile* expr closure) closure))
+(defn eval-in (env form)
+      "Compile and immediatly evaluate the result directly in environment"
+      (mutable-eval* (compile* form env) env))
 
 (defmacro eval (expr)
           "Compile, Evaluate and then return the result of EXPR"

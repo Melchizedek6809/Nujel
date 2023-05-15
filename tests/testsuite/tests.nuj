@@ -563,3 +563,4 @@
 (:divide-by-zero (try car (div/int 10 0)))
 (:arity-error (try car (div/int)))
 (:arity-error (try car (div/int 10)))
+(123 (let ((env (environment*))) (eval-in env '(def test-asd 123)) (ref (closure/data env) 'test-asd)))

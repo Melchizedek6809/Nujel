@@ -153,7 +153,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopRem,
 		&&llopZeroPred,
 		&&llopRef,
-		&&llopCadr
+		&&llopCadr,
+		&&llopMutableEval
 	};
 	#endif
 
@@ -381,7 +382,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		ctx.valueStack[ctx.sp++] = fun;
 		vmbreak; }
+	vmcase(lopMutableEval)
 	vmcase(lopEval) {
+		const lBytecodeOp curOp = ip[-1];
 		lVal env = ctx.valueStack[--ctx.sp];
 		lVal bc = ctx.valueStack[--ctx.sp];
 		if(unlikely(env.type != ltEnvironment)){
@@ -395,7 +398,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		c->sp   = ctx.sp;
 		c->ip   = ip;
 
-		c = ctx.closureStack[++ctx.csp] = lClosureNew(env.vClosure, closureCall);
+		if(unlikely(curOp == lopMutableEval)){
+			c = ctx.closureStack[++ctx.csp] = env.vClosure;
+		} else {
+			c = ctx.closureStack[++ctx.csp] = lClosureNew(env.vClosure, closureCall);
+		}
+
 		c->text = bc.vBytecodeArr;
 		ip = c->ip = c->text->data;
 		ctx.text = ops = c->text;

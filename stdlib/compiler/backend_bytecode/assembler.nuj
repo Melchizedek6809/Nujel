@@ -207,6 +207,13 @@
       :inline
       '(#$1D))
 
+(defn $mutable-eval ()
+      "(bc env) -> (return-val)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#$2D))
+
 (defn $zero? ()
       "(a) -> (result)"
       :cat :bytecode
@@ -244,7 +251,7 @@
       :cat :bytecode
       :internal
       (case fun
-            ((+ - * / rem bytecode-eval*) (= arg-count 2))
+            ((+ - * / rem bytecode-eval* mutable-eval*) (= arg-count 2))
             ((zero? car cdr cadr add/int inc/int ref cons < <= = >= >) #t)))
 
 (defn $apply/optimized (arg-count fun)
@@ -274,6 +281,7 @@
                      (>= ($>=))
                      (> ($>))
                      (bytecode-eval* ($eval))
+                     (mutable-eval* ($mutable-eval))
                      (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
             (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
 

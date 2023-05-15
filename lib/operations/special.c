@@ -26,6 +26,7 @@ lVMErrorPlaceholder(lnfLambda)
 lVMErrorPlaceholder(lnfMacro)
 lVMErrorPlaceholder(lnfEnvironment)
 lVMErrorPlaceholder(lnfBytecodeEval)
+lVMErrorPlaceholder(lnfMutableEval)
 lVMErrorPlaceholder(lnfRef)
 lVMErrorPlaceholder(lnfCadr)
 
@@ -43,7 +44,8 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"macro*",          "(name args source body)", "Create a new, bytecoded, macro", lnfMacro);
 	lAddNativeFunc(c,"fn*",             "(name args source body)", "Create a new, bytecoded, lambda", lnfLambda);
 	lAddNativeFunc(c,"environment*",    "()",                      "Create a new object",       lnfEnvironment);
-	lAddNativeFunc(c,"bytecode-eval*",  "(bc-arr env)",            "Evaluate BC-ARR in ENV", lnfBytecodeEval);
+	lAddNativeFunc(c,"bytecode-eval*",  "(bc-arr env)",            "Evaluate BC-ARR in call closure ofENV", lnfBytecodeEval);
+	lAddNativeFunc(c,"mutable-eval*",   "(bc-arr env)",            "Evaluate BC-ARR directly in ENV", lnfMutableEval);
 	lAddNativeFuncPure(c,"ref",         "(collection key)",        "Look up key in collection", lnfRef);
 	lAddNativeFuncPure(c,"cadr",        "(list)",                  "Look up the cadr of list", lnfCadr);
 }

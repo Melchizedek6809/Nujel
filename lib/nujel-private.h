@@ -225,6 +225,7 @@ typedef enum lOpcode {
 	lopZeroPred        = 0x2A,
 	lopGenericRef      = 0x2B,
 	lopCadr            = 0x2C,
+	lopMutableEval     = 0x2D,
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
@@ -295,7 +296,7 @@ static inline void lGarbageCollectIfNecessary(){
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
 #define BFV_MAX (1<<14)
-#define CON_MAX (1<<18)
+#define CON_MAX (1<<19)
 
 #define allocatorTypes() \
 	defineAllocator(lArray, ARR_MAX) \
