@@ -96,7 +96,8 @@
       (doseq (t (read (slurp filename)) test-list)
              (when (== (car t) 'test/add)
                (cdr! t))
-             (add* (eval (car t)) (cons 'do (cdr t)))))
+             (add* (eval (car t))
+                   (cons 'do (cdr t)))))
 (reset!)
 
 (defn add-builtin-tests ()
@@ -107,7 +108,8 @@
                             (map (fn (a) (meta a :tests)))
                             (filter identity)))
              (doseq (fun test-funs)
-                    (add* (car fun) (cadr fun)))))
+                    (add* (car fun)
+                          (cadr fun)))))
 
 (deftest #t (lambda? test/run))
 ;; (error"Evaluating comments is a terrible Idea!") (newline) (exit 2)

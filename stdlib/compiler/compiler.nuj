@@ -106,7 +106,7 @@
 
 (defmacro eval (expr)
           "Compile, Evaluate and then return the result of EXPR"
-          `(eval-in (current-closure) ~expr))
+          `(bytecode-eval* (compile* ~expr (current-closure)) (current-closure)))
 
 (defmacro typecheck/only (v t)
           `(when-not (= (type-of ~v) ~t)

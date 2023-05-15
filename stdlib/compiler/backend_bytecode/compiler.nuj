@@ -5,11 +5,6 @@
 ;;; and emits bytecode assembly
 
 (def bytecompile* (let*
-                    (def bytecompile/gen-label/counter 0)
-                    (defn bytecompile/gen-label (prefix)
-                          (inc! bytecompile/gen-label/counter)
-                          (string->symbol (cat prefix "label-" bytecompile/gen-label/counter)))
-
                     (defn bytecompile/literal (source)
                           (case (type-of source)
                                 (:int      ($push/int source))
@@ -53,8 +48,8 @@
                                 ($set/val (cadr source))))
 
                     (defn bytecompile/if (source env)
-                          (let ((sym-else (bytecompile/gen-label))
-                                (sym-after (bytecompile/gen-label)))
+                          (let ((sym-else (gensym))
+                                (sym-after (gensym)))
                                (list (bytecompile* (cadr source) env)
                                      ($jf sym-else)
                                      (bytecompile* (caddr source) env)
@@ -64,8 +59,8 @@
                                      (list :label sym-after))))
 
                     (defn bytecompile/while (source env)
-                          (def sym-start (bytecompile/gen-label))
-                          (def sym-end (bytecompile/gen-label))
+                          (def sym-start (gensym))
+                          (def sym-end (gensym))
                           (list ($push/nil) ;; Return value if predicate is #f from the beginning
                                 ($jmp sym-end)
                                 (list :label sym-start)
@@ -121,7 +116,7 @@
                                         (bytecompile/and/rec (cdr source) env label-end)))))
 
                     (defn bytecompile/and (source env)
-                          (def label-end (bytecompile/gen-label))
+                          (def label-end (gensym))
                           (list (bytecompile/and/rec (cdr source) env label-end)
                                 (list :label label-end)))
 
@@ -133,7 +128,7 @@
                                             (bytecompile/or/rec (cdr source) env label-end))))
 
                     (defn bytecompile/or (source env)
-                          (def label-end (bytecompile/gen-label))
+                          (def label-end (gensym))
                           (list (bytecompile/or/rec (cdr source) env label-end)
                                 ($push/val #f)
                                 (list :label label-end)))
@@ -175,7 +170,7 @@
                                 ($ret)))
 
                     (defn bytecompile/try  (source env)
-                          (def end-sym   (bytecompile/gen-label))
+                          (def end-sym   (gensym))
                           (list (bytecompile* (cadr source) env)
                                 ($try end-sym)
                                 (bytecompile/do/form (cddr source) env)
