@@ -170,7 +170,7 @@
                                 ($ret)))
 
                     (defn bytecompile/try  (source env)
-                          (def end-sym   (gensym))
+                          (def end-sym (gensym))
                           (list (bytecompile* (cadr source) env)
                                 ($try end-sym)
                                 (bytecompile/do/form (cddr source) env)
