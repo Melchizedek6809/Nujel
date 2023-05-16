@@ -154,7 +154,7 @@ static lVal lnfCdr(lClosure *c, lVal v){
 
 static lVal lnfCons(lClosure *c, lVal v){
 	if(unlikely(lCddr(v).type != ltNil)){
-		lExceptionThrowValClo("too-many-args","Cons should only be called with 2 arguments!", v, c);
+		lExceptionThrowValClo("arity-error","Cons should only be called with 2 arguments!", v, c);
 	}
 	return lCons(lCar(v),lCadr(v));
 }

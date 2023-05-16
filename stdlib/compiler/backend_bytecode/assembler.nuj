@@ -247,13 +247,6 @@
                 (exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ))
       (list #$2 (int->bytecode-op a)))
 
-(defn $apply/optimize? (fun arg-count)
-      :cat :bytecode
-      :internal
-      (case fun
-            ((+ - * / rem bytecode-eval* mutable-eval*) (= arg-count 2))
-            ((list zero? car cdr cadr add/int inc/int ref cons < <= = >= >) #t)))
-
 (defn $apply/optimized (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       :cat :bytecode
@@ -267,7 +260,7 @@
                      (cadr ($cadr))
                      (zero? ($zero?))
                      (inc/int ($inc/int))
-                     (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
+                     (otherwise #nil)))
             (2 (case fun
                      (add/int ($add/int))
                      (ref ($ref))
@@ -284,9 +277,8 @@
                      (> ($>))
                      (bytecode-eval* ($eval))
                      (mutable-eval* ($mutable-eval))
-                     (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
-            (otherwise
-                 (exception :arity-error "Wrong number of arguments for that function" fun))))
+                     (otherwise #nil)))
+            (otherwise #nil)))
 
 (defn $apply (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"

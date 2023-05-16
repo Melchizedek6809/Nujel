@@ -100,9 +100,10 @@
                                      (not (pair? op)))
                             (exception :type-error "Can't apply to that" op))
                           (def arg-count (length args))
-                          (if ($apply/optimize? op arg-count)
+                          (def optimized ($apply/optimized arg-count op))
+                          (if optimized
                               (list (when args (bytecompile/procedure/arg args))
-                                    ($apply/optimized arg-count op))
+                                    optimized)
                               (list (bytecompile* op-raw env)
                                     (when args (bytecompile/procedure/arg args))
                                     ($apply arg-count))))
