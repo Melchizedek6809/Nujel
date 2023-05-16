@@ -59,10 +59,6 @@
       "Returns its argument"
       α)
 
-(defn list arguments
-      "Return ARGUMENTS as a list"
-      arguments)
-
 (defn caar (p)
       "(car (car p))"
       :inline

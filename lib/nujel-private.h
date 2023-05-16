@@ -226,6 +226,7 @@ typedef enum lOpcode {
 	lopGenericRef      = 0x2B,
 	lopCadr            = 0x2C,
 	lopMutableEval     = 0x2D,
+	lopList            = 0x2E,
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);

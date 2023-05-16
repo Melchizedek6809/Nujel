@@ -9,6 +9,7 @@
 
 lClosure *lClosureNew(lClosure *parent, closureType t) {
 	lClosure *c = lClosureAllocRaw();
+	*c = (lClosure){0};
 	c->parent = parent;
 	c->type = t;
 	return c;

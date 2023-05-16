@@ -252,12 +252,14 @@
       :internal
       (case fun
             ((+ - * / rem bytecode-eval* mutable-eval*) (= arg-count 2))
-            ((zero? car cdr cadr add/int inc/int ref cons < <= = >= >) #t)))
+            ((list zero? car cdr cadr add/int inc/int ref cons < <= = >= >) #t)))
 
 (defn $apply/optimized (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
       :cat :bytecode
       :internal
+      (when (= fun list)
+        (return ($list arg-count)))
       (case arg-count
             (1 (case fun
                      (car ($car))
@@ -283,7 +285,8 @@
                      (bytecode-eval* ($eval))
                      (mutable-eval* ($mutable-eval))
                      (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
-            (otherwise (exception :arity-error "Wrong number of arguments for that function" fun))))
+            (otherwise
+                 (exception :arity-error "Wrong number of arguments for that function" fun))))
 
 (defn $apply (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
@@ -293,6 +296,15 @@
         (exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count))
       (list #$4
             (int->bytecode-op arg-count)))
+
+(defn $list (count)
+      "arguments -> (result) --- Read count arguments from the stack and put a list of those on the stack instead."
+      :cat :bytecode
+      :internal
+      (when (> count 255)
+        (exception :arity-error "$list can only generate lists with up to 255 arguments in one go, try and use cons instead" count))
+      (list #$2E
+            (int->bytecode-op count)))
 
 (defn $try (target)
       "() -> () --- Try something, jumping to target if an exception occurs"
@@ -316,7 +328,6 @@
             (exception :invalid-bc-op "Can't push #nil as a normal lVal" v ))
       (list #$1A
             (list :literal v)))
-(def $push/val/ext $push/val)
 
 (defn $get/val (v)
       "() -> (v) --- Resolve V and get the associated value on the stack"

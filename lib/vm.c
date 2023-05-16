@@ -30,12 +30,14 @@ i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 static lVal lStackBuildList(lVal *stack, int sp, int len){
 	if(unlikely(len == 0)){return NIL;}
 	const int nsp = sp - len;
-	lVal t = stack[nsp] = lCons(stack[nsp], NIL);
-	for(int i = len-1; i > 0; i--){
-		t.vList->cdr = lCons(stack[sp - i], NIL);
+	lVal ret = lCons(stack[nsp], NIL);
+	lVal t = ret;
+	stack = &stack[sp - (len-1)];
+	for(int i = 0; i < (len-1); i++){
+		t.vList->cdr = lCons(stack[i], NIL);
 		t = t.vList->cdr;
 	}
-	return stack[nsp];
+	return ret;
 }
 
 static lVal lDyadicFun(lBytecodeOp op, lClosure *c, lVal a, lVal b){
@@ -154,7 +156,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopZeroPred,
 		&&llopRef,
 		&&llopCadr,
-		&&llopMutableEval
+		&&llopMutableEval,
+		&&llopList
 	};
 	#endif
 
@@ -347,6 +350,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopCadr)
 		ctx.valueStack[ctx.sp-1] = lCadr(ctx.valueStack[ctx.sp-1]);
 		vmbreak;
+	vmcase(lopList) {
+		int len = *ip++;
+		lVal cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
+		ctx.sp = ctx.sp - len;
+		ctx.valueStack[ctx.sp++] = cargs;
+		vmbreak; }
 	vmcase(lopClosurePush)
 		ctx.valueStack[ctx.sp++] = lValEnvironment(c);
 		vmbreak;
