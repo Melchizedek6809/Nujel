@@ -28,7 +28,7 @@ T * T##AllocRaw (){\
 		(T##FFree) = ret->nextFree;	\
 	}\
 	(T##Active)++;							\
-	if(unlikely((typeMax - (T##Active)) < 32)){lGCShouldRunSoon = true;} \
+	if(unlikely((typeMax - (T##Active)) < 128)){lGCShouldRunSoon = true;} \
 	*ret = (T){0};\
 	return ret;\
 }
