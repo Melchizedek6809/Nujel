@@ -12,18 +12,6 @@ extern u8 binlib_no_data[];
 lClosure *mainClosure;
 
 
-#ifdef __EMSCRIPTEN__
-
-/* To be used for the WASM REPL, since we don't run continuously there */
-const char *run(const char *line){
-	lVal *funSym = lValSym("repl/wasm");
-	lVal *fun = lGetClosureSym(mainClosure, funSym->vSymbol);
-	lVal *v = lApply(mainClosure, lCons(lValString(line),NULL), fun);
-	if(!v || v->type != ltString){return NULL;}
-	return lStringData(v->vString);
-}
-#endif
-
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(){
 	lClosure *c = lNewRoot();
