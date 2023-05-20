@@ -26,9 +26,8 @@ NORETURN void throwArityError(lClosure *c, lVal v, int arity){
 static lVal requireCertainType(lClosure *c, lVal v, lType T){
 	if(unlikely(v.type != T)){
 		throwTypeError(c, v, T);
-	} else {
-		return v;
 	}
+	return v;
 }
 
 /* Cast v to be an int without memory allocations, or return fallback */
@@ -147,9 +146,8 @@ const lSymbol *requireKeyword(lClosure *c, lVal v){
 const lSymbol *requireSymbolic(lClosure *c, lVal v){
 	if(unlikely((v.type != ltSymbol) && (v.type != ltKeyword))){
 		throwTypeError(c, v, ltSymbol);
-	} else {
-		return v.vSymbol;
 	}
+	return v.vSymbol;
 }
 
 const lSymbol *optionalSymbolic(lClosure *c, lVal v, const lSymbol *fallback){
@@ -158,9 +156,8 @@ const lSymbol *optionalSymbolic(lClosure *c, lVal v, const lSymbol *fallback){
 	}
 	if(unlikely((v.type != ltSymbol) && (v.type != ltKeyword))){
 		throwTypeError(c, v, ltSymbol);
-	} else {
-		return v.vSymbol;
 	}
+	return v.vSymbol;
 }
 
 lClosure *requireClosure(lClosure *c, lVal v){

@@ -6,7 +6,7 @@
 #include "nujel-private.h"
 #endif
 
-#if defined(__TINYC__)
+#if false
 #include <stdint.h>
 /* Classic binary divide-and-conquer popcount.
    This is popcount_2() from
@@ -27,9 +27,9 @@ uint64_t __builtin_popcountll(uint64_t x){
 uint32_t __builtin_popcount(uint32_t x){
 	return popcount_2(x);
 }
+#endif
 
-void __sync_synchronize(){}
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__TINYC__)
 void __sync_synchronize() {}
 #endif
 

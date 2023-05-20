@@ -223,7 +223,7 @@ typedef enum lOpcode {
 	lopDiv             = 0x28,
 	lopRem             = 0x29,
 	lopZeroPred        = 0x2A,
-	lopGenericRef      = 0x2B,
+	lopRef             = 0x2B,
 	lopCadr            = 0x2C,
 	lopMutableEval     = 0x2D,
 	lopList            = 0x2E,
@@ -239,9 +239,12 @@ void  simplePrintTree      (lTree *t);
 /*
  | Workarounds for missing builtins
  */
-#if defined(__TINYC__)
+#if false
 uint32_t __builtin_popcount(uint32_t x);
 uint64_t __builtin_popcountll(uint64_t x);
+#endif
+
+#if defined(__TINYC__)
 void __sync_synchronize();
 #endif
 
