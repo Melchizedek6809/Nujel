@@ -69,7 +69,6 @@ void lSymbolGCMark(const lSymbol *v){
 void lNFuncGCMark(const lNFunc *v){
 	markerPrefix(lNFunc);
 
-	lSymbolGCMark(v->name);
 	lValGCMark(v->args);
 	lTreeGCMark(v->meta);
 }
@@ -142,7 +141,6 @@ void lClosureGCMark(const lClosure *v){
 	lTreeGCMark(v->meta);
 	lBytecodeArrayMark(v->text);
 	lValGCMark(v->args);
-	lSymbolGCMark(v->name);
 
 	lClosureGCMark(v->caller);
 }

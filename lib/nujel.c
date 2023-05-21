@@ -39,7 +39,7 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "#<not-printable-from-c %i> ", v.type);
 		break;
 	case ltEnvironment:
-		fprintf(stderr, "#<env %s> ", v.vClosure->name->c);
+		fprintf(stderr, "#<env> ");
 		break;
 	case ltBytecodeArr:
 		fprintf(stderr, "#<bc-arr> ");
@@ -48,10 +48,10 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "#<bc-op %x> ", v.vBytecodeOp);
 		break;
 	case ltLambda:
-		fprintf(stderr, "#<fn %s> ", v.vClosure->name->c);
+		fprintf(stderr, "#<fn> ");
 		break;
 	case ltNativeFunc:
-		fprintf(stderr, "#<NFn %s> ", v.vNFunc->name->c);
+		fprintf(stderr, "#<NFn> ");
 		break;
 	case ltTree:
 		fprintf(stderr, " { ");

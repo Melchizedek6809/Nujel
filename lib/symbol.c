@@ -42,6 +42,7 @@ lSymbol *symType;
 lSymbol *symArguments;
 lSymbol *symCode;
 lSymbol *symData;
+lSymbol *symName;
 
 lSymbol *lSymLTNil;
 lSymbol *lSymLTBool;
@@ -93,6 +94,7 @@ void lSymbolInit(){
 	symArguments         = lSymSM("arguments");
 	symCode              = lSymSM("code");
 	symData              = lSymSM("data");
+	symName              = lSymSM("name");
 
 	lSymLTNil            = lSymSM("nil");
 	lSymLTBool           = lSymSM("bool");

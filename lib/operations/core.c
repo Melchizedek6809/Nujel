@@ -67,11 +67,6 @@ static lVal lnfClosureData(lClosure *c, lVal v){
 	return clo ? lValTree(clo->data) : NIL;
 }
 
-static lVal lnfClosureName(lClosure *c, lVal v){
-	lVal cc = requireCallable(c, lCar(v));
-	return lValSymS((cc.type == ltNativeFunc) ? cc.vNFunc->name : cc.vClosure->name);
-}
-
 static lVal lnfDefIn(lClosure *c, lVal v){
 	const lSymbol *sym = requireSymbol(c, lCadr(v));
 	lVal env = lCar(v);
@@ -405,7 +400,6 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFunc(c,"closure/data",     "(clo)",  "Return the data of CLO",                     lnfClosureData);
 	lAddNativeFunc(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode);
-	lAddNativeFunc(c,"closure/name",     "(clo)",  "Return the name of CLO",                     lnfClosureName);
 	lAddNativeFunc(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments);
 	lAddNativeFunc(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent);
 	lAddNativeFunc(c,"closure/caller",   "(clo)",  "Return the caller of CLO",                   lnfClosureCaller);

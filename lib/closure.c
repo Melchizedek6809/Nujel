@@ -20,7 +20,6 @@ lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
 	tmpc->parent = lambda.vClosure;
 	tmpc->type   = closureCall;
 	tmpc->text   = lambda.vClosure->text;
-	tmpc->name   = lambda.vClosure->name;
 	tmpc->caller = parent;
 	tmpc->ip     = tmpc->text->data;
 	for (lVal n = lambda.vClosure->args; ; n = n.vList->cdr) {
@@ -47,6 +46,7 @@ lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 	if(unlikely(lNF.type != ltNativeFunc)){
 		lExceptionThrowValClo(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF, c);
 	}
+	bool nameSet = false;
 
 	// Run at most 64 times, just a precaution
 	for(int i=0;i<64;i++){
@@ -57,7 +57,10 @@ lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 		}
 		lSymbol *name = lSymSL(cur,len);
 		lDefineClosureSym(c,name,lNF);
-		if(lNF.vNFunc->name == NULL){lNF.vNFunc->name = name;}
+		if(!nameSet){
+			lNF.vNFunc->meta = lTreeInsert(lNF.vNFunc->meta, symName, lValSymS(name));
+			nameSet = true;
+		}
 		for(;len<32;len++){ // Advance to the next non whitespace character
 			if(cur[len] == 0)    {return lNF;} // Or return if we reached the final 0 byte
 			if(!isspace((u8)cur[len])){break;}
@@ -145,12 +148,9 @@ lVal lAddNativeFuncPureFold(lClosure *c, const char *sym, const char *args, cons
 }
 
 /* Create a new Lambda Value */
-lVal lLambdaNew(lClosure *parent, lVal name, lVal args, lVal body){
-	const lSymbol *sym = (name.type == ltSymbol) ? name.vSymbol : NULL;
-
+lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
 	lVal ret = lValAlloc(ltLambda);
 	ret.vClosure       = lClosureNew(parent, closureDefault);
-	ret.vClosure->name = sym;
 	ret.vClosure->args = args;
 	ret.vClosure->text = requireBytecodeArray(parent, body);
 	ret.vClosure->ip   = ret.vClosure->text->data;

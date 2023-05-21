@@ -115,7 +115,6 @@ struct lNFunc {
 	lVal (*fp)(lClosure *, lVal);
 	lTree *meta;
 	lVal args;
-	lSymbol *name;
 };
 
 struct lTree {
@@ -136,6 +135,7 @@ struct lClosure {
 		lClosure *parent;
 		lClosure *nextFree;
 	};
+	lClosure *caller;
 	lTree *data, *meta;
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
@@ -143,8 +143,6 @@ struct lClosure {
 		lVal args;
 		lVal exceptionHandler;
 	};
-	const lSymbol *name;
-	lClosure *caller;
 	int sp;
 	u8 type;
 };
@@ -169,7 +167,7 @@ lClosure *lClosureNew        (lClosure *parent, closureType t);
 lClosure *lClosureNewFunCall (lClosure *parent, lVal args, lVal lambda);
 void      lClosureSetMeta    (lClosure *c, lVal doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
-lVal      lLambdaNew         (lClosure *parent, lVal name, lVal args, lVal body);
+lVal      lLambdaNew         (lClosure *parent, lVal args, lVal body);
 
 /*
  | lVal related procedures
@@ -229,7 +227,7 @@ typedef enum lOpcode {
 	lopRef             = 0x2B,
 	lopCadr            = 0x2C,
 	lopMutableEval     = 0x2D,
-	lopList            = 0x2E,
+	lopList            = 0x2E
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
@@ -350,6 +348,7 @@ extern lSymbol *symType;
 extern lSymbol *symArguments;
 extern lSymbol *symCode;
 extern lSymbol *symData;
+extern lSymbol *symName;
 
 extern lSymbol *symNull;
 extern lSymbol *symQuote;
