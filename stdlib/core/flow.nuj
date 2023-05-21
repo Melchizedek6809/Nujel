@@ -16,10 +16,12 @@
 
 (def case (let*
             (defn case/clauses/multiple (key-sym cases)
+                  :internal
                   (when cases
                     (cons (list '= key-sym (car cases))
                           (case/clauses/multiple key-sym (cdr cases)))))
             (defn case/clauses (key-sym clauses)
+                  :internal
                   (when clauses
                     (if (= (caar clauses) 'otherwise)
                         (cons 'do (cdar clauses))
@@ -39,13 +41,17 @@
                             (list 'def key-sym key-form)
                             (case/clauses key-sym clauses)))))
 
-(defmacro cond body
-          "Contains multiple cond clauses"
-          (when (and body (caar body))
+(defn cond/fn (body)
+      :internal
+      (when (and body (caar body))
                 (list 'if
                       (caar body)
                       (cons 'do (cdar body))
-                      (macro-apply cond (cdr body)))))
+                      (cond/fn (cdr body)))))
+
+(defmacro cond body
+          "Contains multiple cond clauses"
+          (cond/fn body))
 
 (defmacro dotimes (binding . body)
           "binding => (name n result-form)"
@@ -72,6 +78,7 @@
 
 (def -> (let*
           (defn thread/-> (init fun)
+                :internal
                 (if-not fun init
                         (if (pair? (car fun))
                             `(~(caar fun) ~(thread/-> init (cdr fun)) ~@(cdar fun))

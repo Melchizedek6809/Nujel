@@ -129,14 +129,6 @@ static lVal lnfApply(lClosure *c, lVal v){
 	return lApply(c, requirePair(c, lCadr(v)), lCar(v));
 }
 
-static lVal lnfMacroApply(lClosure *c, lVal v){
-	lVal fun = lCar(v);
-	if(unlikely(fun.type != ltMacro)){
-		lExceptionThrowValClo("type-error", "Can't macro-apply to that", v, c);
-	}
-	return lLambda(c, lCadr(v), fun);
-}
-
 static lVal lnfCar(lClosure *c, lVal v){
 	(void)c;
 	return lCaar(v);
@@ -410,7 +402,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"symbol-table",  "()",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
 
 	lAddNativeFunc(c,"apply",       "(func list)", "Evaluate FUNC with LIST as arguments",  lnfApply);
-	lAddNativeFunc(c,"macro-apply", "(macro list)","Evaluate MACRO with LIST as arguments", lnfMacroApply);
 
 	lAddNativeFuncPure(c,"car",     "(list)",       "Return the head of LIST",          lnfCar);
 	lAddNativeFuncPure(c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr);

@@ -425,6 +425,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp = ctx.sp - len;
 		lVal fun = ctx.valueStack[--ctx.sp];
 		switch(fun.type){
+		case ltMacro:
 		case ltLambda:
 			c->text = ops;
 			c->sp   = ctx.sp;

@@ -57,7 +57,7 @@
                                       (car source)))
                           (case (type-of op)
                                 (:nil source)
-                                (:macro (macroexpand* (macro-apply op (cdr source)) env))
+                                (:macro (macroexpand* (apply op (cdr source)) env))
                                 (:native-function
                                  (case op
                                        (quote source)

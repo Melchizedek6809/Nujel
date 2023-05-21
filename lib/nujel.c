@@ -121,6 +121,7 @@ lVal lLambda(lClosure *c, lVal args, lVal lambda){
 /* Run fun with args, evaluating args if necessary  */
 lVal lApply(lClosure *c, lVal args, lVal fun){
 	switch(fun.type){
+	case ltMacro:      return lLambda(c,args,fun);
 	case ltLambda:     return lLambda(c,args,fun);
 	case ltNativeFunc: return fun.vNFunc->fp(c,args);
 	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
