@@ -25,11 +25,11 @@
           "Compile SOURCE so it can be evaluated/applied"
           `(compile* ~source (current-closure)))
 
-(defn meta/parse/body (type args body)
+(defn meta/parse/body (name args body)
       :cat :compiler
       :internal
       (def source body)
-      (def meta {})
+      (def meta {:name name})
       (while body
         (def v (car body))
         (case (type-of v)
@@ -62,7 +62,7 @@
           "Define a new macro"
           `(def ~name (macro* '~name
                               '~args
-                              ~(meta/parse/body :macro args body)
+                              ~(meta/parse/body name args body)
                               '~(compile/do* body (current-closure)))))
 
 (defn fn/check (args body)
@@ -81,13 +81,13 @@
           (fn/check args body)
           `(fn* 'anonymous
                 '~args
-                ~(meta/parse/body :lambda args body)
+                ~(meta/parse/body 'anonymous args body)
                 '~(compile/do* body (current-closure))))
 
 (defmacro defn (name args . body)
           "Define a new function"
           (fn/check args body)
-          (def fn-meta (meta/parse/body :lambda args body))
+          (def fn-meta (meta/parse/body name args body))
           (def def-form `(def ~name (fn* '~name
                            '~args
                            ~fn-meta
