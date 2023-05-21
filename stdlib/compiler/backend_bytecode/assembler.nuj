@@ -137,19 +137,33 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :inline
       '(#$14))
 
+(defn $fn/new ()
+      "(args meta body) -> (λ) --- Create a new λ"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#$17))
+
+(defn $macro/new ()
+      "(args meta body) -> (μ) --- Create a new μ"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#$18))
+
 (defn $fn/dynamic ()
       "(name args docs body) -> (λ) --- Create a new λ"
       :cat :bytecode
       :internal
       :inline
-      '(#$17))
+      '(#$2F))
 
 (defn $macro/dynamic ()
       "(name args docs body) -> (μ) --- Create a new μ"
       :cat :bytecode
       :internal
       :inline
-      '(#$18))
+      '(#$30))
 
 (defn $add ()
       "(a b) -> (result)"

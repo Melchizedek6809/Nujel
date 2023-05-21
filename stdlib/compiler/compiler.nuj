@@ -60,8 +60,7 @@
 
 (defmacro defmacro (name args . body)
           "Define a new macro"
-          `(def ~name (macro* '~name
-                              '~args
+          `(def ~name (macro* '~args
                               ~(meta/parse/body name args body)
                               '~(compile/do* body (current-closure)))))
 
@@ -79,8 +78,7 @@
 (defmacro fn (args . body)
           "Define an anonymous function"
           (fn/check args body)
-          `(fn* 'anonymous
-                '~args
+          `(fn* '~args
                 ~(meta/parse/body 'anonymous args body)
                 '~(compile/do* body (current-closure))))
 
@@ -88,8 +86,7 @@
           "Define a new function"
           (fn/check args body)
           (def fn-meta (meta/parse/body name args body))
-          (def def-form `(def ~name (fn* '~name
-                           '~args
+          (def def-form `(def ~name (fn* '~args
                            ~fn-meta
                            '~(compile/do* body (current-closure)))))
           (if (ref fn-meta :export)

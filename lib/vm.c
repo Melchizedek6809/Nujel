@@ -383,8 +383,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal cBody = ctx.valueStack[--ctx.sp];
 		lVal cDocs = ctx.valueStack[--ctx.sp];
 		lVal cArgs = ctx.valueStack[--ctx.sp];
-		lVal cName = ctx.valueStack[--ctx.sp];
-		(void)cName;
 		lVal fun = lLambdaNew(c, cArgs, cBody);
 		lClosureSetMeta(fun.vClosure, cDocs);
 		if(unlikely(curOp == lopMacroDynamic)){

@@ -141,8 +141,7 @@
                           (list (bytecompile* (car source) env)
                                 (bytecompile* (cadr source) env)
                                 (bytecompile* (caddr source) env)
-                                (bytecompile* (cadddr source) env)
-                                ($fn/dynamic)))
+                                ($fn/new)))
 
                     (defn bytecompile/macro* (source env)
                           (def arg-count (length (cdr source)))
@@ -151,8 +150,7 @@
                           (list (bytecompile* (car source) env)
                                 (bytecompile* (cadr source) env)
                                 (bytecompile* (caddr source) env)
-                                (bytecompile* (cadddr source) env)
-                                ($macro/dynamic)))
+                                ($macro/new)))
 
                     (defn bytecompile/environment*  (source env)
                           (list ($let)
