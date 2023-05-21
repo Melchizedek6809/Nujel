@@ -73,16 +73,16 @@ static lVal lDyadicFun(lBytecodeOp op, lClosure *c, lVal a, lVal b){
 
 static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	const int closureSizeLeft = (ctx->closureStackSize - ctx->csp) - 1;
-	if(unlikely(closureSizeLeft < ctx->text->closureStackUsage)){
-		ctx->closureStackSize += (((ctx->text->closureStackUsage >> 8) | 1) << 8);
+	if(unlikely(closureSizeLeft < 16)){
+		ctx->closureStackSize += 32;
 		lClosure **t = realloc(ctx->closureStack, ctx->closureStackSize * sizeof(lClosure *));
 		if(unlikely(t == NULL)){ exit(56); }
 		ctx->closureStack = t;
 	}
 
 	const int valueSizeLeft = ctx->valueStackSize - ctx->sp;
-	if(unlikely(valueSizeLeft < ctx->text->valueStackUsage)){
-		ctx->valueStackSize += (((ctx->text->valueStackUsage >> 8) | 1) << 8);
+	if(unlikely(valueSizeLeft < 32)){
+		ctx->valueStackSize += 128;
 		lVal *t = realloc(ctx->valueStack, ctx->valueStackSize * sizeof(lVal));
 		if(unlikely(t == NULL)){ exit(57); }
 		ctx->valueStack = t;
@@ -167,8 +167,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		return NIL;
 	}
 
-	ctx.closureStackSize = text->closureStackUsage;
-	ctx.valueStackSize   = text->valueStackUsage;
+	ctx.closureStackSize = 256;
+	ctx.valueStackSize   = 32;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
 	ctx.csp              = 0;

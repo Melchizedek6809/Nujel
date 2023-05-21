@@ -100,8 +100,6 @@ struct lBytecodeArray{
 		struct lBytecodeArray *nextFree;
 	};
 	u8 flags;
-	u8 closureStackUsage;
-	u8 valueStackUsage;
 };
 
 typedef enum closureType {
@@ -134,8 +132,10 @@ struct lTree {
 #define TREE_IMMUTABLE 1
 
 struct lClosure {
-	lClosure *parent;
-	lClosure *nextFree;
+	union {
+		lClosure *parent;
+		lClosure *nextFree;
+	};
 	lTree *data, *meta;
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
@@ -150,13 +150,16 @@ struct lClosure {
 };
 
 struct lThread {
+	lBytecodeArray *text;
+
 	lVal *valueStack;
 	lClosure **closureStack;
-	lBytecodeArray *text;
-	int valueStackSize;
-	int closureStackSize;
+
 	int sp;
+	int valueStackSize;
+
 	int csp;
+	int closureStackSize;
 };
 
 /*
