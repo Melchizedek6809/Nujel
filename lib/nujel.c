@@ -172,10 +172,8 @@ lClosure *lNewRoot(){
 }
 
 lVal lCons(lVal car, lVal cdr){
-	lVal v = lValAlloc(ltPair);
 	lPair *cons = lPairAllocRaw();
 	cons->car = car;
 	cons->cdr = cdr;
-	v.vList = cons;
-	return v;
+	return lValAlloc(ltPair, cons);
 }

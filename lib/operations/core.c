@@ -29,9 +29,7 @@ static lVal lnfClosureParent(lClosure *c, lVal v){
 	if(cc->parent == NULL){
 		return NIL;
 	}else{
-		lVal ret = lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda);
-		ret.vClosure = cc->parent;
-		return ret;
+		return lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda, cc->parent);
 	}
 }
 
@@ -40,9 +38,7 @@ static lVal lnfClosureCaller(lClosure *c, lVal v){
 	if((cc == NULL) || (cc->caller == NULL)){
 		return NIL;
 	}else{
-		lVal ret = lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda);
-		ret.vClosure = cc->caller;
-		return ret;
+		return lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda, cc->caller);
 	}
 }
 
@@ -57,9 +53,7 @@ static lVal lnfClosureArguments(lClosure *c, lVal v){
 
 static lVal lnfClosureCode(lClosure *c, lVal v){
 	lClosure *clo = requireClosure(c, lCar(v));
-	lVal text = lValAlloc(ltBytecodeArr);
-	text.vBytecodeArr = clo->text;
-	return text;
+	return lValAlloc(ltBytecodeArr, clo->text);
 }
 
 static lVal lnfClosureData(lClosure *c, lVal v){
@@ -113,16 +107,12 @@ static lVal lnfResolvesPred(lClosure *c, lVal v){
 
 static lVal lnfCurrentClosure(lClosure *c, lVal v){
 	(void)v;
-	lVal ret = lValAlloc(ltEnvironment);
-	ret.vClosure = c;
-	return ret;
+	return lValAlloc(ltEnvironment, c);
 }
 
 static lVal lnfCurrentLambda(lClosure *c, lVal v){
 	(void)v;
-	lVal ret = lValAlloc(ltLambda);
-	ret.vClosure = c;
-	return ret;
+	return lValAlloc(ltLambda, c);
 }
 
 static lVal lnfApply(lClosure *c, lVal v){

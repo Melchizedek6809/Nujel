@@ -144,9 +144,7 @@ static lVal lParseString(lReadContext *s){
 			s->data++;
 		}else if(unlikely(*s->data == '"')){
 			s->data++;
-			lVal v = lValAlloc(ltString);
-			v.vString = lStringNew(buf,b-buf);
-			return v;
+			return lValAlloc(ltString, lStringNew(buf,b-buf));
 		}else if(unlikely(*s->data == 0)){
 			if (likely(i < bufSize)) {
 				buf[i] = 0;
@@ -399,8 +397,7 @@ static lVal lParseBuffer(lReadContext *s){
 		lExceptionThrowValClo("out-of-memory", "OOM during buffer parse outtro", NIL, s->c);
 		return NIL;
 	}
-	lVal ret = lValAlloc(ltBuffer);
-	ret.vBuffer = lBufferAlloc(len, true);
+	lVal ret = lValAlloc(ltBuffer, lBufferAlloc(len, true));
 	ret.vBuffer->buf = newBuf;
 	return ret;
 }

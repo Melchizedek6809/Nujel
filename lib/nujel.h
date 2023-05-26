@@ -127,10 +127,11 @@ struct lVal {
 
 extern lVal NIL;
 
-static inline lVal lValAlloc(lType T){
-	lVal ret;
-	ret.type = T;
-	return ret;
+static inline lVal lValAlloc(lType T, void *v){
+	return (lVal) {
+		T,
+		.vPointer = v
+	};
 }
 
 struct lPair {
@@ -240,23 +241,80 @@ void   lTreeSet             (      lTree *t, const lSymbol *s, lVal v, bool *fou
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
 
 /*
+ | Symbolic routines
+ */
+lSymbol  *lSymS         (const char *s);
+lSymbol  *lSymSM        (const char *s);
+lSymbol  *lSymSL        (const char *s, uint len);
+
+/*
  | lVal related procedures
  */
-lVal     lValSymS      (const lSymbol *s);
-lVal     lValKeywordS  (const lSymbol *s);
-lVal     lValSym       (const char    *s);
-lVal     lValKeyword   (const char    *s);
+static inline lVal lValFloat(lClosure *c, double v){
+	if(unlikely(__builtin_isnan(v))){
+		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NIL, c);
+	}else if(unlikely(__builtin_isinf(v))){
+		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NIL, c);
+	}
+	return (lVal){ltFloat, .vFloat = v};
+}
 
-lVal     lValBool         (bool v);
-lVal     lValInt          (i64 v);
-lVal     lValFloat        (lClosure *c, double v);
-lVal     lValTree         (lTree *v);
-lVal     lValEnvironment  (lClosure *v);
-lVal     lValLambda       (lClosure *v);
+static inline lVal lValInt(i64 v){
+	return (lVal){ltInt, .vInt = v};
+}
+
+static inline lVal lValBool(bool v){
+	return (lVal){ltBool, .vBool = v};
+}
+
+lTreeRoot *lTreeRootAllocRaw();
+static inline lVal lValTree(lTree *v){
+	lVal ret = lValAlloc(ltTree, lTreeRootAllocRaw());
+	ret.vTree->root = v;
+	return ret;
+}
+
+static inline lVal lValEnvironment(lClosure *v){
+	return lValAlloc(ltEnvironment, v);
+}
+
+static inline lVal lValLambda(lClosure *v){
+	return lValAlloc(ltLambda, v);
+}
+
+/* Return a newly allocated nujel symbol of value S */
+static inline lVal lValSymS(const lSymbol *s){
+	if(unlikely(s == NULL)){return NIL;}
+	return (lVal){ltSymbol, .vSymbol = s};
+}
+
+/* Return a nujel value for the symbol within S */
+static inline lVal lValSym(const char *s){
+	return lValSymS(lSymS(s));
+}
+
+/* Return a newly allocated nujel keyword of value S */
+static inline lVal lValKeywordS(const lSymbol *s){
+	if(unlikely(s == NULL)){return NIL;}
+	return (lVal){ltKeyword, .vSymbol = s};
+}
+
+/* Return a nujel value for the keyword within S */
+static inline lVal lValKeyword(const char *s){
+	return lValKeywordS(lSymS(s));
+}
+
+static inline lVal lValFileHandle(FILE *fh){
+	return lValAlloc(ltFileHandle, fh);
+}
+
+static inline lVal lValBytecodeOp(lBytecodeOp v){
+	return (lVal){ltBytecodeOp, .vBytecodeOp = v};
+}
+
 lVal     lValString       (const char *s);
 lVal     lValStringLen    (const char *s, int len);
 lVal     lValStringNoCopy (const char *s, int len);
-lVal     lValFileHandle   (FILE *fh);
 
 /*
  | Allocator related procedures
@@ -265,12 +323,5 @@ lArray *         lArrayAlloc  (size_t len);
 lBuffer *        lBufferAlloc (size_t length, bool immutable);
 lString *        lStringNew   (const char *str, uint len);
 lString *        lStringDup   (const lString *s);
-
-/*
- | Symbolic routines
- */
-lSymbol  *lSymS         (const char *s);
-lSymbol  *lSymSM        (const char *s);
-lSymbol  *lSymSL        (const char *s, uint len);
 
 #endif

@@ -37,8 +37,7 @@ lString *lStringDup(const lString *os){
 /* Create a new string value out of S */
 lVal lValStringLen(const char *c, int len){
 	if(unlikely(c == NULL)){return NIL;}
-	lVal t = lValAlloc(ltString);
-	t.vString = lStringNew(c,len);
+	lVal t = lValAlloc(ltString, lStringNew(c,len));
 	return unlikely(t.vString == NULL) ? NIL : t;
 }
 
@@ -51,9 +50,7 @@ lVal lValString(const char *c){
  * freed once the value leaves scope  */
 lVal lValStringNoCopy(const char *c,int len){
 	if(unlikely(c == NULL)){return NIL;}
-	lVal t = lValAlloc(ltString);
-	t.vString = lStringNewNoCopy(c,len);
-	return t;
+	return lValAlloc(ltString, lStringNewNoCopy(c,len));
 }
 
 /* Return a string value, containing a mark from ERR to ERREND,

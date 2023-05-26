@@ -25,8 +25,7 @@ lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, 
 		lExceptionThrowValClo("invalid-bc-array", "Invalid bytecode array", NIL, errorClosure);
 		return NIL;
 	}
-	lVal ret = lValAlloc(ltBytecodeArr);
-	ret.vBytecodeArr = lBytecodeArrayAlloc(opsLength);
+	lVal ret = lValAlloc(ltBytecodeArr, lBytecodeArrayAlloc(opsLength));
 	ret.vBytecodeArr->literals = literals;
 	ret.vBytecodeArr->literals->flags |= ARRAY_IMMUTABLE;
 	memcpy(ret.vBytecodeArr->data, ops, opsLength);
@@ -67,9 +66,7 @@ static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	const int len = arr->dataEnd - arr->data;
 
-	lVal ret = lValAlloc(ltArray);
-	ret.vArray = lArrayAlloc(len);
-
+	lVal ret = lValAlloc(ltArray, lArrayAlloc(len));
 	for(int i=0;i<len;i++){
 		ret.vArray->data[i] = lValBytecodeOp(arr->data[i]);
 	}
@@ -79,9 +76,7 @@ static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
 	if(arr->literals == NULL){return NIL;}
-	lVal ret = lValAlloc(ltArray);
-	ret.vArray = arr->literals;
-	return ret;
+	return lValAlloc(ltArray, arr->literals);
 }
 
 static lVal lnfBytecodeArrLength(lClosure *c, lVal v){

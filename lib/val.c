@@ -8,48 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-lVal lValInt(i64 v){
-	lVal ret = lValAlloc(ltInt);
-	ret.vInt = v;
-	return ret;
-}
-
-lVal lValFloat(lClosure *c, double v){
-	if(unlikely(isnan(v))){
-		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NIL, c);
-	}else if(unlikely(isinf(v))){
-		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NIL, c);
-	}
-	lVal ret   = lValAlloc(ltFloat);
-	ret.vFloat = v;
-	return ret;
-}
-
-lVal lValBool(bool v){
-	lVal ret = lValAlloc(ltBool);
-	ret.vBool = v;
-	return ret;
-}
-
-lVal lValTree(lTree *v){
-	lVal ret = lValAlloc(ltTree);
-	ret.vTree = lTreeRootAllocRaw();
-	ret.vTree->root = v;
-	return ret;
-}
-
-lVal lValEnvironment(lClosure *v){
-	lVal ret = lValAlloc(ltEnvironment);
-	ret.vClosure = v;
-	return ret;
-}
-
-lVal lValLambda(lClosure *v){
-	lVal ret = lValAlloc(ltLambda);
-	ret.vClosure = v;
-	return ret;
-}
-
 /* Checks if A is greater than B, returns 0 if the two values can't be compared
  | or if they are equal.
  */
@@ -117,42 +75,4 @@ bool lValEqual(const lVal a, const lVal b){
 		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
 	}
 	return a.vPointer == b.vPointer;
-}
-
-/* Return a newly allocated nujel symbol of value S */
-lVal lValSymS(const lSymbol *s){
-	if(unlikely(s == NULL)){return NIL;}
-	lVal ret = lValAlloc(ltSymbol);
-	ret.vSymbol = s;
-	return ret;
-}
-
-/* Return a nujel value for the symbol within S */
-lVal lValSym(const char *s){
-	return lValSymS(lSymS(s));
-}
-
-/* Return a newly allocated nujel keyword of value S */
-lVal lValKeywordS(const lSymbol *s){
-	if(unlikely(s == NULL)){return NIL;}
-	lVal ret = lValAlloc(ltKeyword);
-	ret.vSymbol = s;
-	return ret;
-}
-
-/* Return a nujel value for the keyword within S */
-lVal lValKeyword(const char *s){
-	return lValKeywordS(lSymS(s));
-}
-
-lVal lValFileHandle(FILE *fh){
-	lVal ret = lValAlloc(ltFileHandle);
-	ret.vFileHandle = fh;
-	return ret;
-}
-
-lVal lValBytecodeOp(lBytecodeOp v){
-	lVal ret = lValAlloc(ltBytecodeOp);
-	ret.vBytecodeOp = v;
-	return ret;
 }

@@ -121,8 +121,7 @@ void lDefineVal(lClosure *c, const char *str, lVal val){
 
 /* Add a NFunc to closure C, should only be used during root closure creation */
 lVal lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal)){
-	lVal v = lValAlloc(ltNativeFunc);
-	v.vNFunc = lNFuncAlloc();
+	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = func;
 	v.vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
 	v.vNFunc->args = lCar(lRead(c, args));
@@ -149,8 +148,7 @@ lVal lAddNativeFuncPureFold(lClosure *c, const char *sym, const char *args, cons
 
 /* Create a new Lambda Value */
 lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
-	lVal ret = lValAlloc(ltLambda);
-	ret.vClosure       = lClosureNew(parent, closureDefault);
+	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
 	ret.vClosure->args = args;
 	ret.vClosure->text = requireBytecodeArray(parent, body);
 	ret.vClosure->ip   = ret.vClosure->text->data;

@@ -41,9 +41,7 @@ size_t lBufferViewLength(const lBufferView *v){
 static lVal lnfBufferAllocate(lClosure *c, lVal v) {
 	const i64 size = requireNaturalInt(c, lCar(v));
 	lBuffer *buf = lBufferAlloc(size, false);
-	lVal ret = lValAlloc(ltBuffer);
-	ret.vBuffer = buf;
-	return ret;
+	return lValAlloc(ltBuffer, buf);
 }
 
 static lVal lnfBufferLengthGet(lClosure *c, lVal v){
@@ -104,9 +102,7 @@ static lVal bufferFromPointer(lClosure *c, bool immutable, const void *data, siz
 	}
 	memcpy(retBuf->buf, data, length);
 
-	lVal retV = lValAlloc(ltBuffer);
-	retV.vBuffer = retBuf;
-	return retV;
+	return lValAlloc(ltBuffer, retBuf);
 }
 
 static lVal lnfBufferDup(lClosure *c, lVal v){
@@ -166,9 +162,7 @@ static lVal bufferView(lClosure *c, lVal v, lBufferViewType T){
 	}
 	const size_t length = buf->length / lBufferViewTypeSize(T);
 	lBufferView *bufView = lBufferViewAlloc(buf, T, 0, length, immutable);
-	lVal ret = lValAlloc(ltBufferView);
-	ret.vBufferView = bufView;
-	return ret;
+	return lValAlloc(ltBufferView, bufView);
 }
 
 static lVal  lnfBufferViewU8(lClosure *c, lVal v){ return bufferView(c, v,  lbvtU8); }
@@ -247,9 +241,7 @@ static lVal lnfBufferViewSet(lClosure *c, lVal v){
 
 static lVal lnfBufferViewBuffer(lClosure *c, lVal v){
 	lBufferView *view = requireBufferView(c, lCar(v));
-	lVal ret = lValAlloc(ltBuffer);
-	ret.vBuffer = view->buf;
-	return ret;
+	return lValAlloc(ltBuffer, view->buf);
 }
 
 void lOperationsBuffer(lClosure *c){

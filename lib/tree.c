@@ -182,8 +182,8 @@ lTree *lTreeDup(const lTree *t){
 }
 
 lVal lnfTreeNew(lClosure* c, lVal v) {
-	lVal ret = lValAlloc(ltTree);
-	lTreeRoot *t = ret.vTree = lTreeRootAllocRaw();
+	lTreeRoot *t = lTreeRootAllocRaw();
+	lVal ret = lValAlloc(ltTree, t);
 
 	for (lVal n = v; n.type == ltPair; n = lCddr(n)) {
 		lVal car = lCar(n);

@@ -32,7 +32,7 @@ static inline bool isComment(lVal v){
 	return v.type == ltComment;
 }
 static inline lVal lValComment(){
-	return lValAlloc(ltComment);
+	return lValAlloc(ltComment, NULL);
 }
 lType lTypecast(const lType a, const lType b);
 
