@@ -170,10 +170,3 @@ lClosure *lNewRoot(){
 	lDefineVal(c,"*module*", lValKeyword("core"));
 	return lLoad(c, (const char *)stdlib_no_data);
 }
-
-lVal lCons(lVal car, lVal cdr){
-	lPair *cons = lPairAllocRaw();
-	cons->car = car;
-	cons->cdr = cdr;
-	return lValAlloc(ltPair, cons);
-}

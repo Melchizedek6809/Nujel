@@ -128,10 +128,7 @@ struct lVal {
 extern lVal NIL;
 
 static inline lVal lValAlloc(lType T, void *v){
-	return (lVal) {
-		T,
-		.vPointer = v
-	};
+	return (lVal){T, .vPointer = v};
 }
 
 struct lPair {
@@ -159,7 +156,13 @@ const void *         lBufferViewData        (lBufferView *v);
 void *               lBufferViewDataMutable (lBufferView *v);
 size_t               lBufferViewLength      (const lBufferView *v);
 
-lVal lCons(lVal car, lVal cdr);
+lPair *lPairAllocRaw();
+static inline lVal lCons(lVal car, lVal cdr){
+	lPair *cons = lPairAllocRaw();
+	cons->car = car;
+	cons->cdr = cdr;
+	return lValAlloc(ltPair, cons);
+}
 
 static inline lVal lCar(lVal v){
 	return likely(v.type == ltPair) ? v.vList->car : NIL;

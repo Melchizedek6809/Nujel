@@ -23,7 +23,7 @@ NORETURN void throwArityError(lClosure *c, lVal v, int arity){
 	lExceptionThrowValClo("arity-error", buf, v, c);
 }
 
-static lVal requireCertainType(lClosure *c, lVal v, lType T){
+static inline lVal requireCertainType(lClosure *c, lVal v, lType T){
 	if(unlikely(v.type != T)){
 		throwTypeError(c, v, T);
 	}
