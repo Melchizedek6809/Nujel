@@ -54,15 +54,13 @@ lVal lValLambda(lClosure *v){
  | or if they are equal.
  */
 i64 lValGreater(const lVal a, const lVal b){
-	if(unlikely((a.type == ltNil) || (b.type == ltNil))){
-		return 0;
-	}
 	if(unlikely(a.type != b.type)){
-		if(likely(((a.type == ltInt) || (a.type == ltFloat)) && ((b.type == ltInt) || (b.type == ltFloat)))){
-			return ((a.type == ltInt) ? (float)a.vInt : a.vFloat) < ((b.type == ltInt) ? (float)b.vInt : b.vFloat) ? -1 : 1;
-		}else{
-			return 0;
+		if((a.type == ltInt) && (b.type == ltFloat)){
+			return (((float)a.vInt) < b.vFloat) ? -1 : 1;
+		} else if ((a.type == ltFloat) && (b.type == ltInt)) {
+			return (a.vFloat < ((float)b.vInt)) ? -1 : 1;
 		}
+		return 0;
 	}
 	switch(a.type){
 	default:
@@ -106,51 +104,19 @@ i64 lValGreater(const lVal a, const lVal b){
 
 /* Check two values for equality */
 bool lValEqual(const lVal a, const lVal b){
-	if(unlikely((a.type == ltNil) || (b.type == ltNil))){
-		return a.type == b.type;
-	}
 	if(unlikely(a.type != b.type)){
-		if(likely(((a.type == ltInt) || (a.type == ltFloat)) && ((b.type == ltInt) || (b.type == ltFloat)))){
-			return ((a.type == ltInt) ? (float)a.vInt : a.vFloat) == ((b.type == ltInt) ? (float)b.vInt : b.vFloat);
-		}else{
-			return false;
+		if((a.type == ltInt) && (b.type == ltFloat)){
+			return ((float)a.vInt) == b.vFloat;
+		} else if ((a.type == ltFloat) && (b.type == ltInt)) {
+			return a.vFloat == ((float)b.vInt);
 		}
-	}
-	switch(a.type){
-	default:
 		return false;
-	case ltPair:
-		return a.vList == b.vList;
-	case ltArray:
-		return a.vArray == b.vArray;
-	case ltTree:
-		return a.vTree == b.vTree;
-	case ltKeyword:
-	case ltSymbol:
-		return a.vSymbol == b.vSymbol;
-	case ltEnvironment:
-	case ltMacro:
-	case ltLambda:
-		return a.vClosure == b.vClosure;
-	case ltNativeFunc:
-		return a.vNFunc == b.vNFunc;
-	case ltBytecodeOp:
-		return a.vBytecodeOp == b.vBytecodeOp;
-	case ltBuffer:
-		return a.vBuffer == b.vBuffer;
-	case ltBufferView:
-		return a.vBufferView == b.vBufferView;
-	case ltBool:
-		return a.vBool == b.vBool;
-	case ltInt:
-		return a.vInt == b.vInt;
-	case ltFloat:
-		return a.vFloat == b.vFloat;
-	case ltString: {
+	} else if(unlikely(a.type == ltString)){
 		const uint alen = lStringLength(a.vString);
 		const uint blen = lStringLength(b.vString);
 		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
-	}}
+	}
+	return a.vPointer == b.vPointer;
 }
 
 /* Return a newly allocated nujel symbol of value S */
