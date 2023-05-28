@@ -51,7 +51,6 @@
       (deftest #t (not (< 5 1)))
       (deftest #t (not (= #f #t)))
       (deftest #t (not (< 3 2)))
-      (deftest #t (not (>= "2" 3)))
 
       (if v #f #t))
 

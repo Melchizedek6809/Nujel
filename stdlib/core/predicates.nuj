@@ -9,7 +9,8 @@
 
 (defn pos? (a) :inline
       "Return #t if a is positive"
-      (>= a 0.0))
+      (and (number? a)
+           (>= a 0.0)))
 
 (defn zero-neg? (a) :inline
       "Return #t if a is zero or negative"

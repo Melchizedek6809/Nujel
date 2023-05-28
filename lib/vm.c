@@ -40,37 +40,6 @@ static lVal lStackBuildList(lVal *stack, int sp, int len){
 	return ret;
 }
 
-static lVal lDyadicFun(lBytecodeOp op, lClosure *c, lVal a, lVal b){
-	switch(op){
-	case lopLessPred:
-		return lValBool((lValGreater(a, b) < 0) && !lValEqual(a, b));
-	case lopLessEqPred:
-		return lValBool(lValEqual(a, b) || (lValGreater(a, b) < 0));
-	case lopEqualPred:
-		return lValBool(lValEqual(a, b));
-	case lopGreaterEqPred:
-		return lValBool(lValEqual(a,b) || (lValGreater(a,b) > 0));
-	case lopGreaterPred:
-		return lValBool((lValGreater(a, b) > 0) && !lValEqual(a, b));
-	case lopCons:
-		return lCons(a,b);
-	case lopIntAdd:
-		return lValInt(a.vInt + b.vInt);
-	case lopAdd:
-		return lAdd(c,a,b);
-	case lopSub:
-		return lSub(c,a,b);
-	case lopMul:
-		return lMul(c,a,b);
-	case lopDiv:
-		return lDiv(c,a,b);
-	case lopRem:
-		return lRem(c,a,b);
-	default:
-		return NIL;
-	}
-}
-
 static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	const int closureSizeLeft = (ctx->closureStackSize - ctx->csp) - 1;
 	if(unlikely(closureSizeLeft < 16)){
@@ -188,7 +157,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.csp--;
 			c = ctx.closureStack[ctx.csp];
 		}
-		if(unlikely((ctx.csp > 0) && (++exceptionCount < 1000))){
+		if((ctx.csp > 0) && (++exceptionCount < 1000)){
 			lVal handler = c->exceptionHandler;
 
 			c = ctx.closureStack[--ctx.csp];
@@ -238,20 +207,61 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = lValInt(v);
 		vmbreak;}
 	vmcase(lopAdd)
+		ctx.valueStack[ctx.sp-2] = lAdd(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopSub)
+		ctx.valueStack[ctx.sp-2] = lSub(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopMul)
+		ctx.valueStack[ctx.sp-2] = lMul(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopDiv)
+		ctx.valueStack[ctx.sp-2] = lDiv(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopRem)
+		ctx.valueStack[ctx.sp-2] = lRem(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopIntAdd)
+		ctx.valueStack[ctx.sp-2].vInt = ctx.valueStack[ctx.sp-2].vInt + ctx.valueStack[ctx.sp-1].vInt;
+		ctx.sp--;
+		vmbreak;
 	vmcase(lopCons)
-	vmcase(lopLessEqPred)
-	vmcase(lopLessPred)
-	vmcase(lopEqualPred)
-	vmcase(lopGreaterEqPred)
+		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.sp--;
+		vmbreak;
+	vmcase(lopLessPred) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) < 0);
+		ctx.sp--;
+		vmbreak; }
+	vmcase(lopLessEqPred) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) <= 0);
+		ctx.sp--;
+		vmbreak; }
+	vmcase(lopEqualPred) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b));
+		ctx.sp--;
+		vmbreak; }
+	vmcase(lopGreaterEqPred) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a,b) >= 0);
+		ctx.sp--;
+		vmbreak; }
 	vmcase(lopGreaterPred) {
 		lVal a = ctx.valueStack[ctx.sp-2];
 		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lDyadicFun(ip[-1], c, a, b);
+		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) > 0);
 		ctx.sp--;
 		vmbreak; }
 	vmcase(lopPushNil)

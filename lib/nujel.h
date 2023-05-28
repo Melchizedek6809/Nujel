@@ -61,21 +61,21 @@ typedef enum {
 	ltFloat,
 
 	ltPair,
-	ltString,
 	ltArray,
 	ltTree,
 
 	ltLambda,
 	ltMacro,
 	ltNativeFunc,
+	ltEnvironment,
+	ltThread,
 
+	ltString,
 	ltBuffer,
 	ltBufferView,
-
-	ltEnvironment,
 	ltBytecodeArr,
+
 	ltFileHandle,
-	ltThread,
 	ltComment
 } lType;
 

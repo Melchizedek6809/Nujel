@@ -14,9 +14,17 @@
 i64 lValGreater(const lVal a, const lVal b){
 	if(unlikely(a.type != b.type)){
 		if((a.type == ltInt) && (b.type == ltFloat)){
-			return (((float)a.vInt) < b.vFloat) ? -1 : 1;
+			return (((float)a.vInt) < b.vFloat)
+				? -1
+				: (((float)a.vInt) > b.vFloat)
+				  ? 1
+				  : 0;
 		} else if ((a.type == ltFloat) && (b.type == ltInt)) {
-			return (a.vFloat < ((float)b.vInt)) ? -1 : 1;
+			return (a.vFloat < ((float)b.vInt))
+				? -1
+				: (a.vFloat > ((float)b.vInt))
+				  ? 1
+				  : 0;
 		}
 		return 0;
 	}
