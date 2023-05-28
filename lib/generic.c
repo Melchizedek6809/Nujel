@@ -55,7 +55,7 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
 			lExceptionThrowValClo("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col, c);
 		}
-		return lValBytecodeOp(arr->data[i]); }
+		return lValInt(arr->data[i]); }
 	case ltArray: {
 		lArray *arr = requireArray(c, col);
 		const int i = requireNaturalInt(c, key);

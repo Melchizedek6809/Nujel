@@ -68,7 +68,7 @@
                        (dotimes (i (bytecode-array/length v))
                          (when (zero? (bit-and i #x1F))
                            (port 'block-write "\n"))
-                         (port 'block-write (pad-start (int->string/HEX (bytecode-op->int (ref v i))) 2 "0")))
+                         (port 'block-write (pad-start (int->string/HEX (ref v i)) 2 "0")))
                        (port 'block-write "\n}"))
 
                  (defn write/raw/tree/rec (v port hr? always-space?)
@@ -138,7 +138,6 @@
                              (:float           (port 'block-write (string v))) ;; This one is kinda cheating
                              (:keyword         (port 'write ":" (keyword->string v)))
                              (:symbol          (port 'block-write (string v)))
-                             (:bytecode-op     (port 'write "#$" (int->string/HEX (bytecode-op->int v))))
                              (:array           (write/raw/array v port hr?))
                              (:buffer          (write/raw/buffer v port hr?))
                              (:bytecode-array  (write/raw/bytecode-array v port hr?))

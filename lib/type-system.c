@@ -68,10 +68,6 @@ i64 requireNaturalInt(lClosure *c, lVal v){
 	return ret;
 }
 
-lBytecodeOp requireBytecodeOp(lClosure *c, lVal v){
-	return requireCertainType(c, v, ltBytecodeOp).vBytecodeOp;
-}
-
 lBytecodeArray *requireBytecodeArray(lClosure *c, lVal v){
 	return requireCertainType(c, v, ltBytecodeArr).vBytecodeArr;
 }

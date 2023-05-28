@@ -73,7 +73,6 @@ typedef enum {
 	ltBufferView,
 
 	ltEnvironment,
-	ltBytecodeOp,
 	ltBytecodeArr,
 	ltFileHandle,
 	ltThread,
@@ -309,10 +308,6 @@ static inline lVal lValKeyword(const char *s){
 
 static inline lVal lValFileHandle(FILE *fh){
 	return lValAlloc(ltFileHandle, fh);
-}
-
-static inline lVal lValBytecodeOp(lBytecodeOp v){
-	return (lVal){ltBytecodeOp, .vBytecodeOp = v};
 }
 
 lVal     lValString       (const char *s);

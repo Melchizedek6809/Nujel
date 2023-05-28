@@ -9,238 +9,238 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :cat :bytecode
       :internal
       :inline
-      '(#$00))
+      '(#x00))
 
 (defn $ret ()
       "(a) -> () --- Return top of value stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$01))
+      '(#x01))
 
 (defn $add/int ()
       "(a b) -> (result) --- Adds the two topmost values and pushes the result"
       :cat :bytecode
       :internal
       :inline
-      '(#$03))
+      '(#x03))
 
 (defn $ref ()
       "(col key) -> (result) --- Looks up key in col"
       :cat :bytecode
       :internal
       :inline
-      '(#$2B))
+      '(#x2B))
 
 (defn $dup ()
       "(a) -> (a a) --- Duplicates the value that is on the top of the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$0C))
+      '(#x0C))
 
 (defn $drop ()
       "(a) -> () --- Drop whatever is on top of the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$0D))
+      '(#x0D))
 
 (defn $closure/push ()
       "() -> (closure) --- Push the current closure as a λ on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$13))
+      '(#x13))
 
 (defn $let ()
       "() -> () --- Create a new let closure and switch to it"
       :cat :bytecode
       :internal
       :inline
-      '(#$15))
+      '(#x15))
 
 (defn $closure/pop ()
       "() -> () --- Leave the current closure and return to the parent one"
       :cat :bytecode
       :internal
       :inline
-      '(#$16))
+      '(#x16))
 
 (defn $< ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$1E))
+      '(#x1E))
 
 (defn $<= ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$1F))
+      '(#x1F))
 
 (defn $= ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$20))
+      '(#x20))
 
 (defn $>= ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$21))
+      '(#x21))
 
 (defn $> ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$22))
+      '(#x22))
 
 (defn $push/nil ()
       "() -> (nil) --- Push a #nil on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$24))
+      '(#x24))
 
 (defn $car ()
       "(l) -> (car) --- Replace L with its car"
       :cat :bytecode
       :internal
       :inline
-      '(#$11))
+      '(#x11))
 
 (defn $cdr ()
       "(l) -> (cdr) --- Replace L with its cdr"
       :cat :bytecode
       :internal
       :inline
-      '(#$12))
+      '(#x12))
 
 (defn $cadr ()
       "(l) -> (cadr) --- Replace L with its cadr"
       :cat :bytecode
       :internal
       :inline
-      '(#$2C))
+      '(#x2C))
 
 (defn $cons ()
       "(car cdr) -> (pair) --- Cons CAR and CDR together and put it on the stack"
       :cat :bytecode
       :internal
       :inline
-      '(#$14))
+      '(#x14))
 
 (defn $fn/new ()
       "(args meta body) -> (λ) --- Create a new λ"
       :cat :bytecode
       :internal
       :inline
-      '(#$17))
+      '(#x17))
 
 (defn $macro/new ()
       "(args meta body) -> (μ) --- Create a new μ"
       :cat :bytecode
       :internal
       :inline
-      '(#$18))
+      '(#x18))
 
 (defn $fn/dynamic ()
       "(name args docs body) -> (λ) --- Create a new λ"
       :cat :bytecode
       :internal
       :inline
-      '(#$2F))
+      '(#x2F))
 
 (defn $macro/dynamic ()
       "(name args docs body) -> (μ) --- Create a new μ"
       :cat :bytecode
       :internal
       :inline
-      '(#$30))
+      '(#x30))
 
 (defn $add ()
       "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$25))
+      '(#x25))
 
 (defn $sub ()
       "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$26))
+      '(#x26))
 
 (defn $mul ()
       "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$27))
+      '(#x27))
 
 (defn $div ()
       "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$28))
+      '(#x28))
 
 (defn $rem ()
       "(a b) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$29))
+      '(#x29))
 
 (defn $push/true ()
       "() -> (#t)"
       :cat :bytecode
       :internal
       :inline
-      '(#$1B))
+      '(#x1B))
 
 (defn $push/false ()
       "() -> (#f)"
       :cat :bytecode
       :internal
       :inline
-      '(#$1C))
+      '(#x1C))
 
 (defn $eval ()
       "(bc env) -> (return-val)"
       :cat :bytecode
       :internal
       :inline
-      '(#$1D))
+      '(#x1D))
 
 (defn $mutable-eval ()
       "(bc env) -> (return-val)"
       :cat :bytecode
       :internal
       :inline
-      '(#$2D))
+      '(#x2D))
 
 (defn $zero? ()
       "(a) -> (result)"
       :cat :bytecode
       :internal
       :inline
-      '(#$2A))
+      '(#x2A))
 
 (defn $inc/int ()
       "(a) -> (result) --- Adds 1 to the topmost int"
       :cat :bytecode
       :internal
       :inline
-      '(#$23))
+      '(#x23))
 
 (defn int-fit-in-byte? (a)
       (and (<= a 127) (>= a -128)))
@@ -259,7 +259,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when-not (int-fit-in-byte? a)
                 (exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ))
-      (list #$2 (int->bytecode-op a)))
+      (list #x2 a))
 
 (defn $apply/optimized (arg-count fun)
       "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
@@ -300,8 +300,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when (> arg-count 255)
         (exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count))
-      (list #$4
-            (int->bytecode-op arg-count)))
+      (list #x4 arg-count))
 
 (defn $list (count)
       "arguments -> (result) --- Read count arguments from the stack and put a list of those on the stack instead."
@@ -309,22 +308,21 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when (> count 255)
         (exception :arity-error "$list can only generate lists with up to 255 arguments in one go, try and use cons instead" count))
-      (list #$2E
-            (int->bytecode-op count)))
+      (list #x2E count))
 
 (defn $try (target)
       "() -> () --- Try something, jumping to target if an exception occurs"
       :cat :bytecode
       :internal
-      (list #$19 (list :relocate target 8 0 (int->bytecode-op 0))
-            (list :relocate target 0 1 (int->bytecode-op 0))))
+      (list #x19 (list :relocate target 8 0 0)
+            (list :relocate target 0 1 0)))
 
 (defn $jmp (target)
       :cat :bytecode
       :internal
-      (list #$9
-            (list :relocate target 8 0 (int->bytecode-op 0))
-            (list :relocate target 0 1 (int->bytecode-op 0))))
+      (list #x9
+            (list :relocate target 8 0 0)
+            (list :relocate target 0 1 0)))
 
 (defn $push/val (v)
       "() -> (v) --- Pushes v onto the stack"
@@ -332,7 +330,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when (nil? v)
             (exception :invalid-bc-op "Can't push #nil as a normal lVal" v ))
-      (list #$1A
+      (list #x1A
             (list :literal v)))
 
 (defn $get/val (v)
@@ -341,7 +339,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
-      (list #$E
+      (list #xE
             (list :literal v)))
 
 (defn $set/val (v)
@@ -350,7 +348,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
-      (list #$5
+      (list #x5
             (list :literal v)))
 
 (defn $def/val (v)
@@ -359,27 +357,27 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
-      (list #$7
+      (list #x7
             (list :literal v)))
 
 (defn $jt (target)
       :cat :bytecode
       :internal
-      (list #$A
-            (list :relocate target 8 0 (int->bytecode-op 0))
-            (list :relocate target 0 1 (int->bytecode-op 0))))
+      (list #xA
+            (list :relocate target 8 0 0)
+            (list :relocate target 0 1 0)))
 
 (defn $jf (target)
       :cat :bytecode
       :internal
-      (list #$B
-            (list :relocate target 8 0 (int->bytecode-op 0))
-            (list :relocate target 0 1 (int->bytecode-op 0))))
+      (list #xB
+            (list :relocate target 8 0 0)
+            (list :relocate target 0 1 0)))
 
 (defn $fn (name args docs body)
       :cat :bytecode
       :internal
-      (list #$25
+      (list #x25
             (val->bytecode-op name)
             (val->bytecode-op args)
             (val->bytecode-op docs)
@@ -388,7 +386,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 (defn $macro* (name args docs body)
       :cat :bytecode
       :internal
-      (list #$26
+      (list #x26
             (val->bytecode-op name)
             (val->bytecode-op args)
             (val->bytecode-op docs)
@@ -398,11 +396,13 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                  (defn assemble/build-sym-map (code sym-map pos)
                        (while code
                          (case (type-of (car code))
-                               (:bytecode-op (tree/set! sym-map :last-op (inc! pos)))
+                               (:int (tree/set! sym-map :last-op (inc! pos)))
                                (:keyword (case (car code)
                                                (:label (tree/set! sym-map (cadr code) pos)
-                                                       (cdr! code))
-                                               (:literal (cdr! code))))
+                                                       (return pos))
+                                               (:relocate (tree/set! sym-map :last-op (inc! pos))
+                                                          (return pos))
+                                               (:literal (return pos))))
                                (:pair        (set! pos (assemble/build-sym-map (car code) sym-map pos))))
                          (cdr! code))
                        (return pos))
@@ -410,7 +410,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                  (defn assemble/relocate-op (code sym-map pos out)
                        (def target (ref sym-map (cadr code)))
                        (def off (- (+ target (cadddr code)) pos))
-                       (array/set! out (inc! pos) (int->bytecode-op (bit-and (bit-shift-right off (caddr code)) #xFF)))
+                       (array/set! out (inc! pos) (bit-and (bit-shift-right off (caddr code)) #xFF))
                        (return pos))
 
                  (defn assemble/emit-relocated-ops (code sym-map pos out)
@@ -418,14 +418,14 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                            (set! pos (assemble/relocate-op code sym-map pos out))
                            (doseq (op code pos)
                                   (case (type-of op)
-                                        (:bytecode-op (array/set! out (inc! pos) op))
-                                        (:pair        (set! pos (assemble/emit-relocated-ops op sym-map pos out)))))))
+                                        (:int  (array/set! out (inc! pos) op))
+                                        (:pair (set! pos (assemble/emit-relocated-ops op sym-map pos out)))))))
 
                  (defn literal-index->bytecode-op (i)
                        (if (< i 256)
-                           (int->bytecode-op i)
-                           (list (int->bytecode-op (bit-and (bit-shift-right i 8) #xFF))
-                                 (int->bytecode-op (bit-and i #xFF)))))
+                           i
+                           (list (bit-and (bit-shift-right i 8) #xFF)
+                                 (bit-and i #xFF))))
 
                  (def *max-literal-arr* 0)
                  (defn assemble/add-literal (lit lit-arr)
@@ -444,40 +444,40 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                        (cond ((pair? (car code))
                               (cons (assemble/build-lit-arr (car code) lit-arr)
                                     (assemble/build-lit-arr (cdr code) lit-arr)))
-                             ((and (= (car code) #$1A)
+                             ((and (= (car code) #x1A)
                                    (= (car (cadr code)) :literal))
                               (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
                               (def index-op (assemble/add-literal (cadar code) lit-arr))
                               (cons (if (pair? index-op)
-                                        #$6
-                                        #$1A)
+                                        #x6
+                                        #x1A)
                                     (cons index-op
                                           (assemble/build-lit-arr (cdr code) lit-arr))))
-                             ((and (= (car code) #$E)
+                             ((and (= (car code) #xE)
                                    (= (car (cadr code)) :literal))
                               (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
                               (def index-op (assemble/add-literal (cadar code) lit-arr))
                               (cons (if (pair? index-op)
-                                        #$F
-                                        #$E)
+                                        #xF
+                                        #xE)
                                     (cons index-op
                                           (assemble/build-lit-arr (cdr code) lit-arr))))
-                             ((and (= (car code) #$5)
+                             ((and (= (car code) #x5)
                                    (= (car (cadr code)) :literal))
                               (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
                               (def index-op (assemble/add-literal (cadar code) lit-arr))
                               (cons (if (pair? index-op)
-                                        #$10
-                                        #$5)
+                                        #x10
+                                        #x5)
                                     (cons index-op
                                           (assemble/build-lit-arr (cdr code) lit-arr))))
-                             ((and (= (car code) #$7)
+                             ((and (= (car code) #x7)
                                    (= (car (cadr code)) :literal))
                               (cdr! code)  ; Skip the literal, especially important for :bytecode-op literals
                               (def index-op (assemble/add-literal (cadar code) lit-arr))
                               (cons (if (pair? index-op)
-                                        #$8
-                                        #$7)
+                                        #x8
+                                        #x7)
                                     (cons index-op
                                           (assemble/build-lit-arr (cdr code) lit-arr))))
                              ((= :literal (car code))

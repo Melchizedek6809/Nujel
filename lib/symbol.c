@@ -58,7 +58,6 @@ lSymbol *lSymLTEnvironment;
 lSymbol *lSymLTMacro;
 lSymbol *lSymLTArray;
 lSymbol *lSymLTTree;
-lSymbol *lSymLTBytecodeOp;
 lSymbol *lSymLTBytecodeArray;
 lSymbol *lSymLTBuffer;
 lSymbol *lSymLTBufferView;
@@ -110,7 +109,6 @@ void lSymbolInit(){
 	lSymLTArray          = lSymSM("array");
 	lSymLTMacro          = lSymSM("macro");
 	lSymLTTree           = lSymSM("tree");
-	lSymLTBytecodeOp     = lSymSM("bytecode-op");
 	lSymLTBytecodeArray  = lSymSM("bytecode-array");
 	lSymLTBuffer         = lSymSM("buffer");
 	lSymLTBufferView     = lSymSM("buffer-view");
@@ -246,7 +244,6 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltArray:       return lSymLTArray;
 		case ltMacro:       return lSymLTMacro;
 		case ltTree:        return lSymLTTree;
-		case ltBytecodeOp:  return lSymLTBytecodeOp;
 		case ltBytecodeArr: return lSymLTBytecodeArray;
 		case ltBuffer:      return lSymLTBuffer;
 		case ltBufferView:  return lSymLTBufferView;

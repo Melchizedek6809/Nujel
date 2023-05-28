@@ -32,26 +32,13 @@ lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, 
 	return ret;
 }
 
-static lVal lnfIntBytecodeOp(lClosure *c, lVal v){
-	const i64 val = requireInt(c, lCar(v));
-	if((val < -128) || (val > 255)){
-		lExceptionThrowValClo("invalid-bc-op", "Bytecode operations have to be within the range -128 - 255", lCar(v), c);
-		return NIL;
-	}
-	return lValBytecodeOp(val);
-}
-
-static lVal lnfBytecodeOpInt(lClosure *c, lVal v){
-	return lValInt(requireBytecodeOp(c, lCar(v)));
-}
-
 static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
 	lArray *arr = requireArray(c, lCar(v));
 	const int len = arr->length;
 	lArray *literals = requireArray(c, lCadr(v));
 	lBytecodeOp *ops = malloc(sizeof(lBytecodeOp) * len);
 	for(int i=0;i<len;i++){
-		ops[i] = requireBytecodeOp(c, arr->data[i]);
+		ops[i] = requireInt(c, arr->data[i]);
 	}
 	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
 		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
@@ -68,14 +55,14 @@ static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 
 	lVal ret = lValAlloc(ltArray, lArrayAlloc(len));
 	for(int i=0;i<len;i++){
-		ret.vArray->data[i] = lValBytecodeOp(arr->data[i]);
+		ret.vArray->data[i] = lValInt(arr->data[i]);
 	}
 	return ret;
 }
 
 static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
 	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
-	if(arr->literals == NULL){return NIL;}
+	if(unlikely(arr->literals == NULL)){return NIL;}
 	return lValAlloc(ltArray, arr->literals);
 }
 
@@ -85,8 +72,6 @@ static lVal lnfBytecodeArrLength(lClosure *c, lVal v){
 }
 
 void lOperationsBytecode(lClosure *c){
-	lAddNativeFuncPure(c,"int->bytecode-op", "(a)", "Turns an integer into a bytecode operation with the same value", lnfIntBytecodeOp);
-	lAddNativeFuncPure(c,"bytecode-op->int", "(a)", "Turns a bytecode operation into an integer of the same value", lnfBytecodeOpInt);
 	lAddNativeFunc(c,"arr->bytecode-arr",    "(a)", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
 	lAddNativeFunc(c,"bytecode-arr->arr",    "(a)", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
 	lAddNativeFunc(c,"bytecode-literals",    "(a)", "Return the literal section of a BCA", lnfBytecodeLiterals);

@@ -383,23 +383,6 @@
 
       (= :bytecode-array (type-of v)))
 
-(defn bytecode-op? (v)
-      "Test whether val is a bytecode operation
-
-      val: This argument is going to be tested
-
-      Whether val is a bytecode op"
-      :cat :type-predicate
-      (deftest #t (bytecode-op? (int->bytecode-op 01)))
-      (deftest #f (bytecode-op? 01))
-      (deftest #f (bytecode-op? #{##()01}))
-      (deftest #f (bytecode-op? (buffer/u8* #m00)))
-      (deftest #f (bytecode-op? #m00))
-      (deftest #f (bytecode-op? []))
-      :inline
-
-      (= :bytecode-op (type-of v)))
-
 (defn procedure? (val)
       "Test whether val is a procedure
 

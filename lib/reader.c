@@ -276,17 +276,6 @@ static lVal lParseCharacter(lReadContext *s){
 	return lValInt(ret);
 }
 
-static lVal lParseBytecodeOp(lReadContext *s){
-	lVal ret = lParseNumber(s, 16, 2);
-	if((ret.vInt < 0) || (ret.vInt > 255)){
-		lExceptionThrowReaderStartEnd(s, "Out of bound op");
-	}
-	const i64 code = ret.vInt;
-	ret.type = ltBytecodeOp;
-	ret.vBytecodeOp = code;
-	return ret;
-}
-
 static NORETURN void throwBCReadError(lReadContext *s, lVal v, const char *msg){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
@@ -419,7 +408,6 @@ static lVal lParseSpecial(lReadContext *s){
 	case 'd': return lParseNumber(s, 10, 18);
 	case 'o': return lParseNumber(s,  8, 21);
 	case 'b': return lParseNumber(s,  2, 64);
-	case '$': return lParseBytecodeOp(s);
 	case 'n':
 		lStringAdvanceToNextSpaceOrSpecial(s);
 		return NIL;

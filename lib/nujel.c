@@ -44,9 +44,6 @@ void simplePrintVal(lVal v){
 	case ltBytecodeArr:
 		fprintf(stderr, "#<bc-arr> ");
 		break;
-	case ltBytecodeOp:
-		fprintf(stderr, "#<bc-op %x> ", v.vBytecodeOp);
-		break;
 	case ltLambda:
 		fprintf(stderr, "#<fn> ");
 		break;

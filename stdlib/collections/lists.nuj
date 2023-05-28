@@ -7,6 +7,10 @@
           "(set! l (cdr l))"
           `(set! ~l (cdr ~l)))
 
+(defmacro cddr! (l)
+          "(set! l (cddr l))"
+          `(set! ~l (cddr ~l)))
+
 (defmacro cons! (v l)
           "Cons V onto L and set! the value for L"
           `(set! ~l (cons ~v ~l)))
