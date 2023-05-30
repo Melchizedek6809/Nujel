@@ -12,6 +12,7 @@
       :export
       (def lines [(buffer/allocate 16)])
       (def buf { :lines lines
+                 :lines-clean []
                  :filename filename
                  :changed #f
                  :pos-x 0
@@ -35,7 +36,7 @@
       (when-not line (return 0))
       (dotimes (i (buffer/length line) (buffer/length line))
                (when (zero? (ref line i))
-                 (return (- i 1)))))
+                 (return i))))
 
 (defn backward-delete-line ()
       :export
@@ -49,6 +50,7 @@
         (inc! pos-y))
       (array/length! lines (max 0 ll))
       (tree/set! buf :pos-y (- (ref buf :pos-y) 1))
+      (line-clean! buf (ref buf :pos-y) #f)
       (tree/set! buf :pos-x (inc (line-length (ref buf :pos-y)))))
 
 (defn backward-char ()
@@ -60,7 +62,8 @@
         (when (< pos-y 1)
           (return))
         (tree/set! buf :pos-y (dec pos-y))
-        (tree/set! buf :pos-x (inc (line-length (dec pos-y))))
+        (line-clean! buf (ref buf :pos-y) #f)
+        (tree/set! buf :pos-x (line-length (dec pos-y)))
         (return))
       (tree/set! buf :pos-x (dec pos-x)))
 
@@ -72,7 +75,8 @@
       (when (< pos-y 1)
         (return))
       (tree/set! buf :pos-y (dec pos-y))
-      (tree/set! buf :pos-x (min pos-x (inc (line-length (dec pos-y))))))
+      (line-clean! buf (ref buf :pos-y) #f)
+      (tree/set! buf :pos-x (min pos-x (line-length (dec pos-y)))))
 
 (defn next-line ()
       :export
@@ -84,7 +88,8 @@
       (when (>= pos-y ll)
         (return))
       (tree/set! buf :pos-y (inc pos-y))
-      (tree/set! buf :pos-x (min pos-x (inc (line-length (inc pos-y))))))
+      (line-clean! buf (ref buf :pos-y) #f)
+      (tree/set! buf :pos-x (min pos-x (line-length (inc pos-y)))))
 
 (defn forward-char ()
       :export
@@ -92,11 +97,12 @@
       (def pos-x (ref buf :pos-x))
       (def pos-y (ref buf :pos-y))
       (def ll (line-length pos-y))
-      (when (> pos-x ll)
+      (when (>= pos-x ll)
         (when (>= (inc pos-y) (array/length (ref buf :lines)))
           (return))
         (tree/set! buf :pos-x 0)
         (tree/set! buf :pos-y (inc pos-y))
+        (line-clean! buf (ref buf :pos-y) #f)
         (return))
       (tree/set! buf :pos-x (inc pos-x)))
 
@@ -110,9 +116,8 @@
         (backward-delete-line)
         (return))
       (def bl (- (buffer/length line) 1))
-      (buffer/set! line (- pos-x 1) 0)
-      (while (< pos-x (- bl 1))
-        (buffer/set! line pos-x (ref line (inc pos-x)))
+      (while (<= pos-x bl)
+        (buffer/set! line (- pos-x 1) (ref line pos-x))
         (inc! pos-x))
       (buffer/set! line bl 0)
       (tree/set! buf :pos-x (- (ref buf :pos-x) 1)))
@@ -125,8 +130,13 @@
                 ; ToDo: add line?
                 (return))
       (def pos-x (ref buf :pos-x))
-      (when (>= pos-x (buffer/length line))
-        (buffer/length! line (+ (buffer/length line) 16)))
+      (def i (- (buffer/length line) 1))
+      (when-not (zero? (ref line i))
+                (buffer/length! line (+ (buffer/length line) 16))
+                (def i (- (buffer/length line) 1)))
+      (while (> i pos-x)
+        (buffer/set! line i (ref line (dec i)))
+        (dec! i))
       (buffer/set! line pos-x c)
       (tree/set! buf :pos-x (inc pos-x)))
 
@@ -134,13 +144,29 @@
       :export
       (def buf cur-buffer)
       (def lines (ref buf :lines))
+      (def lines-clean (ref buf :lines-clean))
       (array/length! lines (inc (array/length lines)))
+      (array/length! lines-clean (array/length lines))
       (array/set! lines (- (array/length lines) 1) (buffer/allocate 16))
       (tree/set! buf :pos-x 0)
-      (tree/set! buf :pos-y (inc (ref buf :pos-y))))
+      (tree/set! buf :pos-y (inc (ref buf :pos-y)))
+      (line-clean! buf (ref buf :pos-y) #f))
 
 (defn get-buf-name (buf)
       :export
       (def filename (ref buf :filename))
       (def saved (if (ref buf :changed) "*" ""))
       (fmt "{filename}{saved}"))
+
+(defn line-clean? (buf line)
+      :export
+      (def lines-clean (ref buf :lines-clean))
+      (when (>= line (array/length lines-clean)) (return #f))
+      (or (ref lines-clean line) #f))
+
+(defn line-clean! (buf line clean)
+      :export
+      (def lines-clean (ref buf :lines-clean))
+      (when (>= line (array/length lines-clean))
+        (array/length! lines-clean (inc line)))
+      (array/set! lines-clean line clean))

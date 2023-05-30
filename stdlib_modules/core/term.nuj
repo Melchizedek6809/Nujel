@@ -10,6 +10,18 @@
       :export
       (stdout 'block-write "\e[2J"))
 
+(defn clear-line ()
+      :export
+      (stdout 'block-write "\e[2K"))
+
+(defn hide-cursor ()
+      :export
+      (stdout 'block-write "\e[?25l"))
+
+(defn show-cursor ()
+      :export
+      (stdout 'block-write "\e[?25h"))
+
 (defn start ()
       :export
       (stdin :raw!)

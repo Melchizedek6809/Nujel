@@ -1,5 +1,5 @@
-(import (start stop clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
-(import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line) :app/termed/buffer)
+(import (start stop show-cursor hide-cursor clear-line clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
+(import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line line-clean! line-clean?) :app/termed/buffer)
 
 (def buffers [])
 (def screen-width #nil)
@@ -33,25 +33,29 @@
 (defn draw-buffer-line (buf term-x term-y term-w line-y)
       (def line (get-line buf line-y))
       (when-not line (return))
+      (move-cursor term-x term-y)
+      (clear-line)
       (when (= line-y (ref buf :pos-y))
         (set-color :yellow :blue))
-      (move-cursor term-x term-y)
       (def ln (fmt " {:4} " (inc line-y)))
       (put-string ln)
       (set-color :default)
       (move-cursor (+ 1 (buffer/length ln) term-x) term-y)
-      (put-string line))
+      (put-string line)
+      (line-clean! buf line-y #t))
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
                (def line-y (+ cy (ref buf :scroll-y)))
-               (draw-buffer-line buf x (+ cy y) w line-y))
+               (when-not (line-clean? buf line-y)
+                         (draw-buffer-line buf x (+ cy y) w line-y)))
       (draw-modeline buf))
 
 (defn draw-screen ()
-      (clear-screen)
       (def cur-buffer (get-cur-buffer))
+      (hide-cursor)
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
+      (show-cursor)
       (move-cursor (+ 1 1 6 (ref cur-buffer :pos-x)) (- (inc (ref cur-buffer :pos-y))
                                                              (ref cur-buffer :scroll-y))))
 
@@ -64,7 +68,7 @@
 
 (defn end-of-line ()
       (def buf (get-cur-buffer))
-      (tree/set! buf :pos-x (inc (line-length (ref buf :pos-y)))))
+      (tree/set! buf :pos-x (line-length (ref buf :pos-y))))
 
 (defn scroll-into-view ()
       (def buf (get-cur-buffer))
@@ -106,6 +110,8 @@
 (defn read-input ()
       (def c (poll-input))
       (set! last-char c)
+      (def buf (get-cur-buffer))
+      (line-clean! buf (ref buf :pos-y) #f)
       (when (= c #x1B)
         (return (read-escaped-input)))
       (when (= c #x01) ; C-a
@@ -133,11 +139,13 @@
 (defn load-buffer (filename)
       (def buf (new-buffer filename))
       (def text (slurp filename))
-      (when text (tree/set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
+      (when text
+        (tree/set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
 
 (defn main (args)
       :export
       (start)
+      (clear-screen)
       (def s (get-size))
       (set! screen-width (ref s :width))
       (set! screen-height (ref s :height))
