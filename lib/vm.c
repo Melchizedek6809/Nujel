@@ -69,6 +69,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	lBytecodeArray * volatile ops = text;
 	lClosure * volatile c = callingClosure;
 	lThread ctx;
+	const lVal * volatile lits = text->literals->data;
 
 	#ifdef NUJEL_USE_JUMPTABLE
 	#undef vmdispatch
@@ -162,6 +163,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 			c = ctx.closureStack[--ctx.csp];
 			ops = c->text;
+			lits = ops->literals->data;
 			ctx.text = ops;
 			ip = c->ip;
 			ctx.sp = c->sp;
@@ -276,11 +278,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopPushValExt) {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
+		ctx.valueStack[ctx.sp++] = lits[v];
 		vmbreak; }
 	vmcase(lopPushVal) {
 		const uint v = *ip++;
-		ctx.valueStack[ctx.sp++] = ops->literals->data[v];
+		ctx.valueStack[ctx.sp++] = lits[v];
 		vmbreak; }
 	vmcase(lopDup)
 		ctx.sp++;
@@ -309,7 +311,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopDefVal)
 		v = *ip++;
 		defValBody:
-		lDefineClosureSym(c, ops->literals->data[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopGetValExt) {
 		uint v;
@@ -319,7 +321,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopGetVal)
 		v = *ip++;
 		getValBody:
-		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, ops->literals->data[v].vSymbol);
+		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, lits[v].vSymbol);
 		vmbreak; }
 	vmcase(lopRef)
 		ctx.valueStack[ctx.sp-2] = lGenericRef(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
@@ -332,7 +334,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopSetVal)
 		v = *ip++;
 		setValBody:
-		lSetClosureSym(c, ops->literals->data[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopZeroPred) {
 		lVal a = ctx.valueStack[ctx.sp-1];
@@ -425,6 +427,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		c->text = bc.vBytecodeArr;
 		ip = c->ip = c->text->data;
 		ctx.text = ops = c->text;
+		lits = ops->literals->data;
 		lBytecodeEnsureSufficientStack(&ctx);
 		lGarbageCollectIfNecessary();
 
@@ -445,6 +448,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			c = ctx.closureStack[ctx.csp];
 			ip = c->ip;
 			ctx.text = ops = c->text;
+			lits = ops->literals->data;
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
 			break;
@@ -465,6 +469,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			c   = ctx.closureStack[--ctx.csp];
 			ip  = c->ip;
 			ops = c->text;
+			lits = ops->literals->data;
 			ctx.text = ops;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = ret;
