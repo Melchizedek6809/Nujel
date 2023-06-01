@@ -103,3 +103,6 @@ benchmark-nujel: release
 update-stdlib: tmp/stdlib.c tmp/binlib.c
 	cp -f tmp/stdlib.c bootstrap/stdlib.c
 	cp -f tmp/binlib.c bootstrap/binlib.c
+
+show-section-size: $(NUJEL)
+	nm --print-size --size-sort --radix=d $<

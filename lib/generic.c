@@ -13,7 +13,7 @@ static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
 		lExceptionThrowValClo("type-error", "Can't ref that", car, c);
 	}
 	if(unlikely(i >= length)){
-		lExceptionThrowValClo("out-of-bounds","(buffer/view/ref] index provided is out of bounds", car, c);
+		lExceptionThrowValClo("out-of-bounds","ref - index provided is out of bounds", car, c);
 	}
 
 	switch(viewType){
@@ -65,9 +65,9 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		return arr->data[i]; }
 	case ltString:
 	case ltBuffer: {
-		const char *buf = col.vBuffer->data;
+		const char *buf  = col.vBuffer->data;
 		const size_t len = col.vBuffer->length;
-		const size_t i = requireNaturalInt(c, key);
+		const size_t i   = requireNaturalInt(c, key);
 		if(unlikely(len <= i)){
 			lExceptionThrowValClo("out-of-bounds","(ref) buffer index provided is out of bounds", col, c);
 		}
