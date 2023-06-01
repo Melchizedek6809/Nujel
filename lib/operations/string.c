@@ -91,7 +91,7 @@ static lVal lnfStringCut(lClosure *c, lVal v){
 	}
 
 	const char *buf = str.vString->data;
-	slen = len = lStringLength(str.vString);
+	slen = len = lBufferLength(str.vString);
 	start = MAX(0, requireInt(c, lCadr(v)));
 	lVal lenV = lCaddr(v);
 	len = MIN(slen - start, (((lenV.type == ltInt)) ? lenV.vInt : len) - start);

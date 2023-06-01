@@ -83,7 +83,7 @@ static lVal lnfQuit(lClosure *c, lVal v){
 static lVal lnfFileRemove(lClosure *c, lVal v){
 	lVal car = lCar(v);
 	lString *filename = requireString(c, car);
-	unlink(lStringData(filename));
+	unlink(lBufferData(filename));
 	return car;
 }
 
@@ -138,7 +138,7 @@ static lVal lnfFileStat(lClosure *c, lVal v){
 	return ret;
 #else
 	struct stat statbuf;
-	int err = stat(lStringData(filename), &statbuf);
+	int err = stat(lBufferData(filename), &statbuf);
 	lVal ret = lValTree(NULL);
 	lTreeRoot *t = ret.vTree;
 	t->root = lTreeInsert(t->root, lsError, lValBool(err));
@@ -171,7 +171,7 @@ static lVal lnfPopen(lClosure *c, lVal v){
 	int bufSize = readSize;
 	char *buf = malloc(readSize);
 
-	FILE *child = popen(lStringData(command), "r");
+	FILE *child = popen(lBufferData(command), "r");
 	if(child == NULL){
 		free(buf);
 		return NIL;
@@ -278,17 +278,17 @@ static lVal lnfDirectoryRead(lClosure *c, lVal v){
 
 static lVal lnfDirectoryMake(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(makeDir(lStringData(path)) == 0);
+	return lValBool(makeDir(lBufferData(path)) == 0);
 }
 
 static lVal lnfDirectoryRemove(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(rmdir(lStringData(path)) == 0);
+	return lValBool(rmdir(lBufferData(path)) == 0);
 }
 
 static lVal lnfChangeDirectory(lClosure *c, lVal v){
 	lString *path = requireString(c, lCar(v));
-	return lValBool(chdir(lStringData(path)) == 0);
+	return lValBool(chdir(lBufferData(path)) == 0);
 }
 
 static lVal lnfGetCurrentWorkingDirectory(lClosure *c, lVal v){

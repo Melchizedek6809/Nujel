@@ -68,7 +68,7 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "%f ", v.vFloat);
 		break;
 	case ltString:
-		fprintf(stderr, "%s ", lStringData(v.vString));
+		fprintf(stderr, "%s ", (const char *)lBufferData(v.vString));
 		break;
 	case ltKeyword:
 		fprintf(stderr, ":"); // fall-through

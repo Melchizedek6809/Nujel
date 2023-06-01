@@ -189,7 +189,7 @@ static void lRootsMark(){
 		case ltLambda:
 			lClosureGCMark(rootStack[i].vClosure);
 			break;
-		case ltThread:
+		case ltEnvironment:
 			lThreadGCMark(rootStack[i].vThread);
 			break;
 		default:
@@ -221,7 +221,7 @@ lSymbol *lRootsSymbolPush(lSymbol *v){
 	return lRootsPush(ltSymbol, v);
 }
 lThread *lRootsThreadPush(lThread *v){
-	return lRootsPush(ltThread, v);
+	return lRootsPush(ltEnvironment, v);
 }
 
 /* Mark the roots so they will be skipped by the GC,  */

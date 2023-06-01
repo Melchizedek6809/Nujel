@@ -68,7 +68,6 @@ typedef enum {
 	ltMacro,
 	ltNativeFunc,
 	ltEnvironment,
-	ltThread,
 
 	ltString,
 	ltBuffer,
@@ -79,18 +78,18 @@ typedef enum {
 	ltComment
 } lType;
 
-typedef struct lBuffer lBuffer;
-typedef struct lBufferView lBufferView;
-typedef struct lArray   lArray;
-typedef struct lClosure lClosure;
-typedef struct lThread  lThread;
-typedef struct lNFunc   lNFunc;
-typedef struct lSymbol  lSymbol;
-typedef struct lTree    lTree;
-typedef struct lTreeRoot lTreeRoot;
-typedef struct lVec     lVec;
-typedef struct lVal     lVal;
-typedef struct lPair    lPair;
+typedef struct lBuffer        lBuffer;
+typedef struct lBufferView    lBufferView;
+typedef struct lArray         lArray;
+typedef struct lClosure       lClosure;
+typedef struct lThread        lThread;
+typedef struct lNFunc         lNFunc;
+typedef struct lSymbol        lSymbol;
+typedef struct lTree          lTree;
+typedef struct lTreeRoot      lTreeRoot;
+typedef struct lVec           lVec;
+typedef struct lVal           lVal;
+typedef struct lPair          lPair;
 typedef struct lBytecodeArray lBytecodeArray;
 typedef uint8_t lBytecodeOp;
 typedef lBuffer lString;
@@ -108,7 +107,6 @@ struct lVal {
 		bool            vBool;
 		i64             vInt;
 		double          vFloat;
-		lBytecodeOp     vBytecodeOp;
 		lPair*          vList;
 		const lSymbol * vSymbol;
 		FILE *          vFileHandle;
@@ -146,11 +144,9 @@ lClosure *lNewRoot ();
 lVal      lApply   (lClosure *c, lVal args, lVal fun);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
-const char *         lStringData            (const lString *v);
 const void *         lBufferData            (lBuffer *v);
 void *               lBufferDataMutable     (lBuffer *v);
 size_t               lBufferLength          (const lBuffer *v);
-static inline size_t lStringLength          (const lString *v){return lBufferLength(v);}
 const void *         lBufferViewData        (lBufferView *v);
 void *               lBufferViewDataMutable (lBufferView *v);
 size_t               lBufferViewLength      (const lBufferView *v);
@@ -271,17 +267,17 @@ static inline lVal lValBool(bool v){
 
 lTreeRoot *lTreeRootAllocRaw();
 static inline lVal lValTree(lTree *v){
-	lVal ret = lValAlloc(ltTree, lTreeRootAllocRaw());
-	ret.vTree->root = v;
-	return ret;
+	lTreeRoot *root = lTreeRootAllocRaw();
+	root->root = v;
+	return (lVal){ltTree, .vTree = root};
 }
 
 static inline lVal lValEnvironment(lClosure *v){
-	return lValAlloc(ltEnvironment, v);
+	return (lVal){ltEnvironment, .vClosure = v};
 }
 
 static inline lVal lValLambda(lClosure *v){
-	return lValAlloc(ltLambda, v);
+	return (lVal){ltLambda, .vClosure = v};
 }
 
 /* Return a newly allocated nujel symbol of value S */
@@ -307,7 +303,7 @@ static inline lVal lValKeyword(const char *s){
 }
 
 static inline lVal lValFileHandle(FILE *fh){
-	return lValAlloc(ltFileHandle, fh);
+	return (lVal){ltFileHandle, .vFileHandle = fh};
 }
 
 lVal     lValString       (const char *s);
@@ -317,9 +313,9 @@ lVal     lValStringNoCopy (const char *s, int len);
 /*
  | Allocator related procedures
  */
-lArray *         lArrayAlloc  (size_t len);
-lBuffer *        lBufferAlloc (size_t length, bool immutable);
-lString *        lStringNew   (const char *str, uint len);
-lString *        lStringDup   (const lString *s);
+lArray  *lArrayAlloc  (size_t len);
+lBuffer *lBufferAlloc (size_t length, bool immutable);
+lString *lStringNew   (const char *str, uint len);
+lString *lStringDup   (const lString *s);
 
 #endif

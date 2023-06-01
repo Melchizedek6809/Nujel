@@ -39,7 +39,7 @@ static lVal lnfFileRaw(lClosure *c, lVal v){
 
 static lVal lnfFileOpenOutput(lClosure *c, lVal v){
 	lString *pathname = requireString(c, lCar(v));
-	const char *path = lStringData(pathname);
+	const char *path = lBufferData(pathname);
 	const lSymbol *mode = optionalSymbolic(c, lCadr(v), lSymError);
 
 	FILE *fh = NULL;
@@ -63,7 +63,7 @@ static lVal lnfFileOpenOutput(lClosure *c, lVal v){
 
 static lVal lnfFileOpenInput(lClosure *c, lVal v){
 	lString *pathname = requireString(c, lCar(v));
-	FILE *fh = fopen(lStringData(pathname), "rb");
+	FILE *fh = fopen(lBufferData(pathname), "rb");
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
@@ -128,9 +128,6 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 		lExceptionThrowValClo("type-error", "Can't read into that", contentV, c);
 		return NIL;
 	case ltString:
-		buf = lStringData(contentV.vBuffer);
-		bufSize = lStringLength(contentV.vBuffer);
-		break;
 	case ltBuffer:
 		buf = lBufferData(contentV.vBuffer);
 		bufSize = lBufferLength(contentV.vBuffer);

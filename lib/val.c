@@ -52,8 +52,8 @@ i64 lValGreater(const lVal a, const lVal b){
 	case ltFloat:
 		return a.vFloat < b.vFloat ? -1 : 1;
 	case ltString: {
-		const uint alen = lStringLength(a.vString);
-		const uint blen = lStringLength(b.vString);
+		const uint alen = lBufferLength(a.vString);
+		const uint blen = lBufferLength(b.vString);
 		const uint len = MIN(alen,blen);
 		const char *ab = a.vString->data;
 		const char *bb = b.vString->data;
@@ -78,8 +78,8 @@ bool lValEqual(const lVal a, const lVal b){
 		}
 		return false;
 	} else if(unlikely(a.type == ltString)){
-		const uint alen = lStringLength(a.vString);
-		const uint blen = lStringLength(b.vString);
+		const uint alen = lBufferLength(a.vString);
+		const uint blen = lBufferLength(b.vString);
 		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
 	}
 	return a.vPointer == b.vPointer;
