@@ -36,7 +36,6 @@ static inline lVal lValComment(){
 }
 lType lTypecast(const lType a, const lType b);
 
-
 struct lArray {
 	lVal *data;
 	union {

@@ -50,9 +50,12 @@ const char *castToString(const lVal v, const char *fallback){
 
 /* Determine which type has the highest precedence between a and b */
 lType lTypecast(const lType a, const lType b){
-	if (a == b){ return a;}
-	if((a == ltFloat) || (b == ltFloat)){return ltFloat;}
-	if((a == ltInt)   || (b == ltInt))  {return ltInt;}
+	if (likely(a == b)){
+		return a;
+	}
+	if((a == ltFloat) || (b == ltFloat)){
+		return ltFloat;
+	}
 	return ltNil;
 }
 
