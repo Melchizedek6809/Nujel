@@ -12,21 +12,15 @@
 #ifndef NUJEL_AMALGAMATION
 #include "nujel.h"
 #endif
-#include <setjmp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
 /*
- | Core/Exception handling
+ | Core
  */
-#define RECURSION_DEPTH_MAX (1<<14)
 #define MAX_OPEN_FILE_DESCRIPTORS 256
 #define PI    (3.1415926535897932384626433832795)
-
-extern jmp_buf exceptionTarget;
-extern lVal    exceptionValue;
-extern int     exceptionTargetDepth;
 
 static inline bool isComment(lVal v){
 	return v.type == ltComment;
@@ -226,13 +220,14 @@ typedef enum lOpcode {
 	lopRef             = 0x2B,
 	lopCadr            = 0x2C,
 	lopMutableEval     = 0x2D,
-	lopList            = 0x2E
+	lopList            = 0x2E,
+	lopThrow           = 0x2F
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lLambda              (lClosure *c, lVal args, lVal lambda);
-lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure);
+lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 void  simplePrintVal       (lVal v);
 void  simplePrintTree      (lTree *t);
 
@@ -365,10 +360,9 @@ void      lSymbolFree   (lSymbol *s);
 lSymbol  *getTypeSymbol (const lVal a);
 lSymbol  *getTypeSymbolT(const lType T);
 
-lBytecodeOp     requireBytecodeOp       (lClosure *c, lVal v);
-lBytecodeArray *requireBytecodeArray    (lClosure *c, lVal v);
-lClosure       *requireClosure          (lClosure *c, lVal v);
-lVal            requireEnvironment      (lClosure *c, lVal v);
+lVal requireBytecodeOp       (lVal v);
+lVal requireBytecodeArray    (lVal v);
+lVal requireClosure          (lVal v);
 
 lNFunc *         lNFuncAlloc         ();
 void             lNFuncFree          (lNFunc *n);
@@ -394,11 +388,11 @@ void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
 
-lVal lAdd(lClosure *c, lVal a, lVal b);
-lVal lSub(lClosure *c, lVal a, lVal b);
-lVal lMul(lClosure *c, lVal a, lVal b);
-lVal lDiv(lClosure *c, lVal a, lVal b);
-lVal lRem(lClosure *c, lVal a, lVal b);
+lVal lAdd(lVal a, lVal b);
+lVal lSub(lVal a, lVal b);
+lVal lMul(lVal a, lVal b);
+lVal lDiv(lVal a, lVal b);
+lVal lRem(lVal a, lVal b);
 
 lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lClosure *c, lVal col, lVal key);

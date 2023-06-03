@@ -8,19 +8,31 @@
 #include <string.h>
 
 static lVal lnfArrLength(lClosure *c, lVal v){
-	lArray *arr = requireArray(c, lCar(v));
+	(void)c;
+	lVal car = requireArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lArray *arr = car.vArray;
 	return lValInt(arr->length);
 }
 
 static lVal lnfArrLengthSet(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	lArray *arr = requireArray(c, car);
-	const int length = requireNaturalInt(c, lCadr(v));
+	(void)c;
+	lVal car = requireArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lArray *arr = car.vArray;
+	lVal lenVal = requireNaturalInt(lCadr(v));
+	if(unlikely(lenVal.type == ltException)){
+		return lenVal;
+	}
+	const int length = lenVal.vInt;
 	lVal *newData = realloc(arr->data,length * sizeof(lVal));
 	if (unlikely(newData == NULL)) {
 		free(newData);
-		lExceptionThrowValClo("out-of-memory", "(array/allocate) couldn't allocate its array", v, c);
-		return NIL;
+		return lValException("out-of-memory", "(array/allocate) couldn't allocate its array", v);
 	}
 	arr->data = newData;
 	if(length > arr->length){
@@ -31,28 +43,38 @@ static lVal lnfArrLengthSet(lClosure *c, lVal v){
 }
 
 static lVal lnfArrSet(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	lArray *arr = requireMutableArray(c, car);
-	const int key = requireInt(c, lCadr(v));
+	(void)c;
+	lVal car = requireMutableArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lArray *arr = car.vArray;
+	lVal keyV = requireInt(lCadr(v));
+	if(unlikely(keyV.type == ltException)){
+		return keyV;
+	}
+	const int key = keyV.vInt;
 	if((key < 0) || (key >= arr->length)){
-		lExceptionThrowValClo("out-of-bounds","(array/set!] index provided is out of bounds", v, c);
-		return NIL;
+		return lValException("out-of-bounds","(array/set!) index provided is out of bounds", v);
 	}
 	const lVal vt = lCddr(v);
 	if(vt.type != ltPair){
-		lExceptionThrowValClo("type-mismatch","(array/set!] needs a third argument", v, c);
-		return NIL;
+		return lValException("type-mismatch","(array/set!) needs a third argument", v);
 	}
 	arr->data[key] = vt.vList->car;
 	return car;
 }
 
 static lVal lnfArrAllocate(lClosure *c, lVal v){
-	const int len = requireNaturalInt(c, lCar(v));
+	(void)c;
+	lVal lenV = requireNaturalInt(lCar(v));
+	if(unlikely(lenV.type == ltException)){
+		return lenV;
+	}
+	const int len = lenV.vInt;
 	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
-	if(len && (r.vArray->data == NULL)){
-		lExceptionThrowValClo("out-of-memory","(array/allocate] couldn't allocate its array", v, c);
-		return NIL;
+	if(unlikely(len && (r.vArray->data == NULL))){
+		return lValException("out-of-memory","(array/allocate] couldn't allocate its array", v);
 	}
 	return r;
 }

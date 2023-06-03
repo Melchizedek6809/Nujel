@@ -33,7 +33,7 @@ tmp/binlib.c: tmp/binlib.no $(NUJEL)
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
 run: $(FUTURE_NUJEL)
-	@./$(FUTURE_NUJEL) --only-test-suite tools/tests.nuj
+	@./$(FUTURE_NUJEL) tools/tests.nuj
 
 test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj

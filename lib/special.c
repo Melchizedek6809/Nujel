@@ -8,8 +8,8 @@ char *errorSym = "vm-error";
 char *errorMsg = "Gotta use bytecode";
 #define lVMErrorPlaceholder(sym) \
 	static lVal sym (lClosure *c, lVal v){			\
-		lExceptionThrowValClo(errorSym, errorMsg, v, c);\
-		return NIL;					\
+		(void)c; \
+		return lValException(errorSym, errorMsg, v); \
 	}
 
 lVMErrorPlaceholder(lnfAnd)
@@ -30,6 +30,7 @@ lVMErrorPlaceholder(lnfMutableEval)
 lVMErrorPlaceholder(lnfRef)
 lVMErrorPlaceholder(lnfCadr)
 lVMErrorPlaceholder(lnfList)
+lVMErrorPlaceholder(lnfThrow)
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",              "body",                    "Evaluate body in order and returns the last result", lnfDo);
@@ -50,4 +51,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"list",            "arguments",               "Return ARGUMENTS as a list", lnfList);
 	lAddNativeFuncPure(c,"ref",         "(collection key)",        "Look up key in collection", lnfRef);
 	lAddNativeFuncPure(c,"cadr",        "(list)",                  "Look up the cadr of list", lnfCadr);
+	lAddNativeFunc(c,"throw",           "(v)",                     "Throw V to the closest exception handler", lnfThrow);
 }

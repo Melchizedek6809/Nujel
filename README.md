@@ -18,7 +18,6 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Garbage collection (simple Mark-and-Sweep for now)
 - [X] Extensive test suite
 - [X] Lexical scoping
-- [X] Exceptions (using setjmp/longjmp)
 - [X] WASM support (only via Emscripten)
 - [X] Formatted output (inspired by Python/Rust/Zig)
 - [X] Maps (using binary trees)
@@ -29,6 +28,7 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Printer written in Nujel
 - [X] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [X] Value types
+- [X] Exceptions (without using setjmp/longjmp)
 - [ ] Proper object system
 - [ ] Tail-call optimization
 - [ ] Fibers

@@ -16,8 +16,13 @@ static void disableRawMode() {
 }
 
 static lVal lnfFileRaw(lClosure *c, lVal v){
+	(void)c;
 	struct termios raw;
-	FILE *fh = requireFileHandle(c, lCar(v));
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 
 	tcgetattr(fileno(fh), &raw);
 	if(!rawMode){
@@ -38,9 +43,18 @@ static lVal lnfFileRaw(lClosure *c, lVal v){
 
 
 static lVal lnfFileOpenOutput(lClosure *c, lVal v){
-	lString *pathname = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *pathname = car.vString;
 	const char *path = lBufferData(pathname);
-	const lSymbol *mode = optionalSymbolic(c, lCadr(v), lSymError);
+	lVal cadr = optionalSymbolic(lCadr(v), lSymError);
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	const lSymbol *mode = cadr.vSymbol;
 
 	FILE *fh = NULL;
 	if(mode == lSymError){
@@ -55,28 +69,47 @@ static lVal lnfFileOpenOutput(lClosure *c, lVal v){
 	}else if(mode == lSymAppend){
 		fh = fopen(path, "ab");
 	}else{
-		lExceptionThrowValClo("type-error", "Don't know that particular behaviour: ", lCadr(v), c);
+		return lValException("type-error", "Don't know that particular behaviour: ", lCadr(v));
 	}
 
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
 static lVal lnfFileOpenInput(lClosure *c, lVal v){
-	lString *pathname = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *pathname = car.vString;
 	FILE *fh = fopen(lBufferData(pathname), "rb");
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
 static lVal lnfFileClose(lClosure *c, lVal v){
-	FILE *fh = requireFileHandle(c, lCar(v));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 	fclose(fh);
 	return NIL;
 }
 
 static lVal lnfFileReadAst(lClosure *c, lVal v){
-	FILE *fh = requireFileHandle(c, lCar(v));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 	lVal contentV = lCadr(v);
-	const i64 size = requireNaturalInt(c, lCaddr(v));
+	lVal sizeV = requireNaturalInt(lCaddr(v));
+	if(unlikely(sizeV.type == ltException)){
+		return sizeV;
+	}
+	const i64 size = sizeV.vInt;
 	const i64 offset = castToInt(lCadddr(v), 0);
 
 	void *buf = NULL;
@@ -84,8 +117,7 @@ static lVal lnfFileReadAst(lClosure *c, lVal v){
 	i64 bytesRead = 0;
 	typeswitch(contentV){
 	default:
-		lExceptionThrowValClo("type-error", "Can't read into that", contentV, c);
-		return NIL;
+		return lValException("type-error", "Can't read into that", contentV);
 	case ltBuffer:
 		buf = lBufferDataMutable(contentV.vBuffer);
 		bufSize = lBufferLength(contentV.vBuffer);
@@ -96,15 +128,15 @@ static lVal lnfFileReadAst(lClosure *c, lVal v){
 		break;
 	}}
 	if(buf == NULL){
-		lExceptionThrowValClo("type-error", "Can't read into an immutable buffer", contentV, c);
+		return lValException("type-error", "Can't read into an immutable buffer", contentV);
 	}
 	if((bufSize - offset) < size){
-		lExceptionThrowValClo("type-error", "Buffer is too small for that read operation", contentV, c);
+		return lValException("type-error", "Buffer is too small for that read operation", contentV);
 	}
 	while(bytesRead < size){
 		const int r = fread(&((u8 *)buf)[offset + bytesRead], 1, size - bytesRead, fh);
 		if(ferror(fh)){
-			lExceptionThrowValClo("io-error", "IO Error occured during read", lCar(v), c);
+			return lValException("io-error", "IO Error occured during read", lCar(v));
 		}
 		if(feof(fh)){
 			return NIL;
@@ -115,7 +147,12 @@ static lVal lnfFileReadAst(lClosure *c, lVal v){
 }
 
 static lVal lnfFileWriteAst(lClosure *c, lVal v){
-	FILE *fh = requireFileHandle(c, lCar(v));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 	lVal contentV = lCadr(v);
 	i64 size = castToInt(lCaddr(v), -1);
 	const i64 offset = castToInt(lCadddr(v), 0);
@@ -125,8 +162,7 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 	i64 bytesWritten = 0;
 	typeswitch(contentV){
 	default:
-		lExceptionThrowValClo("type-error", "Can't read into that", contentV, c);
-		return NIL;
+		return lValException("type-error", "Can't read into that", contentV);
 	case ltString:
 	case ltBuffer:
 		buf = lBufferData(contentV.vBuffer);
@@ -138,18 +174,18 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 		break;
 	}}
 	if(buf == NULL){
-		lExceptionThrowValClo("type-error", "Can't read into an immutable buffer", contentV, c);
+		return lValException("type-error", "Can't read into an immutable buffer", contentV);
 	}
 	if(size < 0){
 		size = bufSize - offset;
 	}
 	if((bufSize - offset) < size){
-		lExceptionThrowValClo("type-error", "Buffer is too small for that read operation", contentV, c);
+		return lValException("type-error", "Buffer is too small for that read operation", contentV);
 	}
 	while(bytesWritten < size){
 		const int r = fwrite(&((u8 *)buf)[offset + bytesWritten], 1, size - bytesWritten, fh);
 		if(ferror(fh)){
-			lExceptionThrowValClo("io-error", "IO Error occured during write", lCar(v), c);
+			return lValException("io-error", "IO Error occured during write", lCar(v));
 		}
 		if(r > 0){ bytesWritten += r; }
 	}
@@ -158,25 +194,46 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 }
 
 static lVal lnfFileFlush(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	FILE *fh = requireFileHandle(c, car);
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 	fflush(fh);
 	return car;
 }
 
 static lVal lnfFileTell(lClosure *c, lVal v){
-	FILE *fh = requireFileHandle(c, lCar(v));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
 	const i64 pos = ftell(fh);
 	return lValInt(pos);
 }
 
 static lVal lnfFileSeek(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	FILE *fh = requireFileHandle(c, car);
-	const i64 offset = requireInt(c, lCadr(v));
-	const i64 whenceRaw = requireInt(c, lCaddr(v));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	FILE *fh = car.vFileHandle;
+	lVal offV = requireInt(lCadr(v));
+	if(unlikely(offV.type == ltException)){
+		return offV;
+	}
+	const i64 offset = offV.vInt;
+	lVal whenceV = requireInt(lCaddr(v));
+	if(unlikely(whenceV.type == ltException)){
+		return whenceV;
+	}
+	const i64 whenceRaw = whenceV.vInt;
 	if((whenceRaw < 0) || (whenceRaw > 2)){
-		lExceptionThrowValClo("type-error", "Whence has to be in the range 0-2", lCaddr(v), c);
+		return lValException("type-error", "Whence has to be in the range 0-2", lCaddr(v));
 	}
 	const int whence = whenceRaw == 0 ? SEEK_SET : whenceRaw == 1 ? SEEK_CUR : SEEK_END;
 	fseek(fh, offset, whence);
@@ -184,11 +241,21 @@ static lVal lnfFileSeek(lClosure *c, lVal v){
 }
 
 static lVal lnfFileEof(lClosure *c, lVal v){
-	return lValBool(feof(requireFileHandle(c, lCar(v))));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lValBool(feof(car.vFileHandle));
 }
 
 static lVal lnfFileError(lClosure *c, lVal v){
-	return lValBool(ferror(requireFileHandle(c, lCar(v))));
+	(void)c;
+	lVal car = requireFileHandle(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lValBool(ferror(car.vFileHandle));
 }
 
 void lOperationsPort(lClosure *c){

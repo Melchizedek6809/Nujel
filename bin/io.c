@@ -81,8 +81,12 @@ static lVal lnfQuit(lClosure *c, lVal v){
 }
 
 static lVal lnfFileRemove(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	lString *filename = requireString(c, car);
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *filename = car.vString;
 	unlink(lBufferData(filename));
 	return car;
 }
@@ -99,7 +103,12 @@ LONGLONG FileTime_to_POSIX(FILETIME ft) {
 #endif
 
 static lVal lnfFileStat(lClosure *c, lVal v){
-	lString* filename = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString* filename = car.vString;
 #ifdef _MSC_VER
 	WIN32_FIND_DATA ffd;
 	LARGE_INTEGER filesize;
@@ -164,7 +173,12 @@ static lVal lnfFileStat(lClosure *c, lVal v){
 
 #ifdef ENABLE_POPEN
 static lVal lnfPopen(lClosure *c, lVal v){
-	lString *command = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *command = car.vString;
 
 	const int readSize = 1<<12;
 	int len   = 0;
@@ -277,17 +291,32 @@ static lVal lnfDirectoryRead(lClosure *c, lVal v){
 }
 
 static lVal lnfDirectoryMake(lClosure *c, lVal v){
-	lString *path = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *path = car.vString;
 	return lValBool(makeDir(lBufferData(path)) == 0);
 }
 
 static lVal lnfDirectoryRemove(lClosure *c, lVal v){
-	lString *path = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *path = car.vString;
 	return lValBool(rmdir(lBufferData(path)) == 0);
 }
 
 static lVal lnfChangeDirectory(lClosure *c, lVal v){
-	lString *path = requireString(c, lCar(v));
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *path = car.vString;
 	return lValBool(chdir(lBufferData(path)) == 0);
 }
 

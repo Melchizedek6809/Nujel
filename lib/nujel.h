@@ -14,11 +14,9 @@
 #include <stdio.h>
 
 #if defined(_MSC_VER)
-#define NORETURN
 #define likely(x)   x
 #define unlikely(x) x
 #else
-#define NORETURN __attribute__((noreturn))
 #define likely(x)      __builtin_expect(!!(x), 1)
 #define unlikely(x)    __builtin_expect(!!(x), 0)
 #endif
@@ -75,7 +73,8 @@ typedef enum {
 	ltBytecodeArr,
 
 	ltFileHandle,
-	ltComment
+	ltComment,
+	ltException
 } lType;
 
 typedef struct lBuffer        lBuffer;
@@ -174,8 +173,7 @@ static inline lVal lCddr  (lVal v){return lCdr(lCdr(v));}
 static inline lVal lCaddr (lVal v){return lCar(lCdr(lCdr(v)));}
 static inline lVal lCadddr(lVal v){return lCar(lCdr(lCdr(lCdr(v))));}
 
-void  lExceptionThrowRaw    (lVal v) NORETURN;
-void  lExceptionThrowValClo (const char *symbol, const char *error, lVal v, lClosure *c) NORETURN;
+lVal  lValException         (const char *symbol, const char *error, lVal v);
 
 /*
  | Reader/Printer
@@ -188,28 +186,28 @@ lVal lRead(lClosure *c, const char *str);
 i64             castToInt        (const lVal v, i64 fallback);
 bool            castToBool       (const lVal v);
 const char *    castToString     (const lVal v, const char *fallback);
-const lSymbol * optionalSymbolic (lClosure *c, lVal v, const lSymbol *fallback);
 
-NORETURN void   throwTypeError          (lClosure *c, lVal v, lType T);
-NORETURN void   throwArityError         (lClosure *c, lVal v, int arity);
-i64             requireInt              (lClosure *c, lVal v);
-i64             requireNaturalInt       (lClosure *c, lVal v);
-double          requireFloat            (lClosure *c, lVal v);
-FILE *          requireFileHandle       (lClosure *c, lVal v);
-lArray *        requireArray            (lClosure *c, lVal v);
-lArray *        requireMutableArray     (lClosure *c, lVal v);
-const lSymbol * requireSymbol           (lClosure *c, lVal v);
-const lSymbol * requireKeyword          (lClosure *c, lVal v);
-const lSymbol * requireSymbolic         (lClosure *c, lVal v);
-lString *       requireString           (lClosure *c, lVal v);
-lTreeRoot *     requireTree             (lClosure *c, lVal v);
-lTreeRoot *     requireMutableTree      (lClosure *c, lVal v);
-lVal            requireCallable         (lClosure *c, lVal v);
-lVal            requirePair             (lClosure *c, lVal v);
-lBuffer *       requireBuffer           (lClosure *c, lVal v);
-lBuffer *       requireMutableBuffer    (lClosure *c, lVal v);
-lBufferView *   requireBufferView       (lClosure *c, lVal v);
-lBufferView *   requireMutableBufferView(lClosure *c, lVal v);
+lVal            lValExceptionType       (lVal v, lType T);
+lVal            lValExceptionArity      (lVal v, int arity);
+lVal            requireInt              (lVal v);
+lVal            requireNaturalInt       (lVal v);
+lVal            requireFloat            (lVal v);
+lVal            optionalSymbolic        (lVal v, const lSymbol *fallback);
+lVal            requireSymbol           (lVal v);
+lVal            requireKeyword          (lVal v);
+lVal            requireSymbolic         (lVal v);
+lVal            requireFileHandle       (lVal v);
+lVal            requireArray            (lVal v);
+lVal            requireMutableArray     (lVal v);
+lVal            requireTree             (lVal v);
+lVal            requireMutableTree      (lVal v);
+lVal            requireString           (lVal v);
+lVal            requireCallable         (lVal v);
+lVal            requirePair             (lVal v);
+lVal            requireBuffer           (lVal v);
+lVal            requireMutableBuffer    (lVal v);
+lVal            requireBufferView       (lVal v);
+lVal            requireMutableBufferView(lVal v);
 
 /*
  | Closure related procedores
@@ -248,11 +246,12 @@ lSymbol  *lSymSL        (const char *s, uint len);
 /*
  | lVal related procedures
  */
-static inline lVal lValFloat(lClosure *c, double v){
+static inline lVal lValFloat(double v){
 	if(unlikely(__builtin_isnan(v))){
-		lExceptionThrowValClo("float-nan","NaN is disallowed in Nujel", NIL, c);
-	}else if(unlikely(__builtin_isinf(v))){
-		lExceptionThrowValClo("float-inf","INF is disallowed in Nujel", NIL, c);
+		return lValException("float-nan","NaN is disallowed in Nujel", NIL);
+	}
+	if(unlikely(__builtin_isinf(v))){
+		return lValException("float-inf","INF is disallowed in Nujel", NIL);
 	}
 	return (lVal){ltFloat, .vFloat = v};
 }

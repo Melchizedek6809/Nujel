@@ -86,13 +86,16 @@ static lVal lnfStringCut(lClosure *c, lVal v){
 	i64 start, slen, len;
 	lVal str = lCar(v);
 	if(unlikely(str.type != ltString)){
-		lExceptionThrowValClo("type-error","(string/cut) expects a string as its first and only argument", v, c);
-		return NIL;
+		return lValException("type-error","(string/cut) expects a string as its first and only argument", v);
 	}
 
 	const char *buf = str.vString->data;
 	slen = len = lBufferLength(str.vString);
-	start = MAX(0, requireInt(c, lCadr(v)));
+	lVal startV = requireInt(lCadr(v));
+	if(unlikely(startV.type == ltException)){
+		return startV;
+	}
+	start = MAX(0, startV.vInt);
 	lVal lenV = lCaddr(v);
 	len = MIN(slen - start, (((lenV.type == ltInt)) ? lenV.vInt : len) - start);
 

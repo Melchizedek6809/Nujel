@@ -182,72 +182,135 @@ lTree *lTreeDup(const lTree *t){
 }
 
 lVal lnfTreeNew(lClosure* c, lVal v) {
+	(void)c;
 	lTreeRoot *t = lTreeRootAllocRaw();
 	lVal ret = lValAlloc(ltTree, t);
 
 	for (lVal n = v; n.type == ltPair; n = lCddr(n)) {
 		lVal car = lCar(n);
 		if (car.type == ltNil) { break; }
-		t->root = lTreeInsert(t->root, requireSymbolic(c, car), lCadr(n));
+		car = requireSymbolic(car);
+		if(unlikely(car.type == ltException)){
+			return car;
+		}
+		t->root = lTreeInsert(t->root, car.vSymbol, lCadr(n));
 	}
 	return ret;
 }
 
 static lVal lnfTreeGetKeys(lClosure* c, lVal v) {
-	return lTreeKeysToList(requireTree(c, lCar(v))->root);
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lTreeKeysToList(car.vTree->root);
 }
 
 static lVal lnfTreeGetValues(lClosure* c, lVal v) {
-	return lTreeValuesToList(requireTree(c, lCar(v))->root);
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lTreeValuesToList(car.vTree->root);
 }
 
 static lVal lnfTreeHas(lClosure* c, lVal v) {
-	return lValBool(lTreeHas(requireTree(c, lCar(v))->root, requireSymbolic(c, lCadr(v)), NULL));
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lVal cadr = requireSymbolic(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	return lValBool(lTreeHas(car.vTree->root, cadr.vSymbol, NULL));
 }
 
 static lVal lnfTreeSet(lClosure* c, lVal v) {
+	(void)c;
 	lVal car = lCar(v);
 	if(unlikely(car.type == ltNil)){
 		car = lValTree(NULL);
+	} else {
+		car = requireMutableTree(car);
+		if(unlikely(car.type == ltException)){
+			return car;
+		}
 	}
-	lTreeRoot* t = requireMutableTree(c, car);
-	const lSymbol* key = requireSymbolic(c, lCadr(v));
+	lTreeRoot* t = car.vTree;
+	lVal cadr = requireSymbolic(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	const lSymbol* key = cadr.vSymbol;
 	t->root = lTreeInsert(t->root, key, lCaddr(v));
 	return car;
 }
 
 static lVal lnfTreeSize(lClosure* c, lVal v) {
-	return lValInt(lTreeSize(requireTree(c, lCar(v))->root));
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lValInt(lTreeSize(car.vTree->root));
 }
 
 static lVal lnfTreeDup(lClosure* c, lVal v) {
 	(void)c;
 	if (unlikely((v.type != ltPair)
 		|| (v.vList->car.type != ltTree))) {
-		lExceptionThrowValClo("type-error", "tree/dup can only be called with a tree as an argument", v, c);
+		return lValException("type-error", "tree/dup can only be called with a tree as an argument", v);
 	}
-	lTree* tree = requireTree(c, lCar(v))->root;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lTree* tree = car.vTree->root;
 	tree = lTreeDup(tree);
 	return lValTree(tree);
 }
 
 static lVal lnfTreeKeyAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v))->root;
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lTree* tree = car.vTree->root;
 	return tree ? lValKeywordS(tree->key) : NIL;
 }
 
 static lVal lnfTreeValueAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v))->root;
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lTree* tree = car.vTree->root;
 	return tree ? tree->value : NIL;
 }
 
 static lVal lnfTreeLeftAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v))->root;
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lTree* tree = car.vTree->root;
 	return (tree && tree->left) ? lValTree(tree->left) : NIL;
 }
 
 static lVal lnfTreeRightAst(lClosure* c, lVal v) {
-	lTree* tree = requireTree(c, lCar(v))->root;
+	(void)c;
+	lVal car = requireTree(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lTree* tree = car.vTree->root;
 	return (tree && tree->right) ? lValTree(tree->right) : NIL;
 }
 

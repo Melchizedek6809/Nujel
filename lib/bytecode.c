@@ -6,25 +6,7 @@
 
 #include <string.h>
 
-static bool lBytecodeArrayCheckIfValid(const lBytecodeOp *ops, int opsLength, lArray *literals){
-	(void)ops;
-	(void)opsLength;
-	(void)literals;
-	// ToDo: check that all literal accesses are in bounds
-	// ToDo: check that IP is always within bounds
-	// ToDo: check that SP is always within bounds
-	// ToDo: check that all bytecodes are valid
-	// ToDo: check maximum (C)SP size
-	// ToDo: check that the last opcode is always a return
-	// ToDo: check get/def/set symbol literal types
-	return true;
-}
-
-lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, lClosure *errorClosure){
-	if(!lBytecodeArrayCheckIfValid(ops, opsLength, literals)){
-		lExceptionThrowValClo("invalid-bc-array", "Invalid bytecode array", NIL, errorClosure);
-		return NIL;
-	}
+lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals){
 	lVal ret = lValAlloc(ltBytecodeArr, lBytecodeArrayAlloc(opsLength));
 	ret.vBytecodeArr->literals = literals;
 	ret.vBytecodeArr->literals->flags |= ARRAY_IMMUTABLE;
@@ -33,24 +15,38 @@ lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals, 
 }
 
 static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
-	lArray *arr = requireArray(c, lCar(v));
+	(void)c;
+	lVal car = requireArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lArray *arr = car.vArray;
 	const int len = arr->length;
-	lArray *literals = requireArray(c, lCadr(v));
+	lVal cadr = requireArray(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	lArray *literals = cadr.vArray;
 	lBytecodeOp *ops = malloc(sizeof(lBytecodeOp) * len);
 	for(int i=0;i<len;i++){
-		ops[i] = requireInt(c, arr->data[i]);
+		lVal t = requireInt(arr->data[i]);
+		if(unlikely(t.type == ltException)){
+			return t;
+		}
+		ops[i] = t.vInt;
 	}
-	if(!lBytecodeArrayCheckIfValid(ops, len, literals)){
-		lExceptionThrowValClo("invalid-bc-array", "The bytecodes and literal array are invalid", v, c);
-		return NIL;
-	}
-	lVal ret = lValBytecodeArray(ops,len,literals,c);
+	lVal ret = lValBytecodeArray(ops,len,literals);
 	free(ops);
 	return ret;
 }
 
 static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
+	(void)c;
+	lVal car = requireBytecodeArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBytecodeArray *arr = car.vBytecodeArr;
 	const int len = arr->dataEnd - arr->data;
 
 	lVal ret = lValAlloc(ltArray, lArrayAlloc(len));
@@ -61,13 +57,23 @@ static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 }
 
 static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
+	(void)c;
+	lVal car = requireBytecodeArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBytecodeArray *arr = car.vBytecodeArr;
 	if(unlikely(arr->literals == NULL)){return NIL;}
 	return lValAlloc(ltArray, arr->literals);
 }
 
 static lVal lnfBytecodeArrLength(lClosure *c, lVal v){
-	lBytecodeArray *arr = requireBytecodeArray(c, lCar(v));
+	(void)c;
+	lVal car = requireBytecodeArray(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBytecodeArray *arr = car.vBytecodeArr;
 	return lValInt(arr->dataEnd - arr->data);
 }
 

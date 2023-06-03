@@ -39,17 +39,22 @@ size_t lBufferViewLength(const lBufferView *v){
 }
 
 static lVal lnfBufferAllocate(lClosure *c, lVal v) {
-	const i64 size = requireNaturalInt(c, lCar(v));
+	(void)c;
+	lVal car = requireNaturalInt(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	const i64 size = car.vInt;
 	lBuffer *buf = lBufferAlloc(size, false);
 	return lValAlloc(ltBuffer, buf);
 }
 
 static lVal lnfBufferLengthGet(lClosure *c, lVal v){
+	(void)c;
 	lVal car = lCar(v);
 	typeswitch(car){
 	default:
-		lExceptionThrowValClo("type-error", "Expected a buffer or something compatible", car, c);
-		return NIL;
+		return lValException("type-error", "Expected a buffer or something compatible", car);
 	case ltString:
 	case ltBuffer:
 		return lValInt(car.vBuffer->length);
@@ -59,16 +64,24 @@ static lVal lnfBufferLengthGet(lClosure *c, lVal v){
 }
 
 static lVal lnfBufferLengthSet(lClosure *c, lVal v){
-	lVal bufv = lCar(v);
-	lBuffer *buf = requireMutableBuffer(c, bufv);
-	const int length = requireNaturalInt(c, lCadr(v));
+	(void)c;
+	lVal bufv = requireMutableBuffer(lCar(v));
+	if(unlikely(bufv.type == ltException)){
+		return bufv;
+	}
+	lBuffer *buf = bufv.vBuffer;
+
+	lVal lenVal = requireNaturalInt(lCadr(v));
+	if(unlikely(lenVal.type == ltException)){
+		return lenVal;
+	}
+	const int length = lenVal.vInt;
 	if(length < buf->length){
-		lExceptionThrowValClo("error", "Buffers can only grow, not shrink.", v, c);
+		return lValException("error", "Buffers can only grow, not shrink.", v);
 	}
 	void *nBuf = realloc(buf->buf, length);
 	if (unlikely(nBuf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "(buffer/length!) couldn't allocate its buffer", v, c);
-		return NIL;
+		return lValException("out-of-memory", "(buffer/length!) couldn't allocate its buffer", v);
 	}
 	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
 	buf->buf = nBuf;
@@ -77,6 +90,7 @@ static lVal lnfBufferLengthSet(lClosure *c, lVal v){
 }
 
 static lVal lnfBufferImmutableGet(lClosure *c, lVal v){
+	(void)c;
 	lVal car = lCar(v);
 	typeswitch(car){
 	case ltBufferView:
@@ -85,9 +99,9 @@ static lVal lnfBufferImmutableGet(lClosure *c, lVal v){
 		return lValBool(true);
 	case ltBuffer:
 		return lValBool(car.vBuffer->flags & BUFFER_IMMUTABLE);
+	default:
+		return lValException("type-error", "Can't get immutability info from that: ", car);
 	}
-	lExceptionThrowValClo("type-error", "Can't get immutability info from that: ", car, c);
-	return NIL;
 }
 
 static lVal bufferFromPointer(lClosure *c, bool immutable, const void *data, size_t length){
@@ -97,8 +111,7 @@ static lVal bufferFromPointer(lClosure *c, bool immutable, const void *data, siz
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	retBuf->buf = malloc(length);
 	if (unlikely(retBuf->buf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "(buffer/length!] couldn't allocate its buffer", NIL, c);
-		return NIL;
+		return lValException("out-of-memory", "(buffer/length!) couldn't allocate a buffer", NIL);
 	}
 	memcpy(retBuf->buf, data, length);
 
@@ -106,15 +119,27 @@ static lVal bufferFromPointer(lClosure *c, bool immutable, const void *data, siz
 }
 
 static lVal lnfBufferDup(lClosure *c, lVal v){
-	lBuffer *buf = requireBuffer(c, lCar(v));
+	lVal vBuf = requireBuffer(lCar(v));
+	if(unlikely(vBuf.type == ltException)){
+		return vBuf;
+	}
+	lBuffer *buf = vBuf.vBuffer;
 	return bufferFromPointer(c, castToBool(lCadr(v)), buf->buf, buf->length);
 }
 
 static lVal lnfBufferCopy(lClosure *c, lVal v){
-	lVal car = lCar(v);
-	lBuffer *dest = requireMutableBuffer(c, car);
+	(void)c;
+	lVal car = requireMutableBuffer(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBuffer *dest = car.vBuffer;
 	lVal vSrc = lCadr(v);
-	const int destOffset = requireNaturalInt(c, lCaddr(v));
+	lVal offV = requireNaturalInt(lCaddr(v));
+	if(unlikely(offV.type == ltException)){
+		return offV;
+	}
+	const int destOffset = offV.vInt;
 	const void *buf = NULL;
 	int length = 0;
 
@@ -127,38 +152,48 @@ static lVal lnfBufferCopy(lClosure *c, lVal v){
 	}
 
 	if(unlikely((buf == NULL) || (length < 0))){
-		lExceptionThrowValClo("type-error", "Can't copy from that", vSrc, c);
-		return NIL;
+		return lValException("type-error", "Can't copy from that", vSrc);
 	}
 	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc.vBuffer->length))){
-		lExceptionThrowValClo("out-of-bounds", "Can't fit everything in that buffer", v, c);
-		return NIL;
+		return lValException("out-of-bounds", "Can't fit everything in that buffer", v);
 	}
 	memcpy(&((u8*)dest->buf)[destOffset], buf, length);
 	return car;
 }
 
 static lVal lnfStringToBuffer(lClosure *c, lVal v){
-	lString *str = requireString(c, lCar(v));
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lString *str = car.vString;
 	return bufferFromPointer(c, castToBool(lCadr(v)), str->data, str->length);
 }
 
 static lVal lnfBufferToString(lClosure *c, lVal v){
-	lBuffer *buf = requireBuffer(c, lCar(v));
+	(void)c;
+	lVal car = requireBuffer(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBuffer *buf = car.vBuffer;
 	const i64 length = castToInt(lCadr(v), buf->length);
 	if(unlikely(length < 0)){
-		lExceptionThrowValClo("type-error", "Length has to be greater than 0", lCadr(v), c);
-		return NIL;
+		return lValException("type-error", "Length has to be greater than 0", lCadr(v));
 	}
 	return lValStringLen(buf->buf, length);
 }
 
 static lVal bufferView(lClosure *c, lVal v, lBufferViewType T){
-	lBuffer *buf = requireBuffer(c, lCar(v));
+	(void)c;
+	lVal car = requireBuffer(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBuffer *buf = car.vBuffer;
 	const bool immutable = lCdr(v).type != ltNil ? castToBool(lCadr(v)) : buf->flags & BUFFER_IMMUTABLE;
 	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
-		lExceptionThrowValClo("type-error", "Can't create a mutable view for an immutable buffer", v, c);
-		return NIL;
+		return lValException("type-error", "Can't create a mutable view for an immutable buffer", v);
 	}
 	const size_t length = buf->length / lBufferViewTypeSize(T);
 	lBufferView *bufView = lBufferViewAlloc(buf, T, 0, length, immutable);
@@ -176,11 +211,16 @@ static lVal lnfBufferViewS64(lClosure *c, lVal v){ return bufferView(c, v, lbvtS
 static lVal lnfBufferViewF64(lClosure *c, lVal v){ return bufferView(c, v, lbvtF64); }
 
 static lVal lnfBufferViewSet(lClosure *c, lVal v){
+	(void)c;
 	lVal car = lCar(v);
 	void *buf = NULL;
 	size_t length = 0;
 	lBufferViewType viewType;
-	const size_t i = requireNaturalInt(c, lCadr(v));
+	lVal iv = requireNaturalInt(lCadr(v));
+	if(unlikely(iv.type == ltException)){
+		return iv;
+	}
+	const size_t i = iv.vInt;
 
 	typeswitch(car){
 	case ltBufferView:
@@ -197,50 +237,89 @@ static lVal lnfBufferViewSet(lClosure *c, lVal v){
 	}
 
 	if(unlikely(buf == NULL)){
-		lExceptionThrowValClo("type-error", "Can't set! in that", car, c);
-		return NIL;
+		return lValException("type-error", "Can't set! in that", car);
 	}
 	if(unlikely(i >= length)){
-		lExceptionThrowValClo("out-of-bounds","(buffer/set!] index provided is out of bounds", v, c);
-		return NIL;
+		return lValException("out-of-bounds","(buffer/set!] index provided is out of bounds", v);
 	}
 
 	switch(viewType){
 	default:
 		exit(6);
-	case lbvtU8:
-		((u8 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtS8:
-		((i8 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtS16:
-		((i16 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtU16:
-		((u16 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtS32:
-		((i32 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtU32:
-		((u32 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtS64:
-		((i64 *)buf)[i] = requireInt(c, lCaddr(v));
-		break;
-	case lbvtF32:
-		((float *)buf)[i] = requireFloat(c, lCaddr(v));
-		break;
-	case lbvtF64:
-		((double *)buf)[i] = requireFloat(c, lCaddr(v));
-		break;
+	case lbvtU8: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((u8 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtS8: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((i8 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtS16: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((i16 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtU16: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((u16 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtS32: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((i32 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtU32: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((u32 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtS64: {
+		lVal val = requireInt(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((i64 *)buf)[i] = val.vInt;
+		break; }
+	case lbvtF32: {
+		lVal val = requireFloat(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((float *)buf)[i] = val.vFloat;
+		break; }
+	case lbvtF64: {
+		lVal val = requireFloat(lCaddr(v));
+		if(unlikely(val.type == ltException)){
+			return val;
+		}
+		((double *)buf)[i] = val.vFloat;
+		break; }
 	}
 	return car;
 }
 
 static lVal lnfBufferViewBuffer(lClosure *c, lVal v){
-	lBufferView *view = requireBufferView(c, lCar(v));
+	(void)c;
+	lVal car = requireBufferView(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lBufferView *view = car.vBufferView;
 	return lValAlloc(ltBuffer, view->buf);
 }
 

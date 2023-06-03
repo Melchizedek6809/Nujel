@@ -25,27 +25,26 @@ typedef struct {
 static lVal lReadValue(lReadContext *s);
 static lVal lReadList(lReadContext *s, bool rootForm, char terminator);
 
-static NORETURN void lExceptionThrowReader(lReadContext *s, const char *msg){
+static lVal lValExceptionReaderCustom(lReadContext *s, const char *msg, const char *customError){
 	lVal err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-	lExceptionThrowValClo("read-error", msg, err, s->c);
+	return lValException(customError, msg, err);
 }
 
-static NORETURN void lExceptionThrowReaderCustom(lReadContext *s, const char *msg, const char *customError){
-	lVal err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
-	lExceptionThrowValClo(customError, msg, err, s->c);
+static lVal lValExceptionReader(lReadContext *s, const char *msg) {
+	return lValExceptionReaderCustom(s,msg,"read-error");
 }
 
-static NORETURN void lExceptionThrowReaderStartEnd(lReadContext *s, const char *msg){
+static lVal lValExceptionReaderStartEnd(lReadContext *s, const char *msg){
 	const char *start, *end;
 	for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 	for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
-	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), s->c);
+	return lValException("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 }
 
-static NORETURN void lExceptionThrowReaderEnd(lReadContext *s, const char *start, const char *msg){
+static lVal lValExceptionReaderEnd(lReadContext *s, const char *start, const char *msg){
 	const char *end;
 	for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-	lExceptionThrowValClo("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end), s->c);
+	return lValException("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 }
 
 static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
@@ -138,8 +137,7 @@ static lVal lParseString(lReadContext *s){
 				*b++ = '\\';
 				break;
 			default:
-				lExceptionThrowReaderStartEnd(s, "Unknown escape character");
-				break;
+				return lValExceptionReaderStartEnd(s, "Unknown escape character");
 			}
 			s->data++;
 		}else if(unlikely(*s->data == '"')){
@@ -149,8 +147,7 @@ static lVal lParseString(lReadContext *s){
 			if (likely(i < bufSize)) {
 				buf[i] = 0;
 			}
-			lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
-			return NIL;
+			return lValException("read-error", "Can't find closing \"", lValString(buf));
 		}else{
 			*b++ = *s->data++;
 		}
@@ -158,8 +155,7 @@ static lVal lParseString(lReadContext *s){
 	if (likely(i < bufSize)) {
 		buf[i] = 0;
 	}
-	lExceptionThrowValClo("read-error", "Can't find closing \"", lValString(buf), s->c);
-	return NIL;
+	return lValException("read-error", "Can't find closing \"", lValString(buf));
 }
 
 /* Parse s as a symbol and return the ltSymbol lVal */
@@ -178,7 +174,7 @@ static lVal lParseSymbol(lReadContext *s){
 					s->data--;
 					break;
 				}
-				lExceptionThrowReaderEnd(s, start, "Can't have a colon there");
+				return lValExceptionReaderEnd(s, start, "Can't have a colon there");
 			}
 		}
 		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
@@ -201,14 +197,14 @@ static lVal lParseSymbol(lReadContext *s){
 		kwstart = &buf[1];
 	}
 	if(unlikely(*start == 0)){
-		lExceptionThrowReaderEnd(s, kwstart, "Sym/KW too short");
+		return lValExceptionReaderEnd(s, kwstart, "Sym/KW too short");
 	}
 	return keyword
 		? lValKeyword(kwstart)
 		: lValSym(buf);
 }
 
-static i64 lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int maxDigits){
+static lVal lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int maxDigits){
 	i64 ret = 0;
 	int zeroes = 0, digits = 0;
 	const char *start = s->data;
@@ -228,17 +224,17 @@ static i64 lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int m
 			ret = (ret * base) + curDigit;
 			if(!ret){zeroes++;}
 			if((++digits - zeroes) > maxDigits){
-				lExceptionThrowReaderEnd(s, start, "Literal too big, loss of precision imminent");
+				return lValExceptionReaderEnd(s, start, "Literal too big, loss of precision imminent");
 			}
 		}else{
 			if(!isnumericseparator(c)){
-				lExceptionThrowReaderEnd(s, start, "Wrong char in literal");
+				return lValExceptionReaderEnd(s, start, "Wrong char in literal");
 			}
 		}
 	}
 
 	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
-	return ret;
+	return lValInt(ret);
 }
 
 static lVal lParseNumber(lReadContext *s, int base, int maxDigits){
@@ -248,19 +244,28 @@ static lVal lParseNumber(lReadContext *s, int base, int maxDigits){
 		s->data++;
 		negative = true;
 	}
-	const i64 val = lParseNumberBase(s, NULL, base, maxDigits);
+	lVal val = lParseNumberBase(s, NULL, base, maxDigits);
+	if(unlikely(val.type == ltException)){
+		return val;
+	}
 	if(*s->data == '.'){
 		s->data++;
 		int mantissaLeadingZeroes = 0;
-		const i64 mantissaVal = lParseNumberBase(s, &mantissaLeadingZeroes, base, maxDigits);
+		const lVal mantissaVal = lParseNumberBase(s, &mantissaLeadingZeroes, base, maxDigits);
+		if(unlikely(mantissaVal.type == ltException)){
+			return mantissaVal;
+		}
 		if(*s->data == '.'){
-			lExceptionThrowReaderEnd(s, start, "Period at end of number");
+			return lValExceptionReaderEnd(s, start, "Period at end of number");
 		}else{
-			const double valf = createFloat(val,mantissaVal, mantissaLeadingZeroes);
-			return lValFloat(s->c, negative ? -valf : valf);
+			const double valf = createFloat(val.vInt, mantissaVal.vInt, mantissaLeadingZeroes);
+			return lValFloat(negative ? -valf : valf);
 		}
 	}
-	return lValInt(negative ? -val : val);
+	if(negative){
+		val.vInt = -val.vInt;
+	}
+	return val;
 }
 
 static lVal lParseCharacter(lReadContext *s){
@@ -276,11 +281,11 @@ static lVal lParseCharacter(lReadContext *s){
 	return lValInt(ret);
 }
 
-static NORETURN void throwBCReadError(lReadContext *s, lVal v, const char *msg){
+static lVal lValExceptionBCRead(lReadContext *s, lVal v, const char *msg){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
 	buf[sizeof(buf)-1] = 0;
-	lExceptionThrowValClo("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)), s->c);
+	return lValException("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)));
 }
 
 static lVal lParseBytecodeArray(lReadContext *s){
@@ -291,7 +296,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 
 	lVal v = lReadValue(s);
 	if(v.type != ltArray){
-		throwBCReadError(s, v, "Invalid literal array in BCA");
+		return lValExceptionBCRead(s, v, "Invalid literal array in BCA");
 	}
 	literals = v.vArray;
 	literals->flags = ARRAY_IMMUTABLE;
@@ -302,8 +307,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 			u8 *newD = realloc(d, size);
 			if(unlikely(newD == NULL)){
 				free(d);
-				lExceptionThrowValClo("out-of-memory", "OOM during BC Arr Parse", NIL, s->c);
-				return NIL;
+				return lValException("out-of-memory", "OOM during BC Arr Parse", NIL);
 			}
 			d = newD;
 		}
@@ -317,32 +321,20 @@ static lVal lParseBytecodeArray(lReadContext *s){
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
-			throwBCReadError(s, NIL, "sudden end");
+			return lValExceptionBCRead(s, NIL, "sudden end");
 		}
 		c = *s->data++;
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
-		lExceptionThrowValClo("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1), s->c);
+		return lValException("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
 
 		storeOP:
 		d[len++] = (u8)t;
 	}
-	lVal ret = lValBytecodeArray(d,len,literals,s->c);
+	lVal ret = lValBytecodeArray(d,len,literals);
 	free(d);
 	return ret;
-}
-
-static u8 lReadNibble(lReadContext *s, const u8 c){
-	if(c <  '0'){lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");}
-	if(c <= '9'){
-		return c - '0';
-	}else{
-		if((c < 'A') || (c > 'F')){
-			lExceptionThrowReaderStartEnd(s, "Wrong char in buffer lit.");
-		}
-		return (c - 'A') + 0xA;
-	}
 }
 
 static lVal lParseBuffer(lReadContext *s){
@@ -353,27 +345,46 @@ static lVal lParseBuffer(lReadContext *s){
 		u8 curByte = 0;
 		u8 c = *s->data;
 		if(isspace(c) || isnonsymbol(c)){break;}
-		curByte  = lReadNibble(s, c) << 4;
+		if(c <  '0'){
+			return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
+		}
+		if(c <= '9'){
+			curByte = (c - '0') << 4;
+		}else{
+			if((c < 'A') || (c > 'F')){
+				return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
+			}
+			curByte = ((c - 'A') + 0xA) << 4;
+		}
 
 		s->data++;
 		if(s->data >= s->bufEnd){
 			free(buf);
-			lExceptionThrowReaderStartEnd(s, "Unexpected end of buffer");
+			return lValExceptionReaderStartEnd(s, "Unexpected end of buffer");
 		}
 		c = *s->data++;
 		if(isspace(c)){
 			free(buf);
-			lExceptionThrowReaderStartEnd(s, "Unexpected end of literal");
+			return lValExceptionReaderStartEnd(s, "Unexpected end of literal");
 		}
-		curByte |= lReadNibble(s, c);
+		if(c <  '0'){
+			return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
+		}
+		if(c <= '9'){
+			curByte |= (c - '0');
+		}else{
+			if((c < 'A') || (c > 'F')){
+				return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
+			}
+			curByte |= ((c - 'A') + 0xA);
+		}
 
 		if(len >= bufSize){
 			bufSize = MAX(bufSize*2, 256);
 			u8 *newBuf = realloc(buf, bufSize);
 			if(unlikely(newBuf == NULL)){
 				free(buf);
-				lExceptionThrowValClo("out-of-memory", "OOM during buffer parse", NIL, s->c);
-				return NIL;
+				return lValException("out-of-memory", "OOM during buffer parse", NIL);
 			}
 			buf = newBuf;
 		}
@@ -383,8 +394,8 @@ static lVal lParseBuffer(lReadContext *s){
 
 	u8* newBuf = realloc(buf, len);
 	if (unlikely(newBuf == NULL)) {
-		lExceptionThrowValClo("out-of-memory", "OOM during buffer parse outtro", NIL, s->c);
-		return NIL;
+		free(buf);
+		return lValException("out-of-memory", "OOM during buffer parse outtro", NIL);
 	}
 	lVal ret = lValAlloc(ltBuffer, lBufferAlloc(len, true));
 	ret.vBuffer->buf = newBuf;
@@ -394,7 +405,8 @@ static lVal lParseBuffer(lReadContext *s){
 static lVal lParseSpecial(lReadContext *s){
 	if(s->data >= s->bufEnd){return NIL;}
 	switch(*s->data++){
-	default: lExceptionThrowReaderStartEnd(s, "Wrong char in special lit.");
+	default:
+		return lValExceptionReaderStartEnd(s, "Wrong char in special lit.");
 	case '|': // SRFI-30
 		lStringAdvanceUntilEndOfBlockComment(s);
 		lStringAdvanceToNextCharacter(s);
@@ -435,7 +447,7 @@ static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				lExceptionThrowReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
+				return lValExceptionReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
 			}
 			s->data++;
 			return ret.type == ltNil ? lCons(NIL,NIL) : ret;
@@ -444,32 +456,38 @@ static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
 			continue;
 		}else if(c == terminator){
 			if(rootForm){
-				lExceptionThrowReader(s, "Unmatched closing bracket");
+				return lValExceptionReader(s, "Unmatched closing bracket");
 			}
 			s->data++;
 			return ret.type == ltNil ? lCons(NIL, NIL) : ret;
 		}else if(isClosingChar(c)){
-			lExceptionThrowReader(s, "Unmatched closing char");
+			return lValExceptionReader(s, "Unmatched closing char");
 		}else{
 			const u8 next = s->data[1];
 			if((c == '.') && (isspace(next) || isnonsymbol(next))){
 				if(unlikely(v.type == ltNil)){
-					lExceptionThrowReader(s, "Missing car in dotted pair");
+					return lValExceptionReader(s, "Missing car in dotted pair");
 				}
 				s->data++;
 				lVal nv;
 				do {
 					if(unlikely((s->data >= s->bufEnd) || (*s->data == 0) || (*s->data == ')'))){
-						lExceptionThrowReader(s, "Missing cdr in dotted pair");
+						return lValExceptionReader(s, "Missing cdr in dotted pair");
 					}
 					lStringAdvanceToNextCharacter(s);
 					nv = lReadValue(s);
+					if(unlikely(nv.type == ltException)){
+						return nv;
+					}
 				} while(isComment(nv));
 				v.vList->cdr = isComment(nv) ? NIL : nv;
 				continue;
 			}else{
 				lVal nv = lReadValue(s);
-				if(isComment(nv)){continue;}
+				if(unlikely(isComment(nv))){continue;}
+				if(unlikely(nv.type == ltException)){
+					return nv;
+				}
 				if(v.type == ltNil){
 					v = ret = lCons(nv, NIL);
 				}else{
@@ -538,13 +556,11 @@ static lVal lReadValue(lReadContext *s){
 	case ';':
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
-	default: {
-		const u8 n = s->data[1];
-		if((isdigit((u8)c)) || ((c == '-') && isdigit(n))){
+	default:
+		if((isdigit((u8)c)) || ((c == '-') && isdigit(s->data[1]))){
 			return lParseNumber(s, 10, 18);
 		}
 		return lParseSymbol(s);
-		}
 	}
 }
 

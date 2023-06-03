@@ -13,12 +13,11 @@
 #endif
 #endif
 
-NORETURN void throwStackUnderflowError(lClosure *c, const char *opcode){
-	char buf[128];
-	snprintf(buf, sizeof(buf), "Stack underflow at during lop%s", opcode);
-	buf[sizeof(buf)-1] = 0;
-	lExceptionThrowValClo("stack-underflow", buf, NIL, c);
-}
+#if defined(_MSC_VER)
+#define NORETURN
+#else
+#define NORETURN __attribute__((noreturn))
+#endif
 
 /* Read an encoded signed 16-bit offset at ip */
 i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
@@ -64,12 +63,12 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
-	jmp_buf oldExceptionTarget;
 	lBytecodeOp *ip;
-	lBytecodeArray * volatile ops = text;
-	lClosure * volatile c = callingClosure;
+	lBytecodeArray * ops = text;
+	lClosure * c = callingClosure;
 	lThread ctx;
-	const lVal * volatile lits = text->literals->data;
+	const lVal * lits = text->literals->data;
+	lVal exceptionThrownValue = NIL;
 
 	#ifdef NUJEL_USE_JUMPTABLE
 	#undef vmdispatch
@@ -127,15 +126,10 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopRef,
 		&&llopCadr,
 		&&llopMutableEval,
-		&&llopList
+		&&llopList,
+		&&llopThrow
 	};
 	#endif
-
-	if(unlikely(++exceptionTargetDepth > RECURSION_DEPTH_MAX)){
-		exceptionTargetDepth--;
-		lExceptionThrowValClo("too-deep", "Recursing too deep", NIL, NULL);
-		return NIL;
-	}
 
 	ctx.closureStackSize = 256;
 	ctx.valueStackSize   = 32;
@@ -146,41 +140,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStack[0]  = c;
 	ctx.text             = text;
 
-	int exceptionCount = 0;
 	const int RSP = lRootsGet();
 	lRootsClosurePush(callingClosure);
 	lRootsThreadPush(&ctx);
 
-	memcpy(oldExceptionTarget,exceptionTarget,sizeof(jmp_buf));
-	const int setjmpRet = setjmp(exceptionTarget);
-	if(unlikely(setjmpRet)){
-		while((ctx.csp > 0) && (c->type != closureTry)){
-			ctx.csp--;
-			c = ctx.closureStack[ctx.csp];
-		}
-		if((ctx.csp > 0) && (++exceptionCount < 1000)){
-			lVal handler = c->exceptionHandler;
-
-			c = ctx.closureStack[--ctx.csp];
-			ops = c->text;
-			lits = ops->literals->data;
-			ctx.text = ops;
-			ip = c->ip;
-			ctx.sp = c->sp;
-			ctx.valueStack[ctx.sp++] = lApply(c, lCons(exceptionValue, NIL), handler);
-		} else {
-			exceptionTargetDepth--;
-			memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
-			free(ctx.closureStack);
-			free(ctx.valueStack);
-			lRootsRet(RSP);
-			lExceptionThrowRaw(exceptionValue);
-			return NIL;
-		}
-	} else {
-		ip = ops->data;
-		lGarbageCollectIfNecessary();
-	}
+	ip = ops->data;
+	lGarbageCollectIfNecessary();
 
 	while(true){
 		#ifdef VM_RUNTIME_CHECKS
@@ -208,26 +173,51 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		const i8 v = *ip++;
 		ctx.valueStack[ctx.sp++] = lValInt(v);
 		vmbreak;}
-	vmcase(lopAdd)
-		ctx.valueStack[ctx.sp-2] = lAdd(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+	vmcase(lopAdd) {
+		lVal v = lAdd(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
-	vmcase(lopSub)
-		ctx.valueStack[ctx.sp-2] = lSub(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopSub) {
+		lVal v = lSub(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
-	vmcase(lopMul)
-		ctx.valueStack[ctx.sp-2] = lMul(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopMul) {
+		lVal v = lMul(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
-	vmcase(lopDiv)
-		ctx.valueStack[ctx.sp-2] = lDiv(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopDiv) {
+		lVal v = lDiv(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
-	vmcase(lopRem)
-		ctx.valueStack[ctx.sp-2] = lRem(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopRem) {
+		lVal v = lRem(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
+		vmbreak; }
 	vmcase(lopIntAdd)
 		ctx.valueStack[ctx.sp-2].vInt = ctx.valueStack[ctx.sp-2].vInt + ctx.valueStack[ctx.sp-1].vInt;
 		ctx.sp--;
@@ -304,36 +294,49 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		vmbreak;
 	vmcase(lopDefValExt) {
-		uint v;
-		v = (ip[0] << 8) | (ip[1]);
+		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		goto defValBody;
-	vmcase(lopDefVal)
-		v = *ip++;
-		defValBody:
+		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopDefVal) {
+		const uint v = *ip++;
 		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopGetValExt) {
-		uint v;
-		v = (ip[0] << 8) | (ip[1]);
+		const uint off = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		goto getValBody;
-	vmcase(lopGetVal)
-		v = *ip++;
-		getValBody:
-		ctx.valueStack[ctx.sp++] = lGetClosureSym(c, lits[v].vSymbol);
+		lVal v = lGetClosureSym(c, lits[off].vSymbol);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp++] = v;
 		vmbreak; }
-	vmcase(lopRef)
-		ctx.valueStack[ctx.sp-2] = lGenericRef(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+	vmcase(lopGetVal) {
+		const uint off = *ip++;
+		lVal v = lGetClosureSym(c, lits[off].vSymbol);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp++] = v;
+		vmbreak; }
+	vmcase(lopRef) {
+		lVal v = lGenericRef(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		if(unlikely(v.type == ltException)){
+			exceptionThrownValue = v;
+			goto throwException;
+		}
+		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
-		vmbreak;
+		vmbreak; }
 	vmcase(lopSetValExt) {
-		uint v = (ip[0] << 8) | (ip[1]);
+		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		goto setValBody;
-	vmcase(lopSetVal)
-		v = *ip++;
-		setValBody:
+		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopSetVal) {
+		const uint v = *ip++;
 		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopZeroPred) {
@@ -389,6 +392,53 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=2;
 		vmbreak;
+	vmcase(lopThrow) {
+		lVal v = ctx.valueStack[ctx.sp-1];
+		if(likely(v.type == ltPair)){
+			v.type = ltException;
+		}
+		exceptionThrownValue = v;
+	throwException:
+		if(unlikely((exceptionThrownValue.type != ltPair) && (exceptionThrownValue.type != ltException))){
+			exceptionThrownValue = lCons(exceptionThrownValue, NIL);
+		}
+
+		if(likely(exceptionThrownValue.type == ltException)){
+			exceptionThrownValue.type = ltPair;
+			lPair *t = exceptionThrownValue.vList;
+			while(t->cdr.type == ltPair){
+				t=t->cdr.vList;
+			}
+			t->cdr = lCons(lValLambda(c),NIL);
+		}
+
+		while(c->type != closureTry){
+			if(unlikely(ctx.csp <= 0)){
+				free(ctx.closureStack);
+				free(ctx.valueStack);
+				lRootsRet(RSP);
+				exceptionThrownValue.type = ltException;
+				return exceptionThrownValue;
+			}
+			c = ctx.closureStack[--ctx.csp];
+		}
+		lVal handler = c->exceptionHandler;
+		lVal nv = lApply(c, lCons(exceptionThrownValue, NIL), handler);
+		if(unlikely(nv.type == ltException)){
+			exceptionThrownValue = nv;
+			c = ctx.closureStack[--ctx.csp];
+			goto throwException;
+		}
+
+		c = ctx.closureStack[--ctx.csp]; // We can't do this before the apply since otherwise the GC might collect the handler
+		ops = c->text;
+		lits = ops->literals->data;
+		ctx.text = ops;
+		ip = c->ip;
+		ctx.sp = c->sp;
+
+		ctx.valueStack[ctx.sp++] = nv;
+		vmbreak; }
 	vmcase(lopMacroDynamic)
 	vmcase(lopFnDynamic) {
 		const lBytecodeOp curOp = ip[-1];
@@ -407,11 +457,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		const lBytecodeOp curOp = ip[-1];
 		lVal env = ctx.valueStack[--ctx.sp];
 		lVal bc = ctx.valueStack[--ctx.sp];
-		if(unlikely(env.type != ltEnvironment)){
-			lExceptionThrowValClo("type-error", "Can't eval in that", env, c);
-		}
-		if(unlikely(bc.type != ltBytecodeArr)){
-			lExceptionThrowValClo("type-error", "Can't eval that", bc, c);
+		if(unlikely((env.type != ltEnvironment) || (bc.type != ltBytecodeArr))){
+			exceptionThrownValue = lValException("type-error", "Can't eval in that", env);
+			goto throwException;
 		}
 
 		c->text = ops;
@@ -452,12 +500,17 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
 			break;
-		case ltNativeFunc:
-			ctx.valueStack[ctx.sp++] = fun.vNFunc->fp(c, cargs);
-			break;
-		default:
-			lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
-			break;
+		case ltNativeFunc: {
+			lVal v = fun.vNFunc->fp(c, cargs);
+			if(unlikely(v.type == ltException)){
+				exceptionThrownValue = v;
+				goto throwException;
+			}
+			ctx.valueStack[ctx.sp++] = v;
+			break; }
+		default: {
+			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			goto throwException; }
 		}
 		vmbreak; }
 	vmcase(lopRet)
@@ -476,8 +529,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			vmbreak;
 		}
 		topLevelReturn:
-		memcpy(exceptionTarget, oldExceptionTarget, sizeof(jmp_buf));
-		exceptionTargetDepth--;
 		lVal ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);

@@ -44,7 +44,7 @@ lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
 lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 	const char *cur = sym;
 	if(unlikely(lNF.type != ltNativeFunc)){
-		lExceptionThrowValClo(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF, c);
+		return lValException(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF);
 	}
 	bool nameSet = false;
 
@@ -94,8 +94,7 @@ lVal lGetClosureSym(lClosure *c, const lSymbol *s){
 			return ret;
 		}
 	}
-	lExceptionThrowValClo("unbound-variable","Can't resolve symbol", lValSymS(s), c);
-	return NIL;
+	return lValException("unbound-variable","Can't resolve symbol", lValSymS(s));
 }
 
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */
@@ -150,7 +149,11 @@ lVal lAddNativeFuncPureFold(lClosure *c, const char *sym, const char *args, cons
 lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
 	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
 	ret.vClosure->args = args;
-	ret.vClosure->text = requireBytecodeArray(parent, body);
+	lVal bc = requireBytecodeArray(body);
+	if(unlikely(bc.type == ltException)){
+		return bc;
+	}
+	ret.vClosure->text = bc.vBytecodeArr;
 	ret.vClosure->ip   = ret.vClosure->text->data;
 	return ret;
 }

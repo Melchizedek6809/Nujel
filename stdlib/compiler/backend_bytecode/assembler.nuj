@@ -274,6 +274,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                      (cadr ($cadr))
                      (zero? ($zero?))
                      (inc/int ($inc/int))
+                     (throw ($throw))
                      (otherwise #nil)))
             (2 (case fun
                      (add/int ($add/int))
@@ -316,6 +317,12 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :internal
       (list #x19 (list :relocate target 8 0 0)
             (list :relocate target 0 1 0)))
+
+(defn $throw ()
+      "(v) -> () --- Throw an exception"
+      :cat :bytecode
+      :internal
+      #x2F)
 
 (defn $jmp (target)
       :cat :bytecode

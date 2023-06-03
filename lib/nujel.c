@@ -4,14 +4,10 @@
 #include "nujel-private.h"
 #endif
 
-#include <setjmp.h>
 #include <stdlib.h>
 
 extern u8 stdlib_no_data[];
 
-jmp_buf exceptionTarget;
-lVal exceptionValue;
-int exceptionTargetDepth = 0;
 lVal NIL;
 
 /* Initialize the allocator and symbol table, needs to be called before as
@@ -90,24 +86,12 @@ void simplePrintVal(lVal v){
 	}
 }
 
-/* Cause an exception, passing V directly to the closest exception handler */
-NORETURN void lExceptionThrowRaw(lVal v){
-	if(exceptionTargetDepth < 1){
-		simplePrintVal(v);
-		exit(201);
-	}
-	exceptionValue = v;
-	longjmp(exceptionTarget, 1);
-	while(1){}
-}
-
-/* Cause an exception, passing a list of SYMBOL, ERROR and V to the exception handler */
-NORETURN void lExceptionThrowValClo(const char *symbol, const char *error, lVal v, lClosure *c){
-	lVal l = lCons(lValLambda(c), NIL);
-	l = lCons(v,l);
+lVal lValException(const char *symbol, const char *error, lVal v) {
+	lVal l = lCons(v, NIL);
 	l = lCons(lValString(error),l);
 	l = lCons(lValKeyword(symbol),l);
-	lExceptionThrowRaw(l);
+	l.type = ltException;
+	return l;
 }
 
 /* Evaluate the Nujel Lambda expression and return the results */
@@ -121,7 +105,7 @@ lVal lApply(lClosure *c, lVal args, lVal fun){
 	case ltMacro:
 	case ltLambda:     return lLambda(c,args,fun);
 	case ltNativeFunc: return fun.vNFunc->fp(c,args);
-	default:           lExceptionThrowValClo("type-error", "Can't apply to following val", fun, c);
+	default:           return lValException("type-error", "Can't apply to following val", fun);
 	}
 	return NIL;
 }
@@ -135,9 +119,7 @@ lClosure *lLoad(lClosure *c, const char *expr){
 	for(lVal n=v; n.type == ltPair; n = n.vList->cdr){
 		c->args = n; // We need a reference to make sure that n won't be collected by the GC
 		lVal car = n.vList->car;
-		if(unlikely(car.type != ltBytecodeArr)){
-			lExceptionThrowValClo("load-error", "Can only load values of type :bytecode-arr", car, c);
-		}else{
+		if(likely(car.type == ltBytecodeArr)){
 			lBytecodeEval(c, car.vBytecodeArr);
 		}
 	}

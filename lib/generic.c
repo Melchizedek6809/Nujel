@@ -5,15 +5,16 @@
 #endif
 
 static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
+	(void)c;
 	const void *buf = car.vBufferView->buf->buf;
 	const size_t length = car.vBufferView->length;
 	const lBufferViewType viewType = car.vBufferView->type;
 
 	if(unlikely(buf == NULL)){
-		lExceptionThrowValClo("type-error", "Can't ref that", car, c);
+		return lValException("type-error", "Can't ref that", car);
 	}
 	if(unlikely(i >= length)){
-		lExceptionThrowValClo("out-of-bounds","ref - index provided is out of bounds", car, c);
+		return lValException("out-of-bounds","ref - index provided is out of bounds", car);
 	}
 
 	switch(viewType){
@@ -35,49 +36,84 @@ static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
 	case lbvtS64:
 		return lValInt(((i64 *)buf)[i]);
 	case lbvtF32:
-		return lValFloat(c, ((float *)buf)[i]);
+		return lValFloat(((float *)buf)[i]);
 	case lbvtF64:
-		return lValFloat(c, ((double *)buf)[i]);
+		return lValFloat(((double *)buf)[i]);
 	}
 }
 
 lVal lGenericRef(lClosure *c, lVal col, lVal key){
 	typeswitch(col){
 	case ltPair: {
-		const int index = requireNaturalInt(c, key);
+		lVal keyVal = requireNaturalInt(key);
+		if(unlikely(keyVal.type == ltException)){
+			return keyVal;
+		}
+		const int index = keyVal.vInt;
 		for(int i=0;i<index;i++){
 			col = lCdr(col);
 		}
 		return lCar(col); }
 	case ltBytecodeArr: {
-		const lBytecodeArray *arr = requireBytecodeArray(c, col);
-		const int i = requireNaturalInt(c, key);
+		lVal bc = requireBytecodeArray(col);
+		if(unlikely(bc.type == ltException)){
+			return bc;
+		}
+		const lBytecodeArray *arr = bc.vBytecodeArr;
+		lVal keyVal = requireNaturalInt(key);
+		if(unlikely(keyVal.type == ltException)){
+			return keyVal;
+		}
+		const int i = keyVal.vInt;
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
-			lExceptionThrowValClo("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col, c);
+			return lValException("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col);
 		}
 		return lValInt(arr->data[i]); }
 	case ltArray: {
-		lArray *arr = requireArray(c, col);
-		const int i = requireNaturalInt(c, key);
+		lVal t = requireArray(col);
+		if(unlikely(t.type == ltException)){
+			return t;
+		}
+		lArray *arr = t.vArray;
+		lVal keyVal = requireNaturalInt(key);
+		if(unlikely(keyVal.type == ltException)){
+			return keyVal;
+		}
+		const int i = keyVal.vInt;
 		if(unlikely(arr->length <= i)){
-			lExceptionThrowValClo("out-of-bounds","(ref) array index provided is out of bounds", col, c);
+			return lValException("out-of-bounds","(ref) array index provided is out of bounds", col);
 		}
 		return arr->data[i]; }
 	case ltString:
 	case ltBuffer: {
 		const char *buf  = col.vBuffer->data;
 		const size_t len = col.vBuffer->length;
-		const size_t i   = requireNaturalInt(c, key);
+		lVal keyVal = requireNaturalInt(key);
+		if(unlikely(keyVal.type == ltException)){
+			return keyVal;
+		}
+		const size_t i = keyVal.vInt;
 		if(unlikely(len <= i)){
-			lExceptionThrowValClo("out-of-bounds","(ref) buffer index provided is out of bounds", col, c);
+			return lValException("out-of-bounds","(ref) buffer index provided is out of bounds", col);
 		}
 		return lValInt(buf[i]); }
-	case ltBufferView:
-		return lBufferViewRef(c, col, requireNaturalInt(c, key));
-	case ltTree:
-		return lTreeGet(requireTree(c, col)->root, requireSymbolic(c, key), NULL);
+	case ltBufferView: {
+		lVal t = requireNaturalInt(key);
+		if(unlikely(t.type == ltException)){
+			return t;
+		}
+		return lBufferViewRef(c, col, t.vInt); }
+	case ltTree: {
+		lVal t = requireTree(col);
+		if(unlikely(t.type == ltException)){
+			return t;
+		}
+		lVal tk = requireSymbolic(key);
+		if(unlikely(tk.type == ltException)){
+			return tk;
+		}
+		return lTreeGet(t.vTree->root, tk.vSymbol, NULL); }
 	default:
-		lExceptionThrowValClo("type-error", "Can't ref that", col, c);
-		return NIL;
+		return lValException("type-error", "Can't ref that", col);
 	}
 }

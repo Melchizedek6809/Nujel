@@ -25,7 +25,12 @@ static lVal lnfSymbolTable(lClosure *c, lVal v){
 }
 
 static lVal lnfClosureParent(lClosure *c, lVal v){
-	lClosure *cc = requireClosure(c, lCar(v));
+	(void)c;
+	lVal car = requireClosure(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lClosure *cc = car.vClosure;
 	if(cc->parent == NULL){
 		return NIL;
 	}else{
@@ -34,7 +39,12 @@ static lVal lnfClosureParent(lClosure *c, lVal v){
 }
 
 static lVal lnfClosureCaller(lClosure *c, lVal v){
-	lClosure *cc = requireClosure(c, lCar(v));
+	(void)c;
+	lVal car = requireClosure(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lClosure *cc = car.vClosure;
 	if((cc == NULL) || (cc->caller == NULL)){
 		return NIL;
 	}else{
@@ -43,7 +53,11 @@ static lVal lnfClosureCaller(lClosure *c, lVal v){
 }
 
 static lVal lnfClosureArguments(lClosure *c, lVal v){
-	lVal cc = requireCallable(c, lCar(v));
+	(void)c;
+	lVal cc = requireCallable(lCar(v));
+	if(unlikely(cc.type == ltException)){
+		return cc;
+	}
 	if(cc.type == ltNativeFunc){
 		return cc.vNFunc->args;
 	}else{
@@ -52,39 +66,64 @@ static lVal lnfClosureArguments(lClosure *c, lVal v){
 }
 
 static lVal lnfClosureCode(lClosure *c, lVal v){
-	lClosure *clo = requireClosure(c, lCar(v));
+	(void)c;
+	lVal car = requireClosure(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lClosure *clo = car.vClosure;
 	return lValAlloc(ltBytecodeArr, clo->text);
 }
 
 static lVal lnfClosureData(lClosure *c, lVal v){
-	lClosure *clo = requireClosure(c, lCar(v));
+	(void)c;
+	lVal car = requireClosure(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	lClosure *clo = car.vClosure;
 	return clo ? lValTree(clo->data) : NIL;
 }
 
 static lVal lnfDefIn(lClosure *c, lVal v){
-	const lSymbol *sym = requireSymbol(c, lCadr(v));
+	(void)c;
 	lVal env = lCar(v);
 	if(unlikely((env.type != ltLambda) && (env.type != ltEnvironment))){
-		lExceptionThrowValClo("invalid-environment", "You can only define symbols in Lambdas or Objects", env, c);
+		return lValException("invalid-environment", "You can only define symbols in Lambdas or Objects", env);
 	}
+
+	lVal cadr = requireSymbolic(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	const lSymbol *sym = cadr.vSymbol;
+
 	lDefineClosureSym(env.vClosure, sym, lCaddr(v));
 	return env;
 }
 
 static lVal lnfResolve(lClosure *c, lVal v){
-	const lSymbol *sym = requireSymbol(c, lCar(v));
+	lVal car = requireSymbol(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	const lSymbol *sym = car.vSymbol;
 	lVal env = lCadr(v);
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		lExceptionThrowValClo("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env, c);
+		return lValException("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env);
 	}
 	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
 }
 
 static lVal lnfResolveOrNull(lClosure *c, lVal v){
-	const lSymbol *sym = requireSymbol(c, lCar(v));
+	lVal car = requireSymbol(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	const lSymbol *sym = car.vSymbol;
 	lVal env = lCadr(v);
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		lExceptionThrowValClo("invalid-environment", "You can only resolve-or-nil symbols in Lambdas or Objects", env, c);
+		return lValException("invalid-environment", "You can only resolve-or-nil symbols in Lambdas or Objects", env);
 	}
 	lVal ret;
 	if(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym, &ret)){
@@ -100,7 +139,7 @@ static lVal lnfResolvesPred(lClosure *c, lVal v){
 	const lSymbol *sym = car.vSymbol;
 	lVal env = lCadr(v);
 	if((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment)){
-		lExceptionThrowValClo("invalid-environment", "You can only check symbols in Lambdas or Objects", env, c);
+		return lValException("invalid-environment", "You can only check symbols in Lambdas or Objects", env);
 	}
 	return lValBool(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym,NULL));
 }
@@ -116,7 +155,11 @@ static lVal lnfCurrentLambda(lClosure *c, lVal v){
 }
 
 static lVal lnfApply(lClosure *c, lVal v){
-	return lApply(c, requirePair(c, lCadr(v)), lCar(v));
+	lVal args = requirePair(lCadr(v));
+	if(unlikely(args.type == ltException)){
+		return args;
+	}
+	return lApply(c, args, lCar(v));
 }
 
 static lVal lnfCar(lClosure *c, lVal v){
@@ -130,8 +173,9 @@ static lVal lnfCdr(lClosure *c, lVal v){
 }
 
 static lVal lnfCons(lClosure *c, lVal v){
+	(void)c;
 	if(unlikely(lCddr(v).type != ltNil)){
-		lExceptionThrowValClo("arity-error","Cons should only be called with 2 arguments!", v, c);
+		return lValException("arity-error","Cons should only be called with 2 arguments!", v);
 	}
 	return lCons(lCar(v),lCadr(v));
 }
@@ -212,20 +256,19 @@ static lVal lnfZeroPred(lClosure *c, lVal v){
 }
 
 static lVal lnfQuote(lClosure *c, lVal v){
+	(void)c;
 	if(unlikely(v.type != ltPair)){
-		lExceptionThrowValClo("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v, c);
+		return lValException("invalid-quote","Quote needs a second argument to return, maybe you were trying to use a dotted pair instead of a list?", v);
 	}
 	return lCar(v);
 }
 
-static lVal lnfThrow(lClosure *c, lVal v){
-	(void)c;
-	lExceptionThrowRaw(lCar(v));
-	return NIL;
-}
-
 static lVal lnfRead(lClosure *c, lVal v){
-	return lRead(c, requireString(c, lCar(v))->data);
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lRead(c, car.vString->data);
 }
 
 static lVal lnfTypeOf(lClosure *c, lVal v){
@@ -245,7 +288,12 @@ static lVal lnfGarbageCollectRuns(lClosure *c, lVal v){
 }
 
 static lVal lnfMetaGet(lClosure *c, lVal v){
-	const lSymbol *key = requireSymbolic(c, lCadr(v));
+	(void)c;
+	lVal cadr = requireSymbolic(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	const lSymbol *key = cadr.vSymbol;
 	lVal l = lCar(v);
 	typeswitch(l){
 	case ltNativeFunc:
@@ -259,11 +307,20 @@ static lVal lnfMetaGet(lClosure *c, lVal v){
 }
 
 static lVal lnfMetaSet(lClosure *c, lVal v){
-	const lSymbol *key = requireSymbolic(c, lCadr(v));
-	lVal car = requireCallable(c, lCar(v));
+	(void)c;
+	lVal car = requireCallable(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+
+	lVal cadr = requireSymbolic(lCadr(v));
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	const lSymbol *key = cadr.vSymbol;
 
 	if(car.type == ltNativeFunc){
-		lExceptionThrowValClo("type-error", "Can't add new metadata to native functions", car, c);
+		return lValException("type-error", "Can't add new metadata to native functions", car);
 	}else{
 		car.vClosure->meta = lTreeInsert(car.vClosure->meta, key, lCaddr(v));
 	}
@@ -272,33 +329,50 @@ static lVal lnfMetaSet(lClosure *c, lVal v){
 }
 
 static lVal lCastFloat(lClosure *c, lVal v){
-	typeswitch(v){
-	default:      throwTypeError(c, v, ltFloat);
-	case ltFloat: return v;
-	case ltInt:   return lValFloat(c, v.vInt);
+	(void)c;
+	if(likely(v.type == ltFloat)){
+		return v;
 	}
+	if(likely(v.type == ltInt)){
+		return lValFloat(v.vInt);
+	}
+	return lValExceptionType(v, ltFloat);
 }
+
 static lVal lnfFloat(lClosure *c, lVal v){
 	return lCastFloat(c,lCar(v));
 }
 
 static lVal lCastInt(lClosure *c, lVal v){
-	typeswitch(v){
-	default:      throwTypeError(c, v, ltInt);
-	case ltInt:   return v;
-	case ltFloat: return lValInt(v.vFloat);
+	(void)c;
+	if(likely(v.type == ltInt)){
+		return v;
 	}
+	if(likely(v.type == ltFloat)){
+		return lValInt(v.vFloat);
+	}
+	return lValExceptionType(v, ltInt);
 }
 static lVal lnfInt(lClosure *c, lVal v){
 	return lCastInt(c, lCar(v));
 }
 
 static lVal lnfSymbolToKeyword(lClosure *c, lVal v){
-	return lValKeywordS(requireSymbol(c, lCar(v)));
+	(void)c;
+	lVal car = requireSymbol(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lValKeywordS(car.vSymbol);
 }
 
 static lVal lnfKeywordToSymbol(lClosure *c, lVal v){
-	return lValSymS(requireKeyword(c, lCar(v)));
+	(void)c;
+	lVal car = requireKeyword(lCar(v));
+	if(unlikely(car.type == ltException)){
+		return car;
+	}
+	return lValSymS(car.vSymbol);
 }
 
 static i64 lValToId(lVal v){
@@ -326,13 +400,13 @@ static lVal lnfValToId(lClosure *c, lVal v){
 }
 
 static lVal lnfString(lClosure *c, lVal v){
+	(void)c;
 	char buf[64];
 	int snret;
 	lVal a = lCar(v);
 	typeswitch(a){
 	default:
-		lExceptionThrowValClo("type-error", "Can't convert that into a string", a, c);
-		return NIL;
+		return lValException("type-error", "Can't convert that into a string", a);
 	case ltNil:
 		return lValString("");
 	case ltBuffer:
@@ -363,13 +437,18 @@ static lVal lnfString(lClosure *c, lVal v){
 }
 
 static lVal lnfStrSym(lClosure *c, lVal v){
-	return lValSym(requireString(c, lCar(v))->data);
+	(void)c;
+	lVal car = requireString(lCar(v));
+	if(unlikely(car.type != ltString)){
+		return car;
+	}
+	return lValSym(car.vString->data);
 }
 
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFuncPure(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead);
-	lAddNativeFunc    (c,"throw", "(v)",   "Throw V to the closest exception handler", lnfThrow);
+
 
 	lAddNativeFunc(c,"def-in!",        "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn);
 	lAddNativeFunc(c,"resolve",        "(sym environment)", "Resolve SYM", lnfResolve);
