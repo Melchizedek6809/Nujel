@@ -87,6 +87,8 @@ void lAddPlatformVars(lClosure *c){
 	valOS = lValSym("NetBSD");
 	#elif defined(__DragonFly__)
 	valOS = lValSym("DragonFlyBSD");
+	#elif defined(__wasi__)
+	valOS = lValSym("wasi");
 	#else
 	valOS = lValSym("Unknown");
 	#endif
@@ -100,7 +102,7 @@ void lAddPlatformVars(lClosure *c){
 	valArch = lValSym("x86_64");
 	#elif defined(__i386__)
 	valArch = lValSym("x86");
-	#elif defined(__EMSCRIPTEN__)
+	#elif defined(__EMSCRIPTEN__) || defined(__wasm__)
 	valArch = lValSym("wasm");
 	#elif defined(__powerpc__)
 	valArch = lValSym("powerpc");

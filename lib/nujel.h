@@ -7,6 +7,7 @@
 #ifndef NUJEL_LIB_NUJEL_PUBLIC
 #define NUJEL_LIB_NUJEL_PUBLIC
 
+#include <math.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -250,10 +251,10 @@ lSymbol  *lSymSL        (const char *s, uint len);
  | lVal related procedures
  */
 static inline lVal lValFloat(double v){
-	if(unlikely(__builtin_isnan(v))){
+	if(unlikely(isnan(v))){
 		return lValException("float-nan","NaN is disallowed in Nujel", NIL);
 	}
-	if(unlikely(__builtin_isinf(v))){
+	if(unlikely(isinf(v))){
 		return lValException("float-inf","INF is disallowed in Nujel", NIL);
 	}
 	return (lVal){ltFloat, .vFloat = v};

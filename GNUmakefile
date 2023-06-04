@@ -46,7 +46,7 @@ endif
 all: $(NUJEL)
 .PHONY: all release release.musl release.amalgamation
 .PHONY: rund runn install install.musl profile web
-.PHONY: test.future check test test.verbose test.debug test.slow test.slow.debug test.ridiculous
+.PHONY: test.future check test test.verbose test.debug test.slow test.slow.debug test.ridiculous test.wasm
 
 ifdef EMSDK
 all: nujel.wa
@@ -126,6 +126,11 @@ release.amalgamation: nujel.c
 	@$(CC) -o $(NUJEL) nujel.c $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS)  $(LDFLAGS)
 	@$(STRIP) -xS $(NUJEL)
 	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" $(NUJEL)
+
+nujel.wasm: $(RUNTIME_SRCS)
+	@rm -f $(NUJEL)
+	@$(WASI_CLANG) --target=wasm32-unknown-wasi --sysroot=$(WASI_SDK_PATH) -o nujel.wasm $^ $(CFLAGS) $(CINCLUDES) $(RELEASE_OPTIMIZATION) $(CSTD) $(LIBS) $(LDFLAGS)
+	@echo "$(ANSI_BG_GREEN)" "[CC] " "$(ANSI_RESET)" nujel.wasm
 
 web/index.html: nujel.wa $(BIN_WASM_OBJS) tmp/binlib.wo
 	@mkdir -p releases/wasm/

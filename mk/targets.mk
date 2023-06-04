@@ -1,5 +1,5 @@
 clean:
-	@rm -f -- nujel nujel.exe nujel-bootstrap nujel-bootstrap.exe future-nujel future-nujel.exe nujel.c nujel.h nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe DOSNUJEL.EXE
+	@rm -f -- nujel nujel.exe nujel.wasm nujel-bootstrap nujel-bootstrap.exe future-nujel future-nujel.exe nujel.c nujel.h nujel.a nujel.wa nujel.com nujel.com.dbg tools/assets tools/assets.exe DOSNUJEL.EXE
 	@rm -f -- $(FILES_TO_CLEAN)
 	@rm -f -- $(NOBS_TO_CLEAN)
 	@rm -f ./callgrind.out.*
@@ -11,8 +11,6 @@ distclean:
 
 DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
 	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
-
-release.wasm: web/index.html
 
 tmp/stdlib.no: $(STDLIB_NOBS) $(STDLIB_MOBS)
 	@mkdir -p tmp/
@@ -68,6 +66,12 @@ rund: $(NUJEL)
 runn: $(FUTURE_NUJEL)
 	@rlwrap ./$(FUTURE_NUJEL)
 
+run.wasm: nujel.wasm
+	@rlwrap wasmtime --dir=. nujel.wasm
+
+test.wasm: nujel.wasm
+	@wasmtime --dir=. nujel.wasm tools/tests.nuj
+
 install: release
 	mkdir -p $(bindir)
 	$(INSTALL) ./$(NUJEL) $(bindir)
@@ -75,6 +79,9 @@ install: release
 install.musl: release.musl
 	mkdir -p $(bindir)
 	$(INSTALL) ./$(NUJEL) $(bindir)
+
+release.wasm: nujel.wasm
+	@wasm-strip nujel.wasm
 
 $(FUZZ_NUJEL): $(RUNTIME_SRCS)
 	@$(AFL_CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)

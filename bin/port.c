@@ -4,7 +4,7 @@
 #include "private.h"
 #endif
 
-#if (!defined(_WIN32))
+#if (!defined(_WIN32)) && (!defined(__wasi__))
 #include <termios.h>
 #include <stdlib.h>
 
@@ -269,7 +269,7 @@ void lOperationsPort(lClosure *c){
 	lAddNativeFunc(c,"file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
 	lAddNativeFunc(c,"file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
 	lAddNativeFunc(c,"file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
-#if (!defined(_WIN32))
+#if (!defined(_WIN32)) && (!defined(__wasi__))
 	lAddNativeFunc(c,"file/raw*", "(handle)",                    "Set an input stream into raw mode", lnfFileRaw);
 #endif
 }

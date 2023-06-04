@@ -82,5 +82,10 @@ bool lValEqual(const lVal a, const lVal b){
 		const uint blen = lBufferLength(b.vString);
 		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
 	}
+	#ifdef __wasm__
+	else if(unlikely(a.type == ltBool)){
+		return a.vBool == b.vBool;
+	}
+	#endif
 	return a.vPointer == b.vPointer;
 }

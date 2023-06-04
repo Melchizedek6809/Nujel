@@ -37,6 +37,9 @@ extern char **environ;
 /* Add Environment args to `environment/variables` */
 void initEnvironmentMap(lClosure *c){
 	lTree *t = NULL;
+	#ifdef __wasi__
+	t = addVar("PATH=",t); // Necessary so that tests don't fail
+	#endif
 	for(int i=0;environ[i];i++){
 		t = addVar(environ[i],t);
 	}

@@ -20,13 +20,13 @@
 #include <sys/stat.h>
 
 
-#if defined(__EMSCRIPTEN__) || defined(_MSC_VER)
+#if defined(__wasm__) || defined(_MSC_VER)
 	#define NO_POPEN
 #else
 	#define ENABLE_POPEN
 #endif
 
-#if (!defined(_WIN32))
+#if (!defined(_WIN32)) && (!defined(__wasi__))
 	#include <sys/wait.h>
 #endif
 
@@ -117,8 +117,7 @@ static lVal lnfFileStat(lClosure *c, lVal v){
 	DWORD dwError = 0;
 
 	if (unlikely(lStringLength(filename) >= MAX_PATH)) {
-		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
-		return NULL;
+		return lValException("invalid-call", "Directory path is too long.", lCar(v));
 	}
 
 	hFind = FindFirstFile(lStringData(filename), &ffd);
@@ -222,8 +221,7 @@ static lVal lnfPopen(lClosure *c, lVal v){
 }
 #else
 static lVal lnfPopen(lClosure *c, lVal v){
-	lExceptionThrowValClo("not-available","(popen) is not implemented on your current platform, please try and work around that", v, c);
-	return NULL;
+	return lValException("not-available","(popen) is not implemented on your current platform, please try and work around that", v);
 }
 #endif
 
@@ -242,8 +240,7 @@ static lVal lnfDirectoryRead(lClosure *c, lVal v){
 
 	StringCchLength(path, MAX_PATH, &length_of_arg);
 	if (length_of_arg > (MAX_PATH - 3)){
-		lExceptionThrowValClo("invalid-call", "Directory path is too long.", lCar(v), c);
-		return NULL;
+		return lValException("invalid-call", "Directory path is too long.", lCar(v));
 	}
 
 	StringCchCopy(szDir, MAX_PATH, path);
@@ -252,8 +249,7 @@ static lVal lnfDirectoryRead(lClosure *c, lVal v){
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
-		lExceptionThrowValClo("invalid-call", "FindFirstFile failed", lCar(v), c);
-		return NULL;
+		return lValException("invalid-call", "FindFirstFile failed", lCar(v));
 	}
 
 	lVal ret = NULL;
