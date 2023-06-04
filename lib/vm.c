@@ -689,11 +689,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp++] = ret;
 			vmbreak;
 		}
-	topLevelReturn:
+	topLevelReturn: {
 		lVal ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);
 		lRootsRet(RSP);
-		return ret;
+		return ret; }
 	}}
 }
