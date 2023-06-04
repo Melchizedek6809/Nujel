@@ -7,15 +7,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static lVal lValExceptionNonNumeric(lVal v){
-	return lValException("type-error","Can't calculate with non numeric types", v);
-}
-
-static lVal lValExceptionFloat(lVal v){
-	return lValException("type-error","This function can only be used with floats",v);
-}
-
-lVal lAdd(lVal a, lVal b){
+static lVal lAdd(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return lValInt(0);}
 	if(unlikely(b.type == ltNil)){return a;}
 	lType t = lTypecast(a.type, b.type);
@@ -45,7 +37,7 @@ lVal lAdd(lVal a, lVal b){
 	}
 }
 
-lVal lSub(lVal a, lVal b){
+static lVal lSub(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){
 		return lValExceptionArity(a, 2);
 	}
@@ -86,7 +78,7 @@ lVal lSub(lVal a, lVal b){
 	}
 }
 
-lVal lMul(lVal a, lVal b){
+static lVal lMul(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return lValInt(1);}
 	if(unlikely(b.type == ltNil)){
 		return lValExceptionArity(b, 2);
@@ -118,7 +110,7 @@ lVal lMul(lVal a, lVal b){
 	}
 }
 
-lVal lDiv(lVal a, lVal b){
+static lVal lDiv(lVal a, lVal b){
 	if(unlikely((a.type == ltNil) || (b.type == ltNil))){
 		return lValExceptionArity(b, 2);
 	}
@@ -140,7 +132,7 @@ lVal lDiv(lVal a, lVal b){
 	}
 }
 
-lVal lRem(lVal a, lVal b){
+static lVal lRem(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return b;}
 	if(unlikely(b.type == ltNil)){return a;}
 	lType t = lTypecast(a.type, b.type);

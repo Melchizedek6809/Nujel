@@ -4,6 +4,7 @@
 #include "nujel-private.h"
 #endif
 
+#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -174,49 +175,209 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = lValInt(v);
 		vmbreak;}
 	vmcase(lopAdd) {
-		lVal v = lAdd(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
-			goto throwException;
-		}
-		ctx.valueStack[ctx.sp-2] = v;
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
+		if(likely(a.type == ltInt)){
+			if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vInt += b.vInt;
+			} else if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1] = (lVal) {
+					ltFloat,
+					.vFloat = b.vFloat + a.vInt
+				};
+			} else if(b.type != ltNil){
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			}
+		} else if(likely(a.type == ltFloat)){
+			if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1].vFloat += b.vFloat;
+			} else if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vFloat += b.vInt;
+			} else if(b.type != ltNil) {
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			}
+		} else if(a.type != ltNil){
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		} else {
+			ctx.valueStack[ctx.sp-1] = lValInt(0);
+		}
 		vmbreak; }
 	vmcase(lopSub) {
-		lVal v = lSub(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely(a.type == ltInt)){
+			if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vInt -= b.vInt;
+			} else if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1] = (lVal) {
+					ltFloat,
+					.vFloat = a.vInt - b.vFloat
+				};
+			} else if(b.type != ltNil){
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				ctx.valueStack[ctx.sp-1].vInt = -ctx.valueStack[ctx.sp-1].vInt;
+			}
+		} else if(likely(a.type == ltFloat)){
+			if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1].vFloat -= b.vFloat;
+			} else if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vFloat -= b.vInt;
+			} else if(b.type != ltNil) {
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				ctx.valueStack[ctx.sp-1].vFloat = -ctx.valueStack[ctx.sp-1].vFloat;
+			}
+		} else if(a.type != ltNil){
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		} else {
+			exceptionThrownValue = lValExceptionArity(a, 2);
 			goto throwException;
 		}
-		ctx.valueStack[ctx.sp-2] = v;
-		ctx.sp--;
 		vmbreak; }
 	vmcase(lopMul) {
-		lVal v = lMul(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
-			goto throwException;
-		}
-		ctx.valueStack[ctx.sp-2] = v;
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
+		if(likely(a.type == ltInt)){
+			if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vInt *= b.vInt;
+			} else if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1] = (lVal) {
+					ltFloat,
+					.vFloat = a.vInt * b.vFloat
+				};
+			} else if(b.type != ltNil){
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				exceptionThrownValue = lValExceptionArity(a, 2);
+				goto throwException;
+			}
+		} else if(likely(a.type == ltFloat)){
+			if(likely(b.type == ltFloat)){
+				ctx.valueStack[ctx.sp-1].vFloat *= b.vFloat;
+			} else if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vFloat *= b.vInt;
+			} else if(b.type != ltNil) {
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				exceptionThrownValue = lValExceptionArity(a, 2);
+				goto throwException;
+			}
+		} else if(a.type != ltNil){
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		} else {
+			ctx.valueStack[ctx.sp-1] = lValInt(1);
+		}
 		vmbreak; }
 	vmcase(lopDiv) {
-		lVal v = lDiv(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely(a.type == ltInt)){
+			if(likely(b.type == ltInt)){
+				lVal r = lValFloat((float)a.vInt / (float)b.vInt);
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(likely(b.type == ltFloat)){
+				lVal r = lValFloat((float)a.vInt / b.vFloat);
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(b.type != ltNil){
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				exceptionThrownValue = lValExceptionArity(a, 2);
+				goto throwException;
+			}
+		} else if(likely(a.type == ltFloat)){
+			if(likely(b.type == ltFloat)){
+				lVal r = lValFloat(a.vFloat / b.vFloat);
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(likely(b.type == ltInt)){
+				lVal r = lValFloat(a.vFloat / (float)b.vInt);
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(b.type != ltNil) {
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			} else {
+				exceptionThrownValue = lValExceptionArity(a, 2);
+				goto throwException;
+			}
+		} else if(a.type != ltNil){
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		} else {
+			exceptionThrownValue = lValExceptionArity(a, 2);
 			goto throwException;
 		}
-		ctx.valueStack[ctx.sp-2] = v;
-		ctx.sp--;
 		vmbreak; }
 	vmcase(lopRem) {
-		lVal v = lRem(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely(a.type == ltInt)){
+			if(likely(b.type == ltInt)){
+				ctx.valueStack[ctx.sp-1].vInt = a.vInt % b.vInt;
+			} else if(likely(b.type == ltFloat)){
+				lVal r = lValFloat(fmod(a.vInt, b.vFloat));
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(b.type != ltNil){
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			}
+		} else if(likely(a.type == ltFloat)){
+			if(likely(b.type == ltFloat)){
+				lVal r = lValFloat(fmod(a.vFloat, b.vFloat));
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(likely(b.type == ltInt)){
+				lVal r = lValFloat(fmod(a.vFloat, b.vInt));
+				if(unlikely(r.type == ltException)){
+					exceptionThrownValue = r;
+					goto throwException;
+				}
+				ctx.valueStack[ctx.sp-1] = r;
+			} else if(b.type != ltNil) {
+				exceptionThrownValue = lValExceptionNonNumeric(b);
+				goto throwException;
+			}
+		} else if(a.type != ltNil){
+			exceptionThrownValue = lValExceptionNonNumeric(b);
 			goto throwException;
 		}
-		ctx.valueStack[ctx.sp-2] = v;
-		ctx.sp--;
 		vmbreak; }
 	vmcase(lopIntAdd)
 		ctx.valueStack[ctx.sp-2].vInt = ctx.valueStack[ctx.sp-2].vInt + ctx.valueStack[ctx.sp-1].vInt;
@@ -528,7 +689,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp++] = ret;
 			vmbreak;
 		}
-		topLevelReturn:
+	topLevelReturn:
 		lVal ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);

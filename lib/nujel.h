@@ -141,6 +141,7 @@ struct lPair {
 void      lInit    ();
 lClosure *lNewRoot ();
 lVal      lApply   (lClosure *c, lVal args, lVal fun);
+lVal      lLambda  (lClosure *c, lVal args, lVal lambda);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
 const void *         lBufferData            (lBuffer *v);
@@ -189,6 +190,8 @@ const char *    castToString     (const lVal v, const char *fallback);
 
 lVal            lValExceptionType       (lVal v, lType T);
 lVal            lValExceptionArity      (lVal v, int arity);
+lVal            lValExceptionNonNumeric (lVal v);
+lVal            lValExceptionFloat      (lVal v);
 lVal            requireInt              (lVal v);
 lVal            requireNaturalInt       (lVal v);
 lVal            requireFloat            (lVal v);

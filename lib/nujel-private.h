@@ -388,12 +388,6 @@ void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
 
-lVal lAdd(lVal a, lVal b);
-lVal lSub(lVal a, lVal b);
-lVal lMul(lVal a, lVal b);
-lVal lDiv(lVal a, lVal b);
-lVal lRem(lVal a, lVal b);
-
 lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lClosure *c, lVal col, lVal key);
 

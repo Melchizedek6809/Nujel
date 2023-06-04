@@ -23,6 +23,14 @@ lVal lValExceptionArity(lVal v, int arity){
 	return lValException("arity-error", buf, v);
 }
 
+lVal lValExceptionNonNumeric(lVal v){
+	return lValException("type-error","Can't calculate with non numeric types", v);
+}
+
+lVal lValExceptionFloat(lVal v){
+	return lValException("type-error","This function can only be used with floats",v);
+}
+
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal v, i64 fallback){
 	typeswitch(v){
