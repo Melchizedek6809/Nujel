@@ -115,7 +115,7 @@ static lVal lnfFileReadAst(lClosure *c, lVal v){
 	void *buf = NULL;
 	i64 bufSize = 0;
 	i64 bytesRead = 0;
-	typeswitch(contentV){
+	switch(contentV.type){
 	default:
 		return lValException("type-error", "Can't read into that", contentV);
 	case ltBuffer:
@@ -160,7 +160,7 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 	const void * buf = NULL;
 	i64 bufSize = 0;
 	i64 bytesWritten = 0;
-	typeswitch(contentV){
+	switch(contentV.type){
 	default:
 		return lValException("type-error", "Can't read into that", contentV);
 	case ltString:

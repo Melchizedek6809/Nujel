@@ -362,7 +362,7 @@ static lVal lnfAsh(lClosure *c, lVal v){
 lVal lnfAbs(lClosure *c, lVal v){
 	(void)c;
 	lVal t = lCar(v);
-	typeswitch(t){
+	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(v);
 	case ltFloat:
@@ -375,7 +375,7 @@ lVal lnfAbs(lClosure *c, lVal v){
 lVal lnfCbrt(lClosure *c, lVal v){
 	(void)c;
 	lVal t = lCar(v);
-	typeswitch(t){
+	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(v);
 	case ltFloat:
@@ -388,7 +388,7 @@ lVal lnfCbrt(lClosure *c, lVal v){
 lVal lnfSqrt(lClosure *c, lVal v){
 	(void)c;
 	lVal t = lCar(v);
-	typeswitch(t){
+	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(v);
 	case ltFloat:

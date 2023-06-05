@@ -52,7 +52,7 @@ static lVal lnfBufferAllocate(lClosure *c, lVal v) {
 static lVal lnfBufferLengthGet(lClosure *c, lVal v){
 	(void)c;
 	lVal car = lCar(v);
-	typeswitch(car){
+	switch(car.type){
 	default:
 		return lValException("type-error", "Expected a buffer or something compatible", car);
 	case ltString:
@@ -92,7 +92,7 @@ static lVal lnfBufferLengthSet(lClosure *c, lVal v){
 static lVal lnfBufferImmutableGet(lClosure *c, lVal v){
 	(void)c;
 	lVal car = lCar(v);
-	typeswitch(car){
+	switch(car.type){
 	case ltBufferView:
 		return lValBool(car.vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
 	case ltString:
@@ -143,7 +143,7 @@ static lVal lnfBufferCopy(lClosure *c, lVal v){
 	const void *buf = NULL;
 	int length = 0;
 
-	typeswitch(vSrc){
+	switch(vSrc.type){
 	case ltString:
 	case ltBuffer:
 		buf = vSrc.vBuffer->data;
@@ -222,7 +222,7 @@ static lVal lnfBufferViewSet(lClosure *c, lVal v){
 	}
 	const size_t i = iv.vInt;
 
-	typeswitch(car){
+	switch(car.type){
 	case ltBufferView:
 		buf      = car.vBufferView->buf->buf;
 		length   = car.vBufferView->length;

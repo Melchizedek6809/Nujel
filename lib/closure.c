@@ -73,24 +73,22 @@ lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 
 /* Return TRUE if C contains a binding for S, storing the value in V */
 bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal *v){
-	bool found = false;
-	while(c != NULL){
-		lVal t = lTreeGet(c->data,s,&found);
-		if(found){
+	for (lClosure *cc = c; cc; cc = cc->parent) {
+		lVal t = lTreeRef(cc->data, s);
+		if(t.type != ltException){
 			if(v != NULL){
 				*v = t;
 			}
 			return true;
 		}
-		c = c->parent;
 	}
 	return false;
 }
 
 lVal lGetClosureSym(lClosure *c, const lSymbol *s){
 	for (lClosure *cc = c; cc; cc = cc->parent) {
-		lVal ret;
-		if(lTreeHas(cc->data,s,&ret)){
+		lVal ret = lTreeRef(cc->data, s);
+		if(ret.type != ltException){
 			return ret;
 		}
 	}
@@ -104,13 +102,12 @@ void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal v){
 
 /* Set the value bound to S in C to V, if it has already been bound */
 bool lSetClosureSym(lClosure *c, const lSymbol *s, lVal v){
-	if(unlikely(c == NULL)){return false;}
-	bool found = false;
-	lTreeSet(c->data, s, v, &found);
-	if(found){
-		return true;
+	for (lClosure *cc = c; cc; cc = cc->parent) {
+		if(lTreeSet(cc->data, s, v)){
+			return true;
+		}
 	}
-	return lSetClosureSym(c->parent, s, v);
+	return false;
 }
 
 /* Turn STR into a symbol, and bind VAL to it within C */

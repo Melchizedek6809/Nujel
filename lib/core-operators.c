@@ -295,12 +295,14 @@ static lVal lnfMetaGet(lClosure *c, lVal v){
 	}
 	const lSymbol *key = cadr.vSymbol;
 	lVal l = lCar(v);
-	typeswitch(l){
-	case ltNativeFunc:
-		return lTreeGet(l.vNFunc->meta, key, NULL);
+	switch(l.type){
+	case ltNativeFunc: {
+		lVal t = lTreeRef(l.vNFunc->meta, key);
+		return t.type != ltException ? t : NIL; }
 	case ltLambda:
-	case ltEnvironment:
-		return lTreeGet(l.vClosure->meta, key, NULL);
+	case ltEnvironment: {
+		lVal t = lTreeRef(l.vClosure->meta, key);
+		return t.type != ltException ? t : NIL; }
 	default:
 		return NIL;
 	}
@@ -376,7 +378,7 @@ static lVal lnfKeywordToSymbol(lClosure *c, lVal v){
 }
 
 static i64 lValToId(lVal v){
-	typeswitch(v){
+	switch(v.type){
 	default:      return 0;
 	case ltEnvironment:
 	case ltMacro:
@@ -404,7 +406,7 @@ static lVal lnfString(lClosure *c, lVal v){
 	char buf[64];
 	int snret;
 	lVal a = lCar(v);
-	typeswitch(a){
+	switch(a.type){
 	default:
 		return lValException("type-error", "Can't convert that into a string", a);
 	case ltNil:

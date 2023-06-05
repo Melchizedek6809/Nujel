@@ -170,10 +170,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmdispatch(*ip++){
 	vmcase(lopNOP)
 		vmbreak;
-	vmcase(lopIntByte) {
-		const i8 v = *ip++;
-		ctx.valueStack[ctx.sp++] = lValInt(v);
-		vmbreak;}
+	vmcase(lopIntByte)
+		ctx.valueStack[ctx.sp++] = lValInt((i8)*ip++);
+		vmbreak;
 	vmcase(lopAdd) {
 		lVal a = ctx.valueStack[ctx.sp-2];
 		lVal b = ctx.valueStack[ctx.sp-1];
@@ -351,7 +350,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 					goto throwException;
 				}
 				ctx.valueStack[ctx.sp-1] = r;
-			} else if(b.type != ltNil){
+			} else if(unlikely(b.type != ltNil)){
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
 			}
@@ -370,17 +369,17 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 					goto throwException;
 				}
 				ctx.valueStack[ctx.sp-1] = r;
-			} else if(b.type != ltNil) {
+			} else if(unlikely(b.type != ltNil)) {
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
 			}
-		} else if(a.type != ltNil){
+		} else if(unlikely(a.type != ltNil)){
 			exceptionThrownValue = lValExceptionNonNumeric(b);
 			goto throwException;
 		}
 		vmbreak; }
 	vmcase(lopIntAdd)
-		ctx.valueStack[ctx.sp-2].vInt = ctx.valueStack[ctx.sp-2].vInt + ctx.valueStack[ctx.sp-1].vInt;
+		ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
 		ctx.sp--;
 		vmbreak;
 	vmcase(lopCons)

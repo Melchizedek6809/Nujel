@@ -33,7 +33,7 @@ lVal lValExceptionFloat(lVal v){
 
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal v, i64 fallback){
-	typeswitch(v){
+	switch(v.type){
 		case ltFloat: return v.vFloat;
 		case ltInt:   return v.vInt;
 		default:      return fallback;

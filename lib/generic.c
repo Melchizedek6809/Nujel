@@ -43,7 +43,7 @@ static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
 }
 
 lVal lGenericRef(lClosure *c, lVal col, lVal key){
-	typeswitch(col){
+	switch(col.type){
 	case ltPair: {
 		lVal keyVal = requireNaturalInt(key);
 		if(unlikely(keyVal.type == ltException)){
@@ -55,11 +55,7 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		}
 		return lCar(col); }
 	case ltBytecodeArr: {
-		lVal bc = requireBytecodeArray(col);
-		if(unlikely(bc.type == ltException)){
-			return bc;
-		}
-		const lBytecodeArray *arr = bc.vBytecodeArr;
+		const lBytecodeArray *arr = col.vBytecodeArr;
 		lVal keyVal = requireNaturalInt(key);
 		if(unlikely(keyVal.type == ltException)){
 			return keyVal;
@@ -70,11 +66,7 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		}
 		return lValInt(arr->data[i]); }
 	case ltArray: {
-		lVal t = requireArray(col);
-		if(unlikely(t.type == ltException)){
-			return t;
-		}
-		lArray *arr = t.vArray;
+		lArray *arr = col.vArray;
 		lVal keyVal = requireNaturalInt(key);
 		if(unlikely(keyVal.type == ltException)){
 			return keyVal;
@@ -104,15 +96,11 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		}
 		return lBufferViewRef(c, col, t.vInt); }
 	case ltTree: {
-		lVal t = requireTree(col);
-		if(unlikely(t.type == ltException)){
-			return t;
+		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
+			return lValExceptionType(col, ltKeyword);
 		}
-		lVal tk = requireSymbolic(key);
-		if(unlikely(tk.type == ltException)){
-			return tk;
-		}
-		return lTreeGet(t.vTree->root, tk.vSymbol, NULL); }
+		lVal r = lTreeRef(col.vTree->root, key.vSymbol);
+		return r.type != ltException ? r : NIL; }
 	default:
 		return lValException("type-error", "Can't ref that", col);
 	}

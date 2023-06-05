@@ -30,7 +30,7 @@ void simplePrintTree(lTree *t){
  * we throw past the root exception handler.
  */
 void simplePrintVal(lVal v){
-	typeswitch(v){
+	switch(v.type){
 	default:
 		fprintf(stderr, "#<not-printable-from-c %i> ", v.type);
 		break;

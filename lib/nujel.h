@@ -25,7 +25,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define countof(x) (sizeof(x)/sizeof(*x))
-#define typeswitch(v) switch(v.type)
 
 /*
  | Now for some type/struct definitions
@@ -234,10 +233,8 @@ lVal     lAddNativeFuncPureFold (lClosure *c, const char *sym, const char *args,
 lTree *lTreeNew             (const lSymbol *s, lVal v);
 lTree *lTreeDup             (const lTree *t);
 
-lVal   lTreeGet             (const lTree *t, const lSymbol *s, bool *found);
-bool   lTreeHas             (const lTree *t, const lSymbol *s, lVal *value);
-
-void   lTreeSet             (      lTree *t, const lSymbol *s, lVal v, bool *found);
+lVal   lTreeRef             (const lTree *t, const lSymbol *s);
+bool   lTreeSet             (      lTree *t, const lSymbol *s, lVal v);
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
 
 /*
@@ -258,6 +255,10 @@ static inline lVal lValFloat(double v){
 		return lValException("float-inf","INF is disallowed in Nujel", NIL);
 	}
 	return (lVal){ltFloat, .vFloat = v};
+}
+
+static inline lVal lValExceptionSimple(){
+	return (lVal){ltException, .vList = NULL};
 }
 
 static inline lVal lValInt(i64 v){

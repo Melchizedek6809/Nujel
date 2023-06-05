@@ -28,19 +28,16 @@ static int lTreeGetBalance(const lTree *t){
 
 /* Reset S to be associated to V if it has already been bound, storing TRUE in
  * FOUND on success */
-void lTreeSet(lTree *t, const lSymbol *s, lVal v, bool *found){
-	if(unlikely(t == NULL)){
-		return;
-	}else if(unlikely(s == t->key)){
-		t->value = v;
-		if(likely(found)){
-			*found = true;
+bool lTreeSet(lTree *t, const lSymbol *s, lVal v){
+	lTree *c = t;
+	while(c != NULL){
+		if(c->key == s){
+			c->value = v;
+			return true;
 		}
-	}else if(s > t->key){
-		lTreeSet(t->right,s,v,found);
-	}else{
-		lTreeSet(t->left,s,v,found);
+		c = s > c->key ? c->right : c->left;
 	}
+	return false;
 }
 
 /* Rotate the tree X to the left, in order to balance the tree again */
@@ -117,26 +114,16 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal v){
 }
 
 /* Get whatever value is associated in T to S,
- * setting FOUND to true if successful */
-lVal lTreeGet(const lTree *t, const lSymbol *s, bool *found){
+ * Returns a simple Exception if nothing is found */
+lVal lTreeRef(const lTree *t, const lSymbol *s){
 	const lTree *c = t;
-	while(likely(c)){
-		if(unlikely(s == c->key)){
-			if(likely(found != NULL)){*found = true;}
+	while(c){
+		if(s == c->key){
 			return c->value;
 		}
 		c = s > c->key ? c->right : c->left;
 	}
-	return NIL;
-}
-
-/* Return true if there is an association for S in T, storing the value
- * in values, if found. */
-bool lTreeHas(const lTree *t, const lSymbol *s, lVal *value){
-	bool found = false;
-	lVal v = lTreeGet(t, s, &found);
-	if(found && value){*value = v;}
-	return found;
+	return lValExceptionSimple();;
 }
 
 /* Add all the keys within T to the beginning LIST */
@@ -226,7 +213,7 @@ static lVal lnfTreeHas(lClosure* c, lVal v) {
 	if(unlikely(cadr.type == ltException)){
 		return cadr;
 	}
-	return lValBool(lTreeHas(car.vTree->root, cadr.vSymbol, NULL));
+	return lValBool(lTreeRef(car.vTree->root, cadr.vSymbol).type != ltException);
 }
 
 static lVal lnfTreeSet(lClosure* c, lVal v) {
