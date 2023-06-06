@@ -321,12 +321,14 @@ static lVal lParseBytecodeArray(lReadContext *s){
 
 		readSecondNibble:
 		if(s->data >= s->bufEnd){
+			free(d);
 			return lValExceptionBCRead(s, NIL, "sudden end");
 		}
 		c = *s->data++;
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
+		free(d);
 		return lValException("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
 
 		storeOP:
@@ -346,12 +348,14 @@ static lVal lParseBuffer(lReadContext *s){
 		u8 c = *s->data;
 		if(isspace(c) || isnonsymbol(c)){break;}
 		if(c <  '0'){
+			free(buf);
 			return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
 		}
 		if(c <= '9'){
 			curByte = (c - '0') << 4;
 		}else{
 			if((c < 'A') || (c > 'F')){
+				free(buf);
 				return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
 			}
 			curByte = ((c - 'A') + 0xA) << 4;

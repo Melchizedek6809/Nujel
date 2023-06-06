@@ -69,7 +69,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	lClosure * c = callingClosure;
 	lThread ctx;
 	const lVal * lits = text->literals->data;
-	lVal exceptionThrownValue = NIL;
+	lVal exceptionThrownValue;
 
 	#ifdef NUJEL_USE_JUMPTABLE
 	#undef vmdispatch

@@ -31,6 +31,7 @@ static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
 	for(int i=0;i<len;i++){
 		lVal t = requireInt(arr->data[i]);
 		if(unlikely(t.type == ltException)){
+			free(ops);
 			return t;
 		}
 		ops[i] = t.vInt;
