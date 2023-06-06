@@ -5,7 +5,7 @@
 ;; Find the largest prime factor of 600851475143
 
 (defn prime? (v)
-      (def mv (int v))
+      (def mv v)
       (def i 2)
       (while (< i mv)
              (when (zero? (rem v i))
@@ -15,13 +15,13 @@
 
 (defn prime-factors (v)
       (def factors #nil)
-      (def mv (+ 1 (int (/ v 2))))
+      (def mv (+ 1 (div/int v 2)))
       (def i 2)
       (while (<= i mv)
              (when (prime? i)
                    (while (zero? (rem v i))
-                          (set! v (/ v i))
-                          (set! mv (+ 1 (int v)))
+                          (set! v (div/int v i))
+                          (set! mv (+ 1 v))
                           (set! factors (cons i factors))))
              (inc! i))
       (return factors))
