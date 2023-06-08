@@ -5,9 +5,11 @@
 .two-col > *:nth-child(even) {
 	float:right;
 }
-.two-col:after {
+.two-col::after {
 	content:'';
 	clear:both;
+        display:block;
+        position:relative;
 }
 
 h1 {
