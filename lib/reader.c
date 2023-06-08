@@ -424,12 +424,14 @@ static lVal lParseBuffer(lReadContext *s) {
             return lValExceptionReaderStartEnd(s, "Unexpected end of literal");
         }
         if (c < '0') {
+            free(buf);
             return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
         }
         if (c <= '9') {
             curByte |= (c - '0');
         } else {
             if ((c < 'A') || (c > 'F')) {
+                free(buf);
                 return lValExceptionReaderStartEnd(s, "Wrong char in buffer lit.");
             }
             curByte |= ((c - 'A') + 0xA);
