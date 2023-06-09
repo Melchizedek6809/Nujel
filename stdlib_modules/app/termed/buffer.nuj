@@ -106,6 +106,18 @@
         (return))
       (tree/set! buf :pos-x (inc pos-x)))
 
+(defn delete-forward-char ()
+      :export
+      (def buf cur-buffer)
+      (def line (get-line buf (ref buf :pos-y)))
+      (when-not line (return))
+      (def pos-x (ref buf :pos-x))
+      (def bl (- (buffer/length line) 2))
+      (while (<= pos-x bl)
+        (buffer/set! line pos-x (ref line (inc pos-x)))
+        (inc! pos-x))
+      (buffer/set! line (- (buffer/length line) 1) 0))
+
 (defn backward-delete-char ()
       :export
       (def buf cur-buffer)

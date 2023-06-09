@@ -1,5 +1,5 @@
 (import (start stop show-cursor hide-cursor clear-line clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
-(import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line line-clean! line-clean?) :app/termed/buffer)
+(import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line line-clean! line-clean? delete-forward-char) :app/termed/buffer)
 
 (def buffers [])
 (def screen-width #nil)
@@ -24,10 +24,10 @@
       (fmt " L{y} - {bufname} - KeyCode: {last-char:X}"))
 
 (defn draw-modeline (buf)
-      (draw-box :blue 1 (dec screen-height) screen-width 1)
       (move-cursor 1 (dec screen-height))
       (set-color :yellow :blue)
-      (put-string (get-modeline buf))
+      (def colored-modeline (cat " " (pad-end (get-modeline buf) (dec screen-width))))
+      (put-string colored-modeline)
       (set-color :default :default))
 
 (defn draw-buffer-line (buf term-x term-y term-w line-y)
@@ -73,17 +73,24 @@
       (def buf (get-cur-buffer))
       (tree/set! buf :pos-x (line-length (ref buf :pos-y))))
 
+(defn clear-frame ()
+      (dotimes (y (- screen-height 1))
+               (move-cursor 0 y)
+               (clear-line)))
+
 (defn scroll-into-view ()
       (def buf (get-cur-buffer))
       (def frame-height (- screen-height 3))
       (when (< (- (ref buf :pos-y)
                   (ref buf :scroll-y)) 0)
         (array/fill! (ref buf :lines-clean) #f)
+        (clear-frame)
         (tree/set! buf :scroll-y (* scroll-interval (int (floor (/ (ref buf :pos-y) scroll-interval))))))
 
       (when (> (- (ref buf :pos-y)
                   (ref buf :scroll-y)) frame-height)
         (array/fill! (ref buf :lines-clean) #f)
+        (clear-frame)
         (tree/set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (ref buf :pos-y) frame-height) scroll-interval))))))
 
       (when (< (ref buf :scroll-y) 0)
@@ -93,8 +100,10 @@
 (defn read-bracketed-input ()
       (def c (poll-input))
       (when (= c #\A)
+        (dirty-buf!)
         (return (previous-line)))
       (when (= c #\B)
+        (dirty-buf!)
         (return (next-line)))
       (when (= c #\C)
         (return (forward-char)))
@@ -113,11 +122,13 @@
       (when (= c 3)
         (return (quit))))
 
+(defn dirty-buf! ()
+      (def buf (get-cur-buffer))
+      (line-clean! buf (ref buf :pos-y) #f))
+
 (defn read-input ()
       (def c (poll-input))
       (set! last-char c)
-      (def buf (get-cur-buffer))
-      (line-clean! buf (ref buf :pos-y) #f)
       (when (= c #x1B)
         (return (read-escaped-input)))
       (when (= c #x01) ; C-a
@@ -128,18 +139,26 @@
         (return (end-of-line)))
       (when (= c #x06) ; C-f
         (return (forward-char)))
-      (when (= c #x10) ; C-f
+      (when (= c #x10) ; C-p
+        (dirty-buf!)
         (return (previous-line)))
-      (when (= c #x0e) ; C-f
+      (when (= c #x0E) ; C-n
+        (dirty-buf!)
         (return (next-line)))
-      (when (= c #x18) ; C-f
+      (when (= c #x18) ; C-x
         (return (read-cx-input)))
+      (when (= c #x7E)
+        (dirty-buf!)
+        (return (delete-forward-char)))
       (when (= c #x7F)
+        (dirty-buf!)
         (return (backward-delete-char)))
       (when (= c #x0D)
+        (dirty-buf!)
         (return (insert-newline)))
       (when (and (>= c #x20)
                  (<  c #x80))
+        (dirty-buf!)
         (return (insert-char c))))
 
 (defn load-buffer (filename)
