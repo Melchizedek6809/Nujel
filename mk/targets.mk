@@ -113,6 +113,3 @@ update-stdlib: tmp/stdlib.c tmp/binlib.c
 
 show-section-size: $(NUJEL)
 	nm --print-size --size-sort --radix=d $<
-
-format:
-	clang-format -i bin/*.h bin/*.c lib/*.h lib/*.c

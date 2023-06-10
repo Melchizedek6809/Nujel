@@ -9,14 +9,14 @@
 #include <termios.h>
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #if defined(_MSC_VER)
-#include <io.h>
-#define access(path, mode) _access(path, mode)
+	#include  <io.h>
+	#define access(path,mode) _access(path,mode)
 #else
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
 extern lSymbol *lSymError;
@@ -29,6 +29,6 @@ void lOperationsIO(lClosure *c);
 void lOperationsPort(lClosure *c);
 void lOperationsInit(lClosure *c);
 
-int makeDir(const char *name);
+int  makeDir   (const char *name);
 
 #endif
