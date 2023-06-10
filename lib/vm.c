@@ -58,6 +58,17 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	}
 }
 
+static lVal stackTrace(const lThread *ctx){
+	lVal ret = NIL;
+	for(int i=0;i<=ctx->csp;i++){
+		lClosure *c = ctx->closureStack[i];
+		if(c->type == closureCall){
+			ret = lCons(lValLambda(c),ret);
+		}
+	}
+	return ret;
+}
+
 #define vmdispatch(o)	switch(o)
 #define vmcase(l)	case l:
 #define vmbreak	break
@@ -569,7 +580,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			while(t->cdr.type == ltPair){
 				t=t->cdr.vList;
 			}
-			t->cdr = lCons(lValLambda(c),NIL);
+			t->cdr = lCons(stackTrace(&ctx),NIL);
 		}
 
 		while(c->type != closureTry){
@@ -652,7 +663,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			c->sp   = ctx.sp;
 			c->ip   = ip;
 
-			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(c, cargs, fun);
+			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
 			c = ctx.closureStack[ctx.csp];
 			ip = c->ip;
 			ctx.text = ops = c->text;

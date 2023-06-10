@@ -15,12 +15,11 @@ lClosure *lClosureNew(lClosure *parent, closureType t) {
 	return c;
 }
 
-lClosure *lClosureNewFunCall(lClosure *parent, lVal args, lVal lambda) {
+lClosure *lClosureNewFunCall(lVal args, lVal lambda) {
 	lClosure *tmpc = lClosureAllocRaw();
 	tmpc->parent = lambda.vClosure;
 	tmpc->type   = closureCall;
 	tmpc->text   = lambda.vClosure->text;
-	tmpc->caller = parent;
 	tmpc->ip     = tmpc->text->data;
 	for (lVal n = lambda.vClosure->args; ; n = n.vList->cdr) {
 		if (likely(n.type == ltPair)) {

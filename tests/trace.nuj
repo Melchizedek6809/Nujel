@@ -1,0 +1,10 @@
+(defn third-one (c)
+      (ref #nil 123))
+
+(defn second-one (b c)
+      (third-one c))
+
+(defn first-one (a b c)
+      (second-one b c))
+
+(first-one :a 2 "c")

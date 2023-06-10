@@ -128,7 +128,6 @@ struct lClosure {
 		lClosure *parent;
 		lClosure *nextFree;
 	};
-	lClosure *caller;
 	lTree *data, *meta;
 	lBytecodeArray *text;
 	lBytecodeOp *ip;
@@ -157,7 +156,7 @@ struct lThread {
  | Closure related procedures
  */
 lClosure *lClosureNew        (lClosure *parent, closureType t);
-lClosure *lClosureNewFunCall (lClosure *parent, lVal args, lVal lambda);
+lClosure *lClosureNewFunCall (lVal args, lVal lambda);
 void      lClosureSetMeta    (lClosure *c, lVal doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 lVal      lLambdaNew         (lClosure *parent, lVal args, lVal body);
@@ -226,7 +225,7 @@ typedef enum lOpcode {
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
-lVal  lLambda              (lClosure *c, lVal args, lVal lambda);
+lVal  lLambda              (lVal args, lVal lambda);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 void  simplePrintVal       (lVal v);
 void  simplePrintTree      (lTree *t);

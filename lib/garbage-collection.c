@@ -141,8 +141,6 @@ void lClosureGCMark(const lClosure *v){
 	lTreeGCMark(v->meta);
 	lBytecodeArrayMark(v->text);
 	lValGCMark(v->args);
-
-	lClosureGCMark(v->caller);
 }
 
 void lArrayGCMark(const lArray *v){

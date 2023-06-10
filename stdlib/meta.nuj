@@ -8,8 +8,7 @@
       :internal
       (when c
             (if (= c root-closure)
-                (cat (cat (int (or i 0)) "# <root environment>")
-                     "\r\n")
+                (fmt "{i}# <root environment>")
                 (do (def data (closure/data c))
                     (def l (length data))
                   (cat (int (or i 0)) "# "
@@ -19,19 +18,20 @@
                        " - "
                        (if (< l 16)
                            (string/write data)
-                           "-+- Very big tree structure -+-")
-                       "\r\n"
-                       (describe/closure (closure/caller c) (+ (int (or i 0)) 1)))))))
+                           "-+- Very big tree structure -+-"))))))
 
-(defn stacktrace ()
-      (print (describe/closure (closure/caller (current-lambda)))))
+(defn print/stacktrace (trace)
+      (def i -1)
+      (-> trace
+          (map (fn (c) (describe/closure c (inc! i))))
+          (join "\r\n")))
 
 (def print/error (let*
                    (defn print/error/wrap (i v)
                          (case i
                                (0 v)
                                (2 (string/write v))
-                               (3 (describe/closure v))
+                               (3 (print/stacktrace v))
                                (otherwise (string v))))
 
                    (defn print/error/iter (error i)

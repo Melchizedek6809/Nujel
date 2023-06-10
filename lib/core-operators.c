@@ -38,20 +38,6 @@ static lVal lnfClosureParent(lClosure *c, lVal v){
 	}
 }
 
-static lVal lnfClosureCaller(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireClosure(lCar(v));
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lClosure *cc = car.vClosure;
-	if((cc == NULL) || (cc->caller == NULL)){
-		return NIL;
-	}else{
-		return lValAlloc(cc->caller->type == closureObject ? ltEnvironment : ltLambda, cc->caller);
-	}
-}
-
 static lVal lnfClosureArguments(lClosure *c, lVal v){
 	(void)c;
 	lVal cc = requireCallable(lCar(v));
@@ -465,7 +451,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode);
 	lAddNativeFunc(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments);
 	lAddNativeFunc(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent);
-	lAddNativeFunc(c,"closure/caller",   "(clo)",  "Return the caller of CLO",                   lnfClosureCaller);
 
 	lAddNativeFunc(c,"current-closure",  "()",     "Return the current closure as an object",    lnfCurrentClosure);
 	lAddNativeFunc(c,"current-lambda",   "()",     "Return the current closure as a lambda",     lnfCurrentLambda);
