@@ -130,7 +130,7 @@ struct lClosure {
 	};
 	lTree *data, *meta;
 	lBytecodeArray *text;
-	lBytecodeOp *ip;
+	const lBytecodeOp *ip;
 	union {
 		lVal args;
 		lVal exceptionHandler;
@@ -220,7 +220,8 @@ typedef enum lOpcode {
 	lopCadr            = 0x2C,
 	lopMutableEval     = 0x2D,
 	lopList            = 0x2E,
-	lopThrow           = 0x2F
+	lopThrow           = 0x2F,
+	lopApplyCollection = 0x30
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
@@ -276,12 +277,6 @@ void lThreadGCMark      (lThread *c);
 void lBytecodeArrayMark (const lBytecodeArray *v);
 
 void lGarbageCollect();
-static inline void lGarbageCollectIfNecessary(){
-	if(unlikely(lGCShouldRunSoon)){
-		lGarbageCollect();
-	}
-}
-
 
 /*
  | Alocator related definitions

@@ -303,6 +303,12 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
         (exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count))
       (list #x4 arg-count))
 
+(defn $apply/collection ()
+      "(arguments function) -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
+      :cat :bytecode
+      :internal
+      (list #x30))
+
 (defn $list (count)
       "arguments -> (result) --- Read count arguments from the stack and put a list of those on the stack instead."
       :cat :bytecode

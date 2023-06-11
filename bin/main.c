@@ -30,7 +30,7 @@ int initNujel(int argc, char *argv[], lClosure *c){
 	for(int i = argc-1; i >= 0; i--){
 		ret = lCons(lValString(argv[i]), ret);
 	}
-	lLambda(ret, lGetClosureSym(c, lSymS("init")));
+	lApply(mainClosure, ret, lGetClosureSym(c, lSymS("init")));
 	return 0;
 }
 

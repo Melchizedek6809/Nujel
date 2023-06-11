@@ -140,14 +140,6 @@ static lVal lnfCurrentLambda(lClosure *c, lVal v){
 	return lValAlloc(ltLambda, c);
 }
 
-static lVal lnfApply(lClosure *c, lVal v){
-	lVal args = requirePair(lCadr(v));
-	if(unlikely(args.type == ltException)){
-		return args;
-	}
-	return lApply(c, args, lCar(v));
-}
-
 static lVal lnfCar(lClosure *c, lVal v){
 	(void)c;
 	return lCaar(v);
@@ -456,8 +448,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"current-lambda",   "()",     "Return the current closure as a lambda",     lnfCurrentLambda);
 
 	lAddNativeFunc(c,"symbol-table",  "()",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable);
-
-	lAddNativeFunc(c,"apply",       "(func list)", "Evaluate FUNC with LIST as arguments",  lnfApply);
 
 	lAddNativeFuncPure(c,"car",     "(list)",       "Return the head of LIST",          lnfCar);
 	lAddNativeFuncPure(c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr);

@@ -94,16 +94,11 @@ lVal lValException(const char *symbol, const char *error, lVal v) {
 	return l;
 }
 
-/* Evaluate the Nujel Lambda expression and return the results */
-lVal lLambda(lVal args, lVal lambda){
-	return lBytecodeEval(lClosureNewFunCall(args, lambda), lambda.vClosure->text);
-}
-
 /* Run fun with args, evaluating args if necessary  */
 lVal lApply(lClosure *c, lVal args, lVal fun){
 	switch(fun.type){
 	case ltMacro:
-	case ltLambda:     return lLambda(args,fun);
+	case ltLambda:     return lBytecodeEval(lClosureNewFunCall(args, fun), fun.vClosure->text);
 	case ltNativeFunc: return fun.vNFunc->fp(c,args);
 	default:           return lValException("type-error", "Can't apply to following val", fun);
 	}

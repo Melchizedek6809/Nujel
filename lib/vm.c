@@ -69,13 +69,19 @@ static lVal stackTrace(const lThread *ctx){
 	return ret;
 }
 
+static inline void lGarbageCollectIfNecessary(){
+	if(unlikely(lGCShouldRunSoon)){
+		lGarbageCollect();
+	}
+}
+
 #define vmdispatch(o)	switch(o)
 #define vmcase(l)	case l:
 #define vmbreak	break
 
 /* Evaluate ops within callingClosure after pushing args on the stack */
 lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
-	lBytecodeOp *ip;
+	const lBytecodeOp *ip;
 	lBytecodeArray * ops = text;
 	lClosure * c = callingClosure;
 	lThread ctx;
@@ -139,7 +145,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopCadr,
 		&&llopMutableEval,
 		&&llopList,
-		&&llopThrow
+		&&llopThrow,
+		&&llopApplyCollection
 	};
 	#endif
 
@@ -153,11 +160,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.text             = text;
 
 	const int RSP = lRootsGet();
-	lRootsClosurePush(callingClosure);
 	lRootsThreadPush(&ctx);
-
 	ip = ops->data;
-	lGarbageCollectIfNecessary();
 
 	while(true){
 		#ifdef VM_RUNTIME_CHECKS
@@ -655,6 +659,37 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		int len = *ip++;
 		lVal cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
 		ctx.sp = ctx.sp - len;
+		lVal fun = ctx.valueStack[--ctx.sp];
+		switch(fun.type){
+		case ltMacro:
+		case ltLambda:
+			c->text = ops;
+			c->sp   = ctx.sp;
+			c->ip   = ip;
+
+			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
+			c = ctx.closureStack[ctx.csp];
+			ip = c->ip;
+			ctx.text = ops = c->text;
+			lits = ops->literals->data;
+			lBytecodeEnsureSufficientStack(&ctx);
+			lGarbageCollectIfNecessary();
+			break;
+		case ltNativeFunc: {
+			lVal v = fun.vNFunc->fp(c, cargs);
+			if(unlikely(v.type == ltException)){
+				exceptionThrownValue = v;
+				goto throwException;
+			}
+			ctx.valueStack[ctx.sp++] = v;
+			break; }
+		default: {
+			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			goto throwException; }
+		}
+		vmbreak; }
+	vmcase(lopApplyCollection) {
+		lVal cargs = ctx.valueStack[--ctx.sp];
 		lVal fun = ctx.valueStack[--ctx.sp];
 		switch(fun.type){
 		case ltMacro:

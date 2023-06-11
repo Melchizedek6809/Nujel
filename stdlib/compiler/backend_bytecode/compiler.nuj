@@ -176,6 +176,17 @@
                                 ($closure/pop)
                                 (list :label end-sym)))
 
+                    (defn bytecompile/apply (source env)
+                          (def arg-count (length (cdr source)))
+                          (cond ((= arg-count 1)
+                                 (list (bytecompile* (cadr source) env)
+                                       ($list 0)
+                                       ($apply/collection)))
+                                ((= arg-count 2)
+                                 (list (bytecompile* (cadr source) env)
+                                       (bytecompile* (caddr source) env)
+                                       ($apply/collection)))))
+
                     (defn bytecompile* (source env)
                           "Compile the forms in source"
                           :cat :bytecode
@@ -199,6 +210,7 @@
                                        (environment* (bytecompile/environment* source env))
                                        (try          (bytecompile/try          source env))
                                        (return       (bytecompile/return       source env))
+                                       (apply        (bytecompile/apply        source env))
                                        (quote        (bytecompile/quote        (cadr source)))
                                        (otherwise    (bytecompile/procedure    op (cdr source) env (car source)))))
                                 (otherwise (if (pair? source)

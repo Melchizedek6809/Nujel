@@ -31,6 +31,7 @@ lVMErrorPlaceholder(lnfRef)
 lVMErrorPlaceholder(lnfCadr)
 lVMErrorPlaceholder(lnfList)
 lVMErrorPlaceholder(lnfThrow)
+lVMErrorPlaceholder(lnfApply)
 
 void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"do",              "body",                    "Evaluate body in order and returns the last result", lnfDo);
@@ -52,4 +53,5 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFuncPure(c,"ref",         "(collection key)",        "Look up key in collection", lnfRef);
 	lAddNativeFuncPure(c,"cadr",        "(list)",                  "Look up the cadr of list", lnfCadr);
 	lAddNativeFunc(c,"throw",           "(v)",                     "Throw V to the closest exception handler", lnfThrow);
+	lAddNativeFuncPure(c,"apply",       "(func list)", "Evaluate FUNC with LIST as arguments",  lnfApply);
 }
