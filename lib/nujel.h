@@ -140,7 +140,7 @@ struct lPair {
  */
 void      lInit    ();
 lClosure *lNewRoot ();
-lVal      lApply   (lClosure *c, lVal args, lVal fun);
+lVal      lApply   (lVal fun, lVal args);
 lClosure *lLoad    (lClosure *c, const char *expr);
 
 const void *         lBufferData            (lBuffer *v);

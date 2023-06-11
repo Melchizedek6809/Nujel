@@ -597,22 +597,36 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 			c = ctx.closureStack[--ctx.csp];
 		}
-		lVal handler = c->exceptionHandler;
-		lVal nv = lApply(c, lCons(exceptionThrownValue, NIL), handler);
-		if(unlikely(nv.type == ltException)){
-			exceptionThrownValue = nv;
-			c = ctx.closureStack[--ctx.csp];
-			goto throwException;
+
+		lVal cargs = lCons(exceptionThrownValue, NIL);
+		lVal fun = c->exceptionHandler;
+		c = ctx.closureStack[--ctx.csp];
+		switch(fun.type){
+		case ltLambda:
+			c = ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
+			ip = c->ip;
+			ctx.text = ops = c->text;
+			lits = ops->literals->data;
+			lBytecodeEnsureSufficientStack(&ctx);
+			lGarbageCollectIfNecessary();
+			break;
+		case ltNativeFunc: {
+			lVal nv = fun.vNFunc->fp(c, cargs);
+			if(unlikely(nv.type == ltException)){
+				exceptionThrownValue = nv;
+				goto throwException;
+			}
+			ops = c->text;
+	                lits = ops->literals->data;
+	                ip = c->ip;
+	                ctx.text = ops;
+	                ctx.sp = c->sp;
+			ctx.valueStack[ctx.sp++] = nv;
+			break; }
+		default: {
+			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			goto throwException; }
 		}
-
-		c = ctx.closureStack[--ctx.csp]; // We can't do this before the apply since otherwise the GC might collect the handler
-		ops = c->text;
-		lits = ops->literals->data;
-		ctx.text = ops;
-		ip = c->ip;
-		ctx.sp = c->sp;
-
-		ctx.valueStack[ctx.sp++] = nv;
 		vmbreak; }
 	vmcase(lopMacroDynamic)
 	vmcase(lopFnDynamic) {

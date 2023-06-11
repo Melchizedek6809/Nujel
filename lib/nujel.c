@@ -94,15 +94,12 @@ lVal lValException(const char *symbol, const char *error, lVal v) {
 	return l;
 }
 
-/* Run fun with args, evaluating args if necessary  */
-lVal lApply(lClosure *c, lVal args, lVal fun){
-	switch(fun.type){
-	case ltMacro:
-	case ltLambda:     return lBytecodeEval(lClosureNewFunCall(args, fun), fun.vClosure->text);
-	case ltNativeFunc: return fun.vNFunc->fp(c,args);
-	default:           return lValException("type-error", "Can't apply to following val", fun);
+/* Run fun with args  */
+lVal lApply(lVal fun, lVal args){
+	if(unlikely(fun.type != ltLambda)){
+		return lValException("type-error", "Can't apply to following val", fun);
 	}
-	return NIL;
+	return lBytecodeEval(lClosureNewFunCall(args, fun), fun.vClosure->text);
 }
 
 /* Reads EXPR which should contain bytecode arrays and then evaluate them in C.

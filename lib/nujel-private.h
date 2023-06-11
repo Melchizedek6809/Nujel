@@ -226,7 +226,6 @@ typedef enum lOpcode {
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
-lVal  lLambda              (lVal args, lVal lambda);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 void  simplePrintVal       (lVal v);
 void  simplePrintTree      (lTree *t);
