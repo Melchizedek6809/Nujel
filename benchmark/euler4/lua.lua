@@ -1,7 +1,5 @@
 -- The biggest product of 2 3-digit numbers that is a palindrome
 -- https://projecteuler.net/problem=4
-
-
 local function reverseNum (a)
       local ret = 0
       while (a > 0) do

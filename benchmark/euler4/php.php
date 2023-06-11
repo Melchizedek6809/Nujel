@@ -1,6 +1,6 @@
 <?php
 
-function reverseNum($a){
+function reverseNum(int $a){
 	$ret = 0;
 	while($a > 0){
 		$ret = ($ret * 10) + ($a % 10);
@@ -9,7 +9,7 @@ function reverseNum($a){
 	return $ret;
 }
 
-function palindromeP($a){
+function palindromeP(int $a){
 	return $a == reverseNum($a);
 }
 
