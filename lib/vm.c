@@ -153,11 +153,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStackSize = 256;
 	ctx.valueStackSize   = 32;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
-	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
-	ctx.csp              = 0;
-	ctx.sp               = 0;
+	ctx.valueStack	     = malloc(ctx.valueStackSize * sizeof(lVal));
+	ctx.csp		     = 0;
+	ctx.sp		     = 0;
 	ctx.closureStack[0]  = c;
-	ctx.text             = text;
+	ctx.text	     = text;
 
 	const int RSP = lRootsGet();
 	lRootsThreadPush(&ctx);
@@ -558,8 +558,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		c = ctx.closureStack[--ctx.csp];
 		vmbreak;
 	vmcase(lopTry)
-		c->ip   = ip + lBytecodeGetOffset16(ip)-1;
-		c->sp   = ctx.sp;
+		c->ip	= ip + lBytecodeGetOffset16(ip)-1;
+		c->sp	= ctx.sp;
 		c->text = ops;
 
 		c = lClosureNew(c, closureTry);
@@ -617,10 +617,10 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				goto throwException;
 			}
 			ops = c->text;
-	                lits = ops->literals->data;
-	                ip = c->ip;
-	                ctx.text = ops;
-	                ctx.sp = c->sp;
+			lits = ops->literals->data;
+			ip = c->ip;
+			ctx.text = ops;
+			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = nv;
 			break; }
 		default: {
