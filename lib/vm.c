@@ -146,7 +146,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopMutableEval,
 		&&llopList,
 		&&llopThrow,
-		&&llopApplyCollection
+		&&llopApplyCollection,
+		&&llopBitShiftLeft,
+		&&llopBitShiftRight,
+		&&llopBitAnd,
+		&&llopBitOr,
+		&&llopBitXor,
+		&&llopBitNot
 	};
 	#endif
 
@@ -384,6 +390,69 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			goto throwException;
 		}
 		vmbreak; }
+	vmcase(lopBitShiftLeft) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely((a.type == ltInt) && (b.type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt = a.vInt << b.vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		}
+		vmbreak; }
+	vmcase(lopBitShiftRight) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely((a.type == ltInt) && (b.type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt = a.vInt >> b.vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		}
+		vmbreak; }
+	vmcase(lopBitAnd) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely((a.type == ltInt) && (b.type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt = a.vInt & b.vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		}
+		vmbreak; }
+	vmcase(lopBitOr) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely((a.type == ltInt) && (b.type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt = a.vInt | b.vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		}
+		vmbreak; }
+	vmcase(lopBitXor) {
+		lVal a = ctx.valueStack[ctx.sp-2];
+		lVal b = ctx.valueStack[ctx.sp-1];
+		ctx.sp--;
+		if(likely((a.type == ltInt) && (b.type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt = a.vInt ^ b.vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(b);
+			goto throwException;
+		}
+		vmbreak; }
+	vmcase(lopBitNot)
+		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
+			ctx.valueStack[ctx.sp-1].vInt = ~ctx.valueStack[ctx.sp-1].vInt;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]);
+			goto throwException;
+		}
+		vmbreak;
 	vmcase(lopIntAdd)
 		ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
 		ctx.sp--;

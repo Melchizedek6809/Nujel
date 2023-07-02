@@ -48,7 +48,7 @@
 (-1 (bit-not 0))
 (0 (bit-not -1))
 (16 (bit-shift-left 1 4))
-(1 (bit-shift-left 16 -4))
+(0 (bit-shift-left 16 -4))
 (65536 (bit-shift-left 1 16))
 (-16 (bit-shift-left -1 4))
 (6 (eval (read/single "(+ 1 2 3)")))

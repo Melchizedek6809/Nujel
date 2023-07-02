@@ -356,7 +356,7 @@ static lVal lnfAsh(lClosure *c, lVal v){
 	}
 	const u64 iv = av.vInt;
 	const i64 sv = bv.vInt;
-	return lValInt((sv > 0) ? (iv <<  sv) : (iv >> -sv));
+	return lValInt((sv > 0) ? (iv << sv) : (iv >> -sv));
 }
 
 static lVal lnfBitShiftRight(lClosure *c, lVal v){

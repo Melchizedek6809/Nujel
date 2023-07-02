@@ -48,7 +48,7 @@
       (set! i (buffer/view/le/set! b i 4 0)) ; Important colors, 0 for all
 
       (def row-padding (calc-row-padding (ref image :width) 3))
-      (def pixels (- header-size 1)) ; Pixel data comes immediatly after the header
+      (def pixels (- header-size 1)) ; Pixel data comes immediately after the header
       (let ((y (- (ref image :height) 1)))
            (while (>= y 0)
              (dotimes (x (ref image :width))

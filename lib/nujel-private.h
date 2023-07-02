@@ -221,7 +221,13 @@ typedef enum lOpcode {
 	lopMutableEval     = 0x2D,
 	lopList            = 0x2E,
 	lopThrow           = 0x2F,
-	lopApplyCollection = 0x30
+	lopApplyCollection = 0x30,
+	lopBitShiftLeft    = 0x31,
+	lopBitShiftRight   = 0x32,
+	lopBitAnd          = 0x33,
+	lopBitOr           = 0x34,
+	lopBitXor          = 0x35,
+	lopBitNot          = 0x36,
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);

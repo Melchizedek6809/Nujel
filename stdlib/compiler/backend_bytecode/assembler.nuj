@@ -242,6 +242,48 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :inline
       '(#x23))
 
+(defn $bit-shift-left ()
+      "(a b) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x31))
+
+(defn $bit-shift-right ()
+      "(a b) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x32))
+
+(defn $bit-and ()
+      "(a b) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x33))
+
+(defn $bit-or ()
+      "(a b) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x34))
+
+(defn $bit-xor ()
+      "(a b) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x35))
+
+(defn $bit-not ()
+      "(a) -> (result)"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x36))
+
 (defn int-fit-in-byte? (a)
       (and (<= a 127) (>= a -128)))
 
@@ -275,6 +317,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                      (zero? ($zero?))
                      (inc/int ($inc/int))
                      (throw ($throw))
+                     (bit-not ($bit-not))
                      (otherwise #nil)))
             (2 (case fun
                      (add/int ($add/int))
@@ -292,6 +335,11 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                      (> ($>))
                      (bytecode-eval* ($eval))
                      (mutable-eval* ($mutable-eval))
+                     (bit-shift-left ($bit-shift-left))
+                     (bit-shift-right ($bit-shift-right))
+                     (bit-and ($bit-and))
+                     (bit-or ($bit-or))
+                     (bit-xor ($bit-xor))
                      (otherwise #nil)))
             (otherwise #nil)))
 
