@@ -58,3 +58,6 @@
 ("0.0" (string/write (round (abs (- PI (* (atan2 1.0 0.0) 2.0))))))
 ("0.0" (string/write (round (abs (atan2 0.0 1.0)))))
 ("10.0" (string/write (* (sin (atan2 10.0 10.0)) (sqrt (+ (* 10.0 10.0) (* 10.0 10.0))))))
+(0 (bit-shift-right 16 8))
+(1 (bit-shift-right 16 4))
+(16 (bit-shift-right 16 0))

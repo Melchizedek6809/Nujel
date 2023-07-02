@@ -3,20 +3,6 @@
 ;;;
 ;;; Some functions manipulating binary date
 
-(defn bit-shift-right (cur-val shift-amount)
-      "Shift all the bits in cur-val to the right by shift-amount
-
-      cur-val: The integer val whose bits we want to shift
-      shift-amount: The amount of digits we want to shift the value by
-
-      A shifted integer"
-      :cat :bitwise-operations
-      (deftest 0 (bit-shift-right 16 8))
-      (deftest 1 (bit-shift-right 16 4))
-      (deftest 16 (bit-shift-right 16 0))
-
-      (bit-shift-left cur-val (- shift-amount)))
-
 (defn bit-test? (test-val bit-pos)
       "Test bit at position i
 

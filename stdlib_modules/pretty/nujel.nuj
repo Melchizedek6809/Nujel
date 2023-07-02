@@ -188,7 +188,8 @@
 
 (defn main (args)
       :export
-      (when-not (file/file? (car args))
-                (println "Usage: (...FILES)"))
+      (when (or (not (car args)) (not (file/file? (car args))))
+                (emftln "Usage: (...FILES)")
+                (exit 1))
       (doseq (file args)
              (println (pp-nujel (slurp file)))))

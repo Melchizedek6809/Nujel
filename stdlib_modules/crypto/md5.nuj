@@ -1,0 +1,111 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Simple implementation of md5
+
+(def s [ 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
+         5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
+         4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
+         6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21])
+
+(def K [ #xd76aa478, #xe8c7b756, #x242070db, #xc1bdceee,
+         #xf57c0faf, #x4787c62a, #xa8304613, #xfd469501,
+         #x698098d8, #x8b44f7af, #xffff5bb1, #x895cd7be,
+         #x6b901122, #xfd987193, #xa679438e, #x49b40821,
+         #xf61e2562, #xc040b340, #x265e5a51, #xe9b6c7aa,
+         #xd62f105d, #x02441453, #xd8a1e681, #xe7d3fbc8,
+         #x21e1cde6, #xc33707d6, #xf4d50d87, #x455a14ed,
+         #xa9e3e905, #xfcefa3f8, #x676f02d9, #x8d2a4c8a,
+         #xfffa3942, #x8771f681, #x6d9d6122, #xfde5380c,
+         #xa4beea44, #x4bdecfa9, #xf6bb4b60, #xbebfbc70,
+         #x289b7ec6, #xeaa127fa, #xd4ef3085, #x04881d05,
+         #xd9d4d039, #xe6db99e5, #x1fa27cf8, #xc4ac5665,
+         #xf4292244, #x432aff97, #xab9423a7, #xfc93a039,
+         #x655b59c3, #x8f0ccc92, #xffeff47d, #x85845dd1,
+         #x6fa87e4f, #xfe2ce6e0, #xa3014314, #x4e0811a1,
+         #xf7537e82, #xbd3af235, #x2ad7d2bb, #xeb86d391])
+
+(defn left-rotate (v i)
+      (def t (bit-shift-left (bit-and #xFFFFFFFF v) i))
+      (bit-and #xFFFFFFFF (bit-or t (bit-shift-right t 32))))
+
+(defn fmt-be (v)
+      (fmt "{:02x}{:02x}{:02x}{:02x}" v (bit-shift-right v 8) (bit-shift-right v 16) (bit-shift-right v 24)))
+
+(defn hash (data)
+      :export
+      (when (string? data) (set! data (string->buffer data)))
+      (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
+
+      (def buf)
+      (def M (let*
+               (def cur-len (length data))
+
+               (def new-len (- (* (inc (div/int (+ cur-len 8) 64)) 64) 8))
+               (set! buf (buffer/allocate (+ new-len 8)))
+
+               (buffer/copy buf data 0 cur-len)
+               (buffer/set! buf cur-len #x80)
+
+               (def p (- (length buf) 8))
+               (set! cur-len (* cur-len 8))
+               (dotimes (i 8)
+                        (buffer/set! buf (+ p i) (bit-shift-right cur-len (* i 8))))
+               (buffer/u32* buf)))
+
+      (def a0 #x67452301)
+      (def b0 #xefcdab89)
+      (def c0 #x98badcfe)
+      (def d0 #x10325476)
+
+      (dotimes (chunk (div/int (length M) 16))
+               (def chunk-off (* chunk 16))
+               (def A a0)
+               (def B b0)
+               (def C c0)
+               (def D d0)
+               (dotimes (i 64)
+                        (cond ((< i 16)
+                                (def F (bit-or (bit-and B C) (bit-and (bit-not B) D)))
+                                (def g i))
+                               ((< i 32)
+                                (def F (bit-or (bit-and D B) (bit-and (bit-not D) C)))
+                                (def g (bit-and (inc (* i 5)) #xF)))
+                               ((< i 48)
+                                (def F (bit-xor B C D))
+                                (def g (bit-and (+ 5 (* 3 i)) #xF)))
+                               (#t
+                                (def F (bit-xor C (bit-or B (bit-not D))))
+                                (def g (bit-and (* i 7) #xF))))
+                        (def temp D)
+                        (set! D C)
+                        (set! C B)
+                        (set! B (bit-and #xFFFFFFFF (+ B (left-rotate (+ A F (ref K i) (ref M (+ g chunk-off))) (ref s i)))))
+                        (set! A temp))
+               (set! a0 (bit-and (+ a0 A) #xFFFFFFFF))
+               (set! b0 (bit-and (+ b0 B) #xFFFFFFFF))
+               (set! c0 (bit-and (+ c0 C) #xFFFFFFFF))
+               (set! d0 (bit-and (+ d0 D) #xFFFFFFFF)))
+
+      (fmt "{}{}{}{}" (fmt-be a0) (fmt-be b0) (fmt-be c0) (fmt-be d0)))
+
+(deftest "d41d8cd98f00b204e9800998ecf8427e" (crypto/md5/hash ""))
+(deftest "0cc175b9c0f1b6a831c399e269772661" (crypto/md5/hash "a"))
+(deftest "900150983cd24fb0d6963f7d28e17f72" (crypto/md5/hash "abc"))
+(deftest "f96b697d7cb7938d525a2f31aaf161d0" (crypto/md5/hash "message digest"))
+(deftest "c3fcd3d76192e4007dfb496cca67e13b" (crypto/md5/hash "abcdefghijklmnopqrstuvwxyz"))
+(deftest "d174ab98d277d9f5a5611c2c9f419d9f" (crypto/md5/hash "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
+(deftest "57edf4a22be3c955ac49da2e2107b67a" (crypto/md5/hash "12345678901234567890123456789012345678901234567890123456789012345678901234567890"))
+(deftest "9e107d9d372bb6826bd81d3542a419d6" (crypto/md5/hash "The quick brown fox jumps over the lazy dog"))
+
+(defn main (args)
+      :export
+      (when (not (car args))
+        (efmtln "Usage: (...FILES)")
+        (exit 1))
+      (doseq (file args)
+             (if (file/dir? file)
+                 (pfmtln "md5sum: {file}: Is a directory")
+                 (if (file/file? file)
+                     (pfmtln "{}  {file}" (hash (slurp file)))
+                     (pfmtln "md5sum: {file}: No such file or directory")))))

@@ -359,6 +359,21 @@ static lVal lnfAsh(lClosure *c, lVal v){
 	return lValInt((sv > 0) ? (iv <<  sv) : (iv >> -sv));
 }
 
+static lVal lnfBitShiftRight(lClosure *c, lVal v){
+	(void)c;
+	lVal av = requireInt(lCar(v));
+	if(unlikely(av.type == ltException)){
+		return av;
+	}
+	lVal bv = requireInt(lCadr(v));
+	if(unlikely(bv.type == ltException)){
+		return bv;
+	}
+	const u64 iv = av.vInt;
+	const i64 sv = bv.vInt;
+	return lValInt((sv > 0) ? (iv >> sv) : (iv << -sv));
+}
+
 lVal lnfAbs(lClosure *c, lVal v){
 	(void)c;
 	lVal t = lCar(v);
@@ -487,6 +502,7 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFuncPureFold(c,"bit-not",  "(a)",   "Bitwise not",          lnfLogNot);
 
 	lAddNativeFuncPure(c,"bit-shift-left", "(val amount)","Shift VALUE left AMOUNT bits",    lnfAsh);
+	lAddNativeFuncPure(c,"bit-shift-right", "(val amount)","Shift VALUE right AMOUNT bits",    lnfBitShiftRight);
 	lAddNativeFuncPure(c,"popcount",       "(val)",       "Return amount of bits set in VAL",lnfPopCount);
 
 	lAddNativeFuncPure(c,"abs",  "(a)", "Return the absolute value of a", lnfAbs);
