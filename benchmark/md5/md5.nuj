@@ -1,0 +1,4 @@
+#!/usr/bin/env nujel
+(import hash :crypto/md5)
+
+(println (hash (slurp "test-files/r5rs.pdf")))

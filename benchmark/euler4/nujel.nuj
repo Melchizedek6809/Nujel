@@ -1,6 +1,7 @@
 ;; The biggest product of 2 3-digit numbers that is a palindrome
 ;; https://projecteuler.net/problem=4
 
+
 (defn reverse-num (a)
       (def ret 0)
       (while (> a 0)

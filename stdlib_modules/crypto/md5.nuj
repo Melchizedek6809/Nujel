@@ -37,12 +37,10 @@
       (when (string? data) (set! data (string->buffer data)))
       (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
 
-      (def buf)
       (def M (let*
                (def cur-len (length data))
-
                (def new-len (- (* (inc (div/int (+ cur-len 8) 64)) 64) 8))
-               (set! buf (buffer/allocate (+ new-len 8)))
+               (def buf (buffer/allocate (+ new-len 8)))
 
                (buffer/copy buf data 0 cur-len)
                (buffer/set! buf cur-len #x80)
@@ -53,17 +51,18 @@
                         (buffer/set! buf (+ p i) (bit-shift-right cur-len (* i 8))))
                (buffer/u32* buf)))
 
-      (def a0 #x67452301)
-      (def b0 #xefcdab89)
-      (def c0 #x98badcfe)
-      (def d0 #x10325476)
+      (def h (buffer/u32* (buffer/allocate (* 4 4))))
+      (buffer/set! h 0 #x67452301)
+      (buffer/set! h 1 #xefcdab89)
+      (buffer/set! h 2 #x98badcfe)
+      (buffer/set! h 3 #x10325476)
 
       (dotimes (chunk (div/int (length M) 16))
                (def chunk-off (* chunk 16))
-               (def A a0)
-               (def B b0)
-               (def C c0)
-               (def D d0)
+               (def A (ref h 0))
+               (def B (ref h 1))
+               (def C (ref h 2))
+               (def D (ref h 3))
                (dotimes (i 64)
                         (cond ((< i 16)
                                 (def F (bit-or (bit-and B C) (bit-and (bit-not B) D)))
@@ -82,12 +81,11 @@
                         (set! C B)
                         (set! B (bit-and #xFFFFFFFF (+ B (left-rotate (+ A F (ref K i) (ref M (+ g chunk-off))) (ref s i)))))
                         (set! A temp))
-               (set! a0 (bit-and (+ a0 A) #xFFFFFFFF))
-               (set! b0 (bit-and (+ b0 B) #xFFFFFFFF))
-               (set! c0 (bit-and (+ c0 C) #xFFFFFFFF))
-               (set! d0 (bit-and (+ d0 D) #xFFFFFFFF)))
-
-      (fmt "{}{}{}{}" (fmt-be a0) (fmt-be b0) (fmt-be c0) (fmt-be d0)))
+               (buffer/set! h 0 (+ (ref h 0) A))
+               (buffer/set! h 1 (+ (ref h 1) B))
+               (buffer/set! h 2 (+ (ref h 2) C))
+               (buffer/set! h 3 (+ (ref h 3) D)))
+      (fmt "{}{}{}{}" (fmt-be (ref h 0)) (fmt-be (ref h 1)) (fmt-be (ref h 2)) (fmt-be (ref h 3))))
 
 (deftest "d41d8cd98f00b204e9800998ecf8427e" (crypto/md5/hash ""))
 (deftest "0cc175b9c0f1b6a831c399e269772661" (crypto/md5/hash "a"))

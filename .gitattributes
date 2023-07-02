@@ -1,5 +1,6 @@
 * text eol=lf
 *.input binary
+*.pdf binary
 
 *.c linguist-language=C
 *.h linguist-language=C

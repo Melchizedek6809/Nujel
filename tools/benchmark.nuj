@@ -104,6 +104,7 @@
             ("hello" "Hello")
             ("euler1" "23333331666668")
             ("euler4" "906609")
+            ("md5" "47afad6ea7d0515701d2b63472530971")
             (otherwise "チーズスイートホーム")))
 
 (def time-template "#@(:user %U :system %S :elapsed \\\"%E\\\" :cpu \\\"%P\\\" :text %X :data %D :max-resident %M :inputs %I :outputs %O :pagefaults-major %F :pagefaults-minor %R :swaps %W)")
