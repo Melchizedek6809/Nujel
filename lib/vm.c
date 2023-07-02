@@ -196,10 +196,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vInt += b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = (lVal) {
-					ltFloat,
-					.vFloat = b.vFloat + a.vInt
-				};
+				ctx.valueStack[ctx.sp-1] = lValFloat(b.vFloat + a.vInt);
 			} else if(b.type != ltNil){
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
@@ -228,10 +225,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vInt -= b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = (lVal) {
-					ltFloat,
-					.vFloat = a.vInt - b.vFloat
-				};
+				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt - b.vFloat);
 			} else if(b.type != ltNil){
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
@@ -265,10 +259,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vInt *= b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = (lVal) {
-					ltFloat,
-					.vFloat = a.vInt * b.vFloat
-				};
+				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt * b.vFloat);
 			} else if(b.type != ltNil){
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
