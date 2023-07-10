@@ -18,3 +18,15 @@
 (deftest "00620062" (fmt "{:08X}" (crypto/adler32/hash "a")))
 (deftest "0F9D02BC" (fmt "{:08X}" (crypto/adler32/hash "asdQWE123")))
 (deftest "796B110D" (fmt "{:08X}" (crypto/adler32/hash "DiesIstEinTestDerNujelAdler32Implementierung")))
+
+(defn main (args)
+      :export
+      (when (not (car args))
+        (efmtln "Usage: (...FILES)")
+        (exit 1))
+      (doseq (file args)
+             (if (file/dir? file)
+                 (pfmtln "nujel/adler32: {file}: Is a directory")
+                 (if (file/file? file)
+                     (pfmtln "{:08X} {file} ADLER32" (hash (slurp/buffer file)))
+                     (pfmtln "nujel/adler32: {file}: No such file or directory")))))
