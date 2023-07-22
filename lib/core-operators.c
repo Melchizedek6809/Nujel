@@ -308,33 +308,33 @@ static lVal lnfMetaSet(lClosure *c, lVal v){
 	return car;
 }
 
-static lVal lCastFloat(lClosure *c, lVal v){
-	(void)c;
+static lVal lCastFloat(lVal v){
 	if(likely(v.type == ltFloat)){
 		return v;
-	}
-	if(likely(v.type == ltInt)){
+	} else if(likely(v.type == ltInt)){
 		return lValFloat(v.vInt);
+	} else {
+		return lValExceptionType(v, ltFloat);
 	}
-	return lValExceptionType(v, ltFloat);
 }
 
 static lVal lnfFloat(lClosure *c, lVal v){
-	return lCastFloat(c,lCar(v));
+	(void)c;
+	return lCastFloat(lCar(v));
 }
 
-static lVal lCastInt(lClosure *c, lVal v){
-	(void)c;
+static lVal lCastInt(lVal v){
 	if(likely(v.type == ltInt)){
 		return v;
-	}
-	if(likely(v.type == ltFloat)){
+	} else if(likely(v.type == ltFloat)){
 		return lValInt(v.vFloat);
+	} else {
+		return lValExceptionType(v, ltInt);
 	}
-	return lValExceptionType(v, ltInt);
 }
 static lVal lnfInt(lClosure *c, lVal v){
-	return lCastInt(c, lCar(v));
+	(void)c;
+	return lCastInt(lCar(v));
 }
 
 static lVal lnfSymbolToKeyword(lClosure *c, lVal v){
