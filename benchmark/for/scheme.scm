@@ -1,5 +1,8 @@
-(define (test-run i ret)
-  (cond ((>= i 10000000) ret)
-        (else (test-run (+ 1 i) (+ ret i)))))
-(display (test-run 0 0))
+(define (test-run)
+  (let ((ret 0))
+       (do ((i 0 (+ i 1)))
+           ((>= i 10000000) ret)
+         (set! ret (+ ret i)))))
+
+(display (test-run))
 (newline)
