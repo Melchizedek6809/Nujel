@@ -1,4 +1,4 @@
 #!/usr/bin/env nujel
 (import hash :crypto/adler32)
 
-(println (hash (slurp "test-files/r5rs.pdf")))
+(println (fmt "{:X}" (hash (slurp "test-files/r5rs.pdf"))))
