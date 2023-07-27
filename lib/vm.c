@@ -557,7 +557,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = v;
 		vmbreak; }
 	vmcase(lopRef) {
-		lVal v = lGenericRef(c, ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		lVal v = lGenericRef(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
 		if(unlikely(v.type == ltException)){
 			exceptionThrownValue = v;
 			goto throwException;

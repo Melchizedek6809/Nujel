@@ -4,8 +4,7 @@
 #include "nujel-private.h"
 #endif
 
-static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
-	(void)c;
+static lVal lBufferViewRef(lVal car, size_t i){
 	const void *buf = car.vBufferView->buf->buf;
 	const size_t length = car.vBufferView->length;
 	const lBufferViewType viewType = car.vBufferView->type;
@@ -42,7 +41,7 @@ static lVal lBufferViewRef(lClosure *c, lVal car, size_t i){
 	}
 }
 
-lVal lGenericRef(lClosure *c, lVal col, lVal key){
+lVal lGenericRef(lVal col, lVal key){
 	switch(col.type){
 	case ltPair: {
 		lVal keyVal = requireNaturalInt(key);
@@ -94,7 +93,7 @@ lVal lGenericRef(lClosure *c, lVal col, lVal key){
 		if(unlikely(t.type == ltException)){
 			return t;
 		}
-		return lBufferViewRef(c, col, t.vInt); }
+		return lBufferViewRef(col, t.vInt); }
 	case ltTree: {
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);
