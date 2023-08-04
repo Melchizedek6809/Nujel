@@ -147,10 +147,12 @@
                              (otherwise "")))))
 
 (defn write (v port)
-      (write/raw v (or port stdout) #f))
+      (write/raw v (or port stdout) #f)
+      #nil)
 
-(defn display/new (v port)
-      (write/raw v (or port stdout) #t))
+(defn display (v port)
+      (write/raw v (or port stdout) #t)
+      #nil)
 
 (defn string/write (v)
       (def p (make-string-output-port))

@@ -175,11 +175,12 @@
 (defn print (v port)
       "Display V on the standard output port"
       (write/raw v (or port stdout) #t)
-      (return v))
+      #nil)
 
 (defn error (v port)
       "Prints v on the standard error port"
-      (print v stderr))
+      (print v stderr)
+      #nil)
 
 (defn read-line/raw (port buf)
       "Reads in a line of user input and returns it"

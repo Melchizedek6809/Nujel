@@ -187,7 +187,7 @@
                                    (cons 'cat expr-list)
                                    (if (string? (car expr-list))
                                        (car expr-list)
-                                       (cons 'string expr-list))))
+                                       (cons 'string/display expr-list))))
                      (def fmt/args/map-fun/count 0)
                      (defn fmt/args/map-fun (arg)
                            (def s (string->symbol (cat "fmt-arg-"(string fmt/args/map-fun/count))))
