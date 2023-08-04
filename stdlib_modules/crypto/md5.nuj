@@ -43,12 +43,12 @@
                (def buf (buffer/allocate (+ new-len 8)))
 
                (buffer/copy buf data 0 cur-len)
-               (buffer/set! buf cur-len #x80)
+               (set! buf cur-len #x80)
 
                (def p (- (length buf) 8))
                (set! cur-len (* cur-len 8))
                (dotimes (i 8)
-                        (buffer/set! buf (+ p i) (bit-shift-right cur-len (* i 8))))
+                        (set! buf (+ p i) (bit-shift-right cur-len (* i 8))))
                (buffer/u32* buf)))
 
       (def h0 #x67452301)

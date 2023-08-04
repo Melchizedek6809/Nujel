@@ -42,29 +42,6 @@ static lVal lnfArrLengthSet(lClosure *c, lVal v){
 	return car;
 }
 
-static lVal lnfArrSet(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireMutableArray(lCar(v));
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lArray *arr = car.vArray;
-	lVal keyV = requireInt(lCadr(v));
-	if(unlikely(keyV.type == ltException)){
-		return keyV;
-	}
-	const int key = keyV.vInt;
-	if((key < 0) || (key >= arr->length)){
-		return lValException("out-of-bounds","(array/set!) index provided is out of bounds", v);
-	}
-	const lVal vt = lCddr(v);
-	if(vt.type != ltPair){
-		return lValException("type-mismatch","(array/set!) needs a third argument", v);
-	}
-	arr->data[key] = vt.vList->car;
-	return car;
-}
-
 static lVal lnfArrAllocate(lClosure *c, lVal v){
 	(void)c;
 	lVal lenV = requireNaturalInt(lCar(v));
@@ -105,5 +82,4 @@ void lOperationsArray(lClosure *c){
 	lAddNativeFunc(c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate);
 	lAddNativeFunc(c,"array/length",   "(array)",             "Return length of ARRAY",                   lnfArrLength);
 	lAddNativeFunc(c,"array/length!",  "(array size)",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet);
-	lAddNativeFunc(c,"array/set!",     "(array index value)", "Set ARRAY at INDEX to &...VALUES",         lnfArrSet);
 }

@@ -49,19 +49,19 @@
 (defn image/set! (img x y value)
       :export-as set!
       (def i (+ (int x) (* (int y) (ref img :width))))
-      (buffer/set! (ref img :pixels) i value))
+      (set! (ref img :pixels) i value))
 
 (defn fill! (img value)
       :export
       (def p (ref img :pixels))
       (dotimes (i (* (ref img :width) (ref img :height)) img)
-        (buffer/set! p i value)))
+        (set! p i value)))
 
 (defn map! (img fun)
       :export
       (def p (ref img :pixels))
       (dotimes (i (* (ref img :width) (ref img :height)) img)
-        (buffer/set! p i (fun (ref p i)))))
+        (set! p i (fun (ref p i)))))
 
 (defn dup (img)
       :export
@@ -70,7 +70,7 @@
       (def in (ref img :pixels))
       (def out (ref ret :pixels))
       (dotimes (i (* (ref img :width) (ref img :height)) img)
-        (buffer/set! out i (ref in i))))
+        (set! out i (ref in i))))
 
 (defn save! (img path)
       :export

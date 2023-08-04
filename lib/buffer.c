@@ -210,109 +210,6 @@ static lVal lnfBufferViewF32(lClosure *c, lVal v){ return bufferView(c, v, lbvtF
 static lVal lnfBufferViewS64(lClosure *c, lVal v){ return bufferView(c, v, lbvtS64); }
 static lVal lnfBufferViewF64(lClosure *c, lVal v){ return bufferView(c, v, lbvtF64); }
 
-static lVal lnfBufferViewSet(lClosure *c, lVal v){
-	(void)c;
-	lVal car = lCar(v);
-	void *buf = NULL;
-	size_t length = 0;
-	lBufferViewType viewType;
-	lVal iv = requireNaturalInt(lCadr(v));
-	if(unlikely(iv.type == ltException)){
-		return iv;
-	}
-	const size_t i = iv.vInt;
-
-	switch(car.type){
-	case ltBufferView:
-		buf      = car.vBufferView->buf->buf;
-		length   = car.vBufferView->length;
-		viewType = car.vBufferView->type;
-		break;
-	case ltBuffer:
-		if(car.vBuffer->flags & BUFFER_IMMUTABLE){break;}
-		buf      = car.vBuffer->buf;
-		length   = car.vBuffer->length;
-		viewType = lbvtU8;
-		break;
-	}
-
-	if(unlikely(buf == NULL)){
-		return lValException("type-error", "Can't set! in that", car);
-	}
-	if(unlikely(i >= length)){
-		return lValException("out-of-bounds","(buffer/set!] index provided is out of bounds", v);
-	}
-
-	switch(viewType){
-	default:
-		exit(6);
-	case lbvtU8: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((u8 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtS8: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((i8 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtS16: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((i16 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtU16: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((u16 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtS32: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((i32 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtU32: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((u32 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtS64: {
-		lVal val = requireInt(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((i64 *)buf)[i] = val.vInt;
-		break; }
-	case lbvtF32: {
-		lVal val = requireFloat(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((float *)buf)[i] = val.vFloat;
-		break; }
-	case lbvtF64: {
-		lVal val = requireFloat(lCaddr(v));
-		if(unlikely(val.type == ltException)){
-			return val;
-		}
-		((double *)buf)[i] = val.vFloat;
-		break; }
-	}
-	return car;
-}
-
 static lVal lnfBufferViewBuffer(lClosure *c, lVal v){
 	(void)c;
 	lVal car = requireBufferView(lCar(v));
@@ -343,7 +240,6 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeFunc(c, "buffer/f64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF64);
 	lAddNativeFunc(c, "buffer-view->buffer",    "(view)",           "Return the buffer of VIEW", lnfBufferViewBuffer);
 
-	lAddNativeFunc(c, "buffer/set!",            "(view off val)",   "Set the value of VIEW at OFF to VAL", lnfBufferViewSet);
 	lAddNativeFunc(c, "buffer/length",          "(buf)",            "Return the size of BUF in bytes",   lnfBufferLengthGet);
 	lAddNativeFunc(c, "buffer/immutable?",      "(buf)",            "Return #t if BUF is immutable",     lnfBufferImmutableGet);
 }

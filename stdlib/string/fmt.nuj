@@ -140,7 +140,7 @@
 
                  (if (= "" argument)
                      (do (tree/-- opts :expr-count)
-                         (array/set! arguments-used (ref opts :expr-count) #t)
+                         (set! arguments-used (ref opts :expr-count) #t)
                        (fmt/format-arg format-spec (fmt/arg-sym (ref opts :expr-count))))
                      (let ((read-vals (read argument)))
                           (when (cdr read-vals)
@@ -151,7 +151,7 @@
                           (when (int? (car read-vals))
                             (when (or (< (car read-vals) 0) (>= (car read-vals) (array/length arguments-used)))
                               (throw (list :format-error "fmt numbered argument is out of bounds" argument (current-lambda))))
-                            (array/set! arguments-used (car read-vals) #t))
+                            (set! arguments-used (car read-vals) #t))
                           (fmt/format-arg format-spec (fmt/arg-sym (car read-vals))))))
 
            (defmacro fmt (format-string . args)

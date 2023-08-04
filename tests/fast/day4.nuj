@@ -92,7 +92,7 @@
 (defn take-turns (boards turns)
        (def marks (array/fill! (array/allocate 100) #f))
        (while (int? (car turns))
-              (array/set! marks (car turns) #t)
+              (set! marks (car turns) #t)
               (check/boards boards marks (car turns))
               (cdr! turns))
        (def first-board (car boards))

@@ -101,7 +101,7 @@
           (def s (split (cut (buffer->string buf i) 2) ";"))
           (return { :width (read/int (cadr s))
                     :height (read/int (car s))}))
-        (buffer/set! buf i c)
+        (set! buf i c)
         (inc! i)))
 
 (defn get-width ()

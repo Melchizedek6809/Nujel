@@ -13,7 +13,7 @@
        (while (< i bit-count)
               (def mask (bit-shift-left 1 i))
               (when (zero? (bit-and number mask))
-                    (array/set! state i (+ 1 (ref state i))))
+                    (set! state i (+ 1 (ref state i))))
               (inc! i)))
 
 (defn count-bits (numbers bit-count)

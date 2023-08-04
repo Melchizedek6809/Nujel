@@ -7,7 +7,7 @@
       (def acc 0)
       (dotimes (i 2000)
                (set! acc (+ acc i))
-	       (array/set! ret i acc))
+	       (set! ret i acc))
       ret)
 (def fancy (fancy/calc))
 

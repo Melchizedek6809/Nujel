@@ -32,5 +32,5 @@
                          (> (car l) 255)
                          (< (car l) 0))
                      (exception :type-error "(from-char-code) expects :int arguments from 0 to 255, not: " (car l)))
-               (buffer/set! buf i (car l))
+               (set! buf i (car l))
                (cdr! l)))

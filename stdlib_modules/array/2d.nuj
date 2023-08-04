@@ -31,7 +31,7 @@
               (< x 0)
               (< y 0))
           (exception :out-of-bounds "Trying to set an array out of bounds" data)
-          (array/set! (ref data :data) (+ x (* y (ref data :width))) val))
+          (set! (ref data :data) (+ x (* y (ref data :width))) val))
       (return data))
 
 (defn print (data)

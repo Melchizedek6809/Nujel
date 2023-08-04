@@ -195,7 +195,7 @@
                    (return (if (zero? i) #nil i)))
              (when (== c #\lf)
                    (return i))
-             (buffer/set! view i c)
+             (set! view i c)
              (set! i (inc i))))
 
 (defn read-line ()

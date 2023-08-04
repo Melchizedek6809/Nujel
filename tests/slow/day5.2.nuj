@@ -6,7 +6,7 @@
        (def ret (array/allocate width))
        (def x 0)
        (while (< x width)
-	      (array/set! ret x (array/fill! (array/allocate height) val))
+	      (set! ret x (array/fill! (array/allocate height) val))
 	      (inc! x))
        ret)
 

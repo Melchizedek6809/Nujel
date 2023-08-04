@@ -16,7 +16,7 @@
                                                :block-write (fn (handle buffer size)
                                                                 (file/write* handle buffer size))
                                                :char-write (fn (handle char)
-                                                               (buffer/set! temporary-buffer-view 0 char)
+                                                               (set! temporary-buffer-view 0 char)
                                                              (file/write* handle temporary-buffer-view))
                                                :close! (fn (handle)
                                                            (file/close* handle))
@@ -44,7 +44,7 @@
                                                                1)
                                                         (buffer/length! buf
                                                                         (+ #x80 (buffer/length buf))))
-                                                      (buffer/set! buf (meta self :position) char)
+                                                      (set! buf (meta self :position) char)
                                                       (meta! self :position (+ (meta self :position) 1)))
                                         :write (fn (self . buffers)
                                                    (doseq (buf buffers self)

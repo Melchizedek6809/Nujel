@@ -148,7 +148,7 @@
 
       (def ret (buffer/allocate (buffer/length text)))
       (dotimes (i (buffer/length text) (buffer->string ret))
-        (buffer/set! ret i (upper-case-char (ref text i)))))
+        (set! ret i (upper-case-char (ref text i)))))
 
 (defn lower-case (text)
       "Convert text into a version using only lowercase letters.
@@ -163,7 +163,7 @@
 
       (def ret (buffer/allocate (buffer/length text)))
       (dotimes (i (buffer/length text) (buffer->string ret))
-        (buffer/set! ret i (lower-case-char (ref text i)))))
+        (set! ret i (lower-case-char (ref text i)))))
 
 (defn capitalize (text)
       "Convert text into a capitalized version.
@@ -182,7 +182,7 @@
       (def ret (buffer/allocate (buffer/length text)))
       (def caps? #t)
       (dotimes (i (buffer/length text) (buffer->string ret))
-         (buffer/set! ret i ((if caps? upper-case-char lower-case-char) (ref text i)))
+         (set! ret i ((if caps? upper-case-char lower-case-char) (ref text i)))
         (set! caps? (if (whitespace? (ref text i)) #t #f))))
 
 (defn string/round (text decimal-digits)

@@ -477,7 +477,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                  (defn assemble/relocate-op (code sym-map pos out)
                        (def target (ref sym-map (cadr code)))
                        (def off (- (+ target (cadddr code)) pos))
-                       (array/set! out (inc! pos) (bit-and (bit-shift-right off (caddr code)) #xFF))
+                       (set! out (inc! pos) (bit-and (bit-shift-right off (caddr code)) #xFF))
                        (return pos))
 
                  (defn assemble/emit-relocated-ops (code sym-map pos out)
@@ -485,7 +485,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                            (set! pos (assemble/relocate-op code sym-map pos out))
                            (doseq (op code pos)
                                   (case (type-of op)
-                                        (:int  (array/set! out (inc! pos) op))
+                                        (:int  (set! out (inc! pos) op))
                                         (:pair (set! pos (assemble/emit-relocated-ops op sym-map pos out)))))))
 
                  (defn literal-index->bytecode-op (i)
@@ -503,7 +503,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                            (when (equal? (ref lit-arr i) lit)
                              (return (literal-index->bytecode-op i)))))
                        (array/length! lit-arr (+ 1 (array/length lit-arr)))
-                       (array/set! lit-arr (- (array/length lit-arr) 1) lit)
+                       (set! lit-arr (- (array/length lit-arr) 1) lit)
                        (literal-index->bytecode-op (- (array/length lit-arr) 1)))
 
                  (defn assemble/build-lit-arr (code lit-arr)

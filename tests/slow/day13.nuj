@@ -16,7 +16,7 @@
                       {:width 0 :height 0 :folds #nil}))
        (tree/set! γ :data (-> (array/allocate (* (ref γ :width) (ref γ :height))) (array/fill! 0)))
        (while points
-              (array/set! (ref γ :data) (+ (caar points) (* (ref γ :width) (cadar points))) 1)
+              (set! (ref γ :data) (+ (caar points) (* (ref γ :width) (cadar points))) 1)
               (cdr! points))
        (tree/set! γ :folds (reverse (ref γ :folds))))
 
