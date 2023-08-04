@@ -228,6 +228,7 @@ typedef enum lOpcode {
 	lopBitOr           = 0x34,
 	lopBitXor          = 0x35,
 	lopBitNot          = 0x36,
+	lopGenSet          = 0x37,
 } lOpcode;
 
 i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
@@ -389,5 +390,6 @@ void lOperationsGeneric    (lClosure *c);
 
 lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lVal col, lVal key);
+lVal lGenericSet(lVal col, lVal key, lVal v);
 
 #endif

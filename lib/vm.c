@@ -152,7 +152,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopBitAnd,
 		&&llopBitOr,
 		&&llopBitXor,
-		&&llopBitNot
+		&&llopBitNot,
+		&&llopGenSet
 	};
 	#endif
 
@@ -573,6 +574,17 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopSetVal) {
 		const uint v = *ip++;
 		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		vmbreak; }
+	vmcase(lopGenSet) {
+		lVal val = ctx.valueStack[ctx.sp-1];
+		lVal key = ctx.valueStack[ctx.sp-2];
+		lVal col = ctx.valueStack[ctx.sp-3];
+		lVal ret = lGenericSet(col, key, val);
+		if(unlikely(ret.type == ltException)){
+			exceptionThrownValue = ret;
+			goto throwException;
+		}
+		ctx.sp -= 2;
 		vmbreak; }
 	vmcase(lopZeroPred) {
 		lVal a = ctx.valueStack[ctx.sp-1];

@@ -412,6 +412,12 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       (list #x5
             (list :literal v)))
 
+(defn $set/gen ()
+      "(v v v) -> (v) --- Resolve V and get the associated value on the stack"
+      :cat :bytecode
+      :internal
+      (list #x37))
+
 (defn $def/val (v)
       "(v) -> (v) --- Resolve V and get the associated value on the stack"
       :cat :bytecode

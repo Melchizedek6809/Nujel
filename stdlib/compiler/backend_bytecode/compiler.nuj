@@ -40,12 +40,17 @@
                                 ($def/val (cadr source))))
 
                     (defn bytecompile/set! (source env)
-                          (when (or (not (symbol? (cadr source)))
-                                    (not (cddr source)))
-                            (throw (list :type-error
-                                         "(set!) needs a symbol name and a value as arguments" #nil env)))
-                          (list (bytecompile* (caddr source) env)
-                                ($set/val (cadr source))))
+                          (case (length (cdr source))
+                                (2 (when (not (symbol? (cadr source)))
+                                     (throw (list :type-error
+                                                  "(set!) needs a symbol name and a value as arguments" #nil env)))
+                                   (list (bytecompile* (caddr source) env)
+                                         ($set/val (cadr source))))
+                                (3 (list (bytecompile* (cadr source) env)
+                                         (bytecompile* (caddr source) env)
+                                         (bytecompile* (cadddr source) env)
+                                         ($set/gen)))
+                                (otherwise (throw (list :arity-error "(set!) needs 2 or 3 arguments" #nil env)))))
 
                     (defn bytecompile/if (source env)
                           (let ((sym-else (gensym))
