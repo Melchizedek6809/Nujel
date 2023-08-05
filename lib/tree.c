@@ -216,27 +216,6 @@ static lVal lnfTreeHas(lClosure* c, lVal v) {
 	return lValBool(lTreeRef(car.vTree->root, cadr.vSymbol).type != ltException);
 }
 
-static lVal lnfTreeSet(lClosure* c, lVal v) {
-	(void)c;
-	lVal car = lCar(v);
-	if(unlikely(car.type == ltNil)){
-		car = lValTree(NULL);
-	} else {
-		car = requireMutableTree(car);
-		if(unlikely(car.type == ltException)){
-			return car;
-		}
-	}
-	lTreeRoot* t = car.vTree;
-	lVal cadr = requireSymbolic(lCadr(v));
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
-	}
-	const lSymbol* key = cadr.vSymbol;
-	t->root = lTreeInsert(t->root, key, lCaddr(v));
-	return car;
-}
-
 static lVal lnfTreeSize(lClosure* c, lVal v) {
 	(void)c;
 	lVal car = requireTree(lCar(v));
@@ -307,7 +286,6 @@ void lOperationsTree(lClosure* c) {
 	lAddNativeFunc(c, "tree/values", "(tree)",         "Return each value of TREE in a list", lnfTreeGetValues);
 	lAddNativeFunc(c, "tree/size",   "(tree)",         "Return the amount of entries in TREE", lnfTreeSize);
 	lAddNativeFunc(c, "tree/has?",   "(tree sym)",     "Return #t if TREE contains a value for SYM", lnfTreeHas);
-	lAddNativeFunc(c, "tree/set!",   "(tree sym val)", "Set SYM to VAL in TREE", lnfTreeSet);
 	lAddNativeFunc(c, "tree/dup",    "(tree)",         "Return a duplicate of TREE", lnfTreeDup);
 
 	lAddNativeFunc(c, "tree/key*",   "(tree)", "Low-level: return the key for TREE segment", lnfTreeKeyAst);

@@ -15,32 +15,32 @@
             (def init/parse-args/eval-next #f)
             (def init/parse-args/run-repl #t)
 
-            (tree/set! init/option-map 'r
+            (set! init/option-map 'r
                        (fn (option)
                            (tiny-repl)
                          (exit 0)))
-            (tree/set! init/option-map 'm
+            (set! init/option-map 'm
                        (fn (option)
                            (set! init/parse-args/eval-next-module #t)))
-            (tree/set! init/option-map 'h
+            (set! init/option-map 'h
                        (fn (option)
                            (module/main :help #nil)
                          (exit 0)))
-            (tree/set! init/option-map 'no-color
+            (set! init/option-map 'no-color
                        (fn (option)
                            (import (disable!) :ansi)
                          (set! disable! #t)))
-            (tree/set! init/option-map 'color
+            (set! init/option-map 'color
                        (fn (option)
                            (import (disable!) :ansi)
                          (set! disable! #f)))
-            (tree/set! init/option-map 'x
+            (set! init/option-map 'x
                        (fn (option)
                            (set! init/parse-args/eval-next #t)
                          (set! init/parse-args/run-repl #f)))
-            (tree/set! init/option-map :default
+            (set! init/option-map :default
                        (fn (option)
-                           (tree/set! init/options option #t)))
+                           (set! init/options option #t)))
 
             (defn init/parse-option (option)
                   ((or (ref init/option-map option)

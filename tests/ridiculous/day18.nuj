@@ -40,16 +40,16 @@
       (def n (snail/find/next root t))
       (when n (tree/+= n :v (ref (ref t :r) :v)))
       (-> t
-          (tree/set! :v 0)
-          (tree/set! :l #nil)
-          (tree/set! :r #nil)))
+          (set! :v 0)
+          (set! :l #nil)
+          (set! :r #nil)))
 
 (defn snail/split (t root)
       (def lv (div/int (ref t :v) 2))
       (-> t
-          (tree/set! :l {:v lv})
-          (tree/set! :r {:v (- (ref t :v) lv)})
-          (tree/set! :v #nil)))
+          (set! :l {:v lv})
+          (set! :r {:v (- (ref t :v) lv)})
+          (set! :v #nil)))
 
 (defn snail/explode/maybe (t root d)
       (cond ((snail/int? t) #f)

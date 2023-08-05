@@ -7,12 +7,12 @@
       "Return a tree where KEYS point to VALUES"
       (def ret {})
       (doseq (key keys ret)
-	     (tree/set! ret key (car values))
+	     (set! ret key (car values))
 	     (cdr! values)))
 
 (defn tree/+= (t k v)
       "Increment value at K in T by V"
-      (tree/set! t k (+ v (int (or (ref t k) 0)))))
+      (set! t k (+ v (int (or (ref t k) 0)))))
 
 (defmacro tree/-= (t k v)
           "Decrement value at K in T by V"
@@ -50,7 +50,7 @@
       (doseq (e (tree/keys l) ret)
              (def t (ref l e))
              (when (f t)
-                   (tree/set! ret e t))))
+                   (set! ret e t))))
 
 (defn tree/merge (a b)
       "Merge two trees together, if a key is contained in both trees the on in B gets priority"
@@ -58,4 +58,4 @@
       (when-not a (return (tree/dup b)))
       (def ret (tree/dup a))
       (doseq (k (tree/keys b) ret)
-             (tree/set! ret k (ref b k))))
+             (set! ret k (ref b k))))

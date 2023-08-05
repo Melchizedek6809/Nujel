@@ -17,12 +17,12 @@
 (defn add-encoder! (ext enc)
       :export
       (def ext (string->keyword (lower-case ext)))
-      (tree/set! image/encoders ext enc))
+      (set! image/encoders ext enc))
 
 (defn add-decoder! (ext dec)
       :export
       (def ext (string->keyword (lower-case ext)))
-      (tree/set! image/decoders ext dec))
+      (set! image/decoders ext dec))
 
 (defn get-encoder (path)
       (def ext (string->keyword (lower-case (path/extension path))))

@@ -7,12 +7,12 @@
                (def key-a (string->symbol (string/cut line i (+ i 1))))
                (if (tree/has? eles key-a)
                    (tree/++ eles key-a)
-                   (tree/set! eles key-a 1))
+                   (set! eles key-a 1))
                (when (< i (- (buffer/length line) 1))
                      (def key-b (string->symbol (string/cut line i (+ i 2))))
                      (if (tree/has? pairs key-b)
                          (tree/++ pairs key-b)
-                         (tree/set! pairs key-b 1))))
+                         (set! pairs key-b 1))))
       {:pairs pairs :eles eles :combinations '()})
 
 (defn combination/parse (recipe last-recipe)
@@ -29,7 +29,7 @@
         (if (lambda? last-recipe) (last-recipe α Ω) Ω)))
 
 (defn combination/add (state recipe)
-      (tree/set! state :combinations (combination/parse recipe (ref state :combinations))))
+      (set! state :combinations (combination/parse recipe (ref state :combinations))))
 
 (defn combinations/read (state lines)
       (for-each lines (fn (line) (combination/add state (split line " -> "))))

@@ -585,6 +585,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			goto throwException;
 		}
 		ctx.sp -= 2;
+		ctx.valueStack[ctx.sp-1] = ret;
 		vmbreak; }
 	vmcase(lopZeroPred) {
 		lVal a = ctx.valueStack[ctx.sp-1];

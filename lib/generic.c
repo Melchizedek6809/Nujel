@@ -128,63 +128,63 @@ static lVal lBufferViewSet(lVal car, size_t i, lVal v){
 			return nv;
 		}
 		((u8 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtS8: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((i8 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtU16: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((u16 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtS16: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((i16 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtU32: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((u32 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtS32: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((i32 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtS64: {
 		const lVal nv = requireInt(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((i64 *)buf)[i] = nv.vInt;
-		return NIL; }
+		return car; }
 	case lbvtF32: {
 		const lVal nv = requireFloat(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((float *)buf)[i] = nv.vFloat;
-		return NIL; }
+		return car; }
 	case lbvtF64: {
 		const lVal nv = requireFloat(v);
 		if(unlikely(nv.type == ltException)){
 			return nv;
 		}
 		((double *)buf)[i] = nv.vFloat;
-		return NIL; }
+		return car; }
 	}
 }
 
@@ -204,7 +204,7 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 			return lValException("type-error", "Can't set! a non int value into a BytecodeArray", v);
 		}
 		arr->data[i] = v.vInt;
-		return NIL; }
+		return col; }
 	case ltArray: {
 		lArray *arr = col.vArray;
 		lVal keyVal = requireNaturalInt(key);
@@ -216,7 +216,7 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 			return lValException("out-of-bounds","(ref) array index provided is out of bounds", col);
 		}
 		arr->data[i] = v;
-		return NIL; }
+		return col; }
 	case ltBuffer: {
 		char *buf  = col.vBuffer->buf;
 		const size_t len = col.vBuffer->length;
@@ -232,7 +232,7 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 			return lValException("type-error", "Can't set! a non int value into a BytecodeArray", v);
 		}
 		buf[i] = v.vInt;
-		return NIL; }
+		return col; }
 	case ltBufferView: {
 		lVal t = requireNaturalInt(key);
 		if(unlikely(t.type == ltException)){
@@ -243,8 +243,11 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);
 		}
-		lTreeInsert(col.vTree->root, key.vSymbol, v);
-		return NIL; }
+		if(unlikely(col.vTree->root && col.vTree->root->flags & TREE_IMMUTABLE)){
+			return lValException("type-error", "Can only set! mutable trees", col);
+		}
+		col.vTree->root = lTreeInsert(col.vTree->root, key.vSymbol, v);
+		return col; }
 	default:
 		return lValException("type-error", "Can't set! that", col);
 	}

@@ -31,9 +31,9 @@
       (def off offset)
       (dotimes (i packets)
 	       (def child (bits/parse/packet s off))
-	       (tree/set! p :value (cons (cdr child) (ref p :value)))
+	       (set! p :value (cons (cdr child) (ref p :value)))
 	       (set! off (car child)))
-      (tree/set! p :value (nreverse (ref p :value)))
+      (set! p :value (nreverse (ref p :value)))
       (cons off p))
 
 (defn packet/operator/bits (p s offset bits)
@@ -42,9 +42,9 @@
 
       (while (< off goal-offset)
 	     (def child (bits/parse/packet s off))
-	     (tree/set! p :value (cons (cdr child) (ref p :value)))
+	     (set! p :value (cons (cdr child) (ref p :value)))
 	     (set! off (car child)))
-      (tree/set! p :value (nreverse (ref p :value)))
+      (set! p :value (nreverse (ref p :value)))
       (cons off p))
 
 (defn packet/operator (p s offset)
@@ -62,7 +62,7 @@
       (inc! off)
       (set! parts (cons (string/cut s off (+ 4 off)) parts))
       (inc! off 4)
-      (cons off (tree/set! p :value (read/single (cat "#b" (join (nreverse parts)))))))
+      (cons off (set! p :value (read/single (cat "#b" (join (nreverse parts)))))))
 
 (defn bits/parse/packet-contents (p s offset)
       (case (ref p :type)

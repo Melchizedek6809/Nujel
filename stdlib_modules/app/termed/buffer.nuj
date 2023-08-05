@@ -49,9 +49,9 @@
         (set! lines pos-y (inc pos-y))
         (inc! pos-y))
       (array/length! lines (max 0 ll))
-      (tree/set! buf :pos-y (- (ref buf :pos-y) 1))
+      (set! buf :pos-y (- (ref buf :pos-y) 1))
       (line-clean! buf (ref buf :pos-y) #f)
-      (tree/set! buf :pos-x (inc (line-length (ref buf :pos-y)))))
+      (set! buf :pos-x (inc (line-length (ref buf :pos-y)))))
 
 (defn backward-char ()
       :export
@@ -61,11 +61,11 @@
         (def pos-y (ref buf :pos-y))
         (when (< pos-y 1)
           (return))
-        (tree/set! buf :pos-y (dec pos-y))
+        (set! buf :pos-y (dec pos-y))
         (line-clean! buf (ref buf :pos-y) #f)
-        (tree/set! buf :pos-x (line-length (dec pos-y)))
+        (set! buf :pos-x (line-length (dec pos-y)))
         (return))
-      (tree/set! buf :pos-x (dec pos-x)))
+      (set! buf :pos-x (dec pos-x)))
 
 (defn previous-line ()
       :export
@@ -74,9 +74,9 @@
       (def pos-y (ref buf :pos-y))
       (when (< pos-y 1)
         (return))
-      (tree/set! buf :pos-y (dec pos-y))
+      (set! buf :pos-y (dec pos-y))
       (line-clean! buf (ref buf :pos-y) #f)
-      (tree/set! buf :pos-x (min pos-x (line-length (dec pos-y)))))
+      (set! buf :pos-x (min pos-x (line-length (dec pos-y)))))
 
 (defn next-line ()
       :export
@@ -87,9 +87,9 @@
       (def ll (- (array/length lines) 1))
       (when (>= pos-y ll)
         (return))
-      (tree/set! buf :pos-y (inc pos-y))
+      (set! buf :pos-y (inc pos-y))
       (line-clean! buf (ref buf :pos-y) #f)
-      (tree/set! buf :pos-x (min pos-x (line-length (inc pos-y)))))
+      (set! buf :pos-x (min pos-x (line-length (inc pos-y)))))
 
 (defn forward-char ()
       :export
@@ -100,11 +100,11 @@
       (when (>= pos-x ll)
         (when (>= (inc pos-y) (array/length (ref buf :lines)))
           (return))
-        (tree/set! buf :pos-x 0)
-        (tree/set! buf :pos-y (inc pos-y))
+        (set! buf :pos-x 0)
+        (set! buf :pos-y (inc pos-y))
         (line-clean! buf (ref buf :pos-y) #f)
         (return))
-      (tree/set! buf :pos-x (inc pos-x)))
+      (set! buf :pos-x (inc pos-x)))
 
 (defn delete-forward-char ()
       :export
@@ -132,7 +132,7 @@
         (set! line (- pos-x 1) (ref line pos-x))
         (inc! pos-x))
       (set! line bl 0)
-      (tree/set! buf :pos-x (- (ref buf :pos-x) 1)))
+      (set! buf :pos-x (- (ref buf :pos-x) 1)))
 
 (defn insert-char (c)
       :export
@@ -150,7 +150,7 @@
         (set! line i (ref line (dec i)))
         (dec! i))
       (set! line pos-x c)
-      (tree/set! buf :pos-x (inc pos-x)))
+      (set! buf :pos-x (inc pos-x)))
 
 (defn insert-newline ()
       :export
@@ -160,8 +160,8 @@
       (array/length! lines (inc (array/length lines)))
       (array/length! lines-clean (array/length lines))
       (set! lines (- (array/length lines) 1) (buffer/allocate 16))
-      (tree/set! buf :pos-x 0)
-      (tree/set! buf :pos-y (inc (ref buf :pos-y)))
+      (set! buf :pos-x 0)
+      (set! buf :pos-y (inc (ref buf :pos-y)))
       (line-clean! buf (ref buf :pos-y) #f))
 
 (defn get-buf-name (buf)

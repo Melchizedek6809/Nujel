@@ -2,17 +2,17 @@
 
 (defn do-commands-1 (name val state)
        (case name
-             (('forward) (tree/set! state :horiz (+ (ref state :horiz) val)))
-             (('up     ) (tree/set! state :depth (- (ref state :depth) val)))
-             (('down   ) (tree/set! state :depth (+ (ref state :depth) val)))
+             (('forward) (set! state :horiz (+ (ref state :horiz) val)))
+             (('up     ) (set! state :depth (- (ref state :depth) val)))
+             (('down   ) (set! state :depth (+ (ref state :depth) val)))
              (otherwise  (println "Unknown Command, continuing."))))
 
 (defn do-commands-2 (name val state)
        (case name
-             (('forward) (tree/set! state :horiz (+ (ref state :horiz) val))
-                         (tree/set! state :depth (+ (ref state :depth) (* (ref state :aim) val))))
-             (('up     ) (tree/set! state :aim   (- (ref state   :aim) val)))
-             (('down   ) (tree/set! state :aim   (+ (ref state   :aim) val)))
+             (('forward) (set! state :horiz (+ (ref state :horiz) val))
+                         (set! state :depth (+ (ref state :depth) (* (ref state :aim) val))))
+             (('up     ) (set! state :aim   (- (ref state   :aim) val)))
+             (('down   ) (set! state :aim   (+ (ref state   :aim) val)))
              (otherwise  (println "Unknown Command, continuing."))))
 
 (defn step (l state fun)

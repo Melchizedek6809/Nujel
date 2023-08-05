@@ -66,8 +66,8 @@
 (defn board/score! (board marks last-num)
        (defn board/score/num (a b) (+ a (if (ref marks b) 0 b)))
        (defn board/score/row (a b) (reduce b board/score/num a))
-       (tree/set! board :score (* last-num (reduce (ref board :board) board/score/row 0)))
-       (tree/set! board :order (board/get-order)))
+       (set! board :score (* last-num (reduce (ref board :board) board/score/row 0)))
+       (set! board :order (board/get-order)))
 
 (defn print/board (board marks last-num)
        (if (not (zero? (ref board :order)))

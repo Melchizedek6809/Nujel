@@ -58,18 +58,18 @@
       (doseq (loader module/loader)
              (def mod (loader name))
              (when mod
-               (tree/set! module/cache name mod)
+               (set! module/cache name mod)
                (return mod))))
 
 (defn module/insert/defer (name module-source)
       :cat :modules
       :internal
-      (tree/set! module/store name module-source))
+      (set! module/store name module-source))
 
 (defn module/insert (name module)
       :cat :modules
       :internal
-      (tree/set! module/cache name module))
+      (set! module/cache name module))
 
 (defn module/resolve-string/join (parts ret)
       :cat :modules
@@ -136,7 +136,7 @@
           `(module/insert/defer ~name (string/write ~(list 'quote (cons 'do body)))))
 
 (defmacro export (name value)
-          `(tree/set! exports '~name ~value))
+          `(set! exports '~name ~value))
 
 (defmacro use (module)
           `(require* ~module (current-closure) #f))

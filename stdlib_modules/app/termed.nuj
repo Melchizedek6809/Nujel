@@ -67,11 +67,11 @@
       (exit 0))
 
 (defn beginning-of-line ()
-      (tree/set! (get-cur-buffer) :pos-x 0))
+      (set! (get-cur-buffer) :pos-x 0))
 
 (defn end-of-line ()
       (def buf (get-cur-buffer))
-      (tree/set! buf :pos-x (line-length (ref buf :pos-y))))
+      (set! buf :pos-x (line-length (ref buf :pos-y))))
 
 (defn clear-frame ()
       (dotimes (y (- screen-height 1))
@@ -85,17 +85,17 @@
                   (ref buf :scroll-y)) 0)
         (array/fill! (ref buf :lines-clean) #f)
         (clear-frame)
-        (tree/set! buf :scroll-y (* scroll-interval (int (floor (/ (ref buf :pos-y) scroll-interval))))))
+        (set! buf :scroll-y (* scroll-interval (int (floor (/ (ref buf :pos-y) scroll-interval))))))
 
       (when (> (- (ref buf :pos-y)
                   (ref buf :scroll-y)) frame-height)
         (array/fill! (ref buf :lines-clean) #f)
         (clear-frame)
-        (tree/set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (ref buf :pos-y) frame-height) scroll-interval))))))
+        (set! buf :scroll-y (* scroll-interval (int (ceil (/ (- (ref buf :pos-y) frame-height) scroll-interval))))))
 
       (when (< (ref buf :scroll-y) 0)
         (array/fill! (ref buf :lines-clean) #f)
-        (tree/set! buf :scroll-y)))
+        (set! buf :scroll-y)))
 
 (defn read-bracketed-input ()
       (def c (poll-input))
@@ -165,7 +165,7 @@
       (def buf (new-buffer filename))
       (def text (slurp filename))
       (when text
-        (tree/set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
+        (set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
 
 (defn main (args)
       :export

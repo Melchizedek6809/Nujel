@@ -10,7 +10,7 @@
     (flatten)
     (filter (path/ext?! "nuj"))
     (reduce (fn (a b)
-                (tree/set! a
+                (set! a
                            (string->keyword b)
                            @(name: b content: (file/read b)))))
     (val->json)
