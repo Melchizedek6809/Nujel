@@ -111,11 +111,11 @@ static lVal lnfResolveOrNull(lClosure *c, lVal v){
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
 		return lValException("invalid-environment", "You can only resolve-or-nil symbols in Lambdas or Objects", env);
 	}
-	lVal ret;
-	if(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym, &ret)){
-		return ret;
-	}else{
+	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
+	if(ret.type == ltException){
 		return NIL;
+	} else {
+		return ret;
 	}
 }
 
@@ -127,7 +127,8 @@ static lVal lnfResolvesPred(lClosure *c, lVal v){
 	if((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment)){
 		return lValException("invalid-environment", "You can only check symbols in Lambdas or Objects", env);
 	}
-	return lValBool(lHasClosureSym(env.type != ltNil ? env.vClosure : c, sym,NULL));
+	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
+	return lValBool(ret.type != ltException);
 }
 
 static lVal lnfCurrentClosure(lClosure *c, lVal v){
@@ -425,11 +426,17 @@ static lVal lnfStrSym(lClosure *c, lVal v){
 	return lValSym(car.vString->data);
 }
 
+static lVal lnfMethod(lClosure *c, lVal v){
+	(void)c;(void)v;
+	return lValException("reserved", "method calls aren't implemented yet", v);
+}
+
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncPure(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote);
 	lAddNativeFuncPure(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead);
 
 
+	lAddNativeFunc(c,"!",              "(v method . args)", "Call METHOD on V with ARGS", lnfMethod);
 	lAddNativeFunc(c,"def-in!",        "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn);
 	lAddNativeFunc(c,"resolve",        "(sym environment)", "Resolve SYM", lnfResolve);
 	lAddNativeFunc(c,"resolve-or-nil","(sym environment)", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull);

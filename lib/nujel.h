@@ -101,7 +101,7 @@ struct lTreeRoot {
 };
 
 struct lVal {
-	u32 type;
+	u16 type;
 	union {
 		bool            vBool;
 		i64             vInt;
@@ -233,7 +233,6 @@ lTree *lTreeNew             (const lSymbol *s, lVal v);
 lTree *lTreeDup             (const lTree *t);
 
 lVal   lTreeRef             (const lTree *t, const lSymbol *s);
-bool   lTreeSet             (      lTree *t, const lSymbol *s, lVal v);
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
 
 /*

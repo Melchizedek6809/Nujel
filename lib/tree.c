@@ -26,20 +26,6 @@ static int lTreeGetBalance(const lTree *t){
 	return t == NULL ? 0 : lTreeHeight(t->left) - lTreeHeight(t->right);
 }
 
-/* Reset S to be associated to V if it has already been bound, storing TRUE in
- * FOUND on success */
-bool lTreeSet(lTree *t, const lSymbol *s, lVal v){
-	lTree *c = t;
-	while(c != NULL){
-		if(c->key == s){
-			c->value = v;
-			return true;
-		}
-		c = s > c->key ? c->right : c->left;
-	}
-	return false;
-}
-
 /* Rotate the tree X to the left, in order to balance the tree again */
 static lTree *lTreeRotateLeft(lTree *x){
 	lTree *y = x->right;
@@ -123,7 +109,7 @@ lVal lTreeRef(const lTree *t, const lSymbol *s){
 		}
 		c = s > c->key ? c->right : c->left;
 	}
-	return lValExceptionSimple();;
+	return lValExceptionSimple();
 }
 
 /* Add all the keys within T to the beginning LIST */

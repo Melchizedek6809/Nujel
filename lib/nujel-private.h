@@ -80,29 +80,19 @@ struct lBuffer {
 
 struct lSymbol {
 	union {
-		char c[64];
+		char c[48];
 		struct lSymbol *nextFree;
 	};
 };
 
-struct lBytecodeArray{
+struct lBytecodeArray {
 	lBytecodeOp *data;
 	lArray *literals;
 	union {
 		lBytecodeOp *dataEnd;
 		struct lBytecodeArray *nextFree;
 	};
-	u8 flags;
 };
-
-typedef enum closureType {
-	closureDefault = 0,
-	closureObject = 1,
-	closureCall = 2,
-	closureLet = 3,
-	closureTry = 4,
-	closureRoot = 5,
-} closureType;
 
 struct lNFunc {
 	lVal (*fp)(lClosure *, lVal);
@@ -135,9 +125,19 @@ struct lClosure {
 		lVal args;
 		lVal exceptionHandler;
 	};
-	int sp;
+	u16 sp;
 	u8 type;
 };
+
+typedef enum closureType {
+	closureDefault = 0,
+	closureObject = 1,
+	closureCall = 2,
+	closureLet = 3,
+	closureTry = 4,
+	closureRoot = 5,
+} closureType;
+
 
 struct lThread {
 	lBytecodeArray *text;
@@ -287,6 +287,7 @@ void lGarbageCollect();
 /*
  | Alocator related definitions
  */
+#define SYM_MAX (1<<14)
 #define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
 #define CLO_MAX (1<<15)
@@ -332,7 +333,6 @@ static inline int lNFuncID(const lNFunc *n){
 /*
  | Symbolic procedures
  */
-#define SYM_MAX (1<<14)
 extern lSymbol  lSymbolList [SYM_MAX];
 extern lSymbol *lSymbolFFree;
 extern uint     lSymbolActive;

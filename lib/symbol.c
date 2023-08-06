@@ -21,8 +21,8 @@ lSymbol *lSymbolFFree = NULL;
 // lSymbolIndex stores all indices 1-based, because it allows us to use 0 to
 // mean that the slot is empty which is more convenient.  negative values denote
 // deleted slots, and positive values denote used slots.
-int      lSymbolIndex[SYM_MAX];
-int      lSymbolBackIndex[SYM_MAX];
+i16      lSymbolIndex[SYM_MAX];
+i16      lSymbolBackIndex[SYM_MAX];
 #define SYMBOL_SLOT_IS_EMPTY(X) (X == 0)
 #define SYMBOL_SLOT_IS_TOMB(X)  (X < 0)
 #define SYMBOL_SLOT_IS_USED(X)  (X > 0)

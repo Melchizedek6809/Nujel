@@ -70,25 +70,14 @@ lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 	return NIL;
 }
 
-/* Return TRUE if C contains a binding for S, storing the value in V */
-bool lHasClosureSym(lClosure *c, const lSymbol *s, lVal *v){
-	for (lClosure *cc = c; cc; cc = cc->parent) {
-		lVal t = lTreeRef(cc->data, s);
-		if(t.type != ltException){
-			if(v != NULL){
-				*v = t;
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
 lVal lGetClosureSym(lClosure *c, const lSymbol *s){
-	for (lClosure *cc = c; cc; cc = cc->parent) {
-		lVal ret = lTreeRef(cc->data, s);
-		if(ret.type != ltException){
-			return ret;
+	for (const lClosure *cc = c; cc; cc = cc->parent) {
+		const lTree *t = cc->data;
+		while(t){
+			if (s == t->key) {
+				return t->value;
+			}
+			t = s > t->key ? t->right : t->left;
 		}
 	}
 	return lValException("unbound-variable","Can't resolve symbol", lValSymS(s));
@@ -102,8 +91,13 @@ void lDefineClosureSym(lClosure *c, const lSymbol *s, lVal v){
 /* Set the value bound to S in C to V, if it has already been bound */
 bool lSetClosureSym(lClosure *c, const lSymbol *s, lVal v){
 	for (lClosure *cc = c; cc; cc = cc->parent) {
-		if(lTreeSet(cc->data, s, v)){
-			return true;
+		lTree *t = cc->data;
+		while(t){
+			if(t->key == s){
+				t->value = v;
+				return true;
+			}
+			t = s > t->key ? t->right : t->left;
 		}
 	}
 	return false;
