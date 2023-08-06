@@ -5,20 +5,10 @@
 ;;; you can't use the full REPL module
 
 (def tiny-repl (let*
-                 (def *1 #nil)
-                 (def *2 #nil)
-                 (def *3 #nil)
-                 (def line-history #nil)
                  (def ctx (environment*))
 
                  (defn exception-handler (error)
                        (print/error error))
-
-                 (defn push-result (result)
-                       (set! *3 *2)
-                       (set! *2 *1)
-                       (set! *1 result)
-                       (return result))
 
                  (defn cmd/raw (line)
                        :export
@@ -32,8 +22,8 @@
                               (return))
                             (try exception-handler
                                  (def result (eval-in ctx (cons do expr)))
-                                 (push-result result)
-                                 (println (if (nil? result) "" (string/display result))))))
+                                 (display result)
+                                 (newline))))
 
                  (defn cmd ()
                        (def buf "")
@@ -41,17 +31,14 @@
                        (while (not= (trim line) "[/cmd]")
                          (set! buf (cat buf line))
                          (set! line (readline)))
-                       (def expr (cons do (read buf)))
-                       (def result (eval-in ctx expr))
-                       (push-result result)
-                       (println (if (nil? result) "" (string/display result))))
-
-                 (defn prompt ()
-                       "> ")
+                       (try exception-handler
+                            (def expr (cons do (read buf)))
+                            (def result (eval-in ctx expr))
+                            (display result)
+                            (newline)))
 
                  (defn read-cmd ()
-                       (def line (readline (prompt)))
-                       (cons! line line-history)
+                       (def line (readline "> "))
                        (when (nil? line)
                          (println "Adios, cowboy...")
                          (exit 0))
@@ -60,8 +47,6 @@
                            (cmd/raw line)))
 
                  (defn tiny-repl ()
-                       (println (cat "Nujel TinyREPL is ready for service!"))
-                       (while #t
-                         (try exception-handler
-                              (read-cmd))))
+                       (println "Nujel TinyREPL is ready for service!")
+                       (while #t (read-cmd)))
 ))
