@@ -390,5 +390,7 @@ void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
 
 lVal lValBytecodeOp(lBytecodeOp v);
+lVal lGenericRef(lVal col, lVal key);
+lVal lGenericSet(lVal col, lVal key, lVal v);
 
 #endif
