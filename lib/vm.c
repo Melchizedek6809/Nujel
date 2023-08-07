@@ -21,21 +21,17 @@
 #endif
 
 /* Read an encoded signed 16-bit offset at ip */
-i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
+static inline i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 	const int x = (ip[0] << 8) | ip[1];
 	return (x < (1 << 15)) ? x : -((1<<16) - x);
 }
 
 /* Build a list of length len in stack starting at sp */
 static lVal lStackBuildList(lVal *stack, int sp, int len){
-	if(unlikely(len == 0)){return NIL;}
-	const int nsp = sp - len;
-	lVal ret = lCons(stack[nsp], NIL);
-	lVal t = ret;
-	stack = &stack[sp - (len-1)];
-	for(int i = 0; i < (len-1); i++){
-		t.vList->cdr = lCons(stack[i], NIL);
-		t = t.vList->cdr;
+	lVal *vsp = &stack[sp - (len)];
+	lVal ret = NIL;
+	for(int i = len-1; i >= 0; i--){
+		ret = lCons(vsp[i], ret);
 	}
 	return ret;
 }

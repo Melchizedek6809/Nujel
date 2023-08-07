@@ -231,7 +231,6 @@ typedef enum lOpcode {
 	lopGenSet          = 0x37,
 } lOpcode;
 
-i64   lBytecodeGetOffset16 (const lBytecodeOp *ip);
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 void  simplePrintVal       (lVal v);
