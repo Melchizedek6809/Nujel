@@ -357,6 +357,7 @@ extern lSymbol *symFold;
 
 void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);
+
 lSymbol  *getTypeSymbol (const lVal a);
 lSymbol  *getTypeSymbolT(const lType T);
 

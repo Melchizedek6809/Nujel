@@ -158,11 +158,11 @@ static inline lVal lCons(lVal car, lVal cdr){
 	return lValAlloc(ltPair, cons);
 }
 
-static inline lVal lCar(lVal v){
+static inline lVal lCar(lVal v) {
 	return likely(v.type == ltPair) ? v.vList->car : NIL;
 }
 
-static inline lVal lCdr(lVal v){
+static inline lVal lCdr(lVal v) {
 	return likely(v.type == ltPair) ? v.vList->cdr : NIL;
 }
 

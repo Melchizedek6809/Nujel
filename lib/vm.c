@@ -160,11 +160,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStackSize = 256;
 	ctx.valueStackSize   = 32;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
-	ctx.valueStack	     = malloc(ctx.valueStackSize * sizeof(lVal));
-	ctx.csp		     = 0;
-	ctx.sp		     = 0;
+	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
+	ctx.csp              = 0;
+	ctx.sp               = 0;
 	ctx.closureStack[0]  = c;
-	ctx.text	     = text;
+	ctx.text             = text;
 
 	const int RSP = lRootsGet();
 	lRootsThreadPush(&ctx);

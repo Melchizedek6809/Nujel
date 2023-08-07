@@ -24,16 +24,16 @@ lClosure *lClosureNewFunCall(lVal args, lVal lambda) {
 	for (lVal n = lambda.vClosure->args; ; n = n.vList->cdr) {
 		if (likely(n.type == ltPair)) {
 			if(unlikely(args.type != ltPair)){
-				lDefineClosureSym(tmpc, n.vList->car.vSymbol, NIL);
+				tmpc->data = lTreeInsert(tmpc->data, n.vList->car.vSymbol, NIL);
 			} else {
-				lDefineClosureSym(tmpc, n.vList->car.vSymbol, args.vList->car);
+				tmpc->data = lTreeInsert(tmpc->data, n.vList->car.vSymbol, args.vList->car);
 				args = args.vList->cdr;
 			}
 		} else if(likely(n.type == ltSymbol)) {
-			lDefineClosureSym(tmpc, n.vSymbol, args);
+			tmpc->data = lTreeInsert(tmpc->data, n.vSymbol, args);
 			break;
 		} else {
-			return tmpc;
+			break;
 		}
 	}
 	return tmpc;
@@ -74,7 +74,7 @@ lVal lGetClosureSym(lClosure *c, const lSymbol *s){
 	for (const lClosure *cc = c; cc; cc = cc->parent) {
 		const lTree *t = cc->data;
 		while(t){
-			if (s == t->key) {
+			if(s == t->key){
 				return t->value;
 			}
 			t = s > t->key ? t->right : t->left;

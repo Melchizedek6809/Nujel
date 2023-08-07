@@ -8,6 +8,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+static i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
+	const uint alen = lBufferLength(a);
+	const uint blen = lBufferLength(b);
+	const uint len  = MIN(alen,blen);
+	const char *ab  = a->data;
+	const char *bb  = b->data;
+	for(uint i=0;i<len;i++){
+		const u8 ac = *ab++;
+		const u8 bc = *bb++;
+		if(ac != bc){
+			return ac - bc;
+		}
+	}
+	return alen - blen;
+}
+
+static i64 lSymbolGreater(const lSymbol *a, const lSymbol *b) {
+	const uint alen = strnlen(a->c, sizeof(a->c));
+	const uint blen = strnlen(b->c, sizeof(b->c));
+	const uint len  = MIN(alen,blen);
+	const char *ab  = a->c;
+	const char *bb  = b->c;
+	for(uint i=0;i<len;i++){
+		const u8 ac = *ab++;
+		const u8 bc = *bb++;
+		if(ac != bc){
+			return ac - bc;
+		}
+	}
+	return alen - blen;
+}
+
 /* Checks if A is greater than B, returns 0 if the two values can't be compared
  | or if they are equal.
  */
@@ -31,41 +63,16 @@ i64 lValGreater(const lVal a, const lVal b){
 	switch(a.type){
 	default:
 		return 0;
-	case ltKeyword:
-	case ltSymbol: {
-		const uint alen = strnlen(a.vSymbol->c, sizeof(a.vSymbol->c));
-		const uint blen = strnlen(b.vSymbol->c, sizeof(b.vSymbol->c));
-		const uint len  = MIN(alen,blen);
-		const char *ab  = a.vSymbol->c;
-		const char *bb  = b.vSymbol->c;
-		for(uint i=0;i<len;i++){
-			const u8 ac = *ab++;
-			const u8 bc = *bb++;
-			if(ac != bc){
-				return ac - bc;
-			}
-		}
-		return alen - blen;
-	}
 	case ltInt:
 		return a.vInt - b.vInt;
 	case ltFloat:
 		return a.vFloat < b.vFloat ? -1 : 1;
-	case ltString: {
-		const uint alen = lBufferLength(a.vString);
-		const uint blen = lBufferLength(b.vString);
-		const uint len  = MIN(alen,blen);
-		const char *ab  = a.vString->data;
-		const char *bb  = b.vString->data;
-		for(uint i=0;i<len;i++){
-			const u8 ac = *ab++;
-			const u8 bc = *bb++;
-			if(ac != bc){
-				return ac - bc;
-			}
-		}
-		return alen - blen;
-	}}
+	case ltKeyword:
+	case ltSymbol:
+		return lSymbolGreater(a.vSymbol, b.vSymbol);
+	case ltString:
+		return lStringGreater(a.vString, b.vString);
+	}
 }
 
 /* Check two values for equality */
