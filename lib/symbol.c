@@ -64,6 +64,19 @@ lSymbol *lSymLTBufferView;
 lSymbol *lSymLTFileHandle;
 lSymbol *lSymLTUnknownType;
 
+lSymbol *lSymFloatNaN;
+lSymbol *lSymFloatInf;
+lSymbol *lSymVMError;
+lSymbol *lSymTypeError;
+lSymbol *lSymOutOfBounds;
+lSymbol *lSymIOError;
+lSymbol *lSymArityError;
+lSymbol *lSymDivisionByZero;
+lSymbol *lSymReadError;
+lSymbol *lSymOOM;
+lSymbol *lSymUnmatchedOpeningBracket;
+lSymbol *lSymUnboundVariable;
+
 uint symbolLookups = 0;
 uint tombLookups = 0;
 
@@ -114,6 +127,19 @@ void lSymbolInit(){
 	lSymLTBufferView     = lSymSM("buffer-view");
 	lSymLTFileHandle     = lSymSM("file-handle");
 	lSymLTUnknownType    = lSymSM("unknown-type");
+
+	lSymFloatNaN         = lSymSM("float-nan");
+	lSymFloatInf         = lSymSM("float-inf");
+	lSymVMError          = lSymSM("vm-error");
+	lSymTypeError        = lSymSM("type-error");
+	lSymOutOfBounds      = lSymSM("out-of-bounds");
+	lSymIOError          = lSymSM("io-error");
+	lSymArityError       = lSymSM("arity-error");
+	lSymDivisionByZero   = lSymSM("division-by-zero");
+	lSymReadError        = lSymSM("read-error");
+	lSymOOM              = lSymSM("out-of-memory");
+	lSymUnmatchedOpeningBracket = lSymSM("unmatched-opening-bracket");
+	lSymUnboundVariable  = lSymSM("unbound-variable");
 }
 
 static inline int lSymIndex(const lSymbol *s){

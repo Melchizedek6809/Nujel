@@ -149,7 +149,7 @@ static lVal lnfRem(lVal a, lVal b){
 				return bv;
 			}
 			if(bv.vInt == 0){
-				return lValException("division-by-zero","Module/Dividing by zero is probably not what you wanted", NIL);
+				return lValException(lSymDivisionByZero, "Module/Dividing by zero is probably not what you wanted", NIL);
 			}
 			return lValInt(av.vInt % bv.vInt);}
 		case ltFloat: {
@@ -218,14 +218,14 @@ static lVal lnfMulAstI(lVal a, lVal b){
 
 static lVal lnfDivAstI(lVal a, lVal b){
 	if(unlikely(b.vInt == 0)){
-		return lValException("divide-by-zero", "Can't divide by zero", a);
+		return lValException(lSymDivisionByZero, "Can't divide by zero", a);
 	}
 	return lValInt(a.vInt / b.vInt);
 }
 
 static lVal lnfModAstI(lVal a, lVal b){
 	if(unlikely(b.vInt == 0)){
-		return lValException("divide-by-zero", "Can't divide by zero", a);
+		return lValException(lSymDivisionByZero, "Can't divide by zero", a);
 	}
 	return lValInt(a.vInt % b.vInt);
 }

@@ -100,10 +100,10 @@ void simplePrintVal(lVal v){
 	}
 }
 
-lVal lValException(const char *symbol, const char *error, lVal v) {
+lVal lValException(const lSymbol *symbol, const char *error, lVal v) {
 	lVal l = lCons(v, NIL);
 	l = lCons(lValString(error),l);
-	l = lCons(lValKeyword(symbol),l);
+	l = lCons(lValKeywordS(symbol),l);
 	l.type = ltException;
 	return l;
 }
@@ -111,7 +111,7 @@ lVal lValException(const char *symbol, const char *error, lVal v) {
 /* Run fun with args  */
 lVal lApply(lVal fun, lVal args){
 	if(unlikely(fun.type != ltLambda)){
-		return lValException("type-error", "Can't apply to following val", fun);
+		return lValException(lSymTypeError, "Can't apply to following val", fun);
 	}
 	return lBytecodeEval(lClosureNewFunCall(args, fun), fun.vClosure->text);
 }

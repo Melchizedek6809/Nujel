@@ -24,26 +24,26 @@ typedef struct {
 static lVal lReadValue(lReadContext *s);
 static lVal lReadList(lReadContext *s, bool rootForm, char terminator);
 
-static lVal lValExceptionReaderCustom(lReadContext *s, const char *msg, const char *customError){
+static lVal lValExceptionReaderCustom(lReadContext *s, const char *msg, const lSymbol *customError){
 	lVal err = lValStringError(s->buf, s->bufEnd, MAX(s->buf, s->bufEnd-30) ,s->bufEnd , s->bufEnd);
 	return lValException(customError, msg, err);
 }
 
 static lVal lValExceptionReader(lReadContext *s, const char *msg) {
-	return lValExceptionReaderCustom(s,msg,"read-error");
+	return lValExceptionReaderCustom(s,msg, lSymReadError);
 }
 
 static lVal lValExceptionReaderStartEnd(lReadContext *s, const char *msg){
 	const char *start, *end;
 	for(start = s->data; (start > s->buf) && (*start != '"') && ((start <= s->buf) || (start[-1] != '\\')); start--){}
 	for(end = s->data; (end < s->bufEnd) && (*end != '"') && (end[-1] != '\\'); end++){}
-	return lValException("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+	return lValException(lSymReadError, msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 }
 
 static lVal lValExceptionReaderEnd(lReadContext *s, const char *start, const char *msg){
 	const char *end;
 	for(end = s->data; (end < s->bufEnd) && ((*end > ' ') && !isnonsymbol(*end)); end++){}
-	return lValException("read-error", msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
+	return lValException(lSymReadError, msg, lValStringError(s->buf,s->bufEnd, start ,s->data , end));
 }
 
 static double createFloat(i64 value, i64 mantissa, i64 mantissaLeadingZeroes){
@@ -146,7 +146,7 @@ static lVal lParseString(lReadContext *s){
 			if (likely(i < bufSize)) {
 				buf[i] = 0;
 			}
-			return lValException("read-error", "Can't find closing \"", lValString(buf));
+			return lValException(lSymReadError, "Can't find closing \"", lValString(buf));
 		}else{
 			*b++ = *s->data++;
 		}
@@ -154,7 +154,7 @@ static lVal lParseString(lReadContext *s){
 	if (likely(i < bufSize)) {
 		buf[i] = 0;
 	}
-	return lValException("read-error", "Can't find closing \"", lValString(buf));
+	return lValException(lSymReadError, "Can't find closing \"", lValString(buf));
 }
 
 /* Parse s as a symbol and return the ltSymbol lVal */
@@ -284,7 +284,7 @@ static lVal lValExceptionBCRead(lReadContext *s, lVal v, const char *msg){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
 	buf[sizeof(buf)-1] = 0;
-	return lValException("read-error", buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)));
+	return lValException(lSymReadError, buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)));
 }
 
 static lVal lParseBytecodeArray(lReadContext *s){
@@ -306,7 +306,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 			u8 *newD = realloc(d, size);
 			if(unlikely(newD == NULL)){
 				free(d);
-				return lValException("out-of-memory", "OOM during BC Arr Parse", NIL);
+				return lValException(lSymOOM, "OOM during BC Arr Parse", NIL);
 			}
 			d = newD;
 		}
@@ -328,7 +328,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
 		free(d);
-		return lValException("read-error", "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
+		return lValException(lSymReadError, "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
 
 		storeOP:
 		d[len++] = (u8)t;
@@ -389,7 +389,7 @@ static lVal lParseBuffer(lReadContext *s){
 			u8 *newBuf = realloc(buf, bufSize);
 			if(unlikely(newBuf == NULL)){
 				free(buf);
-				return lValException("out-of-memory", "OOM during buffer parse", NIL);
+				return lValException(lSymOOM, "OOM during buffer parse", NIL);
 			}
 			buf = newBuf;
 		}
@@ -400,7 +400,7 @@ static lVal lParseBuffer(lReadContext *s){
 	u8* newBuf = realloc(buf, len);
 	if (unlikely(newBuf == NULL)) {
 		free(buf);
-		return lValException("out-of-memory", "OOM during buffer parse outtro", NIL);
+		return lValException(lSymOOM, "OOM during buffer parse outtro", NIL);
 	}
 	lVal ret = lValAlloc(ltBuffer, lBufferAlloc(len, true));
 	ret.vBuffer->buf = newBuf;
@@ -452,7 +452,7 @@ static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
 			if(!rootForm){
-				return lValExceptionReaderCustom(s, "Unmatched opening bracket", "unmatched-opening-bracket");
+				return lValExceptionReaderCustom(s, "Unmatched opening bracket", lSymUnmatchedOpeningBracket);
 			}
 			s->data++;
 			return ret.type == ltNil ? lCons(NIL,NIL) : ret;

@@ -52,7 +52,7 @@ static lVal lnfBufferLengthGet(lVal a){
 	lVal car = a;
 	switch(car.type){
 	default:
-		return lValException("type-error", "Expected a buffer or something compatible", car);
+		return lValException(lSymTypeError, "Expected a buffer or something compatible", car);
 	case ltString:
 	case ltBuffer:
 		return lValInt(car.vBuffer->length);
@@ -74,11 +74,11 @@ static lVal lnfBufferLengthSet(lVal a, lVal b){
 	}
 	const int length = lenVal.vInt;
 	if(length < buf->length){
-		return lValException("error", "Buffers can only grow, not shrink.", b);
+		return lValException(lSymOutOfBounds, "Buffers can only grow, not shrink.", b);
 	}
 	void *nBuf = realloc(buf->buf, length);
 	if (unlikely(nBuf == NULL)) {
-		return lValException("out-of-memory", "(buffer/length!) couldn't allocate its buffer", b);
+		return lValException(lSymOOM, "(buffer/length!) couldn't allocate its buffer", b);
 	}
 	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
 	buf->buf = nBuf;
@@ -95,7 +95,7 @@ static lVal lnfBufferImmutableGet(lVal car){
 	case ltBuffer:
 		return lValBool(car.vBuffer->flags & BUFFER_IMMUTABLE);
 	default:
-		return lValException("type-error", "Can't get immutability info from that: ", car);
+		return lValException(lSymTypeError, "Can't get immutability info from that: ", car);
 	}
 }
 
@@ -105,7 +105,7 @@ static lVal bufferFromPointer(bool immutable, const void *data, size_t length){
 	retBuf->flags = immutable ? BUFFER_IMMUTABLE : 0;
 	retBuf->buf = malloc(length);
 	if (unlikely(retBuf->buf == NULL)) {
-		return lValException("out-of-memory", "(buffer/length!) couldn't allocate a buffer", NIL);
+		return lValException(lSymOOM, "(buffer/length!) couldn't allocate a buffer", NIL);
 	}
 	memcpy(retBuf->buf, data, length);
 
@@ -144,10 +144,10 @@ static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength)
 	}
 
 	if(unlikely((buf == NULL) || (length < 0))){
-		return lValException("type-error", "Can't copy from that", vSrc);
+		return lValException(lSymTypeError, "Can't copy from that", vSrc);
 	}
 	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc.vBuffer->length))){
-		return lValException("out-of-bounds", "Can't fit everything in that buffer", vSrc);
+		return lValException(lSymOutOfBounds, "Can't fit everything in that buffer", vSrc);
 	}
 	memcpy(&((u8*)dest->buf)[destOffset], buf, length);
 	return car;
@@ -170,7 +170,7 @@ static lVal lnfBufferToString(lVal a, lVal aLength){
 	lBuffer *buf = car.vBuffer;
 	const i64 length = castToInt(aLength, buf->length);
 	if(unlikely(length < 0)){
-		return lValException("type-error", "Length has to be greater than 0", aLength);
+		return lValException(lSymTypeError, "Length has to be greater than 0", aLength);
 	}
 	return lValStringLen(buf->buf, length);
 }
@@ -184,7 +184,7 @@ static lVal bufferView(lVal a, lVal aImmutable, lBufferViewType T){
 	bool immutable = castToBool(aImmutable);
 	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
 		if(aImmutable.type == ltBool){
-			return lValException("type-error", "Can't create a mutable view for an immutable buffer", a);
+			return lValException(lSymTypeError, "Can't create a mutable view for an immutable buffer", a);
 		} else {
 			immutable = true;
 		}

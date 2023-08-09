@@ -68,7 +68,7 @@ static lVal lnfClosureData(lVal a){
 
 static lVal lnfDefIn(lVal env, lVal aSym, lVal aVal){
 	if(unlikely((env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException("invalid-environment", "You can only define symbols in Lambdas or Objects", env);
+		return lValException(lSymTypeError, "You can only define symbols in Lambdas or Objects", env);
 	}
 
 	lVal cadr = requireSymbolic(aSym);
@@ -88,7 +88,7 @@ static lVal lnfResolve(lClosure *c, lVal aSym, lVal env){
 	}
 	const lSymbol *sym = car.vSymbol;
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException("invalid-environment", "You can only resolve symbols in Lambdas or Objects", env);
+		return lValException(lSymTypeError, "You can only resolve symbols in Lambdas or Objects", env);
 	}
 	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
 }
@@ -100,7 +100,7 @@ static lVal lnfResolveOrNull(lClosure *c, lVal aSym, lVal env){
 	}
 	const lSymbol *sym = car.vSymbol;
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException("invalid-environment", "You can only resolve-or-nil symbols in Lambdas or Objects", env);
+		return lValException(lSymTypeError, "You can only resolve-or-nil symbols in Lambdas or Objects", env);
 	}
 	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
 	if(ret.type == ltException){
@@ -115,7 +115,7 @@ static lVal lnfResolvesPred(lClosure *c, lVal aSym, lVal env){
 	if(car.type != ltSymbol){return lValBool(false);}
 	const lSymbol *sym = car.vSymbol;
 	if((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment)){
-		return lValException("invalid-environment", "You can only check symbols in Lambdas or Objects", env);
+		return lValException(lSymTypeError, "You can only check symbols in Lambdas or Objects", env);
 	}
 	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
 	return lValBool(ret.type != ltException);
@@ -255,7 +255,7 @@ static lVal lnfMetaSet(lVal v, lVal aKey, lVal aVal){
 	const lSymbol *key = cadr.vSymbol;
 
 	if(car.type == ltNativeFunc){
-		return lValException("type-error", "Can't add new metadata to native functions", car);
+		return lValException(lSymTypeError, "Can't add new metadata to native functions", car);
 	}else{
 		car.vClosure->meta = lTreeInsert(car.vClosure->meta, key, aVal);
 	}
@@ -327,7 +327,7 @@ static lVal lnfString(lVal a){
 	int snret;
 	switch(a.type){
 	default:
-		return lValException("type-error", "Can't convert that into a string", a);
+		return lValException(lSymTypeError, "Can't convert that into a string", a);
 	case ltNil:
 		return lValString("");
 	case ltBuffer:

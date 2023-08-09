@@ -377,6 +377,9 @@ extern lSymbol *symDocumentation;
 extern lSymbol *symPure;
 extern lSymbol *symFold;
 
+extern lSymbol *lSymVMError;
+
+
 void      lSymbolInit   ();
 void      lSymbolFree   (lSymbol *s);
 

@@ -43,7 +43,8 @@ lClosure *lClosureNewFunCall(lVal args, lVal lambda) {
 lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
 	const char *cur = sym;
 	if(unlikely(lNF.type != ltNativeFunc)){
-		return lValException(":invalid-alias-definition","Only native functions and special forms can be defined with an alias",lNF);
+		fprintf(stderr, "Only native functions and special forms can be defined with an alias");
+		exit(123);
 	}
 	bool nameSet = false;
 
@@ -80,7 +81,7 @@ lVal lGetClosureSym(lClosure *c, const lSymbol *s){
 			t = s > t->key ? t->right : t->left;
 		}
 	}
-	return lValException("unbound-variable","Can't resolve symbol", lValSymS(s));
+	return lValException(lSymUnboundVariable, "Can't resolve symbol", lValSymS(s));
 }
 
 /* Bind the value V to the Symbol S in the closure C, defining it if necessary */

@@ -8,7 +8,7 @@ char *errorSym = "vm-error";
 char *errorMsg = "Gotta use bytecode";
 #define lVMErrorPlaceholder(sym) \
 	static lVal sym (){\
-		return lValException(errorSym, errorMsg, NIL); \
+		return lValException(lSymVMError, errorMsg, NIL); \
 	}
 
 lVMErrorPlaceholder(lnfAnd)

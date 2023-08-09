@@ -84,7 +84,7 @@ lVal lValStringError(const char *bufStart, const char *bufEnd, const char *errSt
 static lVal lnfStringCut(lVal str, lVal aStart, lVal lenV){
 	i64 start, slen, len;
 	if(unlikely(str.type != ltString)){
-		return lValException("type-error","(string/cut) expects a string as its first and only argument", str);
+		return lValException(lSymTypeError, "(string/cut) expects a string as its first and only argument", str);
 	}
 
 	const char *buf = str.vString->data;

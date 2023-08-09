@@ -67,7 +67,7 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 	}else if(mode == lSymAppend){
 		fh = fopen(path, "ab");
 	}else{
-		return lValException("type-error", "Don't know that particular behaviour: ", aIfExists);
+		return lValException(lSymTypeError, "Don't know that particular behaviour: ", aIfExists);
 	}
 
 	return fh ? lValFileHandle(fh) : NIL;
@@ -112,7 +112,7 @@ static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset)
 	i64 bytesRead = 0;
 	switch(contentV.type){
 	default:
-		return lValException("type-error", "Can't read into that", contentV);
+		return lValException(lSymTypeError, "Can't read into that", contentV);
 	case ltBuffer:
 		buf = lBufferDataMutable(contentV.vBuffer);
 		bufSize = lBufferLength(contentV.vBuffer);
@@ -123,15 +123,15 @@ static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset)
 		break;
 	}}
 	if(buf == NULL){
-		return lValException("type-error", "Can't read into an immutable buffer", contentV);
+		return lValException(lSymTypeError, "Can't read into an immutable buffer", contentV);
 	}
 	if((bufSize - offset) < size){
-		return lValException("type-error", "Buffer is too small for that read operation", contentV);
+		return lValException(lSymTypeError, "Buffer is too small for that read operation", contentV);
 	}
 	while(bytesRead < size){
 		const int r = fread(&((u8 *)buf)[offset + bytesRead], 1, size - bytesRead, fh);
 		if(ferror(fh)){
-			return lValException("io-error", "IO Error occured during read", aHandle);
+			return lValException(lSymIOError, "IO Error occured during read", aHandle);
 		}
 		if(feof(fh)){
 			return NIL;
@@ -156,7 +156,7 @@ static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset
 	i64 bytesWritten = 0;
 	switch(contentV.type){
 	default:
-		return lValException("type-error", "Can't read into that", contentV);
+		return lValException(lSymTypeError, "Can't read into that", contentV);
 	case ltString:
 	case ltBuffer:
 		buf = lBufferData(contentV.vBuffer);
@@ -168,18 +168,18 @@ static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset
 		break;
 	}}
 	if(buf == NULL){
-		return lValException("type-error", "Can't read into an immutable buffer", contentV);
+		return lValException(lSymTypeError, "Can't read into an immutable buffer", contentV);
 	}
 	if(size < 0){
 		size = bufSize - offset;
 	}
 	if((bufSize - offset) < size){
-		return lValException("type-error", "Buffer is too small for that read operation", contentV);
+		return lValException(lSymTypeError, "Buffer is too small for that read operation", contentV);
 	}
 	while(bytesWritten < size){
 		const int r = fwrite(&((u8 *)buf)[offset + bytesWritten], 1, size - bytesWritten, fh);
 		if(ferror(fh)){
-			return lValException("io-error", "IO Error occured during write", aHandle);
+			return lValException(lSymIOError, "IO Error occured during write", aHandle);
 		}
 		if(r > 0){ bytesWritten += r; }
 	}
@@ -224,7 +224,7 @@ static lVal lnfFileSeek(lVal aHandle, lVal aOffset, lVal aWhence){
 	}
 	const i64 whenceRaw = whenceV.vInt;
 	if((whenceRaw < 0) || (whenceRaw > 2)){
-		return lValException("type-error", "Whence has to be in the range 0-2", aWhence);
+		return lValException(lSymTypeError, "Whence has to be in the range 0-2", aWhence);
 	}
 	const int whence = whenceRaw == 0 ? SEEK_SET : whenceRaw == 1 ? SEEK_CUR : SEEK_END;
 	fseek(fh, offset, whence);

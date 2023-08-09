@@ -30,7 +30,7 @@ static lVal lnfArrLengthSet(lVal a, lVal b){
 	lVal *newData = realloc(arr->data,length * sizeof(lVal));
 	if (unlikely(newData == NULL)) {
 		free(newData);
-		return lValException("out-of-memory", "(array/allocate) couldn't allocate its array", b);
+		return lValException(lSymOOM, "(array/allocate) couldn't allocate its array", b);
 	}
 	arr->data = newData;
 	if(length > arr->length){
@@ -48,7 +48,7 @@ static lVal lnfArrAllocate(lVal a){
 	const int len = lenV.vInt;
 	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
 	if(unlikely(len && (r.vArray->data == NULL))){
-		return lValException("out-of-memory","(array/allocate] couldn't allocate its array", a);
+		return lValException(lSymOOM, "(array/allocate] couldn't allocate its array", a);
 	}
 	return r;
 }

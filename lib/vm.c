@@ -701,7 +701,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			case 16: nv = fun.vNFunc->fpR(cargs); break;
 			case 17: nv = fun.vNFunc->fpCR(c, cargs); break;
 			default:
-				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				exceptionThrownValue = lValException(lSymVMError, "Unsupported funcall", fun);
 				goto throwException;
 			}
 			if(unlikely(nv.type == ltException)){
@@ -716,7 +716,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp++] = nv;
 			break; }
 		default: {
-			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
 			goto throwException; }
 		}
 		vmbreak; }
@@ -739,7 +739,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal env = ctx.valueStack[--ctx.sp];
 		lVal bc = ctx.valueStack[--ctx.sp];
 		if(unlikely((env.type != ltEnvironment) || (bc.type != ltBytecodeArr))){
-			exceptionThrownValue = lValException("type-error", "Can't eval in that", env);
+			exceptionThrownValue = lValException(lSymTypeError, "Can't eval in that", env);
 			goto throwException;
 		}
 
@@ -814,7 +814,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			case 16: v = fun.vNFunc->fpR(lStackBuildList(ctx.valueStack, argsSp, len)); break;
 			case 17: v = fun.vNFunc->fpCR(c, lStackBuildList(ctx.valueStack, argsSp, len)); break;
 			default:
-				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				exceptionThrownValue = lValException(lSymVMError, "Unsupported funcall", fun);
 				goto throwException;
 			}
 			if(unlikely(v.type == ltException)){
@@ -824,7 +824,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp++] = v;
 			break; }
 		default: {
-			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
 			goto throwException; }
 		}
 		vmbreak; }
@@ -868,7 +868,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			case 16: v = fun.vNFunc->fpR(cargs); break;
 			case 17: v = fun.vNFunc->fpCR(c, cargs); break;
 			default:
-				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				exceptionThrownValue = lValException(lSymVMError, "Unsupported funcall", fun);
 				goto throwException;
 			}
 			if(unlikely(v.type == ltException)){
@@ -878,7 +878,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp++] = v;
 			break; }
 		default: {
-			exceptionThrownValue = lValException("type-error", "Can't apply to following val", fun);
+			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
 			goto throwException; }
 		}
 		vmbreak; }

@@ -10,10 +10,10 @@ static lVal lBufferViewRef(lVal car, size_t i){
 	const lBufferViewType viewType = car.vBufferView->type;
 
 	if(unlikely(buf == NULL)){
-		return lValException("type-error", "Can't ref that", car);
+		return lValException(lSymTypeError, "Can't ref that", car);
 	}
 	if(unlikely(i >= length)){
-		return lValException("out-of-bounds","ref - index provided is out of bounds", car);
+		return lValException(lSymOutOfBounds, "ref - index provided is out of bounds", car);
 	}
 
 	switch(viewType){
@@ -61,7 +61,7 @@ lVal lGenericRef(lVal col, lVal key){
 		}
 		const int i = keyVal.vInt;
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
-			return lValException("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) bytecode-array index provided is out of bounds", col);
 		}
 		return lValInt(arr->data[i]); }
 	case ltArray: {
@@ -72,7 +72,7 @@ lVal lGenericRef(lVal col, lVal key){
 		}
 		const int i = keyVal.vInt;
 		if(unlikely(arr->length <= i)){
-			return lValException("out-of-bounds","(ref) array index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) array index provided is out of bounds", col);
 		}
 		return arr->data[i]; }
 	case ltString:
@@ -85,7 +85,7 @@ lVal lGenericRef(lVal col, lVal key){
 		}
 		const size_t i = keyVal.vInt;
 		if(unlikely(len <= i)){
-			return lValException("out-of-bounds","(ref) buffer index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) buffer index provided is out of bounds", col);
 		}
 		return lValInt(buf[i]); }
 	case ltBufferView: {
@@ -101,7 +101,7 @@ lVal lGenericRef(lVal col, lVal key){
 		lVal r = lTreeRef(col.vTree->root, key.vSymbol);
 		return r.type != ltException ? r : NIL; }
 	default:
-		return lValException("type-error", "Can't ref that", col);
+		return lValException(lSymTypeError, "Can't ref that", col);
 	}
 }
 
@@ -112,10 +112,10 @@ static lVal lBufferViewSet(lVal car, size_t i, lVal v){
 	const lBufferViewType viewType = car.vBufferView->type;
 
 	if(unlikely(buf == NULL)){
-		return lValException("type-error", "Can't ref that", car);
+		return lValException(lSymTypeError, "Can't ref that", car);
 	}
 	if(unlikely(i >= length)){
-		return lValException("out-of-bounds","ref - index provided is out of bounds", car);
+		return lValException(lSymOutOfBounds, "ref - index provided is out of bounds", car);
 	}
 
 	switch(viewType){
@@ -198,10 +198,10 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		}
 		const int i = keyVal.vInt;
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
-			return lValException("out-of-bounds","(ref) bytecode-array index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) bytecode-array index provided is out of bounds", col);
 		}
 		if(unlikely((v.type != ltInt))){
-			return lValException("type-error", "Can't set! a non int value into a BytecodeArray", v);
+			return lValException(lSymTypeError, "Can't set! a non int value into a BytecodeArray", v);
 		}
 		arr->data[i] = v.vInt;
 		return col; }
@@ -213,7 +213,7 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		}
 		const int i = keyVal.vInt;
 		if(unlikely(arr->length <= i)){
-			return lValException("out-of-bounds","(ref) array index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) array index provided is out of bounds", col);
 		}
 		arr->data[i] = v;
 		return col; }
@@ -226,10 +226,10 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		}
 		const size_t i = keyVal.vInt;
 		if(unlikely(len <= i)){
-			return lValException("out-of-bounds","(ref) buffer index provided is out of bounds", col);
+			return lValException(lSymOutOfBounds, "(ref) buffer index provided is out of bounds", col);
 		}
 		if(unlikely((v.type != ltInt))){
-			return lValException("type-error", "Can't set! a non int value into a BytecodeArray", v);
+			return lValException(lSymTypeError, "Can't set! a non int value into a BytecodeArray", v);
 		}
 		buf[i] = v.vInt;
 		return col; }
@@ -244,11 +244,11 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 			return lValExceptionType(col, ltKeyword);
 		}
 		if(unlikely(col.vTree->root && col.vTree->root->flags & TREE_IMMUTABLE)){
-			return lValException("type-error", "Can only set! mutable trees", col);
+			return lValException(lSymTypeError, "Can only set! mutable trees", col);
 		}
 		col.vTree->root = lTreeInsert(col.vTree->root, key.vSymbol, v);
 		return col; }
 	default:
-		return lValException("type-error", "Can't set! that", col);
+		return lValException(lSymTypeError, "Can't set! that", col);
 	}
 }

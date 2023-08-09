@@ -173,7 +173,7 @@ static inline lVal lCddr  (lVal v){return lCdr(lCdr(v));}
 static inline lVal lCaddr (lVal v){return lCar(lCdr(lCdr(v)));}
 static inline lVal lCadddr(lVal v){return lCar(lCdr(lCdr(lCdr(v))));}
 
-lVal  lValException         (const char *symbol, const char *error, lVal v);
+lVal  lValException         (const lSymbol *symbol, const char *error, lVal v);
 
 /*
  | Reader/Printer
@@ -250,15 +250,27 @@ lSymbol  *lSymS         (const char *s);
 lSymbol  *lSymSM        (const char *s);
 lSymbol  *lSymSL        (const char *s, uint len);
 
+extern lSymbol *lSymFloatNaN;
+extern lSymbol *lSymFloatInf;
+extern lSymbol *lSymTypeError;
+extern lSymbol *lSymOutOfBounds;
+extern lSymbol *lSymIOError;
+extern lSymbol *lSymArityError;
+extern lSymbol *lSymDivisionByZero;
+extern lSymbol *lSymReadError;
+extern lSymbol *lSymOOM;
+extern lSymbol *lSymUnmatchedOpeningBracket;
+extern lSymbol *lSymUnboundVariable;
+
 /*
  | lVal related procedures
  */
 static inline lVal lValFloat(double v){
 	if(unlikely(isnan(v))){
-		return lValException("float-nan","NaN is disallowed in Nujel", NIL);
+		return lValException(lSymFloatNaN,"NaN is disallowed in Nujel", NIL);
 	}
 	if(unlikely(isinf(v))){
-		return lValException("float-inf","INF is disallowed in Nujel", NIL);
+		return lValException(lSymFloatInf,"INF is disallowed in Nujel", NIL);
 	}
 	return (lVal){ltFloat, .vFloat = v};
 }
