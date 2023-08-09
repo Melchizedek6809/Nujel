@@ -178,7 +178,7 @@ lVal  lValException         (const char *symbol, const char *error, lVal v);
 /*
  | Reader/Printer
  */
-lVal lRead(lClosure *c, const char *str);
+lVal lRead(const char *str);
 
 /*
  | Type related procedores
@@ -221,10 +221,18 @@ void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal v);
 bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal v);
 void      lDefineVal         (lClosure *c, const char *str,  lVal v);
 
-lVal     lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
-lVal     lAddNativeFuncFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
-lVal     lAddNativeFuncPure (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
-lVal     lAddNativeFuncPureFold (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal));
+lVal lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags);
+lVal lAddNativeFuncC    (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags);
+lVal lAddNativeFuncV    (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags);
+lVal lAddNativeFuncCV   (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags);
+lVal lAddNativeFuncVV   (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags);
+lVal lAddNativeFuncCVV  (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags);
+lVal lAddNativeFuncVVV  (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags);
+lVal lAddNativeFuncCVVV (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags);
+lVal lAddNativeFuncVVVV (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags);
+lVal lAddNativeFuncCVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags);
+lVal lAddNativeFuncR    (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags);
+lVal lAddNativeFuncCR   (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags);
 
 /*
  | Tree related procedures

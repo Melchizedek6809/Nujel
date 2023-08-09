@@ -19,7 +19,6 @@
 
 typedef struct {
 	const char *buf, *bufEnd, *data;
-	lClosure *c;
 } lReadContext;
 
 static lVal lReadValue(lReadContext *s);
@@ -434,10 +433,10 @@ static lVal lParseSpecial(lReadContext *s){
 	case '{': return lParseBytecodeArray(s);
 	case '#':
 		s->data++;
-		return lnfArrNew(s->c, lReadList(s, false, ')'));
+		return lnfArrNew(lReadList(s, false, ')'));
 	case '@':{
 		s->data++;
-		lVal ret = lnfTreeNew(s->c, lReadList(s,false,')'));
+		lVal ret = lnfTreeNew(lReadList(s,false,')'));
 		if(ret.vTree->root){
 			ret.vTree->root->flags |= TREE_IMMUTABLE;
 		}
@@ -570,9 +569,8 @@ static lVal lReadValue(lReadContext *s){
 	}
 }
 
-lVal lRead(lClosure *c, const char *str){
+lVal lRead(const char *str){
 	lReadContext ctx;
-	ctx.c = c;
 	ctx.buf = ctx.data = str;
 	ctx.bufEnd = &str[strlen(str)];
 	return lReadList(&ctx, true, ')');

@@ -15,10 +15,9 @@ static void disableRawMode() {
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-static lVal lnfFileRaw(lClosure *c, lVal v){
-	(void)c;
+static lVal lnfFileRaw(lVal handle){
 	struct termios raw;
-	lVal car = requireFileHandle(lCar(v));
+	lVal car = requireFileHandle(handle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -42,15 +41,14 @@ static lVal lnfFileRaw(lClosure *c, lVal v){
 #endif
 
 
-static lVal lnfFileOpenOutput(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
+	lVal car = requireString(aPathname);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	lString *pathname = car.vString;
 	const char *path = lBufferData(pathname);
-	lVal cadr = optionalSymbolic(lCadr(v), lSymError);
+	lVal cadr = optionalSymbolic(aIfExists, lSymError);
 	if(unlikely(cadr.type == ltException)){
 		return cadr;
 	}
@@ -69,15 +67,14 @@ static lVal lnfFileOpenOutput(lClosure *c, lVal v){
 	}else if(mode == lSymAppend){
 		fh = fopen(path, "ab");
 	}else{
-		return lValException("type-error", "Don't know that particular behaviour: ", lCadr(v));
+		return lValException("type-error", "Don't know that particular behaviour: ", aIfExists);
 	}
 
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
-static lVal lnfFileOpenInput(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfFileOpenInput(lVal aPathname){
+	lVal car = requireString(aPathname);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -86,9 +83,8 @@ static lVal lnfFileOpenInput(lClosure *c, lVal v){
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
-static lVal lnfFileClose(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileClose(lVal aHandle){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -97,20 +93,19 @@ static lVal lnfFileClose(lClosure *c, lVal v){
 	return NIL;
 }
 
-static lVal lnfFileReadAst(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	FILE *fh = car.vFileHandle;
-	lVal contentV = lCadr(v);
-	lVal sizeV = requireNaturalInt(lCaddr(v));
+	lVal contentV = aBuffer;
+	lVal sizeV = requireNaturalInt(aSize);
 	if(unlikely(sizeV.type == ltException)){
 		return sizeV;
 	}
 	const i64 size = sizeV.vInt;
-	const i64 offset = castToInt(lCadddr(v), 0);
+	const i64 offset = castToInt(aOffset, 0);
 
 	void *buf = NULL;
 	i64 bufSize = 0;
@@ -136,26 +131,25 @@ static lVal lnfFileReadAst(lClosure *c, lVal v){
 	while(bytesRead < size){
 		const int r = fread(&((u8 *)buf)[offset + bytesRead], 1, size - bytesRead, fh);
 		if(ferror(fh)){
-			return lValException("io-error", "IO Error occured during read", lCar(v));
+			return lValException("io-error", "IO Error occured during read", aHandle);
 		}
 		if(feof(fh)){
 			return NIL;
 		}
 		if(r > 0){ bytesRead += r; }
 	}
-	return lCar(v);
+	return aHandle;
 }
 
-static lVal lnfFileWriteAst(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	FILE *fh = car.vFileHandle;
-	lVal contentV = lCadr(v);
-	i64 size = castToInt(lCaddr(v), -1);
-	const i64 offset = castToInt(lCadddr(v), 0);
+	lVal contentV = aBuffer;
+	i64 size = castToInt(aSize, -1);
+	const i64 offset = castToInt(aOffset, 0);
 
 	const void * buf = NULL;
 	i64 bufSize = 0;
@@ -185,17 +179,16 @@ static lVal lnfFileWriteAst(lClosure *c, lVal v){
 	while(bytesWritten < size){
 		const int r = fwrite(&((u8 *)buf)[offset + bytesWritten], 1, size - bytesWritten, fh);
 		if(ferror(fh)){
-			return lValException("io-error", "IO Error occured during write", lCar(v));
+			return lValException("io-error", "IO Error occured during write", aHandle);
 		}
 		if(r > 0){ bytesWritten += r; }
 	}
 
-	return lCar(v);
+	return aHandle;
 }
 
-static lVal lnfFileFlush(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileFlush(lVal aHandle){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -204,9 +197,8 @@ static lVal lnfFileFlush(lClosure *c, lVal v){
 	return car;
 }
 
-static lVal lnfFileTell(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileTell(lVal aHandle){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -215,43 +207,40 @@ static lVal lnfFileTell(lClosure *c, lVal v){
 	return lValInt(pos);
 }
 
-static lVal lnfFileSeek(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileSeek(lVal aHandle, lVal aOffset, lVal aWhence){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	FILE *fh = car.vFileHandle;
-	lVal offV = requireInt(lCadr(v));
+	lVal offV = requireInt(aOffset);
 	if(unlikely(offV.type == ltException)){
 		return offV;
 	}
 	const i64 offset = offV.vInt;
-	lVal whenceV = requireInt(lCaddr(v));
+	lVal whenceV = requireInt(aWhence);
 	if(unlikely(whenceV.type == ltException)){
 		return whenceV;
 	}
 	const i64 whenceRaw = whenceV.vInt;
 	if((whenceRaw < 0) || (whenceRaw > 2)){
-		return lValException("type-error", "Whence has to be in the range 0-2", lCaddr(v));
+		return lValException("type-error", "Whence has to be in the range 0-2", aWhence);
 	}
 	const int whence = whenceRaw == 0 ? SEEK_SET : whenceRaw == 1 ? SEEK_CUR : SEEK_END;
 	fseek(fh, offset, whence);
-	return car;
+	return aHandle;
 }
 
-static lVal lnfFileEof(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileEof(lVal aHandle){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	return lValBool(feof(car.vFileHandle));
 }
 
-static lVal lnfFileError(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireFileHandle(lCar(v));
+static lVal lnfFileError(lVal aHandle){
+	lVal car = requireFileHandle(aHandle);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -259,18 +248,18 @@ static lVal lnfFileError(lClosure *c, lVal v){
 }
 
 void lOperationsPort(lClosure *c){
-	lAddNativeFunc(c,"file/open-output*", "(pathname if-exists)",   "Try to open PATHNAME for MODE",        lnfFileOpenOutput);
-	lAddNativeFunc(c,"file/open-input*",  "(pathname)",             "Try to open PATHNAME for MODE",        lnfFileOpenInput);
-	lAddNativeFunc(c,"file/close*",  "(handle)",                    "Close the open HANDLE",                lnfFileClose);
-	lAddNativeFunc(c,"file/read*",   "(handle buffer size offset)", "Reader from HANDLE into BUFFER",       lnfFileReadAst);
-	lAddNativeFunc(c,"file/write*",  "(handle buffer size offset)", "Write BUFFER into HANDLE",             lnfFileWriteAst);
-	lAddNativeFunc(c,"file/flush*",  "(handle)",                    "Flush stream of HANDLE",               lnfFileFlush);
-	lAddNativeFunc(c,"file/tell*",   "(handle)",                    "Return the stream position of HANDLE", lnfFileTell);
-	lAddNativeFunc(c,"file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek);
-	lAddNativeFunc(c,"file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof);
-	lAddNativeFunc(c,"file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError);
+	lAddNativeFuncVV  (c,"file/open-output*", "(pathname if-exists)",   "Try to open PATHNAME for MODE",        lnfFileOpenOutput, 0);
+	lAddNativeFuncV   (c,"file/open-input*",  "(pathname)",             "Try to open PATHNAME for MODE",        lnfFileOpenInput, 0);
+	lAddNativeFuncV   (c,"file/close*",  "(handle)",                    "Close the open HANDLE",                lnfFileClose, 0);
+	lAddNativeFuncVVVV(c,"file/read*",   "(handle buffer size offset)", "Reader from HANDLE into BUFFER",       lnfFileReadAst, 0);
+	lAddNativeFuncVVVV(c,"file/write*",  "(handle buffer size offset)", "Write BUFFER into HANDLE",             lnfFileWriteAst, 0);
+	lAddNativeFuncV   (c,"file/flush*",  "(handle)",                    "Flush stream of HANDLE",               lnfFileFlush, 0);
+	lAddNativeFuncV   (c,"file/tell*",   "(handle)",                    "Return the stream position of HANDLE", lnfFileTell, 0);
+	lAddNativeFuncVVV (c,"file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek, 0);
+	lAddNativeFuncV   (c,"file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof, 0);
+	lAddNativeFuncV   (c,"file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError, 0);
 #if (!defined(_WIN32)) && (!defined(__wasi__))
-	lAddNativeFunc(c,"file/raw*", "(handle)",                    "Set an input stream into raw mode", lnfFileRaw);
+	lAddNativeFuncV   (c,"file/raw*",    "(handle)",                    "Set an input stream into raw mode", lnfFileRaw, 0);
 #endif
 }
 

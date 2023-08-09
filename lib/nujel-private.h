@@ -95,10 +95,33 @@ struct lBytecodeArray {
 };
 
 struct lNFunc {
-	lVal (*fp)(lClosure *, lVal);
+	union {
+		lVal (*fp)();
+		lVal (*fpC)(lClosure *);
+		lVal (*fpV)(lVal);
+		lVal (*fpCV)(lClosure *, lVal);
+		lVal (*fpVV)(lVal, lVal);
+		lVal (*fpCVV)(lClosure *, lVal, lVal);
+		lVal (*fpVVV)(lVal, lVal, lVal);
+		lVal (*fpCVVV)(lClosure *, lVal, lVal, lVal);
+		lVal (*fpVVVV)(lVal, lVal, lVal, lVal);
+		lVal (*fpCVVVV)(lClosure *, lVal, lVal, lVal, lVal);
+		lVal (*fpVVVVV)(lVal, lVal, lVal, lVal, lVal);
+		lVal (*fpCVVVVV)(lClosure *, lVal, lVal, lVal, lVal, lVal);
+		lVal (*fpVVVVVV)(lVal, lVal, lVal, lVal, lVal, lVal);
+		lVal (*fpCVVVVVV)(lClosure *, lVal, lVal ,lVal, lVal, lVal, lVal);
+		lVal (*fpVVVVVVV)(lVal, lVal, lVal ,lVal, lVal, lVal, lVal);
+		lVal (*fpCVVVVVVV)(lClosure *, lVal, lVal, lVal ,lVal, lVal, lVal, lVal);
+		lVal (*fpR)(lVal);
+		lVal (*fpCR)(lClosure *, lVal);
+	};
 	lTree *meta;
 	lVal args;
+	u8 argCount;
 };
+
+#define NFUNC_FOLD 1
+#define NFUNC_PURE 2
 
 struct lTree {
 	lTree *left;
@@ -370,9 +393,8 @@ lBytecodeArray * lBytecodeArrayAlloc (size_t len);
 lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
 int              lBufferViewTypeSize (lBufferViewType T);
 
-lVal lnfCat     (lClosure *c, lVal v);
-lVal lnfArrNew  (lClosure *c, lVal v);
-lVal lnfTreeNew (lClosure *c, lVal v);
+lVal lnfArrNew  (lVal v);
+lVal lnfTreeNew (lVal v);
 
 /*
  | Operations

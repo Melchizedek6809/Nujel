@@ -14,15 +14,14 @@ lVal lValBytecodeArray(const lBytecodeOp *ops, int opsLength, lArray *literals){
 	return ret;
 }
 
-static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireArray(lCar(v));
+static lVal lnfArrBytecodeArr(lVal a, lVal b){
+	lVal car = requireArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	lArray *arr = car.vArray;
 	const int len = arr->length;
-	lVal cadr = requireArray(lCadr(v));
+	lVal cadr = requireArray(b);
 	if(unlikely(cadr.type == ltException)){
 		return cadr;
 	}
@@ -41,9 +40,8 @@ static lVal lnfArrBytecodeArr(lClosure *c, lVal v){
 	return ret;
 }
 
-static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireBytecodeArray(lCar(v));
+static lVal lnfBytecodeArrArr(lVal a){
+	lVal car = requireBytecodeArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -57,9 +55,8 @@ static lVal lnfBytecodeArrArr(lClosure *c, lVal v){
 	return ret;
 }
 
-static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireBytecodeArray(lCar(v));
+static lVal lnfBytecodeLiterals(lVal a){
+	lVal car = requireBytecodeArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -68,9 +65,8 @@ static lVal lnfBytecodeLiterals(lClosure *c, lVal v){
 	return lValAlloc(ltArray, arr->literals);
 }
 
-static lVal lnfBytecodeArrLength(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireBytecodeArray(lCar(v));
+static lVal lnfBytecodeArrLength(lVal a){
+	lVal car = requireBytecodeArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -79,9 +75,8 @@ static lVal lnfBytecodeArrLength(lClosure *c, lVal v){
 }
 
 void lOperationsBytecode(lClosure *c){
-	lAddNativeFunc(c,"arr->bytecode-arr",    "(a)", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr);
-	lAddNativeFunc(c,"bytecode-arr->arr",    "(a)", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr);
-	lAddNativeFunc(c,"bytecode-literals",    "(a)", "Return the literal section of a BCA", lnfBytecodeLiterals);
-
-	lAddNativeFunc(c,"bytecode-array/length","(a)", "Return the length of the bytecode-array A", lnfBytecodeArrLength);
+	lAddNativeFuncVV(c,"arr->bytecode-arr",    "(a literals)", "Turns an array of bytecode operations into a bytecode array", lnfArrBytecodeArr, 0);
+	lAddNativeFuncV (c,"bytecode-arr->arr",    "(a)", "Turns an bytecode array into an array of bytecode operations", lnfBytecodeArrArr, 0);
+	lAddNativeFuncV (c,"bytecode-literals",    "(a)", "Return the literal section of a BCA", lnfBytecodeLiterals, 0);
+	lAddNativeFuncV (c,"bytecode-array/length","(a)", "Return the length of the bytecode-array A", lnfBytecodeArrLength, 0);
 }

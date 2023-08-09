@@ -35,48 +35,62 @@ void simplePrintVal(lVal v){
 		fprintf(stderr, "#<not-printable-from-c %i> ", v.type);
 		break;
 	case ltEnvironment:
-		fprintf(stderr, "#<env> ");
+		fprintf(stderr, "#<env>");
 		break;
 	case ltBytecodeArr:
-		fprintf(stderr, "#<bc-arr> ");
+		fprintf(stderr, "#<bc-arr>");
 		break;
 	case ltLambda:
-		fprintf(stderr, "#<fn> ");
+		fprintf(stderr, "#<fn>");
 		break;
 	case ltNativeFunc:
-		fprintf(stderr, "#<NFn> ");
+		fprintf(stderr, "#<NFn>");
 		break;
 	case ltTree:
-		fprintf(stderr, " { ");
+		fprintf(stderr, "{");
 		simplePrintTree(v.vTree->root);
-		fprintf(stderr, " } ");
+		fprintf(stderr, "}");
 		break;
 	case ltNil:
-		fprintf(stderr, "#nil ");
+		fprintf(stderr, "#nil");
 		break;
 	case ltBool:
-		fprintf(stderr, "%s ", v.vBool ? "#t" : "#f");
+		fprintf(stderr, "%s", v.vBool ? "#t" : "#f");
 		break;
 	case ltInt:
-		fprintf(stderr, "%lli ", (long long int)v.vInt);
+		fprintf(stderr, "%lli", (long long int)v.vInt);
 		break;
 	case ltFloat:
-		fprintf(stderr, "%f ", v.vFloat);
+		fprintf(stderr, "%f", v.vFloat);
+		break;
+	case ltBuffer:
+		fprintf(stderr, "#<buf>");
 		break;
 	case ltString:
-		fprintf(stderr, "%s ", (const char *)lBufferData(v.vString));
+		fprintf(stderr, "\"%s\"", (const char *)lBufferData(v.vString));
 		break;
 	case ltKeyword:
 		fprintf(stderr, ":"); // fall-through
 	case ltSymbol:
-		fprintf(stderr, "%s ", v.vSymbol->c);
+		fprintf(stderr, "%s", v.vSymbol->c);
 		break;
-	case ltPair:
-		if(likely(v.vList)){
-			simplePrintVal(v.vList->car);
-			simplePrintVal(v.vList->cdr);
+	case ltPair: {
+		fprintf(stderr, "(");
+		lVal t = v;
+		bool first = true;
+		for(; t.type == ltPair; t = lCdr(t)){
+			if(!first){
+				fprintf(stderr, " ");
+			}
+			first = false;
+			simplePrintVal(t.vList->car);
 		}
-		break;
+		if(t.type != ltNil){
+			fprintf(stderr, ". ");
+			simplePrintVal(t);
+		}
+		fprintf(stderr, ")");
+		break; }
 	case ltArray:
 		fprintf(stderr, "##(");
 		for(int i=0;i<v.vArray->length;i++){
@@ -106,7 +120,7 @@ lVal lApply(lVal fun, lVal args){
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
-	lVal v = lRead(c, expr);
+	lVal v = lRead(expr);
 	const int RSP = lRootsGet();
 	for(lVal n=v; n.type == ltPair; n = n.vList->cdr){
 		c->args = n; // We need a reference to make sure that n won't be collected by the GC

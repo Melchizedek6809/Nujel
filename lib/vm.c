@@ -680,7 +680,30 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lGarbageCollectIfNecessary();
 			break;
 		case ltNativeFunc: {
-			lVal nv = fun.vNFunc->fp(c, cargs);
+			lVal nv;
+			switch(fun.vNFunc->argCount){
+			case 0: nv = fun.vNFunc->fp(); break;
+			case 1: nv = fun.vNFunc->fpC(c); break;
+			case 2: nv = fun.vNFunc->fpV(lCar(cargs)); break;
+			case 3: nv = fun.vNFunc->fpCV(c, lCar(cargs)); break;
+			case 4: nv = fun.vNFunc->fpVV(lCar(cargs), lCadr(cargs)); break;
+			case 5: nv = fun.vNFunc->fpCVV(c, lCar(cargs), lCadr(cargs)); break;
+			case 6: nv = fun.vNFunc->fpVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs)); break;
+			case 7: nv = fun.vNFunc->fpCVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs)); break;
+			case 8: nv = fun.vNFunc->fpVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs)); break;
+			case 9: nv = fun.vNFunc->fpCVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs)); break;
+			case 10: nv = fun.vNFunc->fpVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs)))); break;
+			case 11: nv = fun.vNFunc->fpCVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs)))); break;
+			case 12: nv = fun.vNFunc->fpVVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCadr(lCddr(lCddr(cargs)))); break;
+			case 13: nv = fun.vNFunc->fpCVVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCadr(lCddr(lCddr(cargs)))); break;
+			case 14: nv = fun.vNFunc->fpVVVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCaddr(lCddr(lCddr(cargs))), lCadddr(lCddr(lCddr(cargs)))); break;
+			case 15: nv = fun.vNFunc->fpCVVVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCaddr(lCddr(lCddr(cargs))), lCadddr(lCddr(lCddr(cargs)))); break;
+			case 16: nv = fun.vNFunc->fpR(cargs); break;
+			case 17: nv = fun.vNFunc->fpCR(c, cargs); break;
+			default:
+				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				goto throwException;
+			}
 			if(unlikely(nv.type == ltException)){
 				exceptionThrownValue = nv;
 				goto throwException;
@@ -739,10 +762,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 		vmbreak; }
 	vmcase(lopApply) {
-		int len = *ip++;
-		lVal cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
+		const int len = *ip++;
+		const int argsSp = ctx.sp;
 		ctx.sp = ctx.sp - len;
 		lVal fun = ctx.valueStack[--ctx.sp];
+		lVal *vs = &ctx.valueStack[argsSp-1];
 		switch(fun.type){
 		case ltMacro:
 		case ltLambda:
@@ -750,7 +774,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			c->sp   = ctx.sp;
 			c->ip   = ip;
 
-			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
+			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(lStackBuildList(ctx.valueStack, argsSp, len), fun);
 			c = ctx.closureStack[ctx.csp];
 			ip = c->ip;
 			ctx.text = ops = c->text;
@@ -759,7 +783,40 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lGarbageCollectIfNecessary();
 			break;
 		case ltNativeFunc: {
-			lVal v = fun.vNFunc->fp(c, cargs);
+			lVal v;
+			const int ac = ((fun.vNFunc->argCount >> 1)&7);
+			if(unlikely(len != ac)){
+				const int m = ac - len;
+				vs+= m;
+				if(len < ac){
+					for(int i=0;i<m;i++){
+						vs[-i]=NIL;
+					}
+				}
+			}
+			switch(fun.vNFunc->argCount){
+			case 0: v = fun.vNFunc->fp(); break;
+			case 1: v = fun.vNFunc->fpC(c); break;
+			case 2: v = fun.vNFunc->fpV(vs[0]); break;
+			case 3: v = fun.vNFunc->fpCV(c, vs[0]); break;
+			case 4: v = fun.vNFunc->fpVV(vs[-1], vs[0]); break;
+			case 5: v = fun.vNFunc->fpCVV(c, vs[-1], vs[0]); break;
+			case 6: v = fun.vNFunc->fpVVV(vs[-2], vs[-1], vs[0]); break;
+			case 7: v = fun.vNFunc->fpCVVV(c, vs[-2], vs[-1], vs[0]); break;
+			case 8: v = fun.vNFunc->fpVVVV(vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 9: v = fun.vNFunc->fpCVVVV(c, vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 10: v = fun.vNFunc->fpVVVVV(vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 11: v = fun.vNFunc->fpCVVVVV(c, vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 12: v = fun.vNFunc->fpVVVVVV(vs[-5], vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 13: v = fun.vNFunc->fpCVVVVVV(c, vs[-5], vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 14: v = fun.vNFunc->fpVVVVVVV(vs[-6], vs[-5], vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 15: v = fun.vNFunc->fpCVVVVVVV(c, vs[-6], vs[-5], vs[-4], vs[-3], vs[-2], vs[-1], vs[0]); break;
+			case 16: v = fun.vNFunc->fpR(lStackBuildList(ctx.valueStack, argsSp, len)); break;
+			case 17: v = fun.vNFunc->fpCR(c, lStackBuildList(ctx.valueStack, argsSp, len)); break;
+			default:
+				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				goto throwException;
+			}
 			if(unlikely(v.type == ltException)){
 				exceptionThrownValue = v;
 				goto throwException;
@@ -790,7 +847,30 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lGarbageCollectIfNecessary();
 			break;
 		case ltNativeFunc: {
-			lVal v = fun.vNFunc->fp(c, cargs);
+			lVal v;
+			switch(fun.vNFunc->argCount){
+			case 0: v = fun.vNFunc->fp(); break;
+			case 1: v = fun.vNFunc->fpC(c); break;
+			case 2: v = fun.vNFunc->fpV(lCar(cargs)); break;
+			case 3: v = fun.vNFunc->fpCV(c, lCar(cargs)); break;
+			case 4: v = fun.vNFunc->fpVV(lCar(cargs), lCadr(cargs)); break;
+			case 5: v = fun.vNFunc->fpCVV(c, lCar(cargs), lCadr(cargs)); break;
+			case 6: v = fun.vNFunc->fpVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs)); break;
+			case 7: v = fun.vNFunc->fpCVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs)); break;
+			case 8: v = fun.vNFunc->fpVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs)); break;
+			case 9: v = fun.vNFunc->fpCVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs)); break;
+			case 10: v = fun.vNFunc->fpVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs)))); break;
+			case 11: v = fun.vNFunc->fpCVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs)))); break;
+			case 12: v = fun.vNFunc->fpVVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCadr(lCddr(lCddr(cargs)))); break;
+			case 13: v = fun.vNFunc->fpCVVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCadr(lCddr(lCddr(cargs)))); break;
+			case 14: v = fun.vNFunc->fpVVVVVVV(lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCaddr(lCddr(lCddr(cargs))), lCadddr(lCddr(lCddr(cargs)))); break;
+			case 15: v = fun.vNFunc->fpCVVVVVVV(c, lCar(cargs), lCadr(cargs), lCaddr(cargs), lCadddr(cargs), lCar(lCddr(lCddr(cargs))), lCaddr(lCddr(lCddr(cargs))), lCadddr(lCddr(lCddr(cargs)))); break;
+			case 16: v = fun.vNFunc->fpR(cargs); break;
+			case 17: v = fun.vNFunc->fpCR(c, cargs); break;
+			default:
+				exceptionThrownValue = lValException("unsupported", "Unsupported funcall", fun);
+				goto throwException;
+			}
 			if(unlikely(v.type == ltException)){
 				exceptionThrownValue = v;
 				goto throwException;

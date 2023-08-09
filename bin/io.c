@@ -74,15 +74,13 @@ void setIOSymbols(){
 	lSymAppend         = lSymSM("append");
 }
 
-static lVal lnfQuit(lClosure *c, lVal v){
-	(void)c;
-	exit(castToInt(lCar(v), 0));
+static lVal lnfExit(lVal aStatus){
+	exit(castToInt(aStatus, 0));
 	return NIL;
 }
 
-static lVal lnfFileRemove(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfFileRemove(lVal aPath){
+	lVal car = requireString(aPath);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -102,9 +100,8 @@ LONGLONG FileTime_to_POSIX(FILETIME ft) {
 }
 #endif
 
-static lVal lnfFileStat(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfFileStat(lVal aPath){
+	lVal car = requireString(aPath);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -171,9 +168,8 @@ static lVal lnfFileStat(lClosure *c, lVal v){
 }
 
 #ifdef ENABLE_POPEN
-static lVal lnfPopen(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfPopen(lVal aCommand){
+	lVal car = requireString(aCommand);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -220,15 +216,15 @@ static lVal lnfPopen(lClosure *c, lVal v){
 	return lCons(lValInt(exitCode),lValStringNoCopy(buf,len));
 }
 #else
-static lVal lnfPopen(lClosure *c, lVal v){
+static lVal lnfPopen(lVal aCommand){
+	(void)aCommand;
 	return lValException("not-available","(popen) is not implemented on your current platform, please try and work around that", v);
 }
 #endif
 
-static lVal lnfDirectoryRead(lClosure *c, lVal v){
-	(void)c;
-	const char *path = castToString(lCar(v), "./");
-	const bool showHidden = castToBool(lCadr(v));
+static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
+	const char *path = castToString(aPath, "./");
+	const bool showHidden = castToBool(aShowHidden);
 
 #ifdef _MSC_VER
 	WIN32_FIND_DATA ffd;
@@ -286,9 +282,8 @@ static lVal lnfDirectoryRead(lClosure *c, lVal v){
 #endif
 }
 
-static lVal lnfDirectoryMake(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfDirectoryMake(lVal aPath){
+	lVal car = requireString(aPath);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -296,9 +291,8 @@ static lVal lnfDirectoryMake(lClosure *c, lVal v){
 	return lValBool(makeDir(lBufferData(path)) == 0);
 }
 
-static lVal lnfDirectoryRemove(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfDirectoryRemove(lVal aPath){
+	lVal car = requireString(aPath);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -306,9 +300,8 @@ static lVal lnfDirectoryRemove(lClosure *c, lVal v){
 	return lValBool(rmdir(lBufferData(path)) == 0);
 }
 
-static lVal lnfChangeDirectory(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireString(lCar(v));
+static lVal lnfChangeDirectory(lVal aPath){
+	lVal car = requireString(aPath);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -316,8 +309,7 @@ static lVal lnfChangeDirectory(lClosure *c, lVal v){
 	return lValBool(chdir(lBufferData(path)) == 0);
 }
 
-static lVal lnfGetCurrentWorkingDirectory(lClosure *c, lVal v){
-	(void)c;(void)v;
+static lVal lnfGetCurrentWorkingDirectory(){
 	char path[512];
 	if(!getcwd(path, sizeof(path))){
 		return NIL;
@@ -326,14 +318,14 @@ static lVal lnfGetCurrentWorkingDirectory(lClosure *c, lVal v){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFunc(c,"exit",                       "(a)",                "Quits with code a",                                 lnfQuit);
-	lAddNativeFunc(c,"popen",                      "(command)",          "Return a list of [exit-code stdout stderr)",        lnfPopen);
+	lAddNativeFuncV (c,"exit",                       "(status)",      "Quits with code a",                                 lnfExit, 0);
+	lAddNativeFuncV (c,"popen",                      "(command)",          "Return a list of [exit-code stdout stderr)",        lnfPopen, 0);
 
-	lAddNativeFunc(c,"file/stat",                  "(path)",             "Return some stats about FILENAME",                  lnfFileStat);
-	lAddNativeFunc(c,"rm file/remove",             "(path)",             "Remove FILENAME from the filesystem, if possible",  lnfFileRemove);
-	lAddNativeFunc(c,"ls directory/read",          "(path show-hidden)", "Return all files within $PATH",                     lnfDirectoryRead);
-	lAddNativeFunc(c,"rmdir directory/remove",     "(path)",             "Remove empty directory at PATH",                    lnfDirectoryRemove);
-	lAddNativeFunc(c,"mkdir directory/make",       "(path)",             "Create a new empty directory at PATH",              lnfDirectoryMake);
-	lAddNativeFunc(c,"cd path/change",             "(path)",             "Change the current working directory to PATH",      lnfChangeDirectory);
-	lAddNativeFunc(c,"cwd path/working-directory", "()",                 "Return the current working directory",              lnfGetCurrentWorkingDirectory);
+	lAddNativeFuncV (c,"file/stat",                  "(path)",             "Return some stats about FILENAME",                  lnfFileStat, 0);
+	lAddNativeFuncV (c,"rm file/remove",             "(path)",             "Remove FILENAME from the filesystem, if possible",  lnfFileRemove, 0);
+	lAddNativeFuncVV(c,"ls directory/read",          "(path show-hidden)", "Return all files within $PATH",                     lnfDirectoryRead, 0);
+	lAddNativeFuncV (c,"rmdir directory/remove",     "(path)",             "Remove empty directory at PATH",                    lnfDirectoryRemove, 0);
+	lAddNativeFuncV (c,"mkdir directory/make",       "(path)",             "Create a new empty directory at PATH",              lnfDirectoryMake, 0);
+	lAddNativeFuncV (c,"cd path/change",             "(path)",             "Change the current working directory to PATH",      lnfChangeDirectory, 0);
+	lAddNativeFunc  (c,"cwd path/working-directory", "()",                 "Return the current working directory",              lnfGetCurrentWorkingDirectory, 0);
 }

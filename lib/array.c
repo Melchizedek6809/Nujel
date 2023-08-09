@@ -7,9 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static lVal lnfArrLength(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireArray(lCar(v));
+static lVal lnfArrLength(lVal a){
+	lVal car = requireArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -17,14 +16,13 @@ static lVal lnfArrLength(lClosure *c, lVal v){
 	return lValInt(arr->length);
 }
 
-static lVal lnfArrLengthSet(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireArray(lCar(v));
+static lVal lnfArrLengthSet(lVal a, lVal b){
+	lVal car = requireArray(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
 	lArray *arr = car.vArray;
-	lVal lenVal = requireNaturalInt(lCadr(v));
+	lVal lenVal = requireNaturalInt(b);
 	if(unlikely(lenVal.type == ltException)){
 		return lenVal;
 	}
@@ -32,7 +30,7 @@ static lVal lnfArrLengthSet(lClosure *c, lVal v){
 	lVal *newData = realloc(arr->data,length * sizeof(lVal));
 	if (unlikely(newData == NULL)) {
 		free(newData);
-		return lValException("out-of-memory", "(array/allocate) couldn't allocate its array", v);
+		return lValException("out-of-memory", "(array/allocate) couldn't allocate its array", b);
 	}
 	arr->data = newData;
 	if(length > arr->length){
@@ -42,16 +40,15 @@ static lVal lnfArrLengthSet(lClosure *c, lVal v){
 	return car;
 }
 
-static lVal lnfArrAllocate(lClosure *c, lVal v){
-	(void)c;
-	lVal lenV = requireNaturalInt(lCar(v));
+static lVal lnfArrAllocate(lVal a){
+	lVal lenV = requireNaturalInt(a);
 	if(unlikely(lenV.type == ltException)){
 		return lenV;
 	}
 	const int len = lenV.vInt;
 	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
 	if(unlikely(len && (r.vArray->data == NULL))){
-		return lValException("out-of-memory","(array/allocate] couldn't allocate its array", v);
+		return lValException("out-of-memory","(array/allocate] couldn't allocate its array", a);
 	}
 	return r;
 }
@@ -65,8 +62,7 @@ static int lListLength(lVal v){
 	return i;
 }
 
-lVal lnfArrNew(lClosure *c, lVal v){
-	(void)c;
+lVal lnfArrNew(lVal v){
 	int length = lListLength(v);
 	lVal r = lValAlloc(ltArray, lArrayAlloc(length));
 	int key = 0;
@@ -78,8 +74,8 @@ lVal lnfArrNew(lClosure *c, lVal v){
 }
 
 void lOperationsArray(lClosure *c){
-	lAddNativeFunc(c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew);
-	lAddNativeFunc(c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate);
-	lAddNativeFunc(c,"array/length",   "(array)",             "Return length of ARRAY",                   lnfArrLength);
-	lAddNativeFunc(c,"array/length!",  "(array size)",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet);
+	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
+	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
+	lAddNativeFuncV (c,"array/length",   "(array)",             "Return length of ARRAY",                   lnfArrLength, 0);
+	lAddNativeFuncVV(c,"array/length!",  "(array size)",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet, 0);
 }

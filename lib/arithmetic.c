@@ -7,7 +7,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static lVal lAdd(lVal a, lVal b){
+static lVal lnfAdd(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return lValInt(0);}
 	if(unlikely(b.type == ltNil)){return a;}
 	lType t = lTypecast(a.type, b.type);
@@ -37,7 +37,7 @@ static lVal lAdd(lVal a, lVal b){
 	}
 }
 
-static lVal lSub(lVal a, lVal b){
+static lVal lnfSub(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){
 		return lValExceptionArity(a, 2);
 	}
@@ -78,7 +78,7 @@ static lVal lSub(lVal a, lVal b){
 	}
 }
 
-static lVal lMul(lVal a, lVal b){
+static lVal lnfMul(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return lValInt(1);}
 	if(unlikely(b.type == ltNil)){
 		return lValExceptionArity(b, 2);
@@ -110,7 +110,7 @@ static lVal lMul(lVal a, lVal b){
 	}
 }
 
-static lVal lDiv(lVal a, lVal b){
+static lVal lnfDiv(lVal a, lVal b){
 	if(unlikely((a.type == ltNil) || (b.type == ltNil))){
 		return lValExceptionArity(b, 2);
 	}
@@ -132,7 +132,7 @@ static lVal lDiv(lVal a, lVal b){
 	}
 }
 
-static lVal lRem(lVal a, lVal b){
+static lVal lnfRem(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return b;}
 	if(unlikely(b.type == ltNil)){return a;}
 	lType t = lTypecast(a.type, b.type);
@@ -165,43 +165,15 @@ static lVal lRem(lVal a, lVal b){
 	}
 }
 
-static lVal lnfAdd(lClosure *c, lVal v){
-	(void)c;
-	return lAdd(lCar(v), lCadr(v));
-}
-
-static lVal lnfSub(lClosure *c, lVal v){
-	(void)c;
-	return lSub(lCar(v), lCadr(v));
-}
-
-static lVal lnfMul(lClosure *c, lVal v){
-	(void)c;
-	return lMul(lCar(v), lCadr(v));
-}
-
-static lVal lnfDiv(lClosure *c, lVal v){
-	(void)c;
-	return lDiv(lCar(v), lCadr(v));
-}
-
-static lVal lnfRem(lClosure *c, lVal v){
-	(void)c;
-	return lRem(lCar(v), lCadr(v));
-}
-
-static lVal lnfPow(lClosure *c, lVal v){
-	(void)c;
-	lVal a = lCar(v);
-	lVal b = lCadr(v);
+static lVal lnfPow(lVal a, lVal b){
 	if(unlikely(b.type == ltNil)){return a;}
 	if(unlikely(a.type == ltNil)){
-		return lValExceptionArity(v, 2);
+		return lValExceptionArity(b, 2);
 	}
 	lType t = lTypecast(a.type, b.type);
 	switch(t){
 	default:
-		return lValExceptionFloat(v);
+		return lValExceptionFloat(b);
 	case ltInt: {
 		lVal av = requireInt(a);
 		if(unlikely(av.type == ltException)){
@@ -225,114 +197,89 @@ static lVal lnfPow(lClosure *c, lVal v){
 	}
 }
 
-static lVal lnfIncAstI(lClosure *c, lVal v){
-	(void)c;
-	if(unlikely(v.type == ltNil) || unlikely(v.vList->car.type == ltNil)){
-		return lValExceptionNonNumeric(v);
+static lVal lnfIncAstI(lVal a){
+	if(unlikely(a.type == ltNil)){
+		return lValExceptionNonNumeric(a);
 	}
-	const i64 a = v.vList->car.vInt;
-	return lValInt(a + 1);
+	return lValInt(a.vInt + 1);
 }
 
-static lVal lnfAddAstI(lClosure *c, lVal v){
-	(void)c;
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	return lValInt(a + b);
+static lVal lnfAddAstI(lVal a, lVal b){
+	return lValInt(a.vInt + b.vInt);
 }
 
-static lVal lnfSubAstI(lClosure *c, lVal v){
-	(void)c;
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	return lValInt(a - b);
+static lVal lnfSubAstI(lVal a, lVal b){
+	return lValInt(a.vInt - b.vInt);
 }
 
-static lVal lnfMulAstI(lClosure *c, lVal v){
-	(void)c;
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	return lValInt(a * b);
+static lVal lnfMulAstI(lVal a, lVal b){
+	return lValInt(a.vInt * b.vInt);
 }
 
-static lVal lnfDivAstI(lClosure *c, lVal v){
-	(void)c;
-	if(unlikely(((v.type == ltNil) || (v.vList->car.type == ltNil) || (v.vList->cdr.type == ltNil) || (v.vList->cdr.vList->car.type == ltNil)))){
-		return lValException("arity-error", "Expected 2 arguments", v);
+static lVal lnfDivAstI(lVal a, lVal b){
+	if(unlikely(b.vInt == 0)){
+		return lValException("divide-by-zero", "Can't divide by zero", a);
 	}
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	if(unlikely(b == 0)){
-		return lValException("divide-by-zero", "Can't divide by zero", v);
+	return lValInt(a.vInt / b.vInt);
+}
+
+static lVal lnfModAstI(lVal a, lVal b){
+	if(unlikely(b.vInt == 0)){
+		return lValException("divide-by-zero", "Can't divide by zero", a);
 	}
-	return lValInt(a / b);
+	return lValInt(a.vInt % b.vInt);
 }
 
-static lVal lnfModAstI(lClosure *c, lVal v){
-	(void)c;
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	return lValInt(a % b);
+static lVal lnfPowAstI(lVal a, lVal b){
+	return lValInt(pow(a.vInt, b.vInt));
 }
 
-static lVal lnfPowAstI(lClosure *c, lVal v){
-	(void)c;
-	const i64 a = v.vList->car.vInt;
-	const i64 b = v.vList->cdr.vList->car.vInt;
-	return lValInt(pow(a,b));
-}
-
-static lVal lnfLogAnd(lClosure *c, lVal v){
-	(void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfLogAnd(lVal a, lVal b){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
-	lVal bv = requireInt(lCadr(v));
+	lVal bv = requireInt(b);
 	if(unlikely(bv.type == ltException)){
 		return bv;
 	}
 	return lValInt(av.vInt & bv.vInt);
 }
 
-static lVal lnfLogIor(lClosure *c, lVal v){
-	(void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfLogIor(lVal a, lVal b){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
-	lVal bv = requireInt(lCadr(v));
+	lVal bv = requireInt(b);
 	if(unlikely(bv.type == ltException)){
 		return bv;
 	}
 	return lValInt(av.vInt | bv.vInt);
 }
 
-static lVal lnfLogXor(lClosure *c, lVal v){
-        (void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfLogXor(lVal a, lVal b){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
-	lVal bv = requireInt(lCadr(v));
+	lVal bv = requireInt(b);
 	if(unlikely(bv.type == ltException)){
 		return bv;
 	}
 	return lValInt(av.vInt ^ bv.vInt);
 }
 
-static lVal lnfLogNot(lClosure *c, lVal v){
-	(void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfLogNot(lVal a){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
 	return lValInt(~av.vInt);
 }
 
-static lVal lnfPopCount(lClosure *c, lVal v){
-	(void)c;
-	lVal car = requireInt(lCar(v));
+static lVal lnfPopCount(lVal a){
+	lVal car = requireInt(a);
 	if(unlikely(car.type == ltException)){
 		return car;
 	}
@@ -344,13 +291,12 @@ static lVal lnfPopCount(lClosure *c, lVal v){
 #endif
 }
 
-static lVal lnfAsh(lClosure *c, lVal v){
-	(void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfAsh(lVal a, lVal b){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
-	lVal bv = requireInt(lCadr(v));
+	lVal bv = requireInt(b);
 	if(unlikely(bv.type == ltException)){
 		return bv;
 	}
@@ -359,13 +305,12 @@ static lVal lnfAsh(lClosure *c, lVal v){
 	return lValInt((sv > 0) ? (iv << sv) : (iv >> -sv));
 }
 
-static lVal lnfBitShiftRight(lClosure *c, lVal v){
-	(void)c;
-	lVal av = requireInt(lCar(v));
+static lVal lnfBitShiftRight(lVal a, lVal b){
+	lVal av = requireInt(a);
 	if(unlikely(av.type == ltException)){
 		return av;
 	}
-	lVal bv = requireInt(lCadr(v));
+	lVal bv = requireInt(b);
 	if(unlikely(bv.type == ltException)){
 		return bv;
 	}
@@ -374,12 +319,10 @@ static lVal lnfBitShiftRight(lClosure *c, lVal v){
 	return lValInt((sv > 0) ? (iv >> sv) : (iv << -sv));
 }
 
-lVal lnfAbs(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfAbs(lVal t){
 	switch(t.type){
 	default:
-		return lValExceptionNonNumeric(v);
+		return lValExceptionNonNumeric(t);
 	case ltFloat:
 		return lValFloat(fabs(t.vFloat));
 	case ltInt:
@@ -387,12 +330,10 @@ lVal lnfAbs(lClosure *c, lVal v){
 	}
 }
 
-lVal lnfCbrt(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfCbrt(lVal t){
 	switch(t.type){
 	default:
-		return lValExceptionNonNumeric(v);
+		return lValExceptionNonNumeric(t);
 	case ltFloat:
 		return lValFloat(cbrt(t.vFloat));
 	case ltInt:
@@ -400,12 +341,10 @@ lVal lnfCbrt(lClosure *c, lVal v){
 	}
 }
 
-lVal lnfSqrt(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfSqrt(lVal t){
 	switch(t.type){
 	default:
-		return lValExceptionNonNumeric(v);
+		return lValExceptionNonNumeric(t);
 	case ltFloat:
 		return lValFloat(sqrt(t.vFloat));
 	case ltInt:
@@ -413,67 +352,54 @@ lVal lnfSqrt(lClosure *c, lVal v){
 	}
 }
 
-lVal lnfCeil(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfCeil(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(ceil(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfFloor(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfFloor(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(floor(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfRound(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfRound(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(round(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfSin(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfSin(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(sin(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfCos(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfCos(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(cos(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfTan(lClosure *c, lVal v){
-	(void)c;
-	lVal t = lCar(v);
+lVal lnfTan(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(tan(t.vFloat));
 	}
-	return lValExceptionNonNumeric(v);
+	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfAtanTwo(lClosure *c, lVal v){
-	(void)c;
-	lVal a = requireFloat(lCar(v));
+lVal lnfAtanTwo(lVal aA, lVal aB){
+	lVal a = requireFloat(aA);
 	if(unlikely(a.type == ltException)){
 		return a;
 	}
-	lVal b = requireFloat(lCadr(v));
+	lVal b = requireFloat(aB);
 	if(unlikely(b.type == ltException)){
 		return b;
 	}
@@ -481,38 +407,38 @@ lVal lnfAtanTwo(lClosure *c, lVal v){
 }
 
 void lOperationsArithmetic(lClosure *c){
-	lAddNativeFuncPureFold(c,"+",   "(a b)", "Addition",      lnfAdd);
-	lAddNativeFuncPureFold(c,"-",   "(a b)", "Substraction",  lnfSub);
-	lAddNativeFuncPureFold(c,"*",   "(a b)", "Multiplication",lnfMul);
-	lAddNativeFuncPureFold(c,"/",   "(a b)", "Division",      lnfDiv);
-	lAddNativeFuncPureFold(c,"rem", "(a b)", "Remainder",     lnfRem);
-	lAddNativeFuncPureFold(c,"pow", "(a b)", "Return A raised to the power of B",lnfPow);
+	lAddNativeFuncVV(c,"+",   "(a b)", "Addition",      lnfAdd, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"-",   "(a b)", "Substraction",  lnfSub, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"*",   "(a b)", "Multiplication",lnfMul, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"/",   "(a b)", "Division",      lnfDiv, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"rem", "(a b)", "Remainder",     lnfRem, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"pow", "(a b)", "Return A raised to the power of B",lnfPow, NFUNC_FOLD | NFUNC_PURE);
 
-	lAddNativeFuncPureFold(c,"add/int", "(a b)", "Return a:int + b:int",  lnfAddAstI);
-	lAddNativeFuncPureFold(c,"sub/int", "(a b)", "Return a:int - b:int",  lnfSubAstI);
-	lAddNativeFuncPureFold(c,"mul/int", "(a b)", "Return a:int * b:int",  lnfMulAstI);
-	lAddNativeFuncPureFold(c,"div/int", "(a b)", "Return a:int / b:int",  lnfDivAstI);
-	lAddNativeFuncPureFold(c,"mod/int", "(a b)", "Return a:int % b:int",  lnfModAstI);
-	lAddNativeFuncPureFold(c,"pow/int", "(a b)", "Return a:int ** b:int", lnfPowAstI);
-	lAddNativeFuncPureFold(c,"inc/int", "(a)",   "Return a:int + 1",      lnfIncAstI);
+	lAddNativeFuncVV(c,"add/int", "(a b)", "Return a:int + b:int",  lnfAddAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"sub/int", "(a b)", "Return a:int - b:int",  lnfSubAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"mul/int", "(a b)", "Return a:int * b:int",  lnfMulAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"div/int", "(a b)", "Return a:int / b:int",  lnfDivAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"mod/int", "(a b)", "Return a:int % b:int",  lnfModAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"pow/int", "(a b)", "Return a:int ** b:int", lnfPowAstI, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncV (c,"inc/int", "(a)",   "Return a:int + 1",      lnfIncAstI, NFUNC_FOLD | NFUNC_PURE);
 
-	lAddNativeFuncPureFold(c,"bit-and",  "(a b)", "Bitwise and",          lnfLogAnd);
-	lAddNativeFuncPureFold(c,"bit-or",   "(a b)", "Bitwise or",           lnfLogIor);
-	lAddNativeFuncPureFold(c,"bit-xor",  "(a b)", "Bitwise exclusive or", lnfLogXor);
-	lAddNativeFuncPureFold(c,"bit-not",  "(a)",   "Bitwise not",          lnfLogNot);
+	lAddNativeFuncVV(c,"bit-and",  "(a b)", "Bitwise and",          lnfLogAnd, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"bit-or",   "(a b)", "Bitwise or",           lnfLogIor, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncVV(c,"bit-xor",  "(a b)", "Bitwise exclusive or", lnfLogXor, NFUNC_FOLD | NFUNC_PURE);
+	lAddNativeFuncV (c,"bit-not",  "(a)",   "Bitwise not",          lnfLogNot, NFUNC_FOLD | NFUNC_PURE);
 
-	lAddNativeFuncPure(c,"bit-shift-left", "(val amount)","Shift VALUE left AMOUNT bits",    lnfAsh);
-	lAddNativeFuncPure(c,"bit-shift-right", "(val amount)","Shift VALUE right AMOUNT bits",    lnfBitShiftRight);
-	lAddNativeFuncPure(c,"popcount",       "(val)",       "Return amount of bits set in VAL",lnfPopCount);
+	lAddNativeFuncVV(c,"bit-shift-left",  "(val amount)","Shift VALUE left AMOUNT bits",    lnfAsh, NFUNC_PURE);
+	lAddNativeFuncVV(c,"bit-shift-right", "(val amount)","Shift VALUE right AMOUNT bits",    lnfBitShiftRight, NFUNC_PURE);
+	lAddNativeFuncV (c,"popcount",        "(val)",       "Return amount of bits set in VAL",lnfPopCount, NFUNC_PURE);
 
-	lAddNativeFuncPure(c,"abs",  "(a)", "Return the absolute value of a", lnfAbs);
-	lAddNativeFuncPure(c,"sqrt", "(a)", "Return the square root of a",    lnfSqrt);
-	lAddNativeFuncPure(c,"cbrt", "(a)", "Return the cube root of a",      lnfCbrt);
-	lAddNativeFuncPure(c,"floor","(a)", "Round a down",                   lnfFloor);
-	lAddNativeFuncPure(c,"ceil", "(a)", "Round a up",                     lnfCeil);
-	lAddNativeFuncPure(c,"round","(a)", "Round a",                        lnfRound);
-	lAddNativeFuncPure(c,"sin",  "(a)", "Sin A",                          lnfSin);
-	lAddNativeFuncPure(c,"cos",  "(a)", "Cos A",                          lnfCos);
-	lAddNativeFuncPure(c,"tan",  "(a)", "Tan A",                          lnfTan);
-	lAddNativeFuncPure(c,"atan2","(y x)", "Arc tangent of y/x",           lnfAtanTwo);
+	lAddNativeFuncV (c,"abs",  "(a)", "Return the absolute value of a", lnfAbs, NFUNC_PURE);
+	lAddNativeFuncV (c,"sqrt", "(a)", "Return the square root of a",    lnfSqrt, NFUNC_PURE);
+	lAddNativeFuncV (c,"cbrt", "(a)", "Return the cube root of a",      lnfCbrt, NFUNC_PURE);
+	lAddNativeFuncV (c,"floor","(a)", "Round a down",                   lnfFloor, NFUNC_PURE);
+	lAddNativeFuncV (c,"ceil", "(a)", "Round a up",                     lnfCeil, NFUNC_PURE);
+	lAddNativeFuncV (c,"round","(a)", "Round a",                        lnfRound, NFUNC_PURE);
+	lAddNativeFuncV (c,"sin",  "(a)", "Sin A",                          lnfSin, NFUNC_PURE);
+	lAddNativeFuncV (c,"cos",  "(a)", "Cos A",                          lnfCos, NFUNC_PURE);
+	lAddNativeFuncV (c,"tan",  "(a)", "Tan A",                          lnfTan, NFUNC_PURE);
+	lAddNativeFuncVV(c,"atan2","(y x)", "Arc tangent of y/x",           lnfAtanTwo, NFUNC_PURE);
 }

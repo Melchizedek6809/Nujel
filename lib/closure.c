@@ -108,31 +108,55 @@ void lDefineVal(lClosure *c, const char *str, lVal val){
 	lDefineClosureSym(c, lSymS(str), val);
 }
 
-/* Add a NFunc to closure C, should only be used during root closure creation */
-lVal lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal)){
+static lVal lAddNativeFuncRaw(lClosure *c, const char *sym, const char *args, const char *doc, void *func, uint flags, u8 argCount){
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = func;
+	v.vNFunc->args = lCar(lRead(args));
 	v.vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
-	v.vNFunc->args = lCar(lRead(c, args));
+	v.vNFunc->argCount = argCount;
+	if(flags & NFUNC_FOLD){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
+	}
+	if(flags & NFUNC_PURE){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
+	}
 	return lDefineAliased(c,v,sym);
 }
-
-lVal lAddNativeFuncFold(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal)){
-	lVal v = lAddNativeFunc(c, sym, args, doc, func);
-	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
-	return v;
+lVal lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 0);
 }
-
-lVal lAddNativeFuncPure(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal)){
-	lVal v = lAddNativeFunc(c, sym, args, doc, func);
-	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
-	return v;
+lVal lAddNativeFuncC(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1);
 }
-
-lVal lAddNativeFuncPureFold(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal)){
-	lVal v = lAddNativeFuncFold(c, sym, args, doc, func);
-	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
-	return v;
+lVal lAddNativeFuncV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 << 1);
+}
+lVal lAddNativeFuncCV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (1 << 1));
+}
+lVal lAddNativeFuncVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 2 << 1);
+}
+lVal lAddNativeFuncCVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (2 << 1));
+}
+lVal lAddNativeFuncVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 3 << 1);
+}
+lVal lAddNativeFuncCVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (3 << 1));
+}
+lVal lAddNativeFuncVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 4 << 1);
+}
+lVal lAddNativeFuncCVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (4 << 1));
+}
+lVal lAddNativeFuncR(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 << 4);
+}
+lVal lAddNativeFuncCR(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal), uint flags){
+	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (1 << 4));
 }
 
 /* Create a new Lambda Value */

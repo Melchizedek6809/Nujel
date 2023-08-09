@@ -81,38 +81,34 @@ lVal lValStringError(const char *bufStart, const char *bufEnd, const char *errSt
 	return lValStringNoCopy(outbuf, data - outbuf);
 }
 
-static lVal lnfStringCut(lClosure *c, lVal v){
-	(void)c;
+static lVal lnfStringCut(lVal str, lVal aStart, lVal lenV){
 	i64 start, slen, len;
-	lVal str = lCar(v);
 	if(unlikely(str.type != ltString)){
-		return lValException("type-error","(string/cut) expects a string as its first and only argument", v);
+		return lValException("type-error","(string/cut) expects a string as its first and only argument", str);
 	}
 
 	const char *buf = str.vString->data;
 	slen = len = lBufferLength(str.vString);
-	lVal startV = requireInt(lCadr(v));
+	lVal startV = requireInt(aStart);
 	if(unlikely(startV.type == ltException)){
 		return startV;
 	}
 	start = MAX(0, startV.vInt);
-	lVal lenV = lCaddr(v);
 	len = MIN(slen - start, (((lenV.type == ltInt)) ? lenV.vInt : len) - start);
 
 	if(unlikely(len <= 0)){return lValString("");}
 	return lValStringLen(&buf[start], len);
 }
 
-static lVal lnfIndexOf(lClosure *c, lVal v){
-	(void)c;
-	const char *haystack = castToString(lCar(v),NULL);
-	const char *needle   = castToString(lCadr(v),NULL);
+static lVal lnfIndexOf(lVal aHaystack, lVal aNeedle, lVal aPos){
+	const char *haystack = castToString(aHaystack, NULL);
+	const char *needle   = castToString(aNeedle, NULL);
 	if(haystack == NULL) {return lValInt(-1);}
 	if(needle   == NULL) {return lValInt(-2);}
 	const int haystackLength = strlen(haystack);
 	const int needleLength   = strlen(needle);
 
-	const int pos = castToInt(lCaddr(v),0);
+	const int pos = castToInt(aPos, 0);
 	if(pos > haystackLength-needleLength){return lValInt(-3);}
 	/* Empty strings just return the current position, this is so we can
          * split an empty string into each character by passing an empty string
@@ -126,17 +122,16 @@ static lVal lnfIndexOf(lClosure *c, lVal v){
 	return lValInt(-4);
 }
 
-static lVal lnfLastIndexOf(lClosure *c, lVal v){
-	(void)c;
-	const char *haystack = castToString(lCar(v),NULL);
+static lVal lnfLastIndexOf(lVal aHaystack, lVal aNeedle, lVal aPos){
+	const char *haystack = castToString(aHaystack, NULL);
 	if(haystack == NULL) {return lValInt(-1);}
-	const char *needle   = castToString(lCadr(v),NULL);
+	const char *needle   = castToString(aNeedle, NULL);
 	if(needle   == NULL) {return lValInt(-2);}
 	const i64 haystackLength = strlen(haystack);
 	const i64 needleLength   = strlen(needle);
 
 	if(needleLength <= 0){return lValInt(-3);}
-	const i64 pos = castToInt(lCaddr(v),haystackLength - needleLength - 1);
+	const i64 pos = castToInt(aPos, haystackLength - needleLength - 1);
 
 	for(const char *s = &haystack[pos]; s > haystack; s--){
 		if(strncmp(s,needle,needleLength)){continue;}
@@ -146,7 +141,7 @@ static lVal lnfLastIndexOf(lClosure *c, lVal v){
 }
 
 void lOperationsString(lClosure *c){
-	lAddNativeFuncPure(c,"string/cut",    "(str start &stop)",        "Return STR starting at position START=0 and ending at &STOP=[str-len s)", lnfStringCut);
-	lAddNativeFuncPure(c,"index-of",      "(haystack needle &start)", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf);
-	lAddNativeFuncPure(c,"last-index-of", "(haystack needle &start)", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf);
+	lAddNativeFuncVVV(c,"string/cut",    "(str start &stop)",        "Return STR starting at position START=0 and ending at &STOP=[str-len s)", lnfStringCut, NFUNC_PURE);
+	lAddNativeFuncVVV(c,"index-of",      "(haystack needle &start)", "Return the position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfIndexOf, NFUNC_PURE);
+	lAddNativeFuncVVV(c,"last-index-of", "(haystack needle &start)", "Return the last position of NEEDLE in HAYSTACK, searcing from START=0, or -1 if not found",lnfLastIndexOf, NFUNC_PURE);
 }
