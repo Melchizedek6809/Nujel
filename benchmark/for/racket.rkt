@@ -1,8 +1,9 @@
 #lang racket/base
 
-(define (test-run i ret)
-  (cond ((>= i 10000000) ret)
-        (else (test-run (+ 1 i) (+ ret i)))))
+(define (test-run)
+  (do ([i 0 (+ 1 i)]
+       [ret 0 (+ ret i)])
+      ((>= i 10000000) ret)))
 
-(display (time (test-run 0 0)))
+(display (test-run))
 (newline)
