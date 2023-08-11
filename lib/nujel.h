@@ -84,6 +84,7 @@ typedef struct lClosure       lClosure;
 typedef struct lThread        lThread;
 typedef struct lNFunc         lNFunc;
 typedef struct lSymbol        lSymbol;
+typedef struct lClass         lClass;
 typedef struct lTree          lTree;
 typedef struct lTreeRoot      lTreeRoot;
 typedef struct lVec           lVec;
@@ -233,6 +234,10 @@ lVal lAddNativeFuncVVVV (lClosure *c, const char *sym, const char *args, const c
 lVal lAddNativeFuncCVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags);
 lVal lAddNativeFuncR    (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags);
 lVal lAddNativeFuncCR   (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags);
+
+lVal lAddNativeMethodV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal), uint flags);
+lVal lAddNativeMethodVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal), uint flags);
+lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags);
 
 /*
  | Tree related procedures

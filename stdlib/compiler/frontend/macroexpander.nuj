@@ -74,7 +74,7 @@
                                        (if                  (macroexpand-form source env op 3 #f #b0))
                                        ((fn* macro*)        (macroexpand-form source env op 4 #t #b0111))
                                        ((let* environment*) (list op (macroexpand-do (cdr source) env)))
-                                       (otherwise (if (meta op :fold)
+                                       (otherwise (if (:meta op :fold)
                                                       (macroexpand-fold op (cdr source))
                                                       (map source (fn (α) (macroexpand* α env)))))))
                                 (otherwise (map source (fn (α) (macroexpand* α env))))))))

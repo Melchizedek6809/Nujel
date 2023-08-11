@@ -194,6 +194,11 @@ static void lRootsMark(){
 			break;
 		}
 	}
+	for(size_t i=0;i < countof(lClassList);i++){
+		const lClass *T = &lClassList[i];
+		lSymbolGCMark(T->name);
+		lTreeGCMark(T->methods);
+	}
 }
 
 static void *lRootsPush(const lType t, void *ptr){

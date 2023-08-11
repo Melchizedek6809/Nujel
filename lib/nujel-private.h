@@ -30,6 +30,13 @@ static inline lVal lValComment(){
 }
 lType lTypecast(const lType a, const lType b);
 
+struct lClass {
+	const lSymbol *name;
+	lClass *parent;
+	lTree *methods;
+};
+extern lClass lClassList[64];
+
 struct lArray {
 	lVal *data;
 	union {
@@ -366,6 +373,26 @@ extern lSymbol *symCode;
 extern lSymbol *symData;
 extern lSymbol *symName;
 
+extern lSymbol *lSymLTNil;
+extern lSymbol *lSymLTBool;
+extern lSymbol *lSymLTPair;
+extern lSymbol *lSymLTLambda;
+extern lSymbol *lSymLTInt;
+extern lSymbol *lSymLTFloat;
+extern lSymbol *lSymLTString;
+extern lSymbol *lSymLTSymbol;
+extern lSymbol *lSymLTKeyword;
+extern lSymbol *lSymLTNativeFunction;
+extern lSymbol *lSymLTEnvironment;
+extern lSymbol *lSymLTMacro;
+extern lSymbol *lSymLTArray;
+extern lSymbol *lSymLTTree;
+extern lSymbol *lSymLTBytecodeArray;
+extern lSymbol *lSymLTBuffer;
+extern lSymbol *lSymLTBufferView;
+extern lSymbol *lSymLTFileHandle;
+extern lSymbol *lSymLTUnknownType;
+
 extern lSymbol *symNull;
 extern lSymbol *symQuote;
 extern lSymbol *symQuasiquote;
@@ -416,5 +443,8 @@ void lOperationsGeneric    (lClosure *c);
 lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lVal col, lVal key);
 lVal lGenericSet(lVal col, lVal key, lVal v);
+
+void lTypesInit();
+lVal lMethodLookup(const lSymbol *method, lVal self);
 
 #endif

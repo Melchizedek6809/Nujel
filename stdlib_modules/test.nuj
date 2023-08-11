@@ -105,7 +105,7 @@
       (doseq (test-funs (-> (symbol-table)
                             (map resolve-or-nil)
                             (filter callable?)
-                            (map (fn (a) (meta a :tests)))
+                            (map (fn (a) (:meta a :tests)))
                             (filter identity)))
              (doseq (fun test-funs)
                     (add* (car fun)

@@ -45,14 +45,14 @@
                          (print (join (print/error/iter error 0) "\r\n")))))
 
 (defn closure/documentation (o)
-      (meta o :documentation))
+      (:meta o :documentation))
 
 (defn closure/cat (o)
-      (or (meta o :cat) :unsorted))
+      (or (:meta o :cat) :unsorted))
 
 (defn closure/name (o)
       (if (procedure? o)
-          (or (meta o :name)
+          (or (:meta o :name)
               (closure/name (closure/parent o)))
           'unknown))
 
@@ -88,6 +88,6 @@
           parts of an expression, but having the sub expressions
           be available so you can use them easily via nujel-mode."
           :cat :documentation
-          (deftest #nil (let (x #nil) (comment (set! x #t)) x))
+          (deftest #f (let ((x #f)) (comment (set! x #t)) x))
 
           #nil)

@@ -18,7 +18,7 @@
                                 #t))
 
                      (defn constant-fold/pure? (fun)
-                           (meta fun :pure))
+                           (:meta fun :pure))
 
                      (defn constant-fold/resolve (sym)
                            (when-not (symbol? sym) (return sym))

@@ -14,6 +14,7 @@ lVal NIL;
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
 	lSymbolInit();
+	lTypesInit();
 }
 
 void simplePrintTree(lTree *t){

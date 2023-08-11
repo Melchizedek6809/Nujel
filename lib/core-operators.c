@@ -223,44 +223,31 @@ static lVal lnfGarbageCollectRuns(){
 	return lValInt(lGCRuns);
 }
 
-static lVal lnfMetaGet(lVal l, lVal aKey){
-	lVal cadr = requireSymbolic(aKey);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
+static lVal lnmNativeMetaGet(lVal self, lVal key){
+	lVal e = requireSymbolic(key);
+	if(unlikely(e.type == ltException)){
+		return e;
 	}
-	const lSymbol *key = cadr.vSymbol;
-	switch(l.type){
-	case ltNativeFunc: {
-		lVal t = lTreeRef(l.vNFunc->meta, key);
-		return t.type != ltException ? t : NIL; }
-	case ltLambda:
-	case ltEnvironment: {
-		lVal t = lTreeRef(l.vClosure->meta, key);
-		return t.type != ltException ? t : NIL; }
-	default:
-		return NIL;
-	}
+	lVal t = lTreeRef(self.vNFunc->meta, key.vSymbol);
+	return t.type != ltException ? t : NIL;
 }
 
-static lVal lnfMetaSet(lVal v, lVal aKey, lVal aVal){
-	lVal car = requireCallable(v);
-	if(unlikely(car.type == ltException)){
-		return car;
+static lVal lnmNujelMetaGet(lVal self, lVal key){
+	lVal e = requireSymbolic(key);
+	if(unlikely(e.type == ltException)){
+		return e;
 	}
+	lVal t = lTreeRef(self.vClosure->meta, key.vSymbol);
+	return t.type != ltException ? t : NIL;
+}
 
-	lVal cadr = requireSymbolic(aKey);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
+static lVal lnmNujelMetaSet(lVal self, lVal key, lVal value){
+	lVal e = requireSymbolic(key);
+	if(unlikely(e.type == ltException)){
+		return e;
 	}
-	const lSymbol *key = cadr.vSymbol;
-
-	if(car.type == ltNativeFunc){
-		return lValException(lSymTypeError, "Can't add new metadata to native functions", car);
-	}else{
-		car.vClosure->meta = lTreeInsert(car.vClosure->meta, key, aVal);
-	}
-
-	return car;
+	self.vClosure->meta = lTreeInsert(self.vClosure->meta, key.vSymbol, value);
+	return self;
 }
 
 static lVal lnfFloat(lVal v){
@@ -376,15 +363,16 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
 	lAddNativeFuncV(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
-	//lAddNativeFunc(c,"!",              "(v method . args)", "Call METHOD on V with ARGS", lnfMethod, 0);
 	lAddNativeFuncVVV(c,"def-in!",        "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn, 0);
 	lAddNativeFuncCVV(c,"resolve",        "(sym environment)", "Resolve SYM", lnfResolve, 0);
 	lAddNativeFuncCVV(c,"resolve-or-nil","(sym environment)", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull, 0);
 	lAddNativeFuncCVV(c,"resolves?",      "(sym environment)", "Check if SYM resolves to a value",           lnfResolvesPred, 0);
 
 	lAddNativeFuncV  (c,"val->id", "(v)",                "Generate some sort of ID value for V, mainly used in [write)", lnfValToId, 0);
-	lAddNativeFuncVV (c,"meta",    "(v key)",            "Retrieve KEY from V's metadata", lnfMetaGet, 0);
-	lAddNativeFuncVVV(c,"meta!",   "(v key meta-value)", "Set KEY to META-VALUE in V's metadata", lnfMetaSet, 0);
+
+	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
+	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
+	lAddNativeMethodVVV(&lClassList[ltLambda],    lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
 
 	lAddNativeFuncV(c,"closure/data",     "(clo)",  "Return the data of CLO",                     lnfClosureData, 0);
 	lAddNativeFuncV(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode, 0);

@@ -89,13 +89,12 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal v){
 		return t;
 	}else{
 		if(s < t->key){
-			t->left = lTreeInsert(t->left,s,v);
+			t->left = lTreeInsert(t->left, s, v);
 		}else {
-			t->right = lTreeInsert(t->right,s,v);
+			t->right = lTreeInsert(t->right, s, v);
 		}
 		t->height = lTreeCalcHeight(t);
-		t = lTreeBalance(t,s);
-		return t;
+		return lTreeBalance(t, s);
 	}
 }
 

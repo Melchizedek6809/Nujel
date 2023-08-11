@@ -9,6 +9,108 @@
 #include "nujel-private.h"
 #endif
 
+lClass lClassList[64];
+
+static void initType(int i, const lSymbol *name, lClass *parent){
+	lClassList[i].name = name;
+	lClassList[i].parent = parent;
+	lClassList[i].methods = NULL;
+}
+
+static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
+	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
+	v.vNFunc->fp   = fun;
+	v.vNFunc->args = lCar(lRead(args));
+	v.vNFunc->meta = NULL;
+	v.vNFunc->argCount = argCount;
+	if(flags & NFUNC_FOLD){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
+	}
+	if(flags & NFUNC_PURE){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
+	}
+	T->methods = lTreeInsert(T->methods, name, v);
+	return v;
+}
+
+lVal lAddNativeMethodV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal), uint flags){
+	return lAddNativeMethod(T, name, args, fun, flags, (1 << 1));
+}
+lVal lAddNativeMethodVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal), uint flags){
+	return lAddNativeMethod(T, name, args, fun, flags, (2 << 1));
+}
+lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags){
+	return lAddNativeMethod(T, name, args, fun, flags, (3 << 1));
+}
+
+static lVal lnmTypeName(lVal self){
+	if(unlikely(self.type != (self.type & 63))){
+		lValException(lSymVMError, "Out-of-bounds Type", self);
+	}
+	lClass *T = &lClassList[self.type];
+	if(unlikely(T->name == NULL)){
+		lValException(lSymVMError, "Unnamed Type", self);
+	}
+	return lValKeywordS(T->name);
+}
+
+static lVal lnmNilMetaGet(lVal self, lVal key){
+	(void)self;(void)key;
+	return NIL;
+}
+
+static void lTypesAddCoreMethods(){
+	lAddNativeMethod(&lClassList[ltNil], lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE, (1 << 1));
+	lAddNativeMethod(&lClassList[ltNil], lSymS("meta"), "(self key)", lnmNilMetaGet, 0, (2 << 1));
+}
+
+lVal lMethodLookup(const lSymbol *method, lVal self){
+	if(unlikely(self.type != (self.type & 63))){
+		lValException(lSymVMError, "Out-of-bounds Type", self);
+	}
+	lClass *T = &lClassList[self.type];
+	for(;T;T = T->parent){
+		const lTree *t = T->methods;
+		while(t){
+			if(method == t->key){
+				return t->value;
+			}
+			t = method > t->key ? t->right : t->left;
+		}
+	}
+	return lValException(lSymUnboundVariable, "Unbound method", self);
+}
+
+void lTypesInit(){
+	initType(ltNil, lSymLTNil, NULL);
+	lClass *tNil = &lClassList[ltNil];
+	initType(ltSymbol, lSymLTSymbol, tNil);
+	initType(ltKeyword, lSymLTKeyword, tNil);
+	initType(ltBool, lSymLTBool, tNil);
+
+	initType(ltInt, lSymLTInt, tNil);
+	initType(ltFloat, lSymLTFloat, tNil);
+
+	initType(ltPair, lSymLTPair, tNil);
+	initType(ltArray, lSymLTArray, tNil);
+	initType(ltTree, lSymLTTree, tNil);
+
+	initType(ltNativeFunc, lSymLTNativeFunction, tNil);
+	initType(ltLambda, lSymLTLambda, tNil);
+	initType(ltMacro, lSymLTMacro, &lClassList[ltLambda]);
+	initType(ltEnvironment, lSymLTEnvironment, &lClassList[ltLambda]);
+
+	initType(ltBuffer, lSymLTBuffer, tNil);
+	initType(ltString, lSymLTString, &lClassList[ltBuffer]);
+	initType(ltBufferView, lSymLTBufferView, &lClassList[ltBuffer]);
+	initType(ltBytecodeArr, lSymLTBytecodeArray, &lClassList[ltBuffer]);
+
+	initType(ltFileHandle, lSymLTFileHandle, tNil);
+	initType(ltComment, NULL, NULL);
+	initType(ltException, NULL, NULL);
+	lTypesAddCoreMethods();
+}
+
 lVal lValExceptionType(lVal v, lType T){
 	char buf[128];
 	snprintf(buf, sizeof(buf), "expected argument of type %s, not: ", getTypeSymbolT(T)->c);
