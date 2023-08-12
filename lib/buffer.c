@@ -93,15 +93,6 @@ static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength)
 	return car;
 }
 
-static lVal lnfStringToBuffer(lVal a, lVal immutable){
-	lVal car = requireString(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *str = car.vString;
-	return bufferFromPointer(castToBool(immutable), str->data, str->length);
-}
-
 static lVal lnfBufferToString(lVal a, lVal aLength){
 	lVal car = requireBuffer(a);
 	if(unlikely(car.type == ltException)){
@@ -207,7 +198,6 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeFuncV   (c, "buffer/allocate", "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
 	lAddNativeFuncVVVV(c, "buffer/copy",     "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
 
-	lAddNativeFuncVV(c, "string->buffer",    "(str immutable?)", "Copy STR into a buffer and return it", lnfStringToBuffer, 0);
 	lAddNativeFuncVV(c, "buffer->string",    "(buf length)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString, 0);
 
 	lAddNativeFuncVV(c, "buffer/u8*",  "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewU8, 0);

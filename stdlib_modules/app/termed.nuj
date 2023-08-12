@@ -43,7 +43,7 @@
       (move-cursor (+ 1 (:length ln) term-x) term-y)
       (def max-w (- term-w 7))
       (when (>= (:length line) max-w)
-        (set! line (string->buffer (:cut (buffer->string line) 0 max-w))))
+        (set! line (:clone (:cut (buffer->string line) 0 max-w))))
       (put-string line)
       (line-clean! buf line-y #t))
 
@@ -165,7 +165,7 @@
       (def buf (new-buffer filename))
       (def text (slurp filename))
       (when text
-        (set! buf :lines (apply array/new (map (split text "\n") string->buffer)))))
+        (set! buf :lines (apply array/new (map (split text "\n") :clone)))))
 
 (defn main (args)
       :export

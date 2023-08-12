@@ -77,7 +77,7 @@ lVal lGenericRef(lVal col, lVal key){
 		return arr->data[i]; }
 	case ltString:
 	case ltBuffer: {
-		const char *buf  = col.vBuffer->data;
+		const uint8_t *buf = (uint8_t *)col.vBuffer->data;
 		const size_t len = col.vBuffer->length;
 		lVal keyVal = requireNaturalInt(key);
 		if(unlikely(keyVal.type == ltException)){
