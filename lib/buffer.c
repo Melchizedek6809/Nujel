@@ -61,15 +61,6 @@ static lVal bufferFromPointer(bool immutable, const void *data, size_t length){
 	return lValAlloc(ltBuffer, retBuf);
 }
 
-static lVal lnfBufferDup(lVal a, lVal immutable){
-	lVal vBuf = requireBuffer(a);
-	if(unlikely(vBuf.type == ltException)){
-		return vBuf;
-	}
-	lBuffer *buf = vBuf.vBuffer;
-	return bufferFromPointer(castToBool(immutable), buf->buf, buf->length);
-}
-
 static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength){
 	lVal car = requireMutableBuffer(aDest);
 	if(unlikely(car.type == ltException)){
@@ -197,19 +188,23 @@ static lVal lnmBufferViewImmutable(lVal self){
 	return lValBool(self.vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
 }
 
+static lVal lnmBufferClone(lVal self, lVal immutable){
+	return bufferFromPointer(castToBool(immutable), self.vBuffer->buf, self.vBuffer->length);
+}
+
 void lOperationsBuffer(lClosure *c){
 	lClass *Buffer = &lClassList[ltBuffer];
-	lAddNativeMethodV (Buffer, lSymS("length"),     "(self)", lnmBufferLength, 0);
+	lAddNativeMethodV (Buffer, lSymS("length"),     "(self)", lnmBufferLength, NFUNC_PURE);
 	lAddNativeMethodV (Buffer, lSymS("immutable?"), "(self)", lnmBufferImmutable, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("length!"),    "(self new-length)", lnmBufferLengthSet, 0);
+	lAddNativeMethodVV(Buffer, lSymS("clone"),      "(self immutable?)", lnmBufferClone, NFUNC_PURE);
 
 	lClass *BufferView = &lClassList[ltBufferView];
-	lAddNativeMethodV (BufferView, lSymS("length"),     "(self)", lnmBufferViewLength, 0);
-	lAddNativeMethodV (BufferView, lSymS("buffer"),     "(self)", lnmBufferViewBuffer, 0);
+	lAddNativeMethodV (BufferView, lSymS("length"),     "(self)", lnmBufferViewLength, NFUNC_PURE);
+	lAddNativeMethodV (BufferView, lSymS("buffer"),     "(self)", lnmBufferViewBuffer, NFUNC_PURE);
 	lAddNativeMethodV (BufferView, lSymS("immutable?"), "(self)", lnmBufferViewImmutable, NFUNC_PURE);
 
 	lAddNativeFuncV   (c, "buffer/allocate", "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
-	lAddNativeFuncVV  (c, "buffer/dup",      "(buf immutable?)", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup, 0);
 	lAddNativeFuncVVVV(c, "buffer/copy",     "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
 
 	lAddNativeFuncVV(c, "string->buffer",    "(str immutable?)", "Copy STR into a buffer and return it", lnfStringToBuffer, 0);
