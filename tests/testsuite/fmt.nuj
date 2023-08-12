@@ -16,8 +16,8 @@
 (:format-error (try car (eval (macroexpand '(fmt "asd {1}" "qwe")))))
 ("Hello, World!" (eval (macroexpand '(let ((w "World")) (fmt "Hello, {w}!")))))
 (:type-error (try car (macroexpand '(fmt))))
-(1 (buffer/length (eval (macroexpand '(fmt "{:}" "\n")))))
-(4 (buffer/length (eval (macroexpand '(fmt "{:?}" "\n"))))) ;
+(1 (:length (eval (macroexpand '(fmt "{:}" "\n")))))
+(4 (:length (eval (macroexpand '(fmt "{:?}" "\n"))))) ;
 ("   255" (eval (macroexpand '(fmt "{:6d}" 255))))
 ("     99.12" (eval (macroexpand '(fmt "{:10.2d}" 99.1234))))
 (" 99.12" (eval (macroexpand '(fmt "{:6.2d}" 99.1234))))

@@ -27,7 +27,7 @@
 (defn from-char-code l
       "Turn the provided char codes into a string and return it"
       (def buf (buffer/allocate (list/length l)))
-      (dotimes (i (buffer/length buf) (buffer->string buf))
+      (dotimes (i (:length buf) (buffer->string buf))
                (when (or (not (int? (car l)))
                          (> (car l) 255)
                          (< (car l) 0))

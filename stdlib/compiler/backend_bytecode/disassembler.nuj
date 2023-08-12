@@ -114,7 +114,7 @@
 
                    (defn disassemble/bytecode-array (code)
                          "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
-                         (disassemble/array (bytecode-arr->arr code) 0 (bytecode-literals code)))
+                         (disassemble/array (:array code) 0 (:literals code)))
 
                    (defn disassemble/to-string (bc)
                          (disassemble/bytecode-array bc))

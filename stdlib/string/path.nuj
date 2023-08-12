@@ -18,7 +18,7 @@
       "Return the extension of PATH"
       (def last-period (last-index-of path "."))
       (if (>= last-period 0)
-          (string/cut path (+ 1 last-period) (buffer/length path))
+          (string/cut path (+ 1 last-period) (:length path))
           path))
 
 (defn path/without-extension (path)

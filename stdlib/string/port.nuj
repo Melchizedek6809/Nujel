@@ -29,21 +29,21 @@
 
   (def string-out-methods {:block-write (fn (self buffer size)
                                             (def buf (:meta self :buffer))
-                                          (when-not size (set! size (buffer/length buffer)))
+                                          (when-not size (set! size (:length buffer)))
                                           (when (> size
-                                                   (- (buffer/length buf)
+                                                   (- (:length buf)
                                                       (:meta self :position)))
-                                            (buffer/length! buf
-                                                            (+ #x80 (bit-and (+ (buffer/length buf) size) (bit-not #x7F)))))
+                                            (:length! buf
+                                                            (+ #x80 (bit-and (+ (:length buf) size) (bit-not #x7F)))))
                                           (buffer/copy buf buffer (:meta self :position) size)
                                           (:meta! self :position (+ (:meta self :position) size)))
                                         :char-write (fn (self char)
                                                         (def buf (:meta self :buffer))
-                                                      (when (< (- (buffer/length buf)
+                                                      (when (< (- (:length buf)
                                                                   (:meta self :position))
                                                                1)
-                                                        (buffer/length! buf
-                                                                        (+ #x80 (buffer/length buf))))
+                                                        (:length! buf
+                                                                        (+ #x80 (:length buf))))
                                                       (set! buf (:meta self :position) char)
                                                       (:meta! self :position (+ (:meta self :position) 1)))
                                         :write (fn (self . buffers)

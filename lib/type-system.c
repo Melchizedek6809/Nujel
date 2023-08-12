@@ -59,9 +59,16 @@ static lVal lnmNilMetaGet(lVal self, lVal key){
 	return NIL;
 }
 
+static lVal lnmNilLength(lVal self){
+	(void)self;
+	return lValInt(0);
+}
+
 static void lTypesAddCoreMethods(){
-	lAddNativeMethodV(&lClassList[ltNil], lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
-	lAddNativeMethodVV(&lClassList[ltNil], lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
+	lClass *Nil = &lClassList[ltNil];
+	lAddNativeMethodV (Nil, lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
+	lAddNativeMethodV (Nil, lSymS("length"), "(self)", lnmNilLength, 0);
+	lAddNativeMethodVV(Nil, lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
 }
 
 lVal lMethodLookup(const lSymbol *method, lVal self){
@@ -101,9 +108,9 @@ void lTypesInit(){
 	initType(ltEnvironment, lSymLTEnvironment, &lClassList[ltLambda]);
 
 	initType(ltBuffer, lSymLTBuffer, tNil);
+	initType(ltBufferView, lSymLTBufferView, tNil);
+	initType(ltBytecodeArr, lSymLTBytecodeArray, tNil);
 	initType(ltString, lSymLTString, &lClassList[ltBuffer]);
-	initType(ltBufferView, lSymLTBufferView, &lClassList[ltBuffer]);
-	initType(ltBytecodeArr, lSymLTBytecodeArray, &lClassList[ltBuffer]);
 
 	initType(ltFileHandle, lSymLTFileHandle, tNil);
 	initType(ltComment, NULL, NULL);

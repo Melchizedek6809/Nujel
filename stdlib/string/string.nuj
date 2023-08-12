@@ -32,10 +32,10 @@
       (when-not (string? text) (set! text (string text)))
       (when-not (string? padding)
                 (throw (list :type-error "pad-start needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
-      (while (< (buffer/length text) pad-length)
+      (while (< (:length text) pad-length)
              (set! text (cat padding text)))
-      (if (> (buffer/length text) pad-length)
-          (string/cut text (- (buffer/length text) pad-length) (buffer/length text))
+      (if (> (:length text) pad-length)
+          (string/cut text (- (:length text) pad-length) (:length text))
           text))
 
 (defn pad-end (text pad-length padding)
@@ -67,9 +67,9 @@
       (when-not (string? text) (set! text (string text)))
       (when-not (string? padding)
                 (throw (list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
-      (while (< (buffer/length text) pad-length)
+      (while (< (:length text) pad-length)
              (set! text (cat text padding)))
-      (if (> (buffer/length text) pad-length)
+      (if (> (:length text) pad-length)
           (string/cut text 0 pad-length)
           text))
 
@@ -101,11 +101,11 @@
       (when-not (string? text) (set! text (string text)))
       (when-not (string? padding)
                 (throw (list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
-      (while (< (buffer/length text) pad-length)
+      (while (< (:length text) pad-length)
              (set! text (cat padding text padding)))
-      (if (> (buffer/length text) pad-length)
-          (let ((end-overflow (div/int (- (buffer/length text) pad-length) 2))
-                (start-overflow (- (- (buffer/length text) pad-length) end-overflow)))
+      (if (> (:length text) pad-length)
+          (let ((end-overflow (div/int (- (:length text) pad-length) 2))
+                (start-overflow (- (- (:length text) pad-length) end-overflow)))
                (string/cut text start-overflow (+ start-overflow pad-length)))
           text))
 
@@ -130,7 +130,7 @@
       (deftest "Trim Test" (trim "   Trim Test    \n"))
 
       (def start 0)
-      (def end (buffer/length text))
+      (def end (:length text))
       (while (and (< start end) (whitespace? (ref text start))) (set! start (+ start 1)))
       (while (and (> end 0) (whitespace? (ref text (- end 1)))) (set! end (- end 1)))
       (string/cut text start end))
@@ -146,8 +146,8 @@
       :related capitalize
       (deftest "TESTING THE CAPITALIZATION!" (upper-case "Testing THE Capitalization!"))
 
-      (def ret (buffer/allocate (buffer/length text)))
-      (dotimes (i (buffer/length text) (buffer->string ret))
+      (def ret (buffer/allocate (:length text)))
+      (dotimes (i (:length text) (buffer->string ret))
         (set! ret i (upper-case-char (ref text i)))))
 
 (defn lower-case (text)
@@ -161,8 +161,8 @@
       :related capitalize
       (deftest "testing the capitalization!" (lower-case "Testing THE Capitalization!"))
 
-      (def ret (buffer/allocate (buffer/length text)))
-      (dotimes (i (buffer/length text) (buffer->string ret))
+      (def ret (buffer/allocate (:length text)))
+      (dotimes (i (:length text) (buffer->string ret))
         (set! ret i (lower-case-char (ref text i)))))
 
 (defn capitalize (text)
@@ -179,9 +179,9 @@
       :related lower-case
       (deftest "Testing The Capitalization!" (capitalize "Testing THE Capitalization!"))
 
-      (def ret (buffer/allocate (buffer/length text)))
+      (def ret (buffer/allocate (:length text)))
       (def caps? #t)
-      (dotimes (i (buffer/length text) (buffer->string ret))
+      (dotimes (i (:length text) (buffer->string ret))
          (set! ret i ((if caps? upper-case-char lower-case-char) (ref text i)))
         (set! caps? (if (whitespace? (ref text i)) #t #f))))
 
@@ -194,7 +194,7 @@
 
 (def split (let*
              (defn split/empty (str separator)
-                   (def slen (buffer/length str))
+                   (def slen (:length str))
                    (def start 0)
                    (def ret #nil)
                    (while (< start slen)
@@ -207,15 +207,15 @@
                    (def pos-found (index-of str separator start))
                    (if (>= pos-found 0)
                        (cons (string/cut str start pos-found)
-                             (split/string str separator (+ pos-found (buffer/length separator))))
-                       (cons (string/cut str start (buffer/length str))
+                             (split/string str separator (+ pos-found (:length separator))))
+                       (cons (string/cut str start (:length str))
                              #nil)))
 
              (defn split (str separator)
                    "Splits STR into a list at every occurunse of SEPARATOR"
                    (typecheck/only str :string)
                    (typecheck/only separator :string)
-                   (case (buffer/length separator)
+                   (case (:length separator)
                          (0 (split/empty str))
                          (otherwise (split/string str separator 0))))))
 

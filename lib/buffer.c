@@ -48,44 +48,6 @@ static lVal lnfBufferAllocate(lVal a) {
 	return lValAlloc(ltBuffer, buf);
 }
 
-static lVal lnfBufferLengthGet(lVal a){
-	lVal car = a;
-	switch(car.type){
-	default:
-		return lValException(lSymTypeError, "Expected a buffer or something compatible", car);
-	case ltString:
-	case ltBuffer:
-		return lValInt(car.vBuffer->length);
-	case ltBufferView:
-		return lValInt(car.vBufferView->length);
-	}
-}
-
-static lVal lnfBufferLengthSet(lVal a, lVal b){
-	lVal bufv = requireMutableBuffer(a);
-	if(unlikely(bufv.type == ltException)){
-		return bufv;
-	}
-	lBuffer *buf = bufv.vBuffer;
-
-	lVal lenVal = requireNaturalInt(b);
-	if(unlikely(lenVal.type == ltException)){
-		return lenVal;
-	}
-	const int length = lenVal.vInt;
-	if(length < buf->length){
-		return lValException(lSymOutOfBounds, "Buffers can only grow, not shrink.", b);
-	}
-	void *nBuf = realloc(buf->buf, length);
-	if (unlikely(nBuf == NULL)) {
-		return lValException(lSymOOM, "(buffer/length!) couldn't allocate its buffer", b);
-	}
-	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
-	buf->buf = nBuf;
-	buf->length = length;
-	return bufv;
-}
-
 static lVal lnfBufferImmutableGet(lVal car){
 	switch(car.type){
 	case ltBufferView:
@@ -204,19 +166,52 @@ static lVal lnfBufferViewF32(lVal a, lVal aImmutable){ return bufferView(a, aImm
 static lVal lnfBufferViewS64(lVal a, lVal aImmutable){ return bufferView(a, aImmutable, lbvtS64); }
 static lVal lnfBufferViewF64(lVal a, lVal aImmutable){ return bufferView(a, aImmutable, lbvtF64); }
 
-static lVal lnfBufferViewBuffer(lVal a){
-	lVal car = requireBufferView(a);
-	if(unlikely(car.type == ltException)){
-		return car;
+static lVal lnmBufferViewBuffer(lVal self){
+	return lValAlloc(ltBuffer, self.vBufferView->buf);
+}
+
+static lVal lnmBufferLength(lVal self){
+	return lValInt(self.vBuffer->length);
+}
+
+static lVal lnmBufferViewLength(lVal self){
+	return lValInt(self.vBufferView->length);
+}
+
+static lVal lnmBufferLengthSet(lVal self, lVal newLength){
+	if(unlikely(self.vBuffer->flags & BUFFER_IMMUTABLE)){
+		return lValException(lSymTypeError, ":length! requires a mutable buffer", self);
 	}
-	lBufferView *view = car.vBufferView;
-	return lValAlloc(ltBuffer, view->buf);
+	lBuffer *buf = self.vBuffer;
+
+	lVal lenVal = requireNaturalInt(newLength);
+	if(unlikely(lenVal.type == ltException)){
+		return lenVal;
+	}
+	const int length = lenVal.vInt;
+	if(length < buf->length){
+		return lValException(lSymOutOfBounds, "Buffers can only grow, not shrink.", self);
+	}
+	void *nBuf = realloc(buf->buf, length);
+	if (unlikely(nBuf == NULL)) {
+		return lValException(lSymOOM, "(buffer/length!) couldn't allocate its buffer", self);
+	}
+	memset(&((u8 *)nBuf)[buf->length], 0, length - buf->length);
+	buf->buf = nBuf;
+	buf->length = length;
+	return self;
 }
 
 void lOperationsBuffer(lClosure *c){
+	lClass *Buffer = &lClassList[ltBuffer];
+	lAddNativeMethodV (Buffer, lSymS("length"), "(self)", lnmBufferLength, 0);
+	lAddNativeMethodVV(Buffer, lSymS("length!"), "(self new-length)", lnmBufferLengthSet, 0);
+
+	lClass *BufferView = &lClassList[ltBufferView];
+	lAddNativeMethodV (BufferView, lSymS("length"), "(self)", lnmBufferViewLength, 0);
+	lAddNativeMethodV (BufferView, lSymS("buffer"), "(self)", lnmBufferViewBuffer, 0);
+
 	lAddNativeFuncV   (c, "buffer/allocate",        "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
-	lAddNativeFuncV   (c, "buffer/length",          "(buf)",            "Return the size of BUF in bytes",   lnfBufferLengthGet, 0);
-	lAddNativeFuncVV  (c, "buffer/length!",         "(buf new-length)", "Set the size of BUF to NEW-LENGTH", lnfBufferLengthSet, 0);
 	lAddNativeFuncV   (c, "buffer/immutable?",      "(buf)",            "Return #t if BUF is immutable",     lnfBufferImmutableGet, 0);
 	lAddNativeFuncVV  (c, "buffer/dup",             "(buf immutable?)", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup, 0);
 	lAddNativeFuncVVVV(c, "buffer/copy",            "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
@@ -233,5 +228,4 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeFuncVV(c, "buffer/f32*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF32, 0);
 	lAddNativeFuncVV(c, "buffer/s64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewS64, 0);
 	lAddNativeFuncVV(c, "buffer/f64*",            "(buf immutable?)", "Create a new view for BUF spanning the entire area", lnfBufferViewF64, 0);
-	lAddNativeFuncV (c, "buffer-view->buffer",    "(view)",           "Return the buffer of VIEW", lnfBufferViewBuffer, 0);
 }

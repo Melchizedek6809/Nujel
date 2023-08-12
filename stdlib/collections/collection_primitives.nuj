@@ -24,12 +24,9 @@
 (defn length (α)
       "Returns the length of collection α"
       (case (type-of α)
-            (:nil                    0)
             (:pair   (list/length   α))
-            (:array  (:length  α))
             (:tree   (tree/size     α))
-            ((:buffer :string :buffer-view) (buffer/length α))
-            (otherwise (exception :type-error "You can only use length with a collection" α ))))
+            (otherwise (:length  α))))
 
 (defn map (l f)
       "Runs f over every item in collection l and returns the resulting list"

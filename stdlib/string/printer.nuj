@@ -56,16 +56,16 @@
 
                  (defn write/raw/buffer (v port hr?)
                        (if hr?
-                           (port 'write "#<buffer :id " (int->string/decimal (val->id v)) " :size " (int->string/hex (buffer/length v)) ">")
+                           (port 'write "#<buffer :id " (int->string/decimal (val->id v)) " :size " (int->string/hex (:length v)) ">")
                            (do (port 'block-write "#m")
                                (def view (buffer/u8* v))
-                             (dotimes (i (buffer/length v))
+                             (dotimes (i (:length v))
                                (port 'block-write (pad-start (int->string/HEX (ref view i)) 2 "0"))))))
 
                  (defn write/raw/bytecode-array (v port hr?)
                        (port 'block-write "#{")
-                       (write/raw/array (bytecode-literals v) port #f)
-                       (dotimes (i (bytecode-array/length v))
+                       (write/raw/array (:literals v) port #f)
+                       (dotimes (i (:length v))
                          (when (zero? (bit-and i #x1F))
                            (port 'block-write "\n"))
                          (port 'block-write (pad-start (int->string/HEX (ref v i)) 2 "0")))
@@ -109,7 +109,7 @@
                  (defn write/raw/string (v port hr?)
                        (when hr? (return (port 'block-write v)))
                        (port 'block-write "\"")
-                       (dotimes (i (buffer/length v))
+                       (dotimes (i (:length v))
                          (def c (ref v i))
                          (case c
                                (0 (return (port 'block-write "\"")))

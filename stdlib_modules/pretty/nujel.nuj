@@ -35,7 +35,7 @@
                   "<span class=\"nujel-hl-15\">"])
 
 (defn comment-block (source i pp colors)
-      (def len (buffer/length source))
+      (def len (:length source))
       (pp 'block-write (ref colors 8))
       (pp 'block-write "#|") ; Necessary so we don't self recurse endlessly
       (set! i (+ i 2))
@@ -55,7 +55,7 @@
       (return i))
 
 (defn comment-eol (source i pp colors)
-      (def len (buffer/length source))
+      (def len (:length source))
       (pp 'block-write (ref colors 8))
       (while (< i len)
         (def c (ref source i))
@@ -69,7 +69,7 @@
       (return i))
 
 (defn continue-until-separator (source i pp colors)
-      (def len (buffer/length source))
+      (def len (:length source))
       (while (< i len)
         (def c (ref source i))
         (case c
@@ -101,7 +101,7 @@
       (return (continue-until-separator source i pp colors)))
 
 (defn literal-string (source i pp colors)
-      (def len (buffer/length source))
+      (def len (:length source))
       (pp 'block-write (ref colors 3))
       (def escaped-quote? #t)
       (while (< i len)
@@ -160,7 +160,7 @@
       (continue-until-separator source (inc/int i) pp colors d))
 
 (defn top (source i pp colors d)
-      (def len (buffer/length source))
+      (def len (:length source))
       (while (< i len)
         (def c (ref source i))
         (case c

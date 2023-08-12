@@ -188,8 +188,8 @@
       (def c 0)
       (def view (buffer/u8* buf))
       (while #t
-             (while (>= i (buffer/length buf))
-                    (buffer/length! (+ 128 (buffer/length buf))))
+             (while (>= i (:length buf))
+                    (:length! (+ 128 (:length buf))))
              (set! c (port 'char-read))
              (when (= c :end-of-file)
                    (return (if (zero? i) #nil i)))

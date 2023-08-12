@@ -574,7 +574,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                        (assemble/build-sym-map tmp sym-map 0)
                        (def out (array/allocate (ref sym-map :last-op)))
                        (assemble/emit-relocated-ops tmp sym-map -1 out)
-                       (arr->bytecode-arr out lit-arr))))
+                       (:bytecode-array out lit-arr))))
 
 (defn assemble l
       "Assemble all arguments into a single :bytecode-array"

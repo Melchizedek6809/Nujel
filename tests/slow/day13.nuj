@@ -6,7 +6,7 @@
        (def points #nil)
        (def γ (reduce (split (file/read filename) "\n")
                        (fn (α β)
-                         (cond ((zero? (buffer/length β)) α)
+                         (cond ((zero? (:length β)) α)
                                ((= (ref β 0) #\f)
                                 (set! α :folds (cons (split (caddr (split β " ")) "=") (ref α :folds))))
                                (#t (def τ (map (split β ",") read/single))

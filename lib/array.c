@@ -65,10 +65,35 @@ lVal lnfArrNew(lVal v){
 	return r;
 }
 
+static lVal lnmArrayToBytecodeArray(lVal self, lVal aLiterals){
+	lArray *arr = self.vArray;
+	const int len = arr->length;
+
+	lVal cadr = requireArray(aLiterals);
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	lArray *literals = cadr.vArray;
+	lBytecodeOp *ops = malloc(sizeof(lBytecodeOp) * len);
+	for(int i=0;i<len;i++){
+		lVal t = requireInt(arr->data[i]);
+		if(unlikely(t.type == ltException)){
+			free(ops);
+			return t;
+		}
+		ops[i] = t.vInt;
+	}
+	lVal ret = lValBytecodeArray(ops, len, literals);
+	free(ops);
+	return ret;
+}
+
 void lOperationsArray(lClosure *c){
 	lClass *Array = &lClassList[ltArray];
 	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
 	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
+
 	lAddNativeMethodV(Array, lSymS("length"),  "(self)", lnmArrayLength, 0);
 	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
+	lAddNativeMethodVV(Array, lSymS("bytecode-array"), "(self literals)", lnmArrayToBytecodeArray, 0);
 }

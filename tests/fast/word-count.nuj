@@ -10,7 +10,7 @@
        (-> text
            (split "\n")
            (reduce (fn (a b)
-                       (+ a (count (split b " ") (fn (a) (> (buffer/length (trim a)) 0)))))
+                       (+ a (count (split b " ") (fn (a) (> (:length (trim a)) 0)))))
                    0)))
 
 (def lines (count-lines "CODE_OF_CONDUCT.md"))

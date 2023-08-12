@@ -27,7 +27,7 @@
       (try (fn (ε) (if (= (car ε) :return)
                        (cons :part1 (char-to-score (cadr ε)))
                        (throw ε)))
-           (dotimes (i (buffer/length line))
+           (dotimes (i (:length line))
                     (def cc (ref line i))
                     (case cc
                           ((#\() (set! stack (cons #\) stack)))
