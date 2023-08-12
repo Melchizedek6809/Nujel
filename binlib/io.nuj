@@ -186,7 +186,7 @@
       "Reads in a line of user input and returns it"
       (def i 0)
       (def c 0)
-      (def view (buffer/u8* buf))
+      (def view (:u8 buf))
       (while #t
              (while (>= i (:length buf))
                     (:length! (+ 128 (:length buf))))

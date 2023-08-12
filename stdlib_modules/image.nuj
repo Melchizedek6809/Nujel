@@ -39,7 +39,7 @@
       { :width width
          :height height
          :buffer buffer
-         :pixels (buffer/u32* buffer)})
+         :pixels (:u32 buffer)})
 
 (defn image/ref (img x y)
       :export-as ref

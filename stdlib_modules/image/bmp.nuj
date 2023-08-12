@@ -28,7 +28,7 @@
       (def file-size (+ image-size header-size))
 
       (def out (buffer/allocate file-size))
-      (def b (buffer/u8* out))
+      (def b (:u8 out))
       (def i -1)
       (set! b (inc! i) #\B)
       (set! b (inc! i) #\M)

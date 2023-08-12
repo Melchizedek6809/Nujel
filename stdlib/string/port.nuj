@@ -9,7 +9,7 @@
 (def make-input-port #nil)
 (let*
   (def temporary-buffer (buffer/allocate 1))
-  (def temporary-buffer-view (buffer/u8* temporary-buffer))
+  (def temporary-buffer-view (:u8 temporary-buffer))
 
   (def output-port-method-table {:flush-output (fn (handle)
                                                    (file/flush* handle))

@@ -58,7 +58,7 @@
                        (if hr?
                            (port 'write "#<buffer :id " (int->string/decimal (val->id v)) " :size " (int->string/hex (:length v)) ">")
                            (do (port 'block-write "#m")
-                               (def view (buffer/u8* v))
+                               (def view (:u8 v))
                              (dotimes (i (:length v))
                                (port 'block-write (pad-start (int->string/HEX (ref view i)) 2 "0"))))))
 

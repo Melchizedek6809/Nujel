@@ -360,7 +360,7 @@
 
       Whether val is a buffer view"
       :cat :type-predicate
-      (deftest #t (buffer-view? (buffer/u8* #m00)))
+      (deftest #t (buffer-view? (:u8 #m00)))
       (deftest #f (buffer-view? #m00))
       (deftest #f (buffer-view? "asd"))
       (deftest #f (buffer-view? []))
@@ -376,7 +376,7 @@
       Whether val is a buffer view"
       :cat :type-predicate
       (deftest #t (bytecode-array? #{##()01}))
-      (deftest #f (bytecode-array? (buffer/u8* #m00)))
+      (deftest #f (bytecode-array? (:u8 #m00)))
       (deftest #f (bytecode-array? #m00))
       (deftest #f (bytecode-array? "asd"))
       (deftest #f (bytecode-array? []))
