@@ -25,7 +25,6 @@
       "Returns the length of collection α"
       (case (type-of α)
             (:pair   (list/length   α))
-            (:tree   (tree/size     α))
             (otherwise (:length  α))))
 
 (defn map (l f)

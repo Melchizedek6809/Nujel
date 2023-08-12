@@ -41,7 +41,7 @@
       (combinations/read state (cddr input-raw)))
 
 (defn state/dup (α)
-      {:combinations (ref α :combinations) :pairs (tree/dup (ref α :pairs)) :eles (tree/dup (ref α :eles))})
+      {:combinations (ref α :combinations) :pairs (:clone (ref α :pairs)) :eles (:clone (ref α :eles))})
 
 (defn state/run/once (α)
       ((ref α :combinations) α (state/dup α)))

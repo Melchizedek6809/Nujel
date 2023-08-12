@@ -38,14 +38,14 @@
       (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
 
       (def M (let*
-               (def cur-len (length data))
+               (def cur-len (:length data))
                (def new-len (- (* (inc (div/int (+ cur-len 8) 64)) 64) 8))
                (def buf (buffer/allocate (+ new-len 8)))
 
                (buffer/copy buf data 0 cur-len)
                (set! buf cur-len #x80)
 
-               (def p (- (length buf) 8))
+               (def p (- (:length buf) 8))
                (set! cur-len (* cur-len 8))
                (dotimes (i 8)
                         (set! buf (+ p i) (bit-shift-right cur-len (* i 8))))
@@ -56,7 +56,7 @@
       (def h2 #x98badcfe)
       (def h3 #x10325476)
 
-      (dotimes (chunk (div/int (length M) 16))
+      (dotimes (chunk (div/int (:length M) 16))
                (def chunk-off (* chunk 16))
                (def A h0)
                (def B h1)

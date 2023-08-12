@@ -197,22 +197,8 @@ static lVal lnfTreeHas(lVal a, lVal b) {
 	return lValBool(lTreeRef(car.vTree->root, cadr.vSymbol).type != ltException);
 }
 
-static lVal lnfTreeSize(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lValInt(lTreeSize(car.vTree->root));
-}
-
-static lVal lnfTreeDup(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lTree* tree = car.vTree->root;
-	tree = lTreeDup(tree);
-	return lValTree(tree);
+static lVal lnmTreeClone(lVal self) {
+	return lValTree(lTreeDup(self.vTree->root));
 }
 
 static lVal lnfTreeKeyAst(lVal a) {
@@ -251,13 +237,19 @@ static lVal lnfTreeRightAst(lVal a) {
 	return (tree && tree->right) ? lValTree(tree->right) : NIL;
 }
 
+static lVal lnmTreeLength(lVal self) {
+	return lValInt(lTreeSize(self.vTree->root));
+}
+
 void lOperationsTree(lClosure* c) {
+	lClass *Tree = &lClassList[ltTree];
+	lAddNativeMethodV(Tree, lSymS("length"), "(self)", lnmTreeLength, NFUNC_PURE);
+	lAddNativeMethodV(Tree, lSymS("clone"), "(self)", lnmTreeClone, NFUNC_PURE);
+
 	lAddNativeFuncR (c, "tree/new",    "plist",          "Return a new tree", lnfTreeNew, 0);
 	lAddNativeFuncV (c, "tree/keys",   "(tree)",         "Return each key of TREE in a list", lnfTreeGetKeys, 0);
 	lAddNativeFuncV (c, "tree/values", "(tree)",         "Return each value of TREE in a list", lnfTreeGetValues, 0);
-	lAddNativeFuncV (c, "tree/size",   "(tree)",         "Return the amount of entries in TREE", lnfTreeSize, 0);
 	lAddNativeFuncVV(c, "tree/has?",   "(tree sym)",     "Return #t if TREE contains a value for SYM", lnfTreeHas, 0);
-	lAddNativeFuncV (c, "tree/dup",    "(tree)",         "Return a duplicate of TREE", lnfTreeDup, 0);
 
 	lAddNativeFuncV(c, "tree/key*",   "(tree)", "Low-level: return the key for TREE segment", lnfTreeKeyAst, 0);
 	lAddNativeFuncV(c, "tree/value*", "(tree)", "Low-level: return the value for TREE segment", lnfTreeValueAst, 0);

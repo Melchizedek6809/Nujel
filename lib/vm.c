@@ -770,7 +770,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		if(unlikely(fun.type == ltKeyword)){
 			lVal self = vs[1-len];
 			lVal nfun = lMethodLookup(fun.vSymbol, self);
-			if(unlikely(fun.type == ltException)){
+			if(unlikely(nfun.type == ltException)){
 				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", fun);
 				goto throwException;
 			}

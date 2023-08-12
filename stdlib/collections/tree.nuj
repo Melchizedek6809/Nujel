@@ -54,8 +54,8 @@
 
 (defn tree/merge (a b)
       "Merge two trees together, if a key is contained in both trees the on in B gets priority"
-      (when-not b (return (if a (tree/dup a) {})))
-      (when-not a (return (tree/dup b)))
-      (def ret (tree/dup a))
+      (when-not b (return (if a (:clone a) {})))
+      (when-not a (return (:clone b)))
+      (def ret (:clone a))
       (doseq (k (tree/keys b) ret)
              (set! ret k (ref b k))))

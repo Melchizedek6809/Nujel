@@ -48,19 +48,6 @@ static lVal lnfBufferAllocate(lVal a) {
 	return lValAlloc(ltBuffer, buf);
 }
 
-static lVal lnfBufferImmutableGet(lVal car){
-	switch(car.type){
-	case ltBufferView:
-		return lValBool(car.vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
-	case ltString:
-		return lValBool(true);
-	case ltBuffer:
-		return lValBool(car.vBuffer->flags & BUFFER_IMMUTABLE);
-	default:
-		return lValException(lSymTypeError, "Can't get immutability info from that: ", car);
-	}
-}
-
 static lVal bufferFromPointer(bool immutable, const void *data, size_t length){
 	lBuffer *retBuf = lBufferAllocRaw();
 	retBuf->length = length;
@@ -202,17 +189,26 @@ static lVal lnmBufferLengthSet(lVal self, lVal newLength){
 	return self;
 }
 
+static lVal lnmBufferImmutable(lVal self){
+	return lValBool(self.vBuffer->flags & BUFFER_IMMUTABLE);
+}
+
+static lVal lnmBufferViewImmutable(lVal self){
+	return lValBool(self.vBufferView->flags & BUFFER_VIEW_IMMUTABLE);
+}
+
 void lOperationsBuffer(lClosure *c){
 	lClass *Buffer = &lClassList[ltBuffer];
 	lAddNativeMethodV (Buffer, lSymS("length"), "(self)", lnmBufferLength, 0);
+	lAddNativeMethodV (Buffer, lSymS("immutable?"), "(self)", lnmBufferImmutable, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("length!"), "(self new-length)", lnmBufferLengthSet, 0);
 
 	lClass *BufferView = &lClassList[ltBufferView];
 	lAddNativeMethodV (BufferView, lSymS("length"), "(self)", lnmBufferViewLength, 0);
 	lAddNativeMethodV (BufferView, lSymS("buffer"), "(self)", lnmBufferViewBuffer, 0);
+	lAddNativeMethodV (BufferView, lSymS("immutable?"), "(self)", lnmBufferViewImmutable, NFUNC_PURE);
 
 	lAddNativeFuncV   (c, "buffer/allocate",        "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
-	lAddNativeFuncV   (c, "buffer/immutable?",      "(buf)",            "Return #t if BUF is immutable",     lnfBufferImmutableGet, 0);
 	lAddNativeFuncVV  (c, "buffer/dup",             "(buf immutable?)", "Return a copy of BUF that might be IMMUTABLE", lnfBufferDup, 0);
 	lAddNativeFuncVVVV(c, "buffer/copy",            "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
 

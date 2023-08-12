@@ -32,7 +32,7 @@
                             (if twice
                                 (return)
                                 (set! twice #t)))
-                          (set! s (tree/dup s))
+                          (set! s (:clone s))
                           (tree/++ s position))
                 (while routes
                   (calc-routes (car routes) s twice)

@@ -112,7 +112,7 @@
                  (ref opts :argument))
 
            (defn fmt/format-arg (spec argument)
-                 (-> (set! (fmt/parse-spec (tree/dup fmt/format-arg/default) spec) :argument argument)
+                 (-> (set! (fmt/parse-spec (:clone fmt/format-arg/default) spec) :argument argument)
                      fmt/number-format
                      fmt/precision
                      fmt/add-padding
