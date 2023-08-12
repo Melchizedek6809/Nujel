@@ -149,7 +149,7 @@
                                     (throw (list :format-error "Format argument specifier should be either an integer or a symbol" argument (current-lambda))))
 
                           (when (int? (car read-vals))
-                            (when (or (< (car read-vals) 0) (>= (car read-vals) (array/length arguments-used)))
+                            (when (or (< (car read-vals) 0) (>= (car read-vals) (:length arguments-used)))
                               (throw (list :format-error "fmt numbered argument is out of bounds" argument (current-lambda))))
                             (set! arguments-used (car read-vals) #t))
                           (fmt/format-arg format-spec (fmt/arg-sym (car read-vals))))))
@@ -170,7 +170,7 @@
                      (def last-pos (buffer/length format-string))
                      (def arguments-used (-> (array/allocate (length args)) (array/fill! #f)))
 
-                     (def opts {:expr-count (array/length arguments-used)})
+                     (def opts {:expr-count (:length arguments-used)})
                      (doseq (c cuts)
                             (def lit (string/cut format-string (+ (cdr c) 1) last-pos))
                             (when-not (= "" lit) (set! expr-list (cons lit expr-list)))
@@ -180,7 +180,7 @@
                      (when (> last-pos 0)
                        (def lit (string/cut format-string 0 last-pos))
                        (set! expr-list (cons lit expr-list)))
-                     (dotimes (i (array/length arguments-used))
+                     (dotimes (i (:length arguments-used))
                        (when-not (ref arguments-used i)
                                  (throw (list :format-error "fmt expects all arguments to be used" (list format-string (ref args i)) (current-lambda)))))
                      (def expr (if (cdr expr-list)

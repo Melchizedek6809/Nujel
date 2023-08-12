@@ -56,7 +56,7 @@
 
 (defn dot-count (α)
        (def β (ref α :data))
-       (def len (array/length β))
+       (def len (:length β))
        (def ret 0)
        (dotimes (i len ret)
             (when (> (ref β i) 0) (inc! ret))))

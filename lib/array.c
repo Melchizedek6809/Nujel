@@ -7,37 +7,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-static lVal lnfArrLength(lVal a){
-	lVal car = requireArray(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lArray *arr = car.vArray;
-	return lValInt(arr->length);
+static lVal lnmArrayLength(lVal self){
+	return lValInt(self.vArray->length);
 }
 
-static lVal lnfArrLengthSet(lVal a, lVal b){
-	lVal car = requireArray(a);
-	if(unlikely(car.type == ltException)){
-		return car;
+static lVal lnmArrayLengthSet(lVal self, lVal newLength){
+	lVal e = requireNaturalInt(newLength);
+	if(unlikely(e.type == ltException)){
+		return e;
 	}
-	lArray *arr = car.vArray;
-	lVal lenVal = requireNaturalInt(b);
-	if(unlikely(lenVal.type == ltException)){
-		return lenVal;
-	}
-	const int length = lenVal.vInt;
+	const size_t length = e.vInt;
+	lArray *arr = self.vArray;
+
 	lVal *newData = realloc(arr->data,length * sizeof(lVal));
 	if (unlikely(newData == NULL)) {
 		free(newData);
-		return lValException(lSymOOM, "(array/allocate) couldn't allocate its array", b);
+		return lValException(lSymOOM, "(:length Array) couldn't allocate its array", self);
 	}
 	arr->data = newData;
-	if(length > arr->length){
-		memset(&arr->data[arr->length], 0, (((size_t)length) - arr->length) * sizeof(lVal *));
+	if(length > (size_t)arr->length){
+		memset(&arr->data[arr->length], 0, (length - arr->length) * sizeof(lVal));
 	}
 	arr->length = length;
-	return car;
+	return self;
 }
 
 static lVal lnfArrAllocate(lVal a){
@@ -74,8 +66,9 @@ lVal lnfArrNew(lVal v){
 }
 
 void lOperationsArray(lClosure *c){
+	lClass *Array = &lClassList[ltArray];
 	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
 	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
-	lAddNativeFuncV (c,"array/length",   "(array)",             "Return length of ARRAY",                   lnfArrLength, 0);
-	lAddNativeFuncVV(c,"array/length!",  "(array size)",        "Set a new LENGTH for ARRAY",               lnfArrLengthSet, 0);
+	lAddNativeMethodV(Array, lSymS("length"),  "(self)", lnmArrayLength, 0);
+	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
 }

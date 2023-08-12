@@ -48,9 +48,9 @@
 (def write/raw (let*
                  (defn write/raw/array (v port hr?)
                        (port 'block-write "##(")
-                       (dotimes (i (array/length v))
+                       (dotimes (i (:length v))
                          (write/raw (ref v i) port hr?)
-                         (when (< i (- (array/length v) 1))
+                         (when (< i (- (:length v) 1))
                            (port 'block-write " ")))
                        (port 'block-write ")"))
 

@@ -175,9 +175,9 @@
       (set! screen-width (ref s :width))
       (set! screen-height (ref s :height))
       (for-each args load-buffer)
-      (when (zero? (array/length buffers))
+      (when (zero? (:length buffers))
         (new-buffer "*scratch*"))
-      (set-cur-buffer! (ref buffers (dec (array/length buffers))))
+      (set-cur-buffer! (ref buffers (dec (:length buffers))))
       (while #t
         (scroll-into-view)
         (draw-screen)

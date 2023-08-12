@@ -107,7 +107,7 @@
                    (defn disassemble/array (a i literals)
                          "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression"
                          (def ret #nil)
-                         (while (< i (array/length a))
+                         (while (< i (:length a))
                            (cons! (cons i (disassemble/op a i literals)) ret)
                            (set! i (+ i (disassemble/length (ref a i)))))
                          (nreverse ret))

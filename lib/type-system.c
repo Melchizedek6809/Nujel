@@ -60,8 +60,8 @@ static lVal lnmNilMetaGet(lVal self, lVal key){
 }
 
 static void lTypesAddCoreMethods(){
-	lAddNativeMethod(&lClassList[ltNil], lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE, (1 << 1));
-	lAddNativeMethod(&lClassList[ltNil], lSymS("meta"), "(self key)", lnmNilMetaGet, 0, (2 << 1));
+	lAddNativeMethodV(&lClassList[ltNil], lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
+	lAddNativeMethodVV(&lClassList[ltNil], lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
 }
 
 lVal lMethodLookup(const lSymbol *method, lVal self){
