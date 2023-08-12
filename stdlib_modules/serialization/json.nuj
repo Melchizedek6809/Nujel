@@ -6,7 +6,7 @@
 (defn tree->json (v)
       "Converts a tree into a JSON encoded string, you should prefer VAL->JSON"
       (cat "{"
-           (join (map (tree/keys v)
+           (join (map (:keys v)
                       (fn (k)
                         (cat "\"" (keyword->string k) "\": "
                              (val->json (ref v k)))))
@@ -16,7 +16,7 @@
 (defn val->json (v)
       :export-as serialize
       "Return V as a JSON encoded string"
-      (case (type-of v)
+      (case (:type-name v)
             (:nil "null")
             ((:int :float) (string v))
             (:bool (if v "true" "false"))

@@ -12,19 +12,19 @@
        ") " (pad-end (cut path 2 (:length path)) 48)
        (if start (cat " " (blue (pad-start (- (time/milliseconds) start) 8)) "ms") #nil)))
 
-(when (not (tree/has? init/options :only-test-suite))
+(when (not (:has? init/options :only-test-suite))
   (println (purple "First we test the basic functions of the runtime.")))
 (for-each (-> (directory/read-relative "tests/testsuite") sort) test-load)
 (add-builtin-tests)
 
 (def output-passes #f)
-(when (tree/has? init/options :verbose)
+(when (:has? init/options :verbose)
   (set! output-passes #t))
 
 (set! test/testsuite-errors (test-run output-passes))
 (file/test/directory "./stdlib_modules")
 
-(when (tree/has? init/options :only-test-suite)
+(when (:has? init/options :only-test-suite)
   (exit test/testsuite-errors))
 
 (println (green "Great, Now we can do some more complicated and thorough tests."))

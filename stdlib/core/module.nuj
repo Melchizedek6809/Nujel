@@ -21,7 +21,7 @@
 (defn module/qualify-symbol (module-name symbol)
       :cat :modules
       :internal
-      (case (type-of module-name)
+      (case (:type-name module-name)
             (:string (module/qualify-symbol (string->keyword module-name) symbol))
             (:keyword (string->symbol (cat (keyword->symbol module-name) "/" (string symbol))))
             (otherwise (exception "Can't qualify that" module-name))))
@@ -32,7 +32,7 @@
       (def mod (module/load module env))
       (when-not mod (exception "Can't load that module" module))
       (def exports (resolve 'exports mod))
-      (doseq (k (tree/keys exports))
+      (doseq (k (:keys exports))
              (def-in! env
                (if qualify?
                    (module/qualify-symbol module (keyword->symbol k))
@@ -94,7 +94,7 @@
 (defn module/load (name env)
       :cat :modules
       :internal
-      (case (type-of name)
+      (case (:type-name name)
             (:environment name)
             (:string (module/load (module/resolve-string name (resolve '*module-path* env)) env))
             (:keyword (or (module/load/cache name)
@@ -113,7 +113,7 @@
       :cat :modules
       :internal
       (def exports (module/import-all module symbol))
-      (when-not (tree/has? exports symbol)
+      (when-not (:has? exports symbol)
                 (exception :import-error (if (resolves? symbol module)
                                              "That symbol was not exported"
                                              "That symbol does not exist in that module")))

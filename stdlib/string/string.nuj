@@ -35,7 +35,7 @@
       (while (< (:length text) pad-length)
              (set! text (cat padding text)))
       (if (> (:length text) pad-length)
-          (string/cut text (- (:length text) pad-length) (:length text))
+          (:cut text (- (:length text) pad-length) (:length text))
           text))
 
 (defn pad-end (text pad-length padding)
@@ -70,7 +70,7 @@
       (while (< (:length text) pad-length)
              (set! text (cat text padding)))
       (if (> (:length text) pad-length)
-          (string/cut text 0 pad-length)
+          (:cut text 0 pad-length)
           text))
 
 (defn pad-middle (text pad-length padding)
@@ -106,7 +106,7 @@
       (if (> (:length text) pad-length)
           (let ((end-overflow (div/int (- (:length text) pad-length) 2))
                 (start-overflow (- (- (:length text) pad-length) end-overflow)))
-               (string/cut text start-overflow (+ start-overflow pad-length)))
+               (:cut text start-overflow (+ start-overflow pad-length)))
           text))
 
 (defn trim (text)
@@ -133,7 +133,7 @@
       (def end (:length text))
       (while (and (< start end) (whitespace? (ref text start))) (set! start (+ start 1)))
       (while (and (> end 0) (whitespace? (ref text (- end 1)))) (set! end (- end 1)))
-      (string/cut text start end))
+      (:cut text start end))
 
 (defn upper-case (text)
       "Convert text into a version using only capitals or uppercase letters.
@@ -187,9 +187,9 @@
 
 (defn string/round (text decimal-digits)
       "Round the floating point representation in TEXT to have at most DECIMAL-DIGITS after the period"
-      (def pos (last-index-of text "."))
+      (def pos (:last-index-of text "."))
       (if (>= pos 0)
-          (string/cut text 0 (+ pos 1 decimal-digits))
+          (:cut text 0 (+ pos 1 decimal-digits))
           text))
 
 (def split (let*
@@ -198,17 +198,17 @@
                    (def start 0)
                    (def ret #nil)
                    (while (< start slen)
-                     (set! ret (cons (string/cut str start (+ 1 start)) ret))
+                     (set! ret (cons (:cut str start (+ 1 start)) ret))
                      (inc! start))
                    (reverse ret))
 
              (defn split/string (str separator start)
                    (when-not start (set! start 0))
-                   (def pos-found (index-of str separator start))
+                   (def pos-found (:index-of str separator start))
                    (if (>= pos-found 0)
-                       (cons (string/cut str start pos-found)
+                       (cons (:cut str start pos-found)
                              (split/string str separator (+ pos-found (:length separator))))
-                       (cons (string/cut str start (:length str))
+                       (cons (:cut str start (:length str))
                              #nil)))
 
              (defn split (str separator)

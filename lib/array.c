@@ -90,10 +90,10 @@ static lVal lnmArrayToBytecodeArray(lVal self, lVal aLiterals){
 
 void lOperationsArray(lClosure *c){
 	lClass *Array = &lClassList[ltArray];
-	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
-	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
-
 	lAddNativeMethodV(Array, lSymS("length"),  "(self)", lnmArrayLength, 0);
 	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
 	lAddNativeMethodVV(Array, lSymS("bytecode-array"), "(self literals)", lnmArrayToBytecodeArray, 0);
+
+	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
+	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
 }

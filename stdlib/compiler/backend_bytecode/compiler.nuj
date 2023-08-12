@@ -6,7 +6,7 @@
 
 (def bytecompile* (let*
                     (defn bytecompile/literal (source)
-                          (case (type-of source)
+                          (case (:type-name source)
                                 (:int      ($push/int source))
                                 (:nil      ($push/nil))
                                 (:bool     (if source
@@ -17,7 +17,7 @@
                                 (otherwise ($push/val source))))
 
                     (defn bytecompile/quote (source)
-                          (case (type-of source)
+                          (case (:type-name source)
                                 (:nil      ($push/nil))
                                 (:int      ($push/int source))
                                 (otherwise ($push/val source))))
@@ -200,7 +200,7 @@
                           (def op (if (resolves? (car source) env)
                                       (resolve (car source) env)
                                       (car source)))
-                          (case (type-of op)
+                          (case (:type-name op)
                                 ((:lambda :native-function :pair :symbol :keyword)
                                  (case op
                                        (do           (bytecompile/do           source env))

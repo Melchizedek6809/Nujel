@@ -32,7 +32,7 @@
       (def meta {:name name})
       (while body
         (def v (car body))
-        (case (type-of v)
+        (case (:type-name v)
               (:pair (if (= (car v) 'deftest)
                          (set! meta :tests (cons (cdr v) (ref meta :tests)))
                          (set! body #nil)))
@@ -104,7 +104,7 @@
           `(bytecode-eval* (compile* ~expr (current-closure)) (current-closure)))
 
 (defmacro typecheck/only (v t)
-          `(when-not (= (type-of ~v) ~t)
+          `(when-not (= (:type-name ~v) ~t)
                      (throw (list :type-error ~(fmt "Expected a value of type {t}") ~v (current-lambda)))))
 
 (def gensym (let ((gensym/counter 0))

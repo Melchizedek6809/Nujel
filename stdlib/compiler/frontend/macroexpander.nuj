@@ -60,7 +60,7 @@
                           (def op (if (resolves? (car source) env)
                                       (resolve   (car source) env)
                                       (car source)))
-                          (case (type-of op)
+                          (case (:type-name op)
                                 (:nil source)
                                 (:macro (macroexpand* (apply op (cdr source)) env))
                                 (:native-function

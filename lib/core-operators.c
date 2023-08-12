@@ -210,10 +210,6 @@ static lVal lnfRead(lVal a){
 	return lRead(car.vString->data);
 }
 
-static lVal lnfTypeOf(lVal a){
-	return lValKeywordS(getTypeSymbol(a));
-}
-
 static lVal lnfGarbageCollect(){
 	lGarbageCollect();
 	return NIL;
@@ -352,23 +348,16 @@ static lVal lnfStrSym(lVal a){
 	return lValSym(car.vString->data);
 }
 
-/*
-static lVal lnfMethod(lClosure *c, lVal v){
-	(void)c;(void)v;
-	return lValException("reserved", "method calls aren't implemented yet", v);
-}
-*/
-
 void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
 	lAddNativeFuncV(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
-	lAddNativeFuncVVV(c,"def-in!",        "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn, 0);
-	lAddNativeFuncCVV(c,"resolve",        "(sym environment)", "Resolve SYM", lnfResolve, 0);
-	lAddNativeFuncCVV(c,"resolve-or-nil","(sym environment)", "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull, 0);
-	lAddNativeFuncCVV(c,"resolves?",      "(sym environment)", "Check if SYM resolves to a value",           lnfResolvesPred, 0);
+	lAddNativeFuncVVV(c,"def-in!",       "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn, 0);
+	lAddNativeFuncCVV(c,"resolve",       "(sym environment)",   "Resolve SYM", lnfResolve, 0);
+	lAddNativeFuncCVV(c,"resolve-or-nil","(sym environment)",   "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull, 0);
+	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value",           lnfResolvesPred, 0);
 
-	lAddNativeFuncV  (c,"val->id", "(v)",                "Generate some sort of ID value for V, mainly used in [write)", lnfValToId, 0);
+	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in [write)", lnfValToId, 0);
 
 	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
 	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
@@ -404,7 +393,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFunc(c,"garbage-collect",         "()", "Force the garbage collector to run", lnfGarbageCollect, 0);
 	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 
-	lAddNativeFuncV(c,"type-of",         "(α)",     "Return a symbol describing the type of α", lnfTypeOf, NFUNC_PURE);
 	lAddNativeFuncV(c,"int",             "(α)",     "Convert α into an integer number", lnfInt, NFUNC_PURE);
 	lAddNativeFuncV(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
 	lAddNativeFuncV(c,"string",          "(α)",     "Convert α into a printable and readable string", lnfString, NFUNC_PURE);

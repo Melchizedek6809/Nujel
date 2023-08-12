@@ -1,5 +1,5 @@
 ("#{##()\n00090F10FF\n}" (string/write (:bytecode-array [#x0 #x9 #xF #x10 #xFF] [])))
-(:bytecode-array (type-of (:bytecode-array [#x0 #x9 #xF #x10 #xFF] [])))
+(:bytecode-array (:type-name (:bytecode-array [#x0 #x9 #xF #x10 #xFF] [])))
 (#x0 (ref (:array (:bytecode-array [#x0 #x9 #xF #x10 #xFF] [])) 0))
 (0    (bytecode-eval* (:bytecode-array [#x2 #x0 #x1] []) (environment*)))
 (127  (bytecode-eval* (:bytecode-array [#x2 #x7F #x1] []) (environment*)))

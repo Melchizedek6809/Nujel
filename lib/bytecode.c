@@ -42,8 +42,7 @@ static lVal lnmBytecodeArrayLength(lVal self){
 void lOperationsBytecode(lClosure *c){
 	(void)c;
 	lClass *BytecodeArray = &lClassList[ltBytecodeArr];
-
-	lAddNativeMethodV(BytecodeArray, lSymS("array"), "(self)", lnmBytecodeArrayArray, 0);
+	lAddNativeMethodV(BytecodeArray, lSymS("array"),    "(self)", lnmBytecodeArrayArray, 0);
 	lAddNativeMethodV(BytecodeArray, lSymS("literals"), "(self)", lnmBytecodeArrayLiterals, 0);
-	lAddNativeMethodV(BytecodeArray, lSymS("length"), "(self)", lnmBytecodeArrayLength, 0);
+	lAddNativeMethodV(BytecodeArray, lSymS("length"),   "(self)", lnmBytecodeArrayLength, 0);
 }

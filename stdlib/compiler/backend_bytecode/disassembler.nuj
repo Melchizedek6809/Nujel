@@ -123,7 +123,7 @@
                          "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
                          :cat :bytecode
                          :internal
-                         (case (type-of bc)
+                         (case (:type-name bc)
                                ((:lambda :macro) (disassemble/to-string (closure/code bc)))
                                (:bytecode-array  (disassemble/to-string bc))
                                (otherwise (throw (list :type-error "Can't disassemble that" bc (current-lambda))))))))

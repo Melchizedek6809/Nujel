@@ -35,7 +35,7 @@
 (defn hash (data)
       :export
       (when (string? data) (set! data (string->buffer data)))
-      (when (not= (type-of data) :buffer) (exception :type-error "Can only hash buffers or strings"))
+      (when (not= (:type-name data) :buffer) (exception :type-error "Can only hash buffers or strings"))
 
       (def M (let*
                (def cur-len (:length data))

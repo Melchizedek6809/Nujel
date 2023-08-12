@@ -5,7 +5,7 @@
 
 (defn path/ext?! (ext)
       "Return a predicate that checks if a path ends on EXT"
-      (case (type-of ext)
+      (case (:type-name ext)
             (:string (fn (path)
                          (= ext (lower-case (path/extension path)))))
             (:pair (fn (path)
@@ -16,28 +16,28 @@
 
 (defn path/extension (path)
       "Return the extension of PATH"
-      (def last-period (last-index-of path "."))
+      (def last-period (:last-index-of path "."))
       (if (>= last-period 0)
-          (string/cut path (+ 1 last-period) (:length path))
+          (:cut path (+ 1 last-period) (:length path))
           path))
 
 (defn path/without-extension (path)
       "Return PATH, but without the extension part"
-      (def last-period (last-index-of path "."))
+      (def last-period (:last-index-of path "."))
       (if (>= last-period 0)
-          (string/cut path 0 last-period)
+          (:cut path 0 last-period)
           path))
 
 (defn path/dirname (path)
       "Return the directory part of a PATH"
-      (def last-slash (last-index-of path "/"))
+      (def last-slash (:last-index-of path "/"))
       (if (>= last-slash 0)
-          (string/cut path 0 last-slash)
+          (:cut path 0 last-slash)
           ""))
 
 (defn path/basename (path)
       "Return the path without the directory part"
-      (def last-slash (last-index-of path "/"))
+      (def last-slash (:last-index-of path "/"))
       (if (>= last-slash 0)
-          (string/cut path (inc last-slash))
+          (:cut path (inc last-slash))
           path))

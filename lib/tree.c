@@ -169,90 +169,61 @@ lVal lnfTreeNew(lVal v) {
 	return ret;
 }
 
-static lVal lnfTreeGetKeys(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lTreeKeysToList(car.vTree->root);
-}
-
-static lVal lnfTreeGetValues(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lTreeValuesToList(car.vTree->root);
-}
-
-static lVal lnfTreeHas(lVal a, lVal b) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lVal cadr = requireSymbolic(b);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
-	}
-	return lValBool(lTreeRef(car.vTree->root, cadr.vSymbol).type != ltException);
-}
-
 static lVal lnmTreeClone(lVal self) {
 	return lValTree(lTreeDup(self.vTree->root));
-}
-
-static lVal lnfTreeKeyAst(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lTree* tree = car.vTree->root;
-	return tree ? lValKeywordS(tree->key) : NIL;
-}
-
-static lVal lnfTreeValueAst(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lTree* tree = car.vTree->root;
-	return tree ? tree->value : NIL;
-}
-
-static lVal lnfTreeLeftAst(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lTree* tree = car.vTree->root;
-	return (tree && tree->left) ? lValTree(tree->left) : NIL;
-}
-
-static lVal lnfTreeRightAst(lVal a) {
-	lVal car = requireTree(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lTree* tree = car.vTree->root;
-	return (tree && tree->right) ? lValTree(tree->right) : NIL;
 }
 
 static lVal lnmTreeLength(lVal self) {
 	return lValInt(lTreeSize(self.vTree->root));
 }
 
+static lVal lnmTreeKeys(lVal self) {
+	return lTreeKeysToList(self.vTree->root);
+}
+
+static lVal lnmTreeKeyAst(lVal self) {
+	lTree* tree = self.vTree->root;
+	return tree ? lValKeywordS(tree->key) : NIL;
+}
+
+static lVal lnmTreeValueAst(lVal self) {
+	lTree* tree = self.vTree->root;
+	return tree ? tree->value : NIL;
+}
+
+static lVal lnmTreeLeftAst(lVal self) {
+	lTree* tree = self.vTree->root;
+	return (tree && tree->left) ? lValTree(tree->left) : NIL;
+}
+
+static lVal lnmTreeRightAst(lVal self) {
+	lTree* tree = self.vTree->root;
+	return (tree && tree->right) ? lValTree(tree->right) : NIL;
+}
+
+static lVal lnmTreeValues(lVal self) {
+	return lTreeValuesToList(self.vTree->root);
+}
+
+static lVal lnmTreeHas(lVal self, lVal key) {
+	lVal cadr = requireSymbolic(key);
+	if(unlikely(cadr.type == ltException)){
+		return cadr;
+	}
+	return lValBool(lTreeRef(self.vTree->root, cadr.vSymbol).type != ltException);
+}
+
 void lOperationsTree(lClosure* c) {
 	lClass *Tree = &lClassList[ltTree];
-	lAddNativeMethodV(Tree, lSymS("length"), "(self)", lnmTreeLength, NFUNC_PURE);
-	lAddNativeMethodV(Tree, lSymS("clone"), "(self)", lnmTreeClone, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("length"), "(self)", lnmTreeLength, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("clone"),  "(self)", lnmTreeClone, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("values"), "(self)", lnmTreeValues, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("keys"),   "(self)", lnmTreeKeys, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("key*"),   "(self)", lnmTreeKeyAst, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("value*"), "(self)", lnmTreeValueAst, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("left*"),  "(self)", lnmTreeLeftAst, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("right*"), "(self)", lnmTreeRightAst, NFUNC_PURE);
+	lAddNativeMethodVV(Tree, lSymS("has?"),   "(self key)", lnmTreeHas, NFUNC_PURE);
 
-	lAddNativeFuncR (c, "tree/new",    "plist",          "Return a new tree", lnfTreeNew, 0);
-	lAddNativeFuncV (c, "tree/keys",   "(tree)",         "Return each key of TREE in a list", lnfTreeGetKeys, 0);
-	lAddNativeFuncV (c, "tree/values", "(tree)",         "Return each value of TREE in a list", lnfTreeGetValues, 0);
-	lAddNativeFuncVV(c, "tree/has?",   "(tree sym)",     "Return #t if TREE contains a value for SYM", lnfTreeHas, 0);
-
-	lAddNativeFuncV(c, "tree/key*",   "(tree)", "Low-level: return the key for TREE segment", lnfTreeKeyAst, 0);
-	lAddNativeFuncV(c, "tree/value*", "(tree)", "Low-level: return the value for TREE segment", lnfTreeValueAst, 0);
-	lAddNativeFuncV(c, "tree/left*",  "(tree)", "Low-level: return the left ref for TREE segment", lnfTreeLeftAst, 0);
-	lAddNativeFuncV(c, "tree/right*", "(tree)", "Low-level: return the right ref for TREE segment", lnfTreeRightAst, 0);
+	lAddNativeFuncR(c, "tree/new",    "plist",  "Return a new tree", lnfTreeNew, 0);
 }

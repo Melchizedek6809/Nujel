@@ -4,7 +4,7 @@
       (pad-start (int->string/binary (read/single (cat "#x" s))) 4 "0"))
 
 (defn bits/read-value (s offset len)
-      (read/single (cat "#b" (string/cut s offset (+ offset len)))))
+      (read/single (cat "#b" (:cut s offset (+ offset len)))))
 
 (defn bits/mul vals
       (reduce vals * 1))
@@ -57,10 +57,10 @@
       (def off offset)
       (while (= (ref s off) #\1)
 	     (inc! off)
-	     (set! parts (cons (string/cut s off (+ 4 off)) parts))
+	     (set! parts (cons (:cut s off (+ 4 off)) parts))
 	     (+= off 4))
       (inc! off)
-      (set! parts (cons (string/cut s off (+ 4 off)) parts))
+      (set! parts (cons (:cut s off (+ 4 off)) parts))
       (inc! off 4)
       (cons off (set! p :value (read/single (cat "#b" (join (nreverse parts)))))))
 

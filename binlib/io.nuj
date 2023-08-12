@@ -24,11 +24,11 @@
        "Evaluate a Nujel source file in the current context"
        (def mod-name (module/resolve-string (cat (path/without-extension path)) (path/working-directory)))
        (def mod (module/load mod-name))
-       (when-not (= :environment (type-of mod))
+       (when-not (= :environment (:type-name mod))
                  (return mod))
        (def exports (resolve 'exports mod))
        (when-not exports (exception (fmt "Couldn't load {path} as a module since it has no exports")))
-       (when (tree/has? exports :main)
+       (when (:has? exports :main)
          ((ref exports :main) args)))
 
 (defn file/compile (path environment)
@@ -41,7 +41,7 @@
 
 (defn file/compile/module (path environment base-dir)
       "Compile a Nujel source file into optimized object code"
-      (def module-name (string->keyword (path/without-extension (string/cut path (:length base-dir)))))
+      (def module-name (string->keyword (path/without-extension (:cut path (:length base-dir)))))
       (def source `(defmodule/defer ~module-name (def *module* ~module-name) ~@(read (file/read path))))
       (def object-code (compile* source (or environment (environment*))))
       (file/write (if object-code (string/write object-code) "")
@@ -50,9 +50,9 @@
 
 (defn file/compile/argv ()
       (def path (car (last-pair init/args)))
-      (def module (index-of path "_modules/"))
+      (def module (:index-of path "_modules/"))
       (if (>= module 0)
-          (file/compile/module path #nil (string/cut path 0 (+ module 9)))
+          (file/compile/module path #nil (:cut path 0 (+ module 9)))
           (file/compile path))
       (exit 0))
 
@@ -67,9 +67,9 @@
 
 (defn file/test/module (path base-dir)
       "Test a module by running all contained tests"
-      (def rel-path (string/cut path (:length base-dir)))
+      (def rel-path (:cut path (:length base-dir)))
       (when (= (ref rel-path 0) #\/)
-            (set! rel-path (string/cut rel-path 1)))
+            (set! rel-path (:cut rel-path 1)))
       (def module-name (string->keyword (path/without-extension rel-path)))
       (import (blue) :ansi)
       (import (init! finish!) :test)
@@ -221,7 +221,7 @@
 (defn module/loader/filesystem (name)
       (def name-string (keyword->string name))
       (when-not (= (ref name-string 0) #\/) (return #nil)) ; Paths have to start with a /
-      (when (= System/OS 'Windows) (set! name-string (string/cut name-string 1)))
+      (when (= System/OS 'Windows) (set! name-string (:cut name-string 1)))
       (def module-path (fmt "{}.nuj" name-string))
       (def source (file/read module-path))
       (when-not source (return #nil))

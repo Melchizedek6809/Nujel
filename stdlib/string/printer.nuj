@@ -73,14 +73,14 @@
 
                  (defn write/raw/tree/rec (v port hr? always-space?)
                        (when (or (not v)
-                                 (not (tree/key* v)))
+                                 (not (:key* v)))
                          (return always-space?))
-                       (when (write/raw/tree/rec (tree/left* v) port hr? always-space?)
+                       (when (write/raw/tree/rec (:left* v) port hr? always-space?)
                          (port 'block-write " "))
-                       (port 'block-write (keyword->string (tree/key* v)))
+                       (port 'block-write (keyword->string (:key* v)))
                        (port 'block-write ": ")
-                       (write/raw (tree/value* v) port hr?)
-                       (write/raw/tree/rec (tree/right* v) port hr? #t))
+                       (write/raw (:value* v) port hr?)
+                       (write/raw/tree/rec (:right* v) port hr? #t))
 
                  (defn write/raw/tree (v port hr?)
                        (port 'block-write "#@(")
@@ -127,7 +127,7 @@
                        (port 'block-write "\""))
 
                  (defn write/raw (v port hr?)
-                       (case (type-of v)
+                       (case (:type-name v)
                              (:nil             (when-not hr? (port 'block-write "#nil")))
                              (:bool            (port 'block-write (if v "#t" "#f")))
                              (:environment     (port 'write "#<environment " (int->string/hex (val->id v)) ">"))
