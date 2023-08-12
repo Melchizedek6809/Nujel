@@ -21,12 +21,6 @@
             (:pair   (list/reduce  l f α))
             (otherwise (exception :type-error "You can only reduce collections" l ))))
 
-(defn length (α)
-      "Returns the length of collection α"
-      (case (type-of α)
-            (:pair   (list/length   α))
-            (otherwise (:length  α))))
-
 (defn map (l f)
       "Runs f over every item in collection l and returns the resulting list"
       (case (type-of l)

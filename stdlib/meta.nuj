@@ -10,7 +10,7 @@
             (if (= c root-closure)
                 (fmt "{i}# <root environment>")
                 (do (def data (closure/data c))
-                    (def l (length data))
+                    (def l (:length data))
                   (cat (int (or i 0)) "# "
                        (string/write c)
                        " - "

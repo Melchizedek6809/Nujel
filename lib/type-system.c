@@ -64,11 +64,26 @@ static lVal lnmNilLength(lVal self){
 	return lValInt(0);
 }
 
+static lVal lnmPairLength(lVal self){
+	lVal l = self;
+	int i = 0;
+	for(; l.type == ltPair; l = l.vList->cdr){
+		i++;
+	}
+	if(unlikely(l.type != ltNil)){
+		i++;
+	}
+	return lValInt(i);
+}
+
 static void lTypesAddCoreMethods(){
 	lClass *Nil = &lClassList[ltNil];
 	lAddNativeMethodV (Nil, lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
 	lAddNativeMethodV (Nil, lSymS("length"), "(self)", lnmNilLength, 0);
 	lAddNativeMethodVV(Nil, lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
+
+	lClass *Pair = &lClassList[ltPair];
+	lAddNativeMethodV (Pair, lSymS("length"), "(self)", lnmPairLength, NFUNC_PURE);
 }
 
 lVal lMethodLookup(const lSymbol *method, lVal self){

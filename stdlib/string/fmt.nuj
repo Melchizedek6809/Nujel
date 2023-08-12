@@ -168,7 +168,7 @@
                      (when (int? (car cuts)) (throw (list :format-error "fmt placeholders can't be nested" format-string (current-lambda))))
                      (def expr-list #nil)
                      (def last-pos (:length format-string))
-                     (def arguments-used (-> (array/allocate (length args)) (array/fill! #f)))
+                     (def arguments-used (-> (array/allocate (:length args)) (array/fill! #f)))
 
                      (def opts {:expr-count (:length arguments-used)})
                      (doseq (c cuts)

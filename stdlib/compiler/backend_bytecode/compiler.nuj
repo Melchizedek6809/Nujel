@@ -40,7 +40,7 @@
                                 ($def/val (cadr source))))
 
                     (defn bytecompile/set! (source env)
-                          (case (length (cdr source))
+                          (case (:length (cdr source))
                                 (2 (when (not (symbol? (cadr source)))
                                      (throw (list :type-error
                                                   "(set!) needs a symbol name and a value as arguments" #nil env)))
@@ -85,7 +85,7 @@
                           (:meta op :inline))
 
                     (defn bytecompile/procedure/inline (op args env)
-                          (def arg-count (length args))
+                          (def arg-count (:length args))
                           (when (> arg-count 1)
                             (throw (list :compiler-error "For now only monadic functions can be inlined" op env)))
                           (def form (macroexpand (cons 'do (:meta op :source)) env))
@@ -105,7 +105,7 @@
                                      (not (pair? op))
                                      (not (keyword? op)))
                             (exception :type-error "Can't apply to that" op))
-                          (def arg-count (length args))
+                          (def arg-count (:length args))
                           (def optimized ($apply/optimized arg-count op))
                           (if optimized
                               (list (when args (bytecompile/procedure/arg args))
@@ -141,7 +141,7 @@
                                 (list :label label-end)))
 
                     (defn bytecompile/fn* (source env)
-                          (def arg-count (length (cdr source)))
+                          (def arg-count (:length (cdr source)))
                           (when (not= arg-count 5) (exception :arity-error "(fn*) needs exactly 4 arguments" source))
                           (cdr! source)
                           (list (bytecompile* (car source) env)
@@ -150,7 +150,7 @@
                                 ($fn/new)))
 
                     (defn bytecompile/macro* (source env)
-                          (def arg-count (length (cdr source)))
+                          (def arg-count (:length (cdr source)))
                           (when (not= arg-count 5) (exception :arity-error "(macro*) needs exactly 4 arguments" source))
                           (cdr! source)
                           (list (bytecompile* (car source) env)
@@ -183,7 +183,7 @@
                                 (list :label end-sym)))
 
                     (defn bytecompile/apply (source env)
-                          (def arg-count (length (cdr source)))
+                          (def arg-count (:length (cdr source)))
                           (cond ((= arg-count 1)
                                  (list (bytecompile* (cadr source) env)
                                        ($list 0)

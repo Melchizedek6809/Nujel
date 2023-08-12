@@ -41,7 +41,7 @@
 
 (defn file/compile/module (path environment base-dir)
       "Compile a Nujel source file into optimized object code"
-      (def module-name (string->keyword (path/without-extension (string/cut path (length base-dir)))))
+      (def module-name (string->keyword (path/without-extension (string/cut path (:length base-dir)))))
       (def source `(defmodule/defer ~module-name (def *module* ~module-name) ~@(read (file/read path))))
       (def object-code (compile* source (or environment (environment*))))
       (file/write (if object-code (string/write object-code) "")
@@ -67,7 +67,7 @@
 
 (defn file/test/module (path base-dir)
       "Test a module by running all contained tests"
-      (def rel-path (string/cut path (length base-dir)))
+      (def rel-path (string/cut path (:length base-dir)))
       (when (= (ref rel-path 0) #\/)
             (set! rel-path (string/cut rel-path 1)))
       (def module-name (string->keyword (path/without-extension rel-path)))

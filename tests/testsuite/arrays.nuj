@@ -31,7 +31,7 @@
 ([1 2 3] (def testerle [1 2 3]) testerle)
 (:type-error (try car (def testerle [1 2 3]) (ref testerle #t)))
 (1 (ref [1 2 3] 0))
-(2 (def arr [1 2 3]) (:length! arr 2) (length arr))
+(2 (def arr [1 2 3]) (:length! arr 2) (:length arr))
 (3 (def arr [1 2 3]) (:length! arr 2) (reduce arr + 0))
 ("##(2 4)" (string/write (filter [1 2 3 4] even?)))
 ("##(0 0 0)" (string/write (-> (array/allocate 3) (array/fill! 0))))

@@ -9,7 +9,7 @@
 (defn prog-str (fun-color i path start)
   (cat "(" (fun-color (pad-start i 2))
        "/" (pad-start test/count 2)
-       ") " (pad-end (cut path 2 (length path)) 48)
+       ") " (pad-end (cut path 2 (:length path)) 48)
        (if start (cat " " (blue (pad-start (- (time/milliseconds) start) 8)) "ms") #nil)))
 
 (when (not (tree/has? init/options :only-test-suite))
@@ -56,7 +56,7 @@
 					   (when test/ridiculous (directory/read-relative "./tests/ridiculous")))
                                    (path/ext?! "nuj"))))
 
-(def test/count (length test-paths))
+(def test/count (:length test-paths))
 (for-each test-paths file/test)
 (newline)
 (def dur (- (time/milliseconds) test/start))

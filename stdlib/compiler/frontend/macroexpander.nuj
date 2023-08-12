@@ -49,7 +49,7 @@
                               (list op (macroexpand* (car source) env))))
 
                     (defn macroexpand-set (source env)
-                          (if (= 3 (length (cdr source)))
+                          (if (= 3 (:length (cdr source)))
                               (macroexpand-form source env set! 3 #f #b000)
                               (macroexpand-form source env set! 2 #f #b001)))
 

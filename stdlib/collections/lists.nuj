@@ -55,12 +55,6 @@
       (doseq (e l ret)
              (set! ret (cons e ret))))
 
-(defn list/length (l)
-      "Returns the length of list l"
-      (def ret 0)
-      (doseq (e l ret)
-             (inc! ret)))
-
 (defn list/filter (l p)
       "Runs predicate p over every item in list l and returns a list consiting solely of items where p is true"
       (def ret #nil)
