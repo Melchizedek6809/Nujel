@@ -394,7 +394,7 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncVV(c,"<",        "(α β)", "Return true if α is less than β",             lnfLess, NFUNC_PURE);
 	lAddNativeFuncVV(c,"<=",       "(α β)", "Return true if α is less or equal to β",      lnfLessEqual, NFUNC_PURE);
-	lAddNativeFuncVV(c,"= ==",     "(α β)", "Return true if α is equal to β",              lnfEqual, NFUNC_PURE);
+	lAddNativeFuncVV(c,"=",        "(α β)", "Return true if α is equal to β",              lnfEqual, NFUNC_PURE);
 	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β",         lnfUnequal, NFUNC_PURE);
 	lAddNativeFuncVV(c,">=",       "(α β)", "Return true if α is greater or equal than β", lnfGreaterEqual, NFUNC_PURE);
 	lAddNativeFuncVV(c,">",        "(α β)", "Return true if α is greater than β",          lnfGreater, NFUNC_PURE);

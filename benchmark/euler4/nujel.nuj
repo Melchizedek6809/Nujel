@@ -10,7 +10,7 @@
       ret)
 
 (defn palindrome? (a)
-      (== a (reverse-num a)))
+      (= a (reverse-num a)))
 
 (defn bench-run ()
   (def max-val 0)

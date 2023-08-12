@@ -31,7 +31,7 @@
 (:unbound-variable (try car (eval (read "asd"))))
 ('asd 'asd)
 ('asd (string->symbol "asd"))
-(#t (== 'asd (string->symbol "asd")))
+(#t (= 'asd (string->symbol "asd")))
 
 (:asd (eval (read/single ":asd")))
 (:asd (eval (read/single "asd:")))

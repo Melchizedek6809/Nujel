@@ -88,7 +88,7 @@
                        (port 'block-write ")"))
 
                  (defn write/raw/pair (v port hr?)
-                       (when (and (== 'quote (car v))
+                       (when (and (= 'quote (car v))
                                   (nil? (cddr v))
                                   (pair? (cdr v)))
                          (port 'block-write "'")

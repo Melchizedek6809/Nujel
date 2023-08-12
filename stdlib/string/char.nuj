@@ -19,8 +19,8 @@
 
 (defn whitespace? (c)
       "Return #t if C is a whitespace char"
-      (or (== c #x20) ; Space
-          (== c #x09) ; Tabl
+      (or (= c #x20) ; Space
+          (= c #x09) ; Tabl
           (and (>= c #x0a)
                (<= c #x0d))))
 

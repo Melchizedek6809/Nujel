@@ -33,7 +33,7 @@
       (while body
         (def v (car body))
         (case (type-of v)
-              (:pair (if (== (car v) 'deftest)
+              (:pair (if (= (car v) 'deftest)
                          (set! meta :tests (cons (cdr v) (ref meta :tests)))
                          (set! body #nil)))
               (:string (set! meta :documentation (cat (string (ref meta :documentation))

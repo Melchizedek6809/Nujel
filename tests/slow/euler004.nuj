@@ -9,7 +9,7 @@
       (return ret))
 
 (defn palindrome? (a)
-      (== a (reverse-num a)))
+      (= a (reverse-num a)))
 
 (def max 0)
 (dotimes (a 1000)

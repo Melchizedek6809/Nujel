@@ -43,7 +43,7 @@
 (defn test-success (res-should res-is expr)
       "Should be called after a test has finished successfully"
       (when print-passes
-            (efmtln "{} == {}\r\n{}\r\n\r\n"
+            (efmtln "{} = {}\r\n{}\r\n\r\n"
                     (ansi/green (string/write res-is))
                     (ansi/green (string/write res-should))
                     (string/write expr)))
@@ -94,7 +94,7 @@
 (defn load-file (filename)
       :export
       (doseq (t (read (slurp filename)) test-list)
-             (when (== (car t) 'test/add)
+             (when (= (car t) 'test/add)
                (cdr! t))
              (add* (eval (car t))
                    (cons 'do (cdr t)))))

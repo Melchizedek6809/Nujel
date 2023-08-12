@@ -63,12 +63,12 @@
                         `(do (require ~module-name) ~@(cddr expr)))))
 
 (defn file/test/valid-test-form? (form)
-      (== (car form) 'deftest))
+      (= (car form) 'deftest))
 
 (defn file/test/module (path base-dir)
       "Test a module by running all contained tests"
       (def rel-path (string/cut path (length base-dir)))
-      (when (== (ref rel-path 0) #\/)
+      (when (= (ref rel-path 0) #\/)
             (set! rel-path (string/cut rel-path 1)))
       (def module-name (string->keyword (path/without-extension rel-path)))
       (import (blue) :ansi)
@@ -191,9 +191,9 @@
              (while (>= i (buffer/length buf))
                     (buffer/length! (+ 128 (buffer/length buf))))
              (set! c (port 'char-read))
-             (when (== c :end-of-file)
+             (when (= c :end-of-file)
                    (return (if (zero? i) #nil i)))
-             (when (== c #\lf)
+             (when (= c #\lf)
                    (return i))
              (set! view i c)
              (set! i (inc i))))
@@ -220,8 +220,8 @@
 
 (defn module/loader/filesystem (name)
       (def name-string (keyword->string name))
-      (when-not (== (ref name-string 0) #\/) (return #nil)) ; Paths have to start with a /
-      (when (== System/OS 'Windows) (set! name-string (string/cut name-string 1)))
+      (when-not (= (ref name-string 0) #\/) (return #nil)) ; Paths have to start with a /
+      (when (= System/OS 'Windows) (set! name-string (string/cut name-string 1)))
       (def module-path (fmt "{}.nuj" name-string))
       (def source (file/read module-path))
       (when-not source (return #nil))

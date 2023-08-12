@@ -48,7 +48,7 @@ static lVal lnfArrAllocate(lVal a){
 	const int len = lenV.vInt;
 	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
 	if(unlikely(len && (r.vArray->data == NULL))){
-		return lValException(lSymOOM, "(array/allocate] couldn't allocate its array", a);
+		return lValException(lSymOOM, "(array/allocate) couldn't allocate its array", a);
 	}
 	return r;
 }

@@ -75,10 +75,10 @@
       :cat :modules
       :internal
       (cond ((not parts) ret)
-            ((or (== "" (car parts))
-                 (== "." (car parts)))
+            ((or (= "" (car parts))
+                 (= "." (car parts)))
              (module/resolve-string/join (cdr parts) ret))
-            ((== ".." (car parts))
+            ((= ".." (car parts))
              (when-not (cadr parts)
                        (exception "Invalid path" parts))
              (module/resolve-string/join (cddr parts) ret))
