@@ -136,7 +136,7 @@
                      (exception :benchmark-error "Benchmark returned non-zero exit code" (cons filename ret)))
            (when-not (>= (:index-of (cdr ret) (get-result testcase)) 0)
                      (exception :benchmark-error "Benchmark returned wrong result" (cons filename ret)))
-           (set! measurements (tree/dup (read/single (file/read result-file))))
+           (set! measurements (:clone (read/single (file/read result-file))))
            (set! measurements :stdout (cdr ret))
            (file/remove result-file))
       (when-not measurements (return #nil))
