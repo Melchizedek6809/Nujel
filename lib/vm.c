@@ -840,6 +840,15 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopApplyCollection) {
 		lVal cargs = ctx.valueStack[--ctx.sp];
 		lVal fun = ctx.valueStack[--ctx.sp];
+		if(unlikely(fun.type == ltKeyword)){
+			lVal self = lCar(cargs);
+			lVal nfun = lMethodLookup(fun.vSymbol, self);
+			if(unlikely(nfun.type == ltException)){
+				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", fun);
+				goto throwException;
+			}
+			fun = nfun;
+		}
 		switch(fun.type){
 		case ltMacro:
 		case ltLambda:
