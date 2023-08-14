@@ -63,6 +63,13 @@ const validAverageTestcases = {
 	"euler4": true,
 };
 
+const validHostnames = {
+	"mirai": true,
+	"yuno": true,
+	"asuka": true,
+	"lain": true
+}
+
 const getData = (key, filterP, name) => {
 	let newestDate = {};
 	const data = {};
@@ -83,6 +90,7 @@ const getData = (key, filterP, name) => {
 			if(!filterP(entry)){continue;}
 			if(!validAverageTestcases[entry.testcase]){continue;}
 			const runtime = getRuntimeName(entry);
+			if(!validHostnames[entry.hostname]){continue;}
 			if(entry.date != newestDate[runtime]){continue;}
 			if(!data[runtime]){
 				data[runtime] = {
@@ -161,6 +169,7 @@ const getSingleViews = key => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(entry.language != "nujel"){continue;}
+			if(!validHostnames[entry.hostname]){continue;}
 			const k = `${entry.hostname}`;
 			if(!data[k]){data[k]={};}
 			const d = entry.date;
@@ -190,13 +199,16 @@ const getSingleViews = key => {
 
 const getSingleViewsHost = (key,host) => {
 	const data = {};
+
 	for(const run of reportData){
 		for(const entry of run){
 			if(!entry){continue;}
 			if(entry.language != "nujel"){continue;}
 			if(entry.hostname !== host){continue;}
 			const k = `${entry.testcase}-${entry.hostname}-${entry.architecture}`;
-			if(!data[k]){data[k]={};}
+			if(!data[k]){
+				data[k]={};
+			}
 			const d = entry.date;
 			if(!data[k][d]){
 				data[k][d] = {
@@ -208,6 +220,7 @@ const getSingleViewsHost = (key,host) => {
 			data[k][d].count += 1;
 		}
 	}
+
 	const retArr = [];
 	for(const name in data){
 		const ret = {x:[],y:[],type: 'line', name};
