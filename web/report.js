@@ -54,6 +54,15 @@ const getRuntimeName = entry => {
 	return entry.runtime.split(' ')[0];
 };
 
+
+// We can only compare testcases that have benchmarks written in all languages compared
+const validAverageTestcases = {
+	"hello": true,
+	"for": true,
+	"euler1": true,
+	"euler4": true,
+};
+
 const getData = (key, filterP, name) => {
 	let newestDate = {};
 	const data = {};
@@ -61,6 +70,7 @@ const getData = (key, filterP, name) => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(!filterP(entry)){continue;}
+			if(!validAverageTestcases[entry.testcase]){continue;}
 			const runtime = getRuntimeName(entry);
 			if(!newestDate[runtime] || (entry.date > newestDate[runtime])){
 				newestDate[runtime] = entry.date;
@@ -71,6 +81,7 @@ const getData = (key, filterP, name) => {
 		for(const entry of run){
 			if(!entry){continue;}
 			if(!filterP(entry)){continue;}
+			if(!validAverageTestcases[entry.testcase]){continue;}
 			const runtime = getRuntimeName(entry);
 			if(entry.date != newestDate[runtime]){continue;}
 			if(!data[runtime]){
@@ -94,25 +105,25 @@ const getData = (key, filterP, name) => {
 };
 
 const goodCatFilter = v => {
-    if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "common-lisp": true, "javascript":true, "zuo":true}[v.language])){return false;}
-    if(v.language == 'scheme'){
+	if(!({"scheme": true, "mal": true, "franz-lisp": true, "newlisp": true, "common-lisp": true, "javascript":true, "zuo":true}[v.language])){return false;}
+	if(v.language == 'scheme'){
 	if(!({"chibi-scheme -q":true, "s9": true, "tinyscheme": true,"mit-scheme-script": true,"scheme48": true, "gosh": true}[v.runtime])){return false;}
-    }
-    if(v.language == 'common-lisp'){
-        if(!({"ecl --shell": true}[v.runtime])){return false;}
-    }
-    if(v.language == 'javascript'){
-        if(!({"mujs": true}[v.runtime])){return false;}
-    }
-    return true;
+	}
+	if(v.language == 'common-lisp'){
+	if(!({"ecl --shell": true}[v.runtime])){return false;}
+	}
+	if(v.language == 'javascript'){
+	if(!({"mujs": true}[v.runtime])){return false;}
+	}
+	return true;
 };
 
 const uglyCatFilter = v => {
-    if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true, "racket": true, "janet": true, "berry": true}[v.language])){return false;}
+	if(!({"scheme": true, "lua": true, "c": true, "common-lisp": true, "julia": true, "javascript": true, "python": true, "php": true, "racket": true, "janet": true, "berry": true}[v.language])){return false;}
 	if(v.language == 'scheme'){
 		if((v.runtime != 'chez --script') && (v.runtime != 's7')){return false;}
 	}
-        if(v.language == 'racket'){
+	if(v.language == 'racket'){
 		return true;
 	}
 	if(v.language == 'common-lisp'){
@@ -127,22 +138,22 @@ const uglyCatFilter = v => {
 	return true;
 };
 
-const getHostFilter =     (λ, hostname) => v => λ(v) && (v.hostname == hostname);
+const getHostFilter =	  (λ, hostname) => v => λ(v) && (v.hostname == hostname);
 const getTestcaseFilter = (λ, testcase) => v => λ(v) && testcase ? (v.testcase == testcase) : true;
 const getCatFilter = (λ, cat) => {
 	switch(cat){
-		case "good": return v => λ(v) && ((v.language == 'nujel') ||    goodCatFilter(v));
+		case "good": return v => λ(v) && ((v.language == 'nujel') ||	goodCatFilter(v));
 		case "bad":  return v => λ(v) && ((v.language == 'nujel') || (!(goodCatFilter(v) || uglyCatFilter(v))));
-		case "ugly": return v => λ(v) && ((v.language == 'nujel') ||                        uglyCatFilter(v));
+		case "ugly": return v => λ(v) && ((v.language == 'nujel') ||			    uglyCatFilter(v));
 		default:     return λ;
 	}
-}
+};
 
 const getViews = (key, viewName, cat, hostname, testcase) => {
 	const data = [];
 	data.push(getData(key, getCatFilter(getHostFilter(getTestcaseFilter(() => true, testcase), hostname), cat), String(viewName)));
 	return data;
-}
+};
 
 const getSingleViews = key => {
 	const data = {};
@@ -272,23 +283,6 @@ const analyzeData = () => {
 			}
 		}
 	});
-
-	/*
-	Plotly.newPlot("report-memory-time", {
-		data: getSingleViews("max-resident"),
-		layout: {
-			title: "Nujel Maximum resident set during benchmark run (less is better)",
-			xaxis: {
-				title: "Date"
-			},
-			yaxis: {
-				title: "Bytes",
-				type: options.log ? 'log' : null,
-				autorange: true
-			}
-		}
-	});
-	*/
 
 	let to = 0;
 	for(const barReport of document.querySelectorAll(".bar-report")){
