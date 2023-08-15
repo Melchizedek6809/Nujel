@@ -93,7 +93,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	#define vmcase(label)	l##label:
 	#define vmbreak	vmdispatch(*ip++);
 
-	static const void *const vmJumptable[256] = {
+	static const void *const vmJumptable[] = {
 		&&llopNOP,
 		&&llopRet,
 		&&llopIntByte,
@@ -197,7 +197,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt += b.vInt;
+				ctx.valueStack[ctx.sp-1].vInt = ctx.valueStack[ctx.sp-1].vInt + b.vInt;
 			} else if(likely(b.type == ltFloat)){
 				ctx.valueStack[ctx.sp-1] = lValFloat(b.vFloat + a.vInt);
 			} else if(b.type != ltNil){
@@ -206,9 +206,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1].vFloat += b.vFloat;
+				ctx.valueStack[ctx.sp-1].vFloat = ctx.valueStack[ctx.sp-1].vFloat + b.vFloat;
 			} else if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vFloat += b.vInt;
+				ctx.valueStack[ctx.sp-1].vFloat = ctx.valueStack[ctx.sp-1].vFloat + b.vInt;
 			} else if(b.type != ltNil) {
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;
@@ -387,61 +387,36 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			goto throwException;
 		}
 		vmbreak; }
-	vmcase(lopBitShiftLeft) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.sp--;
-		if(likely((a.type == ltInt) && (b.type == ltInt))){
-			ctx.valueStack[ctx.sp-1].vInt = a.vInt << b.vInt;
-		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
-		}
-		vmbreak; }
-	vmcase(lopBitShiftRight) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.sp--;
-		if(likely((a.type == ltInt) && (b.type == ltInt))){
-			ctx.valueStack[ctx.sp-1].vInt = a.vInt >> b.vInt;
-		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
-		}
-		vmbreak; }
-	vmcase(lopBitAnd) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.sp--;
-		if(likely((a.type == ltInt) && (b.type == ltInt))){
-			ctx.valueStack[ctx.sp-1].vInt = a.vInt & b.vInt;
-		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
-		}
-		vmbreak; }
-	vmcase(lopBitOr) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.sp--;
-		if(likely((a.type == ltInt) && (b.type == ltInt))){
-			ctx.valueStack[ctx.sp-1].vInt = a.vInt | b.vInt;
-		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
-		}
-		vmbreak; }
-	vmcase(lopBitXor) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.sp--;
-		if(likely((a.type == ltInt) && (b.type == ltInt))){
-			ctx.valueStack[ctx.sp-1].vInt = a.vInt ^ b.vInt;
-		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
-		}
-		vmbreak; }
+
+#define vmBinaryIntegerOp(OP) do{\
+	const lVal a = ctx.valueStack[ctx.sp-2];\
+	const lVal b = ctx.valueStack[ctx.sp-1];\
+	ctx.sp--;\
+	if(likely((a.type == ltInt) && (b.type == ltInt))){\
+		ctx.valueStack[ctx.sp-1].vInt = a.vInt OP b.vInt;\
+	} else {\
+		exceptionThrownValue = lValExceptionNonNumeric(b);\
+		goto throwException;\
+	}\
+	} while(0)
+
+	vmcase(lopBitShiftLeft)
+		vmBinaryIntegerOp(<<);
+		vmbreak;
+	vmcase(lopBitShiftRight)
+		vmBinaryIntegerOp(>>);
+		vmbreak;
+	vmcase(lopBitAnd)
+		vmBinaryIntegerOp(&);
+		vmbreak;
+	vmcase(lopBitOr)
+		vmBinaryIntegerOp(|);
+		vmbreak;
+	vmcase(lopBitXor)
+		vmBinaryIntegerOp(^);
+		vmbreak;
+
+
 	vmcase(lopBitNot)
 		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
 			ctx.valueStack[ctx.sp-1].vInt = ~ctx.valueStack[ctx.sp-1].vInt;
@@ -458,36 +433,31 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
 		ctx.sp--;
 		vmbreak;
-	vmcase(lopLessPred) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) < 0);
-		ctx.sp--;
-		vmbreak; }
-	vmcase(lopLessEqPred) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) <= 0);
-		ctx.sp--;
-		vmbreak; }
-	vmcase(lopEqualPred) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValEqual(a, b));
-		ctx.sp--;
-		vmbreak; }
-	vmcase(lopGreaterEqPred) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a,b) >= 0);
-		ctx.sp--;
-		vmbreak; }
-	vmcase(lopGreaterPred) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
-		ctx.valueStack[ctx.sp-2] = lValBool(lValGreater(a, b) > 0);
-		ctx.sp--;
-		vmbreak; }
+
+#define vmBinaryPredicateOp(OP) do{\
+	const lVal a = ctx.valueStack[ctx.sp-2];\
+	const lVal b = ctx.valueStack[ctx.sp-1];\
+	ctx.sp--;\
+	ctx.valueStack[ctx.sp-1] = lValBool(OP);\
+	} while(0)
+
+	vmcase(lopLessPred)
+		vmBinaryPredicateOp(lValGreater(a, b) < 0);
+		vmbreak;
+	vmcase(lopLessEqPred)
+		vmBinaryPredicateOp(lValGreater(a, b) <= 0);
+		vmbreak;
+	vmcase(lopEqualPred)
+		vmBinaryPredicateOp(lValEqual(a, b));
+		vmbreak;
+	vmcase(lopGreaterEqPred)
+		vmBinaryPredicateOp(lValGreater(a,b) >= 0);
+		vmbreak;
+	vmcase(lopGreaterPred)
+		vmBinaryPredicateOp(lValGreater(a, b) > 0);
+		vmbreak;
+
+
 	vmcase(lopPushNil)
 		ctx.valueStack[ctx.sp++] = NIL;
 		vmbreak;
