@@ -124,6 +124,16 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 	if(unlikely(self.type != (self.type & 63))){
 		lValException(lSymVMError, "Out-of-bounds Type", self);
 	}
+	if(self.type == ltTree){
+		lVal v = lTreeRef(self.vTree->root, method);
+		if(v.type != ltException){
+			return v;
+		}
+		lVal proto = lTreeRef(self.vTree->root, lSymPrototype);
+		if(proto.type != ltException){
+			return lMethodLookup(method, proto);
+		}
+	}
 	lClass *T = &lClassList[self.type];
 	for(;T;T = T->parent){
 		const lTree *t = T->methods;

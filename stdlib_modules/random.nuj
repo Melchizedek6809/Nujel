@@ -6,6 +6,23 @@
 
 (def seed 0)
 
+(def rng-proto { :seed! (fn (self seed)
+                            "Set a new seed value for the RNG"
+                            (set! self :seed seed))
+                 :rng! (fn (self)
+                           "Generate a random integer"
+                           (set! self :seed (+ 12345 (* (ref self :seed) 1103515245)))
+                         (bit-or (bit-shift-left (bit-and (ref self :seed) #xFFFF) 16)
+                                 (bit-and (bit-shift-right (ref self :seed) 16) #xFFFF)))
+                 :int (fn (self max)
+                          "Return a value from 0 to MAX, or, if left out, a random int"
+                          (if max (rem (abs (:rng! self)) max) (:rng! self)))})
+
+(defn new (seed)
+      :export
+      { :seed (or seed (bit-xor (time) (time/milliseconds)))
+        :prototype* rng-proto })
+
 (defn rng! ()
       :export
       (set! seed (+ 12345 (* seed 1103515245)))
@@ -37,3 +54,6 @@
 (deftest #t (int? (random/int)))
 (deftest #t (random/seed! 123) (def first-value (random/int)) (random/seed! 123) (= first-value (random/int)))
 (deftest #t (random/seed! 99) (not= (random/int) (random/int)))
+(deftest #t (int? (-> (random/new) :int)))
+(deftest #t (def rng (random/new 123)) (def a (:int rng)) (:seed! rng 123) (= (:int rng) a))
+(deftest #t (def rng (random/new 99)) (not= (:int rng) (:int rng)))

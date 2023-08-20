@@ -257,6 +257,7 @@ lSymbol  *lSymS         (const char *s);
 lSymbol  *lSymSM        (const char *s);
 lSymbol  *lSymSL        (const char *s, uint len);
 
+extern lSymbol *lSymPrototype;
 extern lSymbol *lSymFloatNaN;
 extern lSymbol *lSymFloatInf;
 extern lSymbol *lSymTypeError;
