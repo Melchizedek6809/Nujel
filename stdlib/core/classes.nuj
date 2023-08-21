@@ -1,0 +1,14 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains macros that provide a nice class system on the underlying prototype system
+
+(defmacro defclass (name . body)
+          (def fn-meta (meta/parse/body name '() body))
+          (def def-form `(def ~name (closure/data (let* ~@body (def meta* ~fn-meta) (current-closure)))))
+          (if (ref fn-meta :export)
+              (if (ref fn-meta :export)
+                  (list 'export (if (symbol? (ref fn-meta :export))
+                                (ref fn-meta :export)
+                                name) def-form))
+              def-form))

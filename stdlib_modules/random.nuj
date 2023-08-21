@@ -3,25 +3,31 @@
 ;;;
 ;;; A very simple pseudo random number generator, suitable for the illusion of
 ;;; randomness
-
 (def seed 0)
 
-(def rng-proto { :seed! (fn (self seed)
-                            "Set a new seed value for the RNG"
-                            (set! self :seed seed))
-                 :rng! (fn (self)
-                           "Generate a random integer"
-                           (set! self :seed (+ 12345 (* (ref self :seed) 1103515245)))
-                         (bit-or (bit-shift-left (bit-and (ref self :seed) #xFFFF) 16)
-                                 (bit-and (bit-shift-right (ref self :seed) 16) #xFFFF)))
-                 :int (fn (self max)
-                          "Return a value from 0 to MAX, or, if left out, a random int"
-                          (if max (rem (abs (:rng! self)) max) (:rng! self)))})
+(defclass rng
+  "A simple RNG"
+  :export
+
+  (defn seed! (self seed)
+        "Set a new seed value for the RNG"
+        (set! self :seed seed))
+
+  (defn rng! (self)
+        "Generate a random integer"
+        (set! self :seed (+ 12345 (* (ref self :seed) 1103515245)))
+        (bit-or (bit-shift-left (bit-and (ref self :seed) #xFFFF) 16)
+                (bit-and (bit-shift-right (ref self :seed) 16) #xFFFF)))
+
+  (defn int (self max)
+        "Return a value from 0 to MAX, or, if left out, a random int"
+        (if max (rem (abs (:rng! self)) max) (:rng! self))))
+
 
 (defn new (seed)
       :export
       { :seed (or seed (bit-xor (time) (time/milliseconds)))
-        :prototype* rng-proto })
+        :prototype* rng })
 
 (defn rng! ()
       :export
