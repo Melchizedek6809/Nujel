@@ -145,7 +145,7 @@
                              (:tree            (write/raw/tree v port hr?))
                              (:pair            (write/raw/pair v port hr?))
                              (:type            (port 'write ":" (keyword->string (:name v))))
-                             (otherwise (port 'block-write "#<unprintable>"))))))
+                             (otherwise        (port 'block-write "#<unprintable>"))))))
 
 (defn write (v port)
       (write/raw v (or port stdout) #f)

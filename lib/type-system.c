@@ -92,6 +92,19 @@ static lVal lnmTName(lVal self){
 	return lValKeywordS(self.vType->name);
 }
 
+static lVal lnmAddMethod(lVal self, lVal name, lVal fn){
+	lVal err = requireSymbolic(name);
+	if(unlikely(err.type == ltException)){
+		return err;
+	}
+
+	if(unlikely(fn.type != ltLambda)){
+		return lValExceptionType(fn, ltLambda);
+	}
+	self.vType->methods = lTreeInsert(self.vType->methods, name.vSymbol, fn);
+	return self;
+}
+
 static void lTypesAddCoreMethods(){
 	lClass *Nil = &lClassList[ltNil];
 	lAddNativeMethodV (Nil, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
@@ -103,7 +116,8 @@ static void lTypesAddCoreMethods(){
 	lAddNativeMethodV (Pair, lSymS("length"), "(self)", lnmPairLength, NFUNC_PURE);
 
 	lClass *Type = &lClassList[ltType];
-	lAddNativeMethodV (Type, lSymS("name"), "(self)", lnmTName, NFUNC_PURE);
+	lAddNativeMethodV  (Type, lSymS("name"), "(self)", lnmTName, NFUNC_PURE);
+	lAddNativeMethodVVV(Type, lSymS("add-method"), "(self name fn)", lnmAddMethod, NFUNC_PURE);
 }
 
 lVal lMethodLookup(const lSymbol *method, lVal self){
