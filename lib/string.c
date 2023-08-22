@@ -73,7 +73,7 @@ lVal lValStringError(const char *bufStart, const char *bufEnd, const char *errSt
 	if (unlikely(outbuf == NULL)) {
 		return NIL;
 	}
-	char *data      = outbuf;
+	char *data = outbuf;
 
 	memcpy(data, msgStart, msgEnd - msgStart);
 	data += (msgEnd - msgStart);

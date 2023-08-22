@@ -198,6 +198,7 @@ static void lRootsMark(){
 		const lClass *T = &lClassList[i];
 		lSymbolGCMark(T->name);
 		lTreeGCMark(T->methods);
+		lTreeGCMark(T->staticMethods);
 	}
 }
 

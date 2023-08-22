@@ -34,6 +34,7 @@ struct lClass {
 	const lSymbol *name;
 	lClass *parent;
 	lTree *methods;
+	lTree *staticMethods;
 };
 extern lClass lClassList[64];
 
@@ -392,6 +393,7 @@ extern lSymbol *lSymLTBuffer;
 extern lSymbol *lSymLTBufferView;
 extern lSymbol *lSymLTFileHandle;
 extern lSymbol *lSymLTUnknownType;
+extern lSymbol *lSymLTType;
 
 extern lSymbol *symNull;
 extern lSymbol *symQuote;

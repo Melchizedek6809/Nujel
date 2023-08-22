@@ -63,6 +63,7 @@ lSymbol *lSymLTBuffer;
 lSymbol *lSymLTBufferView;
 lSymbol *lSymLTFileHandle;
 lSymbol *lSymLTUnknownType;
+lSymbol *lSymLTType;
 
 lSymbol *lSymFloatNaN;
 lSymbol *lSymFloatInf;
@@ -127,6 +128,7 @@ void lSymbolInit(){
 	lSymLTBufferView     = lSymSM("buffer-view");
 	lSymLTFileHandle     = lSymSM("file-handle");
 	lSymLTUnknownType    = lSymSM("unknown-type");
+	lSymLTType           = lSymSM("type");
 
 	lSymFloatNaN         = lSymSM("float-nan");
 	lSymFloatInf         = lSymSM("float-inf");

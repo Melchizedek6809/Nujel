@@ -22,17 +22,19 @@
 
 (defn print/stacktrace (trace)
       (def i -1)
-      (-> trace
-          (map (fn (c) (describe/closure c (inc! i))))
-          (join "\r\n")))
+      (try (fn (e) "#<Error-in-Stacktrace>")
+           (-> trace
+               (map (fn (c) (describe/closure c (inc! i))))
+               (join "\r\n"))))
 
 (def print/error (let*
                    (defn print/error/wrap (i v)
-                         (case i
-                               (0 v)
-                               (2 (string/write v))
-                               (3 (print/stacktrace v))
-                               (otherwise (string v))))
+                         (try (fn (e) "#<Error>")
+                              (case i
+                                    (0 v)
+                                    (2 (string/write v))
+                                    (3 (print/stacktrace v))
+                                    (otherwise (string v)))))
 
                    (defn print/error/iter (error i)
                          (if error

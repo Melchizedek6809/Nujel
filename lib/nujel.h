@@ -73,6 +73,7 @@ typedef enum {
 	ltBytecodeArr,
 
 	ltFileHandle,
+	ltType,
 	ltComment,
 	ltException
 } lType;
@@ -119,6 +120,7 @@ struct lVal {
 		void *          vPointer;
 		lBuffer *       vBuffer;
 		lBufferView *   vBufferView;
+		lClass *        vType;
 	};
 };
 
@@ -290,6 +292,10 @@ static inline lVal lValInt(i64 v){
 
 static inline lVal lValBool(bool v){
 	return (lVal){ltBool, .vBool = v};
+}
+
+static inline lVal lValType(lClass *T){
+	return (lVal){ltType, .vType = T};
 }
 
 lTreeRoot *lTreeRootAllocRaw();

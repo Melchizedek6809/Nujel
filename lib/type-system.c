@@ -15,6 +15,7 @@ static void initType(int i, const lSymbol *name, lClass *parent){
 	lClassList[i].name = name;
 	lClassList[i].parent = parent;
 	lClassList[i].methods = NULL;
+	lClassList[i].staticMethods = NULL;
 }
 
 static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
@@ -45,13 +46,21 @@ lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal 
 
 static lVal lnmTypeName(lVal self){
 	if(unlikely(self.type != (self.type & 63))){
-		lValException(lSymVMError, "Out-of-bounds Type", self);
+		return lValException(lSymVMError, "Out-of-bounds Type", self);
 	}
 	lClass *T = &lClassList[self.type];
 	if(unlikely(T->name == NULL)){
-		lValException(lSymVMError, "Unnamed Type", self);
+		printf("T: %u\n", self.type);
+		return lValException(lSymVMError, "Unnamed Type", self);
 	}
 	return lValKeywordS(T->name);
+}
+
+static lVal lnmTypeOf(lVal self){
+	if(unlikely(self.type != (self.type & 63))){
+		return lValException(lSymVMError, "Out-of-bounds Type", self);
+	}
+	return lValType(&lClassList[self.type]);
 }
 
 static lVal lnmNilMetaGet(lVal self, lVal key){
@@ -76,14 +85,25 @@ static lVal lnmPairLength(lVal self){
 	return lValInt(i);
 }
 
+static lVal lnmTName(lVal self){
+	if(unlikely(self.vType->name == NULL)){
+		return lValException(lSymVMError, "Unnamed Type", self);
+	}
+	return lValKeywordS(self.vType->name);
+}
+
 static void lTypesAddCoreMethods(){
 	lClass *Nil = &lClassList[ltNil];
+	lAddNativeMethodV (Nil, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
 	lAddNativeMethodV (Nil, lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
 	lAddNativeMethodV (Nil, lSymS("length"), "(self)", lnmNilLength, 0);
 	lAddNativeMethodVV(Nil, lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
 
 	lClass *Pair = &lClassList[ltPair];
 	lAddNativeMethodV (Pair, lSymS("length"), "(self)", lnmPairLength, NFUNC_PURE);
+
+	lClass *Type = &lClassList[ltType];
+	lAddNativeMethodV (Type, lSymS("name"), "(self)", lnmTName, NFUNC_PURE);
 }
 
 lVal lMethodLookup(const lSymbol *method, lVal self){
@@ -128,8 +148,10 @@ void lTypesInit(){
 	initType(ltString, lSymLTString, &lClassList[ltBuffer]);
 
 	initType(ltFileHandle, lSymLTFileHandle, tNil);
+	initType(ltType, lSymLTType, tNil);
 	initType(ltComment, NULL, NULL);
 	initType(ltException, NULL, NULL);
+
 	lTypesAddCoreMethods();
 }
 
