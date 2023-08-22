@@ -88,12 +88,19 @@ static lVal lnmArrayToBytecodeArray(lVal self, lVal aLiterals){
 	return ret;
 }
 
+static lVal lnmArrayAllocate(lVal self, lVal size){
+	(void)self;
+	return lnfArrAllocate(size);
+}
+
 void lOperationsArray(lClosure *c){
 	lClass *Array = &lClassList[ltArray];
 	lAddNativeMethodV(Array, lSymS("length"),  "(self)", lnmArrayLength, 0);
 	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
 	lAddNativeMethodVV(Array, lSymS("bytecode-array"), "(self literals)", lnmArrayToBytecodeArray, 0);
 
-	lAddNativeFuncR (c,"array/new",      "args",                "Create a new array from ...ARGS",          lnfArrNew, 0);
-	lAddNativeFuncV (c,"array/allocate", "(size)",              "Allocate a new array of SIZE",             lnfArrAllocate, 0);
+	lAddNativeStaticMethodVV(Array, lSymS("alloc"), "(self size)", lnmArrayAllocate, NFUNC_PURE);
+
+	lAddNativeFuncR (c, "array/new",      "args",   "Create a new array from ...ARGS", lnfArrNew, 0);
+	lAddNativeFuncV (c, "array/allocate", "(size)", "Allocate a new array of SIZE",    lnfArrAllocate, 0);
 }

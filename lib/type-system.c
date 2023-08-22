@@ -44,6 +44,32 @@ lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal 
 	return lAddNativeMethod(T, name, args, fun, flags, (3 << 1));
 }
 
+static lVal lAddNativeStaticMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
+	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
+	v.vNFunc->fp   = fun;
+	v.vNFunc->args = lCar(lRead(args));
+	v.vNFunc->meta = NULL;
+	v.vNFunc->argCount = argCount;
+	if(flags & NFUNC_FOLD){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
+	}
+	if(flags & NFUNC_PURE){
+		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
+	}
+	T->staticMethods = lTreeInsert(T->staticMethods, name, v);
+	return v;
+}
+
+lVal lAddNativeStaticMethodV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal), uint flags){
+	return lAddNativeStaticMethod(T, name, args, fun, flags, (1 << 1));
+}
+lVal lAddNativeStaticMethodVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal), uint flags){
+	return lAddNativeStaticMethod(T, name, args, fun, flags, (2 << 1));
+}
+lVal lAddNativeStaticMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags){
+	return lAddNativeStaticMethod(T, name, args, fun, flags, (3 << 1));
+}
+
 static lVal lnmTypeName(lVal self){
 	if(unlikely(self.type != (self.type & 63))){
 		return lValException(lSymVMError, "Out-of-bounds Type", self);
@@ -132,6 +158,18 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 		lVal proto = lTreeRef(self.vTree->root, lSymPrototype);
 		if(proto.type != ltException){
 			return lMethodLookup(method, proto);
+		}
+	}
+	if(self.type == ltType){
+		lClass *T = self.vType;
+		for(;T;T = T->parent){
+			const lTree *t = T->staticMethods;
+			while(t){
+				if(method == t->key){
+					return t->value;
+				}
+				t = method > t->key ? t->right : t->left;
+			}
 		}
 	}
 	lClass *T = &lClassList[self.type];
