@@ -88,7 +88,7 @@ struct lBuffer {
 
 struct lSymbol {
 	union {
-		char c[48];
+		char c[94];
 		struct lSymbol *nextFree;
 	};
 };
