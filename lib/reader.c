@@ -288,54 +288,48 @@ static lVal lValExceptionBCRead(lReadContext *s, lVal v, const char *msg){
 }
 
 static lVal lParseBytecodeArray(lReadContext *s){
-	u8 *d    = NULL; // ToDo: make this buffer static / move to stack
-	int size = 0;
+	static int size = 0;
+	static u8 *d    = NULL; // ToDo: make this buffer static / move to stack
 	int len  = 0;
 	lArray *literals = NULL;
 
 	lVal v = lReadValue(s);
-	if(v.type != ltArray){
+	if(unlikely(v.type != ltArray)){
 		return lValExceptionBCRead(s, v, "Invalid literal array in BCA");
 	}
 	literals = v.vArray;
 	literals->flags = ARRAY_IMMUTABLE;
 
 	while(s->data < s->bufEnd){
-		if((len+4) >= size){
+		if(unlikely((len+4) >= size)){
 			size = MAX(size,128) * 2;
 			u8 *newD = realloc(d, size);
 			if(unlikely(newD == NULL)){
-				free(d);
+				free(newD);
 				return lValException(lSymOOM, "OOM during BC Arr Parse", NIL);
 			}
 			d = newD;
 		}
 		lStringAdvanceToNextCharacter(s);
-		char c = *s->data++;
+		char c = toupper(*s->data++);
 		int t = 0;
 		if((c >= '0') && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
 		if((c >= 'A') && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
-		if((c >= 'a') && (c <= 'f')){t = ((c - 'a')+0xA) << 4; goto readSecondNibble;}
 		if(c == '}'){break;}
 
 		readSecondNibble:
-		if(s->data >= s->bufEnd){
-			free(d);
+		if(unlikely(s->data >= s->bufEnd)){
 			return lValExceptionBCRead(s, NIL, "sudden end");
 		}
-		c = *s->data++;
+		c = toupper(*s->data++);
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
-		if((c >= 'a')  && (c <= 'f')){t |= ((c - 'a')+0xA); goto storeOP;}
-		free(d);
 		return lValException(lSymReadError, "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
 
 		storeOP:
 		d[len++] = (u8)t;
 	}
-	lVal ret = lValBytecodeArray(d,len,literals);
-	free(d);
-	return ret;
+	return lValBytecodeArray(d,len,literals);
 }
 
 static lVal lParseBuffer(lReadContext *s){
@@ -451,7 +445,7 @@ static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
 
 		const char c = *s->data;
 		if((s->data >= s->bufEnd) || (c == 0)){
-			if(!rootForm){
+			if(unlikely(!rootForm)){
 				return lValExceptionReaderCustom(s, "Unmatched opening bracket", lSymUnmatchedOpeningBracket);
 			}
 			s->data++;
@@ -460,12 +454,12 @@ static lVal lReadList(lReadContext *s, bool rootForm, char terminator){
 			lStringAdvanceToNextLine(s);
 			continue;
 		}else if(c == terminator){
-			if(rootForm){
+			if(unlikely(rootForm)){
 				return lValExceptionReader(s, "Unmatched closing bracket");
 			}
 			s->data++;
 			return ret.type == ltNil ? lCons(NIL, NIL) : ret;
-		}else if(isClosingChar(c)){
+		}else if(unlikely(isClosingChar(c))){
 			return lValExceptionReader(s, "Unmatched closing char");
 		}else{
 			const u8 next = s->data[1];
@@ -509,7 +503,7 @@ static lVal lReadQuote(lReadContext *s, lSymbol *carSym){
 }
 
 static lVal lReadValue(lReadContext *s){
-	if(s->data >= s->bufEnd){
+	if(unlikely(s->data >= s->bufEnd)){
 		return NIL;
 	}
 	const char c = *s->data;

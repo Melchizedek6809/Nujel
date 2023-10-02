@@ -75,11 +75,15 @@ static inline void lGarbageCollectIfNecessary(){
 #define vmcase(l)	case l:
 #define vmbreak	break
 
-/* Evaluate ops within callingClosure after pushing args on the stack */
+/* Evaluate ops within callingClosure after pushing args on the stack.
+ *
+ * Doesn't look particularly elegant at times, but gets turned into pretty
+ * efficient machine code.
+ */
 lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	const lBytecodeOp *ip;
-	lBytecodeArray * ops = text;
-	lClosure * c = callingClosure;
+	lBytecodeArray *ops = text;
+	lClosure *c = callingClosure;
 	lThread ctx;
 	const lVal * lits = text->literals->data;
 	lVal exceptionThrownValue;
@@ -192,8 +196,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = lValInt((i8)*ip++);
 		vmbreak;
 	vmcase(lopAdd) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-2];
+		const lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
@@ -221,8 +225,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopSub) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-2];
+		const lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
@@ -255,8 +259,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopMul) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-2];
+		const lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
@@ -290,8 +294,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopDiv) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-2];
+		const lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
@@ -317,14 +321,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				lVal r = lValFloat(a.vFloat / b.vFloat);
+				const lVal r = lValFloat(a.vFloat / b.vFloat);
 				if(unlikely(r.type == ltException)){
 					exceptionThrownValue = r;
 					goto throwException;
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(likely(b.type == ltInt)){
-				lVal r = lValFloat(a.vFloat / (float)b.vInt);
+				const lVal r = lValFloat(a.vFloat / (float)b.vInt);
 				if(unlikely(r.type == ltException)){
 					exceptionThrownValue = r;
 					goto throwException;
@@ -346,14 +350,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopRem) {
-		lVal a = ctx.valueStack[ctx.sp-2];
-		lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-2];
+		const lVal b = ctx.valueStack[ctx.sp-1];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vInt = a.vInt % b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				lVal r = lValFloat(fmod(a.vInt, b.vFloat));
+				const lVal r = lValFloat(fmod(a.vInt, b.vFloat));
 				if(unlikely(r.type == ltException)){
 					exceptionThrownValue = r;
 					goto throwException;
@@ -365,14 +369,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				lVal r = lValFloat(fmod(a.vFloat, b.vFloat));
+				const lVal r = lValFloat(fmod(a.vFloat, b.vFloat));
 				if(unlikely(r.type == ltException)){
 					exceptionThrownValue = r;
 					goto throwException;
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(likely(b.type == ltInt)){
-				lVal r = lValFloat(fmod(a.vFloat, b.vInt));
+				const lVal r = lValFloat(fmod(a.vFloat, b.vInt));
 				if(unlikely(r.type == ltException)){
 					exceptionThrownValue = r;
 					goto throwException;
