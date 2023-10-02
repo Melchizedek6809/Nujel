@@ -505,6 +505,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopGetValExt) {
+		// Could be optimized like lopGetVal, but this opcode so rarely
+		// used that I prefer to keep it simple
 		const uint off = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		lVal v = lGetClosureSym(c, lits[off].vSymbol);
@@ -515,14 +517,19 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp++] = v;
 		vmbreak; }
 	vmcase(lopGetVal) {
-		const uint off = *ip++;
-		lVal v = lGetClosureSym(c, lits[off].vSymbol);
-		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
-			goto throwException;
+		const lSymbol *s = lits[*ip++].vSymbol;
+		for (const lClosure *cc = c; cc; cc = cc->parent) {
+			const lTree *t = cc->data;
+			while(t){
+				if(s == t->key){
+					ctx.valueStack[ctx.sp++] = t->value;
+					vmbreak;
+				}
+				t = s > t->key ? t->right : t->left;
+			}
 		}
-		ctx.valueStack[ctx.sp++] = v;
-		vmbreak; }
+		exceptionThrownValue = lValException(lSymUnboundVariable, "Can't resolve symbol", lValSymS(s));
+		goto throwException; }
 	vmcase(lopRef) {
 		lVal v = lGenericRef(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
 		if(unlikely(v.type == ltException)){
@@ -533,13 +540,24 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp--;
 		vmbreak; }
 	vmcase(lopSetValExt) {
+		// Could be optimized like lopSetVal, but this opcode so rarely
+		// used that I prefer to keep it simple
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
 		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
 		vmbreak; }
 	vmcase(lopSetVal) {
-		const uint v = *ip++;
-		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		const lSymbol *s = lits[*ip++].vSymbol;
+		for (lClosure *cc = c; cc; cc = cc->parent) {
+			lTree *t = cc->data;
+			while(t){
+				if(t->key == s){
+					t->value = ctx.valueStack[ctx.sp-1];
+					vmbreak;
+				}
+				t = s > t->key ? t->right : t->left;
+			}
+		}
 		vmbreak; }
 	vmcase(lopGenSet) {
 		lVal val = ctx.valueStack[ctx.sp-1];
