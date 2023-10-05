@@ -11,9 +11,9 @@
 static i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
 	const uint alen = lBufferLength(a);
 	const uint blen = lBufferLength(b);
-	const uint len  = MIN(alen,blen);
-	const char *ab  = a->data;
-	const char *bb  = b->data;
+	const uint len	= MIN(alen,blen);
+	const char *ab	= a->data;
+	const char *bb	= b->data;
 	for(uint i=0;i<len;i++){
 		const u8 ac = *ab++;
 		const u8 bc = *bb++;
@@ -27,9 +27,9 @@ static i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
 static i64 lSymbolGreater(const lSymbol *a, const lSymbol *b) {
 	const uint alen = strnlen(a->c, sizeof(a->c));
 	const uint blen = strnlen(b->c, sizeof(b->c));
-	const uint len  = MIN(alen,blen);
-	const char *ab  = a->c;
-	const char *bb  = b->c;
+	const uint len	= MIN(alen,blen);
+	const char *ab	= a->c;
+	const char *bb	= b->c;
 	for(uint i=0;i<len;i++){
 		const u8 ac = *ab++;
 		const u8 bc = *bb++;
@@ -77,19 +77,19 @@ i64 lValGreater(const lVal a, const lVal b){
 
 /* Check two values for equality */
 bool lValEqual(const lVal a, const lVal b) {
-    if (unlikely(a.type != b.type)) {
-        if ((a.type == ltInt) && (b.type == ltFloat)) {
-            return ((float)a.vInt) == b.vFloat;
-        } else if ((a.type == ltFloat) && (b.type == ltInt)) {
-            return a.vFloat == ((float)b.vInt);
-        }
-        return false;
-    } else if (unlikely(a.type == ltString)) {
-        const uint alen = lBufferLength(a.vString);
-        const uint blen = lBufferLength(b.vString);
-        return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
-    } else if (unlikely(a.type == ltBool)) {
-        return a.vBool == b.vBool;
-    }
-    return a.vPointer == b.vPointer;
+	if (unlikely(a.type != b.type)) {
+		if ((a.type == ltInt) && (b.type == ltFloat)) {
+			return ((float)a.vInt) == b.vFloat;
+		} else if ((a.type == ltFloat) && (b.type == ltInt)) {
+			return a.vFloat == ((float)b.vInt);
+		}
+		return false;
+	} else if (unlikely(a.type == ltString)) {
+		const uint alen = lBufferLength(a.vString);
+		const uint blen = lBufferLength(b.vString);
+		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
+	} else if (unlikely(a.type == ltBool)) {
+		return a.vBool == b.vBool;
+	}
+	return a.vPointer == b.vPointer;
 }

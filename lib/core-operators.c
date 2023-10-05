@@ -37,14 +37,17 @@ static lVal lnfClosureParent(lVal a){
 }
 
 static lVal lnfClosureArguments(lVal a){
-	lVal cc = requireCallable(a);
-	if(unlikely(cc.type == ltException)){
-		return cc;
-	}
-	if(cc.type == ltNativeFunc){
-		return cc.vNFunc->args;
-	}else{
-		return cc.vClosure->args;
+	switch(a.type){
+	case ltException:
+		return a;
+	case ltNativeFunc:
+		return a.vNFunc->args;
+	case ltLambda:
+	case ltEnvironment:
+	case ltMacro:
+		return a.vClosure->args;
+	default:
+		return lValExceptionType(a, ltLambda);
 	}
 }
 
@@ -275,11 +278,12 @@ static lVal lnfSymbolToKeyword(lVal v){
 }
 
 static lVal lnfKeywordToSymbol(lVal a){
-	lVal car = requireKeyword(a);
-	if(unlikely(car.type == ltException)){
-		return car;
+	if(likely(a.type == ltKeyword)){
+		return lValSymS(a.vSymbol);
+	} else {
+		return a;
 	}
-	return lValSymS(car.vSymbol);
+
 }
 
 static i64 lValToId(lVal v){

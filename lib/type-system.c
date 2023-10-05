@@ -161,7 +161,7 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 		}
 	}
 	if(self.type == ltType){
-		lClass *T = self.vType;
+		const lClass *T = self.vType;
 		for(;T;T = T->parent){
 			const lTree *t = T->staticMethods;
 			while(t){
@@ -172,7 +172,7 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 			}
 		}
 	}
-	lClass *T = &lClassList[self.type];
+	const lClass *T = &lClassList[self.type];
 	for(;T;T = T->parent){
 		const lTree *t = T->methods;
 		while(t){
@@ -309,16 +309,6 @@ lVal requireArray(lVal v){
 	return v;
 }
 
-lVal requireMutableArray(lVal v){
-	if(unlikely(v.type != ltArray)){
-		return lValException(lSymTypeError, "Need an :Array", v);
-	}
-	if(unlikely(v.vArray->flags & ARRAY_IMMUTABLE)){
-		return lValException(lSymTypeError, "The provided array is immutable", v);
-	}
-	return v;
-}
-
 lVal requireString(lVal v){
 	if(unlikely(v.type != ltString)){
 		return lValException(lSymTypeError, "Need a :String", v);
@@ -343,50 +333,9 @@ lVal requireMutableBuffer(lVal v){
 	return v;
 }
 
-lVal requireBufferView(lVal v){
-	if(unlikely(v.type != ltBufferView)){
-		return lValException(lSymTypeError, "Need a :BufferView", v);
-	}
-	return v;
-}
-
-lVal requireMutableBufferView(lVal v){
-	if(unlikely(v.type != ltBufferView)){
-		return lValException(lSymTypeError, "Need a :BufferView", v);
-	}
-	if(unlikely(v.vBufferView->flags & BUFFER_VIEW_IMMUTABLE)){
-		return lValException(lSymTypeError, "BufferView is immutable", v);
-	}
-	return v;
-}
-
-lVal requireTree(lVal v){
-	if(unlikely(v.type != ltTree)){
-		return lValException(lSymTypeError, "Need a :Tree", v);
-	}
-	return v;
-}
-
-lVal requireMutableTree(lVal v){
-	if(unlikely(v.type != ltTree)){
-		return lValException(lSymTypeError, "Need a :Tree", v);
-	}
-	if(unlikely(v.vTree->root && v.vTree->root->flags & TREE_IMMUTABLE)){
-		return lValException(lSymTypeError, "Tree is immutable", v);
-	}
-	return v;
-}
-
 lVal requireSymbol(lVal v){
 	if(unlikely(v.type != ltSymbol)){
 		return lValException(lSymTypeError, "Need a :Symbol", v);
-	}
-	return v;
-}
-
-lVal requireKeyword(lVal v){
-	if(unlikely(v.type != ltKeyword)){
-		return lValException(lSymTypeError, "Need a :Keyword", v);
 	}
 	return v;
 }
@@ -415,26 +364,9 @@ lVal requireClosure(lVal v){
 	return v;
 }
 
-lVal requireCallable(lVal v){
-	if(unlikely(!((v.type == ltLambda)
-		|| (v.type == ltNativeFunc)
-		|| (v.type == ltMacro))))
-	{
-			return lValException(lSymTypeError, "Need something callable, not: ", v);
-	}
-	return v;
-}
-
 lVal requireFileHandle(lVal v){
 	if(unlikely(v.type != ltFileHandle)) {
 		return lValException(lSymTypeError, "Need a :FileHandle", v);
-	}
-	return v;
-}
-
-lVal requirePair(lVal v){
-	if(unlikely(v.type != ltPair)){
-		return lValException(lSymTypeError, "Need a :Pair", v);
 	}
 	return v;
 }

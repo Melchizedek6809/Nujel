@@ -112,4 +112,4 @@ update-stdlib: tmp/stdlib.c tmp/binlib.c
 	cp -f tmp/binlib.c bootstrap/binlib.c
 
 show-section-size: $(NUJEL)
-	nm --print-size --size-sort --radix=d $<
+	nm --print-size --size-sort --radix=d -l $<

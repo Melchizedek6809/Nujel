@@ -199,20 +199,12 @@ lVal            requireNaturalInt       (lVal v);
 lVal            requireFloat            (lVal v);
 lVal            optionalSymbolic        (lVal v, const lSymbol *fallback);
 lVal            requireSymbol           (lVal v);
-lVal            requireKeyword          (lVal v);
 lVal            requireSymbolic         (lVal v);
 lVal            requireFileHandle       (lVal v);
 lVal            requireArray            (lVal v);
-lVal            requireMutableArray     (lVal v);
-lVal            requireTree             (lVal v);
-lVal            requireMutableTree      (lVal v);
 lVal            requireString           (lVal v);
-lVal            requireCallable         (lVal v);
-lVal            requirePair             (lVal v);
 lVal            requireBuffer           (lVal v);
 lVal            requireMutableBuffer    (lVal v);
-lVal            requireBufferView       (lVal v);
-lVal            requireMutableBufferView(lVal v);
 
 /*
  | Closure related procedores
