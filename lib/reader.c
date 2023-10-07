@@ -176,6 +176,9 @@ static lVal lParseSymbol(lReadContext *s){
 				return lValExceptionReaderEnd(s, start, "Can't have a colon there");
 			}
 		}
+		if(c == '.'){
+			return lValExceptionReaderEnd(s, start, "Can't have a period there");
+		}
 		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
 			s->data--;
 			break;

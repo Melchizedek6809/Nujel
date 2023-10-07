@@ -46,7 +46,6 @@ lVal lnfArrNew(lVal v){
 	lVal r = lValAlloc(ltArray, lArrayAlloc(length));
 	int key = 0;
 	for(lVal n = v; n.type == ltPair; n = n.vList->cdr){
-		if(unlikely(key >= length)){break;}
 		r.vArray->data[key++] = n.vList->car;
 	}
 	return r;
