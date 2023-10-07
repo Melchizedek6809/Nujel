@@ -21,7 +21,7 @@
       "Append array A to array B"
       (when-not (and (array? a) (array? b))
                 (exception :type-error "array/append expects two arrays as its arguments"))
-      (def ret (array/allocate (+ (:length a) (:length b))))
+      (def ret (:alloc Array (+ (:length a) (:length b))))
       (dotimes (i (:length a))
                (set! ret i (ref a i)))
       (let ((i (:length a))
@@ -33,7 +33,7 @@
 
 (defn array/dup (a)
       "Duplicate Array A"
-      (def ret (array/allocate (:length a)))
+      (def ret (:alloc Array (:length a)))
       (dotimes (i (:length a) ret)
                (set! ret i (ref a i))))
 
@@ -53,7 +53,7 @@
       "Filter an array, (filter) should be preferred"
       (def ri 0)
       (def len (:length arr))
-      (def ret (array/allocate len))
+      (def ret (:alloc Array len))
       (dotimes (ai len (:length! ret ri))
                (when (pred (ref arr ai))
                      (set! ret ri (ref arr ai))
@@ -124,7 +124,7 @@
       "Return a newly allocated array with the values of ARR from START to END"
       (set! start (max 0 start))
       (set! end (min (:length arr) end))
-      (def ret (array/allocate (max 0 (- end start))))
+      (def ret (:alloc Array (max 0 (- end start))))
       (def i start)
       (while (< i end)
              (set! ret (- i start) (ref arr i))

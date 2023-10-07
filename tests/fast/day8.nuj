@@ -1,7 +1,7 @@
 #!/usr/bin/env nujel
 
 (def lines (split (file/read "tests/fast/day8.dat") "\n"))
-(def counts (-> (array/allocate 10) (array/fill! 0)))
+(def counts (-> (:alloc Array 10) (array/fill! 0)))
 
 (defn output/count (entry)
        (def len (:length entry))
@@ -79,7 +79,7 @@
                                           ("g" #x40)))) 0))
 
 (defn translate (vals out-vals)
-       (def numbers (-> (array/allocate 10)
+       (def numbers (-> (:alloc Array 10)
                         (array/fill! #nil)))
 
        (-> (map vals seven-seg->binary)

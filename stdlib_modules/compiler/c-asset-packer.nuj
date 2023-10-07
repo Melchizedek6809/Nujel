@@ -4,7 +4,7 @@
 ;;; Can be used to create C source files for various binary/text files to be
 ;;; included in exceutables
 
-(def hex-cache (array/allocate 256))
+(def hex-cache (:alloc Array 256))
 (dotimes (i 256)
   (set! hex-cache i (fmt "0x{i:02X}, ")))
 

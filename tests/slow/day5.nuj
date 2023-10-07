@@ -1,10 +1,10 @@
 #!/usr/bin/env nujel
 
 (defn array/2d/new (width height val)
-       (def ret (array/allocate width))
+       (def ret (:alloc Array width))
        (def x 0)
        (while (< x width)
-	      (set! ret x (array/fill! (array/allocate height) val))
+	      (set! ret x (array/fill! (:alloc Array height) val))
 	      (inc! x))
        ret)
 

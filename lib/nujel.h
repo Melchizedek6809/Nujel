@@ -74,6 +74,8 @@ typedef enum {
 
 	ltFileHandle,
 	ltType,
+
+	// These should never be visible from inside the Nujel VM
 	ltComment,
 	ltException
 } lType;

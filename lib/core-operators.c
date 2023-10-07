@@ -403,4 +403,24 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"symbol->keyword", "(α)",     "Convert symbol α into a keyword", lnfSymbolToKeyword, NFUNC_PURE);
 	lAddNativeFuncV(c,"keyword->symbol", "(α)",     "Convert keyword α into a symbol", lnfKeywordToSymbol, NFUNC_PURE);
 	lAddNativeFuncV(c,"string->symbol",  "(str)",   "Convert STR to a symbol",         lnfStrSym, NFUNC_PURE);
+
+	lDefineVal(c, "Nil", lValType(&lClassList[ltNil]));
+	lDefineVal(c, "Symbol", lValType(&lClassList[ltSymbol]));
+	lDefineVal(c, "Keyword", lValType(&lClassList[ltKeyword]));
+	lDefineVal(c, "Bool", lValType(&lClassList[ltBool]));
+	lDefineVal(c, "Int", lValType(&lClassList[ltInt]));
+	lDefineVal(c, "Float", lValType(&lClassList[ltFloat]));
+	lDefineVal(c, "Pair", lValType(&lClassList[ltPair]));
+	lDefineVal(c, "Array", lValType(&lClassList[ltArray]));
+	lDefineVal(c, "Tree", lValType(&lClassList[ltTree]));
+	lDefineVal(c, "Lambda", lValType(&lClassList[ltLambda]));
+	lDefineVal(c, "Macro", lValType(&lClassList[ltMacro]));
+	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
+	lDefineVal(c, "Environment", lValType(&lClassList[ltEnvironment]));
+	lDefineVal(c, "String", lValType(&lClassList[ltString]));
+	lDefineVal(c, "Buffer", lValType(&lClassList[ltBuffer]));
+	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
+	lDefineVal(c, "BytecodeArr", lValType(&lClassList[ltBytecodeArr]));
+	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
+	lDefineVal(c, "Type", lValType(&lClassList[ltType]));
 }

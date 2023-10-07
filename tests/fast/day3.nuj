@@ -18,7 +18,7 @@
 
 (defn count-bits (numbers bit-count)
        (def count 0)
-       (def state (array/allocate bit-count))
+       (def state (:alloc Array bit-count))
        (array/fill! state 0)
        (while numbers
               (count-bits/single (car numbers) state bit-count)

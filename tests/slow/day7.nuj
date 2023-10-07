@@ -3,7 +3,7 @@
 (def real-data (apply array/new (map (split (file/read "tests/slow/day7.input") ",") read/int)))
 
 (defn fancy/calc ()
-      (def ret (array/allocate 2000))
+      (def ret (:alloc Array 2000))
       (def acc 0)
       (dotimes (i 2000)
                (set! acc (+ acc i))

@@ -90,7 +90,7 @@
                           (board/score! board marks last-num)))))
 
 (defn take-turns (boards turns)
-       (def marks (array/fill! (array/allocate 100) #f))
+       (def marks (array/fill! (:alloc Array 100) #f))
        (while (int? (car turns))
               (set! marks (car turns) #t)
               (check/boards boards marks (car turns))

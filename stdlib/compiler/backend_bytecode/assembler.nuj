@@ -572,7 +572,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                        (def tmp (-> (assemble/flatten code)
                                     (assemble/build-lit-arr lit-arr)))
                        (assemble/build-sym-map tmp sym-map 0)
-                       (def out (array/allocate (ref sym-map :last-op)))
+                       (def out (:alloc Array (ref sym-map :last-op)))
                        (assemble/emit-relocated-ops tmp sym-map -1 out)
                        (:bytecode-array out lit-arr))))
 

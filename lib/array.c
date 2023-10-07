@@ -32,19 +32,6 @@ static lVal lnmArrayLengthSet(lVal self, lVal newLength){
 	return self;
 }
 
-static lVal lnfArrAllocate(lVal a){
-	lVal lenV = requireNaturalInt(a);
-	if(unlikely(lenV.type == ltException)){
-		return lenV;
-	}
-	const int len = lenV.vInt;
-	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
-	if(unlikely(len && (r.vArray->data == NULL))){
-		return lValException(lSymOOM, "(array/allocate) couldn't allocate its array", a);
-	}
-	return r;
-}
-
 /* Return the length of the list V */
 static int lListLength(lVal v){
 	int i = 0;
@@ -90,7 +77,16 @@ static lVal lnmArrayToBytecodeArray(lVal self, lVal aLiterals){
 
 static lVal lnmArrayAllocate(lVal self, lVal size){
 	(void)self;
-	return lnfArrAllocate(size);
+	lVal lenV = requireNaturalInt(size);
+	if(unlikely(lenV.type == ltException)){
+		return lenV;
+	}
+	const int len = lenV.vInt;
+	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
+	if(unlikely(len && (r.vArray->data == NULL))){
+		return lValException(lSymOOM, "(:alloc Array) couldn't allocate its array", size);
+	}
+	return r;
 }
 
 void lOperationsArray(lClosure *c){
@@ -102,5 +98,4 @@ void lOperationsArray(lClosure *c){
 	lAddNativeStaticMethodVV(Array, lSymS("alloc"), "(self size)", lnmArrayAllocate, NFUNC_PURE);
 
 	lAddNativeFuncR (c, "array/new",      "args",   "Create a new array from ...ARGS", lnfArrNew, 0);
-	lAddNativeFuncV (c, "array/allocate", "(size)", "Allocate a new array of SIZE",    lnfArrAllocate, 0);
 }

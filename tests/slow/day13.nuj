@@ -14,7 +14,7 @@
                                    (set! α :width  (max (ref α  :width) (+ 1 (car τ))))
                                    (set! α :height (max (ref α :height) (+ 1 (cadr τ)))))))
                       {:width 0 :height 0 :folds #nil}))
-       (set! γ :data (-> (array/allocate (* (ref γ :width) (ref γ :height))) (array/fill! 0)))
+       (set! γ :data (-> (:alloc Array (* (ref γ :width) (ref γ :height))) (array/fill! 0)))
        (while points
               (set! (ref γ :data) (+ (caar points) (* (ref γ :width) (cadar points))) 1)
               (cdr! points))

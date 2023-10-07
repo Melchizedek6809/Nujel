@@ -5,7 +5,7 @@
 
 (defn allocate (width height)
       :export
-      { :data (-> (array/allocate (* width height))
+      { :data (-> (:alloc Array (* width height))
                   (array/fill! 0))
         :width width
         :height height})
