@@ -119,7 +119,7 @@ void lBytecodeArrayFree(lBytecodeArray *v){
 
 lArray *lArrayAlloc(size_t len){
 	lArray *ret = lArrayAllocRaw();
-	ret->data = calloc(len, sizeof(lVal));
+	ret->data = calloc(len + 1, sizeof(lVal));
 	if(unlikely(ret->data == NULL)){
 		fprintf(stderr, "OOM: Couldn't allocate a new array");
 		exit(135);
