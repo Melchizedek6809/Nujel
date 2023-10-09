@@ -7,6 +7,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+static lVal lValExceptionFloat(lVal v){
+	return lValException(lSymTypeError, "This function can only be used with floats",v);
+}
+
 static lVal lnfAdd(lVal a, lVal b){
 	if(unlikely(a.type == ltNil)){return lValInt(0);}
 	if(unlikely(b.type == ltNil)){return a;}
@@ -14,16 +18,10 @@ static lVal lnfAdd(lVal a, lVal b){
 	switch(t){
 	default:
 		return lValExceptionNonNumeric(a);
-	case ltInt: {
-		lVal av = requireInt(a);
-		if(unlikely(av.type == ltException)){
-			return av;
-		}
-		lVal bv = requireInt(b);
-		if(unlikely(bv.type == ltException)){
-			return bv;
-		}
-		return lValInt(av.vInt + bv.vInt); }
+	case ltInt:
+		reqInt(a);
+		reqInt(b);
+		return lValInt(a.vInt + b.vInt);
 	case ltFloat: {
 		lVal av = requireFloat(a);
 		if(unlikely(av.type == ltException)){
@@ -55,16 +53,10 @@ static lVal lnfSub(lVal a, lVal b){
 	switch(t){
 	default:
 		return lValExceptionNonNumeric(a);
-	case ltInt: {
-		lVal av = requireInt(a);
-		if(unlikely(av.type == ltException)){
-			return av;
-		}
-		lVal bv = requireInt(b);
-		if(unlikely(bv.type == ltException)){
-			return bv;
-		}
-		return lValInt(av.vInt - bv.vInt); }
+	case ltInt:
+		reqInt(a);
+		reqInt(b);
+		return lValInt(a.vInt - b.vInt);
 	case ltFloat: {
 		lVal av = requireFloat(a);
 		if(unlikely(av.type == ltException)){
@@ -87,16 +79,10 @@ static lVal lnfMul(lVal a, lVal b){
 	switch(t){
 	default:
 		return lValExceptionNonNumeric(a);
-	case ltInt: {
-		lVal av = requireInt(a);
-		if(unlikely(av.type == ltException)){
-			return av;
-		}
-		lVal bv = requireInt(b);
-		if(unlikely(bv.type == ltException)){
-			return bv;
-		}
-		return lValInt(av.vInt * bv.vInt); }
+	case ltInt:
+		reqInt(a);
+		reqInt(b);
+		return lValInt(a.vInt * b.vInt);
 	case ltFloat: {
 		lVal av = requireFloat(a);
 		if(unlikely(av.type == ltException)){
@@ -139,19 +125,13 @@ static lVal lnfRem(lVal a, lVal b){
 	switch(t){
 		default:
 			return lValExceptionNonNumeric(a);
-		case ltInt: {
-			const lVal av = requireInt(a);
-			if(unlikely(av.type == ltException)){
-				return av;
-			}
-			const lVal bv = requireInt(b);
-			if(unlikely(bv.type == ltException)){
-				return bv;
-			}
-			if(bv.vInt == 0){
+		case ltInt:
+			reqInt(a);
+			reqInt(b);
+			if(b.vInt == 0){
 				return lValException(lSymDivisionByZero, "Module/Dividing by zero is probably not what you wanted", NIL);
 			}
-			return lValInt(av.vInt % bv.vInt);}
+			return lValInt(a.vInt % b.vInt);
 		case ltFloat: {
 			lVal av = requireFloat(a);
 			if(unlikely(av.type == ltException)){
@@ -174,16 +154,10 @@ static lVal lnfPow(lVal a, lVal b){
 	switch(t){
 	default:
 		return lValExceptionFloat(b);
-	case ltInt: {
-		lVal av = requireInt(a);
-		if(unlikely(av.type == ltException)){
-			return av;
-		}
-		lVal bv = requireInt(b);
-		if(unlikely(bv.type == ltException)){
-			return bv;
-		}
-		return lValInt(pow(av.vInt,  bv.vInt)); }
+	case ltInt:
+		reqInt(a);
+		reqInt(b);
+		return lValInt(pow(a.vInt, b.vInt));
 	case ltFloat: {
 		lVal av = requireFloat(a);
 		if(unlikely(av.type == ltException)){
@@ -235,91 +209,54 @@ static lVal lnfPowAstI(lVal a, lVal b){
 }
 
 static lVal lnfLogAnd(lVal a, lVal b){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	lVal bv = requireInt(b);
-	if(unlikely(bv.type == ltException)){
-		return bv;
-	}
-	return lValInt(av.vInt & bv.vInt);
+	reqInt(a);
+	reqInt(b);
+	return lValInt(a.vInt & b.vInt);
 }
 
 static lVal lnfLogIor(lVal a, lVal b){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	lVal bv = requireInt(b);
-	if(unlikely(bv.type == ltException)){
-		return bv;
-	}
-	return lValInt(av.vInt | bv.vInt);
+	reqInt(a);
+	reqInt(b);
+	return lValInt(a.vInt | b.vInt);
 }
 
 static lVal lnfLogXor(lVal a, lVal b){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	lVal bv = requireInt(b);
-	if(unlikely(bv.type == ltException)){
-		return bv;
-	}
-	return lValInt(av.vInt ^ bv.vInt);
+	reqInt(a);
+	reqInt(b);
+	return lValInt(a.vInt ^ b.vInt);
 }
 
 static lVal lnfLogNot(lVal a){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	return lValInt(~av.vInt);
+	reqInt(a);
+	return lValInt(~a.vInt);
 }
 
 static lVal lnfPopCount(lVal a){
-	lVal car = requireInt(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	const i64 iv = car.vInt;
+	reqInt(a);
 #ifdef _MSC_VER
-	return lValInt(__popcnt64(iv));
+	return lValInt(__popcnt64(a.vInt));
 #else
-	return lValInt(__builtin_popcountll(iv));
+	return lValInt(__builtin_popcountll(a.vInt));
 #endif
 }
 
 static lVal lnfAsh(lVal a, lVal b){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	lVal bv = requireInt(b);
-	if(unlikely(bv.type == ltException)){
-		return bv;
-	}
-	const u64 iv = av.vInt;
-	const i64 sv = bv.vInt;
+	reqInt(a);
+	reqInt(b);
+	const u64 iv = a.vInt;
+	const i64 sv = b.vInt;
 	return lValInt((sv > 0) ? (iv << sv) : (iv >> -sv));
 }
 
 static lVal lnfBitShiftRight(lVal a, lVal b){
-	lVal av = requireInt(a);
-	if(unlikely(av.type == ltException)){
-		return av;
-	}
-	lVal bv = requireInt(b);
-	if(unlikely(bv.type == ltException)){
-		return bv;
-	}
-	const u64 iv = av.vInt;
-	const i64 sv = bv.vInt;
+	reqInt(a);
+	reqInt(b);
+	const u64 iv = a.vInt;
+	const i64 sv = b.vInt;
 	return lValInt((sv > 0) ? (iv >> sv) : (iv << -sv));
 }
 
-lVal lnfAbs(lVal t){
+static lVal lnfAbs(lVal t){
 	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(t);
@@ -330,7 +267,7 @@ lVal lnfAbs(lVal t){
 	}
 }
 
-lVal lnfCbrt(lVal t){
+static lVal lnfCbrt(lVal t){
 	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(t);
@@ -341,7 +278,7 @@ lVal lnfCbrt(lVal t){
 	}
 }
 
-lVal lnfSqrt(lVal t){
+static lVal lnfSqrt(lVal t){
 	switch(t.type){
 	default:
 		return lValExceptionNonNumeric(t);
@@ -352,49 +289,49 @@ lVal lnfSqrt(lVal t){
 	}
 }
 
-lVal lnfCeil(lVal t){
+static lVal lnfCeil(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(ceil(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfFloor(lVal t){
+static lVal lnfFloor(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(floor(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfRound(lVal t){
+static lVal lnfRound(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(round(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfSin(lVal t){
+static lVal lnfSin(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(sin(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfCos(lVal t){
+static lVal lnfCos(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(cos(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfTan(lVal t){
+static lVal lnfTan(lVal t){
 	if(likely(t.type == ltFloat)){
 		return lValFloat(tan(t.vFloat));
 	}
 	return lValExceptionNonNumeric(t);
 }
 
-lVal lnfAtanTwo(lVal aA, lVal aB){
+static lVal lnfAtanTwo(lVal aA, lVal aB){
 	lVal a = requireFloat(aA);
 	if(unlikely(a.type == ltException)){
 		return a;

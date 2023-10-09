@@ -12,11 +12,8 @@ static lVal lnmArrayLength(lVal self){
 }
 
 static lVal lnmArrayLengthSet(lVal self, lVal newLength){
-	lVal e = requireNaturalInt(newLength);
-	if(unlikely(e.type == ltException)){
-		return e;
-	}
-	const size_t length = e.vInt;
+	reqNaturalInt(newLength);
+	const size_t length = newLength.vInt;
 	lArray *arr = self.vArray;
 
 	lVal *newData = realloc(arr->data,length * sizeof(lVal));
@@ -55,34 +52,25 @@ static lVal lnmArrayToBytecodeArray(lVal self, lVal aLiterals){
 	lArray *arr = self.vArray;
 	const int len = arr->length;
 
-	lVal cadr = requireArray(aLiterals);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
-	}
-	lArray *literals = cadr.vArray;
+	reqArray(aLiterals);
 	lBytecodeOp *ops = malloc(sizeof(lBytecodeOp) * len);
 	for(int i=0;i<len;i++){
-		lVal t = requireInt(arr->data[i]);
-		if(unlikely(t.type == ltException)){
+		if(unlikely(arr->data[i].type != ltInt)){
 			free(ops);
-			return t;
+			return lValException(lSymTypeError, "Need an Int", arr->data[i]);
 		}
-		ops[i] = t.vInt;
+		ops[i] = arr->data[i].vInt;
 	}
-	lVal ret = lValBytecodeArray(ops, len, literals);
+	lVal ret = lValBytecodeArray(ops, len, aLiterals.vArray);
 	free(ops);
 	return ret;
 }
 
 static lVal lnmArrayAllocate(lVal self, lVal size){
 	(void)self;
-	lVal lenV = requireNaturalInt(size);
-	if(unlikely(lenV.type == ltException)){
-		return lenV;
-	}
-	const int len = lenV.vInt;
-	lVal r = lValAlloc(ltArray, lArrayAlloc(len));
-	if(unlikely(len && (r.vArray->data == NULL))){
+	reqNaturalInt(size);
+	lVal r = lValAlloc(ltArray, lArrayAlloc(size.vInt));
+	if(unlikely(size.vInt && (r.vArray->data == NULL))){
 		return lValException(lSymOOM, "(:alloc Array) couldn't allocate its array", size);
 	}
 	return r;

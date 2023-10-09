@@ -143,8 +143,8 @@ void lSymbolInit(){
 	lSymDivisionByZero   = lSymSM("division-by-zero");
 	lSymReadError        = lSymSM("read-error");
 	lSymOOM              = lSymSM("out-of-memory");
-	lSymUnmatchedOpeningBracket = lSymSM("unmatched-opening-bracket");
 	lSymUnboundVariable  = lSymSM("unbound-variable");
+	lSymUnmatchedOpeningBracket = lSymSM("unmatched-opening-bracket");
 }
 
 static inline int lSymIndex(const lSymbol *s){
@@ -206,9 +206,9 @@ uint lSymbolIndexSlot(const char *str){
 	uint firstTomb = 0xffffffff;
 	uint h = lHashSymStr(str) % SYM_MAX;
 	uint hInitial = h;
-	symbolLookups++;
+	//symbolLookups++;
 	do {
-		tombLookups++;
+		//tombLookups++;
 		int idx = lSymbolIndex[h];
 		if(SYMBOL_SLOT_IS_EMPTY(idx)){
 			return firstTomb == 0xffffffff ? h : firstTomb;

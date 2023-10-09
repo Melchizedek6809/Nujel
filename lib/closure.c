@@ -164,11 +164,8 @@ lVal lAddNativeFuncCR(lClosure *c, const char *sym, const char *args, const char
 lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
 	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
 	ret.vClosure->args = args;
-	lVal bc = requireBytecodeArray(body);
-	if(unlikely(bc.type == ltException)){
-		return bc;
-	}
-	ret.vClosure->text = bc.vBytecodeArr;
+	reqBytecodeArray(body);
+	ret.vClosure->text = body.vBytecodeArr;
 	ret.vClosure->ip   = ret.vClosure->text->data;
 	return ret;
 }

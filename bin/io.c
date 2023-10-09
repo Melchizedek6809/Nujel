@@ -80,13 +80,9 @@ static lVal lnfExit(lVal aStatus){
 }
 
 static lVal lnfFileRemove(lVal aPath){
-	lVal car = requireString(aPath);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *filename = car.vString;
-	unlink(lBufferData(filename));
-	return car;
+	reqString(aPath);
+	unlink(lBufferData(aPath.vString));
+	return aPath;
 }
 
 #ifdef _MSC_VER
@@ -101,11 +97,7 @@ LONGLONG FileTime_to_POSIX(FILETIME ft) {
 #endif
 
 static lVal lnfFileStat(lVal aPath){
-	lVal car = requireString(aPath);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString* filename = car.vString;
+	reqString(aPath);
 #ifdef _MSC_VER
 	WIN32_FIND_DATA ffd;
 	LARGE_INTEGER filesize;
@@ -113,11 +105,11 @@ static lVal lnfFileStat(lVal aPath){
 	HANDLE hFind = INVALID_HANDLE_VALUE;
 	DWORD dwError = 0;
 
-	if (unlikely(lStringLength(filename) >= MAX_PATH)) {
+	if (unlikely(lStringLength(aPath.vString) >= MAX_PATH)) {
 		return lValException("invalid-call", "Directory path is too long.", lCar(v));
 	}
 
-	hFind = FindFirstFile(lStringData(filename), &ffd);
+	hFind = FindFirstFile(lBufferData(aPath.vString), &ffd);
 
 
 	lVal ret = lValTree(NULL);
@@ -143,7 +135,7 @@ static lVal lnfFileStat(lVal aPath){
 	return ret;
 #else
 	struct stat statbuf;
-	int err = stat(lBufferData(filename), &statbuf);
+	int err = stat(lBufferData(aPath.vString), &statbuf);
 	lVal ret = lValTree(NULL);
 	lTreeRoot *t = ret.vTree;
 	t->root = lTreeInsert(t->root, lsError, lValBool(err));
@@ -169,18 +161,13 @@ static lVal lnfFileStat(lVal aPath){
 
 #ifdef ENABLE_POPEN
 static lVal lnfPopen(lVal aCommand){
-	lVal car = requireString(aCommand);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *command = car.vString;
-
+	reqString(aCommand);
 	const int readSize = 1<<12;
 	int len   = 0;
 	int bufSize = readSize;
 	char *buf = malloc(readSize);
 
-	FILE *child = popen(lBufferData(command), "r");
+	FILE *child = popen(lBufferData(aCommand.vString), "r");
 	if(child == NULL){
 		free(buf);
 		return NIL;
@@ -223,7 +210,7 @@ static lVal lnfPopen(lVal aCommand){
 #endif
 
 static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
-	const char *path = castToString(aPath, "./");
+	const char *path = aPath.type == ltString ? lBufferData(aPath.vString) : "./";
 	const bool showHidden = castToBool(aShowHidden);
 
 #ifdef _MSC_VER
@@ -256,8 +243,7 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == 0)) { continue; }
 		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == '.') && (ffd.cFileName[2] == 0)) { continue; }
 		ret = lCons(lValString(ffd.cFileName), ret);
-   } while (FindNextFile(hFind, &ffd) != 0);
-   return ret;
+   } while (FindNextFile(hFind, &ffd) != 0);   return ret;
 #else
 	DIR *dp = opendir(path);
 	if(dp == NULL){return NIL;}
@@ -283,30 +269,18 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 }
 
 static lVal lnfDirectoryMake(lVal aPath){
-	lVal car = requireString(aPath);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *path = car.vString;
-	return lValBool(makeDir(lBufferData(path)) == 0);
+	reqString(aPath);
+	return lValBool(makeDir(lBufferData(aPath.vString)) == 0);
 }
 
 static lVal lnfDirectoryRemove(lVal aPath){
-	lVal car = requireString(aPath);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *path = car.vString;
-	return lValBool(rmdir(lBufferData(path)) == 0);
+	reqString(aPath);
+	return lValBool(rmdir(lBufferData(aPath.vString)) == 0);
 }
 
 static lVal lnfChangeDirectory(lVal aPath){
-	lVal car = requireString(aPath);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *path = car.vString;
-	return lValBool(chdir(lBufferData(path)) == 0);
+	reqString(aPath);
+	return lValBool(chdir(lBufferData(aPath.vString)) == 0);
 }
 
 static lVal lnfGetCurrentWorkingDirectory(){

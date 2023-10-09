@@ -17,11 +17,8 @@ static void disableRawMode() {
 
 static lVal lnfFileRaw(lVal handle){
 	struct termios raw;
-	lVal car = requireFileHandle(handle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
+	reqFileHandle(handle);
+	FILE *fh = handle.vFileHandle;
 
 	tcgetattr(fileno(fh), &raw);
 	if(!rawMode){
@@ -42,12 +39,8 @@ static lVal lnfFileRaw(lVal handle){
 
 
 static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
-	lVal car = requireString(aPathname);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *pathname = car.vString;
-	const char *path = lBufferData(pathname);
+	reqString(aPathname);
+	const char *path = lBufferData(aPathname.vString);
 	lVal cadr = optionalSymbolic(aIfExists, lSymError);
 	if(unlikely(cadr.type == ltException)){
 		return cadr;
@@ -74,37 +67,23 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 }
 
 static lVal lnfFileOpenInput(lVal aPathname){
-	lVal car = requireString(aPathname);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lString *pathname = car.vString;
-	FILE *fh = fopen(lBufferData(pathname), "rb");
+	reqString(aPathname);
+	FILE *fh = fopen(lBufferData(aPathname.vString), "rb");
 	return fh ? lValFileHandle(fh) : NIL;
 }
 
 static lVal lnfFileClose(lVal aHandle){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
-	fclose(fh);
+	reqFileHandle(aHandle);
+	fclose(aHandle.vFileHandle);
 	return NIL;
 }
 
 static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
+	reqFileHandle(aHandle);
+	FILE *fh = aHandle.vFileHandle;
 	lVal contentV = aBuffer;
-	lVal sizeV = requireNaturalInt(aSize);
-	if(unlikely(sizeV.type == ltException)){
-		return sizeV;
-	}
-	const i64 size = sizeV.vInt;
+	reqNaturalInt(aSize);
+	const i64 size = aSize.vInt;
 	const i64 offset = castToInt(aOffset, 0);
 
 	void *buf = NULL;
@@ -142,11 +121,8 @@ static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset)
 }
 
 static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
+	reqFileHandle(aHandle);
+	FILE *fh = aHandle.vFileHandle;
 	lVal contentV = aBuffer;
 	i64 size = castToInt(aSize, -1);
 	const i64 offset = castToInt(aOffset, 0);
@@ -188,41 +164,23 @@ static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset
 }
 
 static lVal lnfFileFlush(lVal aHandle){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
-	fflush(fh);
-	return car;
+	reqFileHandle(aHandle);
+	fflush(aHandle.vFileHandle);
+	return aHandle;
 }
 
 static lVal lnfFileTell(lVal aHandle){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
-	const i64 pos = ftell(fh);
+	const i64 pos = ftell(aHandle.vFileHandle);
 	return lValInt(pos);
 }
 
 static lVal lnfFileSeek(lVal aHandle, lVal aOffset, lVal aWhence){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	FILE *fh = car.vFileHandle;
-	lVal offV = requireInt(aOffset);
-	if(unlikely(offV.type == ltException)){
-		return offV;
-	}
-	const i64 offset = offV.vInt;
-	lVal whenceV = requireInt(aWhence);
-	if(unlikely(whenceV.type == ltException)){
-		return whenceV;
-	}
-	const i64 whenceRaw = whenceV.vInt;
+	reqFileHandle(aHandle);
+	reqInt(aOffset);
+	reqInt(aWhence);
+	FILE *fh = aHandle.vFileHandle;
+	const i64 offset = aOffset.vInt;
+	const i64 whenceRaw = aWhence.vInt;
 	if((whenceRaw < 0) || (whenceRaw > 2)){
 		return lValException(lSymTypeError, "Whence has to be in the range 0-2", aWhence);
 	}
@@ -232,19 +190,13 @@ static lVal lnfFileSeek(lVal aHandle, lVal aOffset, lVal aWhence){
 }
 
 static lVal lnfFileEof(lVal aHandle){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lValBool(feof(car.vFileHandle));
+	reqFileHandle(aHandle);
+	return lValBool(feof(aHandle.vFileHandle));
 }
 
 static lVal lnfFileError(lVal aHandle){
-	lVal car = requireFileHandle(aHandle);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lValBool(ferror(car.vFileHandle));
+	reqFileHandle(aHandle);
+	return lValBool(ferror(aHandle.vFileHandle));
 }
 
 void lOperationsPort(lClosure *c){

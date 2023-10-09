@@ -39,9 +39,21 @@ if(unlikely(v == NULL)){return;} \
 const uint ci = v - T##List; \
 if(unlikely(ci >= T##Max)){return;} \
 if(T##MarkMap[ci]){return;} \
-T##MarkMap[ci] = 1						\
+T##MarkMap[ci] = 1
 
-void lThreadGCMark(lThread *c){
+static void lValGCMark         (lVal v);
+static void lBufferGCMark      (const lBuffer *v);
+static void lBufferViewGCMark  (const lBufferView *v);
+static void lTreeGCMark        (const lTree *v);
+static void lTreeRootGCMark    (const lTreeRoot *v);
+static void lClosureGCMark     (const lClosure *c);
+static void lArrayGCMark       (const lArray *v);
+static void lNFuncGCMark       (const lNFunc *f);
+static void lSymbolGCMark      (const lSymbol *v);
+static void lThreadGCMark      (lThread *c);
+static void lBytecodeArrayMark (const lBytecodeArray *v);
+
+static void lThreadGCMark(lThread *c){
 	if(unlikely(c == NULL)){return;}
 	lBytecodeArrayMark(c->text);
 	for(int i=0;i <= c->csp;i++){
@@ -52,35 +64,35 @@ void lThreadGCMark(lThread *c){
 	}
 }
 
-void lBufferGCMark(const lBuffer *v){
+static void lBufferGCMark(const lBuffer *v){
 	markerPrefix(lBuffer);
 }
 
-void lBufferViewGCMark(const lBufferView *v){
+static void lBufferViewGCMark(const lBufferView *v){
 	markerPrefix(lBufferView);
 
 	lBufferGCMark(lBufferViewList[ci].buf);
 }
 
-void lSymbolGCMark(const lSymbol *v){
+static void lSymbolGCMark(const lSymbol *v){
 	markerPrefix(lSymbol);
 }
 
-void lNFuncGCMark(const lNFunc *v){
+static void lNFuncGCMark(const lNFunc *v){
 	markerPrefix(lNFunc);
 
 	lValGCMark(v->args);
 	lTreeGCMark(v->meta);
 }
 
-void lPairGCMark(const lPair *v){
+static void lPairGCMark(const lPair *v){
 	markerPrefix(lPair);
 
 	lValGCMark(v->car);
 	lValGCMark(v->cdr);
 }
 
-void lValGCMark(lVal v){
+static void lValGCMark(lVal v){
 	switch(v.type){
 	case ltPair:
 		lPairGCMark(v.vList);
@@ -118,7 +130,7 @@ void lValGCMark(lVal v){
 	}
 }
 
-void lTreeGCMark(const lTree *v){
+static void lTreeGCMark(const lTree *v){
 	markerPrefix(lTree);
 
 	lSymbolGCMark(v->key);
@@ -128,12 +140,12 @@ void lTreeGCMark(const lTree *v){
 	lTreeGCMark(v->right);
 }
 
-void lTreeRootGCMark(const lTreeRoot *v){
+static void lTreeRootGCMark(const lTreeRoot *v){
 	markerPrefix(lTreeRoot);
 	lTreeGCMark(v->root);
 }
 
-void lClosureGCMark(const lClosure *v){
+static void lClosureGCMark(const lClosure *v){
 	markerPrefix(lClosure);
 
 	lClosureGCMark(v->parent);
@@ -143,7 +155,7 @@ void lClosureGCMark(const lClosure *v){
 	lValGCMark(v->args);
 }
 
-void lArrayGCMark(const lArray *v){
+static void lArrayGCMark(const lArray *v){
 	markerPrefix(lArray);
 
 	for(int i=0;i<v->length;i++){
@@ -151,7 +163,7 @@ void lArrayGCMark(const lArray *v){
 	}
 }
 
-void lBytecodeArrayMark(const lBytecodeArray *v){
+static void lBytecodeArrayMark(const lBytecodeArray *v){
 	markerPrefix(lBytecodeArray);
 
 	lArrayGCMark(v->literals);
@@ -218,9 +230,6 @@ static void *lRootsPush(const lType t, void *ptr){
 	return ptr;
 }
 
-lClosure *lRootsClosurePush(lClosure *v){
-	return lRootsPush(ltLambda, v);
-}
 lSymbol *lRootsSymbolPush(lSymbol *v){
 	return lRootsPush(ltSymbol, v);
 }

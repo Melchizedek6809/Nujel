@@ -24,15 +24,11 @@ static lVal lnfSymbolTable(lClosure *c){
 }
 
 static lVal lnfClosureParent(lVal a){
-	lVal car = requireClosure(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lClosure *cc = car.vClosure;
-	if(cc->parent == NULL){
+	reqClosure(a);
+	if(a.vClosure->parent == NULL){
 		return NIL;
 	}else{
-		return lValAlloc(cc->parent->type == closureObject ? ltEnvironment : ltLambda, cc->parent);
+		return lValAlloc(a.vClosure->parent->type == closureObject ? ltEnvironment : ltLambda, a.vClosure->parent);
 	}
 }
 
@@ -52,21 +48,13 @@ static lVal lnfClosureArguments(lVal a){
 }
 
 static lVal lnfClosureCode(lVal a){
-	lVal car = requireClosure(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lClosure *clo = car.vClosure;
-	return lValAlloc(ltBytecodeArr, clo->text);
+	reqClosure(a);
+	return lValAlloc(ltBytecodeArr, a.vClosure->text);
 }
 
 static lVal lnfClosureData(lVal a){
-	lVal car = requireClosure(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lClosure *clo = car.vClosure;
-	return clo ? lValTree(clo->data) : NIL;
+	reqClosure(a);
+	return lValTree(a.vClosure->data);
 }
 
 static lVal lnfDefIn(lVal env, lVal aSym, lVal aVal){
@@ -85,32 +73,20 @@ static lVal lnfDefIn(lVal env, lVal aSym, lVal aVal){
 }
 
 static lVal lnfResolve(lClosure *c, lVal aSym, lVal env){
-	lVal car = requireSymbol(aSym);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	const lSymbol *sym = car.vSymbol;
+	reqSymbol(aSym);
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
 		return lValException(lSymTypeError, "You can only resolve symbols in Lambdas or Objects", env);
 	}
-	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
+	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, aSym.vSymbol);
 }
 
 static lVal lnfResolveOrNull(lClosure *c, lVal aSym, lVal env){
-	lVal car = requireSymbol(aSym);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	const lSymbol *sym = car.vSymbol;
+	reqSymbol(aSym);
 	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
 		return lValException(lSymTypeError, "You can only resolve-or-nil symbols in Lambdas or Objects", env);
 	}
-	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, sym);
-	if(ret.type == ltException){
-		return NIL;
-	} else {
-		return ret;
-	}
+	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, aSym.vSymbol);
+	return unlikely(ret.type == ltException) ? NIL : ret;
 }
 
 static lVal lnfResolvesPred(lClosure *c, lVal aSym, lVal env){
@@ -206,11 +182,8 @@ static lVal lnfQuote(lVal v){
 }
 
 static lVal lnfRead(lVal a){
-	lVal car = requireString(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lRead(car.vString->data);
+	reqString(a);
+	return lRead(a.vString->data);
 }
 
 static lVal lnfGarbageCollect(){
@@ -270,11 +243,8 @@ static lVal lnfInt(lVal v){
 }
 
 static lVal lnfSymbolToKeyword(lVal v){
-	lVal car = requireSymbol(v);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	return lValKeywordS(car.vSymbol);
+	reqSymbol(v);
+	return lValKeywordS(v.vSymbol);
 }
 
 static lVal lnfKeywordToSymbol(lVal a){
@@ -345,11 +315,8 @@ static lVal lnfString(lVal a){
 }
 
 static lVal lnfStrSym(lVal a){
-	lVal car = requireString(a);
-	if(unlikely(car.type != ltString)){
-		return car;
-	}
-	return lValSym(car.vString->data);
+	reqString(a);
+	return lValSym(a.vString->data);
 }
 
 void lOperationsCore(lClosure *c){

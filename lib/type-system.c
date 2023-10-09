@@ -235,10 +235,6 @@ lVal lValExceptionNonNumeric(lVal v){
 	return lValException(lSymTypeError, "Can't calculate with non numeric types", v);
 }
 
-lVal lValExceptionFloat(lVal v){
-	return lValException(lSymTypeError, "This function can only be used with floats",v);
-}
-
 /* Cast v to be an int without memory allocations, or return fallback */
 i64 castToInt(const lVal v, i64 fallback){
 	switch(v.type){
@@ -268,30 +264,6 @@ lType lTypecast(const lType a, const lType b){
 	return ltNil;
 }
 
-lVal requireInt(lVal v){
-	if(unlikely(v.type != ltInt)){
-		return lValException(lSymTypeError, "Need an :Int", v);
-	}
-	return v;
-}
-
-lVal requireNaturalInt(lVal v){
-	if(unlikely(v.type != ltInt)){
-		return lValException(lSymTypeError, "Need an :Int", v);
-	}
-	if(unlikely(v.vInt < 0)){
-		return lValException(lSymTypeError, "Expected a Natural int, not: ", v);
-	}
-	return v;
-}
-
-lVal requireBytecodeArray(lVal v){
-	if(unlikely(v.type != ltBytecodeArr)){
-		return lValException(lSymTypeError, "Need an :BytecodeArray", v);
-	}
-	return v;
-}
-
 lVal requireFloat(lVal v){
 	if(likely(v.type == ltFloat)){
 		return v;
@@ -300,44 +272,6 @@ lVal requireFloat(lVal v){
 	} else {
 		return lValException(lSymTypeError, "Need an :Int or :Float", v);
 	}
-}
-
-lVal requireArray(lVal v){
-	if(unlikely(v.type != ltArray)){
-		return lValException(lSymTypeError, "Need an :Array", v);
-	}
-	return v;
-}
-
-lVal requireString(lVal v){
-	if(unlikely(v.type != ltString)){
-		return lValException(lSymTypeError, "Need a :String", v);
-	}
-	return v;
-}
-
-lVal requireBuffer(lVal v){
-	if(unlikely(v.type != ltBuffer)){
-		return lValException(lSymTypeError, "Need a :Buffer", v);
-	}
-	return v;
-}
-
-lVal requireMutableBuffer(lVal v){
-	if(unlikely(v.type != ltBuffer)){
-		return lValException(lSymTypeError, "Need a :Buffer", v);
-	}
-	if(unlikely(v.vBuffer->flags & BUFFER_IMMUTABLE)){
-		return lValException(lSymTypeError, "Buffer is immutable", v);
-	}
-	return v;
-}
-
-lVal requireSymbol(lVal v){
-	if(unlikely(v.type != ltSymbol)){
-		return lValException(lSymTypeError, "Need a :Symbol", v);
-	}
-	return v;
 }
 
 lVal requireSymbolic(lVal v){
@@ -352,21 +286,4 @@ lVal optionalSymbolic(lVal v, const lSymbol *fallback){
 		return lValSymS(fallback);
 	}
 	return requireSymbolic(v);
-}
-
-lVal requireClosure(lVal v){
-	if(unlikely(!((v.type == ltLambda)
-		|| (v.type == ltEnvironment)
-		|| (v.type == ltMacro))))
-	{
-			return lValException(lSymTypeError, "Need a closure, not: ", v);
-	}
-	return v;
-}
-
-lVal requireFileHandle(lVal v){
-	if(unlikely(v.type != ltFileHandle)) {
-		return lValException(lSymTypeError, "Need a :FileHandle", v);
-	}
-	return v;
 }

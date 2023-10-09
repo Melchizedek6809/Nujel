@@ -43,34 +43,25 @@ static lVal lBufferViewRef(lVal car, size_t i){
 
 lVal lGenericRef(lVal col, lVal key){
 	switch(col.type){
-	case ltPair: {
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const int index = keyVal.vInt;
+	case ltPair:
+		reqNaturalInt(key);
+		const int index = key.vInt;
 		for(int i=0;i<index;i++){
 			col = lCdr(col);
 		}
-		return lCar(col); }
+		return lCar(col);
 	case ltBytecodeArr: {
 		const lBytecodeArray *arr = col.vBytecodeArr;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const int i = keyVal.vInt;
+		reqNaturalInt(key);
+		const int i = key.vInt;
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
 			return lValException(lSymOutOfBounds, "(ref) bytecode-array index provided is out of bounds", col);
 		}
 		return lValInt(arr->data[i]); }
 	case ltArray: {
 		lArray *arr = col.vArray;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const int i = keyVal.vInt;
+		reqNaturalInt(key);
+		const int i = key   .vInt;
 		if(unlikely(arr->length <= i)){
 			return lValException(lSymOutOfBounds, "(ref) array index provided is out of bounds", col);
 		}
@@ -79,21 +70,15 @@ lVal lGenericRef(lVal col, lVal key){
 	case ltBuffer: {
 		const uint8_t *buf = (uint8_t *)col.vBuffer->data;
 		const size_t len = col.vBuffer->length;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const size_t i = keyVal.vInt;
+		reqNaturalInt(key);
+		const size_t i = key.vInt;
 		if(unlikely(len <= i)){
 			return lValException(lSymOutOfBounds, "(ref) buffer index provided is out of bounds", col);
 		}
 		return lValInt(buf[i]); }
-	case ltBufferView: {
-		lVal t = requireNaturalInt(key);
-		if(unlikely(t.type == ltException)){
-			return t;
-		}
-		return lBufferViewRef(col, t.vInt); }
+	case ltBufferView:
+		reqNaturalInt(key);
+		return lBufferViewRef(col, key.vInt);
 	case ltTree: {
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);
@@ -122,55 +107,34 @@ static lVal lBufferViewSet(lVal car, size_t i, lVal v){
 	default:
 		exit(5);
 		return NIL;
-	case lbvtU8: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((u8 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtS8: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((i8 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtU16: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((u16 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtS16: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((i16 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtU32: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((u32 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtS32: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((i32 *)buf)[i] = nv.vInt;
-		return car; }
-	case lbvtS64: {
-		const lVal nv = requireInt(v);
-		if(unlikely(nv.type == ltException)){
-			return nv;
-		}
-		((i64 *)buf)[i] = nv.vInt;
-		return car; }
+	case lbvtU8:
+		reqInt(v);
+		((u8 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtS8:
+		reqInt(v);
+		((i8 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtU16:
+		reqInt(v);
+		((u16 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtS16:
+		reqInt(v);
+		((i16 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtU32:
+		reqInt(v);
+		((u32 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtS32:
+		reqInt(v);
+		((i32 *)buf)[i] = v.vInt;
+		return car;
+	case lbvtS64:
+		reqInt(v);
+		((i64 *)buf)[i] = v.vInt;
+		return car;
 	case lbvtF32: {
 		const lVal nv = requireFloat(v);
 		if(unlikely(nv.type == ltException)){
@@ -192,11 +156,8 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 	switch(col.type){
 	case ltBytecodeArr: {
 		const lBytecodeArray *arr = col.vBytecodeArr;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const int i = keyVal.vInt;
+		reqNaturalInt(key);
+		const int i = key.vInt;
 		if(unlikely((arr->data + i) >= arr->dataEnd)){
 			return lValException(lSymOutOfBounds, "(ref) bytecode-array index provided is out of bounds", col);
 		}
@@ -207,11 +168,8 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		return col; }
 	case ltArray: {
 		lArray *arr = col.vArray;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const int i = keyVal.vInt;
+		reqNaturalInt(key);
+		const int i = key.vInt;
 		if(unlikely(arr->length <= i)){
 			return lValException(lSymOutOfBounds, "(ref) array index provided is out of bounds", col);
 		}
@@ -220,11 +178,8 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 	case ltBuffer: {
 		char *buf  = col.vBuffer->buf;
 		const size_t len = col.vBuffer->length;
-		lVal keyVal = requireNaturalInt(key);
-		if(unlikely(keyVal.type == ltException)){
-			return keyVal;
-		}
-		const size_t i = keyVal.vInt;
+		reqNaturalInt(key);
+		const size_t i = key.vInt;
 		if(unlikely(len <= i)){
 			return lValException(lSymOutOfBounds, "(ref) buffer index provided is out of bounds", col);
 		}
@@ -234,11 +189,8 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		buf[i] = v.vInt;
 		return col; }
 	case ltBufferView: {
-		lVal t = requireNaturalInt(key);
-		if(unlikely(t.type == ltException)){
-			return t;
-		}
-		return lBufferViewSet(col, t.vInt, v); }
+		reqNaturalInt(key);
+		return lBufferViewSet(col, key.vInt, v); }
 	case ltTree: {
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);

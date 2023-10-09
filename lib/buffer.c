@@ -16,10 +16,6 @@ void *lBufferDataMutable(lBuffer *v){
 	return v == NULL ? NULL : v->buf;
 }
 
-const char *lStringData(const lString *v){
-	return v == NULL ? NULL : v->data;
-}
-
 size_t lBufferLength(const lBuffer *v){
 	return v == NULL ? 0 : v->length;
 }
@@ -39,12 +35,8 @@ size_t lBufferViewLength(const lBufferView *v){
 }
 
 static lVal lnfBufferAllocate(lVal a) {
-	lVal car = requireNaturalInt(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	const i64 size = car.vInt;
-	lBuffer *buf = lBufferAlloc(size, false);
+	reqNaturalInt(a);
+	lBuffer *buf = lBufferAlloc(a.vInt, false);
 	return lValAlloc(ltBuffer, buf);
 }
 
@@ -62,16 +54,9 @@ static lVal bufferFromPointer(bool immutable, const void *data, size_t length){
 }
 
 static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength){
-	lVal car = requireMutableBuffer(aDest);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lBuffer *dest = car.vBuffer;
-	lVal offV = requireNaturalInt(aDestOffset);
-	if(unlikely(offV.type == ltException)){
-		return offV;
-	}
-	const int destOffset = offV.vInt;
+	reqMutableBuffer(aDest);
+	reqNaturalInt(aDestOffset);
+	const int destOffset = aDestOffset.vInt;
 	const void *buf = NULL;
 	int length = 0;
 
@@ -86,42 +71,34 @@ static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength)
 	if(unlikely((buf == NULL) || (length < 0))){
 		return lValException(lSymTypeError, "Can't copy from that", vSrc);
 	}
-	if(unlikely(((length + destOffset) > dest->length) || (length > vSrc.vBuffer->length))){
+	if(unlikely(((length + destOffset) > aDest.vBuffer->length) || (length > vSrc.vBuffer->length))){
 		return lValException(lSymOutOfBounds, "Can't fit everything in that buffer", vSrc);
 	}
-	memcpy(&((u8*)dest->buf)[destOffset], buf, length);
-	return car;
+	memcpy(&((u8*)aDest.vBuffer->buf)[destOffset], buf, length);
+	return aDest;
 }
 
 static lVal lnfBufferToString(lVal a, lVal aLength){
-	lVal car = requireBuffer(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lBuffer *buf = car.vBuffer;
-	const i64 length = castToInt(aLength, buf->length);
+	reqBuffer(a);
+	const i64 length = castToInt(aLength, a.vBuffer->length);
 	if(unlikely(length < 0)){
 		return lValException(lSymTypeError, "Length has to be greater than 0", aLength);
 	}
-	return lValStringLen(buf->buf, length);
+	return lValStringLen(a.vBuffer->buf, length);
 }
 
 static lVal bufferView(lVal a, lVal aImmutable, lBufferViewType T){
-	lVal car = requireBuffer(a);
-	if(unlikely(car.type == ltException)){
-		return car;
-	}
-	lBuffer *buf = car.vBuffer;
+	reqBuffer(a);
 	bool immutable = castToBool(aImmutable);
-	if(unlikely(!immutable && (buf->flags & BUFFER_IMMUTABLE))){
+	if(unlikely(!immutable && (a.vBuffer->flags & BUFFER_IMMUTABLE))){
 		if(aImmutable.type == ltBool){
 			return lValException(lSymTypeError, "Can't create a mutable view for an immutable buffer", a);
 		} else {
 			immutable = true;
 		}
 	}
-	const size_t length = buf->length / lBufferViewTypeSize(T);
-	lBufferView *bufView = lBufferViewAlloc(buf, T, 0, length, immutable);
+	const size_t length = a.vBuffer->length / lBufferViewTypeSize(T);
+	lBufferView *bufView = lBufferViewAlloc(a.vBuffer, T, 0, length, immutable);
 	return lValAlloc(ltBufferView, bufView);
 }
 
@@ -153,11 +130,8 @@ static lVal lnmBufferLengthSet(lVal self, lVal newLength){
 	}
 	lBuffer *buf = self.vBuffer;
 
-	lVal lenVal = requireNaturalInt(newLength);
-	if(unlikely(lenVal.type == ltException)){
-		return lenVal;
-	}
-	const int length = lenVal.vInt;
+	reqNaturalInt(newLength);
+	const int length = newLength.vInt;
 	if(length < buf->length){
 		return lValException(lSymOutOfBounds, "Buffers can only grow, not shrink.", self);
 	}

@@ -93,3 +93,11 @@ bool lValEqual(const lVal a, const lVal b) {
 	}
 	return a.vPointer == b.vPointer;
 }
+
+lVal lValException(const lSymbol *symbol, const char *error, lVal v) {
+	lVal l = lCons(v, NIL);
+	l = lCons(lValString(error),l);
+	l = lCons(lValKeywordS(symbol),l);
+	l.type = ltException;
+	return l;
+}

@@ -190,23 +190,60 @@ lVal lRead(const char *str);
  */
 i64             castToInt        (const lVal v, i64 fallback);
 bool            castToBool       (const lVal v);
-const char *    castToString     (const lVal v, const char *fallback);
 
 lVal            lValExceptionType       (lVal v, lType T);
 lVal            lValExceptionArity      (lVal v, int arity);
 lVal            lValExceptionNonNumeric (lVal v);
-lVal            lValExceptionFloat      (lVal v);
-lVal            requireInt              (lVal v);
-lVal            requireNaturalInt       (lVal v);
 lVal            requireFloat            (lVal v);
 lVal            optionalSymbolic        (lVal v, const lSymbol *fallback);
-lVal            requireSymbol           (lVal v);
 lVal            requireSymbolic         (lVal v);
-lVal            requireFileHandle       (lVal v);
-lVal            requireArray            (lVal v);
-lVal            requireString           (lVal v);
-lVal            requireBuffer           (lVal v);
-lVal            requireMutableBuffer    (lVal v);
+
+#define reqNaturalInt(str) do { if(unlikely(str.type != ltInt)){\
+	return lValException(lSymTypeError, "Need ab Int", str);\
+}\
+if(unlikely(str.vInt < 0)){\
+	return lValException(lSymTypeError, "Expected a Natural int, not: ", str);\
+} } while(0)
+
+#define reqClosure(str) do { if(unlikely((str.type != ltLambda) && (str.type != ltEnvironment) && str.type != ltMacro)){ \
+	return lValException(lSymTypeError, "Need a Closure", str);\
+} } while(0)
+
+#define reqBytecodeArray(str) do { if(unlikely(str.type != ltBytecodeArr)){\
+	return lValException(lSymTypeError, "Need a BytecodeArr", str);\
+} } while(0)
+
+#define reqInt(str) do { if(unlikely(str.type != ltInt)){\
+	return lValException(lSymTypeError, "Need an Int", str);\
+} } while(0)
+
+#define reqString(str) do { if(unlikely(str.type != ltString)){\
+	return lValException(lSymTypeError, "Need a String", str);\
+} } while(0)
+
+#define reqBuffer(val) do { if(unlikely(val.type != ltBuffer)){\
+	return lValException(lSymTypeError, "Need a Buffer", val);\
+} } while(0)
+
+#define reqArray(val) do { if(unlikely(val.type != ltArray)){\
+	return lValException(lSymTypeError, "Need an Array", val);\
+} } while(0)
+
+#define reqSymbol(val) do { if(unlikely(val.type != ltSymbol)){\
+	return lValException(lSymTypeError, "Need a Symbol", val);\
+} } while(0)
+
+#define reqFileHandle(val) do { if(unlikely(val.type != ltFileHandle)){\
+	return lValException(lSymTypeError, "Need a FileHandle", val);\
+} } while(0)
+
+#define reqMutableBuffer(val) do { if(unlikely(val.type != ltBuffer)){\
+	return lValException(lSymTypeError, "Need a Buffer", val);\
+}\
+if(unlikely(val.vBuffer->flags & BUFFER_IMMUTABLE)){\
+	return lValException(lSymTypeError, "Buffer is immutable", val);\
+ } } while(0)
+
 
 /*
  | Closure related procedores
@@ -349,5 +386,6 @@ lArray  *lArrayAlloc  (size_t len);
 lBuffer *lBufferAlloc (size_t length, bool immutable);
 lString *lStringNew   (const char *str, uint len);
 lString *lStringDup   (const lString *s);
+
 
 #endif

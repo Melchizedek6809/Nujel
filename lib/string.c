@@ -85,11 +85,8 @@ static lVal lnmStringCut(lVal self, lVal start, lVal stop){
 	i64 slen, len;
 	const char *buf = self.vString->data;
 	slen = len = lBufferLength(self.vString);
-	lVal startV = requireInt(start);
-	if(unlikely(startV.type == ltException)){
-		return startV;
-	}
-	i64 off = MAX(0, startV.vInt);
+	reqInt(start);
+	i64 off = MAX(0, start.vInt);
 	len = MIN(slen - off, (((stop.type == ltInt)) ? stop.vInt : len) - off);
 
 	if(unlikely(len <= 0)){return lValString("");}
@@ -139,8 +136,7 @@ static lVal lnmStringLastIndexOf(lVal self, lVal search, lVal start){
 	return lValInt(-1);
 }
 
-void lOperationsString(lClosure *c){
-	(void)c;
+void lOperationsString(){
 	lClass *String = &lClassList[ltString];
 	lAddNativeMethodVVV(String, lSymS("cut"),      "(self start stop)", lnmStringCut, NFUNC_PURE);
 	lAddNativeMethodVVV(String, lSymS("index-of"), "(self search start)", lnmStringIndexOf, NFUNC_PURE);

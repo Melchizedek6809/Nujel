@@ -265,7 +265,6 @@ typedef enum lOpcode {
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 void  simplePrintVal       (lVal v);
-void  simplePrintTree      (lTree *t);
 
 /*
  | Workarounds for missing builtins
@@ -289,7 +288,6 @@ void lAddPlatformVars(lClosure *c);
 /*
  | GC related procedures
  */
-lClosure *lRootsClosurePush(lClosure *v);
 lSymbol  *lRootsSymbolPush (lSymbol *v);
 lThread  *lRootsThreadPush (lThread *v);
 extern int rootSP;
@@ -299,18 +297,6 @@ static inline void lRootsRet(const int i){ rootSP = i; }
 static inline int  lRootsGet(){ return rootSP; }
 
 extern bool lGCShouldRunSoon;
-
-void lValGCMark         (lVal v);
-void lBufferGCMark      (const lBuffer *v);
-void lBufferViewGCMark  (const lBufferView *v);
-void lTreeGCMark        (const lTree *v);
-void lTreeRootGCMark    (const lTreeRoot *v);
-void lClosureGCMark     (const lClosure *c);
-void lArrayGCMark       (const lArray *v);
-void lNFuncGCMark       (const lNFunc *f);
-void lSymbolGCMark      (const lSymbol *v);
-void lThreadGCMark      (lThread *c);
-void lBytecodeArrayMark (const lBytecodeArray *v);
 
 void lGarbageCollect();
 
@@ -415,10 +401,6 @@ void      lSymbolFree   (lSymbol *s);
 lSymbol  *getTypeSymbol (const lVal a);
 lSymbol  *getTypeSymbolT(const lType T);
 
-lVal requireBytecodeOp       (lVal v);
-lVal requireBytecodeArray    (lVal v);
-lVal requireClosure          (lVal v);
-
 lNFunc *         lNFuncAlloc         ();
 void             lNFuncFree          (lNFunc *n);
 lBytecodeArray * lBytecodeArrayAlloc (size_t len);
@@ -435,12 +417,12 @@ void lOperationsBase       (lClosure *c);
 void lOperationsArithmetic (lClosure *c);
 void lOperationsArray      (lClosure *c);
 void lOperationsBuffer     (lClosure *c);
-void lOperationsBytecode   (lClosure *c);
 void lOperationsCore       (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
-void lOperationsString     (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
+void lOperationsString     ();
+void lOperationsBytecode   ();
 
 lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lVal col, lVal key);
