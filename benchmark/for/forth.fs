@@ -1,0 +1,4 @@
+: BENCHRUN 0 10000000 0 DO I + LOOP . ;
+
+BENCHRUN
+bye
