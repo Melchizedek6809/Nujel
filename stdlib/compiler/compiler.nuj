@@ -30,8 +30,9 @@
       :internal
       (def source body)
       (while (and (not (last? source))
-                  (not= (:type-name (car source))
-                        :pair))
+                  (or (not= (:type-name (car source))
+                            :pair)
+                      (= (caar source) 'deftest)))
         (cdr! source))
       (def meta {:name name})
       (while body
