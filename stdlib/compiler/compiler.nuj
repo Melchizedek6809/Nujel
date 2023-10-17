@@ -29,6 +29,10 @@
       :cat :compiler
       :internal
       (def source body)
+      (while (and (not (last? source))
+                  (not= (:type-name (car source))
+                        :pair))
+        (cdr! source))
       (def meta {:name name})
       (while body
         (def v (car body))
