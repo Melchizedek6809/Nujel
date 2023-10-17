@@ -112,4 +112,4 @@ update-stdlib: tmp/stdlib.c tmp/binlib.c
 	cp -f tmp/binlib.c bootstrap/binlib.c
 
 show-section-size: $(NUJEL)
-	nm --print-size --size-sort --radix=d -l $<
+	nm --print-size --size-sort --radix=d -l $< | awk '{ if ($$3 != "B") { print } }'
