@@ -78,13 +78,18 @@ static lVal lnfBufferCopy(lVal aDest, lVal vSrc, lVal aDestOffset, lVal aLength)
 	return aDest;
 }
 
-static lVal lnfBufferToString(lVal a, lVal aLength){
+static lVal lnfBufferToString(lVal a, lVal aLength, lVal aOffset){
 	reqBuffer(a);
-	const i64 length = castToInt(aLength, a.vBuffer->length);
+	const i64 length = MIN(a.vBuffer->length, castToInt(aLength, a.vBuffer->length));
+	i64 offset = aOffset.type == ltInt ? aOffset.vInt : 0;
+	if(unlikely(offset > length)){
+		return lValString("");
+	}
 	if(unlikely(length < 0)){
 		return lValException(lSymTypeError, "Length has to be greater than 0", aLength);
 	}
-	return lValStringLen(a.vBuffer->buf, length);
+
+	return lValStringLen(a.vBuffer->buf + offset, length - offset);
 }
 
 static lVal bufferView(lVal a, lVal aImmutable, lBufferViewType T){
@@ -157,12 +162,29 @@ static lVal lnmBufferClone(lVal self, lVal immutable){
 	return bufferFromPointer(castToBool(immutable), self.vBuffer->buf, self.vBuffer->length);
 }
 
+static lVal lnmBufferCut(lVal self, lVal start, lVal stop){
+	i64 slen, len;
+	const char *buf = self.vBuffer->data;
+	slen = len = lBufferLength(self.vBuffer);
+	reqInt(start);
+	i64 off = MAX(0, start.vInt);
+	len = MIN(slen - off, (((stop.type == ltInt)) ? stop.vInt : len) - off);
+
+	if(unlikely(len <= 0)){
+		return lnfBufferAllocate(lValInt(0));
+	}
+	lBuffer *ret = lBufferAlloc(len, false);
+	memcpy(lBufferDataMutable(ret), buf+off, len);
+	return lValAlloc(ltBuffer, ret);
+}
+
 void lOperationsBuffer(lClosure *c){
 	lClass *Buffer = &lClassList[ltBuffer];
 	lAddNativeMethodV (Buffer, lSymS("length"),     "(self)", lnmBufferLength, NFUNC_PURE);
 	lAddNativeMethodV (Buffer, lSymS("immutable?"), "(self)", lnmBufferImmutable, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("length!"),    "(self new-length)", lnmBufferLengthSet, 0);
 	lAddNativeMethodVV(Buffer, lSymS("clone"),      "(self immutable?)", lnmBufferClone, NFUNC_PURE);
+	lAddNativeMethodVVV(Buffer, lSymS("cut"),      "(self start stop)", lnmBufferCut, NFUNC_PURE);
 
 	lAddNativeMethodVV(Buffer, lSymS("u8"),  "(buf immutable?)", lnmBufferU8, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("s8"),  "(buf immutable?)", lnmBufferS8, NFUNC_PURE);
@@ -181,5 +203,5 @@ void lOperationsBuffer(lClosure *c){
 
 	lAddNativeFuncV   (c, "buffer/allocate", "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
 	lAddNativeFuncVVVV(c, "buffer/copy",     "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
-	lAddNativeFuncVV  (c, "buffer->string",  "(buf length)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString, 0);
+	lAddNativeFuncVVV (c, "buffer->string",  "(buf length offset)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString, 0);
 }

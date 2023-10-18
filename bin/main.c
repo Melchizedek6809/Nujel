@@ -18,6 +18,7 @@ static lClosure *createRootClosure(){
 	lOperationsIO(c);
 	lOperationsPort(c);
 	lOperationsInit(c);
+	lOperationsNet(c);
 	mainClosure = lLoad(c, (const char *)binlib_no_data);
 	return c;
 }

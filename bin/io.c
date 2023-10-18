@@ -292,7 +292,7 @@ static lVal lnfGetCurrentWorkingDirectory(){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFuncV (c,"exit",                       "(status)",      "Quits with code a",                                 lnfExit, 0);
+	lAddNativeFuncV (c,"exit",                       "(status)",           "Quits with code a",                                 lnfExit, 0);
 	lAddNativeFuncV (c,"popen",                      "(command)",          "Return a list of [exit-code stdout stderr)",        lnfPopen, 0);
 
 	lAddNativeFuncV (c,"file/stat",                  "(path)",             "Return some stats about FILENAME",                  lnfFileStat, 0);

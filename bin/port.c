@@ -108,16 +108,16 @@ static lVal lnfFileReadAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset)
 		return lValException(lSymTypeError, "Buffer is too small for that read operation", contentV);
 	}
 	while(bytesRead < size){
+		if(feof(fh)){
+			return lValInt(bytesRead);
+		}
 		const int r = fread(&((u8 *)buf)[offset + bytesRead], 1, size - bytesRead, fh);
 		if(ferror(fh)){
 			return lValException(lSymIOError, "IO Error occured during read", aHandle);
 		}
-		if(feof(fh)){
-			return NIL;
-		}
 		if(r > 0){ bytesRead += r; }
 	}
-	return aHandle;
+	return lValInt(bytesRead);
 }
 
 static lVal lnfFileWriteAst(lVal aHandle, lVal aBuffer, lVal aSize, lVal aOffset){

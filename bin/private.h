@@ -25,9 +25,10 @@ extern lSymbol *lSymAppend;
 
 void initEnvironmentMap(lClosure *c);
 void setIOSymbols();
-void lOperationsIO(lClosure *c);
-void lOperationsPort(lClosure *c);
-void lOperationsInit(lClosure *c);
+void lOperationsIO   (lClosure *c);
+void lOperationsPort (lClosure *c);
+void lOperationsInit (lClosure *c);
+void lOperationsNet  (lClosure *c);
 
 int  makeDir   (const char *name);
 
