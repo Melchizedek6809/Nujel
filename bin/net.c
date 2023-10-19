@@ -40,9 +40,9 @@ static lVal lnfSocketConect(lVal host, lVal port){
 	//printf("Host: %s\n", (char *)lBufferData(host.vBuffer));
 	while (res){
 		if(res->ai_family == AF_INET){
-			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port.vInt);
+			((struct sockaddr_in*)((void *)res->ai_addr))->sin_port = htons(port.vInt);
 		} else if(res->ai_family == AF_INET6){
-			((struct sockaddr_in6*)res->ai_addr)->sin6_port = htons(port.vInt);
+			((struct sockaddr_in6*)((void *)res->ai_addr))->sin6_port = htons(port.vInt);
 		} else {
 			continue;
 		}
