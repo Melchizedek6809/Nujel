@@ -72,6 +72,7 @@ static lVal lnfSocketConect(lVal host, lVal port){
 
 
 void lOperationsNet(lClosure *c){
+	(void)c;
 	#if (!defined(_WIN32)) && (!defined(__wasi__))
 	lAddNativeFuncVV(c,"socket/connect", "(host port)", "Quits with code a", lnfSocketConect, 0);
 	#endif
