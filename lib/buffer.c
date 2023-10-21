@@ -184,7 +184,7 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeMethodV (Buffer, lSymS("immutable?"), "(self)", lnmBufferImmutable, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("length!"),    "(self new-length)", lnmBufferLengthSet, 0);
 	lAddNativeMethodVV(Buffer, lSymS("clone"),      "(self immutable?)", lnmBufferClone, NFUNC_PURE);
-	lAddNativeMethodVVV(Buffer, lSymS("cut"),      "(self start stop)", lnmBufferCut, NFUNC_PURE);
+	lAddNativeMethodVVV(Buffer, lSymS("cut"),       "(self start stop)", lnmBufferCut, NFUNC_PURE);
 
 	lAddNativeMethodVV(Buffer, lSymS("u8"),  "(buf immutable?)", lnmBufferU8, NFUNC_PURE);
 	lAddNativeMethodVV(Buffer, lSymS("s8"),  "(buf immutable?)", lnmBufferS8, NFUNC_PURE);

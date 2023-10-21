@@ -46,3 +46,11 @@
                                (:cut url path-start))
                     (http/get* url "/"))))
       (error "unsupported scheme"))
+
+(defn http/wget (url filename)
+      (when-not filename
+                (set! filename (car (last-pair (split url "/")))))
+      (def res (http/get url))
+      (when (> (ref res :status-code) 299)
+        (error "Couldn't download file" url))
+      (file/write (ref res :body) filename))
