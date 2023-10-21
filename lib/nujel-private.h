@@ -421,6 +421,7 @@ void lOperationsCore       (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
 void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
+void lOperationsImage      (lClosure *c);
 void lOperationsString     ();
 void lOperationsBytecode   ();
 

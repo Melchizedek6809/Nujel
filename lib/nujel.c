@@ -51,6 +51,7 @@ void lOperationsBase(lClosure *c){
 	lOperationsCore(c);
 	lOperationsSpecial(c);
 	lOperationsTree(c);
+	lOperationsImage(c);
 	lOperationsBytecode();
 	lOperationsString();
 }
