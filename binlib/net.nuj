@@ -1,5 +1,15 @@
-(defn http/get* (host path)
-      (def req (fmt "GET {path} HTTP/1.0\r\n\r\n"))
+(defn http/req* (verb host path header)
+      (set! header (if header (:clone header) {}))
+      (set! header :Host host)
+      (set! header :Connection "close")
+      (set! header :User-Agent "Nujel/0.1")
+      (def header-lines (join (map (:keys header)
+                                   (fn (k) (fmt "{}: {}"
+                                                (keyword->string k)
+                                                (string (ref header k)))))
+                              "\r\n"))
+      (def req (fmt "{verb} {path} HTTP/1.1\r\n{header-lines}\r\n\r\n"))
+
       (def buf (buffer/allocate 0))
       (def fh (socket/connect host 80))
       (file/write* fh req (:length req))
@@ -17,20 +27,20 @@
       (when (< eosl 0) (return #nil))
       (def eoh (:index-of raw-res "\r\n\r\n"))
       (when (< eoh 0) (return #nil))
-      (def status-line (buffer->string buf eosl))
-      (def status-list (split status-line " "))
+
       (def headers {})
-      (def header-raw (buffer->string buf eoh (+ 2 eosl)))
-      (def header-lines (split header-raw "\r\n"))
-      (doseq (header header-lines)
+      (def body (:cut buf (+ 4 eoh)))
+      (def status-list (split (buffer->string buf eosl) " "))
+      (def status-code (read/int (cadr status-list)))
+      (doseq (header (split (buffer->string buf eoh (+ 2 eosl)) "\r\n"))
              (def eok (:index-of header ":"))
              (when (>= eok 0)
                (def key (string->keyword (:cut header 0 eok)))
                (def v (trim (:cut header (inc eok))))
                (set! headers key v)))
-      (def body (:cut buf (+ 4 eoh)))
+
       { :http-version (car status-list)
-        :status-code (read/int (cadr status-list))
+        :status-code status-code
         :status-message (join (cddr status-list) " ")
         :headers headers
         :body body})
@@ -42,9 +52,10 @@
         (set! url (:cut url 7))
         (def path-start (:index-of url "/"))
         (return (if (>= path-start 0)
-                    (http/get* (:cut url 0 path-start)
+                    (http/req* "GET"
+                               (:cut url 0 path-start)
                                (:cut url path-start))
-                    (http/get* url "/"))))
+                    (http/req* "GET" url "/"))))
       (error "unsupported scheme"))
 
 (defn http/wget (url filename)
