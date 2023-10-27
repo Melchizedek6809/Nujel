@@ -132,11 +132,11 @@ static lVal lnmAddMethod(lVal self, lVal name, lVal fn){
 }
 
 static void lTypesAddCoreMethods(){
-	lClass *Nil = &lClassList[ltNil];
-	lAddNativeMethodV (Nil, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
-	lAddNativeMethodV (Nil, lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
-	lAddNativeMethodV (Nil, lSymS("length"), "(self)", lnmNilLength, 0);
-	lAddNativeMethodVV(Nil, lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
+	lClass *Any = &lClassList[ltAny];
+	lAddNativeMethodV (Any, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
+	lAddNativeMethodV (Any, lSymS("type-name"), "(self)", lnmTypeName, NFUNC_PURE);
+	lAddNativeMethodV (Any, lSymS("length"), "(self)", lnmNilLength, 0);
+	lAddNativeMethodVV(Any, lSymS("meta"), "(self key)", lnmNilMetaGet, 0);
 
 	lClass *Pair = &lClassList[ltPair];
 	lAddNativeMethodV (Pair, lSymS("length"), "(self)", lnmPairLength, NFUNC_PURE);
@@ -186,33 +186,35 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 }
 
 void lTypesInit(){
-	initType(ltNil, lSymLTNil, NULL);
-	lClass *tNil = &lClassList[ltNil];
-	initType(ltSymbol, lSymLTSymbol, tNil);
-	initType(ltKeyword, lSymLTKeyword, tNil);
-	initType(ltBool, lSymLTBool, tNil);
+	initType(ltAny, lSymLTAny, NULL);
+	lClass *tAny = &lClassList[ltAny];
 
-	initType(ltInt, lSymLTInt, tNil);
-	initType(ltFloat, lSymLTFloat, tNil);
+	initType(ltNil, lSymLTNil, tAny);
+	initType(ltSymbol, lSymLTSymbol, tAny);
+	initType(ltKeyword, lSymLTKeyword, tAny);
+	initType(ltBool, lSymLTBool, tAny);
 
-	initType(ltPair, lSymLTPair, tNil);
-	initType(ltArray, lSymLTArray, tNil);
-	initType(ltTree, lSymLTTree, tNil);
+	initType(ltInt, lSymLTInt, tAny);
+	initType(ltFloat, lSymLTFloat, tAny);
 
-	initType(ltNativeFunc, lSymLTNativeFunction, tNil);
-	initType(ltLambda, lSymLTLambda, tNil);
+	initType(ltPair, lSymLTPair, tAny);
+	initType(ltArray, lSymLTArray, tAny);
+	initType(ltTree, lSymLTTree, tAny);
+
+	initType(ltNativeFunc, lSymLTNativeFunction, tAny);
+	initType(ltLambda, lSymLTLambda, tAny);
 	initType(ltMacro, lSymLTMacro, &lClassList[ltLambda]);
 	initType(ltEnvironment, lSymLTEnvironment, &lClassList[ltLambda]);
 
-	initType(ltBuffer, lSymLTBuffer, tNil);
-	initType(ltBufferView, lSymLTBufferView, tNil);
-	initType(ltBytecodeArr, lSymLTBytecodeArray, tNil);
+	initType(ltBuffer, lSymLTBuffer, tAny);
+	initType(ltBufferView, lSymLTBufferView, tAny);
+	initType(ltBytecodeArr, lSymLTBytecodeArray, tAny);
 	initType(ltString, lSymLTString, &lClassList[ltBuffer]);
 
-	initType(ltFileHandle, lSymLTFileHandle, tNil);
-	initType(ltType, lSymLTType, tNil);
-	initType(ltComment, NULL, NULL);
-	initType(ltException, NULL, NULL);
+	initType(ltFileHandle, lSymLTFileHandle, tAny);
+	initType(ltType, lSymLTType, tAny);
+	initType(ltComment, NULL, tAny);
+	initType(ltException, NULL, tAny);
 
 	lTypesAddCoreMethods();
 }

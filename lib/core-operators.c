@@ -333,15 +333,14 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments, 0);
 	lAddNativeFuncV(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent, 0);
 
-	lAddNativeFuncC(c,"current-closure",  "()",     "Return the current closure as an object",    lnfCurrentClosure, 0);
-	lAddNativeFuncC(c,"current-lambda",   "()",     "Return the current closure as a lambda",     lnfCurrentLambda, 0);
+	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object",    lnfCurrentClosure, 0);
+	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",     lnfCurrentLambda, 0);
+	lAddNativeFuncC(c,"symbol-table",    "()", "Return a list of all symbols defined, accessible from the current closure", lnfSymbolTable, 0);
 
-	lAddNativeFuncC(c,"symbol-table",  "()",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable, 0);
-
-	lAddNativeFuncV (c,"car",     "(list)",       "Return the head of LIST",          lnfCar, NFUNC_PURE);
-	lAddNativeFuncV (c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr, NFUNC_PURE);
-	lAddNativeFuncVV(c,"cons",    "(car cdr)",    "Return a new pair of CAR and CDR", lnfCons, NFUNC_PURE);
-	lAddNativeFuncV (c,"nreverse","(list)",       "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
+	lAddNativeFuncV (c,"car",     "(list)",    "Return the head of LIST",          lnfCar, NFUNC_PURE);
+	lAddNativeFuncV (c,"cdr",     "(list)",    "Return the rest of LIST",          lnfCdr, NFUNC_PURE);
+	lAddNativeFuncVV(c,"cons",    "(car cdr)", "Return a new pair of CAR and CDR", lnfCons, NFUNC_PURE);
+	lAddNativeFuncV (c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
 	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs, 0);
@@ -361,21 +360,21 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"int",             "(α)",     "Convert α into an integer number", lnfInt, NFUNC_PURE);
 	lAddNativeFuncV(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
 
-	lAddNativeMethodV(&lClassList[ltNil],    lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltInt],    lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltFloat],  lSymLTString, "(self)", lnfFloatToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltBuffer], lSymLTString, "(self)", lnfBufferToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltString], lSymLTString, "(self)", lnfIdentity, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltNil],     lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltInt],     lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltFloat],   lSymLTString, "(self)", lnfFloatToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltBuffer],  lSymLTString, "(self)", lnfBufferToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword], lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol],  lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltString],  lSymLTString, "(self)", lnfIdentity, NFUNC_PURE);
 
-	lAddNativeMethodV(&lClassList[ltString], lSymLTKeyword, "(self)", lnfStringToKeyword, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTKeyword, "(self)", lnfIdentity, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTKeyword, "(self)", lnfSymbolToKeyword, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltString],  lSymLTKeyword, "(self)", lnfStringToKeyword, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword], lSymLTKeyword, "(self)", lnfIdentity, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol],  lSymLTKeyword, "(self)", lnfSymbolToKeyword, NFUNC_PURE);
 
-	lAddNativeMethodV(&lClassList[ltString], lSymLTSymbol, "(self)", lnfStringToSymbol, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTSymbol, "(self)", lnfKeywordToSymbol, NFUNC_PURE);
-	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTSymbol, "(self)", lnfIdentity, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltString],  lSymLTSymbol, "(self)", lnfStringToSymbol, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword], lSymLTSymbol, "(self)", lnfKeywordToSymbol, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol],  lSymLTSymbol, "(self)", lnfIdentity, NFUNC_PURE);
 
 	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
 	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
@@ -400,4 +399,5 @@ void lOperationsCore(lClosure *c){
 	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
 	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
 	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
+	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
 }

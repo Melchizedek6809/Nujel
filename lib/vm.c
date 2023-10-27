@@ -763,7 +763,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lVal self = vs[1-len];
 			lVal nfun = lMethodLookup(fun.vSymbol, self);
 			if(unlikely(nfun.type == ltException)){
-				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", fun);
+				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL)));
 				goto throwException;
 			}
 			fun = nfun;
@@ -836,7 +836,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lVal self = lCar(cargs);
 			lVal nfun = lMethodLookup(fun.vSymbol, self);
 			if(unlikely(nfun.type == ltException)){
-				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", fun);
+				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL)));
 				goto throwException;
 			}
 			fun = nfun;

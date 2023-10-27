@@ -77,7 +77,8 @@ typedef enum {
 
 	// These should never be visible from inside the Nujel VM
 	ltComment,
-	ltException
+	ltException,
+	ltAny
 } lType;
 
 typedef struct lBuffer        lBuffer;

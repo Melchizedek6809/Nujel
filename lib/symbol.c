@@ -64,6 +64,7 @@ lSymbol *lSymLTBufferView;
 lSymbol *lSymLTFileHandle;
 lSymbol *lSymLTUnknownType;
 lSymbol *lSymLTType;
+lSymbol *lSymLTAny;
 lSymbol *lSymPrototype;
 
 lSymbol *lSymFloatNaN;
@@ -130,6 +131,7 @@ void lSymbolInit(){
 	lSymLTFileHandle     = lSymSM("file-handle");
 	lSymLTUnknownType    = lSymSM("unknown-type");
 	lSymLTType           = lSymSM("type");
+	lSymLTAny            = lSymSM("any");
 
 	lSymPrototype        = lSymSM("prototype*");
 
@@ -279,6 +281,7 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltBuffer:      return lSymLTBuffer;
 		case ltBufferView:  return lSymLTBufferView;
 		case ltFileHandle:  return lSymLTFileHandle;
+		case ltAny:         return lSymLTAny;
 	}
 }
 

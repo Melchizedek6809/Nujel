@@ -380,6 +380,7 @@ extern lSymbol *lSymLTBufferView;
 extern lSymbol *lSymLTFileHandle;
 extern lSymbol *lSymLTUnknownType;
 extern lSymbol *lSymLTType;
+extern lSymbol *lSymLTAny;
 
 extern lSymbol *symNull;
 extern lSymbol *symQuote;
