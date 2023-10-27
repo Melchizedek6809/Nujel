@@ -42,7 +42,7 @@
 
 (defn int->string/decimal (α)
       "Turn α into a its **decimal** string representation"
-      (string α))
+      (:string α))
 (def int->string int->string/decimal)
 
 (def write/raw (let*
@@ -77,7 +77,7 @@
                          (return always-space?))
                        (when (write/raw/tree/rec (:left* v) port hr? always-space?)
                          (port 'block-write " "))
-                       (port 'block-write (keyword->string (:key* v)))
+                       (port 'block-write (:string (:key* v)))
                        (port 'block-write ": ")
                        (write/raw (:value* v) port hr?)
                        (write/raw/tree/rec (:right* v) port hr? #t))
@@ -133,18 +133,18 @@
                              (:environment     (port 'write "#<environment " (int->string/hex (val->id v)) ">"))
                              (:file-handle     (port 'write "#<file-handle " (int->string/hex (val->id v)) ">"))
                              (:buffer-view     (port 'write "#<buffer-view " (int->string/hex (val->id v)) ">"))
-                             ((:lambda :macro :native-function) (port 'block-write (string (or (closure/name v) 'anonymous))))
+                             ((:lambda :macro :native-function) (port 'block-write (:string (or (closure/name v) 'anonymous))))
                              (:int             (port 'block-write (int->string/decimal v)))
-                             (:float           (port 'block-write (string v))) ;; This one is kinda cheating
-                             (:keyword         (port 'write ":" (keyword->string v)))
-                             (:symbol          (port 'block-write (string v)))
+                             (:float           (port 'block-write (:string v))) ;; This one is kinda cheating
+                             (:keyword         (port 'write ":"   (:string v)))
+                             (:symbol          (port 'block-write (:string v)))
                              (:array           (write/raw/array v port hr?))
                              (:buffer          (write/raw/buffer v port hr?))
                              (:bytecode-array  (write/raw/bytecode-array v port hr?))
                              (:string          (write/raw/string v port hr?))
                              (:tree            (write/raw/tree v port hr?))
                              (:pair            (write/raw/pair v port hr?))
-                             (:type            (port 'write ":" (keyword->string (:name v))))
+                             (:type            (port 'write ":" (:string (:name v))))
                              (otherwise        (port 'block-write "#<unprintable>"))))))
 
 (defn write (v port)

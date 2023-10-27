@@ -15,7 +15,7 @@
       (and l (ref l :v)))
 
 (defn snail->str (l)
-      (cond ((snail/int? l) (string (ref l :v)))
+      (cond ((snail/int? l) (:string (ref l :v)))
             (#t (cat "(" (snail->str (ref l :l))  "," (snail->str (ref l :r)) ")"))))
 
 (defn snail/find (root needle as bs)

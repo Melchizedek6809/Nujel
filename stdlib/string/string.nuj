@@ -29,7 +29,7 @@
 
 
       (when-not padding (set! padding " "))
-      (when-not (string? text) (set! text (string text)))
+      (when-not (string? text) (set! text (:string text)))
       (when-not (string? padding)
                 (throw (list :type-error "pad-start needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
       (while (< (:length text) pad-length)
@@ -64,7 +64,7 @@
 
 
       (when-not padding (set! padding " "))
-      (when-not (string? text) (set! text (string text)))
+      (when-not (string? text) (set! text (:string text)))
       (when-not (string? padding)
                 (throw (list :type-error "pad-end needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
       (while (< (:length text) pad-length)
@@ -98,7 +98,7 @@
       (deftest "-123.-" (pad-middle '123 6 ".-"))
 
       (when-not padding (set! padding " "))
-      (when-not (string? text) (set! text (string text)))
+      (when-not (string? text) (set! text (:string text)))
       (when-not (string? padding)
                 (throw (list :type-error "string/pad-middle needs char as a string, so that one can pad with multiple characters" padding (current-lambda))))
       (while (< (:length text) pad-length)

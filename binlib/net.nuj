@@ -5,8 +5,8 @@
       (set! header :User-Agent "Nujel/0.1")
       (def header-lines (join (map (:keys header)
                                    (fn (k) (fmt "{}: {}"
-                                                (keyword->string k)
-                                                (string (ref header k)))))
+                                                (:string k)
+                                                (:string (ref header k)))))
                               "\r\n"))
       (def req (fmt "{verb} {path} HTTP/1.1\r\n{header-lines}\r\n\r\n"))
 
@@ -35,7 +35,7 @@
       (doseq (header (split (buffer->string buf eoh (+ 2 eosl)) "\r\n"))
              (def eok (:index-of header ":"))
              (when (>= eok 0)
-               (def key (string->keyword (:cut header 0 eok)))
+               (def key (:keyword (:cut header 0 eok)))
                (def v (trim (:cut header (inc eok))))
                (set! headers key v)))
 

@@ -104,9 +104,9 @@
 
 (def part-2 (reduce lines (fn (Σ line)
           (def split-args (split line "|"))
-          (def output-raw (map (read (cadr split-args)) string))
+          (def output-raw (map (read (cadr split-args)) :string))
           (for-each output-raw output/count)
-          (def table-raw (map (read (car split-args)) string))
+          (def table-raw (map (read (car split-args)) :string))
           (def output-sum (translate table-raw output-raw))
           (+ Σ output-sum)) 0))
 

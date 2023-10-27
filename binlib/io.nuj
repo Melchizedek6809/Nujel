@@ -41,7 +41,7 @@
 
 (defn file/compile/module (path environment base-dir)
       "Compile a Nujel source file into optimized object code"
-      (def module-name (string->keyword (path/without-extension (:cut path (:length base-dir)))))
+      (def module-name (:keyword (path/without-extension (:cut path (:length base-dir)))))
       (def source `(defmodule/defer ~module-name (def *module* ~module-name) ~@(read (file/read path))))
       (def object-code (compile* source (or environment (environment*))))
       (file/write (if object-code (string/write object-code) "")
@@ -70,7 +70,7 @@
       (def rel-path (:cut path (:length base-dir)))
       (when (= (ref rel-path 0) #\/)
             (set! rel-path (:cut rel-path 1)))
-      (def module-name (string->keyword (path/without-extension rel-path)))
+      (def module-name (:keyword (path/without-extension rel-path)))
       (import (blue) :ansi)
       (import (init! finish!) :test)
       (init!)
@@ -219,7 +219,7 @@
 (def *module-path* (path/working-directory))
 
 (defn module/loader/filesystem (name)
-      (def name-string (keyword->string name))
+      (def name-string (:string name))
       (when-not (= (ref name-string 0) #\/) (return #nil)) ; Paths have to start with a /
       (when (= System/OS 'Windows) (set! name-string (:cut name-string 1)))
       (def module-path (fmt "{}.nuj" name-string))

@@ -41,7 +41,7 @@
               (:pair (if (= (car v) 'deftest)
                          (set! meta :tests (cons (cdr v) (ref meta :tests)))
                          (set! body #nil)))
-              (:string (set! meta :documentation (cat (string (ref meta :documentation))
+              (:string (set! meta :documentation (cat (:string (ref meta :documentation))
                                                                  "\n"
                                                                  v)))
               (:keyword (case v
@@ -115,4 +115,4 @@
 (def gensym (let ((gensym/counter 0))
                  (defn gensym (prefix)
                        (inc! gensym/counter)
-                       (string->symbol (cat prefix "ΓεnΣym-" gensym/counter)))))
+                       (:symbol (cat prefix "ΓεnΣym-" gensym/counter)))))

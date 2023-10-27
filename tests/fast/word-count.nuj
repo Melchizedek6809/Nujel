@@ -2,11 +2,11 @@
 ;; Simple test program that should give the same result as `wc -l` or `wc -w`
 
 (defn count-lines (filename)
-       (def text (string (file/read filename)))
+       (def text (:string (file/read filename)))
        (- (count (split text "\n")) 1))
 
 (defn count-words (filename)
-       (def text (string (file/read filename)))
+       (def text (:string (file/read filename)))
        (-> text
            (split "\n")
            (reduce (fn (a b)

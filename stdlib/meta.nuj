@@ -34,7 +34,7 @@
                                     (0 v)
                                     (2 (string/write v))
                                     (3 (print/stacktrace v))
-                                    (otherwise (string v)))))
+                                    (otherwise (:string v)))))
 
                    (defn print/error/iter (error i)
                          (if error
@@ -74,7 +74,7 @@
 
                 (defn describe/string (a)
                       "Descibe whatever value string A resolves to"
-                      (describe/thing (resolve (string->symbol a))))
+                      (describe/thing (resolve (:symbol a))))
 
                 (defn describe (fun) "Describe FUN, if there is documentation available"
                       (if (string? fun)

@@ -22,8 +22,8 @@
       :cat :modules
       :internal
       (case (:type-name module-name)
-            (:string (module/qualify-symbol (string->keyword module-name) symbol))
-            (:keyword (string->symbol (cat (keyword->symbol module-name) "/" (string symbol))))
+            (:string (module/qualify-symbol (:keyword module-name) symbol))
+            (:keyword (:symbol (cat (:symbol module-name) "/" (:string symbol))))
             (otherwise (exception "Can't qualify that" module-name))))
 
 (defn require* (module env qualify?)
@@ -35,8 +35,8 @@
       (doseq (k (:keys exports))
              (def-in! env
                (if qualify?
-                   (module/qualify-symbol module (keyword->symbol k))
-                   (keyword->symbol k))
+                   (module/qualify-symbol module (:symbol k))
+                   (:symbol k))
                (ref exports k))))
 
 (defn module/load/cache (name)
@@ -89,7 +89,7 @@
       :internal
       (def mod-path wd)
       (def parts (module/resolve-string/join (nreverse (append (split mod-path "/") (split name "/"))) #nil))
-      (string->keyword (join (cons "" parts) "/"))) ; The cons is for the leading /
+      (:keyword (join (cons "" parts) "/"))) ; The cons is for the leading /
 
 (defn module/load (name env)
       :cat :modules

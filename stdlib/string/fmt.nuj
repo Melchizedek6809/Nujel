@@ -126,9 +126,9 @@
 
            (defn fmt/arg-sym (v)
                  (case (:type-name v)
-                       (:int (fmt/arg-sym (cat "fmt-arg-" (string v))))
+                       (:int (fmt/arg-sym (cat "fmt-arg-" (:string v))))
                        (:symbol v)
-                       (:string (string->symbol v))
+                       (:string (:symbol v))
                        (otherwise (throw (list :type-error "Invalid fmt argument name" v (current-lambda))))))
 
            (defn fmt/expr (expr arguments-used opts)
@@ -190,7 +190,7 @@
                                        (cons 'string/display expr-list))))
                      (def fmt/args/map-fun/count 0)
                      (defn fmt/args/map-fun (arg)
-                           (def s (string->symbol (cat "fmt-arg-"(string fmt/args/map-fun/count))))
+                           (def s (:symbol (cat "fmt-arg-" (:string fmt/args/map-fun/count))))
                            (inc! fmt/args/map-fun/count)
                            (list 'def s arg))
                      (if args

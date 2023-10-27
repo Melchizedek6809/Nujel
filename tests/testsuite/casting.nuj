@@ -25,3 +25,4 @@
 (:type-error (try car (int "1a")))
 (:type-error (try car (int "1 a")))
 (:type-error (try car (def cb '+) (apply cb)))
+(#t (= (:symbol "asd") (:symbol :asd)))

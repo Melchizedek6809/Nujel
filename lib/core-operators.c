@@ -242,20 +242,6 @@ static lVal lnfInt(lVal v){
 	}
 }
 
-static lVal lnfSymbolToKeyword(lVal v){
-	reqSymbol(v);
-	return lValKeywordS(v.vSymbol);
-}
-
-static lVal lnfKeywordToSymbol(lVal a){
-	if(likely(a.type == ltKeyword)){
-		return lValSymS(a.vSymbol);
-	} else {
-		return a;
-	}
-
-}
-
 static i64 lValToId(lVal v){
 	switch(v.type){
 	default:      return 0;
@@ -279,44 +265,56 @@ static lVal lnfValToId(lVal a){
 	return lValInt(lValToId(a));
 }
 
-static lVal lnfString(lVal a){
-	char buf[64];
-	int snret;
-	switch(a.type){
-	default:
-		return lValException(lSymTypeError, "Can't convert that into a string", a);
-	case ltNil:
-		return lValString("");
-	case ltBuffer:
-		return lValStringLen(a.vBuffer->data, a.vBuffer->length);
-	case ltString:
-		return a;
-	case ltKeyword:
-		snret = snprintf(buf,sizeof(buf),":%s",a.vSymbol->c);
-		break;
-	case ltSymbol:
-		snret = snprintf(buf,sizeof(buf),"%s",a.vSymbol->c);
-		break;
-	case ltInt:
-		snret = snprintf(buf,sizeof(buf),"%" PRId64, a.vInt);
-		break;
-	case ltFloat: {
-		snret = snprintf(buf,sizeof(buf),"%f", a.vFloat);
-		if(snret < 0){exit(5);}
-		buf[snret--] = 0;
-		for(;(snret > 0) && (buf[snret] == '0');snret--){}
-		if(buf[snret] == '.'){snret++;}
-		snret++;
-		break; }
-	}
-	if(snret < 0){exit(5);}
-	buf[snret] = 0;
+static lVal lnfSymbolToKeyword(lVal v){
+	return lValKeywordS(v.vSymbol);
+}
+
+static lVal lnfStringToKeyword(lVal v){
+	return lValKeyword(v.vString->data);
+}
+
+static lVal lnfKeywordToSymbol(lVal a){
+	return lValSymS(a.vSymbol);
+}
+
+static lVal lnfStringToSymbol(lVal a){
+	return lValSym(a.vString->data);
+}
+
+static lVal lnfIdentity(lVal a){
+	return a;
+}
+
+static lVal lnfNilToString(lVal a){
+	(void)a;
+	return lValStringLen("",0);
+}
+
+static lVal lnfBufferToString(lVal a){
+	return lValStringLen(a.vBuffer->data, a.vBuffer->length);
+}
+
+static lVal lnfSymbolToString(lVal a){
+	return lValString(a.vSymbol->c);
+}
+
+static lVal lnfIntToString(lVal a){
+	char buf[32];
+	const int snret = snprintf(buf, sizeof(buf),"%" PRId64, a.vInt);
 	return lValStringLen(buf,snret);
 }
 
-static lVal lnfStrSym(lVal a){
-	reqString(a);
-	return lValSym(a.vString->data);
+static lVal lnfFloatToString(lVal a){
+	char buf[32];
+	int snret = snprintf(buf,sizeof(buf),"%f", a.vFloat);
+	if(snret < 0){
+		return lValException(lSymIOError, "Unprintable flonum", a);
+	}
+	buf[snret--] = 0;
+	for(;(snret > 0) && (buf[snret] == '0');snret--){}
+	if(buf[snret] == '.'){snret++;}
+	snret++;
+	return lValStringLen(buf, snret);
 }
 
 void lOperationsCore(lClosure *c){
@@ -328,11 +326,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncCVV(c,"resolve-or-nil","(sym environment)",   "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull, 0);
 	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value",           lnfResolvesPred, 0);
 
-	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in [write)", lnfValToId, 0);
-
-	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
-	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
-	lAddNativeMethodVVV(&lClassList[ltLambda],    lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
+	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
 
 	lAddNativeFuncV(c,"closure/data",     "(clo)",  "Return the data of CLO",                     lnfClosureData, 0);
 	lAddNativeFuncV(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode, 0);
@@ -344,9 +338,9 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncC(c,"symbol-table",  "()",        "Return a list of all symbols defined, accessible from the current closure",lnfSymbolTable, 0);
 
-	lAddNativeFuncV (c,"car",     "(list)",       "Return the head of LIST",          lnfCar, 0);
-	lAddNativeFuncV (c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr, 0);
-	lAddNativeFuncVV(c,"cons",    "(car cdr)",    "Return a new pair of CAR and CDR", lnfCons, 0);
+	lAddNativeFuncV (c,"car",     "(list)",       "Return the head of LIST",          lnfCar, NFUNC_PURE);
+	lAddNativeFuncV (c,"cdr",     "(list)",       "Return the rest of LIST",          lnfCdr, NFUNC_PURE);
+	lAddNativeFuncVV(c,"cons",    "(car cdr)",    "Return a new pair of CAR and CDR", lnfCons, NFUNC_PURE);
 	lAddNativeFuncV (c,"nreverse","(list)",       "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
@@ -366,28 +360,44 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncV(c,"int",             "(α)",     "Convert α into an integer number", lnfInt, NFUNC_PURE);
 	lAddNativeFuncV(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
-	lAddNativeFuncV(c,"string",          "(α)",     "Convert α into a printable and readable string", lnfString, NFUNC_PURE);
-	lAddNativeFuncV(c,"symbol->keyword", "(α)",     "Convert symbol α into a keyword", lnfSymbolToKeyword, NFUNC_PURE);
-	lAddNativeFuncV(c,"keyword->symbol", "(α)",     "Convert keyword α into a symbol", lnfKeywordToSymbol, NFUNC_PURE);
-	lAddNativeFuncV(c,"string->symbol",  "(str)",   "Convert STR to a symbol",         lnfStrSym, NFUNC_PURE);
 
-	lDefineVal(c, "Nil", lValType(&lClassList[ltNil]));
-	lDefineVal(c, "Symbol", lValType(&lClassList[ltSymbol]));
-	lDefineVal(c, "Keyword", lValType(&lClassList[ltKeyword]));
-	lDefineVal(c, "Bool", lValType(&lClassList[ltBool]));
-	lDefineVal(c, "Int", lValType(&lClassList[ltInt]));
-	lDefineVal(c, "Float", lValType(&lClassList[ltFloat]));
-	lDefineVal(c, "Pair", lValType(&lClassList[ltPair]));
-	lDefineVal(c, "Array", lValType(&lClassList[ltArray]));
-	lDefineVal(c, "Tree", lValType(&lClassList[ltTree]));
-	lDefineVal(c, "Lambda", lValType(&lClassList[ltLambda]));
-	lDefineVal(c, "Macro", lValType(&lClassList[ltMacro]));
+	lAddNativeMethodV(&lClassList[ltNil],    lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltInt],    lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltFloat],  lSymLTString, "(self)", lnfFloatToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltBuffer], lSymLTString, "(self)", lnfBufferToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTString, "(self)", lnfSymbolToString, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltString], lSymLTString, "(self)", lnfIdentity, NFUNC_PURE);
+
+	lAddNativeMethodV(&lClassList[ltString], lSymLTKeyword, "(self)", lnfStringToKeyword, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTKeyword, "(self)", lnfIdentity, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTKeyword, "(self)", lnfSymbolToKeyword, NFUNC_PURE);
+
+	lAddNativeMethodV(&lClassList[ltString], lSymLTSymbol, "(self)", lnfStringToSymbol, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltKeyword],lSymLTSymbol, "(self)", lnfKeywordToSymbol, NFUNC_PURE);
+	lAddNativeMethodV(&lClassList[ltSymbol], lSymLTSymbol, "(self)", lnfIdentity, NFUNC_PURE);
+
+	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
+	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
+	lAddNativeMethodVVV(&lClassList[ltLambda],    lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
+
+	lDefineVal(c, "Nil",        lValType(&lClassList[ltNil]));
+	lDefineVal(c, "Symbol",     lValType(&lClassList[ltSymbol]));
+	lDefineVal(c, "Keyword",    lValType(&lClassList[ltKeyword]));
+	lDefineVal(c, "Bool",       lValType(&lClassList[ltBool]));
+	lDefineVal(c, "Int",        lValType(&lClassList[ltInt]));
+	lDefineVal(c, "Float",      lValType(&lClassList[ltFloat]));
+	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
+	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
+	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
+	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
+	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
 	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
-	lDefineVal(c, "Environment", lValType(&lClassList[ltEnvironment]));
-	lDefineVal(c, "String", lValType(&lClassList[ltString]));
-	lDefineVal(c, "Buffer", lValType(&lClassList[ltBuffer]));
+	lDefineVal(c, "Environment",lValType(&lClassList[ltEnvironment]));
+	lDefineVal(c, "String",     lValType(&lClassList[ltString]));
+	lDefineVal(c, "Buffer",     lValType(&lClassList[ltBuffer]));
 	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
-	lDefineVal(c, "BytecodeArr", lValType(&lClassList[ltBytecodeArr]));
+	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
 	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
-	lDefineVal(c, "Type", lValType(&lClassList[ltType]));
+	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
 }
