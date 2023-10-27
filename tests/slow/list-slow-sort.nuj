@@ -1,11 +1,11 @@
 #!/usr/bin/env nujel
-
-(require :random)
+(import (rng) :random)
 
 (defn test-sort (times sort-func)
-       (def l #nil)
+      (def l #nil)
+      (def rand (:new rng))
        (dotimes (i times)
-                (set! l (cons (random/rng!) l)))
+                (set! l (cons (:rng! rand) l)))
        (def sorted (sort-func l))
        (while sorted
               (when (and (cadr sorted)

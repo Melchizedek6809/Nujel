@@ -3,11 +3,13 @@
 ;;;
 ;;; A very simple pseudo random number generator, suitable for the illusion of
 ;;; randomness
-(def seed 0)
-
 (defclass rng
   "A simple RNG"
   :export
+
+  (defn new (self seed)
+        (when-not seed (set! seed (bit-xor (time) (time/milliseconds))))
+        { :seed seed :prototype* self })
 
   (defn seed! (self seed)
         "Set a new seed value for the RNG"
@@ -23,43 +25,9 @@
         "Return a value from 0 to MAX, or, if left out, a random int"
         (if max (rem (abs (:rng! self)) max) (:rng! self))))
 
-
-(defn new (seed)
-      :export
-      { :seed (or seed (bit-xor (time) (time/milliseconds)))
-        :prototype* rng })
-
-(defn rng! ()
-      :export
-      (set! seed (+ 12345 (* seed 1103515245)))
-      (bit-or (bit-shift-left (bit-and seed #xFFFF) 16)
-              (bit-and (bit-shift-right seed 16) #xFFFF)))
-
-(defn seed! (new-seed)
-      :export
-      "Set a new seed value for the RNG"
-      (set! seed new-seed))
-
-(defn seed ()
-      :export
-      "Return the current RNG seed value"
-      (return seed))
-
-(defn random (max)
-      :export-as int
-      "Return a value from 0 to MAX, or, if left out, a random int"
-      (if max
-          (rem (abs (rng!)) max)
-          (rng!)))
-
-(defn seed-initialize! ()
-      :export
-      (set! seed (bit-xor (time) (time/milliseconds))))
-(seed-initialize!)
-
-(deftest #t (int? (random/int)))
-(deftest #t (random/seed! 123) (def first-value (random/int)) (random/seed! 123) (= first-value (random/int)))
-(deftest #t (random/seed! 99) (not= (random/int) (random/int)))
-(deftest #t (int? (-> (random/new) :int)))
-(deftest #t (def rng (random/new 123)) (def a (:int rng)) (:seed! rng 123) (= (:int rng) a))
-(deftest #t (def rng (random/new 99)) (not= (:int rng) (:int rng)))
+(deftest #t (int? (:int (:new random/rng))))
+(deftest #t (def r (:new random/rng)) (:seed! r 123) (def first-value (:int r)) (:seed! r 123) (= first-value (:int r)))
+(deftest #t (def r (:new random/rng)) (:seed! r 99) (not= (:int r) (:int r)))
+(deftest #t (int? (-> (:new random/rng) :int)))
+(deftest #t (def rng (:new random/rng 123)) (def a (:int rng)) (:seed! rng 123) (= (:int rng) a))
+(deftest #t (def rng (:new random/rng 99)) (not= (:int rng) (:int rng)))

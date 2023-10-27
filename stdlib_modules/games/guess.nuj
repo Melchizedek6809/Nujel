@@ -1,5 +1,5 @@
 (require :ansi)
-(require :random)
+(import (rng) :random)
 
 (defn win (guesses-left)
       (pfmtln "Fantastic, {} with {guesses-left} guesses left." (ansi/rainbow "you won"))
@@ -20,8 +20,9 @@
       (println (ansi/rainbow "Guess the number!!!"))
       (println "")
       (println "You have 10 tries, with every guess I will tell you if it was too high or too low, the number is in the range of 0 to 100")
+      (def rand (:new rng))
       (def guesses-left 10)
-      (def number (random/int 100))
+      (def number (:int rand 100))
       (while (> guesses-left 0)
         (def line (readline (fmt "Your {} guess? " (cond ((= guesses-left 1) (ansi/red "final"))
                                                          (#t (- 11 guesses-left))))))
