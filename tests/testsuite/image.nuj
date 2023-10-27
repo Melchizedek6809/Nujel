@@ -1,0 +1,5 @@
+(-123 (image/deserialize (image/serialize -123)))
+(123 (image/deserialize (image/serialize 123)))
+(123.321 (image/deserialize (image/serialize 123.321)))
+(#f (image/deserialize (image/serialize #f)))
+(#t (image/deserialize (image/serialize #t)))

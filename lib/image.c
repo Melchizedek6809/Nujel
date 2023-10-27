@@ -20,6 +20,12 @@ typedef enum {
 } lImageTableTypes;
 
 typedef struct {
+	uint8_t flags;
+	uint32_t offset;
+	uint32_t size;
+} lImageTableBuffer;
+
+typedef struct {
 	uint8_t T;
 	uint32_t imageOffset;
 	uint32_t elementCount;
@@ -83,9 +89,39 @@ static lVal readImage(const lImage *img){
 	}
 }
 
+typedef struct {
+	lBuffer **buffer;
+	uint32_t bufferCount;
+	uint32_t bufferSize;
+} writeImageContext;
+
+static uint32_t ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
+	if(ctx->bufferSize <= (1+ctx->bufferCount)){
+		ctx->bufferSize += 64;
+		ctx->buffer = realloc(ctx->buffer, ctx->bufferSize * sizeof(void *));
+	}
+	ctx->buffer[ctx->bufferCount] = v;
+	return ctx->bufferCount++;
+}
+
+static lImage *ctxWriteBufferTable(writeImageContext *ctx, lImage *img){
+	if(ctx->bufferCount == 0){
+		return img;
+	}
+	return img;
+}
+
+static lImage *ctxWriteTables(writeImageContext *ctx, lImage *img){
+	img = ctxWriteBufferTable(ctx, img);
+	return img;
+}
+
 static lImage *writeImage(lVal rootValue){
 	size_t size = sizeof(lImage);
+	writeImageContext ctx;
+	memset(&ctx, 0, sizeof(ctx));
 	lImage *buf = malloc(size);
+
 	buf->magic[0] = 'N';
 	buf->magic[1] = 'u';
 	buf->magic[2] = 'j';
@@ -103,8 +139,6 @@ static lImage *writeImage(lVal rootValue){
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment:
-	case ltString:
-	case ltBuffer:
 	case ltBufferView:
 	case ltBytecodeArr:
 		free(buf);
@@ -116,16 +150,22 @@ static lImage *writeImage(lVal rootValue){
 	case ltType:
 		free(buf);
 		return NULL;
+	case ltString:
+	case ltBuffer:
+		buf->rootValue = rootValue;
+		buf->rootValue.vBuffer = (lBuffer *)((uint64_t)ctxAddBuffer(&ctx, rootValue.vBuffer));
+		break;
 	default:
 		buf->rootValue = rootValue;
+		break;
 	}
-	return buf;
+	return ctxWriteTables(&ctx, buf);
 }
 
 static lVal lnfSerialize(lVal val){
 	lImage *img = writeImage(val);
 	if(unlikely(img == NULL)){
-		return lValExceptionSimple();
+		return lValException(lSymTypeError, "Can't serialize that", NIL);
 	} else {
 		lBuffer *buf = lBufferAlloc(img->imageSize, true);
 		buf->buf = img;
