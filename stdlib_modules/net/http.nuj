@@ -1,0 +1,63 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+(defn req* (verb host path header)
+      (set! header (if header (:clone header) {}))
+      (set! header :Host host)
+      (set! header :Connection "close")
+      (set! header :User-Agent "Nujel/0.1")
+      (def header-lines (join (map (:keys header)
+                                   (fn (k) (fmt "{}: {}"
+                                                (:string k)
+                                                (:string (ref header k)))))
+                              "\r\n"))
+      (def req (fmt "{verb} {path} HTTP/1.1\r\n{header-lines}\r\n\r\n"))
+
+      (def buf (buffer/allocate 0))
+      (def fh (socket/connect host 80))
+      (file/write* fh req (:length req))
+      (file/flush* fh)
+      (def bytes-read 0)
+      (def bytes-read-now 1)
+      (while (not (zero? bytes-read-now))
+        (:length! buf (+ 65536 (:length buf)))
+        (set! bytes-read-now (file/read* fh buf 65536 bytes-read))
+        (set! bytes-read (+ bytes-read bytes-read-now)))
+      (file/close* fh)
+
+      (def raw-res (buffer->string buf bytes-read))
+      (def eosl (:index-of raw-res "\r\n"))
+      (when (< eosl 0) (return #nil))
+      (def eoh (:index-of raw-res "\r\n\r\n"))
+      (when (< eoh 0) (return #nil))
+
+      (def headers {})
+      (def body (:cut buf (+ 4 eoh)))
+      (def status-list (split (buffer->string buf eosl) " "))
+      (def status-code (read/int (cadr status-list)))
+      (doseq (header (split (buffer->string buf eoh (+ 2 eosl)) "\r\n"))
+             (def eok (:index-of header ":"))
+             (when (>= eok 0)
+               (def key (:keyword (:cut header 0 eok)))
+               (def v (trim (:cut header (inc eok))))
+               (set! headers key v)))
+
+      { :http-version (car status-list)
+        :status-code status-code
+        :status-message (join (cddr status-list) " ")
+        :headers headers
+        :body body})
+
+(defn get (url)
+      :export
+      (when (= (:index-of url "https://") 0)
+        (error "https is unsupported right now"))
+      (when (= (:index-of url "http://") 0)
+        (set! url (:cut url 7))
+        (def path-start (:index-of url "/"))
+        (return (if (>= path-start 0)
+                    (http/req* "GET"
+                               (:cut url 0 path-start)
+                               (:cut url path-start))
+                    (http/req* "GET" url "/"))))
+      (error "unsupported scheme"))

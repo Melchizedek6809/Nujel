@@ -1,0 +1,62 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+
+(defn parse-url (url)
+      (when (= (:index-of url "gopher://") 0)
+        (set! url (:cut url 9))
+        (def host url)
+        (def port 70)
+        (def path "")
+
+        (def first-slash (:index-of url "/"))
+        (when (>= first-slash 0)
+          (set! path (:cut url first-slash))
+          (set! host (:cut url 0 first-slash)))
+
+        (def first-colon (:index-of host ":"))
+        (when (>= first-colon 0)
+          (set! port (read/int (:cut host (inc first-colon))))
+          (set! host (:cut host 0 first-colon)))
+
+        (return {:host host :port port :path path :protocol :gopher}))
+      #nil)
+
+(defn get* (host path port)
+      (def buf (buffer/allocate 0))
+      (def fh (socket/connect host port))
+      (file/write* fh path (:length path))
+      (file/write* fh "\r\n" 2)
+      (file/flush* fh)
+      (def bytes-read 0)
+      (def bytes-read-now 1)
+      (while (not (zero? bytes-read-now))
+        (:length! buf (+ 4096 (:length buf)))
+        (set! bytes-read-now (file/read* fh buf 4096 bytes-read))
+        (set! bytes-read (+ bytes-read bytes-read-now)))
+      (file/close* fh)
+      (def raw-res (buffer->string buf bytes-read))
+      raw-res)
+
+(defn parse-gopher-map (line)
+      (def T (:cut line 0 1))
+      (when (= T ".")
+        (return #nil))
+      (def cols (split (:cut line 1) "\t"))
+      { :type (:keyword T)
+        :display  (or (car cols) "")
+        :selector (or (cadr cols) "")
+        :hostname (or (caddr cols) "")
+        :port     (or (caddr cols) 70)})
+
+(defn get (url type)
+      :export
+      (when-not type (set! type :1))
+      (def info (parse-url url))
+      (when-not info (return #nil))
+      (def res (get* (ref info :host) (ref info :path) (ref info :port)))
+      (when-not res (return #nil))
+      (if (= type :1)
+          (-> (split res "\r\n")
+              (map parse-gopher-map))
+          res))

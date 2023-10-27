@@ -1,0 +1,18 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+(import (get :as http/get) :net/http)
+
+(defn get (url)
+      :export
+      (def res (http/get url))
+      (when (> (ref res :status-code) 299)
+        (return #nil))
+      (ref res :body))
+
+(defn download (url filename)
+      :export
+      (when-not filename
+                (set! filename (car (last-pair (split url "/")))))
+      (def body (get url))
+      (when body (file/write body filename)))
