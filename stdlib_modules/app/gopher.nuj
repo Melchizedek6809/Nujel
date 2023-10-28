@@ -7,47 +7,48 @@
 (def screen-width 0)
 (def screen-height 0)
 (def frame-height 0)
-(def scroll-interval 10)
+(def scroll-interval 8)
 (def last-char 0)
 
-(def cur-page { :url "gopher://sdf.org/phlogs"
+(def cur-page { :url "gopher://sdf.org"
                 :type :1
                 :scrolly 0
                 :data #nil
                 :item #nil })
 (def history #nil)
 
+(def gopher-type-map { :0 "(TXT)"
+                       :1 "(DIR)"
+                       :2 "(NAM)"
+                       :3 "(ERR)"
+                       :4 "(BHX)"
+                       :5 "(DOS)"
+                       :6 "(UUE)"
+                       :7 "(FTS)"
+                       :8 "(TEL)"
+                       :9 "(BIN)"
+                       :g "(GIF)"
+                       :I "(IMG)"
+                       :T "(IBM)"
+                       :< "(SND)"
+                       :d "(DOC)"
+                       :h "(HTM)"
+                       :p "(PNG)"
+                       :r "(RTF)"
+                       :s "(WAV)"
+                       :P "(PDF)"
+                       :X "(XML)"
+                       :i "     " })
+
 (defn gopher-type-name (data)
-      (case (or (ref data :type) :un)
-            (:0 "(TXT)")
-            (:1 "(DIR)")
-            (:2 "(NAM)")
-            (:3 "(ERR)")
-            (:4 "(BHX)")
-            (:5 "(DOS)")
-            (:6 "(UUE)")
-            (:7 "(FTS)")
-            (:8 "(TEL)")
-            (:9 "(BIN)")
-            (:g "(GIF)")
-            (:I "(IMG)")
-            (:T "(IBM)")
-            (:< "(SND)")
-            (:d "(DOC)")
-            (:h "(HTM)")
-            (:p "(PNG)")
-            (:r "(RTF)")
-            (:s "(WAV)")
-            (:P "(PDF)")
-            (:X "(XML)")
-            (:i "     ")
-            (otherwise " (?) ")))
+      (or (ref gopher-type-map (or (ref data :type) :un)) " (?) "))
 
 (defn get-modeline (page)
       (def y (get-item-pos page))
+
       (def scroll (ref page :scrolly))
       (def url (ref page :url))
-      (fmt " Scroll: {scroll} - Y: {y}  -  {url} - KeyCode: {last-char:X}"))
+      (fmt "{url}{}" (if (> y 0) (fmt " - L{y}") "")))
 
 (defn draw-modeline (page)
       (move-cursor 1 (dec screen-height))
@@ -60,13 +61,14 @@
       (def scroll-y (ref page :scrolly))
       (def y 0)
       (doseq (e data)
-             (when (> (- y scroll-y) frame-height) (return))
-             (when (>= y scroll-y)
-               (move-cursor 2 (inc y))
+             (def cy (- y scroll-y))
+             (when (> cy frame-height) (return))
+             (when (>= cy 0)
+               (move-cursor 2 (inc cy))
                (put-string (gopher-type-name e))
                (when (and (not (ref cur-page :item)) (= :1 (ref e :type)))
                  (set! cur-page :item e))
-               (move-cursor 8 (inc y))
+               (move-cursor 8 (inc cy))
                (when (not= :i (ref e :type))
                  (set-color :blue :default))
                (when (= e (ref cur-page :item))
@@ -77,15 +79,19 @@
 
 (defn draw-text (data page)
       (set-color :default :default)
+      (def scroll-y (ref page :scrolly))
       (def y 0)
       (doseq (e data)
-             (move-cursor 2 (inc y))
-             (put-string e)
-             (when (> y frame-height)
-               (return))
+             (def cy (- y scroll-y))
+             (when (> cy frame-height) (return))
+             (when (>= cy 0)
+               (move-cursor 2 (inc cy))
+               (put-string e))
              (inc! y)))
 
 (defn draw-page (page)
+      (when (nil? (ref page :data))
+        (return))
       (if (= (ref page :type) :1)
           (draw-map (ref page :data) page)
           (draw-text (ref page :data) page)))
@@ -105,7 +111,9 @@
       (def last-entry (ref cur-page :item))
       (doseq (e (ref cur-page :data))
              (when (= e (ref cur-page :item))
-               (return (set! cur-page :item last-entry)))
+               (set! cur-page :item last-entry)
+               (center-buffer cur-page)
+               (return))
              (when (and (tree? e) (not= :i (ref e :type)))
                (set! last-entry e))))
 
@@ -113,7 +121,9 @@
       (def take-entry #f)
       (doseq (e (ref cur-page :data))
              (when (and take-entry (not= :i (ref e :type)))
-               (return (set! cur-page :item e)))
+               (set! cur-page :item e)
+               (center-buffer cur-page)
+               (return))
              (when (= e (ref cur-page :item))
                (set! take-entry #t))))
 
@@ -126,7 +136,8 @@
       (when (tree? (ref cur-page :item))
         (set! history (cons cur-page history))
         (def port (ref (ref cur-page :item) :port))
-        (set! port (if (= 70 port)
+        (set! port (if (or (= 70 port)
+                           (= "70" port))
                        ""
                        (fmt ":{port}")))
         (def cur-url (fmt "gopher://{}{}{}" (ref (ref cur-page :item) :host) port (ref (ref cur-page :item) :path)))
@@ -138,13 +149,27 @@
                          :data #nil
                          :item #nil })))
 
+(defn normalize-scroll ()
+      (set! cur-page :scrolly (max 0 (min (- (:length (ref cur-page :data)) frame-height)
+                                          (ref cur-page :scrolly)))))
+
+(defn page-up ()
+      (set! cur-page :scrolly (- (ref cur-page :scrolly) scroll-interval))
+      (normalize-scroll))
+
+(defn page-down ()
+      (set! cur-page :scrolly (+ (ref cur-page :scrolly) scroll-interval))
+      (normalize-scroll))
+
 (defn read-bracketed-input ()
       (def c (poll-input))
       (case c
             (#\A (previous-line))
             (#\B (next-line))
             (#\C (follow-link))
-            (#\D (history-back))))
+            (#\D (history-back))
+            (#\5 (poll-input) (page-up))
+            (#\6 (poll-input) (page-down))))
 
 (defn read-escaped-input ()
       (def c (poll-input))
@@ -179,8 +204,8 @@
       (def y 0)
       (doseq (e (ref page :data))
              (when (= e (ref page :item))
-               (return y)
-             (inc! y)))
+               (return y))
+             (set! y (inc y)))
       (return -1))
 
 (defn center-buffer (page)
@@ -189,12 +214,11 @@
         (return))
       (while (> (ref page :scrolly) item-pos)
         (set! page :scrolly (- (ref page :scrolly) scroll-interval)))
-      (set! page :scrolly (max (ref page :scrolly) 0))
 
       (def item-bottom-pos (- item-pos frame-height))
       (while (< (ref page :scrolly) item-bottom-pos)
         (set! page :scrolly (+ (ref page :scrolly) scroll-interval)))
-      (set! page :scrolly (min (ref page :scrolly) (:length (ref page :data)))))
+      (normalize-scroll))
 
 (defn main (args)
       :export
@@ -203,11 +227,12 @@
       (def s (get-size))
       (set! screen-width (ref s :width))
       (set! screen-height (ref s :height))
-      (set! frame-height (- screen-height 2))
+      (set! frame-height (- screen-height 3))
+      (set! scroll-interval (int (/ frame-height 2)))
       (when (car args)
         (set! cur-page :data (car args)))
+      (draw-screen)
       (while #t
         (get-data cur-page)
-        (center-buffer cur-page)
         (draw-screen)
         (read-input)))
