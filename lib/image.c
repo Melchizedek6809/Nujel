@@ -153,7 +153,7 @@ static lImage *writeImage(lVal rootValue){
 	case ltString:
 	case ltBuffer:
 		buf->rootValue = rootValue;
-		buf->rootValue.vBuffer = (lBuffer *)((uint64_t)ctxAddBuffer(&ctx, rootValue.vBuffer));
+		buf->rootValue.vInt = ((uint64_t)ctxAddBuffer(&ctx, rootValue.vBuffer));
 		break;
 	default:
 		buf->rootValue = rootValue;
