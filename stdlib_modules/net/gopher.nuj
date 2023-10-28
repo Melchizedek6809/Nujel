@@ -44,10 +44,10 @@
         (return #nil))
       (def cols (split (:cut line 1) "\t"))
       { :type (:keyword T)
-        :display  (or (car cols) "")
-        :selector (or (cadr cols) "")
-        :hostname (or (caddr cols) "")
-        :port     (or (caddr cols) 70)})
+        :display (or (car cols) "")
+        :path    (or (cadr cols) "")
+        :host    (or (caddr cols) "")
+        :port    (or (cadddr cols) 70)})
 
 (defn get (url type)
       :export
