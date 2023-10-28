@@ -159,7 +159,9 @@ static lImage *writeImage(lVal rootValue){
 		buf->rootValue = rootValue;
 		break;
 	}
-	return ctxWriteTables(&ctx, buf);
+	buf = ctxWriteTables(&ctx, buf);
+	free(ctx.buffer);
+	return buf;
 }
 
 static lVal lnfSerialize(lVal val){
