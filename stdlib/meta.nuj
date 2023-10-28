@@ -16,7 +16,7 @@
                        " - "
                        (resolve '*module* c)
                        " - "
-                       (if (< l 16)
+                       (if (< l 8)
                            (string/write data)
                            "-+- Very big tree structure -+-"))))))
 
