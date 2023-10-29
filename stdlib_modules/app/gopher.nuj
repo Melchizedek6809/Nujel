@@ -170,8 +170,8 @@
             (#\B (next-line))
             (#\C (follow-link))
             (#\D (history-back))
-            (#\5 (:poll-input) term (page-up))
-            (#\6 (:poll-input) term (page-down))))
+            (#\5 (:poll-input term) (page-up))
+            (#\6 (:poll-input term) (page-down))))
 
 (defn read-escaped-input ()
       (def c (:poll-input term))
