@@ -232,7 +232,7 @@
       (set! frame-height (- screen-height 3))
       (set! scroll-interval (int (/ frame-height 2)))
       (when (car args)
-        (set! cur-page :data (car args)))
+        (set! cur-page :url (car args)))
       (draw-screen)
       (while #t
         (get-data cur-page)
