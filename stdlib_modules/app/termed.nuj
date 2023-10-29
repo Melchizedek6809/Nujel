@@ -1,6 +1,7 @@
-(import (start stop show-cursor hide-cursor clear-line clear-screen get-size poll-input draw-box move-cursor put-char put-string set-color) :core/term)
+(import (Term) :core/term)
 (import (new-buffer :as new-buffer* get-line line-length forward-char backward-char backward-delete-line backward-delete-char insert-char insert-newline get-buf-name set-cur-buffer! get-cur-buffer previous-line next-line line-clean! line-clean? delete-forward-char) :app/termed/buffer)
 
+(def term (:new Term))
 (def buffers [])
 (def screen-width #nil)
 (def screen-height #nil)
@@ -14,7 +15,7 @@
       buf)
 
 (defn draw-gutter ()
-      (draw-box :red 1 2 4 (- screen-height 2)))
+      (:draw-box term :red 1 2 4 (- screen-height 2)))
 
 (defn get-modeline (buf)
       (def x (ref buf :pos-x))
@@ -24,27 +25,27 @@
       (fmt " L{y} - {bufname} - KeyCode: {last-char:X}"))
 
 (defn draw-modeline (buf)
-      (move-cursor 1 (dec screen-height))
-      (set-color :yellow :blue)
+      (:move-cursor term 1 (dec screen-height))
+      (:set-color term :yellow :blue)
       (def colored-modeline (cat " " (pad-end (get-modeline buf) (dec screen-width))))
-      (put-string colored-modeline)
-      (set-color :default :default))
+      (:put-string term colored-modeline)
+      (:set-color term :default :default))
 
 (defn draw-buffer-line (buf term-x term-y term-w line-y)
       (def line (get-line buf line-y))
       (when-not line (return))
-      (move-cursor term-x term-y)
-      (clear-line)
+      (:move-cursor term term-x term-y)
+      (:clear-line term)
       (when (= line-y (ref buf :pos-y))
-        (set-color :yellow :blue))
+        (:set-color term :yellow :blue))
       (def ln (fmt " {:4} " (inc line-y)))
-      (put-string ln)
-      (set-color :default)
-      (move-cursor (+ 1 (:length ln) term-x) term-y)
+      (:put-string term ln)
+      (:set-color term :default)
+      (:move-cursor term (+ 1 (:length ln) term-x) term-y)
       (def max-w (- term-w 7))
       (when (>= (:length line) max-w)
         (set! line (:clone (:cut (buffer->string line) 0 max-w))))
-      (put-string line)
+      (:put-string term line)
       (line-clean! buf line-y #t))
 
 (defn draw-buffer (buf x y w h)
@@ -56,14 +57,15 @@
 
 (defn draw-screen ()
       (def cur-buffer (get-cur-buffer))
-      (hide-cursor)
+      (:hide-cursor term)
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
-      (show-cursor)
-      (move-cursor (+ 1 1 6 (ref cur-buffer :pos-x)) (- (inc (ref cur-buffer :pos-y))
-                                                             (ref cur-buffer :scroll-y))))
+      (:show-cursor term)
+      (:move-cursor term (+ 1 1 6 (ref cur-buffer :pos-x)) (- (inc (ref cur-buffer :pos-y))
+                                                              (ref cur-buffer :scroll-y)))
+      (:flip term))
 
 (defn quit ()
-      (stop)
+      (:stop term)
       (exit 0))
 
 (defn beginning-of-line ()
@@ -75,8 +77,8 @@
 
 (defn clear-frame ()
       (dotimes (y (- screen-height 1))
-               (move-cursor 0 y)
-               (clear-line)))
+               (:move-cursor term 0 y)
+               (:clear-line term)))
 
 (defn scroll-into-view ()
       (def buf (get-cur-buffer))
@@ -98,7 +100,7 @@
         (set! buf :scroll-y)))
 
 (defn read-bracketed-input ()
-      (def c (poll-input))
+      (def c (:poll-input term))
       (case c
             (#\A (dirty-buf!) (previous-line))
             (#\B (dirty-buf!) (next-line))
@@ -106,13 +108,13 @@
             (#\D (backward-char))))
 
 (defn read-escaped-input ()
-      (def c (poll-input))
+      (def c (:poll-input term))
       (when (= c #\[)
         (return (read-bracketed-input)))
       (return (insert-char #\[)))
 
 (defn read-cx-input ()
-      (def c (poll-input))
+      (def c (:poll-input term))
       (when (= c 3)
         (return (quit))))
 
@@ -121,7 +123,7 @@
       (line-clean! buf (ref buf :pos-y) #f))
 
 (defn read-input ()
-      (def c (poll-input))
+      (def c (:poll-input term))
       (set! last-char c)
       (case c
             (#x1B (read-escaped-input))
@@ -148,9 +150,9 @@
 
 (defn main (args)
       :export
-      (start)
-      (clear-screen)
-      (def s (get-size))
+      (:start term)
+      (:clear-screen term)
+      (def s (:get-size term))
       (set! screen-width (ref s :width))
       (set! screen-height (ref s :height))
       (for-each args load-buffer)
