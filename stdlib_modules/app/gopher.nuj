@@ -110,6 +110,8 @@
       (exit 0))
 
 (defn previous-line ()
+      (when (not= :1 (ref cur-page :type))
+        (return (page-up)))
       (def last-entry (ref cur-page :item))
       (doseq (e (ref cur-page :data))
              (when (= e (ref cur-page :item))
@@ -120,6 +122,8 @@
                (set! last-entry e))))
 
 (defn next-line ()
+      (when (not= :1 (ref cur-page :type))
+        (return (page-down)))
       (def take-entry #f)
       (doseq (e (ref cur-page :data))
              (when (and take-entry (not= :i (ref e :type)))
@@ -190,6 +194,13 @@
             (#x1B (read-escaped-input))
             (#x10 (previous-line))
             (#x0E (next-line))
+            (#\h  (history-back))
+            (#\j  (next-line))
+            (#\J  (page-down))
+            (#\k  (previous-line))
+            (#\K  (page-up))
+            (#\l  (follow-link))
+            ((#\q #\Q) (quit))
             (#x18 (read-cx-input))))
 
 (defn get-data (page)
