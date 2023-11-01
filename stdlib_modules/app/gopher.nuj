@@ -46,7 +46,6 @@
 
 (defn get-modeline (page)
       (def y (get-item-pos page))
-
       (def scroll (ref page :scrolly))
       (def url (ref page :url))
       (fmt "{url}{}" (if (> y 0) (fmt " - L{y}") "")))
@@ -142,8 +141,7 @@
       (when (tree? (ref cur-page :item))
         (set! history (cons cur-page history))
         (def port (ref (ref cur-page :item) :port))
-        (set! port (if (or (= 70 port)
-                           (= "70" port))
+        (set! port (if (or (= 70 port) (= "70" port))
                        ""
                        (fmt ":{port}")))
         (def cur-url (fmt "gopher://{}{}{}" (ref (ref cur-page :item) :host) port (ref (ref cur-page :item) :path)))
@@ -225,12 +223,14 @@
       (def item-pos (get-item-pos page))
       (when (< item-pos 0)
         (return))
+
       (while (> (ref page :scrolly) item-pos)
         (set! page :scrolly (- (ref page :scrolly) scroll-interval)))
 
       (def item-bottom-pos (- item-pos frame-height))
       (while (< (ref page :scrolly) item-bottom-pos)
         (set! page :scrolly (+ (ref page :scrolly) scroll-interval)))
+
       (normalize-scroll))
 
 (defn main (args)
