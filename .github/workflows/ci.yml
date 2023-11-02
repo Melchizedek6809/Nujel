@@ -176,7 +176,7 @@ jobs:
     - name: Install Dependencies
       run: sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y musl-dev musl-tools
     - name: Build release
-      run: make release.musl
+      run: make ${{ matrix.buildtype }}
     - name: Test runtime
       run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
