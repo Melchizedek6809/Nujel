@@ -33,5 +33,4 @@ RELEASE_OPTIMIZATION := -O2
 VERSION_ARCH         := $(shell uname -m)
 
 WASI_CLANG           := clang
-
 WASI_SDK_PATH        := /usr/share/wasi-sysroot/
