@@ -29,22 +29,23 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [X] Value types
 - [X] Exceptions (without using setjmp/longjmp)
-- [ ] Proper object system
+- [X] Simple gopher client and terminal browser
+- [X] Simple HTTP 1.1 client
+- [X] (somewhat) Proper object system
+- [ ] Simple HTTP 1.1 client/server
 - [ ] Tail-call optimization
 - [ ] Fibers
-- [ ] Simple HTTP 1.1 client/server
 - [ ] Binary/FASL format
 - [ ] Reader written in Nujel
 
 ## Current Limitations
 These will be addressed in later versions
-- [ ] No networking support
 - [ ] Static Heap (works far better than expected)
 
 ## Documentation
 I've started to write some documentation, which you can read here: [https://nujel.net/](https://nujel.net/)
 
-### GitHub CI (Windows/MacOS/Ubuntu)
+### GitHub CI (Windows/MacOS/Ubuntu/WASM)
 | Master | Develop   |
 |--------|-----------|
 | [![CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml) | [![CI](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/Melchizedek6809/Nujel/actions/workflows/ci.yml) |

@@ -134,7 +134,7 @@ jobs:
         tar -xvf wasi-sdk-20.0-linux.tar.gz
     - name: Compile runtime
       run: |
-        make nujel.wasm WASI_CLANG=./wasi-sdk-20.0/bin/clang WASI_SDK_PATH=./wasi-sdk-20.0/share/wasi-sysroot/
+        make nujel.wasm WASI_CLANG=./wasi-sdk-20.0/bin/clang WASI_SDK_PATH=./wasi-sdk-20.0/share/wasi-sysroot/ WASI_STRIP=./wasi-sdk-20.0/bin/strip
     - name: Test runtime
       run: ./wasmtime-v14.0.4-x86_64-linux/wasmtime --dir=. nujel.wasm tools/tests.nuj
   build-stdlib:
@@ -219,7 +219,7 @@ jobs:
         wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-20/wasi-sdk-20.0-linux.tar.gz
         tar -xvf wasi-sdk-20.0-linux.tar.gz
     - name: Compile runtime
-      run: make release.wasm WASI_CLANG=./wasi-sdk-20.0/bin/clang WASI_SDK_PATH=./wasi-sdk-20.0/share/wasi-sysroot/
+      run: make release.wasm WASI_CLANG=./wasi-sdk-20.0/bin/clang WASI_SDK_PATH=./wasi-sdk-20.0/share/wasi-sysroot/ WASI_STRIP=./wasi-sdk-20.0/bin/strip
     - name: Test runtime
       run: ./wasmtime-v14.0.4-x86_64-linux/wasmtime --dir=. nujel.wasm --slow-test tools/tests.nuj
     - name: Upload release

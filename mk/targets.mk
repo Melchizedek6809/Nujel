@@ -81,7 +81,7 @@ install.musl: release.musl
 	$(INSTALL) ./$(NUJEL) $(bindir)
 
 release.wasm: nujel.wasm
-	@llvm-strip nujel.wasm
+	@$(WASI_STRIP) nujel.wasm
 
 $(FUZZ_NUJEL): $(RUNTIME_SRCS)
 	@$(AFL_CC) -o $@ $^ $(LDFLAGS) $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD) $(LIBS)
