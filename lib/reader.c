@@ -206,9 +206,9 @@ static lVal lParseSymbol(lReadContext *s){
 		: lValSym(buf);
 }
 
-static lVal lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int maxDigits){
+static lVal lParseNumberBase(lReadContext *s, int base, int maxDigits){
 	i64 ret = 0;
-	int zeroes = 0, digits = 0;
+	int digits = 0;
 	const char *start = s->data;
 
 	for(;s->data < s->bufEnd;s->data++){
@@ -224,8 +224,7 @@ static lVal lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int 
 
 		if((curDigit >= 0) && (curDigit < base)){
 			ret = (ret * base) + curDigit;
-			if(!ret){zeroes++;}
-			if((++digits - zeroes) > maxDigits){
+			if((++digits) > maxDigits){
 				return lValExceptionReaderEnd(s, start, "Literal too big, loss of precision imminent");
 			}
 		}else{
@@ -234,8 +233,6 @@ static lVal lParseNumberBase(lReadContext *s, int *leadingZeroes, int base, int 
 			}
 		}
 	}
-
-	if(leadingZeroes != NULL){*leadingZeroes = zeroes;}
 	return lValInt(ret);
 }
 
@@ -246,14 +243,18 @@ static lVal lParseNumber(lReadContext *s, int base, int maxDigits){
 		s->data++;
 		negative = true;
 	}
-	lVal val = lParseNumberBase(s, NULL, base, maxDigits);
+	lVal val = lParseNumberBase(s, base, maxDigits);
 	if(unlikely(val.type == ltException)){
 		return val;
 	}
 	if(*s->data == '.'){
 		s->data++;
 		int mantissaLeadingZeroes = 0;
-		const lVal mantissaVal = lParseNumberBase(s, &mantissaLeadingZeroes, base, maxDigits);
+		while(*s->data == '0'){
+			mantissaLeadingZeroes++;
+			s->data++;
+		}
+		const lVal mantissaVal = lParseNumberBase(s, base, maxDigits);
 		if(unlikely(mantissaVal.type == ltException)){
 			return mantissaVal;
 		}

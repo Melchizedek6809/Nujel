@@ -71,10 +71,6 @@ static inline void lGarbageCollectIfNecessary(){
 	}
 }
 
-#define vmdispatch(o)	switch(o)
-#define vmcase(l)	case l:
-#define vmbreak	break
-
 /* Evaluate ops within callingClosure after pushing args on the stack.
  *
  * Doesn't look particularly elegant at times, but gets turned into pretty
@@ -88,11 +84,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	const lVal * lits = text->literals->data;
 	lVal exceptionThrownValue;
 
-	#ifdef NUJEL_USE_JUMPTABLE
-	#undef vmdispatch
-	#undef vmcase
-	#undef vmbreak
-
+#ifndef NUJEL_USE_JUMPTABLE
+	#define vmdispatch(o)	switch(o)
+	#define vmcase(l)	case l:
+	#define vmbreak	break
+#else
 	#define vmdispatch(x)	goto *vmJumptable[x];
 	#define vmcase(label)	l##label:
 	#define vmbreak	vmdispatch(*ip++);
@@ -155,7 +151,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopBitNot,
 		&&llopGenSet
 	};
-	#endif
+#endif
 
 	ctx.closureStackSize = 256;
 	ctx.valueStackSize   = 32;

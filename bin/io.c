@@ -205,7 +205,7 @@ static lVal lnfPopen(lVal aCommand){
 #else
 static lVal lnfPopen(lVal aCommand){
 	(void)aCommand;
-	return lValException("not-available","(popen) is not implemented on your current platform, please try and work around that", v);
+	return lValException("not-available","(popen) is not implemented on your current platform, please try and work around that", aCommand);
 }
 #endif
 

@@ -22,7 +22,7 @@
   (set! output-passes #t))
 
 (set! test/testsuite-errors (test-run output-passes))
-(file/test/directory "./stdlib_modules")
+(set! test/testsuite-errors (+ test/testsuite-errors (file/test/directory "./stdlib_modules")))
 
 (when (:has? init/options :only-test-suite)
   (exit test/testsuite-errors))
@@ -53,7 +53,7 @@
 
 (def test-paths (list/sort (filter (append (directory/read-relative "./tests/fast")
                                            (when test/slow (directory/read-relative "./tests/slow"))
-					   (when test/ridiculous (directory/read-relative "./tests/ridiculous")))
+                                           (when test/ridiculous (directory/read-relative "./tests/ridiculous")))
                                    (path/ext?! "nuj"))))
 
 (def test/count (:length test-paths))
@@ -65,4 +65,4 @@
     (do (println (cat (red   "Extended Tests failed")    " - (" (green test/success) " / " (red test/errors) ") in " dur "ms"))))
 
 (println (cat "Running everything took " (blue (- (time/milliseconds) test/beginning)) "ms"))
-(exit test/errors + test/testsuite-errors)
+(exit (min 1 (+ test/errors test/testsuite-errors)))
