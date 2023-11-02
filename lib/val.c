@@ -91,7 +91,16 @@ bool lValEqual(const lVal a, const lVal b) {
 	} else if (unlikely(a.type == ltBool)) {
 		return a.vBool == b.vBool;
 	}
-	return a.vPointer == b.vPointer;
+	switch(a.type){
+	case(ltBool):
+		return a.vBool == b.vBool;
+	case(ltInt):
+		return a.vInt == b.vInt;
+	case(ltFloat):
+		return a.vFloat == b.vFloat;
+	default:
+		return a.vPointer == b.vPointer;
+	}
 }
 
 lVal lValException(const lSymbol *symbol, const char *error, lVal v) {
