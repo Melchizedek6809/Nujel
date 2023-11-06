@@ -197,7 +197,6 @@ lVal            lValExceptionArity      (lVal v, int arity);
 lVal            lValExceptionNonNumeric (lVal v);
 lVal            requireFloat            (lVal v);
 lVal            optionalSymbolic        (lVal v, const lSymbol *fallback);
-lVal            requireSymbolic         (lVal v);
 
 #define reqNaturalInt(str) do { if(unlikely(str.type != ltInt)){\
 	return lValException(lSymTypeError, "Need ab Int", str);\
@@ -232,6 +231,10 @@ if(unlikely(str.vInt < 0)){\
 
 #define reqSymbol(val) do { if(unlikely(val.type != ltSymbol)){\
 	return lValException(lSymTypeError, "Need a Symbol", val);\
+} } while(0)
+
+#define reqSymbolic(val) do { if(unlikely((val.type != ltSymbol) && (val.type != ltKeyword))){ \
+	return lValException(lSymTypeError, "Need a Symbol or Keyword", val);\
 } } while(0)
 
 #define reqFileHandle(val) do { if(unlikely(val.type != ltFileHandle)){\

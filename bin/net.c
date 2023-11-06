@@ -37,7 +37,6 @@ static lVal lnfSocketConect(lVal host, lVal port){
 		return NIL;
 	}
 	res = result;
-	//printf("Host: %s\n", (char *)lBufferData(host.vBuffer));
 	while (res){
 		if(res->ai_family == AF_INET){
 			((struct sockaddr_in*)((void *)res->ai_addr))->sin_port = htons(port.vInt);
@@ -59,8 +58,6 @@ static lVal lnfSocketConect(lVal host, lVal port){
 				return NIL;
 			}
 			return lValFileHandle(fh);
-		} else {
-			//printf("%s\n",strerror(errno));
 		}
 		res = res->ai_next;
 	}

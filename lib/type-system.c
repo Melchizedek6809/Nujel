@@ -119,14 +119,11 @@ static lVal lnmTName(lVal self){
 }
 
 static lVal lnmAddMethod(lVal self, lVal name, lVal fn){
-	lVal err = requireSymbolic(name);
-	if(unlikely(err.type == ltException)){
-		return err;
-	}
-
+	reqSymbolic(name);
 	if(unlikely(fn.type != ltLambda)){
 		return lValExceptionType(fn, ltLambda);
 	}
+
 	self.vType->methods = lTreeInsert(self.vType->methods, name.vSymbol, fn);
 	return self;
 }
@@ -163,29 +160,25 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 	if(self.type == ltType){
 		const lClass *T = self.vType;
 		for(;T;T = T->parent){
-			const lTree *t = T->staticMethods;
-			while(t){
+			for(const lTree *t = T->staticMethods; t; t = (method > t->key) ? t->right : t->left){
 				if(method == t->key){
 					return t->value;
 				}
-				t = method > t->key ? t->right : t->left;
 			}
 		}
 	}
 	const lClass *T = &lClassList[self.type];
 	for(;T;T = T->parent){
-		const lTree *t = T->methods;
-		while(t){
+		for(const lTree *t = T->methods; t; t = (method > t->key) ? t->right : t->left){
 			if(method == t->key){
 				return t->value;
 			}
-			t = method > t->key ? t->right : t->left;
 		}
 	}
 	return lValException(lSymUnboundVariable, "Unbound method", self);
 }
 
-void lTypesInit(){
+void lTypesInit(lClosure *c){
 	initType(ltAny, lSymLTAny, NULL);
 	lClass *tAny = &lClassList[ltAny];
 
@@ -217,6 +210,27 @@ void lTypesInit(){
 	initType(ltException, NULL, tAny);
 
 	lTypesAddCoreMethods();
+
+	lDefineVal(c, "Nil",        lValType(&lClassList[ltNil]));
+	lDefineVal(c, "Symbol",     lValType(&lClassList[ltSymbol]));
+	lDefineVal(c, "Keyword",    lValType(&lClassList[ltKeyword]));
+	lDefineVal(c, "Bool",       lValType(&lClassList[ltBool]));
+	lDefineVal(c, "Int",        lValType(&lClassList[ltInt]));
+	lDefineVal(c, "Float",      lValType(&lClassList[ltFloat]));
+	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
+	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
+	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
+	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
+	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
+	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
+	lDefineVal(c, "Environment",lValType(&lClassList[ltEnvironment]));
+	lDefineVal(c, "String",     lValType(&lClassList[ltString]));
+	lDefineVal(c, "Buffer",     lValType(&lClassList[ltBuffer]));
+	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
+	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
+	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
+	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
+	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
 }
 
 lVal lValExceptionType(lVal v, lType T){
@@ -276,16 +290,12 @@ lVal requireFloat(lVal v){
 	}
 }
 
-lVal requireSymbolic(lVal v){
-	if(unlikely((v.type != ltKeyword) && (v.type != ltSymbol))){
-		return lValException(lSymTypeError, "Need a :Symbol or :Keyword", v);
-	}
-	return v;
-}
-
 lVal optionalSymbolic(lVal v, const lSymbol *fallback){
 	if(likely(v.type == ltNil)){
 		return lValSymS(fallback);
 	}
-	return requireSymbolic(v);
+	if(unlikely((v.type != ltKeyword) && (v.type != ltSymbol))){
+		return lValException(lSymTypeError, "Need a :Symbol or :Keyword", v);
+	}
+	return v;
 }

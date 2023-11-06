@@ -45,8 +45,7 @@ lVal lGenericRef(lVal col, lVal key){
 	switch(col.type){
 	case ltPair:
 		reqNaturalInt(key);
-		const int index = key.vInt;
-		for(int i=0;i<index;i++){
+		for(int i=0;i<key.vInt;i++){
 			col = lCdr(col);
 		}
 		return lCar(col);
@@ -61,7 +60,7 @@ lVal lGenericRef(lVal col, lVal key){
 	case ltArray: {
 		lArray *arr = col.vArray;
 		reqNaturalInt(key);
-		const int i = key   .vInt;
+		const int i = key.vInt;
 		if(unlikely(arr->length <= i)){
 			return lValException(lSymOutOfBounds, "(ref) array index provided is out of bounds", col);
 		}

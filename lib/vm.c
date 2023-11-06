@@ -14,12 +14,6 @@
 #endif
 #endif
 
-#if defined(_MSC_VER)
-#define NORETURN
-#else
-#define NORETURN __attribute__((noreturn))
-#endif
-
 /* Read an encoded signed 16-bit offset at ip */
 static inline i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 	const int x = (ip[0] << 8) | ip[1];
@@ -65,12 +59,6 @@ static lVal stackTrace(const lThread *ctx){
 	return ret;
 }
 
-static inline void lGarbageCollectIfNecessary(){
-	if(unlikely(lGCShouldRunSoon)){
-		lGarbageCollect();
-	}
-}
-
 /* Evaluate ops within callingClosure after pushing args on the stack.
  *
  * Doesn't look particularly elegant at times, but gets turned into pretty
@@ -83,6 +71,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	lThread ctx;
 	const lVal * lits = text->literals->data;
 	lVal exceptionThrownValue;
+
+#define lGarbageCollectIfNecessary() do {\
+	if(unlikely(lGCShouldRunSoon)){\
+		lGarbageCollect();\
+	}\
+} while(0)
 
 #ifndef NUJEL_USE_JUMPTABLE
 	#define vmdispatch(o)	switch(o)
@@ -152,7 +146,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopGenSet
 	};
 #endif
-
 	ctx.closureStackSize = 256;
 	ctx.valueStackSize   = 32;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
@@ -518,8 +511,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmbreak; }
 	vmcase(lopGetVal) {
 		const lSymbol *s = lits[*ip++].vSymbol;
-		for (const lClosure *cc = c; cc; cc = cc->parent) {
-			const lTree *t = cc->data;
+		for (lClosure *cc = c; cc; cc = cc->parent) {
+			lTree *t = cc->data;
 			while(t){
 				if(s == t->key){
 					ctx.valueStack[ctx.sp++] = t->value;
@@ -572,17 +565,17 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.valueStack[ctx.sp-1] = ret;
 		vmbreak; }
 	vmcase(lopZeroPred) {
-		lVal a = ctx.valueStack[ctx.sp-1];
-		bool p = false;
+		const lVal a = ctx.valueStack[ctx.sp-1];
 
-		if(likely(a.type == ltInt)){
-			p = a.vInt == 0;
-		}else if(a.type == ltFloat){
-			p = a.vFloat == 0.0;
+		if (likely(a.type == ltInt)) {
+			ctx.valueStack[ctx.sp-1] = lValBool(a.vInt == 0);
+		} else if(a.type == ltFloat) {
+			ctx.valueStack[ctx.sp-1] = lValBool(a.vFloat == 0.0);
+		} else {
+			ctx.valueStack[ctx.sp-1] = lValBool(false);
 		}
-
-		ctx.valueStack[ctx.sp-1] = lValBool(p);
-		vmbreak; }
+		vmbreak;
+	}
 	vmcase(lopIncInt)
 		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
 			ctx.valueStack[ctx.sp-1] = lValInt(ctx.valueStack[ctx.sp-1].vInt + 1);

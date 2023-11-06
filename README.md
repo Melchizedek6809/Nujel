@@ -1,9 +1,9 @@
 Nujel
 --------------------------------------------------------
-A fast, tiny and easy to embed Lisp dialect.
-While providing a scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/)
-was what started the development effort for Nujel, it is now trying to become
-useful for general scripting tasks as well.
+A fast, tiny and and embeddable Lisp dialect.
+This started out as an experiment to provide a fast scripting system for [WolkenWelten](https://sr.ht/~melchizedek6809/WolkenWelten/),
+without bloating up the executable size. Now I'm just enjoying working on the runtime and language, trying to keep everything as simple as possible
+while improving performance.
 
 ## Performance
 To make sure that there are no performance regressions, benchmarks are regularly
@@ -28,19 +28,20 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Printer written in Nujel
 - [X] "Stackless" funcalls (not using the C call stack for Nujel funcalls)
 - [X] Value types
-- [X] Exceptions (without using setjmp/longjmp)
-- [X] Simple gopher client and terminal browser
+- [X] Exceptions (without using setjmp/longjmp for improved portability, especially relevant for WASM/WASI)
+- [X] Gopher client and terminal browser
 - [X] Simple HTTP 1.1 client
-- [X] (somewhat) Proper object system
-- [ ] Simple HTTP 1.1 client/server
-- [ ] Tail-call optimization
-- [ ] Fibers
+- [X] (somewhat) useable object system
+- [ ] Simple HTTP 1.1 server
 - [ ] Binary/FASL format
-- [ ] Reader written in Nujel
+- [ ] Reader written in Nujel (requires FASL for bootstrapping)
+- [ ] Tail-call optimization (doesn't seem to be much of a problem right now)
+- [ ] Fibers
 
 ## Current Limitations
 These will be addressed in later versions
 - [ ] Static Heap (works far better than expected)
+- [ ] Base image needs to be copied to the heap during startup (would be nice to run straight from .rodata)
 
 ## Documentation
 I've started to write some documentation, which you can read here: [https://nujel.net/](https://nujel.net/)

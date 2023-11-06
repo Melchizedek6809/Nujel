@@ -14,7 +14,6 @@ lVal NIL;
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
 	lSymbolInit();
-	lTypesInit();
 }
 
 /* Run fun with args  */
@@ -44,7 +43,9 @@ lClosure *lLoad(lClosure *c, const char *expr){
 }
 
 /* Add all the essential Native Functions to closure c */
-void lOperationsBase(lClosure *c){
+static void lInitRootClosure(lClosure *c){
+	c->type = closureRoot;
+	lTypesInit(c);
 	lOperationsArithmetic(c);
 	lOperationsBuffer(c);
 	lOperationsArray(c);
@@ -54,15 +55,14 @@ void lOperationsBase(lClosure *c){
 	lOperationsImage(c);
 	lOperationsBytecode();
 	lOperationsString();
+	lAddPlatformVars(c);
+	lDefineVal(c,"exports",  lValTree(NULL));
+	lDefineVal(c,"*module*", lValKeyword("core"));
 }
 
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
 	lClosure *c = lClosureAllocRaw();
-	c->type = closureRoot;
-	lOperationsBase(c);
-	lAddPlatformVars(c);
-	lDefineVal(c,"exports",  lValTree(NULL));
-	lDefineVal(c,"*module*", lValKeyword("core"));
+	lInitRootClosure(c);
 	return lLoad(c, (const char *)stdlib_no_data);
 }

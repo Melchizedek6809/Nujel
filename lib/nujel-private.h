@@ -414,7 +414,6 @@ lVal lnfTreeNew (lVal v);
 /*
  | Operations
  */
-void lOperationsBase       (lClosure *c);
 void lOperationsArithmetic (lClosure *c);
 void lOperationsArray      (lClosure *c);
 void lOperationsBuffer     (lClosure *c);
@@ -430,7 +429,7 @@ lVal lValBytecodeOp(lBytecodeOp v);
 lVal lGenericRef(lVal col, lVal key);
 lVal lGenericSet(lVal col, lVal key, lVal v);
 
-void lTypesInit();
+void lTypesInit(lClosure *c);
 lVal lMethodLookup(const lSymbol *method, lVal self);
 
 #endif

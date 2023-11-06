@@ -58,17 +58,9 @@ static lVal lnfClosureData(lVal a){
 }
 
 static lVal lnfDefIn(lVal env, lVal aSym, lVal aVal){
-	if(unlikely((env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException(lSymTypeError, "You can only define symbols in Lambdas or Objects", env);
-	}
-
-	lVal cadr = requireSymbolic(aSym);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
-	}
-	const lSymbol *sym = cadr.vSymbol;
-
-	lDefineClosureSym(env.vClosure, sym, aVal);
+	reqClosure(env);
+	reqSymbolic(aSym);
+	lDefineClosureSym(env.vClosure, aSym.vSymbol, aVal);
 	return env;
 }
 
@@ -91,7 +83,7 @@ static lVal lnfResolveOrNull(lClosure *c, lVal aSym, lVal env){
 
 static lVal lnfResolvesPred(lClosure *c, lVal aSym, lVal env){
 	lVal car = aSym;
-	if(car.type != ltSymbol){return lValBool(false);}
+	if(unlikely(car.type != ltSymbol)){return lValBool(false);}
 	const lSymbol *sym = car.vSymbol;
 	if((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment)){
 		return lValException(lSymTypeError, "You can only check symbols in Lambdas or Objects", env);
@@ -168,11 +160,12 @@ static lVal lnfNilPred(lVal a){
 }
 
 static lVal lnfZeroPred(lVal a){
-	if(a.type == ltInt){
+	switch(a.type){
+	case(ltInt):
 		return lValBool(a.vInt == 0);
-	} else if(a.type == ltFloat){
+	case(ltFloat):
 		return lValBool(a.vFloat == 0.0);
-	} else {
+	default:
 		return lValBool(false);
 	}
 }
@@ -196,28 +189,19 @@ static lVal lnfGarbageCollectRuns(){
 }
 
 static lVal lnmNativeMetaGet(lVal self, lVal key){
-	lVal e = requireSymbolic(key);
-	if(unlikely(e.type == ltException)){
-		return e;
-	}
+	reqSymbolic(key);
 	lVal t = lTreeRef(self.vNFunc->meta, key.vSymbol);
 	return t.type != ltException ? t : NIL;
 }
 
 static lVal lnmNujelMetaGet(lVal self, lVal key){
-	lVal e = requireSymbolic(key);
-	if(unlikely(e.type == ltException)){
-		return e;
-	}
+	reqSymbolic(key);
 	lVal t = lTreeRef(self.vClosure->meta, key.vSymbol);
 	return t.type != ltException ? t : NIL;
 }
 
 static lVal lnmNujelMetaSet(lVal self, lVal key, lVal value){
-	lVal e = requireSymbolic(key);
-	if(unlikely(e.type == ltException)){
-		return e;
-	}
+	reqSymbolic(key);
 	self.vClosure->meta = lTreeInsert(self.vClosure->meta, key.vSymbol, value);
 	return self;
 }
@@ -379,25 +363,4 @@ void lOperationsCore(lClosure *c){
 	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
 	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
 	lAddNativeMethodVVV(&lClassList[ltLambda],    lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
-
-	lDefineVal(c, "Nil",        lValType(&lClassList[ltNil]));
-	lDefineVal(c, "Symbol",     lValType(&lClassList[ltSymbol]));
-	lDefineVal(c, "Keyword",    lValType(&lClassList[ltKeyword]));
-	lDefineVal(c, "Bool",       lValType(&lClassList[ltBool]));
-	lDefineVal(c, "Int",        lValType(&lClassList[ltInt]));
-	lDefineVal(c, "Float",      lValType(&lClassList[ltFloat]));
-	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
-	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
-	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
-	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
-	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
-	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
-	lDefineVal(c, "Environment",lValType(&lClassList[ltEnvironment]));
-	lDefineVal(c, "String",     lValType(&lClassList[ltString]));
-	lDefineVal(c, "Buffer",     lValType(&lClassList[ltBuffer]));
-	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
-	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
-	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
-	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
-	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
 }

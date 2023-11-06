@@ -160,10 +160,7 @@ lVal lnfTreeNew(lVal v) {
 	for (lVal n = v; n.type == ltPair; n = lCddr(n)) {
 		lVal car = lCar(n);
 		if (car.type == ltNil) { break; }
-		car = requireSymbolic(car);
-		if(unlikely(car.type == ltException)){
-			return car;
-		}
+		reqSymbolic(car);
 		t->root = lTreeInsert(t->root, car.vSymbol, lCadr(n));
 	}
 	return ret;
@@ -206,11 +203,8 @@ static lVal lnmTreeValues(lVal self) {
 }
 
 static lVal lnmTreeHas(lVal self, lVal key) {
-	lVal cadr = requireSymbolic(key);
-	if(unlikely(cadr.type == ltException)){
-		return cadr;
-	}
-	return lValBool(lTreeRef(self.vTree->root, cadr.vSymbol).type != ltException);
+	reqSymbolic(key);
+	return lValBool(lTreeRef(self.vTree->root, key.vSymbol).type != ltException);
 }
 
 void lOperationsTree(lClosure* c) {
