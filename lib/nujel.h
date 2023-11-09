@@ -286,6 +286,7 @@ lVal lAddNativeStaticMethodVVV(lClass *T, const lSymbol *name, const char *args,
 lTree *lTreeNew             (const lSymbol *s, lVal v);
 lTree *lTreeDup             (const lTree *t);
 
+int    lTreeSize            (const lTree *t);
 lVal   lTreeRef             (const lTree *t, const lSymbol *s);
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
 

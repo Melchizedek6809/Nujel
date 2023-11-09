@@ -164,7 +164,7 @@ void lSymbolFree(lSymbol *s){
 }
 
 lSymbol *lSymSL(const char *str, uint len){
-	char buf[32];
+	char buf[128];
 	len = MIN(sizeof(buf)-1,len);
 	memcpy(buf,str,len);
 	buf[len] = 0;

@@ -85,6 +85,7 @@ struct lBuffer {
 	u8 flags;
 };
 #define BUFFER_IMMUTABLE 1
+#define BUFFER_STATIC 2
 
 struct lSymbol {
 	union {
@@ -100,6 +101,7 @@ struct lBytecodeArray {
 		lBytecodeOp *dataEnd;
 		struct lBytecodeArray *nextFree;
 	};
+	u8 flags;
 };
 
 struct lNFunc {

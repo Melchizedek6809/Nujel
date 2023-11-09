@@ -87,7 +87,7 @@ bool lValEqual(const lVal a, const lVal b) {
 	} else if (unlikely(a.type == ltString)) {
 		const uint alen = lBufferLength(a.vString);
 		const uint blen = lBufferLength(b.vString);
-		return (alen == blen) && (strncmp(a.vString->data, b.vString->data, alen) == 0);
+		return (alen == blen) && (memcmp(a.vString->data, b.vString->data, alen) == 0);
 	} else if (unlikely(a.type == ltBool)) {
 		return a.vBool == b.vBool;
 	}

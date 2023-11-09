@@ -73,7 +73,10 @@ lBuffer *lBufferAlloc(size_t length, bool immutable){
 
 void lBufferFree(lBuffer *buf){
 	if(unlikely(buf == NULL)){return;}
-	free(buf->buf);
+	if(!(buf->flags & BUFFER_STATIC)){
+		free(buf->buf);
+	}
+	buf->buf = NULL;
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
 	lBufferFFree = buf;
@@ -110,7 +113,9 @@ lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 
 void lBytecodeArrayFree(lBytecodeArray *v){
 	if(unlikely(v == NULL)){return;}
-	free(v->data);
+	if(!(v->flags & BUFFER_STATIC)){
+		free(v->data);
+	}
 	v->data     = NULL;
 	v->nextFree = lBytecodeArrayFFree;
 	lBytecodeArrayActive--;

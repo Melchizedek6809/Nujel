@@ -20,6 +20,12 @@ static uint lTreeCalcHeight(const lTree *t){
 	return 1 + MAX(lTreeHeight(t->left),lTreeHeight(t->right));
 }
 
+/* Return the total size of the tree T */
+int lTreeSize(const lTree *t){
+	if(t == NULL){return 0;}
+	return 1 + lTreeSize(t->left) + lTreeSize(t->right);
+}
+
 /* Get the balance factor of T,
  * which is used to rebalance the tree automatically during inserts */
 static int lTreeGetBalance(const lTree *t){
@@ -134,11 +140,6 @@ static lVal lTreeKeysToList(const lTree *t){
 /* Create a list of all the values within T */
 static lVal lTreeValuesToList(const lTree *t){
 	return t ? lTreeAddValuesToList(t, NIL) : NIL;
-}
-
-/* Return the total size of the tree T */
-static uint lTreeSize(const lTree *t){
-	return t == NULL ? 0 : (t->key ? 1 : 0) + lTreeSize(t->left) + lTreeSize(t->right);
 }
 
 /* Return a duplicate of t */
