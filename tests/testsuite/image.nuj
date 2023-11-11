@@ -16,3 +16,4 @@
 ({:a 1 :b 2 :c 3} (image/deserialize (image/serialize {:a 1 :b 2 :c 3})))
 (Int (image/deserialize (image/serialize Int)))
 (nreverse (image/deserialize (image/serialize nreverse)))
+(stdin* (image/deserialize (image/serialize stdin*)))

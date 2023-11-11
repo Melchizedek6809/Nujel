@@ -153,10 +153,20 @@ static lVal readVal(const lImage *img, i32 off, bool staticImage){
 	case ltMacro:
 	case ltEnvironment:
 		return lValException(lSymReadError, "Can't have rootValues of that Type (for now)", NIL);
-	case ltFileHandle:
 	case ltComment:
 	case ltException:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
+	case ltFileHandle:
+		switch(rootValue.vInt){
+		case 0:
+			return lValFileHandle(stdin);
+		case 1:
+			return lValFileHandle(stdout);
+		case 2:
+			return lValFileHandle(stderr);
+		default:
+			return lValException(lSymReadError, "Can't serialize file handles other than stdin, stdout or stderr", NIL);
+		}
 	case ltNativeFunc:
 		rootValue.vNFunc = readNFunc(img, rootValue.vInt, staticImage);
 		return rootValue;
@@ -355,10 +365,21 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltMacro:
 	case ltEnvironment:
 		exit(234);
-	case ltFileHandle:
 	case ltComment:
 	case ltException:
 		exit(234);
+	case ltFileHandle:
+		*out = v;
+		if(v.vFileHandle == stdin){
+			out->vInt = 0;
+		} else if(v.vFileHandle == stdout){
+			out->vInt = 1;
+		} else if(v.vFileHandle == stderr){
+			out->vInt = 2;
+		} else {
+			out->vInt = 0xFF;
+		}
+		break;
 	case ltNativeFunc: {
 		const u64 off = ctxAddSymbol(ctx, v.vNFunc->name);
 		out = (lVal *)((void *)&ctx->start[curOff]);
