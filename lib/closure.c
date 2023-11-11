@@ -39,38 +39,6 @@ lClosure *lClosureNewFunCall(lVal args, lVal lambda) {
 	return tmpc;
 }
 
-/* Define the NFunc LNF in C with all the space separated symbols in SYM */
-lVal lDefineAliased(lClosure *c, lVal lNF, const char *sym){
-	const char *cur = sym;
-	if(unlikely(lNF.type != ltNativeFunc)){
-		fprintf(stderr, "Only native functions and special forms can be defined with an alias");
-		exit(123);
-	}
-	bool nameSet = false;
-
-	// Run at most 64 times, just a precaution
-	for(int i=0;i<64;i++){
-		uint len;
-		for(len=0;len < sizeof(lSymbol);len++){ // Find the end of the current token, either space or 0
-			if(cur[len] == 0)        {break;}
-			if(isspace((u8)cur[len])){break;}
-		}
-		lSymbol *name = lSymSL(cur,len);
-		lDefineClosureSym(c,name,lNF);
-		if(!nameSet){
-			lNF.vNFunc->meta = lTreeInsert(lNF.vNFunc->meta, symName, lValSymS(name));
-			nameSet = true;
-		}
-		for(;len<32;len++){ // Advance to the next non whitespace character
-			if(cur[len] == 0)    {return lNF;} // Or return if we reached the final 0 byte
-			if(!isspace((u8)cur[len])){break;}
-		}
-		cur += len;
-	}
-	exit(125);
-	return NIL;
-}
-
 lVal lGetClosureSym(lClosure *c, const lSymbol *s){
 	for (const lClosure *cc = c; cc; cc = cc->parent) {
 		const lTree *t = cc->data;
@@ -111,17 +79,22 @@ void lDefineVal(lClosure *c, const char *str, lVal val){
 
 static lVal lAddNativeFuncRaw(lClosure *c, const char *sym, const char *args, const char *doc, void *func, uint flags, u8 argCount){
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
+	lSymbol *name = lSymS(sym);
 	v.vNFunc->fp   = func;
 	v.vNFunc->args = lCar(lRead(args));
 	v.vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
 	v.vNFunc->argCount = argCount;
+	v.vNFunc->name = name;
 	if(flags & NFUNC_FOLD){
 		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
 	}
 	if(flags & NFUNC_PURE){
 		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
 	}
-	return lDefineAliased(c,v,sym);
+
+	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symName, lValSymS(name));
+	lDefineClosureSym(c, name, v);
+	return v;
 }
 lVal lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags){
 	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 0);
