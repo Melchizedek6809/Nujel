@@ -122,6 +122,18 @@ static lTree *readTree(const lImage *img, i32 off, bool staticImage){
 	return ret;
 }
 
+static lNFunc *readNFunc(const lImage *img, i32 off, bool staticImage){
+	const lSymbol *sym = readSymbol(img, off, staticImage);
+	for(uint i=0;i<lNFuncMax;i++){
+		lNFunc *t = &lNFuncList[i];
+		if(t == NULL){break;}
+		if(t->name == sym){
+			return t;
+		}
+	}
+	return NULL;
+}
+
 static lClass *readType(const lImage *img, i32 off, bool staticImage){
 	const lSymbol *sym = readSymbol(img, off, staticImage);
 	for(uint i=0;i<countof(lClassList);i++){
@@ -137,7 +149,6 @@ static lClass *readType(const lImage *img, i32 off, bool staticImage){
 static lVal readVal(const lImage *img, i32 off, bool staticImage){
 	lVal rootValue = *((lVal *)((void *)&img->data[off]));
 	switch(rootValue.type){
-	case ltNativeFunc:
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment:
@@ -146,6 +157,9 @@ static lVal readVal(const lImage *img, i32 off, bool staticImage){
 	case ltComment:
 	case ltException:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
+	case ltNativeFunc:
+		rootValue.vNFunc = readNFunc(img, rootValue.vInt, staticImage);
+		return rootValue;
 	case ltType:
 		rootValue.vType = readType(img, rootValue.vInt, staticImage);
 		return rootValue;
@@ -340,12 +354,17 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment:
-	case ltNativeFunc:
 		exit(234);
 	case ltFileHandle:
 	case ltComment:
 	case ltException:
 		exit(234);
+	case ltNativeFunc: {
+		const u64 off = ctxAddSymbol(ctx, v.vNFunc->name);
+		out = (lVal *)((void *)&ctx->start[curOff]);
+		*out = v;
+		out->vInt = off;
+		break; }
 	case ltType: {
 		const u64 off = ctxAddSymbol(ctx, v.vType->name);
 		out = (lVal *)((void *)&ctx->start[curOff]);
