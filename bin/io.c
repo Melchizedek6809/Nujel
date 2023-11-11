@@ -292,14 +292,14 @@ static lVal lnfGetCurrentWorkingDirectory(){
 }
 
 void lOperationsIO(lClosure *c){
-	lAddNativeFuncV (c,"exit",                       "(status)",           "Quits with code a",                                 lnfExit, 0);
-	lAddNativeFuncV (c,"popen",                      "(command)",          "Return a list of [exit-code stdout stderr)",        lnfPopen, 0);
+	lAddNativeFuncV (c,"exit",     "(status)",  "Quits with code a",                                 lnfExit, 0);
+	lAddNativeFuncV (c,"popen",    "(command)", "Return a list of [exit-code stdout stderr)",        lnfPopen, 0);
 
-	lAddNativeFuncV (c,"file/stat",                  "(path)",             "Return some stats about FILENAME",                  lnfFileStat, 0);
-	lAddNativeFuncV (c,"rm file/remove",             "(path)",             "Remove FILENAME from the filesystem, if possible",  lnfFileRemove, 0);
-	lAddNativeFuncVV(c,"ls directory/read",          "(path show-hidden)", "Return all files within $PATH",                     lnfDirectoryRead, 0);
-	lAddNativeFuncV (c,"rmdir directory/remove",     "(path)",             "Remove empty directory at PATH",                    lnfDirectoryRemove, 0);
-	lAddNativeFuncV (c,"mkdir directory/make",       "(path)",             "Create a new empty directory at PATH",              lnfDirectoryMake, 0);
-	lAddNativeFuncV (c,"cd path/change",             "(path)",             "Change the current working directory to PATH",      lnfChangeDirectory, 0);
-	lAddNativeFunc  (c,"cwd path/working-directory", "()",                 "Return the current working directory",              lnfGetCurrentWorkingDirectory, 0);
+	lAddNativeFuncV (c,"file/stat","(path)",        "Return some stats about FILENAME",                  lnfFileStat, 0);
+	lAddNativeFuncV (c,"rm",   "(path)",            "Remove FILENAME from the filesystem, if possible",  lnfFileRemove, 0);
+	lAddNativeFuncVV(c,"ls",   "(path show-hidden)","Return all files within $PATH",                     lnfDirectoryRead, 0);
+	lAddNativeFuncV (c,"rmdir","(path)",            "Remove empty directory at PATH",                    lnfDirectoryRemove, 0);
+	lAddNativeFuncV (c,"mkdir","(path)",       "Create a new empty directory at PATH",              lnfDirectoryMake, 0);
+	lAddNativeFuncV (c,"cd",  "(path)",        "Change the current working directory to PATH",      lnfChangeDirectory, 0);
+	lAddNativeFunc  (c,"cwd", "()",            "Return the current working directory",              lnfGetCurrentWorkingDirectory, 0);
 }

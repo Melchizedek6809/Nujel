@@ -22,7 +22,7 @@
 
 (defn file/eval-module (path args)
        "Evaluate a Nujel source file in the current context"
-       (def mod-name (module/resolve-string (cat (path/without-extension path)) (path/working-directory)))
+       (def mod-name (module/resolve-string (cat (path/without-extension path)) (cwd)))
        (def mod (module/load mod-name))
        (when-not (= :environment (:type-name mod))
                  (return mod))
@@ -95,7 +95,7 @@
        (ref (file/stat filename) :directory?))
 
 (defn directory/read-relative (path)
-      (map (directory/read path)
+      (map (ls path)
            (fn (a) (cat path "/" a))))
 
 (def directory/read-recursive
@@ -215,8 +215,8 @@
   "Run CMD using popen and return the trimmed stdout"
   (trim (cdr (popen cmd))))
 
-(def +root-working-dir+ (path/working-directory))
-(def *module-path* (path/working-directory))
+(def +root-working-dir+ (cwd))
+(def *module-path* (cwd))
 
 (defn module/loader/filesystem (name)
       (def name-string (:string name))

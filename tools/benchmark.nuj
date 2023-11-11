@@ -129,7 +129,7 @@
       (def measurements #nil)
       (def testcase (cadr (split filename "/")))
       (try (fn (err)
-               (file/remove result-file)
+               (rm result-file)
              (print/error err)
              (throw err))
            (def ret (popen (fmt "{} -o {result-file} --format=\"{time-template}\" {runtime} {filename}" time-path)))
@@ -139,7 +139,7 @@
                      (exception :benchmark-error "Benchmark returned wrong result" (cons filename ret)))
            (set! measurements (:clone (read/single (file/read result-file))))
            (set! measurements :stdout (cdr ret))
-           (file/remove result-file))
+           (rm result-file))
       (when-not measurements (return #nil))
       (-> measurements
           (set! :language (bench/get-language filename))

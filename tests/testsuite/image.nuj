@@ -14,3 +14,4 @@
 ([1 "qwe" :asd] (image/deserialize (image/serialize [1 "qwe" :asd])))
 ([['(1 2 3)] "qwe" :asd] (image/deserialize (image/serialize [['(1 2 3)] "qwe" :asd])))
 ({:a 1 :b 2 :c 3} (image/deserialize (image/serialize {:a 1 :b 2 :c 3})))
+(Int (image/deserialize (image/serialize Int)))

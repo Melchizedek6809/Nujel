@@ -125,6 +125,7 @@ struct lNFunc {
 		lVal (*fpR)(lVal);
 		lVal (*fpCR)(lClosure *, lVal);
 	};
+	const lSymbol *name;
 	lTree *meta;
 	lVal args;
 	u8 argCount;
