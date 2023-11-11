@@ -17,6 +17,14 @@ typedef struct {
 } lImage;
 
 typedef struct {
+	i32 buffer;
+	i32 length;
+	i32 offset;
+	u8 flags;
+	u8 type;
+} lImageBufferView;
+
+typedef struct {
 	i32 length;
 	u8 flags;
 	u8 data[];
@@ -90,6 +98,18 @@ static lBuffer *readBuffer(const lImage *img, i32 off, bool staticImage){
 	return buf;
 }
 
+static lBufferView *readBufferView(const lImage *img, i32 off, bool staticImage){
+	lImageBufferView *imgBuf = (lImageBufferView *)((void *)&img->data[off]);
+	lBuffer *buf = readBuffer(img, imgBuf->buffer, staticImage);
+	lBufferView *view = lBufferViewAllocRaw();
+	view->buf = buf;
+	view->offset = imgBuf->offset;
+	view->length = imgBuf->length;
+	view->flags = imgBuf->flags;
+	view->type = imgBuf->type;
+	return view;
+}
+
 static lTree *readTree(const lImage *img, i32 off, bool staticImage){
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const i32 len = *in++;
@@ -110,7 +130,6 @@ static lVal readVal(const lImage *img, i32 off, bool staticImage){
 	case ltEnvironment:
 		return lValException(lSymReadError, "Can't have rootValues of that Type (for now)", NIL);
 	case ltFileHandle:
-	case ltBufferView:
 	case ltComment:
 	case ltNativeFunc:
 	case ltException:
@@ -126,6 +145,9 @@ static lVal readVal(const lImage *img, i32 off, bool staticImage){
 		return rootValue;
 	case ltPair:
 		rootValue.vList = readPair(img, rootValue.vInt, staticImage);
+		return rootValue;
+	case ltBufferView:
+		rootValue.vBufferView = readBufferView(img, rootValue.vInt, staticImage);
 		return rootValue;
 	case ltString:
 	case ltBuffer:
@@ -197,6 +219,23 @@ static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
 	out->flags = v->flags;
 	out->length = v->length;
 	memcpy(out->data, v->data, v->length);
+	return curOff;
+}
+
+static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
+	i32 eleSize = dwordAlign(sizeof(lImageBufferView));
+	ctxRealloc(ctx, eleSize);
+
+	i32 curOff = ctx->curOff;
+	ctx->curOff += eleSize;
+	const i32 buf = ctxAddBuffer(ctx, v->buf);
+	lImageBufferView *out = (lImageBufferView *)((void *)&ctx->start[curOff]);
+	out->buffer = buf;
+	out->length = v->length;
+	out->offset = v->offset;
+	out->flags = v->flags;
+	out->type = v->type;
+
 	return curOff;
 }
 
@@ -287,7 +326,6 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment:
-	case ltBufferView:
 		exit(234);
 	case ltFileHandle:
 	case ltComment:
@@ -322,6 +360,12 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltSymbol:
 	case ltKeyword: {
 		const u64 off = ctxAddSymbol(ctx, v.vSymbol);
+		out = (lVal *)((void *)&ctx->start[curOff]);
+		*out = v;
+		out->vInt = off;
+		break; }
+	case ltBufferView: {
+		const u64 off = ctxAddBufferView(ctx, v.vBufferView);
 		out = (lVal *)((void *)&ctx->start[curOff]);
 		*out = v;
 		out->vInt = off;

@@ -70,7 +70,7 @@ struct lBufferView {
 	};
 	size_t offset;
 	size_t length;
-	lBufferViewType type;
+	u8 type;
 	u8 flags;
 };
 #define BUFFER_VIEW_IMMUTABLE 1
