@@ -11,6 +11,7 @@
 ('(1 2 3) (image/deserialize (image/serialize '(1 2 3))))
 ('(1 "qwe" :asd) (image/deserialize (image/serialize '(1 "qwe" :asd))))
 ([1 2 3] (image/deserialize (image/serialize [1 2 3])))
+([:a :a :a :a :a] (image/deserialize (image/serialize [:a :a :a :a :a])))
 ([1 "qwe" :asd] (image/deserialize (image/serialize [1 "qwe" :asd])))
 ([['(1 2 3)] "qwe" :asd] (image/deserialize (image/serialize [['(1 2 3)] "qwe" :asd])))
 ({:a 1 :b 2 :c 3} (image/deserialize (image/serialize {:a 1 :b 2 :c 3})))
