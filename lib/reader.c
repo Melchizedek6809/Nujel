@@ -212,7 +212,7 @@ static lVal lParseNumberBase(lReadContext *s, int base, int maxDigits){
 	const char *start = s->data;
 
 	for(;s->data < s->bufEnd;s->data++){
-		const u8 c = tolower(*s->data);
+		const u8 c = tolower(*((u8 *)s->data));
 		if((c <= ' ') || isnonsymbol(c) || (c == '.')){break;}
 
 		int curDigit = -1;
@@ -315,7 +315,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 			d = newD;
 		}
 		lStringAdvanceToNextCharacter(s);
-		char c = toupper(*s->data++);
+		char c = toupper(*((u8 *)s->data++));
 		int t = 0;
 		if((c >= '0') && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
 		if((c >= 'A') && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
@@ -325,7 +325,7 @@ static lVal lParseBytecodeArray(lReadContext *s){
 		if(unlikely(s->data >= s->bufEnd)){
 			return lValExceptionBCRead(s, NIL, "sudden end");
 		}
-		c = toupper(*s->data++);
+		c = toupper(*((u8 *)s->data++));
 		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
 		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
 		return lValException(lSymReadError, "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
@@ -560,7 +560,7 @@ static lVal lReadValue(lReadContext *s){
 		lStringAdvanceToNextLine(s);
 		return lReadValue(s);
 	default:
-		if((isdigit((u8)c)) || ((c == '-') && isdigit(s->data[1]))){
+		if((isdigit((u8)c)) || ((c == '-') && isdigit(((u8 *)s->data)[1]))){
 			return lParseNumber(s, 10, 18);
 		}
 		return lParseSymbol(s);
