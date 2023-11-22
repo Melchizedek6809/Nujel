@@ -29,7 +29,7 @@ WARNINGS             := -Wall -Werror -Wextra -Wshadow -Wcast-align -Wno-missing
 
 LIBS                 := -lm
 
-RELEASE_OPTIMIZATION := -O2
+RELEASE_OPTIMIZATION := -O3
 VERSION_ARCH         := $(shell uname -m)
 
 WASI_CLANG           := clang

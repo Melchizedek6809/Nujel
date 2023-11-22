@@ -32,6 +32,17 @@ static lVal lnfClosureParent(lVal a){
 	}
 }
 
+static lVal lnfClosureParentSet(lVal a, lVal parent){
+	reqClosure(a);
+	if(parent.type == ltNil){
+		a.vClosure->parent = NULL;
+	} else {
+		reqClosure(parent);
+		a.vClosure->parent = parent.vClosure;
+	}
+	return a;
+}
+
 static lVal lnfClosureArguments(lVal a){
 	switch(a.type){
 	case ltException:
@@ -316,6 +327,7 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode, 0);
 	lAddNativeFuncV(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments, 0);
 	lAddNativeFuncV(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent, 0);
+	lAddNativeFuncVV(c,"closure/parent!", "(clo parent)",  "Set the parent of CLO",               lnfClosureParentSet, 0);
 
 	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object",    lnfCurrentClosure, 0);
 	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",     lnfCurrentLambda, 0);

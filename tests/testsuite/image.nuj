@@ -18,3 +18,6 @@
 (Int (image/deserialize (image/serialize Int)))
 (nreverse (image/deserialize (image/serialize nreverse)))
 (stdin* (image/deserialize (image/serialize stdin*)))
+('("asd" . "asd") (image/deserialize (image/serialize (let ((t "asd")) (cons t t)))))
+;(8 (defn double (a) (* a 2)) (closure/parent! double #nil) ((image/deserialize (image/serialize double)) 4))
+;(let* (defn double (a) (* a 2)) (closure/parent! double #nil) (write (image/deserialize (image/serialize double))))
