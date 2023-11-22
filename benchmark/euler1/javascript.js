@@ -1,3 +1,5 @@
+"use strict";
+
 try{
     var consoleLog = print ? print : console.log;
 }catch(e){
