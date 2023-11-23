@@ -93,8 +93,8 @@ static void *readMapGet(readImageMap *map, i32 key){
 static void readMapSet(readImageMap *map, i32 key, void *val){
 	if(map->len+1 >= map->size){
 		map->size += 32;
-		map->key = realloc(map->key, map->size * sizeof(void *));
-		map->val = realloc(map->val, map->size * sizeof(i32));
+		map->key = realloc(map->key, map->size * sizeof(i32));
+		map->val = realloc(map->val, map->size * sizeof(void *));
 	}
 	map->key[map->len] = key;
 	map->val[map->len] = val;
@@ -244,7 +244,7 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 	ret->sp = clo->sp;
 	ret->text = clo->text ? readBytecodeArray(map, img, clo->text, staticImage) : NULL;
 	ret->type = clo->type;
-	if(ret->text){
+	if(ret->text != NULL){
 		ret->ip = &ret->text->data[clo->ip];
 	} else {
 		ret->ip = NULL;
