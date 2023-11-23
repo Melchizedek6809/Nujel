@@ -38,6 +38,7 @@ typedef struct {
 } lImageClosure;
 
 typedef struct {
+	i32 imgSize;
 	i32 len;
 	i32 size;
 	i32 *key;
@@ -108,31 +109,34 @@ static i32 dwordAlign(i32 eleSize){
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)staticImage;
 	(void)map;
+	if(off < 0){return NULL;}
 	return lSymS((const char *)&img->data[off]);
 }
 
 static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
+	if(off < 0){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lArray *)mapP; }
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const i32 len = in[0];
 	lArray *out = lArrayAlloc(len);
+	readMapSet(map, off, out);
 	out->flags = in[1];
 	in = &in[2];
 	for(int i=0;i<len;i++){
 		out->data[i] = readVal(map, img, in[i], staticImage);
 	}
-	readMapSet(map, off, out);
 	return out;
 }
 
 static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	if(off == 0){return NULL;}
+	if(off < 0){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBytecodeArray *)mapP; }
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const i32 len = *in++;
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
+	readMapSet(map, off, ret);
 	ret->literals = readArray(map, img, *in++, staticImage);
 	if(staticImage){
 		ret->data = (void *)in;
@@ -141,29 +145,29 @@ static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i
 		memcpy(ret->data, in, len);
 	}
 	ret->dataEnd = &ret->data[len];
-	readMapSet(map, off, ret);
 	return ret;
 }
 
 static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
+	if(off < 0){return NULL;}
 	if(mapP != NULL){ return (lPair *)mapP; }
 	const i32 *pair = (const i32 *)((void *)&img->data[off]);
-	lVal car = readVal(map, img,pair[0],staticImage);
-	lVal cdr = readVal(map, img,pair[1],staticImage);
 	lPair *ret = lPairAllocRaw();
-	ret->car = car;
-	ret->cdr = cdr;
 	readMapSet(map, off, ret);
+	ret->car = readVal(map, img, pair[0], staticImage);
+	ret->cdr = readVal(map, img, pair[1], staticImage);
 	return ret;
 }
 
 static lBuffer *readBuffer(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBuffer *)mapP; }
+	if(off < 0){return NULL;}
 	lImageBuffer *imgBuf = (lImageBuffer *)((void *)&img->data[off]);
 	bool immutable = imgBuf->flags & BUFFER_IMMUTABLE;
 	lBuffer *buf = lBufferAlloc(imgBuf->length, immutable);
+	readMapSet(map, off, buf);
 	if(staticImage && immutable){
 		buf->buf = imgBuf->data;
 		buf->flags |= BUFFER_STATIC;
@@ -171,42 +175,44 @@ static lBuffer *readBuffer(readImageMap *map, const lImage *img, i32 off, bool s
 		buf->buf = malloc(imgBuf->length);
 		memcpy(buf->buf, imgBuf->data, imgBuf->length);
 	}
-	readMapSet(map, off, buf);
 	return buf;
 }
 
 static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBufferView *)mapP; }
+	if(off < 0){return NULL;}
 	lImageBufferView *imgBuf = (lImageBufferView *)((void *)&img->data[off]);
 	lBuffer *buf = readBuffer(map, img, imgBuf->buffer, staticImage);
 	lBufferView *view = lBufferViewAllocRaw();
+	readMapSet(map, off, view);
 	view->buf = buf;
 	view->offset = imgBuf->offset;
 	view->length = imgBuf->length;
 	view->flags = imgBuf->flags;
 	view->type = imgBuf->type;
-	readMapSet(map, off, view);
 	return view;
 }
 
 static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
+	if(off < 0){return NULL;}
 	if(mapP != NULL){ return (lTree *)mapP; }
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const i32 len = *in++;
 	lTree *ret = lTreeAllocRaw();
+	readMapSet(map, off, ret);
 	for(int i=0;i<len;i++){
 		const lSymbol *s = readSymbol(map, img, *in++, staticImage);
 		lVal v = readVal(map, img, *in++, staticImage);
 		ret = lTreeInsert(ret, s, v);
 	}
-	readMapSet(map, off, ret);
 	return ret;
 }
 
 static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)map;
+	if(off < 0){return NULL;}
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
 	for(uint i=0;i<lNFuncMax;i++){
 		lNFunc *t = &lNFuncList[i];
@@ -221,6 +227,7 @@ static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool sta
 static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)map;
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
+	if(off < 0){return NULL;}
 	for(uint i=0;i<countof(lClassList);i++){
 		lClass *t = &lClassList[i];
 		if(t == NULL){break;}
@@ -234,15 +241,18 @@ static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool stat
 static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lClosure *)mapP; }
+	if(off < 0){return NULL;}
+	if(off >= map->imgSize){((u8 *)NULL)[0] = 1;}
 	lImageClosure *clo = (lImageClosure *)((void *)&img->data[off]);
 	lClosure *ret = lClosureAllocRaw();
+	readMapSet(map, off, ret);
 
-	ret->args = clo->args ? readVal(map, img, clo->args, staticImage) : NIL;
-	ret->data = clo->data ? readTree(map, img, clo->data, staticImage) : NULL;
-	ret->meta = clo->meta ? readTree(map, img, clo->meta, staticImage) : NULL;
-	ret->parent = clo->parent ? readClosure(map, img, clo->parent, staticImage) : NULL;
+	ret->args = readVal(map, img, clo->args, staticImage);
+	ret->data = readTree(map, img, clo->data, staticImage);
+	ret->meta = readTree(map, img, clo->meta, staticImage);
+	ret->parent = readClosure(map, img, clo->parent, staticImage);
 	ret->sp = clo->sp;
-	ret->text = clo->text ? readBytecodeArray(map, img, clo->text, staticImage) : NULL;
+	ret->text = readBytecodeArray(map, img, clo->text, staticImage);
 	ret->type = clo->type;
 	if(ret->text != NULL){
 		ret->ip = &ret->text->data[clo->ip];
@@ -250,12 +260,13 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 		ret->ip = NULL;
 	}
 
-	readMapSet(map, off, ret);
 	return ret;
 }
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	lVal rootValue = *((lVal *)((void *)&img->data[off]));
+	if(off < 0){return NIL;}
+	if(off >= map->imgSize){((u8 *)NULL)[0] = 1;}
 	switch(rootValue.type){
 	case ltComment:
 	case ltException:
@@ -309,7 +320,7 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	}
 }
 
-static lVal readImage(const lImage *img, bool staticImage){
+static lVal readImage(const lImage *img, size_t imgSize, bool staticImage){
 	if(unlikely(img == NULL)){
 		return lValExceptionSimple();
 	}
@@ -321,8 +332,9 @@ static lVal readImage(const lImage *img, bool staticImage){
 	}
 	readImageMap map;
 	memset(&map, 0, sizeof(map));
+	map.imgSize = imgSize-4;
 
-	lVal ret = readVal(&map, img,0,staticImage);
+	lVal ret = readVal(&map, img, 0, staticImage);
 	free(map.key);
 	free(map.val);
 	return ret;
@@ -370,7 +382,7 @@ static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 }
 
 static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
-	if(v == NULL){return 0;}
+	if(v == NULL){return -1;}
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
@@ -413,7 +425,7 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
-	if(v == NULL){return 0;}
+	if(v == NULL){return -1;}
 
 	int len = v->dataEnd - v->data;
 	i32 eleSize = dwordAlign(8 + len);
@@ -433,7 +445,7 @@ static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 }
 
 static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
-	if(v == NULL){return 0;}
+	if(v == NULL){return -1;}
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
@@ -656,7 +668,7 @@ static lVal lnfSerialize(lVal val){
 
 static lVal lnfDeserialize(lVal val){
 	reqBuffer(val);
-	return readImage(val.vBuffer->buf, false);
+	return readImage(val.vBuffer->buf, val.vBuffer->length, false);
 }
 
 void lOperationsImage(lClosure *c){

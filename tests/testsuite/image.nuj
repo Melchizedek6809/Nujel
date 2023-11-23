@@ -20,4 +20,5 @@
 (stdin* (image/deserialize (image/serialize stdin*)))
 ('("asd" . "asd") (image/deserialize (image/serialize (let ((t "asd")) (cons t t)))))
 (8 (defn double (a) (* a 2)) (closure/parent! double #nil) ((image/deserialize (image/serialize double)) 4))
+(2 ((image/deserialize (image/serialize min)) 2 4))
 ;(let* (defn double (a) (* a 2)) (closure/parent! double #nil) (write (image/deserialize (image/serialize double))))

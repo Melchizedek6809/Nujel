@@ -309,7 +309,7 @@ void lGarbageCollect();
 #define SYM_MAX (1<<14)
 #define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
-#define CLO_MAX (1<<15)
+#define CLO_MAX (1<<16)
 #define TRR_MAX (1<<15)
 #define BCA_MAX (1<<14)
 #define BUF_MAX (1<<15)
