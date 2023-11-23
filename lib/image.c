@@ -442,16 +442,23 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(&ctx->map, (void *)v, curOff);
-	lImageClosure *out = (lImageClosure *)((void *)&ctx->start[ctx->curOff]);
 	ctx->curOff += eleSize;
 
-	out->args = ctxAddVal(ctx, v->args);
+	const i32 args = ctxAddVal(ctx, v->args);
+	const i32 data = ctxAddTree(ctx, v->data);
+	const i32 meta = ctxAddTree(ctx, v->meta);
+	const i32 text = ctxAddBytecodeArray(ctx, v->text);
+	const i32 parent = ctxAddClosure(ctx, v->parent);
+
+	lImageClosure *out = (lImageClosure *)((void *)&ctx->start[curOff]);
+
+	out->args = args;
+	out->data = data;
+	out->meta = meta;
+	out->text = text;
 	out->ip   = v->text == NULL ? 0 : (i32)((u8 *)v->ip - (u8 *)v->text->data);
-	out->data = ctxAddTree(ctx, v->data);
-	out->meta = ctxAddTree(ctx, v->meta);
-	out->parent = ctxAddClosure(ctx, v->parent);
+	out->parent = parent;
 	out->sp   = v->sp;
-	out->text = ctxAddBytecodeArray(ctx, v->text);
 	out->type = v->type;
 
 	return curOff;
@@ -465,13 +472,13 @@ static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	lImageBuffer *out = (lImageBuffer *)((void *)&ctx->start[ctx->curOff]);
 	ctx->curOff += eleSize;
 
 	out->flags = v->flags;
 	out->length = v->length;
 	memcpy(out->data, v->data, v->length);
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 
@@ -483,8 +490,10 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 	const i32 buf = ctxAddBuffer(ctx, v->buf);
+
 	lImageBufferView *out = (lImageBufferView *)((void *)&ctx->start[curOff]);
 	out->buffer = buf;
 	out->length = v->length;
@@ -492,7 +501,6 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 	out->flags = v->flags;
 	out->type = v->type;
 
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 
@@ -504,6 +512,7 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 
 	const i32 car = ctxAddVal(ctx, v->car);
@@ -511,7 +520,7 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
 	out[0] = car;
 	out[1] = cdr;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+
 	return curOff;
 }
 
