@@ -9,10 +9,6 @@
 
 typedef struct {
 	u8 magic[4]; // NujI
-	u32 imageSize;
-	u8 version; // 1
-	u8 padding[3];
-
 	u8 data[];
 } lImage;
 
@@ -63,6 +59,7 @@ typedef struct {
 } writeImageContext;
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage);
+static i32 ctxAddVal(writeImageContext *ctx, lVal v);
 
 static i32 writeMapGet(writeImageMap *map, void *key){
 	for(int i=0;i<map->len;i++){
@@ -107,7 +104,6 @@ static void readMapSet(readImageMap *map, i32 key, void *val){
 static i32 dwordAlign(i32 eleSize){
 	return (eleSize & 3) ? eleSize + 4 - (eleSize&3) : eleSize;
 }
-
 
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)staticImage;
@@ -322,13 +318,6 @@ static lVal readImage(const lImage *img, bool staticImage){
 	   || (img->magic[3] != 'I'))){
 		return lValException(lSymReadError, "Invalid Magic prefix in Nujel Image", NIL);
 	}
-	if(unlikely(img->version != 1)){
-		return lValException(lSymReadError, "Unsupported Version in Nujel Image", lValInt(img->version));
-	}
-	const size_t size = img->imageSize;
-	if(unlikely(img->imageSize < sizeof(lImage))){
-		return lValException(lSymReadError, "Invalid Image size", lValInt(size));
-	}
 	readImageMap map;
 	memset(&map, 0, sizeof(map));
 
@@ -347,8 +336,6 @@ static void ctxRealloc(writeImageContext *ctx, i32 eleSize){
 		ctx->start = realloc(ctx->start, ctx->size);
 	}
 }
-
-static i32 ctxAddVal(writeImageContext *ctx, lVal v);
 
 static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
@@ -457,7 +444,7 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	ctx->curOff += eleSize;
 
 	out->args = ctxAddVal(ctx, v->args);
-	out->ip   = (i32)((u8 *)v->ip - (u8 *)v->text);
+	out->ip   = (i32)((u8 *)v->ip - (u8 *)v->text->data);
 	out->data = ctxAddTree(ctx, v->data);
 	out->meta = ctxAddTree(ctx, v->meta);
 	out->parent = ctxAddClosure(ctx, v->parent);
@@ -622,7 +609,7 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	return curOff;
 }
 
-static lImage *writeImage(lVal rootValue){
+static lImage *writeImage(lVal rootValue, i32 *outSize){
 	size_t size = sizeof(lImage);
 	writeImageContext ctx;
 	memset(&ctx, 0, sizeof(ctx));
@@ -632,14 +619,13 @@ static lImage *writeImage(lVal rootValue){
 	buf->magic[1] = 'u';
 	buf->magic[2] = 'j';
 	buf->magic[3] = 'I';
-	buf->version = 1;
 
 	ctxAddVal(&ctx, rootValue);
 
 	buf = realloc(buf, sizeof(lImage) + ctx.curOff);
 	memcpy(buf->data, ctx.start, ctx.curOff);
 	size += ctx.curOff;
-	buf->imageSize = size;
+	*outSize = size;
 	free(ctx.start);
 	free(ctx.map.key);
 	free(ctx.map.val);
@@ -647,11 +633,12 @@ static lImage *writeImage(lVal rootValue){
 }
 
 static lVal lnfSerialize(lVal val){
-	lImage *img = writeImage(val);
+	i32 size;
+	lImage *img = writeImage(val, &size);
 	if(unlikely(img == NULL)){
 		return lValException(lSymTypeError, "Can't serialize that", NIL);
 	} else {
-		lBuffer *buf = lBufferAlloc(img->imageSize, true);
+		lBuffer *buf = lBufferAlloc(size, true);
 		buf->buf = img;
 		return lValAlloc(ltBuffer, buf);
 	}
