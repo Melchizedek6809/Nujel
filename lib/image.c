@@ -127,6 +127,7 @@ static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool sta
 }
 
 static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
+	if(off == 0){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBytecodeArray *)mapP; }
 	const i32 *in = (i32 *)((void *)&img->data[off]);
@@ -243,10 +244,10 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 	ret->sp = clo->sp;
 	ret->text = clo->text ? readBytecodeArray(map, img, clo->text, staticImage) : NULL;
 	ret->type = clo->type;
-	ret->ip = &ret->text->data[clo->ip];
-	if(ret->text && (ret->ip >= ret->text->dataEnd)){
+	if(ret->text){
+		ret->ip = &ret->text->data[clo->ip];
+	} else {
 		ret->ip = NULL;
-		return NULL;
 	}
 
 	readMapSet(map, off, ret);
@@ -347,17 +348,15 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 	memcpy(&ctx->start[curOff], v->c, eleSize);
 	ctx->start[ctx->curOff + strLen] = 0;
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 
 static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 	if(v == NULL){return curOff;}
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
-	if(mapOff > 0){ return mapOff; }
 
 	const i32 sym = ctxAddSymbol(ctx, v->key);
 	const i32 val = ctxAddVal(ctx, v->value);
@@ -367,7 +366,6 @@ static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 	curOff += 8;
 	curOff = ctxAddTreeVal(ctx, curOff, v->left);
 	curOff = ctxAddTreeVal(ctx, curOff, v->right);
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 
@@ -381,11 +379,11 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	i32 *out = (i32 *)((void *)&ctx->start[ctx->curOff]);
 	*out = len;
 	ctx->curOff += eleSize;
 	ctxAddTreeVal(ctx, curOff + 4, v);
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 
@@ -397,6 +395,7 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	i32 *out = (i32 *)((void *)&ctx->start[ctx->curOff]);
 	ctx->curOff += eleSize;
 
@@ -407,19 +406,21 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 		out = (i32 *)((void *)&ctx->start[curOff + 8 + i*4]);
 		*out = off;
 	}
-	writeMapSet(&ctx->map, (void *)v, curOff);
+
 	return curOff;
 }
 
 static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
+	if(v == NULL){return 0;}
 
 	int len = v->dataEnd - v->data;
 	i32 eleSize = dwordAlign(8 + len);
 	ctxRealloc(ctx, eleSize);
 
 	i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 
 	ctx->curOff += eleSize;
 
@@ -427,7 +428,7 @@ static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 	const i32 arr = ctxAddArray(ctx, v->literals);
 	*((i32 *)((void *)&ctx->start[curOff+4])) = arr;
 	memcpy(&ctx->start[curOff+8], v->data, len);
-	writeMapSet(&ctx->map, (void *)v, curOff);
+
 	return curOff;
 }
 
@@ -440,11 +441,12 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
 	lImageClosure *out = (lImageClosure *)((void *)&ctx->start[ctx->curOff]);
 	ctx->curOff += eleSize;
 
 	out->args = ctxAddVal(ctx, v->args);
-	out->ip   = (i32)((u8 *)v->ip - (u8 *)v->text->data);
+	out->ip   = v->text == NULL ? 0 : (i32)((u8 *)v->ip - (u8 *)v->text->data);
 	out->data = ctxAddTree(ctx, v->data);
 	out->meta = ctxAddTree(ctx, v->meta);
 	out->parent = ctxAddClosure(ctx, v->parent);
@@ -452,7 +454,6 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	out->text = ctxAddBytecodeArray(ctx, v->text);
 	out->type = v->type;
 
-	writeMapSet(&ctx->map, (void *)v, curOff);
 	return curOff;
 }
 

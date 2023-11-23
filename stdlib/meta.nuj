@@ -85,6 +85,10 @@
 
 (defmacro deftest l #nil) ; Tests should be skipped when compiling
 
+(defmacro profile form
+          (def t (gensym))
+          `(let ((~t (time/milliseconds))) (do ~@form) (efmtln "Took {}ms" (- (time/milliseconds) ~t))))
+
 (defmacro comment body
           "Does nothing, mainly used for commenting out
           parts of an expression, but having the sub expressions
