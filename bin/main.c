@@ -25,11 +25,11 @@ static lClosure *createRootClosure(lClosure *c){
 
 static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *init){
 	size_t len = 0;
-	printf("Loading image '%s'\n", filename);
 	void *img = loadFile(filename, &len);
 	lClosure *c = initBinRootClosure(lInitRootClosure());
 	lVal imgVal = readImage(img, len, false);
 	*init = imgVal;
+	free(img);
 	return c;
 }
 

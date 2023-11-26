@@ -1,19 +1,145 @@
 #!/usr/bin/env nujel
 
-(import (blue green red purple yellow) :ansi)
-(import (run :as test-run load-file :as test-load add-builtin-tests) :test)
+(require :ansi)
 
+(def test-list   #nil)
+(def test-count     0)
+(def nujel-start    0)
+(def success-count  0)
+(def error-count    0)
+(def print-errors  #t)
+(def print-passes  #f)
 (def test/beginning (time/milliseconds))
 (def test/testsuite-errors 0)
+
+(defn add* (result expr)
+      (set! test-list (cons (cons result expr) test-list))
+      (set! test-count (+ test-count 1)))
+
+(defn reset! ()
+      (set! test-list (cons 4 '(+ 3 1)))
+      (set! test-count 1))
+
+(defn display-results (description)
+      "Prints the result Message"
+      (efmtln "{} {} - [{} / {}] in {} ms"
+              (if (and (zero? error-count) (> test-count 0))
+                  (if (zero? success-count)
+                      (ansi/yellow "?")
+                      (ansi/green "✓"))
+                  (ansi/red "✗"))
+              description
+              (if (zero? success-count)
+                  (ansi/yellow success-count)
+                  (ansi/green success-count))
+              (if (zero? error-count)
+                  (ansi/gray error-count)
+                  (ansi/red error-count))
+              (- (time/milliseconds) nujel-start)))
+
+(defn test-success (res-should res-is expr)
+      "Should be called after a test has finished successfully"
+      (when print-passes
+            (efmtln "{} = {}\r\n{}\r\n\r\n"
+                    (ansi/green (string/write res-is))
+                    (ansi/green (string/write res-should))
+                    (string/write expr)))
+      (set! success-count (+ 1 success-count)))
+
+(defn test-failure (res-should res-is expr)
+      "Should be called if EXPR does not equal RES"
+      (when print-errors
+            (pfmtln "{} != {}\r\n{}\r\n\r\n"
+                    (ansi/red (string/write res-is))
+                    (ansi/green (string/write res-should))
+                    (string/write expr)))
+      (set! error-count (+ 1 error-count)))
+
+(defn run-test! (result rawexpr)
+      "Tests that RAWEXPR evaluates to RESULT"
+      ;(pfmtln "(== {result:?} {rawexpr:?})")
+      (try (fn (err)
+             (test-failure result (list :exception-caught err) rawexpr))
+           (def expr (eval rawexpr))
+           (if (equal? result expr)
+               (test-success result expr rawexpr)
+               (test-failure result expr rawexpr))))
+
+(defn init! (output-passes hide-errors)
+      "Initialize the testing framework"
+      (set! print-errors   (not hide-errors))
+      (set! print-passes   (boolean output-passes))
+      (set! nujel-start    (time/milliseconds))
+      (set! success-count  0)
+      (set! error-count    0))
+
+(defn finish! (description)
+      (display-results description)
+      (return error-count))
+
+(defn test-run (output-passes hide-errors)
+      "Run through all automated Tests"
+      (init!)
+      (doseq (cur-test test-list)
+             (run-test! (car cur-test)
+                        (cdr cur-test)))
+      (finish! (fmt "{} {} [{System/OS} {System/Architecture}]" (ansi/blue ":core") (ansi/rainbow "Nujel"))))
+
+(defn test-load (filename)
+      (doseq (t (read (slurp filename)) test-list)
+             (when (= (car t) 'test/add)
+               (cdr! t))
+             (add* (eval (car t))
+                   (cons 'do (cdr t)))))
+
+(defn add-builtin-tests ()
+      (doseq (test-funs (-> (symbol-table)
+                            (map resolve-or-nil)
+                            (filter callable?)
+                            (map (fn (a) (:meta a :tests)))
+                            (filter identity)))
+             (doseq (fun test-funs)
+                    (add* (car fun)
+                          (cadr fun)))))
+
+(defn file/test/module/run (tests module-name)
+      (doseq (expr tests)
+             (run-test! (eval (cadr expr))
+                        `(do (require ~module-name) ~@(cddr expr)))))
+
+(defn file/test/valid-test-form? (form)
+      (= (car form) 'deftest))
+
+(defn file/test/module (path base-dir)
+      "Test a module by running all contained tests"
+      (def rel-path (:cut path (:length base-dir)))
+      (when (= (ref rel-path 0) #\/)
+            (set! rel-path (:cut rel-path 1)))
+      (def module-name (:keyword (path/without-extension rel-path)))
+      (init!)
+      (-> (read (file/read path))
+          (filter file/test/valid-test-form?)
+          (file/test/module/run module-name))
+      (finish! (ansi/blue module-name)))
+
+(defn file/test/directory (base-dir)
+      "Compile a Nujel source file into optimized object code"
+      (-> (directory/read-recursive base-dir)
+          (flatten)
+          (sort)
+          (filter (path/ext?! "nuj"))
+          (map (fn (path) (file/test/module path base-dir)))
+          (sum)))
+
 
 (defn prog-str (fun-color i path start)
   (cat "(" (fun-color (pad-start i 2))
        "/" (pad-start test/count 2)
        ") " (pad-end (cut path 2 (:length path)) 48)
-       (if start (cat " " (blue (pad-start (- (time/milliseconds) start) 8)) "ms") #nil)))
+       (if start (cat " " (ansi/blue (pad-start (- (time/milliseconds) start) 8)) "ms") #nil)))
 
 (when (not (:has? init/options :only-test-suite))
-  (println (purple "First we test the basic functions of the runtime.")))
+  (println (ansi/purple "First we test the basic functions of the runtime.")))
 (for-each (-> (directory/read-relative "tests/testsuite") sort) test-load)
 (add-builtin-tests)
 
@@ -27,7 +153,7 @@
 (when (:has? init/options :only-test-suite)
   (exit test/testsuite-errors))
 
-(println (green "Great, Now we can do some more complicated and thorough tests."))
+(println (ansi/green "Great, Now we can do some more complicated and thorough tests."))
 
 (def test/slow (or (ref init/options :slow-test) #f))
 (def test/ridiculous (or (ref init/options :ridiculous-test) #f))
@@ -44,12 +170,12 @@
            (inc! test/errors)
            (print/error err)
            (newline))
-       (print (prog-str yellow i path #nil))
+       (print (prog-str ansi/yellow i path #nil))
        (def ret (file/eval path (environment*)))
        (when (not= ret :success) (exception :wrong-result "Test did not return :success"))
        (inc! test/success)
        (print "\r")
-       (println (prog-str green i path test/start/file))))
+       (println (prog-str ansi/green i path test/start/file))))
 
 (def test-paths (list/sort (filter (append (directory/read-relative "./tests/fast")
                                            (when test/slow (directory/read-relative "./tests/slow"))
@@ -61,8 +187,8 @@
 (newline)
 (def dur (- (time/milliseconds) test/start))
 (if (and (> test/success 0) (zero? test/errors))
-    (do (println (cat (green "Extended Tests succeeded") " - (" (green test/success) " / " (red test/errors) ") in " dur "ms")))
-    (do (println (cat (red   "Extended Tests failed")    " - (" (green test/success) " / " (red test/errors) ") in " dur "ms"))))
+    (do (println (cat (ansi/green "Extended Tests succeeded") " - (" (ansi/green test/success) " / " (ansi/red test/errors) ") in " dur "ms")))
+    (do (println (cat (ansi/red   "Extended Tests failed")    " - (" (ansi/green test/success) " / " (ansi/red test/errors) ") in " dur "ms"))))
 
-(println (cat "Running everything took " (blue (- (time/milliseconds) test/beginning)) "ms"))
+(println (cat "Running everything took " (ansi/blue (- (time/milliseconds) test/beginning)) "ms"))
 (exit (min 1 (+ test/errors test/testsuite-errors)))

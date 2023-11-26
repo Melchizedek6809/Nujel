@@ -56,38 +56,6 @@
           (file/compile path))
       (exit 0))
 
-(defn file/test/module/run (tests module-name)
-      (import (run-test!) :test)
-      (doseq (expr tests)
-             (run-test! (eval (cadr expr))
-                        `(do (require ~module-name) ~@(cddr expr)))))
-
-(defn file/test/valid-test-form? (form)
-      (= (car form) 'deftest))
-
-(defn file/test/module (path base-dir)
-      "Test a module by running all contained tests"
-      (def rel-path (:cut path (:length base-dir)))
-      (when (= (ref rel-path 0) #\/)
-            (set! rel-path (:cut rel-path 1)))
-      (def module-name (:keyword (path/without-extension rel-path)))
-      (import (blue) :ansi)
-      (import (init! finish!) :test)
-      (init!)
-      (-> (read (file/read path))
-          (filter file/test/valid-test-form?)
-          (file/test/module/run module-name))
-      (finish! (blue module-name)))
-
-(defn file/test/directory (base-dir)
-      "Compile a Nujel source file into optimized object code"
-      (-> (directory/read-recursive base-dir)
-          (flatten)
-          (sort)
-          (filter (path/ext?! "nuj"))
-          (map (fn (path) (file/test/module path base-dir)))
-          (sum)))
-
 (defn file/file? (filename)
        (ref (file/stat filename) :regular-file?))
 
