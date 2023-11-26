@@ -146,8 +146,10 @@ struct lPair {
  */
 void      lInit    ();
 lClosure *lNewRoot ();
+lClosure *lInitRootClosure();
 lVal      lApply   (lVal fun, lVal args);
 lClosure *lLoad    (lClosure *c, const char *expr);
+lVal readImage     (const void *ptr, size_t imgSize, bool staticImage);
 
 const void *         lBufferData            (lBuffer *v);
 void *               lBufferDataMutable     (lBuffer *v);

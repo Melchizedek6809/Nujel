@@ -46,3 +46,33 @@ int makeDir(const char *name){
 	return mkdir(name,0755);
 	#endif
 }
+
+void *loadFile(const char *filename,size_t *len){
+	FILE *fp;
+	size_t filelen,readlen,read;
+	u8 *buf = NULL;
+
+	fp = fopen(filename,"rb");
+	if(fp == NULL){return NULL;}
+
+	fseek(fp,0,SEEK_END);
+	filelen = ftell(fp);
+	fseek(fp,0,SEEK_SET);
+
+	buf = malloc(filelen);
+	if(buf == NULL){return NULL;}
+
+	readlen = 0;
+	while(readlen < filelen){
+		read = fread(buf+readlen,1,filelen-readlen,fp);
+		if(read == 0){
+			free(buf);
+			return NULL;
+		}
+		readlen += read;
+	}
+	fclose(fp);
+
+	*len = filelen;
+	return buf;
+}

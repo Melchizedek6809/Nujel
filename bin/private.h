@@ -29,6 +29,7 @@ void lOperationsIO   (lClosure *c);
 void lOperationsPort (lClosure *c);
 void lOperationsInit (lClosure *c);
 void lOperationsNet  (lClosure *c);
+void *loadFile(const char *filename, size_t *len);
 
 int  makeDir   (const char *name);
 

@@ -6,33 +6,64 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-extern u8 stdlib_no_data[];
 extern u8 binlib_no_data[];
-lClosure *mainClosure;
 
-
-/* Return a new root Closure, with all native functions in place */
-static lClosure *createRootClosure(){
-	lClosure *c = lNewRoot();
+static lClosure *initBinRootClosure(lClosure *c){
 	lOperationsIO(c);
 	lOperationsPort(c);
 	lOperationsInit(c);
 	lOperationsNet(c);
-	mainClosure = lLoad(c, (const char *)binlib_no_data);
+	return c;
+}
+
+/* Return a new root Closure, with all native functions in place */
+static lClosure *createRootClosure(lClosure *c){
+	return lLoad(initBinRootClosure(c), (const char *)binlib_no_data);;
+}
+
+static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *init){
+	size_t len = 0;
+	printf("Loading image '%s'\n", filename);
+	void *img = loadFile(filename, &len);
+	lClosure *c = initBinRootClosure(lInitRootClosure());
+	lVal imgVal = readImage(img, len, false);
+	*init = imgVal;
 	return c;
 }
 
 /* Initialize the Nujel context with an stdlib as well
  * as parsing arguments passed to the runtime */
-int initNujel(int argc, char *argv[], lClosure *c){
-	lVal volatile ret = NIL;
-	initEnvironmentMap(c);
+int initNujel(int argc, char *argv[]){
+	lClosure *c = NULL;
+	lVal ret = NIL;
+	lVal init = NIL;
 	for(int i = argc-1; i >= 0; i--){
+		if(strcmp(argv[i], "--base-image") == 0){
+			if(c != NULL){
+				fprintf(stderr, "You can only specify one image\n");
+				exit(124);
+			}
+			if(i > (argc-2)){
+				fprintf(stderr, "Please specify an image\n");
+				exit(125);
+			}
+			c = createRootClosureFromExternalImage(argv[i+1], &init);
+			ret = lCdr(ret);
+			continue;
+		}
 		ret = lCons(lValString(argv[i]), ret);
 	}
+	if(c == NULL){
+		c = createRootClosure(lNewRoot());
+	}
+	initEnvironmentMap(c);
 
-	lApply(lGetClosureSym(c, lSymS("init")), ret);
+	if(init.type == ltNil){
+		init = lGetClosureSym(c, lSymS("init"));
+	}
+	lApply(init, ret);
 	return 0;
 }
 
@@ -44,5 +75,5 @@ int main(int argc, char *argv[]){
 	lInit();
 	setIOSymbols();
 
-	return initNujel(argc,argv,createRootClosure());
+	return initNujel(argc,argv);
 }

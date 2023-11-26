@@ -14,6 +14,7 @@
             (def init/parse-args/eval-next-module #f)
             (def init/parse-args/eval-next #f)
             (def init/parse-args/run-repl #t)
+            (def init/parse-args/ignore-next #f)
 
             (set! init/option-map 'r
                        (fn (option)
@@ -52,7 +53,8 @@
                       (for-each (map (split options "") :symbol) init/parse-option)))
 
             (defn init/parse-arg (arg args)
-                  (cond (init/parse-args/eval-next (try print/error
+                  (cond (init/parse-args/ignore-next (set! init/parse-args/ignore-next #f))
+                        (init/parse-args/eval-next (try print/error
                                                         (eval-in root-closure (cons do (read arg)))
                                                         (set! init/parse-args/eval-next #f)))
                         (init/parse-args/eval-next-module (try (fn (e)

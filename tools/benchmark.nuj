@@ -178,7 +178,7 @@
 
 (def res-name (fmt "{rough-date}-{hostname}-{git-head}"))
 (def out-name (fmt "web/benchmark-results/{}.json" res-name))
-(directory/make "web/benchmark-results")
+(mkdir "web/benchmark-results")
 
 (and (:has? init/options :no-overwrite)
      (file/file? out-name)

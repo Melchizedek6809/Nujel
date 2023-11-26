@@ -43,7 +43,8 @@ lClosure *lLoad(lClosure *c, const char *expr){
 }
 
 /* Add all the essential Native Functions to closure c */
-static void lInitRootClosure(lClosure *c){
+lClosure *lInitRootClosure(){
+	lClosure *c = lClosureAllocRaw();
 	c->type = closureRoot;
 	lTypesInit(c);
 	lOperationsArithmetic(c);
@@ -58,11 +59,10 @@ static void lInitRootClosure(lClosure *c){
 	lAddPlatformVars(c);
 	lDefineVal(c,"exports",  lValTree(NULL));
 	lDefineVal(c,"*module*", lValKeyword("core"));
+	return c;
 }
 
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
-	lClosure *c = lClosureAllocRaw();
-	lInitRootClosure(c);
-	return lLoad(c, (const char *)stdlib_no_data);
+	return lLoad(lInitRootClosure(), (const char *)stdlib_no_data);
 }

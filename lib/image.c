@@ -318,7 +318,8 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	}
 }
 
-static lVal readImage(const lImage *img, size_t imgSize, bool staticImage){
+lVal readImage(const void *ptr, size_t imgSize, bool staticImage){
+	const lImage *img = ptr;
 	if(unlikely(img == NULL)){
 		return lValExceptionSimple();
 	}

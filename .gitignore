@@ -71,3 +71,5 @@ gmon.out
 *.user
 *.userosscache
 *.sln.docstates
+
+/init.nuji
