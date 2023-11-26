@@ -7,7 +7,7 @@
 
 (when (not= coc-hash #xB5C288AD)
       (throw (list :wrong-result "CoC Adler32 digest wrong" (int->string/HEX coc-hash))))
-(when (not= lic-hash #xE98856BD)
+(when (not= lic-hash #x8A5056E4)
       (throw (list :wrong-result "License Adler32 digest wrong" (int->string/HEX lic-hash))))
 
 (return :success)

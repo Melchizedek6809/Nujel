@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../third-party/fasthash/fasthash.h"
+
 lSymbol  lSymbolList[SYM_MAX];
 uint     lSymbolActive = 0;
 uint     lSymbolMax    = 0;
@@ -175,29 +177,8 @@ lSymbol *lSymSM(const char *str){
 	return lRootsSymbolPush(lSymS(str));
 }
 
-const u32 hashLookupTable[8] = {
-	0x2e003dc5,
-	0x8b27c03c,
-	0x4d9b3063,
-	0xbd3e8d7e,
-	0x52568b75,
-	0x1d528623,
-	0xf0a5bd1d,
-	0x76c15bf8
-};
-
-static u32 lHashSymStr(const char *str){
-	u32 res = 0xf3b06b3b;
-	while (*str) {
-		res = (res << 4) | ((res & 0xF0000000) >> 28);
-		res ^= *str++;
-#ifdef _MSC_VER
-		res ^= hashLookupTable[__popcnt(res) & 0x7];
-#else
-		res ^= hashLookupTable[__builtin_popcount(res)&0x7];
-#endif
-	}
-	return res;
+static inline u32 lHashSymStr(const char *str){
+	return fasthash32(str, strlen(str), 0x8b0a159d);
 }
 
 // Probes the symbol index and returns the slot where STR is stored.  If STR is
