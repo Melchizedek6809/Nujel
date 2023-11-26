@@ -85,3 +85,13 @@ lClosure *findRoot (lVal v){
 		return NULL;
 	}
 }
+
+lClosure *lRedefineNativeFuncs(lClosure *c){
+	for(uint i=0;i<lNFuncMax;i++){
+		lNFunc *t = &lNFuncList[i];
+		if(t == NULL){break;}
+		lVal nf = lValAlloc(ltNativeFunc, t);
+		lDefineClosureSym(c, t->name, nf);
+	}
+	return c;
+}

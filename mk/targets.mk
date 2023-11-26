@@ -30,11 +30,22 @@ tmp/binlib.c: tmp/binlib.no $(NUJEL)
 	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/binlib.no" "./tmp/binlib.c" "binlib_no_data"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
+tmp/init.nuji: $(NUJEL)
+	@mkdir -p tmp/
+	@echo "(file/write (image/serialize init) \"tmp/init.nuji\") (exit 0)" | ./$(NUJEL)
+	@echo "$(ANSI_GREEN)" "[IMG]" "$(ANSI_RESET)" $@
+
+runi: $(NUJEL) tmp/init.nuji
+	@./$(NUJEL) --base-image "tmp/init.nuji"
+
 run: $(FUTURE_NUJEL)
 	@./$(FUTURE_NUJEL) tools/tests.nuj
 
 test: $(NUJEL)
 	@./$(NUJEL) tools/tests.nuj
+
+test.img: $(NUJEL) tmp/init.nuji
+	@./$(NUJEL) --base-image tmp/init.nuji tools/tests.nuj
 
 test.v: $(NUJEL)
 	@./$(NUJEL) -v tools/tests.nuj

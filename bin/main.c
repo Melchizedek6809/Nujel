@@ -33,7 +33,7 @@ static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *
 		fprintf(stderr,"Can't determine root closure of that image, exiting\n");
 		exit(131);
 	}
-	c = imgC;
+	c = lRedefineNativeFuncs(imgC);
 	*init = imgVal;
 	free(img);
 	return c;
