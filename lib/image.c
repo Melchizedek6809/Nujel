@@ -242,7 +242,6 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lClosure *)mapP; }
 	if(off < 0){return NULL;}
-	if(off >= map->imgSize){((u8 *)NULL)[0] = 1;}
 	lImageClosure *clo = (lImageClosure *)((void *)&img->data[off]);
 	lClosure *ret = lClosureAllocRaw();
 	readMapSet(map, off, ret);
@@ -266,7 +265,6 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	lVal rootValue = *((lVal *)((void *)&img->data[off]));
 	if(off < 0){return NIL;}
-	if(off >= map->imgSize){((u8 *)NULL)[0] = 1;}
 	switch(rootValue.type){
 	case ltComment:
 	case ltException:
@@ -362,8 +360,8 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 	const i32 curOff = ctx->curOff;
 	writeMapSet(&ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
-	memcpy(&ctx->start[curOff], v->c, eleSize);
-	ctx->start[ctx->curOff + strLen] = 0;
+	memcpy(&ctx->start[curOff], v->c, strLen);
+        ctx->start[curOff + strLen] = 0;
 	return curOff;
 }
 
