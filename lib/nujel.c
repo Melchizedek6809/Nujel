@@ -66,3 +66,22 @@ lClosure *lInitRootClosure(){
 lClosure *lNewRoot(){
 	return lLoad(lInitRootClosure(), (const char *)stdlib_no_data);
 }
+
+static lClosure *findRootRec(lClosure *v){
+	if(v->type == closureRoot){
+		return v;
+	} else {
+		return findRootRec(v->parent);
+	}
+}
+
+lClosure *findRoot (lVal v){
+	switch(v.type){
+	case ltEnvironment:
+	case ltMacro:
+	case ltLambda:
+		return findRootRec(v.vClosure);
+	default:
+		return NULL;
+	}
+}

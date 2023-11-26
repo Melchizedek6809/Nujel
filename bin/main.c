@@ -28,6 +28,12 @@ static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *
 	void *img = loadFile(filename, &len);
 	lClosure *c = initBinRootClosure(lInitRootClosure());
 	lVal imgVal = readImage(img, len, false);
+	lClosure *imgC = findRoot(imgVal);
+	if(imgC == NULL){
+		fprintf(stderr,"Can't determine root closure of that image, exiting\n");
+		exit(131);
+	}
+	c = imgC;
 	*init = imgVal;
 	free(img);
 	return c;
