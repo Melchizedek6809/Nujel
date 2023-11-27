@@ -26,14 +26,14 @@ static lClosure *createRootClosure(lClosure *c){
 static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *init){
 	size_t len = 0;
 	void *img = loadFile(filename, &len);
-	lClosure *c = initBinRootClosure(lInitRootClosure());
+	initBinRootClosure(lInitRootClosure());
 	lVal imgVal = readImage(img, len, false);
 	lClosure *imgC = findRoot(imgVal);
 	if(imgC == NULL){
 		fprintf(stderr,"Can't determine root closure of that image, exiting\n");
 		exit(131);
 	}
-	c = lRedefineNativeFuncs(imgC);
+	lClosure *c = lRedefineNativeFuncs(imgC);
 	*init = imgVal;
 	free(img);
 	return c;
