@@ -92,16 +92,6 @@
              (add* (eval (car t))
                    (cons 'do (cdr t)))))
 
-(defn add-builtin-tests ()
-      (doseq (test-funs (-> (symbol-table)
-                            (map resolve-or-nil)
-                            (filter callable?)
-                            (map (fn (a) (:meta a :tests)))
-                            (filter identity)))
-             (doseq (fun test-funs)
-                    (add* (car fun)
-                          (cadr fun)))))
-
 (defn file/test/module/run (tests module-name)
       (doseq (expr tests)
              (run-test! (eval (cadr expr))
@@ -141,7 +131,6 @@
 (when (not (:has? init/options :only-test-suite))
   (println (ansi/purple "First we test the basic functions of the runtime.")))
 (for-each (-> (directory/read-relative "tests/testsuite") sort) test-load)
-(add-builtin-tests)
 
 (def output-passes #f)
 (when (:has? init/options :verbose)
