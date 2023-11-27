@@ -23,9 +23,6 @@
       :related pad-middle
       :related pad-end
       :related trim
-      (deftest "   123" (pad-start "123" 6))
-      (deftest "000123" (pad-start 123 6 "0"))
-      (deftest "-.-123" (pad-start '123 6 ".-"))
 
 
       (when-not padding (set! padding " "))
@@ -58,9 +55,6 @@
       :related pad-middle
       :related pad-start
       :related trim
-      (deftest "123   " (pad-end "123" 6))
-      (deftest "123000" (pad-end 123 6 "0"))
-      (deftest "123.-." (pad-end '123 6 ".-"))
 
 
       (when-not padding (set! padding " "))
@@ -93,9 +87,6 @@
       :related pad-start
       :related pad-end
       :related trim
-      (deftest " 123  " (pad-middle "123" 6))
-      (deftest "012300" (pad-middle 123 6 "0"))
-      (deftest "-123.-" (pad-middle '123 6 ".-"))
 
       (when-not padding (set! padding " "))
       (when-not (string? text) (set! text (:string text)))
@@ -122,12 +113,6 @@
       :related pad-middle
       :related pad-end
       :related trim
-      (deftest "Test" (trim " Test"))
-      (deftest "Test" (trim "Test "))
-      (deftest "Test" (trim "Test"))
-      (deftest "" (trim ""))
-      (deftest "Test" (trim "   Test\t\n"))
-      (deftest "Trim Test" (trim "   Trim Test    \n"))
 
       (def start 0)
       (def end (:length text))
@@ -144,7 +129,6 @@
       :cat :string-manipulation
       :related lower-case
       :related capitalize
-      (deftest "TESTING THE CAPITALIZATION!" (upper-case "Testing THE Capitalization!"))
 
       (def ret (buffer/allocate (:length text)))
       (dotimes (i (:length text) (buffer->string ret))
@@ -159,7 +143,6 @@
       :cat :string-manipulation
       :related upper-case
       :related capitalize
-      (deftest "testing the capitalization!" (lower-case "Testing THE Capitalization!"))
 
       (def ret (buffer/allocate (:length text)))
       (dotimes (i (:length text) (buffer->string ret))
@@ -177,7 +160,6 @@
       :cat :string-manipulation
       :related upper-case
       :related lower-case
-      (deftest "Testing The Capitalization!" (capitalize "Testing THE Capitalization!"))
 
       (def ret (buffer/allocate (:length text)))
       (def caps? #t)

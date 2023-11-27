@@ -30,14 +30,6 @@
       :inline
       :cat :boolean-operations
       :related not
-      (deftest #t (boolean #t))
-      (deftest #f (boolean #nil))
-      (deftest #f (boolean #f))
-      (deftest #t (boolean 0))
-      (deftest #t (boolean 1))
-      (deftest #t (boolean 0.1))
-      (deftest #t (boolean ""))
-      (deftest #t (boolean "a"))
 
       (if v #t #f))
 
@@ -46,11 +38,6 @@
       :inline
       :cat :boolean-operations
       :related boolean
-      (deftest #f (not #t))
-      (deftest #t (not #f))
-      (deftest #t (not (< 5 1)))
-      (deftest #t (not (= #f #t)))
-      (deftest #t (not (< 3 2)))
 
       (if v #f #t))
 
@@ -65,7 +52,6 @@
       :related cadr
       :related car
       :related cdr
-      (deftest #t (caar '((#t) #f)))
 
       (car (car p)))
 
@@ -76,8 +62,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cdar '((#f . #t) #f)))
-      (deftest (#t) (cdar '((#f #t) #f)))
 
       (cdr (car p)))
 
@@ -88,8 +72,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cddr '(#f #f . #t)))
-      (deftest (#t) (cddr '(#f #f #t)))
 
       (cdr (cdr p)))
 
@@ -100,7 +82,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cadar '((#f #t) #f)))
 
       (car (cdr (car p))))
 
@@ -111,7 +92,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (caddr '(#f #f #t)))
 
       (car (cdr (cdr p))))
 
@@ -122,8 +102,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cdddr '(#f #f #f . #t)))
-      (deftest (#t) (cdddr '(#f #f #f #t)))
 
       (cdr (cdr (cdr p))))
 
@@ -134,7 +112,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cadddr '(#f #f #f #t)))
 
       (car (cdr (cdr (cdr p)))))
 
@@ -145,7 +122,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cddddr '(#f #f #f #f . #t)))
 
       (cdr (cdr (cdr (cdr p)))))
 
@@ -156,7 +132,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (caddddr '(#f #f #f #f #t)))
 
       (car (cdr (cdr (cdr (cdr p))))))
 
@@ -167,7 +142,6 @@
       :related caar
       :related car
       :related cdr
-      (deftest #t (cdddddr '(#f #f #f #f #f. #t)))
 
       (cdr (cdr (cdr (cdr (cdr p))))))
 

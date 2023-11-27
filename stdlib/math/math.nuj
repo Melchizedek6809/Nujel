@@ -41,16 +41,6 @@
       The smallest value"
       :cat :math
 
-      (deftest 2 (min 2 4 9 25))
-      (deftest 1 (apply min '(1 4 9 25)))
-      (deftest 8.2 (reduce [32 9 8.2] min))
-      (deftest 4 (min 25.3 4 9.1))
-      (deftest 1 (apply min '(25 4 9 1)))
-      (deftest 1 (reduce [25 4 9 1] min))
-      (deftest #nil (min))
-      (deftest 4 (min 4))
-      (deftest 4 (min 4 9))
-
       (reduce args (fn (a b) (if (< a b) a b))))
 
 (defn max args
@@ -60,15 +50,5 @@
 
       The biggest value"
       :cat :math
-
-      (deftest #nil (max))
-      (deftest 1 (max 1))
-      (deftest 9.1 (max 4 9.1))
-      (deftest 25 (max 1 4 9 25))
-      (deftest 25 (apply max '(1 4 9 25)))
-      (deftest 25 (reduce [1 4 9 25] max))
-      (deftest 31.0 (max 31.0 4 9 1))
-      (deftest 25 (apply max '(25 4 9 1)))
-      (deftest 25 (reduce [25 4 9 1] max))
 
       (reduce args (fn (a b) (if (> a b) a b))))

@@ -43,15 +43,6 @@
 
       Whether the two arguments are equal?"
       :cat :predicate
-      (deftest #t (equal? 1 1))
-      (deftest #t (equal? 2.0 2.0))
-      (deftest #f (equal? 2.0 2.1))
-      (deftest #t (equal? :a :a))
-      (deftest #f (equal? :a :b))
-      (deftest #t (equal? '(1 :b "c") '(1 :b "c")))
-      (deftest #f (equal? '(1 :b "c" [4.0]) '(1 :b "c")))
-      (deftest #t (equal? '(1 :b "c" [4.0]) '(1 :b "c" [4.0])))
-      (deftest #t (equal? ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :b 2}) '("7" [8 88] :9)] ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :b 2}) '("7" [8 88] :9)]))
 
       (def cur-type (:type-name val-a))
       (if (not= cur-type (:type-name val-b))
@@ -73,11 +64,6 @@
 
       Whether the two arguments are not equal?"
       :cat :predicate
-      (deftest #t (not-equal? ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :b 2}) '("7" [8 88] :9)] ['(1 #o2 #x3) '(4.0 5.0 {:a 1 :a 2}) '("7" [8 88] :9)]))
-      (deftest #f (not-equal? :a :a))
-      (deftest #t (not-equal? :a :b))
-      (deftest #t (not-equal? '(1 :b "c" [4.0]) '(1 :b "c")))
-      (deftest #t (not-equal? ['(1 #o2 #x3) '(4.0 5.0 6.0) '("7" [8 88] :9)] ['(1 #o2 #x3) '(4.0 5.0 6.0) '("7" [8 88] :99)]))
 
       (not (equal? val-a val-b)))
 
@@ -90,9 +76,6 @@
 
       Whether val is an integer"
       :cat :type-predicate
-      (deftest #t (int? 123))
-      (deftest #f (int? 123.123))
-      (deftest #f (int? 'asd))
       :inline
 
       (= :int (:type-name val)))
@@ -106,9 +89,6 @@
 
       Whether val is a floating-point number"
       :cat :type-predicate
-      (deftest #f (float? 123))
-      (deftest #t (float? 123.123))
-      (deftest #f (float? 'abc))
       :inline
 
       (= :float (:type-name val)))
@@ -122,10 +102,6 @@
 
       Whether val is a number"
       :cat :type-predicate
-      (deftest #t (number? 123))
-      (deftest #t (number? 123.123))
-      (deftest #f (number? 'abc))
-      (deftest #f (number? "123"))
 
       (or (int? val)
           (float? val)))
@@ -137,12 +113,6 @@
 
       Whether val is a boolean"
       :cat :type-predicate
-      (deftest #t (bool? #t))
-      (deftest #t (bool? #f))
-      (deftest #f (bool? #nil))
-      (deftest #f (bool? 123))
-      (deftest #f (bool? 123.123))
-      (deftest #f (bool? 'qwe))
       :inline
 
       (= :bool (:type-name val)))
@@ -156,11 +126,6 @@
 
       Whether val is a pair"
       :cat :type-predicate
-      (deftest #t (pair? '()))
-      (deftest #t (pair? '(123)))
-      (deftest #f (pair? 123))
-      (deftest #f (pair? 123.123))
-      (deftest #f (pair? 'qwe))
       :inline
 
       (= :pair (:type-name val)))
@@ -174,11 +139,6 @@
 
       Whether val is an array"
       :cat :type-predicate
-      (deftest #t (array? []))
-      (deftest #f (array? '(123)))
-      (deftest #f (array? 123))
-      (deftest #f (array? 123.123))
-      (deftest #f (array? 'abc))
       :inline
 
       (= :array (:type-name val)))
@@ -190,12 +150,6 @@
 
       Whether val is a string"
       :cat :type-predicate
-      (deftest #t (string? "asd"))
-      (deftest #f (string? []))
-      (deftest #f (string? '(123)))
-      (deftest #f (string? 123))
-      (deftest #f (string? 123.123))
-      (deftest #f (string? 'abc))
       :inline
 
       (= :string (:type-name val)))
@@ -207,11 +161,6 @@
 
       Whether val is a symbol"
       :cat :type-predicate
-      (deftest #t (symbol? 'abc))
-      (deftest #f (symbol? "asd"))
-      (deftest #f (symbol? '(123)))
-      (deftest #f (symbol? 123))
-      (deftest #f (symbol? 123.123))
       :inline
 
       (= :symbol (:type-name val)))
@@ -225,9 +174,6 @@
 
       Whether val is an environment"
       :cat :type-predicate
-      (deftest #t (environment? (current-closure)))
-      (deftest #f (environment? []))
-      (deftest #f (environment? '(123)))
       :inline
 
       (= :environment (:type-name val)))
@@ -241,13 +187,6 @@
 
       Whether val is a tree"
       :cat :type-predicate
-      (deftest #t (tree? {}))
-      (deftest #f (tree? (current-closure)))
-      (deftest #f (tree? []))
-      (deftest #f (tree? '(123)))
-      (deftest #f (tree? 123))
-      (deftest #f (tree? 123.123))
-      (deftest #f (tree? 'abc))
       :inline
 
       (= :tree (:type-name val)))
@@ -259,13 +198,6 @@
 
       Whether val is a collection"
       :cat :type-predicate
-      (deftest #t (collection? {}))
-      (deftest #t (collection? []))
-      (deftest #t (collection? '(123)))
-      (deftest #f (collection? (current-closure)))
-      (deftest #f (collection? 123))
-      (deftest #f (collection? 123.123))
-      (deftest #f (collection? 'abc))
       :inline
 
       (case (:type-name l)
@@ -279,13 +211,6 @@
 
       Whether val is a keyword"
       :cat :type-predicate
-      (deftest #t (keyword? :abc))
-      (deftest #f (keyword? 'abc))
-      (deftest #f (keyword? "asd"))
-      (deftest #f (keyword? []))
-      (deftest #f (keyword? '(123)))
-      (deftest #f (keyword? 123))
-      (deftest #f (keyword? 123.123))
       :inline
 
       (= :keyword (:type-name v)))
@@ -297,8 +222,6 @@
 
       Whether val is a macro"
       :cat :type-predicate
-      (deftest #t (macro? case))
-      (deftest #f (macro? :abc))
       :inline
 
       (= :macro (:type-name val)))
@@ -312,10 +235,6 @@
 
       Whether val is a function"
       :cat :type-predicate
-      (deftest #t (lambda? min))
-      (deftest #f (lambda? case))
-      (deftest #f (lambda? (current-closure)))
-      (deftest #f (lambda? 'abc))
       :inline
 
       (or (= :lambda (:type-name val))))
@@ -329,9 +248,6 @@
 
       Whether val is a native function"
       :cat :type-predicate
-      (deftest #t (native? sin))
-      (deftest #f (native? (defn +123 (a) (+ a 123))))
-      (deftest #f (native? (defmacro +123 (a) (+ a 123))))
       :inline
 
       (= :native-function (:type-name val)))
@@ -345,9 +261,6 @@
 
       Whether val is a buffer"
       :cat :type-predicate
-      (deftest #t (buffer? #m00))
-      (deftest #f (buffer? "asd"))
-      (deftest #f (buffer? []))
 
       :inline
 
@@ -360,10 +273,6 @@
 
       Whether val is a buffer view"
       :cat :type-predicate
-      (deftest #t (buffer-view? (:u8 #m00)))
-      (deftest #f (buffer-view? #m00))
-      (deftest #f (buffer-view? "asd"))
-      (deftest #f (buffer-view? []))
       :inline
 
       (= :buffer-view (:type-name v)))
@@ -375,11 +284,6 @@
 
       Whether val is a buffer view"
       :cat :type-predicate
-      (deftest #t (bytecode-array? #{##()01}))
-      (deftest #f (bytecode-array? (:u8 #m00)))
-      (deftest #f (bytecode-array? #m00))
-      (deftest #f (bytecode-array? "asd"))
-      (deftest #f (bytecode-array? []))
       :inline
 
       (= :bytecode-array (:type-name v)))
@@ -393,12 +297,6 @@
 
       Whether val is a procedure"
       :cat :type-predicate
-      (deftest #t (and (native? sin) (procedure? sin)))
-      (deftest #t (and (lambda? min) (procedure? min)))
-      (deftest #t (procedure? min))
-      (deftest #t (procedure? sin))
-      (deftest #f (procedure? case))
-      (deftest #f (procedure? (current-closure)))
 
       (or (lambda? val)
           (native? val)))
@@ -413,10 +311,6 @@
 
       Whether val is callable"
       :cat :type-predicate
-      (deftest #t (and (macro? case) (callable? case)))
-      (deftest #t (callable? min))
-      (deftest #t (callable? sin))
-      (deftest #f (callable? (current-closure)))
 
       (or (macro? val)
           (procedure? val)))

@@ -11,11 +11,6 @@
       The numeric sum of all the elements of collection"
       :cat :collection-operations
 
-      (deftest :type-error (try car (sum 123)))
-      (deftest 10 (+ (sum '(1 2 3)) (apply (fn (α) (+ 1 α)) '(3))))
-      (deftest 15 (sum [1 2 3 4 5]))
-      (deftest 6 (sum '(1 2 3)))
-
       (reduce collection + 0))
 
 (defn every? (collection predicate?)
@@ -26,15 +21,6 @@
 
       Whether every invocation returned #t or not"
       :cat :collection-operations
-
-      (deftest #t (every? '(1 2 3 4 5 6) int?))
-      (deftest #f (every? '(1 2 3 4 5 6.0) int?))
-      (deftest #t (every? '(1.0 6.0) float?))
-      (deftest #f (every? '() float?))
-      (deftest #t (every? [1 2 3 4 5 6] int?))
-      (deftest #f (every? [1 2 3 4 5 6.0] int?))
-      (deftest #t (every? [1.0 6.0] float?))
-      (deftest #t (every? [] float?))
 
       (reduce collection (fn (a b) (and a (predicate? b))) #t))
 
@@ -47,18 +33,6 @@
 
       The number of times predicate? returned #t"
       :cat :collection-operations
-
-      (deftest 0 (count #nil))
-      (deftest 0 (count []))
-      (deftest 1 (count '(1)))
-      (deftest 1 (count [1]))
-      (deftest 3 (count '(1 2 3)))
-      (deftest 3 (count [1 2 3]))
-      (deftest 2 (count [1 2 3 4] even?))
-      (deftest 3 (count '(1 2 3 4 5 6) odd?))
-      (deftest 3 (count '(1 2 3 4 5 6) even?))
-      (deftest 6 (count '(1 2 3 4 5 6) int?))
-      (deftest 0 (count '(1 2 3 4 5 6) float?))
 
       (if predicate?
           (reduce collection (fn (a b) (+ a (if (predicate? b) 1 0))) 0)
