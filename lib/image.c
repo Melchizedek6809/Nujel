@@ -155,8 +155,8 @@ static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool stati
 	const i32 *pair = (const i32 *)((void *)&img->data[off]);
 	lPair *ret = lPairAllocRaw();
 	readMapSet(map, off, ret);
-	ret->car = readVal(map, img, pair[0], staticImage);
-	ret->cdr = readVal(map, img, pair[1], staticImage);
+	ret->car = pair[0] >= 0 ? readVal(map, img, pair[0], staticImage) : NIL;
+	ret->cdr = pair[1] >= 0 ? readVal(map, img, pair[1], staticImage) : NIL;
 	return ret;
 }
 
@@ -526,8 +526,8 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	writeMapSet(&ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 
-	const i32 car = ctxAddVal(ctx, v->car);
-	const i32 cdr = ctxAddVal(ctx, v->cdr);
+	const i32 car = v->car.type != ltNil ? ctxAddVal(ctx, v->car) : -1;
+	const i32 cdr = v->cdr.type != ltNil ? ctxAddVal(ctx, v->cdr) : -1;
 	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
 	out[0] = car;
 	out[1] = cdr;
