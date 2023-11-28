@@ -551,7 +551,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				t = s > t->key ? t->right : t->left;
 			}
 		}
-		vmbreak; }
+		exceptionThrownValue = lValException(lSymUnboundVariable, "Can't set symbol", lValSymS(s));
+		goto throwException; }
 	vmcase(lopGenSet) {
 		lVal val = ctx.valueStack[ctx.sp-1];
 		lVal key = ctx.valueStack[ctx.sp-2];
@@ -578,7 +579,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	}
 	vmcase(lopIncInt)
 		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
-			ctx.valueStack[ctx.sp-1] = lValInt(ctx.valueStack[ctx.sp-1].vInt + 1);
+			ctx.valueStack[ctx.sp-1].vInt++;
 		}
 		vmbreak;
 	vmcase(lopCar)
