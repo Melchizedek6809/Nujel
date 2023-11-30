@@ -96,7 +96,7 @@ lTree *lTreeInsert(lTree *t, const lSymbol *s, lVal v){
 	}else{
 		if(s < t->key){
 			t->left = lTreeInsert(t->left, s, v);
-		}else {
+		}else{
 			t->right = lTreeInsert(t->right, s, v);
 		}
 		t->height = lTreeCalcHeight(t);

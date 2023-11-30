@@ -333,7 +333,6 @@ extern uint T##Max;	   \
 extern uint T##Active; \
 extern T * T##FFree; \
 T * T##AllocRaw(); \
-void T##Free(T * v);
 
 allocatorTypes()
 #undef defineAllocator
@@ -406,7 +405,6 @@ lSymbol  *getTypeSymbol (const lVal a);
 lSymbol  *getTypeSymbolT(const lType T);
 
 lNFunc *         lNFuncAlloc         ();
-void             lNFuncFree          (lNFunc *n);
 lBytecodeArray * lBytecodeArrayAlloc (size_t len);
 lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
 int              lBufferViewTypeSize (lBufferViewType T);

@@ -53,8 +53,71 @@ static void lSymbolGCMark      (const lSymbol *v);
 static void lThreadGCMark      (lThread *c);
 static void lBytecodeArrayMark (const lBytecodeArray *v);
 
+static void lBufferFree(lBuffer *buf){
+	if(!(buf->flags & BUFFER_STATIC)){
+		free(buf->buf);
+	}
+	buf->buf = NULL;
+	buf->nextFree = lBufferFFree;
+	lBufferActive--;
+	lBufferFFree = buf;
+}
+
+static void lBufferViewFree(lBufferView *buf){
+	buf->buf = NULL;
+	buf->nextFree = lBufferViewFFree;
+	lBufferViewActive--;
+	lBufferViewFFree = buf;
+}
+
+static void lBytecodeArrayFree(lBytecodeArray *v){
+	if(!(v->flags & BUFFER_STATIC)){
+		free(v->data);
+	}
+	v->data     = NULL;
+	v->nextFree = lBytecodeArrayFFree;
+	lBytecodeArrayActive--;
+	lBytecodeArrayFFree = v;
+}
+
+static void lNFuncFree(lNFunc *n){
+	(void)n;
+}
+
+static void lArrayFree(lArray *v){
+	free(v->data);
+	v->data     = NULL;
+	v->nextFree = lArrayFFree;
+	lArrayFFree = v;
+	lArrayActive--;
+}
+
+static void lClosureFree(lClosure *clo){
+	clo->nextFree = lClosureFFree;
+	lClosureFFree = clo;
+	lClosureActive--;
+}
+
+static void lTreeFree(lTree *t){
+	t->nextFree = lTreeFFree;
+	lTreeFFree = t;
+	lTreeActive--;
+}
+
+static void lTreeRootFree(lTreeRoot *t){
+	t->nextFree = lTreeRootFFree;
+	lTreeRootFFree = t;
+	lTreeRootActive--;
+}
+
+static void lPairFree(lPair *cons){
+	cons->car = NIL;
+	cons->nextFree = lPairFFree;
+	lPairFFree = cons;
+	lPairActive--;
+}
+
 static void lThreadGCMark(lThread *c){
-	if(unlikely(c == NULL)){return;}
 	lBytecodeArrayMark(c->text);
 	for(int i=0;i <= c->csp;i++){
 		lClosureGCMark(c->closureStack[i]);

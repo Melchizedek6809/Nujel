@@ -71,17 +71,6 @@ lBuffer *lBufferAlloc(size_t length, bool immutable){
 	return ret;
 }
 
-void lBufferFree(lBuffer *buf){
-	if(unlikely(buf == NULL)){return;}
-	if(!(buf->flags & BUFFER_STATIC)){
-		free(buf->buf);
-	}
-	buf->buf = NULL;
-	buf->nextFree = lBufferFFree;
-	lBufferActive--;
-	lBufferFFree = buf;
-}
-
 lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable){
 	lBufferView *ret = lBufferViewAllocRaw();
 	ret->buf    = buf;
@@ -90,14 +79,6 @@ lBufferView *lBufferViewAlloc(lBuffer *buf, lBufferViewType type, size_t offset,
 	ret->flags  = immutable;
 	ret->type   = type;
 	return ret;
-}
-
-void lBufferViewFree(lBufferView *buf){
-	if(unlikely(buf == NULL)){return;}
-	buf->buf = NULL;
-	buf->nextFree = lBufferViewFFree;
-	lBufferViewActive--;
-	lBufferViewFFree = buf;
 }
 
 lBytecodeArray *lBytecodeArrayAlloc(size_t len){
@@ -109,17 +90,6 @@ lBytecodeArray *lBytecodeArrayAlloc(size_t len){
 	}
 	ret->dataEnd = &ret->data[len];
 	return ret;
-}
-
-void lBytecodeArrayFree(lBytecodeArray *v){
-	if(unlikely(v == NULL)){return;}
-	if(!(v->flags & BUFFER_STATIC)){
-		free(v->data);
-	}
-	v->data     = NULL;
-	v->nextFree = lBytecodeArrayFFree;
-	lBytecodeArrayActive--;
-	lBytecodeArrayFFree = v;
 }
 
 lArray *lArrayAlloc(size_t len){
@@ -139,46 +109,4 @@ lNFunc *lNFuncAlloc(){
 	}
 	memset(&lNFuncList[lNFuncMax++], 0, sizeof(ltNativeFunc));
 	return &lNFuncList[lNFuncMax++];
-}
-
-void lNFuncFree(lNFunc *n){
-	(void)n;
-}
-
-void lArrayFree(lArray *v){
-	if(unlikely(v == NULL)){return;}
-	free(v->data);
-	v->data     = NULL;
-	v->nextFree = lArrayFFree;
-	lArrayFFree = v;
-	lArrayActive--;
-}
-
-void lClosureFree(lClosure *clo){
-	if(unlikely(clo == NULL)){return;}
-	clo->nextFree = lClosureFFree;
-	lClosureFFree = clo;
-	lClosureActive--;
-}
-
-void lTreeFree(lTree *t){
-	if(unlikely(t == NULL)){return;}
-	t->nextFree = lTreeFFree;
-	lTreeFFree = t;
-	lTreeActive--;
-}
-
-void lTreeRootFree(lTreeRoot *t){
-	if(unlikely(t == NULL)){return;}
-	t->nextFree = lTreeRootFFree;
-	lTreeRootFFree = t;
-	lTreeRootActive--;
-}
-
-void lPairFree(lPair *cons){
-	if(unlikely(cons == NULL)){return;}
-	cons->car = NIL;
-	cons->nextFree = lPairFFree;
-	lPairFFree = cons;
-	lPairActive--;
 }

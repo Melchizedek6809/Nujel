@@ -190,7 +190,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt = ctx.valueStack[ctx.sp-1].vInt + b.vInt;
+				ctx.valueStack[ctx.sp-1].vInt += b.vInt;
 			} else if(likely(b.type == ltFloat)){
 				ctx.valueStack[ctx.sp-1] = lValFloat(b.vFloat + a.vInt);
 			} else if(b.type != ltNil){
@@ -199,9 +199,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1].vFloat = ctx.valueStack[ctx.sp-1].vFloat + b.vFloat;
+				ctx.valueStack[ctx.sp-1].vFloat += b.vFloat;
 			} else if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vFloat = ctx.valueStack[ctx.sp-1].vFloat + b.vInt;
+				ctx.valueStack[ctx.sp-1].vFloat += b.vInt;
 			} else if(b.type != ltNil) {
 				exceptionThrownValue = lValExceptionNonNumeric(b);
 				goto throwException;

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
+static inline i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
 	const uint alen = lBufferLength(a);
 	const uint blen = lBufferLength(b);
 	const uint len	= MIN(alen,blen);
@@ -24,7 +24,7 @@ static i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
 	return alen - blen;
 }
 
-static i64 lSymbolGreater(const lSymbol *a, const lSymbol *b) {
+static inline i64 lSymbolGreater(const lSymbol *a, const lSymbol *b) {
 	const uint alen = strnlen(a->c, sizeof(a->c));
 	const uint blen = strnlen(b->c, sizeof(b->c));
 	const uint len	= MIN(alen,blen);
@@ -84,14 +84,12 @@ bool lValEqual(const lVal a, const lVal b) {
 			return a.vFloat == ((float)b.vInt);
 		}
 		return false;
-	} else if (unlikely(a.type == ltString)) {
-		const uint alen = lBufferLength(a.vString);
-		const uint blen = lBufferLength(b.vString);
-		return (alen == blen) && (memcmp(a.vString->data, b.vString->data, alen) == 0);
-	} else if (unlikely(a.type == ltBool)) {
-		return a.vBool == b.vBool;
 	}
 	switch(a.type){
+	case(ltString):{
+		const uint alen = lBufferLength(a.vString);
+		const uint blen = lBufferLength(b.vString);
+		return (alen == blen) && (memcmp(a.vString->data, b.vString->data, alen) == 0); }
 	case(ltBool):
 		return a.vBool == b.vBool;
 	case(ltInt):
