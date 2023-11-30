@@ -2,6 +2,11 @@ include mk/ansi_colors.mk
 include mk/common.mk
 include mk/disable_implicit_rules.mk
 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	LIBS := -lm -lrt
+endif
+
 LIB_SRCS      := $(shell find lib -type f -name '*.c')
 LIB_OBJS      := $(LIB_SRCS:.c=.o)
 LIB_WASM_OBJS := $(LIB_SRCS:.c=.wo)

@@ -155,7 +155,7 @@
   (def test/start/file (time/milliseconds))
   (try (fn (err)
            (print "\r")
-           (println (prog-str red i path test/start/file))
+           (println (prog-str ansi/red i path test/start/file))
            (inc! test/errors)
            (print/error err)
            (newline))
