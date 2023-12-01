@@ -129,7 +129,7 @@ static lVal lnmStringLastIndexOf(lVal self, lVal search, lVal start){
 	if(needleLength <= 0){return lValInt(-1);}
 	const i64 pos = castToInt(start, haystackLength - needleLength);
 
-	for(const char *s = &haystack[pos]; s > haystack; s--){
+	for(const char *s = &haystack[pos]; s >= haystack; s--){
 		if(strncmp(s,needle,needleLength)){continue;}
 		return lValInt(s-haystack);
 	}
