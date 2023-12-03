@@ -10,11 +10,12 @@
 (def init/options {})
 (def init/option-map {})
 
-(def init (let*
+(defn init args (let*
             (def init/parse-args/eval-next-module #f)
             (def init/parse-args/eval-next #f)
             (def init/parse-args/run-repl #t)
             (def init/parse-args/ignore-next #f)
+            (set! init/args args)
 
             (set! init/option-map 'r
                        (fn (option)
@@ -84,6 +85,4 @@
                        (when (init/parse-args (cdr args))
                          (module/main :repl #nil))))
 
-            (defn init args
-                  (set! init/args args)
-                  (init/bin args))))
+            (init/bin args)))

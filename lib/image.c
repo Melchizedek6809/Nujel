@@ -12,6 +12,41 @@ typedef struct {
 	u8 data[];
 } lImage;
 
+typedef enum {
+	litNil = 0,
+
+	litSymbol,
+	litKeyword,
+
+	litInt8,
+	litInt16,
+	litInt32,
+	litInt64,
+
+	litFloat,
+
+	litPair,
+	litArray,
+	litTree,
+
+	litLambda,
+	litMacro,
+	litNativeFunc,
+	litEnvironment,
+
+	litString,
+	litBuffer,
+	litBufferView,
+	litBytecodeArr,
+
+	litFileHandle,
+	litType,
+
+	litTrue,
+	litFalse,
+
+} lImageType;
+
 typedef struct {
 	i32 buffer;
 	i32 length;
@@ -100,10 +135,6 @@ static void readMapSet(readImageMap *map, i32 key, void *val){
 	map->key[map->len] = key;
 	map->val[map->len] = val;
 	map->len++;
-}
-
-static i32 dwordAlign(i32 eleSize){
-	return (eleSize & 3) ? eleSize + 4 - (eleSize&3) : eleSize;
 }
 
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
@@ -264,16 +295,13 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	if(off < 0){return NIL;}
-	const lType T = img->data[off++];
+	const lImageType T = img->data[off++];
 	const i32 *dword = (i32 *)((void *)&img->data[off]);
 
 	switch(T){
 	default:
-	case ltComment:
-	case ltException:
-	case ltAny:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
-	case ltFileHandle:
+	case litFileHandle:
 		switch(img->data[off]){
 		case 0:
 			return lValFileHandle(stdin);
@@ -284,42 +312,52 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		default:
 			return lValException(lSymReadError, "Can't serialize file handles other than stdin, stdout or stderr", NIL);
 		}
-	case ltNativeFunc:
+	case litNativeFunc:
 		return lValAlloc(ltNativeFunc, readNFunc(map, img, *dword, staticImage));
-	case ltType:
+	case litType:
 		return lValAlloc(ltType, readType(map, img, *dword, staticImage));
-	case ltBytecodeArr:
+	case litBytecodeArr:
 		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, *dword, staticImage));
-	case ltTree:
+	case litTree:
 		return lValTree(readTree(map, img, *dword, staticImage));
-	case ltArray:
+	case litArray:
 		return lValAlloc(ltArray, readArray(map, img, *dword, staticImage));
-	case ltPair:
+	case litPair:
 		return lValAlloc(ltPair, readPair(map, img, *dword, staticImage));
-	case ltBufferView:
+	case litBufferView:
 		return lValAlloc(ltBufferView, readBufferView(map, img, *dword, staticImage));
-	case ltLambda:
-	case ltMacro:
-	case ltEnvironment:
-		return lValAlloc(T, readClosure(map, img, *dword, staticImage));
-	case ltString:
-	case ltBuffer:
-		return lValAlloc(T, readBuffer(map, img, *dword, staticImage));
-	case ltSymbol:
-	case ltKeyword:
-		return lValAlloc(T, (void *)readSymbol(map, img, *dword, staticImage));
-	case ltBool:
-		return lValBool(img->data[off]);
-	case ltNil:
+	case litLambda:
+		return lValAlloc(ltLambda, readClosure(map, img, *dword, staticImage));
+	case litMacro:
+		return lValAlloc(ltMacro, readClosure(map, img, *dword, staticImage));
+	case litEnvironment:
+		return lValAlloc(ltEnvironment, readClosure(map, img, *dword, staticImage));
+	case litString:
+		return lValAlloc(ltString, readBuffer(map, img, *dword, staticImage));
+	case litBuffer:
+		return lValAlloc(ltBuffer, readBuffer(map, img, *dword, staticImage));
+	case litSymbol:
+		return lValAlloc(ltSymbol, (void *)readSymbol(map, img, *dword, staticImage));
+	case litKeyword:
+		return lValAlloc(ltKeyword, (void *)readSymbol(map, img, *dword, staticImage));
+	case litNil:
 		return NIL;
-	case ltInt: {
-		const u64 *qword = (u64 *)((void *)&img->data[off]);
-		return lValInt(*qword);
-	}
-	case ltFloat: {
+	case litInt64:
+		return lValInt(*(i64 *)((void *)&img->data[off]));
+	case litInt32:
+		return lValInt(*(i32 *)((void *)&img->data[off]));
+	case litInt16:
+		return lValInt(*(i16 *)((void *)&img->data[off]));
+	case litInt8:
+		return lValInt(*(i8 *)((void *)&img->data[off]));
+	case litFloat: {
 		const double *fword = (double *)((void *)&img->data[off]);
 		return lValFloat(*fword);
 	}
+	case litFalse:
+		return lValBool(false);
+	case litTrue:
+		return lValBool(true);
 	}
 	return NIL;
 }
@@ -360,7 +398,7 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 strLen = strnlen(v->c, sizeof(v->c));
-	const i32 eleSize = dwordAlign(strLen+1);
+	const i32 eleSize = strLen+1;
 	ctxRealloc(ctx, eleSize);
 
 
@@ -433,7 +471,7 @@ static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 	if(v == NULL){return -1;}
 
 	int len = v->dataEnd - v->data;
-	i32 eleSize = dwordAlign(8 + len);
+	i32 eleSize = 8 + len;
 	ctxRealloc(ctx, eleSize);
 
 	i32 curOff = ctx->curOff;
@@ -454,7 +492,7 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = dwordAlign(sizeof(lImageClosure));
+	const i32 eleSize = sizeof(lImageClosure);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
@@ -485,7 +523,7 @@ static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = dwordAlign(sizeof(lImageBuffer) + v->length);
+	const i32 eleSize = sizeof(lImageBuffer) + v->length;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
@@ -503,7 +541,7 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = dwordAlign(sizeof(lImageBufferView));
+	const i32 eleSize = sizeof(lImageBufferView);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
@@ -525,7 +563,7 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = dwordAlign(8);
+	const i32 eleSize = 8;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
@@ -558,7 +596,6 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 
 	const i32 curOff = ctx->curOff;
 	u8 *outb = (u8 *)((void *)&ctx->start[curOff]);
-	*outb++ = v.type;
 
 	switch(v.type){
 	case ltAny:
@@ -567,40 +604,47 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 		exit(234);
 	case ltFileHandle:
 		ctx->curOff += 2;
+		*outb++ = litFileHandle;
 		*outb = ctxAddFilehandle(v.vFileHandle);
 		break;
 	case ltNativeFunc: {
 		ctx->curOff += 5;
+		*outb = litNativeFunc;
 		const i32 off = ctxAddSymbol(ctx, v.vNFunc->name);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltType: {
 		ctx->curOff += 5;
+		*outb = litType;
 		const i32 off = ctxAddSymbol(ctx, v.vType->name);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltBytecodeArr: {
 		ctx->curOff += 5;
+		*outb = litBytecodeArr;
 		const i32 off = ctxAddBytecodeArray(ctx, v.vBytecodeArr);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltTree: {
 		ctx->curOff += 5;
+		*outb = litTree;
 		const i32 off = ctxAddTree(ctx, v.vTree->root);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltArray: {
 		ctx->curOff += 5;
+		*outb = litArray;
 		const i32 off = ctxAddArray(ctx, v.vArray);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltPair: {
 		ctx->curOff += 5;
+		*outb = litPair;
 		const i32 off = ctxAddPair(ctx, v.vList);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
@@ -608,20 +652,35 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltSymbol:
 	case ltKeyword: {
 		ctx->curOff += 5;
+		*outb = v.type == ltSymbol ? litSymbol : litKeyword;
 		const i32 off = ctxAddSymbol(ctx, v.vSymbol);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
 	case ltBufferView: {
 		ctx->curOff += 5;
+		*outb = litBufferView;
 		const i32 off = ctxAddBufferView(ctx, v.vBufferView);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
-	case ltLambda:
-	case ltMacro:
+	case ltLambda: {
+		ctx->curOff += 5;
+		*outb = litLambda;
+		const i32 off = ctxAddClosure(ctx, v.vClosure);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
+		break; }
+	case ltMacro: {
+		ctx->curOff += 5;
+		*outb = litMacro;
+		const i32 off = ctxAddClosure(ctx, v.vClosure);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
+		break; }
 	case ltEnvironment: {
 		ctx->curOff += 5;
+		*outb = litEnvironment;
 		const i32 off = ctxAddClosure(ctx, v.vClosure);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
@@ -629,26 +688,46 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 	case ltString:
 	case ltBuffer: {
 		ctx->curOff += 5;
+		*outb = v.type == ltString ? litString : litBuffer;
 		const i32 off = ctxAddBuffer(ctx, v.vBuffer);
 		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
 		*outd = off;
 		break; }
-	case ltInt: {
-		ctx->curOff += 9;
-		u64 *outq = (u64 *)((void *)&ctx->start[curOff+1]);
-		*outq = v.vInt;
-		break; }
+	case ltInt:
+		if(v.vInt == ((i8)v.vInt)){
+			ctx->curOff += 2;
+			*outb++ = litInt8;
+			*outb++ = v.vInt;
+		} else if(v.vInt == ((i16)v.vInt)){
+			*outb++ = litInt16;
+			ctx->curOff += 3;
+			i16 *out = (i16 *)((void *)&ctx->start[curOff+1]);
+			*out = v.vInt;
+		} else if(v.vInt == ((i32)v.vInt)){
+			*outb++ = litInt32;
+			ctx->curOff += 5;
+			i32 *out = (i32 *)((void *)&ctx->start[curOff+1]);
+			*out = v.vInt;
+		} else {
+			*outb++ = litInt64;
+			ctx->curOff += 9;
+			u64 *outq = (u64 *)((void *)&ctx->start[curOff+1]);
+			*outq = v.vInt;
+		}
+		break;
 	case ltFloat: {
 		ctx->curOff += 9;
+		*outb = litFloat;
 		double *outf = (double *)((void *)&ctx->start[curOff+1]);
 		*outf = v.vFloat;
 		break; }
 	case ltBool:
-		ctx->curOff += 2;
-		*outb = v.vBool;
+		ctx->curOff += 1;
+		*outb = v.vBool ? litTrue : litFalse;
 		break;
 	case ltNil:
 		ctx->curOff += 1;
+		*outb = litNil;
 		break;
 	}
 	return curOff;

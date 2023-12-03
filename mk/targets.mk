@@ -32,7 +32,7 @@ tmp/binlib.c: tmp/binlib.no $(NUJEL)
 
 tmp/init.nuji: $(NUJEL)
 	@mkdir -p tmp/
-	@echo "(file/write (image/serialize init) \"tmp/init.nuji\") (exit 0)" | ./$(NUJEL)
+	@echo "(create-image \"tmp/init.nuji\" init) (exit 0)" | ./$(NUJEL)
 	@echo "$(ANSI_GREEN)" "[IMG]" "$(ANSI_RESET)" $@
 
 runi: $(NUJEL) tmp/init.nuji

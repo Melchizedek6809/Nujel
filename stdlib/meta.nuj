@@ -83,6 +83,15 @@
 
 (def root-closure (current-closure))
 
+(defn create-image (filename main)
+      (set! System/Environment {})
+      (set! init/args #nil)
+      (set! init/options {})
+      (set! init/option-map {})
+      (set! module/cache {})
+      (def img (image/serialize main))
+      (file/write img filename))
+
 (defmacro deftest l #nil) ; Tests should be skipped when compiling
 
 (defmacro profile form
