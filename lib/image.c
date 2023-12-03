@@ -263,14 +263,18 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 }
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	lVal rootValue = *((lVal *)((void *)&img->data[off]));
 	if(off < 0){return NIL;}
-	switch(rootValue.type){
+	const lType T = img->data[off++];
+	const i32 *dword = (i32 *)((void *)&img->data[off]);
+
+	switch(T){
+	default:
 	case ltComment:
 	case ltException:
+	case ltAny:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
 	case ltFileHandle:
-		switch(rootValue.vInt){
+		switch(img->data[off]){
 		case 0:
 			return lValFileHandle(stdin);
 		case 1:
@@ -281,41 +285,43 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 			return lValException(lSymReadError, "Can't serialize file handles other than stdin, stdout or stderr", NIL);
 		}
 	case ltNativeFunc:
-		rootValue.vNFunc = readNFunc(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltNativeFunc, readNFunc(map, img, *dword, staticImage));
 	case ltType:
-		rootValue.vType = readType(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltType, readType(map, img, *dword, staticImage));
 	case ltBytecodeArr:
-		rootValue.vBytecodeArr = readBytecodeArray(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, *dword, staticImage));
 	case ltTree:
-		return lValTree(readTree(map, img, rootValue.vInt, staticImage));
+		return lValTree(readTree(map, img, *dword, staticImage));
 	case ltArray:
-		rootValue.vArray = readArray(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltArray, readArray(map, img, *dword, staticImage));
 	case ltPair:
-		rootValue.vList = readPair(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltPair, readPair(map, img, *dword, staticImage));
 	case ltBufferView:
-		rootValue.vBufferView = readBufferView(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(ltBufferView, readBufferView(map, img, *dword, staticImage));
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment:
-		rootValue.vClosure = readClosure(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(T, readClosure(map, img, *dword, staticImage));
 	case ltString:
 	case ltBuffer:
-		rootValue.vBuffer = readBuffer(map, img, rootValue.vInt, staticImage);
-		return rootValue;
+		return lValAlloc(T, readBuffer(map, img, *dword, staticImage));
 	case ltSymbol:
 	case ltKeyword:
-		rootValue.vSymbol = readSymbol(map, img, rootValue.vInt, staticImage);
-		return rootValue;
-	default:
-		return rootValue;
+		return lValAlloc(T, (void *)readSymbol(map, img, *dword, staticImage));
+	case ltBool:
+		return lValBool(img->data[off]);
+	case ltNil:
+		return NIL;
+	case ltInt: {
+		const u64 *qword = (u64 *)((void *)&img->data[off]);
+		return lValInt(*qword);
 	}
+	case ltFloat: {
+		const double *fword = (double *)((void *)&img->data[off]);
+		return lValFloat(*fword);
+	}
+	}
+	return NIL;
 }
 
 lVal readImage(const void *ptr, size_t imgSize, bool staticImage){
@@ -535,96 +541,114 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	return curOff;
 }
 
-static i32 ctxAddVal(writeImageContext *ctx, lVal v){
-	i32 eleSize = dwordAlign(sizeof(lVal));
-	ctxRealloc(ctx, eleSize);
+static u8 ctxAddFilehandle(FILE *fh){
+	if(fh == stdin){
+		return 0;
+	} else if(fh == stdout){
+		return 1;
+	} else if(fh == stderr){
+		return 2;
+	} else {
+		return 0xFF;
+	}
+}
 
-	i32 curOff = ctx->curOff;
-	lVal *out = (lVal *)((void *)&ctx->start[ctx->curOff]);
-	ctx->curOff += eleSize;
+static i32 ctxAddVal(writeImageContext *ctx, lVal v){
+	ctxRealloc(ctx, 16);
+
+	const i32 curOff = ctx->curOff;
+	u8 *outb = (u8 *)((void *)&ctx->start[curOff]);
+	*outb++ = v.type;
 
 	switch(v.type){
+	case ltAny:
 	case ltComment:
 	case ltException:
 		exit(234);
 	case ltFileHandle:
-		*out = v;
-		if(v.vFileHandle == stdin){
-			out->vInt = 0;
-		} else if(v.vFileHandle == stdout){
-			out->vInt = 1;
-		} else if(v.vFileHandle == stderr){
-			out->vInt = 2;
-		} else {
-			out->vInt = 0xFF;
-		}
+		ctx->curOff += 2;
+		*outb = ctxAddFilehandle(v.vFileHandle);
 		break;
 	case ltNativeFunc: {
-		const u64 off = ctxAddSymbol(ctx, v.vNFunc->name);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddSymbol(ctx, v.vNFunc->name);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltType: {
-		const u64 off = ctxAddSymbol(ctx, v.vType->name);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddSymbol(ctx, v.vType->name);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltBytecodeArr: {
-		const u64 off = ctxAddBytecodeArray(ctx, v.vBytecodeArr);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddBytecodeArray(ctx, v.vBytecodeArr);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltTree: {
-		const u64 off = ctxAddTree(ctx, v.vTree->root);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddTree(ctx, v.vTree->root);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltArray: {
-		const u64 off = ctxAddArray(ctx, v.vArray);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddArray(ctx, v.vArray);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltPair: {
-		const u64 off = ctxAddPair(ctx, v.vList);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddPair(ctx, v.vList);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltSymbol:
 	case ltKeyword: {
-		const u64 off = ctxAddSymbol(ctx, v.vSymbol);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddSymbol(ctx, v.vSymbol);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltBufferView: {
-		const u64 off = ctxAddBufferView(ctx, v.vBufferView);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddBufferView(ctx, v.vBufferView);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltLambda:
 	case ltMacro:
 	case ltEnvironment: {
-		const u64 off = ctxAddClosure(ctx, v.vClosure);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddClosure(ctx, v.vClosure);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
 	case ltString:
 	case ltBuffer: {
-		const u64 off = ctxAddBuffer(ctx, v.vBuffer);
-		out = (lVal *)((void *)&ctx->start[curOff]);
-		*out = v;
-		out->vInt = off;
+		ctx->curOff += 5;
+		const i32 off = ctxAddBuffer(ctx, v.vBuffer);
+		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
+		*outd = off;
 		break; }
-	default:
-		*out = v;
+	case ltInt: {
+		ctx->curOff += 9;
+		u64 *outq = (u64 *)((void *)&ctx->start[curOff+1]);
+		*outq = v.vInt;
+		break; }
+	case ltFloat: {
+		ctx->curOff += 9;
+		double *outf = (double *)((void *)&ctx->start[curOff+1]);
+		*outf = v.vFloat;
+		break; }
+	case ltBool:
+		ctx->curOff += 2;
+		*outb = v.vBool;
+		break;
+	case ltNil:
+		ctx->curOff += 1;
 		break;
 	}
 	return curOff;
