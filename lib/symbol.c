@@ -178,7 +178,7 @@ lSymbol *lSymSM(const char *str){
 }
 
 static inline u32 lHashSymStr(const char *str){
-	return fasthash32(str, strlen(str), 0x8b0a159d);
+	return fasthash32(str, strlen(str), 0x5b0a159d9eac0381ULL);
 }
 
 // Probes the symbol index and returns the slot where STR is stored.  If STR is

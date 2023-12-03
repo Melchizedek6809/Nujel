@@ -37,6 +37,25 @@
 			(h) ^= (h) >> 47; })
 
 /**
+ * fasthash64v - 64-bit implementation of fasthash
+ * @v:  data to hash
+ * @seed: the seed
+ */
+static inline uint64_t fasthash64v(uint64_t v){
+	const uint64_t    m = 0x880355f21e6d1965ULL;
+	const uint64_t seed = 0x5b0a159d9eac0381ULL;
+	uint64_t h = seed ^ (8 * m);
+	h ^= mix(v);
+	h *= m;
+	return mix(h);
+}
+
+static inline uint32_t fasthash32v(uint64_t v){
+	const uint64_t h = fasthash64v(v);
+	return h - (h >> 32);
+}
+
+/**
  * fasthash64 - 64-bit implementation of fasthash
  * @buf:  data buffer
  * @len:  data size
@@ -80,11 +99,11 @@ static inline uint64_t fasthash64(const void *buf, size_t len, uint64_t seed){
  * @len:  data size
  * @seed: the seed
  */
-static inline uint32_t fasthash32(const void *buf, size_t len, uint32_t seed){
+static inline uint32_t fasthash32(const void *buf, size_t len, uint64_t seed){
 	// the following trick converts the 64-bit hashcode to Fermat
 	// residue, which shall retain information from both the higher
 	// and lower parts of hashcode.
-        uint64_t h = fasthash64(buf, len, seed);
+        const uint64_t h = fasthash64(buf, len, seed);
 	return h - (h >> 32);
 }
 
