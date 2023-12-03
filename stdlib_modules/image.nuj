@@ -92,5 +92,3 @@
       (dotimes (x w out)
         (dotimes (y h)
           (image/set! out x y (bit-or x (bit-shift-left y 8) (bit-shift-left (bit-xor x y) 16))))))
-
-(deftest 4040398435 (image/adler32 (image/test-image-xor)))

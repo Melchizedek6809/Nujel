@@ -15,10 +15,6 @@
         (set! b (mod/int (add/int a b) 65521)))
       (bit-or a (bit-shift-left b 16)))
 
-(deftest "00620062" (fmt "{:08X}" (crypto/adler32/hash "a")))
-(deftest "0F9D02BC" (fmt "{:08X}" (crypto/adler32/hash "asdQWE123")))
-(deftest "796B110D" (fmt "{:08X}" (crypto/adler32/hash "DiesIstEinTestDerNujelAdler32Implementierung")))
-
 (defn main (args)
       :export
       (when (not (car args))

@@ -1,0 +1,6 @@
+(#t (import (rng) :random) (int? (:int (:new rng))))
+(#t (import (rng) :random) (def r (:new rng)) (:seed! r 123) (def first-value (:int r)) (:seed! r 123) (= first-value (:int r)))
+(#t (import (rng) :random) (def r (:new rng)) (:seed! r 99) (not= (:int r) (:int r)))
+(#t (import (rng) :random) (int? (-> (:new rng) :int)))
+(#t (import (rng) :random) (def r (:new rng 123)) (def a (:int r)) (:seed! r 123) (= (:int r) a))
+(#t (import (rng) :random) (def r (:new rng 99)) (not= (:int r) (:int r)))

@@ -40,8 +40,3 @@
       (def out (make-output-port (file/open-output* output-file :replace)))
       (out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n")
       (create-c-asset (slurp filename) out symbol-name))
-
-(deftest 2716273128 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "asd" "test")))
-(deftest 29 (:length (compiler/c-asset-packer/create-string-asset "asd" "test")))
-(deftest 40 (:length (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))
-(deftest 535759991 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))

@@ -17,9 +17,3 @@
       :export
       "Return the hours part of TIMESTAMP, defaults to current time"
       (rem (div/int (or timestamp (time)) 3600) 24))
-
-(deftest 34 (time/seconds 1637755714))
-(deftest  8 (time/minutes 1637755714))
-(deftest 12 (time/hours   1637755714))
-(deftest 59 (time/seconds 1637755739))
-(deftest  0 (time/seconds 1637755740))
