@@ -9,6 +9,8 @@
 #include "nujel-private.h"
 #endif
 
+#include <string.h>
+
 lClass lClassList[64];
 
 static void initType(int i, const lSymbol *name, lClass *parent){
@@ -21,7 +23,7 @@ static void initType(int i, const lSymbol *name, lClass *parent){
 static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = lCar(lRead(args));
+	v.vNFunc->args = lCar(lRead(args, strlen(args)));
 	v.vNFunc->meta = NULL;
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){
@@ -47,7 +49,7 @@ lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal 
 static lVal lAddNativeStaticMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = lCar(lRead(args));
+	v.vNFunc->args = lCar(lRead(args, strlen(args)));
 	v.vNFunc->meta = NULL;
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){

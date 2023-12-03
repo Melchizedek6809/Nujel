@@ -188,7 +188,7 @@ lVal  lValException         (const lSymbol *symbol, const char *error, lVal v);
 /*
  | Reader/Printer
  */
-lVal lRead(const char *str);
+lVal lRead(const char *str, size_t len);
 
 /*
  | Type related procedores

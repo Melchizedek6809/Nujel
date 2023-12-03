@@ -567,9 +567,9 @@ static lVal lReadValue(lReadContext *s){
 	}
 }
 
-lVal lRead(const char *str){
+lVal lRead(const char *str, size_t len){
 	lReadContext ctx;
 	ctx.buf = ctx.data = str;
-	ctx.bufEnd = &str[strlen(str)];
+	ctx.bufEnd = &str[len];
 	return lReadList(&ctx, true, ')');
 }

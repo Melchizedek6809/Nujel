@@ -5,6 +5,7 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
 
 extern u8 stdlib_no_data[];
 
@@ -28,7 +29,7 @@ lVal lApply(lVal fun, lVal args){
  * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
-	lVal v = lRead(expr);
+	lVal v = lRead(expr, strlen(expr));
 	const int RSP = lRootsGet();
 	for(lVal n=v; n.type == ltPair; n = n.vList->cdr){
 		c->args = n; // We need a reference to make sure that n won't be collected by the GC

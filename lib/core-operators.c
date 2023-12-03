@@ -187,7 +187,7 @@ static lVal lnfQuote(lVal v){
 
 static lVal lnfRead(lVal a){
 	reqString(a);
-	return lRead(a.vString->data);
+	return lRead(a.vString->data, a.vString->length);
 }
 
 static lVal lnfGarbageCollect(){
