@@ -46,6 +46,10 @@
                                   (bit-xor (bit-shift-right crc 8)
                                            (ref table (bit-and #xFF (bit-xor crc (ref data i)))))))))
 
+(deftest "E8B7BE43" (fmt "{:08X}" (crypto/crc32/hash "a")))
+(deftest "784DD132" (fmt "{:08X}" (crypto/crc32/hash "Test")))
+(deftest "EC4AC3D0" (fmt "{:08X}" (crypto/crc32/hash "Hello, World!")))
+
 (defn main (args)
       :export
       (when (not (car args))

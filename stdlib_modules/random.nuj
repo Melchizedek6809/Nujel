@@ -24,3 +24,10 @@
   (defn int (self max)
         "Return a value from 0 to MAX, or, if left out, a random int"
         (if max (rem (abs (:rng! self)) max) (:rng! self))))
+
+(deftest #t (int? (:int (:new random/rng))))
+(deftest #t (def r (:new random/rng)) (:seed! r 123) (def first-value (:int r)) (:seed! r 123) (= first-value (:int r)))
+(deftest #t (def r (:new random/rng)) (:seed! r 99) (not= (:int r) (:int r)))
+(deftest #t (int? (-> (:new random/rng) :int)))
+(deftest #t (def rng (:new random/rng 123)) (def a (:int rng)) (:seed! rng 123) (= (:int rng) a))
+(deftest #t (def rng (:new random/rng 99)) (not= (:int rng) (:int rng)))

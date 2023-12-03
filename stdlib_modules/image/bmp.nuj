@@ -61,3 +61,8 @@
       :export
       (require :image)
       (image/add-encoder! "bmp" image/bmp/encode))
+
+(deftest 3149043687
+  (import hash :crypto/adler32)
+  (import (test-image-xor) :image)
+  (hash (image/bmp/encode (test-image-xor))))

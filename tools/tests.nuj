@@ -121,6 +121,7 @@
           (map (fn (path) (file/test/module path base-dir)))
           (sum)))
 
+
 (defn prog-str (fun-color i path start)
   (cat "(" (fun-color (pad-start i 2))
        "/" (pad-start test/count 2)
@@ -136,7 +137,7 @@
   (set! output-passes #t))
 
 (set! test/testsuite-errors (test-run output-passes))
-;(set! test/testsuite-errors (+ test/testsuite-errors (file/test/directory "./stdlib_modules")))
+(set! test/testsuite-errors (+ test/testsuite-errors (file/test/directory "./stdlib_modules")))
 
 (when (:has? init/options :only-test-suite)
   (exit test/testsuite-errors))
