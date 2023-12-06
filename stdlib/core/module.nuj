@@ -31,9 +31,9 @@
       :internal
       (def mod (module/load module env))
       (when-not mod (exception "Can't load that module" module))
-      (def exports (resolve 'exports mod))
+      (def exports (ref mod :exports))
       (doseq (k (:keys exports))
-             (def-in! env
+             (set! env
                (if qualify?
                    (module/qualify-symbol module (:symbol k))
                    (:symbol k))
@@ -96,7 +96,7 @@
       :internal
       (case (:type-name name)
             (:environment name)
-            (:string (module/load (module/resolve-string name (resolve '*module-path* env)) env))
+            (:string (module/load (module/resolve-string name (ref env :*module-path*)) env))
             (:keyword (or (module/load/cache name)
                           (module/load/store name)
                           (module/load/external name)))
@@ -105,7 +105,7 @@
 (defn module/import-all (module symbol)
       :cat :modules
       :internal
-      (def exports (resolve 'exports module))
+      (def exports (ref module :exports))
       (typecheck/only exports :tree)
       (return exports))
 
@@ -163,7 +163,7 @@
       "Import and run MODULE's main function with ARGS"
       (def mod (module/load module (current-closure)))
       (when-not mod (exception "Module not found" module))
-      (def exports (resolve 'exports mod))
+      (def exports (ref mod :exports))
       (when-not exports (exception "Invalid module, can't resolve exports" module))
       (def main (ref exports :main))
       (when-not main (exception "There is no symbol exported as main" module))

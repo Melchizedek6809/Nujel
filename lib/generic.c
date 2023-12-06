@@ -78,6 +78,13 @@ lVal lGenericRef(lVal col, lVal key){
 	case ltBufferView:
 		reqNaturalInt(key);
 		return lBufferViewRef(col, key.vInt);
+	case ltLambda:
+	case ltMacro:
+	case ltEnvironment:
+		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
+			return lValExceptionType(col, ltKeyword);
+		}
+		return lGetClosureSym(col.vClosure, key.vSymbol);
 	case ltTree: {
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);
@@ -187,10 +194,18 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 		}
 		buf[i] = v.vInt;
 		return col; }
-	case ltBufferView: {
+	case ltBufferView:
 		reqNaturalInt(key);
-		return lBufferViewSet(col, key.vInt, v); }
-	case ltTree: {
+		return lBufferViewSet(col, key.vInt, v);
+	case ltLambda:
+	case ltMacro:
+	case ltEnvironment:
+		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
+			return lValExceptionType(col, ltKeyword);
+		}
+		lDefineClosureSym(col.vClosure, key.vSymbol, v);
+		return col;
+	case ltTree:
 		if(unlikely((key.type != ltSymbol) && (key.type != ltKeyword))){
 			return lValExceptionType(col, ltKeyword);
 		}
@@ -198,7 +213,7 @@ lVal lGenericSet(lVal col, lVal key, lVal v){
 			return lValException(lSymTypeError, "Can only set! mutable trees", col);
 		}
 		col.vTree->root = lTreeInsert(col.vTree->root, key.vSymbol, v);
-		return col; }
+		return col;
 	default:
 		return lValException(lSymTypeError, "Can't set! that", col);
 	}

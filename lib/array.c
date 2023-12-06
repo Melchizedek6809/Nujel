@@ -76,11 +76,18 @@ static lVal lnmArrayAllocate(lVal self, lVal size){
 	return r;
 }
 
+static lVal lnmArrayHas(lVal self, lVal index){
+	reqInt(index);
+	const i64 i = index.vInt;
+	return lValBool((i >= 0) && (i < self.vArray->length));
+}
+
 void lOperationsArray(lClosure *c){
 	lClass *Array = &lClassList[ltArray];
-	lAddNativeMethodV(Array, lSymS("length"),  "(self)", lnmArrayLength, 0);
+	lAddNativeMethodV(Array,  lSymS("length"),  "(self)", lnmArrayLength, 0);
 	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
 	lAddNativeMethodVV(Array, lSymS("bytecode-array"), "(self literals)", lnmArrayToBytecodeArray, 0);
+	lAddNativeMethodVV(Array, lSymS("has?"),   "(self index)", lnmArrayHas, NFUNC_PURE);
 
 	lAddNativeStaticMethodVV(Array, lSymS("alloc"), "(self size)", lnmArrayAllocate, NFUNC_PURE);
 

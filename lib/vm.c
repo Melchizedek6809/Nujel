@@ -750,8 +750,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal fun = ctx.valueStack[--ctx.sp];
 		lVal *vs = &ctx.valueStack[argsSp-1];
 		if(unlikely(fun.type == ltKeyword)){
-			lVal self = vs[1-len];
-			lVal nfun = lMethodLookup(fun.vSymbol, self);
+			const lVal self = vs[1-len];
+			const lVal nfun = lMethodLookup(fun.vSymbol, self);
 			if(unlikely(nfun.type == ltException)){
 				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL)));
 				goto throwException;

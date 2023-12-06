@@ -26,7 +26,7 @@
        (def mod (module/load mod-name))
        (when-not (= :environment (:type-name mod))
                  (return mod))
-       (def exports (resolve 'exports mod))
+       (def exports (ref mod :exports))
        (when-not exports (exception (fmt "Couldn't load {path} as a module since it has no exports")))
        (when (:has? exports :main)
          ((ref exports :main) args)))

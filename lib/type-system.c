@@ -78,7 +78,7 @@ static lVal lnmTypeName(lVal self){
 	}
 	lClass *T = &lClassList[self.type];
 	if(unlikely(T->name == NULL)){
-		printf("T: %u\n", self.type);
+		fprintf(stderr, "T: %u\n", self.type);
 		return lValException(lSymVMError, "Unnamed Type", self);
 	}
 	return lValKeywordS(T->name);
@@ -130,6 +130,14 @@ static lVal lnmAddMethod(lVal self, lVal name, lVal fn){
 	return self;
 }
 
+static lVal lnmLambdaHas(lVal self, lVal key){
+	if(unlikely((key.type != ltKeyword) && (key.type != ltSymbol))){
+		return lValBool(false);
+	}
+	lVal v = lGetClosureSym(self.vClosure, key.vSymbol);
+	return lValBool(v.type != ltException);
+}
+
 static void lTypesAddCoreMethods(){
 	lClass *Any = &lClassList[ltAny];
 	lAddNativeMethodV (Any, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
@@ -139,6 +147,9 @@ static void lTypesAddCoreMethods(){
 
 	lClass *Pair = &lClassList[ltPair];
 	lAddNativeMethodV (Pair, lSymS("length"), "(self)", lnmPairLength, NFUNC_PURE);
+
+	lClass *Lambda = &lClassList[ltLambda];
+	lAddNativeMethodVV(Lambda, lSymS("has?"), "(self key)", lnmLambdaHas, NFUNC_PURE);
 
 	lClass *Type = &lClassList[ltType];
 	lAddNativeMethodV  (Type, lSymS("name"), "(self)", lnmTName, NFUNC_PURE);

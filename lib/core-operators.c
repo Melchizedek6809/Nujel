@@ -68,30 +68,6 @@ static lVal lnfClosureData(lVal a){
 	return lValTree(a.vClosure->data);
 }
 
-static lVal lnfDefIn(lVal env, lVal aSym, lVal aVal){
-	reqClosure(env);
-	reqSymbolic(aSym);
-	lDefineClosureSym(env.vClosure, aSym.vSymbol, aVal);
-	return env;
-}
-
-static lVal lnfResolve(lClosure *c, lVal aSym, lVal env){
-	reqSymbol(aSym);
-	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException(lSymTypeError, "You can only resolve symbols in Lambdas or Objects", env);
-	}
-	return lGetClosureSym(env.type != ltNil ? env.vClosure : c, aSym.vSymbol);
-}
-
-static lVal lnfResolveOrNull(lClosure *c, lVal aSym, lVal env){
-	reqSymbol(aSym);
-	if(unlikely((env.type != ltNil) && (env.type != ltLambda) && (env.type != ltEnvironment))){
-		return lValException(lSymTypeError, "You can only resolve-or-nil symbols in Lambdas or Objects", env);
-	}
-	const lVal ret = lGetClosureSym(env.type != ltNil ? env.vClosure : c, aSym.vSymbol);
-	return unlikely(ret.type == ltException) ? NIL : ret;
-}
-
 static lVal lnfResolvesPred(lClosure *c, lVal aSym, lVal env){
 	lVal car = aSym;
 	if(unlikely(car.type != ltSymbol)){return lValBool(false);}
@@ -316,9 +292,6 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
 	lAddNativeFuncV(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
-	lAddNativeFuncVVV(c,"def-in!",       "(environment sym v)", "Define SYM to be V in ENVIRONMENT", lnfDefIn, 0);
-	lAddNativeFuncCVV(c,"resolve",       "(sym environment)",   "Resolve SYM", lnfResolve, 0);
-	lAddNativeFuncCVV(c,"resolve-or-nil","(sym environment)",   "Resolve SYM, or return #nil if it's undefined", lnfResolveOrNull, 0);
 	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value",           lnfResolvesPred, 0);
 
 	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);

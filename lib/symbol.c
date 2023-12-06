@@ -39,6 +39,7 @@ lSymbol *symTreeNew;
 lSymbol *symDocumentation;
 lSymbol *symPure;
 lSymbol *symFold;
+lSymbol *symRef;
 
 lSymbol *symType;
 lSymbol *symArguments;
@@ -106,6 +107,7 @@ void lSymbolInit(){
 	symDocumentation     = lSymSM("documentation");
 	symPure              = lSymSM("pure");
 	symFold              = lSymSM("fold");
+	symRef               = lSymSM("ref");
 
 	symType              = lSymSM("type");
 	symArguments         = lSymSM("arguments");

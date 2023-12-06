@@ -14,7 +14,7 @@
                   (cat (int (or i 0)) "# "
                        (string/write c)
                        " - "
-                       (resolve '*module* c)
+                       (ref c :*module*)
                        " - "
                        (if (< l 8)
                            (string/write data)
@@ -74,7 +74,7 @@
 
                 (defn describe/string (a)
                       "Descibe whatever value string A resolves to"
-                      (describe/thing (resolve (:symbol a))))
+                      (describe/thing (ref (current-closure) (:symbol a))))
 
                 (defn describe (fun) "Describe FUN, if there is documentation available"
                       (if (string? fun)

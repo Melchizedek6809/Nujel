@@ -198,7 +198,7 @@
                           :cat :bytecode
                           :internal
                           (def op (if (resolves? (car source) env)
-                                      (resolve (car source) env)
+                                      (ref (or env (current-closure)) (car source))
                                       (car source)))
                           (case (:type-name op)
                                 ((:lambda :native-function :pair :symbol :keyword)
