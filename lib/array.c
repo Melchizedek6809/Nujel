@@ -82,7 +82,7 @@ static lVal lnmArrayHas(lVal self, lVal index){
 	return lValBool((i >= 0) && (i < self.vArray->length));
 }
 
-void lOperationsArray(lClosure *c){
+void lOperationsArray(){
 	lClass *Array = &lClassList[ltArray];
 	lAddNativeMethodV(Array,  lSymS("length"),  "(self)", lnmArrayLength, 0);
 	lAddNativeMethodVV(Array, lSymS("length!"), "(self new-size)", lnmArrayLengthSet, 0);
@@ -90,6 +90,4 @@ void lOperationsArray(lClosure *c){
 	lAddNativeMethodVV(Array, lSymS("has?"),   "(self index)", lnmArrayHas, NFUNC_PURE);
 
 	lAddNativeStaticMethodVV(Array, lSymS("alloc"), "(self size)", lnmArrayAllocate, NFUNC_PURE);
-
-	lAddNativeFuncR (c, "array/new",      "args",   "Create a new array from ...ARGS", lnfArrNew, 0);
 }

@@ -267,7 +267,6 @@ typedef enum lOpcode {
 
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
-void  simplePrintVal       (lVal v);
 
 /*
  | Workarounds for missing builtins
@@ -416,13 +415,13 @@ lVal lnfTreeNew (lVal v);
  | Operations
  */
 void lOperationsArithmetic (lClosure *c);
-void lOperationsArray      (lClosure *c);
 void lOperationsBuffer     (lClosure *c);
 void lOperationsCore       (lClosure *c);
 void lOperationsSpecial    (lClosure *c);
-void lOperationsTree       (lClosure *c);
 void lOperationsGeneric    (lClosure *c);
 void lOperationsImage      (lClosure *c);
+void lOperationsTree       ();
+void lOperationsArray      ();
 void lOperationsString     ();
 void lOperationsBytecode   ();
 

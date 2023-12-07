@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+lVal NIL;
+
 static inline i64 lStringGreater(const lBuffer *a, const lBuffer *b) {
 	const uint alen = lBufferLength(a);
 	const uint blen = lBufferLength(b);

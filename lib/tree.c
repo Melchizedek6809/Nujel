@@ -208,7 +208,7 @@ static lVal lnmTreeHas(lVal self, lVal key) {
 	return lValBool(lTreeRef(self.vTree->root, key.vSymbol).type != ltException);
 }
 
-void lOperationsTree(lClosure* c) {
+void lOperationsTree() {
 	lClass *Tree = &lClassList[ltTree];
 	lAddNativeMethodV (Tree, lSymS("length"), "(self)", lnmTreeLength, NFUNC_PURE);
 	lAddNativeMethodV (Tree, lSymS("clone"),  "(self)", lnmTreeClone, NFUNC_PURE);
@@ -219,6 +219,4 @@ void lOperationsTree(lClosure* c) {
 	lAddNativeMethodV (Tree, lSymS("left*"),  "(self)", lnmTreeLeftAst, NFUNC_PURE);
 	lAddNativeMethodV (Tree, lSymS("right*"), "(self)", lnmTreeRightAst, NFUNC_PURE);
 	lAddNativeMethodVV(Tree, lSymS("has?"),   "(self key)", lnmTreeHas, NFUNC_PURE);
-
-	lAddNativeFuncR(c, "tree/new",    "plist",  "Return a new tree", lnfTreeNew, 0);
 }

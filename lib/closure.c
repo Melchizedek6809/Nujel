@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <string.h>
 
+extern u8 stdlib_no_data[];
+
 lClosure *lClosureNew(lClosure *parent, closureType t) {
 	lClosure *c = lClosureAllocRaw();
 	memset(c,0,sizeof(lClosure));
@@ -149,4 +151,66 @@ void lClosureSetMeta(lClosure *c, lVal doc){
 	}
 	lTree *t = doc.vTree->root;
 	c->meta = (t && t->flags & TREE_IMMUTABLE) ? lTreeDup(t) : t;
+}
+
+/* Add all the essential Native Functions to closure c */
+lClosure *lInitRootClosure(){
+	lClosure *c = lClosureAllocRaw();
+	c->type = closureRoot;
+	lTypesInit(c);
+	lOperationsArithmetic(c);
+	lOperationsBuffer(c);
+	lOperationsArray(c);
+	lOperationsCore(c);
+	lOperationsSpecial(c);
+	lOperationsTree(c);
+	lOperationsImage(c);
+	lOperationsBytecode();
+	lOperationsString();
+	lAddPlatformVars(c);
+	lDefineVal(c,"exports",  lValTree(NULL));
+	lDefineVal(c,"*module*", lValKeyword("core"));
+	return c;
+}
+
+/* Create a new root closure with the stdlib */
+lClosure *lNewRoot(){
+	return lLoad(lInitRootClosure(), (const char *)stdlib_no_data);
+}
+
+static lClosure *findRootRec(lClosure *v){
+	if(v->type == closureRoot){
+		return v;
+	} else {
+		return findRootRec(v->parent);
+	}
+}
+
+lClosure *findRoot (lVal v){
+	switch(v.type){
+	case ltEnvironment:
+	case ltMacro:
+	case ltLambda:
+		return findRootRec(v.vClosure);
+	default:
+		return NULL;
+	}
+}
+
+lClosure *lRedefineNativeFuncs(lClosure *c){
+	for(uint i=0;i<lNFuncMax;i++){
+		lNFunc *t = &lNFuncList[i];
+		if(t == NULL){break;}
+		lVal nf = lValAlloc(ltNativeFunc, t);
+		lDefineClosureSym(c, t->name, nf);
+	}
+	return c;
+}
+
+/* Run fun with args  */
+lVal lApply(lVal fun, lVal args){
+	if(unlikely(fun.type != ltLambda)){
+		return lValException(lSymTypeError, "Can't apply to following val", fun);
+	}
+	return lBytecodeEval(lClosureNewFunCall(args, fun), fun.vClosure->text);
 }

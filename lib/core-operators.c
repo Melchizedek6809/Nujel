@@ -272,6 +272,9 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"int",             "(α)",     "Convert α into an integer number", lnfInt, NFUNC_PURE);
 	lAddNativeFuncV(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
 
+	lAddNativeFuncR(c, "array/new", "args",  "Create a new array from ...ARGS", lnfArrNew, 0);
+	lAddNativeFuncR(c, "tree/new",  "plist", "Return a new tree", lnfTreeNew, 0);
+
 	lAddNativeMethodV(&lClassList[ltNil],     lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltInt],     lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltFloat],   lSymLTString, "(self)", lnfFloatToString, NFUNC_PURE);
