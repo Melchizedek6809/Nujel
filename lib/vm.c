@@ -4,15 +4,21 @@
 #include "nujel-private.h"
 #endif
 
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-
 #if !defined(NUJEL_USE_JUMPTABLE)
 #if defined(__GNUC__)
 #define NUJEL_USE_JUMPTABLE 1
 #endif
 #endif
+
+/* Create a new Lambda Value */
+static inline lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
+	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
+	ret.vClosure->args = args;
+	reqBytecodeArray(body);
+	ret.vClosure->text = body.vBytecodeArr;
+	ret.vClosure->ip   = ret.vClosure->text->data;
+	return ret;
+}
 
 /* Read an encoded signed 16-bit offset at ip */
 static inline i64 lBytecodeGetOffset16(const lBytecodeOp *ip){

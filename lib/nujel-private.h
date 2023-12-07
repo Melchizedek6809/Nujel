@@ -13,21 +13,15 @@
 #include "nujel.h"
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  | Core
  */
-#define MAX_OPEN_FILE_DESCRIPTORS 256
+#define MAX_OPEN_FILE_DESCRIPTORS 250
 #define PI    (3.1415926535897932384626433832795)
 
-static inline bool isComment(lVal v){
-	return v.type == ltComment;
-}
-static inline lVal lValComment(){
-	return lValAlloc(ltComment, NULL);
-}
 lType lTypecast(const lType a, const lType b);
 
 struct lClass {
@@ -193,7 +187,6 @@ lClosure *lClosureNew        (lClosure *parent, closureType t);
 lClosure *lClosureNewFunCall (lVal args, lVal lambda);
 void      lClosureSetMeta    (lClosure *c, lVal doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
-lVal      lLambdaNew         (lClosure *parent, lVal args, lVal body);
 
 /*
  | lVal related procedures

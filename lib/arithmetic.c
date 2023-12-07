@@ -4,9 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <math.h>
-#include <stdlib.h>
-
 static lVal lValExceptionFloat(lVal v){
 	return lValException(lSymTypeError, "This function can only be used with floats",v);
 }

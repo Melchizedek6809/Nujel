@@ -5,8 +5,6 @@
 #endif
 
 #include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* Create a new string containing a direct reference to STR, STR will be
  * freed by the GC if it ever goes out of scope */

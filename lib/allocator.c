@@ -4,9 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-
 bool lGCShouldRunSoon = false;
 
 #define defineAllocator(T, typeMax) \

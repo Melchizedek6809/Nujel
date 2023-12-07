@@ -5,9 +5,7 @@
 #endif
 
 #include <errno.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #if (!defined(_WIN32)) && (!defined(__wasi__))
 #include <sys/types.h>

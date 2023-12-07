@@ -9,8 +9,9 @@
 #include <termios.h>
 #endif
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #if defined(_MSC_VER)
 	#include  <io.h>

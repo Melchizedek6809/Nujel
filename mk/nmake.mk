@@ -1,0 +1,1 @@
+# No NMake support (yet)

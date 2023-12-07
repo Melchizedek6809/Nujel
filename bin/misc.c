@@ -11,9 +11,6 @@
 	#include <unistd.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 
 #ifdef __MINGW32__

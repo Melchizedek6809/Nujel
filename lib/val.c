@@ -4,10 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-
 lVal NIL;
 
 static inline i64 lStringGreater(const lBuffer *a, const lBuffer *b) {

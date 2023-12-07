@@ -5,10 +5,7 @@
 #endif
 
 #include <ctype.h>
-#include <math.h>
 #include <limits.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define isparen(v) (((v) == '(') || ((v) == ')'))
 #define isbracket(v) (((v) == '[') || ((v) == ']'))
@@ -20,6 +17,14 @@
 typedef struct {
 	const char *buf, *bufEnd, *data;
 } lReadContext;
+
+static inline bool isComment(lVal v){
+	return v.type == ltComment;
+}
+
+static inline lVal lValComment(){
+	return lValAlloc(ltComment, NULL);
+}
 
 static lVal lReadValue(lReadContext *s);
 static lVal lReadList(lReadContext *s, bool rootForm, char terminator);

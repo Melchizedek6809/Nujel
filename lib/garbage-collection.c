@@ -9,8 +9,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <stdlib.h>
-
 typedef struct {
 	lType t;
 	union {

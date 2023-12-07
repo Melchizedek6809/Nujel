@@ -4,10 +4,6 @@
 #include "private.h"
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 extern u8 binlib_no_data[];
 
 static lClosure *initBinRootClosure(lClosure *c){

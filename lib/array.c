@@ -4,9 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-
 static lVal lnmArrayLength(lVal self){
 	return lValInt(self.vArray->length);
 }

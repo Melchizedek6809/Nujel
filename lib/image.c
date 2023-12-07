@@ -5,8 +5,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <string.h>
-
 typedef struct {
 	u8 magic[4]; // NujI
 	u8 data[];

@@ -4,9 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-
 const void *lBufferData (lBuffer *v){
 	return v == NULL ? NULL : v->buf;
 }

@@ -5,7 +5,6 @@
 #endif
 
 #include <ctype.h>
-#include <string.h>
 
 extern u8 stdlib_no_data[];
 
@@ -133,16 +132,6 @@ lVal lAddNativeFuncR(lClosure *c, const char *sym, const char *args, const char 
 }
 lVal lAddNativeFuncCR(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal), uint flags){
 	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (1 << 4));
-}
-
-/* Create a new Lambda Value */
-lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
-	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
-	ret.vClosure->args = args;
-	reqBytecodeArray(body);
-	ret.vClosure->text = body.vBytecodeArr;
-	ret.vClosure->ip   = ret.vClosure->text->data;
-	return ret;
 }
 
 void lClosureSetMeta(lClosure *c, lVal doc){

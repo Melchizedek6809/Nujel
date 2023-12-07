@@ -8,9 +8,7 @@
 #define NUJEL_LIB_NUJEL_PUBLIC
 
 #include <math.h>
-#include <stdarg.h>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -183,8 +181,6 @@ static inline lVal lCddr  (lVal v){return lCdr(lCdr(v));}
 static inline lVal lCaddr (lVal v){return lCar(lCdr(lCdr(v)));}
 static inline lVal lCadddr(lVal v){return lCar(lCdr(lCdr(lCdr(v))));}
 
-lVal  lValException         (const lSymbol *symbol, const char *error, lVal v);
-
 /*
  | Reader/Printer
  */
@@ -196,11 +192,12 @@ lVal lRead(const char *str, size_t len);
 i64             castToInt        (const lVal v, i64 fallback);
 bool            castToBool       (const lVal v);
 
-lVal            lValExceptionType       (lVal v, lType T);
-lVal            lValExceptionArity      (lVal v, int arity);
-lVal            lValExceptionNonNumeric (lVal v);
-lVal            requireFloat            (lVal v);
-lVal            optionalSymbolic        (lVal v, const lSymbol *fallback);
+lVal lValException           (const lSymbol *symbol, const char *error, lVal v);
+lVal lValExceptionType       (lVal v, lType T);
+lVal lValExceptionArity      (lVal v, int arity);
+lVal lValExceptionNonNumeric (lVal v);
+lVal requireFloat            (lVal v);
+lVal optionalSymbolic        (lVal v, const lSymbol *fallback);
 
 #define reqNaturalInt(str) do { if(unlikely(str.type != ltInt)){\
 	return lValException(lSymTypeError, "Need ab Int", str);\
@@ -256,12 +253,12 @@ if(unlikely(val.vBuffer->flags & BUFFER_IMMUTABLE)){\
 /*
  | Closure related procedores
  */
-lVal      lDefineAliased     (lClosure *c, lVal lNF, const char *sym);
+lVal lDefineAliased     (lClosure *c, lVal lNF, const char *sym);
 
-lVal      lGetClosureSym     (lClosure *c, const lSymbol *s);
-void      lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal v);
-bool      lSetClosureSym     (lClosure *c, const lSymbol *s, lVal v);
-void      lDefineVal         (lClosure *c, const char *str,  lVal v);
+lVal lGetClosureSym     (lClosure *c, const lSymbol *s);
+void lDefineClosureSym  (lClosure *c, const lSymbol *s, lVal v);
+bool lSetClosureSym     (lClosure *c, const lSymbol *s, lVal v);
+void lDefineVal         (lClosure *c, const char *str,  lVal v);
 
 lVal lAddNativeFunc     (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags);
 lVal lAddNativeFuncC    (lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags);
@@ -289,7 +286,6 @@ lVal lAddNativeStaticMethodVVV(lClass *T, const lSymbol *name, const char *args,
  */
 lTree *lTreeNew             (const lSymbol *s, lVal v);
 lTree *lTreeDup             (const lTree *t);
-
 int    lTreeSize            (const lTree *t);
 lVal   lTreeRef             (const lTree *t, const lSymbol *s);
 lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);

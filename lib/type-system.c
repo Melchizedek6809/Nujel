@@ -9,8 +9,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <string.h>
-
 lClass lClassList[64];
 
 static void initType(int i, const lSymbol *name, lClass *parent){

@@ -4,9 +4,6 @@
 #include "nujel-private.h"
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "../third-party/fasthash/fasthash.h"
 
 lSymbol  lSymbolList[SYM_MAX];

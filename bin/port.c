@@ -6,7 +6,6 @@
 
 #if (!defined(_WIN32)) && (!defined(__wasi__))
 #include <termios.h>
-#include <stdlib.h>
 
 bool rawMode = false;
 struct termios orig_termios;
