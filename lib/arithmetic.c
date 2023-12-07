@@ -204,10 +204,6 @@ static lVal lnfModAstI(lVal a, lVal b){
 	return lValInt(a.vInt % b.vInt);
 }
 
-static lVal lnfPowAstI(lVal a, lVal b){
-	return lValInt(pow(a.vInt, b.vInt));
-}
-
 static lVal lnfLogAnd(lVal a, lVal b){
 	reqInt(a);
 	reqInt(b);
@@ -356,7 +352,6 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFuncVV(c,"mul/int", "(a b)", "Return a:int * b:int",  lnfMulAstI, NFUNC_FOLD | NFUNC_PURE);
 	lAddNativeFuncVV(c,"div/int", "(a b)", "Return a:int / b:int",  lnfDivAstI, NFUNC_FOLD | NFUNC_PURE);
 	lAddNativeFuncVV(c,"mod/int", "(a b)", "Return a:int % b:int",  lnfModAstI, NFUNC_FOLD | NFUNC_PURE);
-	lAddNativeFuncVV(c,"pow/int", "(a b)", "Return a:int ** b:int", lnfPowAstI, NFUNC_FOLD | NFUNC_PURE);
 	lAddNativeFuncV (c,"inc/int", "(a)",   "Return a:int + 1",      lnfIncAstI, NFUNC_FOLD | NFUNC_PURE);
 
 	lAddNativeFuncVV(c,"bit-and",  "(a b)", "Bitwise and",          lnfLogAnd, NFUNC_FOLD | NFUNC_PURE);
@@ -364,18 +359,18 @@ void lOperationsArithmetic(lClosure *c){
 	lAddNativeFuncVV(c,"bit-xor",  "(a b)", "Bitwise exclusive or", lnfLogXor, NFUNC_FOLD | NFUNC_PURE);
 	lAddNativeFuncV (c,"bit-not",  "(a)",   "Bitwise not",          lnfLogNot, NFUNC_FOLD | NFUNC_PURE);
 
-	lAddNativeFuncVV(c,"bit-shift-left",  "(val amount)","Shift VALUE left AMOUNT bits",    lnfAsh, NFUNC_PURE);
-	lAddNativeFuncVV(c,"bit-shift-right", "(val amount)","Shift VALUE right AMOUNT bits",    lnfBitShiftRight, NFUNC_PURE);
-	lAddNativeFuncV (c,"popcount",        "(val)",       "Return amount of bits set in VAL",lnfPopCount, NFUNC_PURE);
+	lAddNativeFuncVV(c,"bit-shift-left",  "(val amount)", "Shift VALUE left AMOUNT bits",    lnfAsh, NFUNC_PURE);
+	lAddNativeFuncVV(c,"bit-shift-right", "(val amount)", "Shift VALUE right AMOUNT bits",    lnfBitShiftRight, NFUNC_PURE);
+	lAddNativeFuncV (c,"popcount",        "(val)",        "Return amount of bits set in VAL",lnfPopCount, NFUNC_PURE);
 
-	lAddNativeFuncV (c,"abs",  "(a)", "Return the absolute value of a", lnfAbs, NFUNC_PURE);
-	lAddNativeFuncV (c,"sqrt", "(a)", "Return the square root of a",    lnfSqrt, NFUNC_PURE);
-	lAddNativeFuncV (c,"cbrt", "(a)", "Return the cube root of a",      lnfCbrt, NFUNC_PURE);
-	lAddNativeFuncV (c,"floor","(a)", "Round a down",                   lnfFloor, NFUNC_PURE);
-	lAddNativeFuncV (c,"ceil", "(a)", "Round a up",                     lnfCeil, NFUNC_PURE);
-	lAddNativeFuncV (c,"round","(a)", "Round a",                        lnfRound, NFUNC_PURE);
-	lAddNativeFuncV (c,"sin",  "(a)", "Sin A",                          lnfSin, NFUNC_PURE);
-	lAddNativeFuncV (c,"cos",  "(a)", "Cos A",                          lnfCos, NFUNC_PURE);
-	lAddNativeFuncV (c,"tan",  "(a)", "Tan A",                          lnfTan, NFUNC_PURE);
+	lAddNativeFuncV (c,"abs",  "(a)",   "Return the absolute value of a", lnfAbs, NFUNC_PURE);
+	lAddNativeFuncV (c,"sqrt", "(a)",   "Return the square root of a",    lnfSqrt, NFUNC_PURE);
+	lAddNativeFuncV (c,"cbrt", "(a)",   "Return the cube root of a",      lnfCbrt, NFUNC_PURE);
+	lAddNativeFuncV (c,"floor","(a)",   "Round a down",                   lnfFloor, NFUNC_PURE);
+	lAddNativeFuncV (c,"ceil", "(a)",   "Round a up",                     lnfCeil, NFUNC_PURE);
+	lAddNativeFuncV (c,"round","(a)",   "Round a",                        lnfRound, NFUNC_PURE);
+	lAddNativeFuncV (c,"sin",  "(a)",   "Sin A",                          lnfSin, NFUNC_PURE);
+	lAddNativeFuncV (c,"cos",  "(a)",   "Cos A",                          lnfCos, NFUNC_PURE);
+	lAddNativeFuncV (c,"tan",  "(a)",   "Tan A",                          lnfTan, NFUNC_PURE);
 	lAddNativeFuncVV(c,"atan2","(y x)", "Arc tangent of y/x",           lnfAtanTwo, NFUNC_PURE);
 }

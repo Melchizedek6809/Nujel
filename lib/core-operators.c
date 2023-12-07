@@ -7,22 +7,6 @@
 #include <time.h>
 #include <inttypes.h>
 
-static lVal lTreeAddSymbolsToList(const lTree *t, lVal list){
-	if(unlikely((t == NULL) || (t->key == NULL))){return list;}
-	list = lTreeAddSymbolsToList(t->right, list);
-	list = lCons(lValSymS(t->key), list);
-	return lTreeAddSymbolsToList(t->left, list);
-}
-
-static lVal lSymbolTable(lClosure *c, lVal ret){
-	if(unlikely(c == NULL)){return ret;}
-	return lSymbolTable(c->parent, lTreeAddSymbolsToList(c->data, ret));
-}
-
-static lVal lnfSymbolTable(lClosure *c){
-	return lSymbolTable(c, NIL);
-}
-
 static lVal lnfClosureParent(lVal a){
 	reqClosure(a);
 	if(a.vClosure->parent == NULL){
@@ -245,32 +229,31 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncV(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
 	lAddNativeFuncV(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
-	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value",           lnfResolvesPred, 0);
+	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value", lnfResolvesPred, 0);
 
 	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
 
-	lAddNativeFuncV(c,"closure/data",     "(clo)",  "Return the data of CLO",                     lnfClosureData, 0);
-	lAddNativeFuncV(c,"closure/code",     "(clo)",  "Return the code of CLO",                     lnfClosureCode, 0);
-	lAddNativeFuncV(c,"closure/arguments","(clo)",  "Return the argument list of CLO",            lnfClosureArguments, 0);
-	lAddNativeFuncV(c,"closure/parent",   "(clo)",  "Return the parent of CLO",                   lnfClosureParent, 0);
-	lAddNativeFuncVV(c,"closure/parent!", "(clo parent)",  "Set the parent of CLO",               lnfClosureParentSet, 0);
+	lAddNativeFuncV(c, "closure/data",     "(clo)",  "Return the data of CLO",          lnfClosureData, 0);
+	lAddNativeFuncV(c, "closure/code",     "(clo)",  "Return the code of CLO",          lnfClosureCode, 0);
+	lAddNativeFuncV(c, "closure/arguments","(clo)",  "Return the argument list of CLO", lnfClosureArguments, 0);
+	lAddNativeFuncV(c, "closure/parent",   "(clo)",  "Return the parent of CLO",        lnfClosureParent, 0);
+	lAddNativeFuncVV(c,"closure/parent!", "(clo parent)",  "Set the parent of CLO",     lnfClosureParentSet, 0);
 
-	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object",    lnfCurrentClosure, 0);
-	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",     lnfCurrentLambda, 0);
-	lAddNativeFuncC(c,"symbol-table",    "()", "Return a list of all symbols defined, accessible from the current closure", lnfSymbolTable, 0);
+	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object", lnfCurrentClosure, 0);
+	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
 
 	lAddNativeFuncV (c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
 	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs, 0);
 
-	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β",         lnfUnequal, NFUNC_PURE);
+	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β", lnfUnequal, NFUNC_PURE);
 
 	lAddNativeFunc(c,"garbage-collect",         "()", "Force the garbage collector to run", lnfGarbageCollect, 0);
 	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 
-	lAddNativeFuncV(c,"int",             "(α)",     "Convert α into an integer number", lnfInt, NFUNC_PURE);
-	lAddNativeFuncV(c,"float",           "(α)",     "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
+	lAddNativeFuncV(c,"int",   "(α)", "Convert α into an integer number", lnfInt, NFUNC_PURE);
+	lAddNativeFuncV(c,"float", "(α)", "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
 
 	lAddNativeFuncR(c, "array/new", "args",  "Create a new array from ...ARGS", lnfArrNew, 0);
 	lAddNativeFuncR(c, "tree/new",  "plist", "Return a new tree", lnfTreeNew, 0);
