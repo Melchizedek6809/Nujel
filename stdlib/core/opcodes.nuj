@@ -1,0 +1,44 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Contains some functions so that opcodes can be used as functions
+
+(defn < (a b)
+      "Less than comparator"
+      (< a b))
+
+(defn <= (a b)
+      "Less or equal comparator"
+      (<= a b))
+
+(defn = (a b)
+      "Equality comparator"
+      (= a b))
+
+(defn >= (a b)
+      "Greater or equal comparator"
+      (>= a b))
+
+(defn > (a b)
+      "Greater than comparator"
+      (> a b))
+
+(defn car (pair)
+      "Return the head of PAIR"
+      (car pair))
+
+(defn cdr (pair)
+      "Return the rest of PAIR"
+      (cdr pair))
+
+(defn cons (a b)
+      "Construct a new pair of A and B"
+      (cons a b))
+
+(defn nil? (a)
+      "Check whether a is #nil"
+      (= a #nil))
+
+(defn zero? (a)
+      "Check whether a is 0"
+      (= a 0))

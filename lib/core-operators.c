@@ -87,18 +87,6 @@ static lVal lnfCurrentLambda(lClosure *c){
 	return lValAlloc(ltLambda, c);
 }
 
-static lVal lnfCar(lVal v){
-	return lCar(v);
-}
-
-static lVal lnfCdr(lVal v){
-	return lCdr(v);
-}
-
-static lVal lnfCons(lVal a, lVal b){
-	return lCons(a, b);
-}
-
 static lVal lnfNReverse(lVal l){
 	lVal t = NIL;
 	while(l.type == ltPair){
@@ -118,43 +106,8 @@ static lVal lnfTimeMsecs(){
 	return lValInt(getMSecs());
 }
 
-static lVal lnfLess(lVal a, lVal b){
-	return lValBool(lValGreater(a, b) < 0);
-}
-
 static lVal lnfUnequal(lVal a, lVal b){
 	return lValBool(!lValEqual(a, b));
-}
-
-static lVal lnfEqual(lVal a, lVal b){
-	return lValBool(lValEqual(a, b));
-}
-
-static lVal lnfLessEqual(lVal a, lVal b){
-	return lValBool(lValEqual(a,b) || (lValGreater(a, b) < 0));
-}
-
-static lVal lnfGreater(lVal a, lVal b){
-	return lValBool(lValGreater(a, b) > 0);
-}
-
-static lVal lnfGreaterEqual(lVal a, lVal b){
-	return lValBool(lValEqual(a, b) || (lValGreater(a, b) > 0));
-}
-
-static lVal lnfNilPred(lVal a){
-	return lValBool(a.type == ltNil);
-}
-
-static lVal lnfZeroPred(lVal a){
-	switch(a.type){
-	case(ltInt):
-		return lValBool(a.vInt == 0);
-	case(ltFloat):
-		return lValBool(a.vFloat == 0.0);
-	default:
-		return lValBool(false);
-	}
 }
 
 static lVal lnfQuote(lVal v){
@@ -306,22 +259,12 @@ void lOperationsCore(lClosure *c){
 	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",     lnfCurrentLambda, 0);
 	lAddNativeFuncC(c,"symbol-table",    "()", "Return a list of all symbols defined, accessible from the current closure", lnfSymbolTable, 0);
 
-	lAddNativeFuncV (c,"car",     "(list)",    "Return the head of LIST",          lnfCar, NFUNC_PURE);
-	lAddNativeFuncV (c,"cdr",     "(list)",    "Return the rest of LIST",          lnfCdr, NFUNC_PURE);
-	lAddNativeFuncVV(c,"cons",    "(car cdr)", "Return a new pair of CAR and CDR", lnfCons, NFUNC_PURE);
 	lAddNativeFuncV (c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
 	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs, 0);
 
-	lAddNativeFuncVV(c,"<",        "(α β)", "Return true if α is less than β",             lnfLess, NFUNC_PURE);
-	lAddNativeFuncVV(c,"<=",       "(α β)", "Return true if α is less or equal to β",      lnfLessEqual, NFUNC_PURE);
-	lAddNativeFuncVV(c,"=",        "(α β)", "Return true if α is equal to β",              lnfEqual, NFUNC_PURE);
 	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β",         lnfUnequal, NFUNC_PURE);
-	lAddNativeFuncVV(c,">=",       "(α β)", "Return true if α is greater or equal than β", lnfGreaterEqual, NFUNC_PURE);
-	lAddNativeFuncVV(c,">",        "(α β)", "Return true if α is greater than β",          lnfGreater, NFUNC_PURE);
-	lAddNativeFuncV (c,"nil?",     "(α)",   "Return true if α is #nil",                    lnfNilPred, NFUNC_PURE);
-	lAddNativeFuncV (c,"zero?",    "(α)",   "Return true if α is 0",                       lnfZeroPred, NFUNC_PURE);
 
 	lAddNativeFunc(c,"garbage-collect",         "()", "Force the garbage collector to run", lnfGarbageCollect, 0);
 	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
