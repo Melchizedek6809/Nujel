@@ -9,7 +9,7 @@
       (when c
             (if (= c root-closure)
                 (fmt "{i}# <root environment>")
-                (do (def data (closure/data c))
+                (do (def data (:data c))
                     (def l (:length data))
                   (cat (int (or i 0)) "# "
                        (string/write c)
@@ -55,7 +55,7 @@
 (defn closure/name (o)
       (if (procedure? o)
           (or (:meta o :name)
-              (closure/name (closure/parent o)))
+              (closure/name (:parent o)))
           'unknown))
 
 (def describe (let*
@@ -64,7 +64,7 @@
                       (def documentation (closure/documentation o))
                       (def name (closure/name o))
                       (pfmt "({}" (closure/name o))
-                      (def arguments (closure/arguments o))
+                      (def arguments (:arguments o))
                       (if (pair? arguments)
                           (doseq (arg arguments (println ")"))
                                  (when arg (pfmt " {arg}")))

@@ -93,7 +93,7 @@
 (#f (tree? 123))
 (#f (tree? "asd"))
 (#f (tree? #t))
-(#t (tree? (closure/data min)))
+(#t (tree? (:data min)))
 (#t (last? '()))
 (#t (last? '(1)))
 (#f (last? '(1 2)))

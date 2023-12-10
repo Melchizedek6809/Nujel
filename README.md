@@ -32,8 +32,8 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Gopher client and terminal browser
 - [X] Simple HTTP 1.1 client
 - [X] (somewhat) useable object system
+- [X] Binary/FASL format
 - [ ] Simple HTTP 1.1 server
-- [ ] Binary/FASL format
 - [ ] Reader written in Nujel (requires FASL for bootstrapping)
 - [ ] Tail-call optimization (doesn't seem to be much of a problem right now)
 - [ ] Fibers
@@ -41,7 +41,6 @@ Here is a collection of features already implemented, or about to be finished.
 ## Current Limitations
 These will be addressed in later versions
 - [ ] Static Heap (works far better than expected)
-- [ ] Base image needs to be copied to the heap during startup (would be nice to run straight from .rodata)
 
 ## Documentation
 I've started to write some documentation, which you can read here: [https://nujel.net/](https://nujel.net/)

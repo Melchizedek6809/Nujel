@@ -15,6 +15,10 @@
       "Equality comparator"
       (= a b))
 
+(defn not= (a b)
+      "Inequality comparator"
+      (not= a b))
+
 (defn >= (a b)
       "Greater or equal comparator"
       (>= a b))

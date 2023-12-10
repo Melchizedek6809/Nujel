@@ -136,6 +136,40 @@ static lVal lnmLambdaHas(lVal self, lVal key){
 	return lValBool(v.type != ltException);
 }
 
+static lVal lnmLambdaData(lVal self){
+	return lValTree(self.vClosure->data);
+}
+
+static lVal lnmLambdaCode(lVal self){
+	return lValAlloc(ltBytecodeArr, self.vClosure->text);
+}
+
+static lVal lnmLambdaArguments(lVal self){
+	return self.vClosure->args;
+}
+
+static lVal lnmLambdaParent(lVal self){
+	if(self.vClosure->parent == NULL){
+		return NIL;
+	}else{
+		return lValAlloc(self.vClosure->parent->type == closureObject ? ltEnvironment : ltLambda, self.vClosure->parent);
+	}
+}
+
+static lVal lnmLambdaParentSet(lVal self, lVal v){
+	if(v.type == ltNil){
+		self.vClosure->parent = NULL;
+	} else {
+		reqClosure(v);
+		self.vClosure->parent = v.vClosure;
+	}
+	return self;
+}
+
+static lVal lnmNFuncArguments(lVal self){
+	return self.vNFunc->args;
+}
+
 static void lTypesAddCoreMethods(){
 	lClass *Any = &lClassList[ltAny];
 	lAddNativeMethodV (Any, lSymS("type-of"), "(self)", lnmTypeOf, NFUNC_PURE);
@@ -148,6 +182,14 @@ static void lTypesAddCoreMethods(){
 
 	lClass *Lambda = &lClassList[ltLambda];
 	lAddNativeMethodVV(Lambda, lSymS("has?"), "(self key)", lnmLambdaHas, NFUNC_PURE);
+	lAddNativeMethodV (Lambda, lSymS("code"), "(self)", lnmLambdaCode, NFUNC_PURE);
+	lAddNativeMethodV (Lambda, lSymS("data"), "(self)", lnmLambdaData, 0);
+	lAddNativeMethodV (Lambda, lSymS("arguments"), "(self)", lnmLambdaArguments, 0);
+	lAddNativeMethodV (Lambda, lSymS("parent"), "(self)", lnmLambdaParent, 0);
+	lAddNativeMethodVV(Lambda, lSymS("parent!"), "(self v)", lnmLambdaParentSet, 0);
+
+	lClass *NFunc = &lClassList[ltNativeFunc];
+	lAddNativeMethodV (NFunc, lSymS("arguments"), "(self)", lnmNFuncArguments, 0);
 
 	lClass *Type = &lClassList[ltType];
 	lAddNativeMethodV  (Type, lSymS("name"), "(self)", lnmTName, NFUNC_PURE);

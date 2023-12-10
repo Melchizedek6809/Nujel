@@ -7,51 +7,6 @@
 #include <time.h>
 #include <inttypes.h>
 
-static lVal lnfClosureParent(lVal a){
-	reqClosure(a);
-	if(a.vClosure->parent == NULL){
-		return NIL;
-	}else{
-		return lValAlloc(a.vClosure->parent->type == closureObject ? ltEnvironment : ltLambda, a.vClosure->parent);
-	}
-}
-
-static lVal lnfClosureParentSet(lVal a, lVal parent){
-	reqClosure(a);
-	if(parent.type == ltNil){
-		a.vClosure->parent = NULL;
-	} else {
-		reqClosure(parent);
-		a.vClosure->parent = parent.vClosure;
-	}
-	return a;
-}
-
-static lVal lnfClosureArguments(lVal a){
-	switch(a.type){
-	case ltException:
-		return a;
-	case ltNativeFunc:
-		return a.vNFunc->args;
-	case ltLambda:
-	case ltEnvironment:
-	case ltMacro:
-		return a.vClosure->args;
-	default:
-		return lValExceptionType(a, ltLambda);
-	}
-}
-
-static lVal lnfClosureCode(lVal a){
-	reqClosure(a);
-	return lValAlloc(ltBytecodeArr, a.vClosure->text);
-}
-
-static lVal lnfClosureData(lVal a){
-	reqClosure(a);
-	return lValTree(a.vClosure->data);
-}
-
 static lVal lnfResolvesPred(lClosure *c, lVal aSym, lVal env){
 	lVal car = aSym;
 	if(unlikely(car.type != ltSymbol)){return lValBool(false);}
@@ -88,10 +43,6 @@ static lVal lnfTime(){
 
 static lVal lnfTimeMsecs(){
 	return lValInt(getMSecs());
-}
-
-static lVal lnfUnequal(lVal a, lVal b){
-	return lValBool(!lValEqual(a, b));
 }
 
 static lVal lnfQuote(lVal v){
@@ -228,12 +179,6 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
 
-	lAddNativeFuncV(c, "closure/data",     "(clo)",  "Return the data of CLO",          lnfClosureData, 0);
-	lAddNativeFuncV(c, "closure/code",     "(clo)",  "Return the code of CLO",          lnfClosureCode, 0);
-	lAddNativeFuncV(c, "closure/arguments","(clo)",  "Return the argument list of CLO", lnfClosureArguments, 0);
-	lAddNativeFuncV(c, "closure/parent",   "(clo)",  "Return the parent of CLO",        lnfClosureParent, 0);
-	lAddNativeFuncVV(c,"closure/parent!", "(clo parent)",  "Set the parent of CLO",     lnfClosureParentSet, 0);
-
 	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object", lnfCurrentClosure, 0);
 	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
 
@@ -241,8 +186,6 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
 	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs, 0);
-
-	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β", lnfUnequal, NFUNC_PURE);
 
 	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 

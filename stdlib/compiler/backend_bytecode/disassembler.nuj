@@ -125,6 +125,6 @@
                          :cat :bytecode
                          :internal
                          (case (:type-name bc)
-                               ((:lambda :macro) (disassemble/to-string (closure/code bc)))
+                               ((:lambda :macro) (disassemble/to-string (:code bc)))
                                (:bytecode-array  (disassemble/to-string bc))
                                (otherwise (throw (list :type-error "Can't disassemble that" bc (current-lambda))))))))

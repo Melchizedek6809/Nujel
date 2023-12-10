@@ -5,7 +5,7 @@
 
 (defmacro defclass (name . body)
           (def fn-meta (meta/parse/body name '() body))
-          (def def-form `(def ~name (closure/data (let* ~@body (def meta* ~fn-meta) (current-closure)))))
+          (def def-form `(def ~name (:data (let* ~@body (def meta* ~fn-meta) (current-closure)))))
           (if (ref fn-meta :export)
               (if (ref fn-meta :export)
                   (list 'export (if (symbol? (ref fn-meta :export))
