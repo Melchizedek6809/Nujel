@@ -88,6 +88,13 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       :inline
       '(#x20))
 
+(defn $not= ()
+      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
+      :cat :bytecode
+      :internal
+      :inline
+      '(#x38))
+
 (defn $>= ()
       "(a b) -> (bool) --- Compare A and B and push the result on the stack"
       :cat :bytecode
@@ -331,6 +338,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                      (< ($<))
                      (<= ($<=))
                      (= ($=))
+                     (not= ($not=))
                      (>= ($>=))
                      (> ($>))
                      (bytecode-eval* ($eval))

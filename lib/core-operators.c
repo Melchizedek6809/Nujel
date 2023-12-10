@@ -103,11 +103,6 @@ static lVal lnfRead(lVal a){
 	return lRead(a.vString->data, a.vString->length);
 }
 
-static lVal lnfGarbageCollect(){
-	//lGarbageCollect();
-	return NIL;
-}
-
 static lVal lnfGarbageCollectRuns(){
 	return lValInt(lGCRuns);
 }
@@ -249,7 +244,6 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncVV(c,"not=",     "(α β)", "Return true if α is not equal to  β", lnfUnequal, NFUNC_PURE);
 
-	lAddNativeFunc(c,"garbage-collect",         "()", "Force the garbage collector to run", lnfGarbageCollect, 0);
 	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 
 	lAddNativeFuncV(c,"int",   "(α)", "Convert α into an integer number", lnfInt, NFUNC_PURE);

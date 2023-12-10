@@ -256,6 +256,7 @@ typedef enum lOpcode {
 	lopBitXor          = 0x35,
 	lopBitNot          = 0x36,
 	lopGenSet          = 0x37,
+	lopUnequalPred     = 0x38,
 } lOpcode;
 
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);

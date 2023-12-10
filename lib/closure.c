@@ -30,12 +30,11 @@ lClosure *lClosureNewFunCall(lVal args, lVal lambda) {
 				tmpc->data = lTreeInsert(tmpc->data, n.vList->car.vSymbol, args.vList->car);
 				args = args.vList->cdr;
 			}
+			continue;
 		} else if(likely(n.type == ltSymbol)) {
 			tmpc->data = lTreeInsert(tmpc->data, n.vSymbol, args);
-			break;
-		} else {
-			break;
 		}
+		return tmpc;
 	}
 	return tmpc;
 }
@@ -149,14 +148,14 @@ lClosure *lInitRootClosure(){
 	lTypesInit(c);
 	lOperationsArithmetic(c);
 	lOperationsBuffer(c);
-	lOperationsArray();
 	lOperationsSpecial(c);
 	lOperationsImage(c);
-	lOperationsTree();
 	lOperationsCore(c);
+	lAddPlatformVars(c);
+	lOperationsArray();
+	lOperationsTree();
 	lOperationsBytecode();
 	lOperationsString();
-	lAddPlatformVars(c);
 	lDefineVal(c,"exports",  lValTree(NULL));
 	lDefineVal(c,"*module*", lValKeyword("core"));
 	return c;
