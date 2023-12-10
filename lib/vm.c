@@ -80,7 +80,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 #define lGarbageCollectIfNecessary() do {\
 	if(unlikely(lGCShouldRunSoon)){\
-		lGarbageCollect();\
+		lGarbageCollect(&ctx);\
 	}\
 } while(0)
 
@@ -161,8 +161,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStack[0]  = c;
 	ctx.text             = text;
 
-	const int RSP = lRootsGet();
-	lRootsThreadPush(&ctx);
 	ip = ops->data;
 
 	while(true){
@@ -648,7 +646,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(unlikely(ctx.csp <= 0)){
 				free(ctx.closureStack);
 				free(ctx.valueStack);
-				lRootsRet(RSP);
 				exceptionThrownValue.type = ltException;
 				return exceptionThrownValue;
 			}
@@ -907,7 +904,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal ret = ctx.valueStack[ctx.sp-1];
 		free(ctx.closureStack);
 		free(ctx.valueStack);
-		lRootsRet(RSP);
 		return ret; }
 	}}
 }

@@ -9,19 +9,6 @@
 #include "nujel-private.h"
 #endif
 
-typedef struct {
-	lType t;
-	union {
-		lClosure *vClosure;
-		lSymbol  *vSymbol;
-		void     *vPointer;
-		lThread  *vThread;
-	};
-} rootEntry;
-
-rootEntry *rootStack = NULL;
-int rootSP  = 0;
-int rootMax = 0;
 int lGCRuns = 0;
 
 u8 fileDescriptorMarkMap[MAX_OPEN_FILE_DESCRIPTORS];
@@ -35,7 +22,6 @@ defineAllocator(lNFunc, NFN_MAX)
 #define markerPrefix(T) \
 if(unlikely(v == NULL)){return;} \
 const uint ci = v - T##List; \
-if(unlikely(ci >= T##Max)){return;} \
 if(T##MarkMap[ci]){return;} \
 T##MarkMap[ci] = 1
 
@@ -59,6 +45,7 @@ static void lBufferFree(lBuffer *buf){
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
 	lBufferFFree = buf;
+	lBufferMarkMap[buf - lBufferList] = 2;
 }
 
 
@@ -66,6 +53,7 @@ static void lBufferViewFree(lBufferView *buf){
 	buf->nextFree = lBufferViewFFree;
 	lBufferViewActive--;
 	lBufferViewFFree = buf;
+	lBufferViewMarkMap[buf - lBufferViewList] = 2;
 }
 
 static void lBytecodeArrayFree(lBytecodeArray *v){
@@ -75,6 +63,7 @@ static void lBytecodeArrayFree(lBytecodeArray *v){
 	v->nextFree = lBytecodeArrayFFree;
 	lBytecodeArrayActive--;
 	lBytecodeArrayFFree = v;
+	lBytecodeArrayMarkMap[v - lBytecodeArrayList] = 2;
 }
 
 static void lNFuncFree(lNFunc *n){
@@ -86,24 +75,28 @@ static void lArrayFree(lArray *v){
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;
 	lArrayActive--;
+	lArrayMarkMap[v - lArrayList] = 2;
 }
 
 static void lClosureFree(lClosure *clo){
 	clo->nextFree = lClosureFFree;
 	lClosureFFree = clo;
 	lClosureActive--;
+	lClosureMarkMap[clo - lClosureList] = 2;
 }
 
 static void lTreeFree(lTree *t){
 	t->nextFree = lTreeFFree;
 	lTreeFFree = t;
 	lTreeActive--;
+	lTreeMarkMap[t - lTreeList] = 2;
 }
 
 static void lTreeRootFree(lTreeRoot *t){
 	t->nextFree = lTreeRootFFree;
 	lTreeRootFFree = t;
 	lTreeRootActive--;
+	lTreeRootMarkMap[t - lTreeRootList] = 2;
 }
 
 static void lPairFree(lPair *cons){
@@ -111,6 +104,7 @@ static void lPairFree(lPair *cons){
 	cons->nextFree = lPairFFree;
 	lPairFFree = cons;
 	lPairActive--;
+	lPairMarkMap[cons - lPairList] = 2;
 }
 
 static void lThreadGCMark(lThread *c){
@@ -228,37 +222,8 @@ static void lBytecodeArrayMark(const lBytecodeArray *v){
 	lArrayGCMark(v->literals);
 }
 
-/* There should be a way to avoid having this procedure alltogether, but for
- * now a solution is not apparent to me. It marks every free object so it won't
- * get freed again.
- */
-static void lMarkFree(){
-	#define defineAllocator(T, TMAX)\
-	for(T *v = T##FFree;v;v=v->nextFree){\
-		T##MarkMap[v - T##List] = 1;\
-	}
-	allocatorTypes()
-	defineAllocator(lSymbol, SYM_MAX)
-	#undef defineAllocator
-}
-
 /* Mark every single root and everything they point to */
 static void lRootsMark(){
-	for(int i=0;i<rootSP;i++){
-		switch(rootStack[i].t){
-		case ltSymbol:
-			lSymbolGCMark(rootStack[i].vSymbol);
-			break;
-		case ltLambda:
-			lClosureGCMark(rootStack[i].vClosure);
-			break;
-		case ltEnvironment:
-			lThreadGCMark(rootStack[i].vThread);
-			break;
-		default:
-			break;
-		}
-	}
 	for(size_t i=0;i < countof(lClassList);i++){
 		const lClass *T = &lClassList[i];
 		lSymbolGCMark(T->name);
@@ -270,33 +235,9 @@ static void lRootsMark(){
 	}
 }
 
-static void *lRootsPush(const lType t, void *ptr){
-	if(unlikely(rootSP >= rootMax)){
-		rootMax = MAX(rootMax * 2, 256);
-		rootEntry *newRootStack = realloc(rootStack, rootMax * sizeof(rootEntry));
-		if(unlikely(newRootStack == NULL)){
-			free(rootStack);
-			exit(126);
-		}
-		rootStack = newRootStack;
-	}
-	rootStack[rootSP].t = t;
-	rootStack[rootSP].vPointer = ptr;
-	rootSP++;
-	return ptr;
-}
-
 lSymbol *lRootsSymbolPush(lSymbol *v){
-	return lRootsPush(ltSymbol, v);
-}
-lThread *lRootsThreadPush(lThread *v){
-	return lRootsPush(ltEnvironment, v);
-}
-
-/* Mark the roots so they will be skipped by the GC,  */
-static void lGCMark(){
-	lRootsMark();
-	lMarkFree();
+	lSymbolMarkMap[v - lSymbolList] = 2;
+	return v;
 }
 
 /* Free all values that have not been marked by lGCMark */
@@ -306,8 +247,8 @@ static void lGCSweep(){
 		if(T##MarkMap[i] == 0) {\
 			T##Free(&T##List[i]);\
 		}\
-	}\
-	memset(T##MarkMap,0,sizeof(T##MarkMap));
+		T##MarkMap[i] = T##MarkMap[i]&2;\
+	}
 	allocatorTypes()
 	defineAllocator(lSymbol, SYM_MAX)
 	defineAllocator(lNFunc, NFN_MAX)
@@ -316,9 +257,11 @@ static void lGCSweep(){
 
 /* Force a garbage collection cycle, shouldn't need to be called manually since
  * when the heap is exhausted the GC is run */
-void lGarbageCollect(){
+void lGarbageCollect(lThread *ctx){
 	lGCRuns++;
-	lGCMark();
+	lRootsMark();
+	lThreadGCMark(ctx);
+
 	lGCSweep();
 	lGCShouldRunSoon = false;
 }

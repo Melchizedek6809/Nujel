@@ -284,16 +284,11 @@ void lAddPlatformVars(lClosure *c);
  | GC related procedures
  */
 lSymbol  *lRootsSymbolPush (lSymbol *v);
-lThread  *lRootsThreadPush (lThread *v);
-extern int rootSP;
 extern int lGCRuns;
-
-static inline void lRootsRet(const int i){ rootSP = i; }
-static inline int  lRootsGet(){ return rootSP; }
 
 extern bool lGCShouldRunSoon;
 
-void lGarbageCollect();
+void lGarbageCollect(lThread *ctx);
 
 /*
  | Alocator related definitions
@@ -323,11 +318,14 @@ void lGarbageCollect();
 extern T T##List[typeMax]; \
 extern uint T##Max;	   \
 extern uint T##Active; \
+extern u8 T##MarkMap[typeMax]; \
 extern T * T##FFree; \
-T * T##AllocRaw(); \
+T * T##AllocRaw();
 
 allocatorTypes()
 #undef defineAllocator
+
+extern u8 lSymbolMarkMap[SYM_MAX];
 
 extern lNFunc   lNFuncList[NFN_MAX];
 extern uint     lNFuncMax;

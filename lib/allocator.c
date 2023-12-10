@@ -25,6 +25,7 @@ T * T##AllocRaw (){\
 		(T##FFree) = ret->nextFree;	\
 	}\
 	if(unlikely((typeMax - (++T##Active) < 64))){lGCShouldRunSoon = true;} \
+	T##MarkMap[ret - T##List] = 0;\
 	memset(ret,0,sizeof(T));\
 	return ret;\
 }

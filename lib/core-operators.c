@@ -104,7 +104,7 @@ static lVal lnfRead(lVal a){
 }
 
 static lVal lnfGarbageCollect(){
-	lGarbageCollect();
+	//lGarbageCollect();
 	return NIL;
 }
 

@@ -162,6 +162,7 @@ void lSymbolFree(lSymbol *s){
 	const int symIndex = lSymIndex(s);
 	const int slot = lSymbolBackIndex[symIndex];
 	lSymbolIndex[slot] = -symIndex;
+	lSymbolMarkMap[s - lSymbolList] = 2;
 }
 
 lSymbol *lSymSL(const char *str, uint len){
@@ -237,6 +238,7 @@ lSymbol *lSymS(const char *str){
 	symIndex = lSymIndex(ret);
 	lSymbolIndex[slot] = symIndex + 1;
 	lSymbolBackIndex[symIndex] = slot;
+	lSymbolMarkMap[ret - lSymbolList] = 0;
 	return ret;
 }
 

@@ -584,7 +584,6 @@ lVal lRead(const char *str, size_t len){
  * files. */
 lClosure *lLoad(lClosure *c, const char *expr){
 	lVal v = lRead(expr, strlen(expr));
-	const int RSP = lRootsGet();
 	for(lVal n=v; n.type == ltPair; n = n.vList->cdr){
 		c->args = n; // We need a reference to make sure that n won't be collected by the GC
 		lVal car = n.vList->car;
@@ -593,6 +592,5 @@ lClosure *lLoad(lClosure *c, const char *expr){
 		}
 	}
 	c->args = NIL;
-	lRootsRet(RSP);
 	return c;
 }
