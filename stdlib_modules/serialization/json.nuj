@@ -24,7 +24,7 @@
             (:string (string/write v))
             ((:symbol :keyword)  (cat "\"" (:string v) "\""))
             (:tree (tree->json v))
-            (otherwise (throw (list :type-error "Can't encode the value into JSON" v (current-lambda))))))
+            (otherwise (exception :type-error "Can't encode the value into JSON" v))))
 
 (deftest "null" (serialization/json/serialize #nil))
 (deftest "123" (serialization/json/serialize 123))

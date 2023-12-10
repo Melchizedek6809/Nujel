@@ -110,7 +110,7 @@
 
 (defmacro typecheck/only (v t)
           `(when-not (= (:type-name ~v) ~t)
-                     (throw (list :type-error ~(fmt "Expected a value of type {t}") ~v (current-lambda)))))
+                     (exception :type-error ~(fmt "Expected a value of type {t}") ~v)))
 
 (def gensym (let ((gensym/counter 0))
                  (defn gensym (prefix)
