@@ -58,6 +58,9 @@ static lVal stackTrace(const lThread *ctx){
 	lVal ret = NIL;
 	for(int i=0;i<=ctx->csp;i++){
 		lClosure *c = ctx->closureStack[i];
+		if(unlikely(c == NULL)){
+			break;
+		}
 		if(c->type == closureCall){
 			ret = lCons(lValLambda(c),ret);
 		}
@@ -646,7 +649,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			t->cdr = lCons(stackTrace(&ctx),NIL);
 		}
 
-		while(c->type != closureTry){
+		while(likely(c != NULL) && (c->type != closureTry)){
 			if(unlikely(ctx.csp <= 0)){
 				free(ctx.closureStack);
 				free(ctx.valueStack);
@@ -657,6 +660,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 
 		lVal cargs = lCons(exceptionThrownValue, NIL);
+		if(unlikely(c == NULL) || (ctx.csp <= 0)){
+			exit(66);
+		}
 		lVal fun = c->exceptionHandler;
 		c = ctx.closureStack[--ctx.csp];
 		switch(fun.type){
