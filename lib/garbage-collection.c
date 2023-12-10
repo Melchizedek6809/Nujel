@@ -51,18 +51,18 @@ static void lSymbolGCMark      (const lSymbol *v);
 static void lThreadGCMark      (lThread *c);
 static void lBytecodeArrayMark (const lBytecodeArray *v);
 
+
 static void lBufferFree(lBuffer *buf){
 	if(!(buf->flags & BUFFER_STATIC)){
 		free(buf->buf);
 	}
-	buf->buf = NULL;
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
 	lBufferFFree = buf;
 }
 
+
 static void lBufferViewFree(lBufferView *buf){
-	buf->buf = NULL;
 	buf->nextFree = lBufferViewFFree;
 	lBufferViewActive--;
 	lBufferViewFFree = buf;
@@ -72,7 +72,6 @@ static void lBytecodeArrayFree(lBytecodeArray *v){
 	if(!(v->flags & BUFFER_STATIC)){
 		free(v->data);
 	}
-	v->data     = NULL;
 	v->nextFree = lBytecodeArrayFFree;
 	lBytecodeArrayActive--;
 	lBytecodeArrayFFree = v;
@@ -84,7 +83,6 @@ static void lNFuncFree(lNFunc *n){
 
 static void lArrayFree(lArray *v){
 	free(v->data);
-	v->data     = NULL;
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;
 	lArrayActive--;
@@ -244,12 +242,6 @@ static void lMarkFree(){
 	#undef defineAllocator
 }
 
-static void lMarkNFuncs(){
-	for(uint i=0;i<lNFuncMax;i++){
-		lNFuncGCMark(&lNFuncList[i]);
-	}
-}
-
 /* Mark every single root and everything they point to */
 static void lRootsMark(){
 	for(int i=0;i<rootSP;i++){
@@ -272,6 +264,9 @@ static void lRootsMark(){
 		lSymbolGCMark(T->name);
 		lTreeGCMark(T->methods);
 		lTreeGCMark(T->staticMethods);
+	}
+	for(uint i=0;i<lNFuncMax;i++){
+		lNFuncGCMark(&lNFuncList[i]);
 	}
 }
 
@@ -301,7 +296,6 @@ lThread *lRootsThreadPush(lThread *v){
 /* Mark the roots so they will be skipped by the GC,  */
 static void lGCMark(){
 	lRootsMark();
-	lMarkNFuncs();
 	lMarkFree();
 }
 
@@ -309,12 +303,11 @@ static void lGCMark(){
 static void lGCSweep(){
 	#define defineAllocator(T, TMAX) \
 	for(uint i=0;i < T##Max;i++){\
-		if(T##MarkMap[i]){\
-			T##MarkMap[i]=0;\
-		}else{\
+		if(T##MarkMap[i] == 0) {\
 			T##Free(&T##List[i]);\
 		}\
-	}
+	}\
+	memset(T##MarkMap,0,sizeof(T##MarkMap));
 	allocatorTypes()
 	defineAllocator(lSymbol, SYM_MAX)
 	defineAllocator(lNFunc, NFN_MAX)

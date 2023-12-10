@@ -24,8 +24,7 @@ T * T##AllocRaw (){\
 		ret = T ## FFree;\
 		(T##FFree) = ret->nextFree;	\
 	}\
-	(T##Active)++;							\
-	if(unlikely((typeMax - (T##Active)) < 256)){lGCShouldRunSoon = true;} \
+	if(unlikely((typeMax - (++T##Active) < 64))){lGCShouldRunSoon = true;} \
 	memset(ret,0,sizeof(T));\
 	return ret;\
 }

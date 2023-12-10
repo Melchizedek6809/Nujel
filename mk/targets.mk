@@ -104,7 +104,7 @@ valgrind: $(NUJEL)
 	valgrind --error-exitcode=1 ./$(NUJEL) tools/tests.nuj
 
 profile: $(NUJEL)
-	valgrind --tool=callgrind --dump-instr=yes ./$(NUJEL) --only-test-suite tools/tests.nuj
+	valgrind --tool=callgrind --dump-instr=yes --cache-sim=yes --branch-sim=yes ./$(NUJEL) --only-test-suite tools/tests.nuj
 
 web:
 	./tools/buildwasm
