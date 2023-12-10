@@ -149,11 +149,11 @@ lClosure *lInitRootClosure(){
 	lTypesInit(c);
 	lOperationsArithmetic(c);
 	lOperationsBuffer(c);
-	lOperationsArray(c);
-	lOperationsCore(c);
+	lOperationsArray();
 	lOperationsSpecial(c);
-	lOperationsTree(c);
 	lOperationsImage(c);
+	lOperationsTree();
+	lOperationsCore(c);
 	lOperationsBytecode();
 	lOperationsString();
 	lAddPlatformVars(c);
