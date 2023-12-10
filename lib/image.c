@@ -146,12 +146,13 @@ static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool sta
 	if(off < 0){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lArray *)mapP; }
-	const i32 *in = (i32 *)((void *)&img->data[off]);
-	const i32 len = in[0];
+	const u32 raw = *(u32 *)((void *)&img->data[off]);
+	const i32 len = raw & 0xFFFFFF;
+	const u8 flags = len >> 24;
 	lArray *out = lArrayAlloc(len);
+	out->flags = flags;
 	readMapSet(map, off, out);
-	out->flags = in[1];
-	in = &in[2];
+	const i32 *in = (i32 *)((void *)&img->data[off+4]);
 	for(int i=0;i<len;i++){
 		out->data[i] = readVal(map, img, in[i], staticImage);
 	}
@@ -444,19 +445,18 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = 8 + (4 * v->length);
+	const i32 eleSize = 4 + (4 * v->length);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(&ctx->map, (void *)v, curOff);
-	i32 *out = (i32 *)((void *)&ctx->start[ctx->curOff]);
 	ctx->curOff += eleSize;
 
-	out[0] = v->length;
-	out[1] = v->flags;
+	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
+	out[0] = ((u32)v->length) | (((u32)v->flags) << 24);
 	for(int i=0;i<v->length;i++){
 		const i32 off = ctxAddVal(ctx, v->data[i]);
-		out = (i32 *)((void *)&ctx->start[curOff + 8 + i*4]);
+		out = (i32 *)((void *)&ctx->start[curOff + 4 + i*4]);
 		*out = off;
 	}
 
