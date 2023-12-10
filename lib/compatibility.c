@@ -4,6 +4,8 @@
 #include "nujel-private.h"
 #endif
 
+#include <time.h>
+
 #if false
 #include <stdint.h>
 /* Classic binary divide-and-conquer popcount.
