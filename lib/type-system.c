@@ -152,7 +152,18 @@ static lVal lnmLambdaParent(lVal self){
 	if(self.vClosure->parent == NULL){
 		return NIL;
 	}else{
-		return lValAlloc(self.vClosure->parent->type == closureObject ? ltEnvironment : ltLambda, self.vClosure->parent);
+		lType T;
+		switch(self.vClosure->parent->type){
+		case closureRoot:
+		case closureLet:
+		case closureTry:
+			T = ltEnvironment;
+			break;
+		default:
+			T = ltLambda;
+			break;
+		}
+		return lValAlloc(T, self.vClosure->parent);
 	}
 }
 
@@ -163,6 +174,24 @@ static lVal lnmLambdaParentSet(lVal self, lVal v){
 		reqClosure(v);
 		self.vClosure->parent = v.vClosure;
 	}
+	return self;
+}
+
+static lVal lnmNativeMetaGet(lVal self, lVal key){
+	reqSymbolic(key);
+	lVal t = lTreeRef(self.vNFunc->meta, key.vSymbol);
+	return t.type != ltException ? t : NIL;
+}
+
+static lVal lnmNujelMetaGet(lVal self, lVal key){
+	reqSymbolic(key);
+	lVal t = lTreeRef(self.vClosure->meta, key.vSymbol);
+	return t.type != ltException ? t : NIL;
+}
+
+static lVal lnmNujelMetaSet(lVal self, lVal key, lVal value){
+	reqSymbolic(key);
+	self.vClosure->meta = lTreeInsert(self.vClosure->meta, key.vSymbol, value);
 	return self;
 }
 
@@ -187,8 +216,11 @@ static void lTypesAddCoreMethods(){
 	lAddNativeMethodV (Lambda, lSymS("arguments"), "(self)", lnmLambdaArguments, 0);
 	lAddNativeMethodV (Lambda, lSymS("parent"), "(self)", lnmLambdaParent, 0);
 	lAddNativeMethodVV(Lambda, lSymS("parent!"), "(self v)", lnmLambdaParentSet, 0);
+	lAddNativeMethodVV(Lambda, lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
+	lAddNativeMethodVVV(Lambda,lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
 
 	lClass *NFunc = &lClassList[ltNativeFunc];
+	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
 	lAddNativeMethodV (NFunc, lSymS("arguments"), "(self)", lnmNFuncArguments, 0);
 
 	lClass *Type = &lClassList[ltType];

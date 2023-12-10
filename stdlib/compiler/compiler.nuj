@@ -8,9 +8,9 @@
       "Compile SOURCE so it can be evaluated/applied"
       :cat :compiler
       :internal
-      (-> (macroexpand source environment)
-          constant-fold
-          backend))
+      (-> (macroexpand* source environment)
+          (constant-fold environment)
+          (backend environment)))
 
 (defn compile/do* (source environment)
       :cat :compiler
@@ -106,7 +106,7 @@
 
 (defmacro eval (expr)
           "Compile, Evaluate and then return the result of EXPR"
-          `(bytecode-eval* (compile* ~expr (current-closure)) (current-closure)))
+          `(bytecode-eval* (compile ~expr) (current-closure)))
 
 (defmacro typecheck/only (v t)
           `(when-not (= (:type-name ~v) ~t)

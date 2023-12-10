@@ -197,6 +197,6 @@
                       `(def *module* ~name)
                       `(def *module-path* ~(path/dirname module-path))
                       (cons do (read source))))
-      (def mod (eval expr))
+      (def mod (bytecode-eval* (compile* expr root-closure) root-closure))
       (return mod))
 (module/add-loader module/loader/filesystem)

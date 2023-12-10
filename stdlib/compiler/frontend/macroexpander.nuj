@@ -79,6 +79,6 @@
                                                       (map source (fn (α) (macroexpand* α env)))))))
                                 (otherwise (map source (fn (α) (macroexpand* α env))))))))
 
-(defn macroexpand (source env)
+(defmacro macroexpand (source)
       "Macroexpand the forms in source"
-      (macroexpand* source (or env root-closure)))
+      `(macroexpand* (quote ~source) (current-closure)))

@@ -32,7 +32,7 @@
                                (cons (car expr)
                                      (constant-fold/args (cdr expr)))))
 
-                     (defn constant-fold (expr)
+                     (defn constant-fold (expr env)
                            "Will try and evaluate as many constant as possible to make the expression simpler."
                            :cat :compiler
                            :internal

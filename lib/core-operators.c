@@ -58,24 +58,6 @@ static lVal lnfGarbageCollectRuns(){
 	return lValInt(lGCRuns);
 }
 
-static lVal lnmNativeMetaGet(lVal self, lVal key){
-	reqSymbolic(key);
-	lVal t = lTreeRef(self.vNFunc->meta, key.vSymbol);
-	return t.type != ltException ? t : NIL;
-}
-
-static lVal lnmNujelMetaGet(lVal self, lVal key){
-	reqSymbolic(key);
-	lVal t = lTreeRef(self.vClosure->meta, key.vSymbol);
-	return t.type != ltException ? t : NIL;
-}
-
-static lVal lnmNujelMetaSet(lVal self, lVal key, lVal value){
-	reqSymbolic(key);
-	self.vClosure->meta = lTreeInsert(self.vClosure->meta, key.vSymbol, value);
-	return self;
-}
-
 static lVal lnfFloat(lVal v){
 	if(likely(v.type == ltFloat)){
 		return v;
@@ -210,8 +192,4 @@ void lOperationsCore(lClosure *c){
 	lAddNativeMethodV(&lClassList[ltString],  lSymLTSymbol, "(self)", lnfStringToSymbol, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltKeyword], lSymLTSymbol, "(self)", lnfKeywordToSymbol, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltSymbol],  lSymLTSymbol, "(self)", lnfIdentity, NFUNC_PURE);
-
-	lAddNativeMethodVV(&lClassList[ltNativeFunc], lSymS("meta"),  "(self key)", lnmNativeMetaGet, 0);
-	lAddNativeMethodVV(&lClassList[ltLambda],     lSymS("meta"),  "(self key)", lnmNujelMetaGet, 0);
-	lAddNativeMethodVVV(&lClassList[ltLambda],    lSymS("meta!"), "(self key value)", lnmNujelMetaSet, 0);
 }

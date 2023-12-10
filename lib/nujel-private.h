@@ -159,7 +159,6 @@ struct lClosure {
 
 typedef enum closureType {
 	closureDefault = 0,
-	closureObject = 1,
 	closureCall = 2,
 	closureLet = 3,
 	closureTry = 4,
