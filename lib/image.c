@@ -54,12 +54,6 @@ typedef struct {
 } lImageBufferView;
 
 typedef struct {
-	i32 length;
-	u8 flags;
-	u8 data[];
-} lImageBuffer;
-
-typedef struct {
 	i32 parent;
 	i32 data;
 	i32 meta;
@@ -144,15 +138,21 @@ static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, 
 
 static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lArray *)mapP; }
-	const u32 raw = *(u32 *)((void *)&img->data[off]);
-	const i32 len = raw & 0xFFFFFF;
-	const u8 flags = len >> 24;
+
+	const i32 *in = (i32 *)((void *)&img->data[off]);
+	const u32 raw = in[0];
+	const i32 len = raw & 0x0FFFFFFF;
+	const u8 flags = raw >> 28;
 	lArray *out = lArrayAlloc(len);
 	out->flags = flags;
 	readMapSet(map, off, out);
-	const i32 *in = (i32 *)((void *)&img->data[off+4]);
+
+	out->flags = flags;
+	in++;
+
 	for(int i=0;i<len;i++){
 		out->data[i] = readVal(map, img, in[i], staticImage);
 	}
@@ -161,6 +161,7 @@ static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool sta
 
 static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBytecodeArray *)mapP; }
 	const i32 *in = (i32 *)((void *)&img->data[off]);
@@ -180,13 +181,15 @@ static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i
 
 static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
-	if(off < 0){return NULL;}
 	if(mapP != NULL){ return (lPair *)mapP; }
-	const i32 *pair = (const i32 *)((void *)&img->data[off]);
+	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	lPair *ret = lPairAllocRaw();
 	readMapSet(map, off, ret);
-	ret->car = pair[0] >= 0 ? readVal(map, img, pair[0], staticImage) : NIL;
-	ret->cdr = pair[1] >= 0 ? readVal(map, img, pair[1], staticImage) : NIL;
+	const i32 car = img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16);
+	const i32 cdr = img->data[off+3] | (img->data[off+4]<<8) | (img->data[off+5]<<16);
+	ret->car = car < ((1<<24)-1) ? readVal(map, img, car, staticImage) : NIL;
+	ret->cdr = cdr < ((1<<24)-1) ? readVal(map, img, cdr, staticImage) : NIL;
 	return ret;
 }
 
@@ -194,16 +197,19 @@ static lBuffer *readBuffer(readImageMap *map, const lImage *img, i32 off, bool s
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBuffer *)mapP; }
 	if(off < 0){return NULL;}
-	lImageBuffer *imgBuf = (lImageBuffer *)((void *)&img->data[off]);
-	bool immutable = imgBuf->flags & BUFFER_IMMUTABLE;
-	lBuffer *buf = lBufferAlloc(imgBuf->length, immutable);
+	if(off >= (1<<24)-1){return NULL;}
+	const u32 raw = *(u32 *)((void *)&img->data[off]);
+	const u32 len = raw & 0x0FFFFFFF;
+	const bool immutable = (raw >> 28) & BUFFER_IMMUTABLE;
+	void *data = (void *)&img->data[off+4];
+	lBuffer *buf = lBufferAlloc(len, immutable);
 	readMapSet(map, off, buf);
 	if(staticImage && immutable){
-		buf->buf = imgBuf->data;
+		buf->buf = data;
 		buf->flags |= BUFFER_STATIC;
 	} else {
-		buf->buf = malloc(imgBuf->length);
-		memcpy(buf->buf, imgBuf->data, imgBuf->length);
+		buf->buf = malloc(len);
+		memcpy(buf->buf, data, len);
 	}
 	return buf;
 }
@@ -212,6 +218,7 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lBufferView *)mapP; }
 	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	lImageBufferView *imgBuf = (lImageBufferView *)((void *)&img->data[off]);
 	lBuffer *buf = readBuffer(map, img, imgBuf->buffer, staticImage);
 	lBufferView *view = lBufferViewAllocRaw();
@@ -226,15 +233,20 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 
 static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
-	if(off < 0){return NULL;}
 	if(mapP != NULL){ return (lTree *)mapP; }
-	const i32 *in = (i32 *)((void *)&img->data[off]);
-	const i32 len = *in++;
+	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
+	const i32 len = img->data[off] | (img->data[off+1]<<8);
 	lTree *ret = lTreeAllocRaw();
 	readMapSet(map, off, ret);
+	off += 2;
 	for(int i=0;i<len;i++){
-		const lSymbol *s = readSymbol(map, img, *in++, staticImage);
-		lVal v = readVal(map, img, *in++, staticImage);
+		const i32 sym = img->data[off+0] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
+		const i32 val = img->data[off+3] | (img->data[off+4] << 8) | (img->data[off+5] << 16);
+		off += 6;
+
+		const lSymbol *s = readSymbol(map, img, sym, staticImage);
+		lVal v = readVal(map, img, val, staticImage);
 		ret = lTreeInsert(ret, s, v);
 	}
 	return ret;
@@ -258,6 +270,7 @@ static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool stat
 	(void)map;
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
 	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	for(uint i=0;i<countof(lClassList);i++){
 		lClass *t = &lClassList[i];
 		if(t == NULL){break;}
@@ -272,6 +285,7 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return (lClosure *)mapP; }
 	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
 	lImageClosure *clo = (lImageClosure *)((void *)&img->data[off]);
 	lClosure *ret = lClosureAllocRaw();
 	readMapSet(map, off, ret);
@@ -294,12 +308,9 @@ static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	if(off < 0){return NIL;}
-	const lImageType T = img->data[off++];
-	const i32 *dword = (i32 *)((void *)&img->data[off]);
 
+	const lImageType T = img->data[off++];
 	switch(T){
-	default:
-		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
 	case litFileHandle:
 		switch(img->data[off]){
 		case 0:
@@ -311,34 +322,6 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		default:
 			return lValException(lSymReadError, "Can't serialize file handles other than stdin, stdout or stderr", NIL);
 		}
-	case litNativeFunc:
-		return lValAlloc(ltNativeFunc, readNFunc(map, img, *dword, staticImage));
-	case litType:
-		return lValAlloc(ltType, readType(map, img, *dword, staticImage));
-	case litBytecodeArr:
-		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, *dword, staticImage));
-	case litTree:
-		return lValTree(readTree(map, img, *dword, staticImage));
-	case litArray:
-		return lValAlloc(ltArray, readArray(map, img, *dword, staticImage));
-	case litPair:
-		return lValAlloc(ltPair, readPair(map, img, *dword, staticImage));
-	case litBufferView:
-		return lValAlloc(ltBufferView, readBufferView(map, img, *dword, staticImage));
-	case litLambda:
-		return lValAlloc(ltLambda, readClosure(map, img, *dword, staticImage));
-	case litMacro:
-		return lValAlloc(ltMacro, readClosure(map, img, *dword, staticImage));
-	case litEnvironment:
-		return lValAlloc(ltEnvironment, readClosure(map, img, *dword, staticImage));
-	case litString:
-		return lValAlloc(ltString, readBuffer(map, img, *dword, staticImage));
-	case litBuffer:
-		return lValAlloc(ltBuffer, readBuffer(map, img, *dword, staticImage));
-	case litSymbol:
-		return lValAlloc(ltSymbol, (void *)readSymbol(map, img, *dword, staticImage));
-	case litKeyword:
-		return lValAlloc(ltKeyword, (void *)readSymbol(map, img, *dword, staticImage));
 	case litNil:
 		return NIL;
 	case litInt64:
@@ -357,6 +340,42 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		return lValBool(false);
 	case litTrue:
 		return lValBool(true);
+	default:
+		break;
+	}
+
+	const i32 tbyte = img->data[off] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
+	switch(T){
+	default:
+		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
+	case litNativeFunc:
+		return lValAlloc(ltNativeFunc, readNFunc(map, img, tbyte, staticImage));
+	case litType:
+		return lValAlloc(ltType, readType(map, img, tbyte, staticImage));
+	case litBytecodeArr:
+		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, tbyte, staticImage));
+	case litTree:
+		return lValTree(readTree(map, img, tbyte, staticImage));
+	case litArray:
+		return lValAlloc(ltArray, readArray(map, img, tbyte, staticImage));
+	case litPair:
+		return lValAlloc(ltPair, readPair(map, img, tbyte, staticImage));
+	case litBufferView:
+		return lValAlloc(ltBufferView, readBufferView(map, img, tbyte, staticImage));
+	case litLambda:
+		return lValAlloc(ltLambda, readClosure(map, img, tbyte, staticImage));
+	case litMacro:
+		return lValAlloc(ltMacro, readClosure(map, img, tbyte, staticImage));
+	case litEnvironment:
+		return lValAlloc(ltEnvironment, readClosure(map, img, tbyte, staticImage));
+	case litString:
+		return lValAlloc(ltString, readBuffer(map, img, tbyte, staticImage));
+	case litBuffer:
+		return lValAlloc(ltBuffer, readBuffer(map, img, tbyte, staticImage));
+	case litSymbol:
+		return lValAlloc(ltSymbol, (void *)readSymbol(map, img, tbyte, staticImage));
+	case litKeyword:
+		return lValAlloc(ltKeyword, (void *)readSymbol(map, img, tbyte, staticImage));
 	}
 	return NIL;
 }
@@ -413,11 +432,16 @@ static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 	if(v == NULL){return curOff;}
 
 	const i32 sym = ctxAddSymbol(ctx, v->key);
+	ctx->start[curOff]   = (sym    )&0xFF;
+	ctx->start[curOff+1] = (sym>> 8)&0xFF;
+	ctx->start[curOff+2] = (sym>>16)&0xFF;
+
 	const i32 val = ctxAddVal(ctx, v->value);
-	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
-	out[0] = sym;
-	out[1] = val;
-	curOff += 8;
+	ctx->start[curOff+3] = (val    )&0xFF;
+	ctx->start[curOff+4] = (val>> 8)&0xFF;
+	ctx->start[curOff+5] = (val>>16)&0xFF;
+
+	curOff += 6;
 	curOff = ctxAddTreeVal(ctx, curOff, v->left);
 	curOff = ctxAddTreeVal(ctx, curOff, v->right);
 	return curOff;
@@ -429,15 +453,15 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 	if(mapOff > 0){ return mapOff; }
 
 	const int len = lTreeSize(v);
-	const i32 eleSize = 4 + (4*2*len);
+	const i32 eleSize = 2 + (3*2*len);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(&ctx->map, (void *)v, curOff);
-	i32 *out = (i32 *)((void *)&ctx->start[ctx->curOff]);
-	*out = len;
+	ctx->start[curOff  ] =  len     & 0xFF;
+	ctx->start[curOff+1] = (len>>8) & 0xFF;
 	ctx->curOff += eleSize;
-	ctxAddTreeVal(ctx, curOff + 4, v);
+	ctxAddTreeVal(ctx, curOff + 2, v);
 	return curOff;
 }
 
@@ -453,7 +477,7 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 	ctx->curOff += eleSize;
 
 	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
-	out[0] = ((u32)v->length) | (((u32)v->flags) << 24);
+	out[0] = (v->length & 0x0FFFFFFF) | (v->flags << 28);
 	for(int i=0;i<v->length;i++){
 		const i32 off = ctxAddVal(ctx, v->data[i]);
 		out = (i32 *)((void *)&ctx->start[curOff + 4 + i*4]);
@@ -509,8 +533,8 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	out->data = data;
 	out->meta = meta;
 	out->text = text;
-	out->ip   = v->text == NULL ? 0 : (i32)((u8 *)v->ip - (u8 *)v->text->data);
 	out->parent = parent;
+	out->ip   = v->text == NULL ? 0 : (i32)((u8 *)v->ip - (u8 *)v->text->data);
 	out->sp   = v->sp;
 	out->type = v->type;
 
@@ -521,17 +545,17 @@ static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = sizeof(lImageBuffer) + v->length;
+	const i32 eleSize = 4 + v->length;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(&ctx->map, (void *)v, curOff);
-	lImageBuffer *out = (lImageBuffer *)((void *)&ctx->start[ctx->curOff]);
+	u32 *out = (u32 *)((void *)&ctx->start[ctx->curOff]);
+	const u32 outVal = (v->length & 0x0FFFFFFF) | (v->flags << 28);
+	*out = outVal;
 	ctx->curOff += eleSize;
 
-	out->flags = v->flags;
-	out->length = v->length;
-	memcpy(out->data, v->data, v->length);
+	memcpy(&out[1], v->data, v->length);
 	return curOff;
 }
 
@@ -569,10 +593,14 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	ctx->curOff += eleSize;
 
 	const i32 car = v->car.type != ltNil ? ctxAddVal(ctx, v->car) : -1;
+	ctx->start[curOff  ] =  car      & 0xFF;
+	ctx->start[curOff+1] = (car>> 8) & 0xFF;
+	ctx->start[curOff+2] = (car>>16) & 0xFF;
+
 	const i32 cdr = v->cdr.type != ltNil ? ctxAddVal(ctx, v->cdr) : -1;
-	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
-	out[0] = car;
-	out[1] = cdr;
+	ctx->start[curOff+3] =  cdr      & 0xFF;
+	ctx->start[curOff+4] = (cdr>> 8) & 0xFF;
+	ctx->start[curOff+5] = (cdr>>16) & 0xFF;
 
 	return curOff;
 }
@@ -606,90 +634,114 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 		*outb = ctxAddFilehandle(v.vFileHandle);
 		break;
 	case ltNativeFunc: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litNativeFunc;
 		const i32 off = ctxAddSymbol(ctx, v.vNFunc->name);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltType: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litType;
 		const i32 off = ctxAddSymbol(ctx, v.vType->name);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltBytecodeArr: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litBytecodeArr;
 		const i32 off = ctxAddBytecodeArray(ctx, v.vBytecodeArr);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltTree: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litTree;
 		const i32 off = ctxAddTree(ctx, v.vTree->root);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltArray: {
 		ctx->curOff += 5;
 		*outb = litArray;
 		const i32 off = ctxAddArray(ctx, v.vArray);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltPair: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litPair;
 		const i32 off = ctxAddPair(ctx, v.vList);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltSymbol:
 	case ltKeyword: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = v.type == ltSymbol ? litSymbol : litKeyword;
 		const i32 off = ctxAddSymbol(ctx, v.vSymbol);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltBufferView: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litBufferView;
 		const i32 off = ctxAddBufferView(ctx, v.vBufferView);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltLambda: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litLambda;
 		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltMacro: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litMacro;
 		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltEnvironment: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = litEnvironment;
 		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltString:
 	case ltBuffer: {
-		ctx->curOff += 5;
+		ctx->curOff += 4;
 		*outb = v.type == ltString ? litString : litBuffer;
 		const i32 off = ctxAddBuffer(ctx, v.vBuffer);
-		i32 *outd = (i32 *)((void *)&ctx->start[curOff+1]);
-		*outd = off;
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
 		break; }
 	case ltInt:
 		if(v.vInt == ((i8)v.vInt)){
