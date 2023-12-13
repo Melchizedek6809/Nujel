@@ -31,11 +31,11 @@ BIN_WASM_OBJS := $(BIN_SRCS:.c=.wo)
 BINLIB_NUJS := $(shell find binlib -type f -name '*.nuj' | sort)
 BINLIB_NOBS := $(BINLIB_NUJS:.nuj=.no)
 
-FUTURE_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
-FUTURE_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+FUTURE_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/image.c
+FUTURE_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/image.o
 
-RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
-RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/image.c
+RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/image.o
 
 ifeq ($(OS),Windows_NT)
 	NUJEL   := nujel.exe
@@ -62,10 +62,6 @@ NOBS_TO_CLEAN  := $(shell find binlib stdlib stdlib_modules -type f -name '*.no'
 
 $(BIN_OBJS): lib/nujel.h lib/nujel-private.h bin/private.h
 $(LIB_OBJS): lib/nujel.h lib/nujel-private.h
-
-%.no: %.nuj | $(NUJEL)
-	@./$(NUJEL) -x "(file/compile/argv)" $^
-	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
 %.o: %.c
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD)

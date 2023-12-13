@@ -12,24 +12,6 @@ distclean:
 DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
 	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
 
-tmp/stdlib.no: $(STDLIB_NOBS) $(STDLIB_MOBS)
-	@mkdir -p tmp/
-	@cat $(STDLIB_NOBS) $(STDLIB_MOBS) > tmp/stdlib.no
-	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/stdlib.no
-
-tmp/binlib.no: $(BINLIB_NOBS)
-	@mkdir -p tmp/
-	@cat $(BINLIB_NOBS) > tmp/binlib.no
-	@echo "$(ANSI_GREEN)" "[CAT]" "$(ANSI_RESET)" tmp/binlib.no
-
-tmp/stdlib.c: tmp/stdlib.no $(NUJEL)
-	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/stdlib.no" "./tmp/stdlib.c" "stdlib_no_data"
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-
-tmp/binlib.c: tmp/binlib.no $(NUJEL)
-	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/binlib.no" "./tmp/binlib.c" "binlib_no_data"
-	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
-
 tmp/image.c: tmp/init.nuji $(NUJEL)
 	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/init.nuji" "./tmp/image.c" "bootstrap_image"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
@@ -122,9 +104,8 @@ benchmark-nujel: release
 	cp -f $(NUJEL) ~/bin/
 	./$(NUJEL) --no-overwrite --only-nujel ./tools/benchmark.nuj && ./tools/benchmark-sync.nuj
 
-update-stdlib: tmp/stdlib.c tmp/binlib.c
-	cp -f tmp/stdlib.c bootstrap/stdlib.c
-	cp -f tmp/binlib.c bootstrap/binlib.c
+update-stdlib: tmp/image.c
+	cp -f tmp/image.c bootstrap/image.c
 
 show-section-size: $(NUJEL)
 	nm --print-size --size-sort --radix=d -l ./nujel | awk '{ if ($$3 != "B") { print } }'

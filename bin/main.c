@@ -4,8 +4,6 @@
 #include "private.h"
 #endif
 
-extern u8 binlib_no_data[];
-
 static lClosure *initBinRootClosure(lClosure *c){
 	lOperationsIO(c);
 	lOperationsPort(c);
@@ -16,14 +14,14 @@ static lClosure *initBinRootClosure(lClosure *c){
 
 /* Return a new root Closure, with all native functions in place */
 static lClosure *createRootClosure(lClosure *c){
-	return lLoad(initBinRootClosure(c), (const char *)binlib_no_data);;
+	return initBinRootClosure(c);
 }
 
 static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *init){
 	size_t len = 0;
 	void *img = loadFile(filename, &len);
 	initBinRootClosure(lInitRootClosure());
-	lVal imgVal = readImage(img, len, false);
+	lVal imgVal = readImage(img, len, true);
 	lClosure *imgC = findRoot(imgVal);
 	if(imgC == NULL){
 		fprintf(stderr,"Can't determine root closure of that image, exiting\n");
@@ -62,6 +60,8 @@ int initNujel(int argc, char *argv[]){
 	if(c == NULL){
 		c = createRootClosure(lNewRoot());
 	}
+	lRedefineNativeFuncs(c);
+	lOperationsInit(c);
 	initEnvironmentMap(c);
 
 	if(init.type == ltNil){

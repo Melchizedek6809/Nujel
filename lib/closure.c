@@ -7,7 +7,8 @@
 
 #include <ctype.h>
 
-extern u8 stdlib_no_data[];
+extern unsigned long long int bootstrap_image_len;
+extern unsigned char bootstrap_image[];
 
 lClosure *lClosureNew(lClosure *parent, closureType t) {
 	lClosure *c = lClosureAllocRaw();
@@ -151,19 +152,19 @@ lClosure *lInitRootClosure(){
 	lOperationsSpecial(c);
 	lOperationsImage(c);
 	lOperationsCore(c);
-	lAddPlatformVars(c);
 	lOperationsArray();
 	lOperationsTree();
 	lOperationsBytecode();
 	lOperationsString();
-	lDefineVal(c,"exports",  lValTree(NULL));
-	lDefineVal(c,"*module*", lValKeyword("core"));
+
+	lVal imgVal = readImage(bootstrap_image, bootstrap_image_len, false);
+	c = findRoot(imgVal);
 	return c;
 }
 
 /* Create a new root closure with the stdlib */
 lClosure *lNewRoot(){
-	return lLoad(lInitRootClosure(), (const char *)stdlib_no_data);
+	return lInitRootClosure();
 }
 
 static lClosure *findRootRec(lClosure *v){
