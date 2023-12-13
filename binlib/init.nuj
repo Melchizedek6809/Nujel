@@ -20,6 +20,8 @@
             (set! init/args args)
             (set! +root-working-dir+ (cwd))
             (set! *module-path* (cwd))
+            (set! module/loader #nil)
+            (module/add-loader module/loader/filesystem)
 
             (set! init/option-map 'r
                        (fn (option)

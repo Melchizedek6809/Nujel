@@ -282,7 +282,8 @@ void lAddPlatformVars(lClosure *c);
 /*
  | GC related procedures
  */
-lSymbol  *lRootsSymbolPush (lSymbol *v);
+lSymbol *lRootsSymbolPush(lSymbol *v);
+void lDefineTypeVars(lClosure *c);
 extern int lGCRuns;
 
 extern bool lGCShouldRunSoon;
@@ -290,7 +291,7 @@ extern bool lGCShouldRunSoon;
 void lGarbageCollect(lThread *ctx);
 
 /*
- | Alocator related definitions
+ | Allocator related definitions
  */
 #define SYM_MAX (1<<14)
 #define NFN_MAX (1<<10)

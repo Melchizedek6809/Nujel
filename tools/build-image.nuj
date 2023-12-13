@@ -1,0 +1,54 @@
+(import (green) :ansi)
+
+(def directories '("binlib" "stdlib"))
+(def module_dir "stdlib_modules")
+(def output-file "tmp/init.nuji")
+
+(def env (environment*))
+
+(defn define-in-env (v)
+      (def kw (:keyword (cat v)))
+      (set! env kw v))
+
+(defn compile-in-env (path)
+      (def code (compile* (cons 'do (read (slurp path))) env))
+      (mutable-eval* code env))
+
+(defn compile-module-in-env (path)
+      (def module-name (:keyword (:cut (path/without-extension path) (inc (:length module_dir)))))
+      (def source `(defmodule/defer ~module-name (def *module* ~module-name) ~@(read (file/read path))))
+      (mutable-eval* (compile* source env) env))
+
+(defn compile-stdlib ()
+      (-> directories
+          (map directory/read-recursive)
+          (flatten)
+          (filter (path/ext?! "nuj"))
+          (for-each compile-in-env)))
+
+(compile-stdlib)
+
+(-> (:data root-closure)
+    :values
+    (filter (fn (v) (or (= NativeFunc (:type-of v))
+                        (= Type (:type-of v)))))
+    (for-each define-in-env))
+(set! env :stdin* stdin*)
+(set! env :stdout* stdout*)
+(set! env :stderr* stderr*)
+
+(set! env :*module* :core)
+(set! env :exports {})
+(:parent! env #nil)
+
+(compile-stdlib)
+
+(-> (directory/read-recursive module_dir)
+    (flatten)
+    (filter (path/ext?! "nuj"))
+    (for-each compile-module-in-env))
+
+(def img (image/serialize (ref env :init)))
+(pfmtln "{} Final size: {}KB" (green "Image built successfully!") (/ (:length img) 1024))
+(file/write img output-file)
+(exit 0)

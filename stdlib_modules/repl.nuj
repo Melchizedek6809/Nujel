@@ -5,7 +5,6 @@
 ;;; which files to load and whether to start a interactive session.
 (import (rainbow) :ansi)
 
-
 (def *1 #nil)
 (def *2 #nil)
 (def *3 #nil)

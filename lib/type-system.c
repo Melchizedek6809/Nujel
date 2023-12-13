@@ -262,6 +262,30 @@ lVal lMethodLookup(const lSymbol *method, lVal self){
 	return lValException(lSymUnboundVariable, "Unbound method", self);
 }
 
+
+void lDefineTypeVars(lClosure *c){
+	lDefineVal(c, "Nil",        lValType(&lClassList[ltNil]));
+	lDefineVal(c, "Symbol",     lValType(&lClassList[ltSymbol]));
+	lDefineVal(c, "Keyword",    lValType(&lClassList[ltKeyword]));
+	lDefineVal(c, "Bool",       lValType(&lClassList[ltBool]));
+	lDefineVal(c, "Int",        lValType(&lClassList[ltInt]));
+	lDefineVal(c, "Float",      lValType(&lClassList[ltFloat]));
+	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
+	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
+	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
+	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
+	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
+	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
+	lDefineVal(c, "Environment",lValType(&lClassList[ltEnvironment]));
+	lDefineVal(c, "String",     lValType(&lClassList[ltString]));
+	lDefineVal(c, "Buffer",     lValType(&lClassList[ltBuffer]));
+	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
+	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
+	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
+	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
+	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
+}
+
 void lTypesInit(lClosure *c){
 	initType(ltAny, lSymLTAny, NULL);
 	lClass *tAny = &lClassList[ltAny];
@@ -294,27 +318,7 @@ void lTypesInit(lClosure *c){
 	initType(ltException, NULL, tAny);
 
 	lTypesAddCoreMethods();
-
-	lDefineVal(c, "Nil",        lValType(&lClassList[ltNil]));
-	lDefineVal(c, "Symbol",     lValType(&lClassList[ltSymbol]));
-	lDefineVal(c, "Keyword",    lValType(&lClassList[ltKeyword]));
-	lDefineVal(c, "Bool",       lValType(&lClassList[ltBool]));
-	lDefineVal(c, "Int",        lValType(&lClassList[ltInt]));
-	lDefineVal(c, "Float",      lValType(&lClassList[ltFloat]));
-	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
-	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
-	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
-	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
-	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
-	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
-	lDefineVal(c, "Environment",lValType(&lClassList[ltEnvironment]));
-	lDefineVal(c, "String",     lValType(&lClassList[ltString]));
-	lDefineVal(c, "Buffer",     lValType(&lClassList[ltBuffer]));
-	lDefineVal(c, "BufferView", lValType(&lClassList[ltBufferView]));
-	lDefineVal(c, "BytecodeArr",lValType(&lClassList[ltBytecodeArr]));
-	lDefineVal(c, "FileHandle", lValType(&lClassList[ltFileHandle]));
-	lDefineVal(c, "Type",       lValType(&lClassList[ltType]));
-	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
+	lDefineTypeVars(c);
 }
 
 lVal lValExceptionType(lVal v, lType T){

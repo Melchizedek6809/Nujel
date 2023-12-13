@@ -1,5 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#include "nujel.h"
 #ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
 #endif
@@ -190,6 +191,9 @@ lClosure *lRedefineNativeFuncs(lClosure *c){
 		lVal nf = lValAlloc(ltNativeFunc, t);
 		lDefineClosureSym(c, t->name, nf);
 	}
+	lDefineTypeVars(c);
+	lAddPlatformVars(c);
+
 	return c;
 }
 

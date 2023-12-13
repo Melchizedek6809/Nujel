@@ -30,6 +30,8 @@ static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *
 		exit(131);
 	}
 	lClosure *c = lRedefineNativeFuncs(imgC);
+	lOperationsInit(c);
+	initEnvironmentMap(c);
 	*init = imgVal;
 	free(img);
 	return c;

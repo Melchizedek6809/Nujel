@@ -412,6 +412,7 @@ static void ctxRealloc(writeImageContext *ctx, i32 eleSize){
 }
 
 static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
+	if(v == NULL){return -1;}
 	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
@@ -429,7 +430,7 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 }
 
 static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
-	if(v == NULL){return curOff;}
+	if((v == NULL) || (v->key == NULL)){return curOff;}
 
 	const i32 sym = ctxAddSymbol(ctx, v->key);
 	ctx->start[curOff]   = (sym    )&0xFF;
