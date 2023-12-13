@@ -183,9 +183,6 @@
   "Run CMD using popen and return the trimmed stdout"
   (trim (cdr (popen cmd))))
 
-(def +root-working-dir+ (cwd))
-(def *module-path* (cwd))
-
 (defn module/loader/filesystem (name)
       (def name-string (:string name))
       (when-not (= (ref name-string 0) #\/) (return #nil)) ; Paths have to start with a /

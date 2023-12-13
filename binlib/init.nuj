@@ -9,6 +9,8 @@
 (def init/args #nil)
 (def init/options {})
 (def init/option-map {})
+(def +root-working-dir+ "")
+(def *module-path* "")
 
 (defn init args (let*
             (def init/parse-args/eval-next-module #f)
@@ -16,6 +18,8 @@
             (def init/parse-args/run-repl #t)
             (def init/parse-args/ignore-next #f)
             (set! init/args args)
+            (set! +root-working-dir+ (cwd))
+            (set! *module-path* (cwd))
 
             (set! init/option-map 'r
                        (fn (option)

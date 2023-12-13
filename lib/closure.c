@@ -144,7 +144,6 @@ void lClosureSetMeta(lClosure *c, lVal doc){
 /* Add all the essential Native Functions to closure c */
 lClosure *lInitRootClosure(){
 	lClosure *c = lClosureAllocRaw();
-	c->type = closureRoot;
 	lTypesInit(c);
 	lOperationsArithmetic(c);
 	lOperationsBuffer(c);
@@ -167,11 +166,10 @@ lClosure *lNewRoot(){
 }
 
 static lClosure *findRootRec(lClosure *v){
-	if(v->type == closureRoot){
-		return v;
-	} else {
-		return findRootRec(v->parent);
+	while(v->parent){
+		v = v->parent;
 	}
+	return v;
 }
 
 lClosure *findRoot (lVal v){

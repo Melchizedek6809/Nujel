@@ -154,7 +154,6 @@ static lVal lnmLambdaParent(lVal self){
 	}else{
 		lType T;
 		switch(self.vClosure->parent->type){
-		case closureRoot:
 		case closureLet:
 		case closureTry:
 			T = ltEnvironment;
