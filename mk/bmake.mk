@@ -15,11 +15,11 @@ BINLIB_NOBS          := $(BINLIB_NUJS:.nuj=.no)
 
 BIN_OBJS             := $(BIN_SRCS:.c=.o)
 
-FUTURE_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/stdlib.c tmp/binlib.c
-FUTURE_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/stdlib.o tmp/binlib.o
+FUTURE_SRCS = $(BIN_SRCS) $(LIB_SRCS) tmp/image.c
+FUTURE_OBJS = $(BIN_OBJS) $(LIB_OBJS) tmp/image.o
 
-RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/stdlib.c bootstrap/binlib.c
-RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/stdlib.o bootstrap/binlib.o
+RUNTIME_SRCS = $(BIN_SRCS) $(LIB_SRCS) bootstrap/image.c
+RUNTIME_OBJS = $(BIN_OBJS) $(LIB_OBJS) bootstrap/image.o
 
 all: $(NUJEL)
 .PHONY: clean distclean all release release.musl test check test.slow test.ridiculous run runl rnd runn install profile profile-when
@@ -40,11 +40,6 @@ $(BIN_OBJ): lib/nujel.h lib/nujel-private.h bin/private.h
 .c.o:
 	@$(CC) -o $@ -c $< $(CFLAGS) $(CINCLUDES) $(OPTIMIZATION) $(WARNINGS) $(CSTD)
 	@echo "$(ANSI_GREEN)" "[CC] " "$(ANSI_RESET)" $@
-
-.SUFFIXES: .nuj .no
-.nuj.no: $(NUJEL)
-	@./$(NUJEL) -x "(file/compile/argv)" $<
-	@echo "$(ANSI_GREEN)" "[NUJ]" "$(ANSI_RESET)" $@
 
 nujel.a: $(LIB_OBJS)
 	@rm -rf $@
