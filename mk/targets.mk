@@ -30,9 +30,13 @@ tmp/binlib.c: tmp/binlib.no $(NUJEL)
 	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/binlib.no" "./tmp/binlib.c" "binlib_no_data"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/init.nuji: $(NUJEL)
+tmp/image.c: tmp/init.nuji $(NUJEL)
+	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/init.nuji" "./tmp/image.c" "bootstrap_image"
+	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
+
+tmp/init.nuji: $(NUJEL) $(STDLIB_NUJS) $(STDLIB_MODS)
 	@mkdir -p tmp/
-	@echo "(create-image \"tmp/init.nuji\" init) (exit 0)" | ./$(NUJEL)
+	@./$(NUJEL) tools/build-image.nuj
 	@echo "$(ANSI_GREEN)" "[IMG]" "$(ANSI_RESET)" $@
 
 runi: $(NUJEL) tmp/init.nuji

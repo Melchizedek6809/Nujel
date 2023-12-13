@@ -13,16 +13,14 @@
       (typecheck/only out :lambda)
       (typecheck/only symbol-name :string)
 
-      (out 'block-write (fmt "unsigned char {symbol-name}[] = \""))
+      (out 'block-write (fmt "unsigned long long int {symbol-name}_len = {};\n" (:length raw)))
+      (out 'block-write (fmt "unsigned char {symbol-name}[] = "))
+      (out 'block-write "{")
       (dotimes (i (:length raw))
-               (def c (ref raw i))
-               (case c
-                     (#\lf (out 'block-write "\\n\"\n\""))
-                     (#\cr (out 'block-write "\\r"))
-                     (#\"  (out 'block-write "\\\""))
-                     (#\\  (out 'block-write "\\\\"))
-                     (otherwise (out 'char-write c))))
-      (out 'block-write "\";")
+               (when (zero? (bit-and i #xF))
+                 (out 'block-write "\n  "))
+               (out 'block-write (ref hex-cache (ref raw i))))
+      (out 'block-write "};")
       (out 'close!))
 
 (defn create-string-asset (in symbol-name)
@@ -40,8 +38,3 @@
       (def out (make-output-port (file/open-output* output-file :replace)))
       (out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n")
       (create-c-asset (slurp filename) out symbol-name))
-
-(deftest 2716273128 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "asd" "test")))
-(deftest 29 (:length (compiler/c-asset-packer/create-string-asset "asd" "test")))
-(deftest 40 (:length (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))
-(deftest 535759991 (import (hash) :crypto/adler32) (hash (compiler/c-asset-packer/create-string-asset "j32093f3223f" "secret")))
