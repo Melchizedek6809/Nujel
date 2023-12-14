@@ -4,34 +4,20 @@
 ;;; A bunch of procedurs that work on all collections where the collection primitives are implemented
 
 (defn sum (collection)
-      "Return the sum of every value in collection
-
-      collection: The collection to sum, can be a List, Vector or something else supported by reduce.
-
-      The numeric sum of all the elements of collection"
+      "Return the sum of every value in collection"
       :cat :collection-operations
 
       (reduce collection + 0))
 
 (defn every? (collection predicate?)
-      "Returns whether predicate? is #t for every member of the collection
-
-      collection: The collection to test, can be a List, Vector or something else supported by reduce.
-      predicate?: A function that takes a single argument and returns a bool.
-
-      Whether every invocation returned #t or not"
+      "Returns whether predicate? is #t for every member of the collection"
       :cat :collection-operations
 
       (reduce collection (fn (a b) (and a (predicate? b))) #t))
 
 (defn count (collection predicate?)
       "Count the number of items in the collection where predicate? is #t.
-      If no predicate is provided, it will count the number of elements instead.
-
-      collection: The collection to count in
-      predicate?: Optional, a function that takes a single argument which is then called for every item.
-
-      The number of times predicate? returned #t"
+      If no predicate is provided, it will count the number of elements instead."
       :cat :collection-operations
 
       (if predicate?

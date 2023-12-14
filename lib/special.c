@@ -45,7 +45,7 @@ void lOperationsSpecial(lClosure *c){
 	lAddNativeFunc(c,"set!",            "(s v)",                   "Bind a new value v to already defined symbol s",   lnfSet, 0);
 	lAddNativeFunc(c,"macro*",          "(name args source body)", "Create a new, bytecoded, macro", lnfMacro, 0);
 	lAddNativeFunc(c,"fn*",             "(name args source body)", "Create a new, bytecoded, lambda", lnfLambda, 0);
-	lAddNativeFunc(c,"environment*",    "()",                      "Create a new object",       lnfEnvironment, 0);
+	lAddNativeFunc(c,"environment*",    "",                      "Create a new object",       lnfEnvironment, 0);
 	lAddNativeFunc(c,"bytecode-eval*",  "(bc-arr env)",            "Evaluate BC-ARR in call closure ofENV", lnfBytecodeEval, 0);
 	lAddNativeFunc(c,"mutable-eval*",   "(bc-arr env)",            "Evaluate BC-ARR directly in ENV", lnfMutableEval, 0);
 	lAddNativeFunc(c,"list",            "arguments",               "Return ARGUMENTS as a list", lnfList, 0);

@@ -578,19 +578,3 @@ lVal lRead(const char *str, size_t len){
 	ctx.bufEnd = &str[len];
 	return lReadList(&ctx, true, ')');
 }
-
-/* Reads EXPR which should contain bytecode arrays and then evaluate them in C.
- * Mainly used for bootstrapping the stdlib and compiler out of precompiled .no
- * files. */
-lClosure *lLoad(lClosure *c, const char *expr){
-	lVal v = lRead(expr, strlen(expr));
-	for(lVal n=v; n.type == ltPair; n = n.vList->cdr){
-		c->args = n; // We need a reference to make sure that n won't be collected by the GC
-		lVal car = n.vList->car;
-		if(likely(car.type == ltBytecodeArr)){
-			lBytecodeEval(c, car.vBytecodeArr);
-		}
-	}
-	c->args = NIL;
-	return c;
-}

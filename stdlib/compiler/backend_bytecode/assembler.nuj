@@ -5,288 +5,248 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 ;;; and emits. Additionally it calculates branch offsets using the labels provided.
 
 (defn $nop ()
-      "() -> () --- Do Nothing"
-      :cat :bytecode
+      ; () -> () --- Do Nothing
       :internal
       :inline
       '(#x00))
 
 (defn $ret ()
-      "(a) -> () --- Return top of value stack"
-      :cat :bytecode
+      ; (a) -> () --- Return top of value stack
       :internal
       :inline
       '(#x01))
 
 (defn $add/int ()
-      "(a b) -> (result) --- Adds the two topmost values and pushes the result"
-      :cat :bytecode
+      ; (a b) -> (result) --- Adds the two topmost values and pushes the result
       :internal
       :inline
       '(#x03))
 
 (defn $ref ()
-      "(col key) -> (result) --- Looks up key in col"
-      :cat :bytecode
+      ; (col key) -> (result) --- Looks up key in col
       :internal
       :inline
       '(#x2B))
 
 (defn $dup ()
-      "(a) -> (a a) --- Duplicates the value that is on the top of the stack"
-      :cat :bytecode
+      ; (a) -> (a a) --- Duplicates the value that is on the top of the stack
       :internal
       :inline
       '(#x0C))
 
 (defn $drop ()
-      "(a) -> () --- Drop whatever is on top of the stack"
-      :cat :bytecode
+      ; (a) -> () --- Drop whatever is on top of the stack
       :internal
       :inline
       '(#x0D))
 
 (defn $closure/push ()
-      "() -> (closure) --- Push the current closure as a λ on the stack"
-      :cat :bytecode
+      ; () -> (closure) --- Push the current closure as a λ on the stack
       :internal
       :inline
       '(#x13))
 
 (defn $let ()
-      "() -> () --- Create a new let closure and switch to it"
-      :cat :bytecode
+      ; () -> () --- Create a new let closure and switch to it
       :internal
       :inline
       '(#x15))
 
 (defn $closure/pop ()
-      "() -> () --- Leave the current closure and return to the parent one"
-      :cat :bytecode
+      ; () -> () --- Leave the current closure and return to the parent one
       :internal
       :inline
       '(#x16))
 
 (defn $< ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :cat :bytecode
       :internal
       :inline
       '(#x1E))
 
 (defn $<= ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
-      :cat :bytecode
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :internal
       :inline
       '(#x1F))
 
 (defn $= ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
-      :cat :bytecode
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :internal
       :inline
       '(#x20))
 
 (defn $not= ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
-      :cat :bytecode
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :internal
       :inline
       '(#x38))
 
 (defn $>= ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
-      :cat :bytecode
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :internal
       :inline
       '(#x21))
 
 (defn $> ()
-      "(a b) -> (bool) --- Compare A and B and push the result on the stack"
-      :cat :bytecode
+      ; (a b) -> (bool) --- Compare A and B and push the result on the stack
       :internal
       :inline
       '(#x22))
 
 (defn $push/nil ()
-      "() -> (nil) --- Push a #nil on the stack"
-      :cat :bytecode
+      ; () -> (nil) --- Push a #nil on the stack
       :internal
       :inline
       '(#x24))
 
 (defn $car ()
-      "(l) -> (car) --- Replace L with its car"
-      :cat :bytecode
+      ; (l) -> (car) --- Replace L with its car
       :internal
       :inline
       '(#x11))
 
 (defn $cdr ()
-      "(l) -> (cdr) --- Replace L with its cdr"
-      :cat :bytecode
+      ; (l) -> (cdr) --- Replace L with its cdr
       :internal
       :inline
       '(#x12))
 
 (defn $cadr ()
-      "(l) -> (cadr) --- Replace L with its cadr"
-      :cat :bytecode
+      ; (l) -> (cadr) --- Replace L with its cadr
       :internal
       :inline
       '(#x2C))
 
 (defn $cons ()
-      "(car cdr) -> (pair) --- Cons CAR and CDR together and put it on the stack"
-      :cat :bytecode
+      ; (car cdr) -> (pair) --- Cons CAR and CDR together and put it on the stack
       :internal
       :inline
       '(#x14))
 
 (defn $fn/new ()
-      "(args meta body) -> (λ) --- Create a new λ"
-      :cat :bytecode
+      ; (args meta body) -> (λ) --- Create a new λ
       :internal
       :inline
       '(#x17))
 
 (defn $macro/new ()
-      "(args meta body) -> (μ) --- Create a new μ"
-      :cat :bytecode
+      ; (args meta body) -> (μ) --- Create a new μ
       :internal
       :inline
       '(#x18))
 
 (defn $fn/dynamic ()
-      "(name args docs body) -> (λ) --- Create a new λ"
-      :cat :bytecode
+      ; (name args docs body) -> (λ) --- Create a new λ
       :internal
       :inline
       '(#x2F))
 
 (defn $macro/dynamic ()
-      "(name args docs body) -> (μ) --- Create a new μ"
-      :cat :bytecode
+      ; (name args docs body) -> (μ) --- Create a new μ
       :internal
       :inline
       '(#x30))
 
 (defn $add ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x25))
 
 (defn $sub ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x26))
 
 (defn $mul ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x27))
 
 (defn $div ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x28))
 
 (defn $rem ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x29))
 
 (defn $push/true ()
-      "() -> (#t)"
-      :cat :bytecode
+      ; () -> (#t)
       :internal
       :inline
       '(#x1B))
 
 (defn $push/false ()
-      "() -> (#f)"
-      :cat :bytecode
+      ; () -> (#f)
       :internal
       :inline
       '(#x1C))
 
 (defn $eval ()
-      "(bc env) -> (return-val)"
-      :cat :bytecode
+      ; (bc env) -> (return-val)
       :internal
       :inline
       '(#x1D))
 
 (defn $mutable-eval ()
-      "(bc env) -> (return-val)"
-      :cat :bytecode
+      ; (bc env) -> (return-val)
       :internal
       :inline
       '(#x2D))
 
 (defn $zero? ()
-      "(a) -> (result)"
-      :cat :bytecode
+      ; (a) -> (result)
       :internal
       :inline
       '(#x2A))
 
 (defn $inc/int ()
-      "(a) -> (result) --- Adds 1 to the topmost int"
-      :cat :bytecode
+      ; (a) -> (result) --- Adds 1 to the topmost int
       :internal
       :inline
       '(#x23))
 
 (defn $bit-shift-left ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x31))
 
 (defn $bit-shift-right ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x32))
 
 (defn $bit-and ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x33))
 
 (defn $bit-or ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x34))
 
 (defn $bit-xor ()
-      "(a b) -> (result)"
-      :cat :bytecode
+      ; (a b) -> (result)
       :internal
       :inline
       '(#x35))
 
 (defn $bit-not ()
-      "(a) -> (result)"
-      :cat :bytecode
+      ; (a) -> (result)
       :internal
       :inline
       '(#x36))
@@ -295,24 +255,21 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
       (and (<= a 127) (>= a -128)))
 
 (defn $push/int (a)
-      "() -> (a) --- Push A on the stack as an :int"
-      :cat :bytecode
+      ; () -> (a) --- Push A on the stack as an :int
       :internal
       (if (int-fit-in-byte? a)
           ($push/int/byte a)
           ($push/val a)))
 
 (defn $push/int/byte (a)
-      "() -> (a) --- Push A on the stack as an :int that fits within a byte"
-      :cat :bytecode
+      ; () -> (a) --- Push A on the stack as an :int that fits within a byte
       :internal
       (when-not (int-fit-in-byte? a)
                 (exception :invalid-bc-op "$push/int/byte can only push a signed 8-bit value" a ))
       (list #x2 a))
 
 (defn $apply/optimized (arg-count fun)
-      "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-      :cat :bytecode
+      ; arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack
       :internal
       (when (= fun list)
         (return ($list arg-count)))
@@ -352,50 +309,43 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (otherwise #nil)))
 
 (defn $apply (arg-count fun)
-      "arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-      :cat :bytecode
+      ; arguments -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack
       :internal
       (when (> arg-count 255)
         (exception :arity-error "Functions can only take up to 255 arguments directly, try to pass a list/array/map instead" arg-count))
       (list #x4 arg-count))
 
 (defn $apply/collection ()
-      "(arguments function) -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack"
-      :cat :bytecode
+      ; (arguments function) -> (result) --- Read arg-count arguments from the stack, apply the to fun and push the result on the stack
       :internal
       (list #x30))
 
 (defn $list (count)
-      "arguments -> (result) --- Read count arguments from the stack and put a list of those on the stack instead."
-      :cat :bytecode
+      ; arguments -> (result) --- Read count arguments from the stack and put a list of those on the stack instead.
       :internal
       (when (> count 255)
         (exception :arity-error "$list can only generate lists with up to 255 arguments in one go, try and use cons instead" count))
       (list #x2E count))
 
 (defn $try (target)
-      "() -> () --- Try something, jumping to target if an exception occurs"
-      :cat :bytecode
+      ; () -> () --- Try something, jumping to target if an exception occurs
       :internal
       (list #x19 (list :relocate target 8 0 0)
             (list :relocate target 0 1 0)))
 
 (defn $throw ()
-      "(v) -> () --- Throw an exception"
-      :cat :bytecode
+      ; (v) -> () --- Throw an exception
       :internal
       #x2F)
 
 (defn $jmp (target)
-      :cat :bytecode
       :internal
       (list #x9
             (list :relocate target 8 0 0)
             (list :relocate target 0 1 0)))
 
 (defn $push/val (v)
-      "() -> (v) --- Pushes v onto the stack"
-      :cat :bytecode
+      ; () -> (v) --- Pushes v onto the stack
       :internal
       (when (nil? v)
             (exception :invalid-bc-op "Can't push #nil as a normal lVal" v ))
@@ -403,8 +353,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (list :literal v)))
 
 (defn $get/val (v)
-      "() -> (v) --- Resolve V and get the associated value on the stack"
-      :cat :bytecode
+      ; () -> (v) --- Resolve V and get the associated value on the stack
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
@@ -412,8 +361,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (list :literal v)))
 
 (defn $set/val (v)
-      "(v) -> (v) --- Resolve V and get the associated value on the stack"
-      :cat :bytecode
+      ; (v) -> (v) --- Resolve V and get the associated value on the stack
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
@@ -421,14 +369,12 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (list :literal v)))
 
 (defn $set/gen ()
-      "(v v v) -> (v) --- Resolve V and get the associated value on the stack"
-      :cat :bytecode
+      ; (v v v) -> (v) --- Resolve V and get the associated value on the stack
       :internal
       (list #x37))
 
 (defn $def/val (v)
-      "(v) -> (v) --- Resolve V and get the associated value on the stack"
-      :cat :bytecode
+      ; (v) -> (v) --- Resolve V and get the associated value on the stack
       :internal
       (when-not (symbol? v)
             (exception :invalid-bc-op "Can only get symbol" v ))
@@ -436,21 +382,18 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (list :literal v)))
 
 (defn $jt (target)
-      :cat :bytecode
       :internal
       (list #xA
             (list :relocate target 8 0 0)
             (list :relocate target 0 1 0)))
 
 (defn $jf (target)
-      :cat :bytecode
       :internal
       (list #xB
             (list :relocate target 8 0 0)
             (list :relocate target 0 1 0)))
 
 (defn $fn (name args docs body)
-      :cat :bytecode
       :internal
       (list #x25
             (val->bytecode-op name)
@@ -459,7 +402,6 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
             (val->bytecode-op body)))
 
 (defn $macro* (name args docs body)
-      :cat :bytecode
       :internal
       (list #x26
             (val->bytecode-op name)
@@ -572,8 +514,7 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
                            (cons (car code) ret)))
 
                  (defn assemble* (code)
-                       "Assemble all arguments into a single :bytecode-array"
-                       :cat :bytecode
+                       ; Assemble all arguments into a single :bytecode-array
                        :internal
                        (def sym-map {})
                        (def lit-arr [])
@@ -586,12 +527,10 @@ a;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
 
 (defn assemble l
       "Assemble all arguments into a single :bytecode-array"
-      :cat :bytecode
       :internal
       (assemble* l))
 
 (defmacro asmrun ops
           "Assemble and evaluate all bytecode arguments"
-          :cat :bytecode
           :internal
           `(bytecode-eval* (assemble ~@ops) (current-closure)))

@@ -147,8 +147,7 @@ lClosure *lNewRoot ();
 lClosure *lInitRootClosure();
 lClosure *lRedefineNativeFuncs(lClosure *c);
 lVal      lApply   (lVal fun, lVal args);
-lClosure *lLoad    (lClosure *c, const char *expr);
-lVal readImage     (const void *ptr, size_t imgSize, bool staticImage);
+lVal      readImage(const void *ptr, size_t imgSize, bool staticImage);
 lClosure *findRoot (lVal v);
 
 const void *         lBufferData            (lBuffer *v);

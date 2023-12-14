@@ -68,135 +68,77 @@
       (not (equal? val-a val-b)))
 
 (defn int? (val)
-      "Test whether val is an integer
-
-      Integer are sometimes called fixnum's as well
-
-      val: This argument is going to be tested
-
-      Whether val is an integer"
+      "Test whether val is an integer"
       :cat :type-predicate
       :inline
 
       (= :int (:type-name val)))
 
 (defn float? (val)
-      "Test whether val is a floating-point number
-
-      Float's are sometimes called flonum's as well
-
-      val: This argument is going to be tested
-
-      Whether val is a floating-point number"
+      "Test whether val is a floating-point number"
       :cat :type-predicate
       :inline
 
       (= :float (:type-name val)))
 
 (defn number? (val)
-      "Test whether val is a number
-
-      Right now this means either a floating-point or integer number.
-
-      val: This argument is going to be tested
-
-      Whether val is a number"
+      "Test whether val is a number"
       :cat :type-predicate
 
       (or (int? val)
           (float? val)))
 
 (defn bool? (val)
-      "Test whether val is a boolean
-
-      val: This argument is going to be tested
-
-      Whether val is a boolean"
+      "Test whether val is a boolean"
       :cat :type-predicate
       :inline
 
       (= :bool (:type-name val)))
 
 (defn pair? (val)
-      "Test whether val is a pair
-
-      A pair is sometimes also called a cons cell, which can be used to build lists and much more.
-
-      val: This argument is going to be tested
-
-      Whether val is a pair"
+      "Test whether val is a pair"
       :cat :type-predicate
       :inline
 
       (= :pair (:type-name val)))
 
 (defn array? (val)
-      "Test whether val is an array
-
-      Sometimes also called a vector.
-
-      val: This argument is going to be tested
-
-      Whether val is an array"
+      "Test whether val is an array"
       :cat :type-predicate
       :inline
 
       (= :array (:type-name val)))
 
 (defn string? (val)
-      "Test whether val is a string
-
-      val: This argument is going to be tested
-
-      Whether val is a string"
+      "Test whether val is a string"
       :cat :type-predicate
       :inline
 
       (= :string (:type-name val)))
 
 (defn symbol? (val)
-      "Test whether val is a symbol
-
-      val: This argument is going to be tested
-
-      Whether val is a symbol"
+      "Test whether val is a symbol"
       :cat :type-predicate
       :inline
 
       (= :symbol (:type-name val)))
 
 (defn environment? (val)
-      "Test whether val is an environment
-
-      Sometimes also called a closure
-
-      val: This argument is going to be tested
-
-      Whether val is an environment"
+      "Test whether val is an environment"
       :cat :type-predicate
       :inline
 
       (= :environment (:type-name val)))
 
 (defn tree? (val)
-      "Test whether val is a binary tree
-
-      Trees can also be used as maps, tuples or '
-
-      val: This argument is going to be tested
-
-      Whether val is a tree"
+      "Test whether val is a binary tree"
       :cat :type-predicate
       :inline
 
       (= :tree (:type-name val)))
 
 (defn collection? (l)
-      "Test whether val is a collection
-
-      val: This argument is going to be tested
-
-      Whether val is a collection"
+      "Test whether val is a collection"
       :cat :type-predicate
       :inline
 
@@ -205,115 +147,62 @@
             (otherwise #f)))
 
 (defn keyword? (v)
-      "Test whether val is a keyword
-
-      val: This argument is going to be tested
-
-      Whether val is a keyword"
+      "Test whether val is a keyword"
       :cat :type-predicate
       :inline
 
       (= :keyword (:type-name v)))
 
 (defn macro? (val)
-      "Test whether val is a macro
-
-      val: This argument is going to be tested
-
-      Whether val is a macro"
+      "Test whether val is a macro"
       :cat :type-predicate
       :inline
 
       (= :macro (:type-name val)))
 
 (defn lambda? (val)
-      "Test whether val is a function
-
-      Sometimes also called lambda or subroutine
-
-      val: This argument is going to be tested
-
-      Whether val is a function"
+      "Test whether val is a function"
       :cat :type-predicate
       :inline
 
       (or (= :lambda (:type-name val))))
 
 (defn native? (val)
-      "Test whether val is a native function
-
-      Sometimes also called lambda or subroutine
-
-      val: This argument is going to be tested
-
-      Whether val is a native function"
+      "Test whether val is a native function"
       :cat :type-predicate
       :inline
 
       (= :native-function (:type-name val)))
 
 (defn buffer? (v)
-      "Test whether val is a buffer
-
-      Buffers are just modifiable chunks of memory
-
-      val: This argument is going to be tested
-
-      Whether val is a buffer"
+      "Test whether val is a buffer"
       :cat :type-predicate
 
       :inline
 
       (= :buffer (:type-name v)))
 
-(defn buffer-view? (v)
-      "Test whether val is a buffer view
-
-      val: This argument is going to be tested
-
-      Whether val is a buffer view"
-      :cat :type-predicate
-      :inline
-
-      (= :buffer-view (:type-name v)))
-
 (defn bytecode-array? (v)
-      "Test whether val is a bytecode-array
-
-      val: This argument is going to be tested
-
-      Whether val is a buffer view"
+      "Test whether val is a bytecode-array"
       :cat :type-predicate
       :inline
 
       (= :bytecode-array (:type-name v)))
 
 (defn procedure? (val)
-      "Test whether val is a procedure
-
-      Procedures in this context mean something you can use with map or put at the beginning of an expression.
-
-      val: This argument is going to be tested
-
-      Whether val is a procedure"
+      "Test whether val is a procedure"
       :cat :type-predicate
 
       (or (lambda? val)
           (native? val)))
 
 (defn callable? (val)
-      "Test whether val is callable
-
-      This means basically anything where procedure? returns true, as well as macros, since they are
-      just standard procedures, but ones who run during compile time.
-
-      val: This argument is going to be tested
-
-      Whether val is callable"
+      "Test whether val is callable"
       :cat :type-predicate
 
       (or (macro? val)
-          (procedure? val)))
+          (lambda? val)
+          (native? val)))
 
 (defn in-range? (v min max)
       (and (>= v min)

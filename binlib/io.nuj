@@ -31,30 +31,6 @@
        (when (:has? exports :main)
          ((ref exports :main) args)))
 
-(defn file/compile (path environment)
-      "Compile a Nujel source file into optimized object code"
-      (def source (cons 'do (read (file/read path))))
-      (def object-code (compile* source (or environment (environment*))))
-      (file/write (if object-code (string/write object-code) "")
-                  (cat (path/without-extension path) ".no"))
-      (return object-code))
-
-(defn file/compile/module (path environment base-dir)
-      "Compile a Nujel source file into optimized object code"
-      (def module-name (:keyword (path/without-extension (:cut path (:length base-dir)))))
-      (def source `(defmodule/defer ~module-name (def *module* ~module-name) ~@(read (file/read path))))
-      (def object-code (compile* source (or environment (environment*))))
-      (file/write (if object-code (string/write object-code) "")
-                  (cat (path/without-extension path) ".no"))
-      (return object-code))
-
-(defn file/compile/argv ()
-      (def path (car (last-pair init/args)))
-      (def module (:index-of path "_modules/"))
-      (if (>= module 0)
-          (file/compile/module path #nil (:cut path 0 (+ module 9)))
-          (file/compile path))
-      (exit 0))
 
 (defn file/file? (filename)
        (ref (file/stat filename) :regular-file?))

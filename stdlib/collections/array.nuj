@@ -85,7 +85,7 @@
 
 (def array/heap-sort (let*
                        (defn array/heapify (arr n at)
-                             "bubble up the element from index AT to until the max-heap property is satisfied"
+                             ; bubble up the element from index AT to until the max-heap property is satisfied
                              (def top at)
                              (def looping #t)
                              (while looping

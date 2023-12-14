@@ -54,8 +54,7 @@
                               (macroexpand-form source env set! 2 #f #b001)))
 
                     (defn macroexpand* (source env)
-                          "Expand all macros within source"
-                          :cat :compiler
+                          ; Expand all macros within source
                           :internal
                           (def op (if (resolves? (car source) env)
                                       (ref (or env (current-closure)) (car source))

@@ -6,27 +6,23 @@
 
 (defn compile* (source environment)
       "Compile SOURCE so it can be evaluated/applied"
-      :cat :compiler
       :internal
       (-> (macroexpand* source environment)
           (constant-fold environment)
           (backend environment)))
 
 (defn compile/do* (source environment)
-      :cat :compiler
       :internal
       (if (pair? source)
           (compile* (cons do source) environment)
           source))
 
 (defmacro compile (source)
-          :cat :compiler
           :internal
           "Compile SOURCE so it can be evaluated/applied"
           `(compile* ~source (current-closure)))
 
 (defn meta/parse/body (name args body)
-      :cat :compiler
       :internal
       (def source body)
       (while (and (not (last? source))

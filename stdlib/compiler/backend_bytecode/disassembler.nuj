@@ -6,7 +6,7 @@
 
 (def disassemble (let*
                    (defn disassemble/length (op)
-                         "Return the length in bytes of a bytecode operation and all its arguments"
+                         ; Return the length in bytes of a bytecode operation and all its arguments
                          (case op
                                ((#x0 #x1 #x3 #xC #xD #x11 #x12 #x13 #x14 #x15 #x16 #x17 #x18 #x19 #x1B #x1C #x1D #x1E #x1F #x20 #x21 #x22 #x23 #x24 #x25 #x26 #x27 #x28 #x29 #x2A #x2B #x2C #x2D #x2F #x30 #x31 #x32 #x33 #x34 #x35 #x36 #x37 #x38) 1)
                                ((#x2 #x4 #x5 #x7 #xE #x1A #x2E) 2)
@@ -16,31 +16,31 @@
                    (defn bytecode/nil-catcher (error) (if (= (car error) :type-error) #nil (throw error)))
 
                    (defn bytecode-arr->val (a i)
-                         "Read a bytecode encoded value in A at I and return it"
+                         ; Read a bytecode encoded value in A at I and return it
                          (try bytecode/nil-catcher (bytecode-op->val (ref a i) (ref a (+ 1 i)) (ref a (+ 2 i)))))
 
                    (defn bytecode-arr->sym (a i)
-                         "Read a bytecode encoded symbol in A at I and return it"
+                         ; Read a bytecode encoded symbol in A at I and return it
                          (try bytecode/nil-catcher (bytecode-op->sym (ref a i) (ref a (+ 1 i)) (ref a (+ 2 i)))))
 
                    (defn bytecode-op->offset (a b)
-                         "Turn two bytecode ops encoding an offset into the integer representation"
+                         ; Turn two bytecode ops encoding an offset into the integer representation
                          (def t (bit-or (bit-shift-left a 8) b))
                          (if-not (> t 32768) t
                                  (- (- 65536 t))))
 
                    (defn bytecode-arr->offset (a i)
-                         "Read a bytecode encoded offset in A at I and return it as a signed integer"
+                         ; Read a bytecode encoded offset in A at I and return it as a signed integer
                          (bytecode-op->offset (ref a i) (ref a (+ 1 i))))
 
                    (defn disassemble/maybe-quote (v)
-                         "Quotes symbols but just passes through every other value"
+                         ; Quotes symbols but just passes through every other value
                          (cond ((symbol? v) (list 'quote v))
                                ((bytecode-array? v) (disassemble/bytecode-array v))
                                (#t v)))
 
                    (defn disassemble/op (a i literals)
-                         "Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval"
+                         ; Disassemble a single bytecode op in A at I and return it as an s-expression, that could be applied to eval
                          (case (ref a i)
                                (#x0  '($nop))
                                (#x1  '($ret))
@@ -106,7 +106,7 @@
                                (otherwise :unknown-op)))
 
                    (defn disassemble/array (a i literals)
-                         "Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression"
+                         ; Disassemble all bytecode operations in the plain array A starting at I, turning it into an assembler S-Expression and return it as a dotted pair, with the car containing the offset and the cdr containing the S-Expression
                          (def ret #nil)
                          (while (< i (:length a))
                            (cons! (cons i (disassemble/op a i literals)) ret)
@@ -114,7 +114,7 @@
                          (nreverse ret))
 
                    (defn disassemble/bytecode-array (code)
-                         "Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,"
+                         ; Disassemble the bytecode array CODE, turning it into a list of dotted pairs, with the car containing the offset and the cdr containing assembler S-Expressions,
                          (disassemble/array (:array code) 0 (:literals code)))
 
                    (defn disassemble/to-string (bc)

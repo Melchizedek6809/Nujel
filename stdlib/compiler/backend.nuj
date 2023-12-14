@@ -5,12 +5,10 @@
 ;;; support :bytecode and :none (:none is lowered Nujel, with most of the sugar removed).
 
 (defn compile/backend/none (expr env)
-      :cat :compiler
       :internal
       expr)
 
 (defn compile/backend/bytecode (expr env)
-      :cat :compiler
       :internal
       (-> (bytecompile expr env)
           (assemble* env)))
@@ -20,7 +18,6 @@
                     :none compile/backend/none})
 
 (defn backend (expr env)
-      :cat :compiler
       :internal
       ((ref backend/tree *active-backend*) expr env))
 

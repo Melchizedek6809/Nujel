@@ -161,15 +161,15 @@ void lOperationsCore(lClosure *c){
 
 	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
 
-	lAddNativeFuncC(c,"current-closure", "()", "Return the current closure as an object", lnfCurrentClosure, 0);
-	lAddNativeFuncC(c,"current-lambda",  "()", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
+	lAddNativeFuncC(c,"current-closure", "", "Return the current closure as an object", lnfCurrentClosure, 0);
+	lAddNativeFuncC(c,"current-lambda",  "", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
 
 	lAddNativeFuncV (c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
-	lAddNativeFunc(c,"time",             "()", "Return the current unix time",lnfTime, 0);
-	lAddNativeFunc(c,"time/milliseconds","()", "Return monotonic msecs",lnfTimeMsecs, 0);
+	lAddNativeFunc(c,"time",             "", "Return the current unix time",lnfTime, 0);
+	lAddNativeFunc(c,"time/milliseconds","", "Return monotonic msecs",lnfTimeMsecs, 0);
 
-	lAddNativeFunc(c,"garbage-collection-runs", "()", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
+	lAddNativeFunc(c,"garbage-collection-runs", "", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 
 	lAddNativeFuncV(c,"int",   "(α)", "Convert α into an integer number", lnfInt, NFUNC_PURE);
 	lAddNativeFuncV(c,"float", "(α)", "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);

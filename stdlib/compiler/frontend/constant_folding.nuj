@@ -33,8 +33,7 @@
                                      (constant-fold/args (cdr expr)))))
 
                      (defn constant-fold (expr env)
-                           "Will try and evaluate as many constant as possible to make the expression simpler."
-                           :cat :compiler
+                           ; Will try and evaluate as many constant as possible to make the expression simpler.
                            :internal
                            (when-not (pair? expr) (return expr))
                            (def folded-fun  (car expr))
