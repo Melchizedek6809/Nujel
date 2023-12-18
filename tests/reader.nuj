@@ -47,6 +47,7 @@
           (when (>= start end) (return (cons Comment start)))
           (def c (ref buf start))
           (case c
+                (#\! (return (read-comment buf start end)))
                 (#\| (return (read-ml-comment buf start end)))
                 (#\t (def s (read-symbol buf start end))
                  (if (or (= (car s) 't) (= (car s) 'true))

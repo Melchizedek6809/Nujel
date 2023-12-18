@@ -72,8 +72,3 @@
 (16 (eval (cons 'do (read "(#;sqrt abs -16)"))))
 ('(a . c) (eval (cons 'do (read "'(a . #;b c)"))))
 ('(a . b) (eval (cons 'do (read "'(a . b #;c)"))))
-(:read-error (try car (read "#{#nil 01}")))
-(:read-error (try car (read "#{123 01}")))
-(:read-error (try car (read "#{:asd 01}")))
-(:read-error (try car (read "#{#() 01}")))
-(#t (not= :read-error (try car (read "#{##() 01}"))))

@@ -289,58 +289,6 @@ static lVal lParseCharacter(lReadContext *s){
 	return lValInt(ret);
 }
 
-static lVal lValExceptionBCRead(lReadContext *s, lVal v, const char *msg){
-	char buf[128];
-	snprintf(buf, sizeof(buf), "invalid %s in Bytecoded Array", msg);
-	buf[sizeof(buf)-1] = 0;
-	return lValException(lSymReadError, buf, lCons(v, lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data)));
-}
-
-static lVal lParseBytecodeArray(lReadContext *s){
-	static int size = 0;
-	static u8 *d    = NULL; // ToDo: make this buffer static / move to stack
-	int len  = 0;
-	lArray *literals = NULL;
-
-	lVal v = lReadValue(s);
-	if(unlikely(v.type != ltArray)){
-		return lValExceptionBCRead(s, v, "Invalid literal array in BCA");
-	}
-	literals = v.vArray;
-	literals->flags = ARRAY_IMMUTABLE;
-
-	while(s->data < s->bufEnd){
-		if(unlikely((len+4) >= size)){
-			size = MAX(size,128) * 2;
-			u8 *newD = realloc(d, size);
-			if(unlikely(newD == NULL)){
-				free(newD);
-				return lValException(lSymOOM, "OOM during BC Arr Parse", NIL);
-			}
-			d = newD;
-		}
-		lStringAdvanceToNextCharacter(s);
-		char c = toupper(*((u8 *)s->data++));
-		int t = 0;
-		if((c >= '0') && (c <= '9')){t =  (c - '0')      << 4; goto readSecondNibble;}
-		if((c >= 'A') && (c <= 'F')){t = ((c - 'A')+0xA) << 4; goto readSecondNibble;}
-		if(c == '}'){break;}
-
-		readSecondNibble:
-		if(unlikely(s->data >= s->bufEnd)){
-			return lValExceptionBCRead(s, NIL, "sudden end");
-		}
-		c = toupper(*((u8 *)s->data++));
-		if((c >= '0')  && (c <= '9')){t |=  (c - '0');      goto storeOP;}
-		if((c >= 'A')  && (c <= 'F')){t |= ((c - 'A')+0xA); goto storeOP;}
-		return lValException(lSymReadError, "Wrong char in BCArr", lValStringError(s->buf,s->bufEnd, s->data ,s->data ,s->data+1));
-
-		storeOP:
-		d[len++] = (u8)t;
-	}
-	return lValBytecodeArray(d,len,literals);
-}
-
 static lVal lParseBuffer(lReadContext *s){
 	u8 *buf = NULL;
 	size_t len = 0;
@@ -433,7 +381,6 @@ static lVal lParseSpecial(lReadContext *s){
 		return NIL;
 	case 't': return lValBool(true);
 	case 'f': return lValBool(false);
-	case '{': return lParseBytecodeArray(s);
 	case '#':
 		s->data++;
 		return lnfArrNew(lReadList(s, false, ')'));

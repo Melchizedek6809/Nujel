@@ -504,8 +504,6 @@
 (0 (:length (let* (defn a l l) (a))))
 (:float-inf (try car (/ 4 0.0)))
 (:float-nan (try car (/ 0.0 0.0)))
-(:type-error (try car (apply (environment*) #{##() 2401})))
-(#t (bytecode-eval* #{##() 1B01} (environment*)))
 (0 (apply + '()))
 (1 (apply + '(1)))
 (3 (apply + '(1 2)))

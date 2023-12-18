@@ -1,3 +1,5 @@
+#!/usr/bin/env nujel
+
 (+ q) qwe :qwe (a s :d) ; Test comment
 Test a s d ;;;; qwe asd
 zxc #|
