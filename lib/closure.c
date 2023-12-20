@@ -79,7 +79,7 @@ void lDefineVal(lClosure *c, const char *str, lVal val){
 	lDefineClosureSym(c, lSymS(str), val);
 }
 
-static lVal lAddNativeFuncRaw(lClosure *c, const char *sym, const char *args, const char *doc, void *func, uint flags, u8 argCount){
+static lVal lAddNativeFuncRaw(const char *sym, const char *args, const char *doc, void *func, uint flags, u8 argCount){
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	lSymbol *name = lSymS(sym);
 	v.vNFunc->fp   = func;
@@ -95,44 +95,43 @@ static lVal lAddNativeFuncRaw(lClosure *c, const char *sym, const char *args, co
 	}
 
 	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symName, lValSymS(name));
-	lDefineClosureSym(c, name, v);
 	return v;
 }
-lVal lAddNativeFunc(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 0);
+lVal lAddNativeFunc(const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 0);
 }
-lVal lAddNativeFuncC(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1);
+lVal lAddNativeFuncC(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1);
 }
-lVal lAddNativeFuncV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 << 1);
+lVal lAddNativeFuncV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 << 1);
 }
-lVal lAddNativeFuncCV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (1 << 1));
+lVal lAddNativeFuncCV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (1 << 1));
 }
-lVal lAddNativeFuncVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 2 << 1);
+lVal lAddNativeFuncVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 2 << 1);
 }
-lVal lAddNativeFuncCVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (2 << 1));
+lVal lAddNativeFuncCVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (2 << 1));
 }
-lVal lAddNativeFuncVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 3 << 1);
+lVal lAddNativeFuncVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 3 << 1);
 }
-lVal lAddNativeFuncCVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (3 << 1));
+lVal lAddNativeFuncCVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (3 << 1));
 }
-lVal lAddNativeFuncVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 4 << 1);
+lVal lAddNativeFuncVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 4 << 1);
 }
-lVal lAddNativeFuncCVVVV(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (4 << 1));
+lVal lAddNativeFuncCVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (4 << 1));
 }
-lVal lAddNativeFuncR(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 << 4);
+lVal lAddNativeFuncR(const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 << 4);
 }
-lVal lAddNativeFuncCR(lClosure *c, const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal), uint flags){
-	return lAddNativeFuncRaw(c, sym, args, doc, func, flags, 1 | (1 << 4));
+lVal lAddNativeFuncCR(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal), uint flags){
+	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (1 << 4));
 }
 
 void lClosureSetMeta(lClosure *c, lVal doc){
@@ -141,30 +140,6 @@ void lClosureSetMeta(lClosure *c, lVal doc){
 	}
 	lTree *t = doc.vTree->root;
 	c->meta = (t && t->flags & TREE_IMMUTABLE) ? lTreeDup(t) : t;
-}
-
-/* Add all the essential Native Functions to closure c */
-lClosure *lInitRootClosure(){
-	lClosure *c = lClosureAllocRaw();
-	lTypesInit(c);
-	lOperationsArithmetic(c);
-	lOperationsBuffer(c);
-	lOperationsSpecial(c);
-	lOperationsImage(c);
-	lOperationsCore(c);
-	lOperationsArray();
-	lOperationsTree();
-	lOperationsBytecode();
-	lOperationsString();
-
-	lVal imgVal = readImage(bootstrap_image, bootstrap_image_len, false);
-	c = findRoot(imgVal);
-	return c;
-}
-
-/* Create a new root closure with the stdlib */
-lClosure *lNewRoot(){
-	return lInitRootClosure();
 }
 
 static lClosure *findRootRec(lClosure *v){
@@ -183,6 +158,14 @@ lClosure *findRoot (lVal v){
 	default:
 		return NULL;
 	}
+}
+
+/* Create a new root closure with the stdlib */
+lClosure *lNewRoot(){
+	lVal imgVal = readImage(bootstrap_image, bootstrap_image_len, false);
+	lClosure *c = findRoot(imgVal);
+	lRedefineNativeFuncs(c);
+	return c;
 }
 
 lClosure *lRedefineNativeFuncs(lClosure *c){

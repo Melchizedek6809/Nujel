@@ -956,4 +956,14 @@ void lOperationsBytecode(){
  * soon as possible, since most procedures depend on it.*/
 void lInit(){
 	lSymbolInit();
+	lTypesInit();
+	lOperationsArithmetic();
+	lOperationsBuffer();
+	lOperationsSpecial();
+	lOperationsImage();
+	lOperationsCore();
+	lOperationsArray();
+	lOperationsTree();
+	lOperationsBytecode();
+	lOperationsString();
 }

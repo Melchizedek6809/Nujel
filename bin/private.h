@@ -24,12 +24,13 @@ extern lSymbol *lSymError;
 extern lSymbol *lSymReplace;
 extern lSymbol *lSymAppend;
 
-void initEnvironmentMap(lClosure *c);
+void lRedefineEnvironment(lClosure *c);
+void lRedefineFileHandles(lClosure *c);
+
 void setIOSymbols();
-void lOperationsIO   (lClosure *c);
-void lOperationsPort (lClosure *c);
-void lOperationsInit (lClosure *c);
-void lOperationsNet  (lClosure *c);
+void lOperationsIO   ();
+void lOperationsPort ();
+void lOperationsNet  ();
 void *loadFile(const char *filename, size_t *len);
 
 int  makeDir   (const char *name);

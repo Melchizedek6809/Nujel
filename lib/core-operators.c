@@ -153,29 +153,29 @@ static lVal lnfFloatToString(lVal a){
 	return lValStringLen(buf, snret);
 }
 
-void lOperationsCore(lClosure *c){
-	lAddNativeFuncV(c,"quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
-	lAddNativeFuncV(c,"read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
+void lOperationsCore(){
+	lAddNativeFuncV("quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
+	lAddNativeFuncV("read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
-	lAddNativeFuncCVV(c,"resolves?",     "(sym environment)",   "Check if SYM resolves to a value", lnfResolvesPred, 0);
+	lAddNativeFuncCVV("resolves?",     "(sym environment)",   "Check if SYM resolves to a value", lnfResolvesPred, 0);
 
-	lAddNativeFuncV  (c,"val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
+	lAddNativeFuncV  ("val->id", "(v)", "Generate some sort of ID value for V, mainly used in (write)", lnfValToId, 0);
 
-	lAddNativeFuncC(c,"current-closure", "", "Return the current closure as an object", lnfCurrentClosure, 0);
-	lAddNativeFuncC(c,"current-lambda",  "", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
+	lAddNativeFuncC("current-closure", "", "Return the current closure as an object", lnfCurrentClosure, 0);
+	lAddNativeFuncC("current-lambda",  "", "Return the current closure as a lambda",  lnfCurrentLambda, 0);
 
-	lAddNativeFuncV (c,"nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
+	lAddNativeFuncV ("nreverse","(list)",    "Return LIST in reverse order, fast but mutates", lnfNReverse, 0);
 
-	lAddNativeFunc(c,"time",             "", "Return the current unix time",lnfTime, 0);
-	lAddNativeFunc(c,"time/milliseconds","", "Return monotonic msecs",lnfTimeMsecs, 0);
+	lAddNativeFunc("time",             "", "Return the current unix time",lnfTime, 0);
+	lAddNativeFunc("time/milliseconds","", "Return monotonic msecs",lnfTimeMsecs, 0);
 
-	lAddNativeFunc(c,"garbage-collection-runs", "", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
+	lAddNativeFunc("garbage-collection-runs", "", "Return the amount of times the GC ran since runtime startup", lnfGarbageCollectRuns, 0);
 
-	lAddNativeFuncV(c,"int",   "(α)", "Convert α into an integer number", lnfInt, NFUNC_PURE);
-	lAddNativeFuncV(c,"float", "(α)", "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
+	lAddNativeFuncV("int",   "(α)", "Convert α into an integer number", lnfInt, NFUNC_PURE);
+	lAddNativeFuncV("float", "(α)", "Convert α into a floating-point number", lnfFloat, NFUNC_PURE);
 
-	lAddNativeFuncR(c, "array/new", "args",  "Create a new array from ...ARGS", lnfArrNew, 0);
-	lAddNativeFuncR(c, "tree/new",  "plist", "Return a new tree", lnfTreeNew, 0);
+	lAddNativeFuncR("array/new", "args",  "Create a new array from ...ARGS", lnfArrNew, 0);
+	lAddNativeFuncR("tree/new",  "plist", "Return a new tree", lnfTreeNew, 0);
 
 	lAddNativeMethodV(&lClassList[ltNil],     lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltInt],     lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);

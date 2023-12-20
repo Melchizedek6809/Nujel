@@ -175,7 +175,7 @@ static lVal lnmBufferCut(lVal self, lVal start, lVal stop){
 	return lValAlloc(ltBuffer, ret);
 }
 
-void lOperationsBuffer(lClosure *c){
+void lOperationsBuffer(){
 	lClass *Buffer = &lClassList[ltBuffer];
 	lAddNativeMethodV (Buffer, lSymS("length"),     "(self)", lnmBufferLength, NFUNC_PURE);
 	lAddNativeMethodV (Buffer, lSymS("immutable?"), "(self)", lnmBufferImmutable, NFUNC_PURE);
@@ -198,7 +198,7 @@ void lOperationsBuffer(lClosure *c){
 	lAddNativeMethodV (BufferView, lSymS("buffer"),     "(self)", lnmBufferViewBuffer, NFUNC_PURE);
 	lAddNativeMethodV (BufferView, lSymS("immutable?"), "(self)", lnmBufferViewImmutable, NFUNC_PURE);
 
-	lAddNativeFuncV   (c, "buffer/allocate", "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
-	lAddNativeFuncVVVV(c, "buffer/copy",     "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
-	lAddNativeFuncVVV (c, "buffer->string",  "(buf length offset)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString, 0);
+	lAddNativeFuncV   ("buffer/allocate", "(length)",         "Allocate a new buffer of LENGTH",   lnfBufferAllocate, 0);
+	lAddNativeFuncVVVV("buffer/copy",     "(dest src dest-offset length)","Return a copy of BUF that might be IMMUTABLE", lnfBufferCopy, 0);
+	lAddNativeFuncVVV ("buffer->string",  "(buf length offset)",     "Turn BUF into a string of LENGTH which defaults to the size of BUF", lnfBufferToString, 0);
 }

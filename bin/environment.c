@@ -22,7 +22,7 @@ static lTree *addVar(const char *e, lTree *t){
 #include <windows.h>
 
 /* Windows specific - add Environment args to `environment/variables` */
-void initEnvironmentMap(lClosure *c){
+void lRedefineEnvironment(lClosure *c){
 	lTree *t = NULL;
 	LPCH env = GetEnvironmentStrings();
 	while(*env){
@@ -35,7 +35,7 @@ void initEnvironmentMap(lClosure *c){
 #else
 extern char **environ;
 /* Add Environment args to `environment/variables` */
-void initEnvironmentMap(lClosure *c){
+void lRedefineEnvironment(lClosure *c){
 	lTree *t = NULL;
 	#ifdef __wasi__
 	t = addVar("PATH=",t); // Necessary so that tests don't fail

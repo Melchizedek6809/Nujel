@@ -286,7 +286,7 @@ void lDefineTypeVars(lClosure *c){
 	lDefineVal(c, "Any",        lValType(&lClassList[ltAny]));
 }
 
-void lTypesInit(lClosure *c){
+void lTypesInit(){
 	initType(ltAny, lSymLTAny, NULL);
 	lClass *tAny = &lClassList[ltAny];
 
@@ -318,7 +318,6 @@ void lTypesInit(lClosure *c){
 	initType(ltException, NULL, tAny);
 
 	lTypesAddCoreMethods();
-	lDefineTypeVars(c);
 }
 
 lVal lValExceptionType(lVal v, lType T){

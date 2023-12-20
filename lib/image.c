@@ -824,7 +824,7 @@ static lVal lnfDeserialize(lVal val){
 	return readImage(val.vBuffer->buf, val.vBuffer->length, false);
 }
 
-void lOperationsImage(lClosure *c){
-	lAddNativeFuncV(c,"image/serialize",   "(val)", "Serializes val into a binary representation that can be stored", lnfSerialize, 0);
-	lAddNativeFuncV(c,"image/deserialize", "(buf)", "Deserializes buf into a value", lnfDeserialize, 0);
+void lOperationsImage(){
+	lAddNativeFuncV("image/serialize",   "(val)", "Serializes val into a binary representation that can be stored", lnfSerialize, 0);
+	lAddNativeFuncV("image/deserialize", "(buf)", "Deserializes buf into a value", lnfDeserialize, 0);
 }

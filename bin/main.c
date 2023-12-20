@@ -4,23 +4,15 @@
 #include "private.h"
 #endif
 
-static lClosure *initBinRootClosure(lClosure *c){
-	lOperationsIO(c);
-	lOperationsPort(c);
-	lOperationsInit(c);
-	lOperationsNet(c);
-	return c;
-}
-
-/* Return a new root Closure, with all native functions in place */
-static lClosure *createRootClosure(lClosure *c){
-	return initBinRootClosure(c);
+static void initBinNativeFuncs(){
+	lOperationsIO();
+	lOperationsPort();
+	lOperationsNet();
 }
 
 static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *init){
 	size_t len = 0;
 	void *img = loadFile(filename, &len);
-	initBinRootClosure(lInitRootClosure());
 	lVal imgVal = readImage(img, len, true);
 	lClosure *imgC = findRoot(imgVal);
 	if(imgC == NULL){
@@ -28,8 +20,6 @@ static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *
 		exit(131);
 	}
 	lClosure *c = lRedefineNativeFuncs(imgC);
-	lOperationsInit(c);
-	initEnvironmentMap(c);
 	*init = imgVal;
 	free(img);
 	return c;
@@ -37,7 +27,7 @@ static lClosure *createRootClosureFromExternalImage(const char *filename, lVal *
 
 /* Initialize the Nujel context with an stdlib as well
  * as parsing arguments passed to the runtime */
-int initNujel(int argc, char *argv[]){
+static lVal initNujel(int argc, char *argv[]){
 	lClosure *c = NULL;
 	lVal ret = NIL;
 	lVal init = NIL;
@@ -58,26 +48,24 @@ int initNujel(int argc, char *argv[]){
 		ret = lCons(lValString(argv[i]), ret);
 	}
 	if(c == NULL){
-		c = createRootClosure(lNewRoot());
+		c = lNewRoot();
 	}
-	lRedefineNativeFuncs(c);
-	lOperationsInit(c);
-	initEnvironmentMap(c);
+	lRedefineFileHandles(c);
+	lRedefineEnvironment(c);
 
 	if(init.type == ltNil){
 		init = lGetClosureSym(c, lSymS("init"));
 	}
-	lApply(init, ret);
-	return 0;
+	return lApply(init, ret);
 }
 
 int main(int argc, char *argv[]){
-	(void)argc; (void)argv;
-	// printf("%s",stdlib_no_data); return 0;
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 	lInit();
+	initBinNativeFuncs();
 	setIOSymbols();
 
-	return initNujel(argc,argv);
+	initNujel(argc,argv);
+	return 0;
 }

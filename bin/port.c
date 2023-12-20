@@ -198,23 +198,23 @@ static lVal lnfFileError(lVal aHandle){
 	return lValBool(ferror(aHandle.vFileHandle));
 }
 
-void lOperationsPort(lClosure *c){
-	lAddNativeFuncVV  (c,"file/open-output*", "(pathname if-exists)",   "Try to open PATHNAME for MODE",        lnfFileOpenOutput, 0);
-	lAddNativeFuncV   (c,"file/open-input*",  "(pathname)",             "Try to open PATHNAME for MODE",        lnfFileOpenInput, 0);
-	lAddNativeFuncV   (c,"file/close*",  "(handle)",                    "Close the open HANDLE",                lnfFileClose, 0);
-	lAddNativeFuncVVVV(c,"file/read*",   "(handle buffer size offset)", "Reader from HANDLE into BUFFER",       lnfFileReadAst, 0);
-	lAddNativeFuncVVVV(c,"file/write*",  "(handle buffer size offset)", "Write BUFFER into HANDLE",             lnfFileWriteAst, 0);
-	lAddNativeFuncV   (c,"file/flush*",  "(handle)",                    "Flush stream of HANDLE",               lnfFileFlush, 0);
-	lAddNativeFuncV   (c,"file/tell*",   "(handle)",                    "Return the stream position of HANDLE", lnfFileTell, 0);
-	lAddNativeFuncVVV (c,"file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek, 0);
-	lAddNativeFuncV   (c,"file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof, 0);
-	lAddNativeFuncV   (c,"file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError, 0);
+void lOperationsPort(){
+	lAddNativeFuncVV  ("file/open-output*", "(pathname if-exists)",   "Try to open PATHNAME for MODE",        lnfFileOpenOutput, 0);
+	lAddNativeFuncV   ("file/open-input*",  "(pathname)",             "Try to open PATHNAME for MODE",        lnfFileOpenInput, 0);
+	lAddNativeFuncV   ("file/close*",  "(handle)",                    "Close the open HANDLE",                lnfFileClose, 0);
+	lAddNativeFuncVVVV("file/read*",   "(handle buffer size offset)", "Reader from HANDLE into BUFFER",       lnfFileReadAst, 0);
+	lAddNativeFuncVVVV("file/write*",  "(handle buffer size offset)", "Write BUFFER into HANDLE",             lnfFileWriteAst, 0);
+	lAddNativeFuncV   ("file/flush*",  "(handle)",                    "Flush stream of HANDLE",               lnfFileFlush, 0);
+	lAddNativeFuncV   ("file/tell*",   "(handle)",                    "Return the stream position of HANDLE", lnfFileTell, 0);
+	lAddNativeFuncVVV ("file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek, 0);
+	lAddNativeFuncV   ("file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof, 0);
+	lAddNativeFuncV   ("file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError, 0);
 #if (!defined(_WIN32)) && (!defined(__wasi__))
-	lAddNativeFuncV   (c,"file/raw*",    "(handle)",                    "Set an input stream into raw mode", lnfFileRaw, 0);
+	lAddNativeFuncV   ("file/raw*",    "(handle)",                    "Set an input stream into raw mode", lnfFileRaw, 0);
 #endif
 }
 
-void lOperationsInit(lClosure *c){
+void lRedefineFileHandles(lClosure *c){
 	lDefineVal(c, "stdin*",  lValFileHandle(stdin));
 	lDefineVal(c, "stdout*", lValFileHandle(stdout));
 	lDefineVal(c, "stderr*", lValFileHandle(stderr));
