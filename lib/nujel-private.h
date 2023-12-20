@@ -1,11 +1,11 @@
-/*
- | nujel-private.h
+/*\
+ |  nujel-private.h
  |
- | This file contains all the internal definitions needed for the Nujel runtime.
- | No external program should include this file, since it WILL change a lot and
- | a lot of the functions aren't very easy to use. To interface to Nujel one
- | should use nujel-public.h instead.
- */
+ |  This file contains all the internal definitions needed for the Nujel runtime.
+ |  No external program should include this file, since it WILL change a lot and
+ |  a lot of the functions aren't very easy to use. To interface to Nujel one
+ |  should use nujel-public.h instead.
+\*/
 #ifndef NUJEL_LIB_NUJEL_PRIVATE
 #define NUJEL_LIB_NUJEL_PRIVATE
 
@@ -16,9 +16,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
- | Core
- */
+/*\
+ |  Core
+\*/
 #define MAX_OPEN_FILE_DESCRIPTORS 250
 #define PI    (3.1415926535897932384626433832795)
 
@@ -178,25 +178,25 @@ struct lThread {
 	int closureStackSize;
 };
 
-/*
- | Closure related procedures
- */
+/*\
+ |  Closure related procedures
+\*/
 lClosure *lClosureNew        (lClosure *parent, closureType t);
 lClosure *lClosureNewFunCall (lVal args, lVal lambda);
 void      lClosureSetMeta    (lClosure *c, lVal doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 
-/*
- | lVal related procedures
- */
+/*\
+ |  lVal related procedures
+\*/
 int       lValCompare      (const lVal a, const lVal b);
 bool      lValEqual        (const lVal a, const lVal b);
 i64       lValGreater      (const lVal a, const lVal b);
 lVal      lValStringError  (const char *bufStart, const char *bufEnd, const char *errStart, const char *err, const char *errEnd);
 
-/*
- | Bytecode related definitions
- */
+/*\
+ |  Bytecode related definitions
+\*/
 typedef enum lOpcode {
 	lopNOP             =  0x0,
 	lopRet             =  0x1,
@@ -260,9 +260,9 @@ typedef enum lOpcode {
 lVal  lBytecodeEval        (lClosure *c, lBytecodeArray *ops);
 lVal  lValBytecodeArray    (const lBytecodeOp *ops, int opsLength, lArray *literals);
 
-/*
+/*\
  | Workarounds for missing builtins
- */
+\*/
 #if false
 uint32_t __builtin_popcount(uint32_t x);
 uint64_t __builtin_popcountll(uint64_t x);
@@ -279,9 +279,9 @@ void __sync_synchronize();
 u64 getMSecs();
 void lAddPlatformVars(lClosure *c);
 
-/*
+/*\
  | GC related procedures
- */
+\*/
 lSymbol *lRootsSymbolPush(lSymbol *v);
 void lDefineTypeVars(lClosure *c);
 extern int lGCRuns;
@@ -290,9 +290,9 @@ extern bool lGCShouldRunSoon;
 
 void lGarbageCollect(lThread *ctx);
 
-/*
+/*\
  | Allocator related definitions
- */
+\*/
 #define SYM_MAX (1<<14)
 #define NFN_MAX (1<<10)
 #define ARR_MAX (1<<14)
@@ -338,9 +338,9 @@ static inline int lNFuncID(const lNFunc *n){
 	return n - lNFuncList;
 }
 
-/*
+/*\
  | Symbolic procedures
- */
+\*/
 extern lSymbol  lSymbolList [SYM_MAX];
 extern lSymbol *lSymbolFFree;
 extern uint     lSymbolActive;
@@ -400,17 +400,18 @@ lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t
 int              lBufferViewTypeSize (lBufferViewType T);
 
 lVal lnfArrNew  (lVal v);
-lVal lnfTreeNew (lVal v);
+lVal lnfTreeNew(lVal v);
+lVal lnfSerialize(lVal val);
+lVal lnfDeserialize(lVal val);
 
-/*
- | Operations
- */
+/*\
+ |  Operations
+\*/
 void lOperationsArithmetic ();
 void lOperationsBuffer     ();
 void lOperationsCore       ();
 void lOperationsSpecial    ();
 void lOperationsGeneric    ();
-void lOperationsImage      ();
 void lOperationsTree       ();
 void lOperationsArray      ();
 void lOperationsString     ();
@@ -422,5 +423,67 @@ lVal lGenericSet(lVal col, lVal key, lVal v);
 
 void lTypesInit();
 lVal lMethodLookup(const lSymbol *method, lVal self);
+
+/*\
+ |  Image handing
+\*/
+typedef struct {
+	u8 magic[4]; // NujI
+	u8 data[];
+} lImage;
+
+typedef enum {
+	litNil = 0,
+
+	litSymbol,
+	litKeyword,
+
+	litInt8,
+	litInt16,
+	litInt32,
+	litInt64,
+
+	litFloat,
+
+	litPair,
+	litArray,
+	litTree,
+
+	litLambda,
+	litMacro,
+	litNativeFunc,
+	litEnvironment,
+
+	litString,
+	litBuffer,
+	litBufferView,
+	litBytecodeArr,
+
+	litFileHandle,
+	litType,
+
+	litTrue,
+	litFalse,
+
+} lImageType;
+
+typedef struct {
+	i32 buffer;
+	i32 length;
+	i32 offset;
+	u8 flags;
+	u8 type;
+} lImageBufferView;
+
+typedef struct {
+	i32 parent;
+	i32 data;
+	i32 meta;
+	i32 text;
+	i32 args;
+	i32 ip;
+	u16 sp;
+	u8 type;
+} lImageClosure;
 
 #endif
