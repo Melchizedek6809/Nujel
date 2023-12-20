@@ -68,6 +68,15 @@ static lVal stackTrace(const lThread *ctx){
 	return ret;
 }
 
+static inline lClosure *funCallClosure(lVal lambda) {
+	lClosure *tmpc = lClosureAllocRaw();
+	tmpc->parent = lambda.vClosure;
+	tmpc->type   = closureCall;
+	tmpc->text   = lambda.vClosure->text;
+	tmpc->ip     = tmpc->text->data;
+	return tmpc;
+}
+
 /* Evaluate ops within callingClosure after pushing args on the stack.
  *
  * Doesn't look particularly elegant at times, but gets turned into pretty
@@ -771,19 +780,36 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		switch(fun.type){
 		case ltMacro:
-		case ltLambda:
+		case ltLambda: {
 			c->text = ops;
 			c->sp   = ctx.sp;
 			c->ip   = ip;
 
-			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(lStackBuildList(ctx.valueStack, argsSp, len), fun);
-			c = ctx.closureStack[ctx.csp];
+			ctx.closureStack[++ctx.csp] = c = funCallClosure(fun);
+			int vsi = -(len-1);
+			for (lVal n = fun.vClosure->args; ; n = n.vList->cdr) {
+				if (likely(n.type == ltPair)) {
+					if(unlikely(vsi > 0)){
+						c->data = lTreeInsert(c->data, n.vList->car.vSymbol, NIL);
+					} else {
+						c->data = lTreeInsert(c->data, n.vList->car.vSymbol, vs[vsi++]);
+					}
+					continue;
+				} else if(likely(n.type == ltSymbol)) {
+					lVal rest = NIL;
+					for(int i=0; i >= vsi; i--){
+						rest = lCons(vs[i], rest);
+					}
+					c->data = lTreeInsert(c->data, n.vSymbol, rest);
+				}
+				break;
+			}
 			ip = c->ip;
 			ctx.text = ops = c->text;
 			lits = ops->literals->data;
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
-			break;
+			break; }
 		case ltNativeFunc: {
 			lVal v;
 			const int ac = ((fun.vNFunc->argCount >> 1)&7);
