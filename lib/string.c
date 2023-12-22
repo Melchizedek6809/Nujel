@@ -27,11 +27,6 @@ lString *lStringNew(const char *str, uint len){
 	return lStringNewNoCopy(nbuf, len);
 }
 
-/* Return a duplicate of OS */
-lString *lStringDup(const lString *os){
-	return lStringNew(os->data, os->length);
-}
-
 /* Create a new string value out of S */
 lVal lValStringLen(const char *c, int len){
 	if(unlikely(c == NULL)){return NIL;}

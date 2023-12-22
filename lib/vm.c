@@ -10,6 +10,14 @@
 #endif
 #endif
 
+static inline void lClosureSetMeta(lClosure *c, lVal doc){
+	if(unlikely(doc.type != ltTree)){
+		return;
+	}
+	lTree *t = doc.vTree->root;
+	c->meta = (t && t->flags & TREE_IMMUTABLE) ? lTreeDup(t) : t;
+}
+
 /* Create a new Lambda Value */
 static inline lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
 	reqBytecodeArray(body);

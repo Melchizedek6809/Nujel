@@ -389,7 +389,5 @@ lVal     lValStringNoCopy (const char *s, int len);
 lArray  *lArrayAlloc  (size_t len);
 lBuffer *lBufferAlloc (size_t length, bool immutable);
 lString *lStringNew   (const char *str, uint len);
-lString *lStringDup   (const lString *s);
-
 
 #endif

@@ -183,7 +183,6 @@ struct lThread {
 \*/
 lClosure *lClosureNew        (lClosure *parent, closureType t);
 lClosure *lClosureNewFunCall (lVal args, lVal lambda);
-void      lClosureSetMeta    (lClosure *c, lVal doc);
 bool      lHasClosureSym     (lClosure *c, const lSymbol *s, lVal *v);
 
 /*\

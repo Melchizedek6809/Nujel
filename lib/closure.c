@@ -134,27 +134,17 @@ lVal lAddNativeFuncCR(const char *sym, const char *args, const char *doc, lVal (
 	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (1 << 4));
 }
 
-void lClosureSetMeta(lClosure *c, lVal doc){
-	if(unlikely(doc.type != ltTree)){
-		return;
-	}
-	lTree *t = doc.vTree->root;
-	c->meta = (t && t->flags & TREE_IMMUTABLE) ? lTreeDup(t) : t;
-}
-
-static lClosure *findRootRec(lClosure *v){
-	while(v->parent){
-		v = v->parent;
-	}
-	return v;
-}
-
 lClosure *findRoot (lVal v){
 	switch(v.type){
 	case ltEnvironment:
 	case ltMacro:
-	case ltLambda:
-		return findRootRec(v.vClosure);
+	case ltLambda: {
+		lClosure *c = v.vClosure;
+		while(c->parent){
+			c = c->parent;
+		}
+		return c;
+	}
 	default:
 		return NULL;
 	}
