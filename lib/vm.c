@@ -38,7 +38,7 @@ static inline i64 lBytecodeGetOffset16(const lBytecodeOp *ip){
 static lVal lStackBuildList(lVal *stack, int sp, int len){
 	lVal *vsp = &stack[sp - (len)];
 	lVal ret = NIL;
-	for(int i = len-1; i >= 0; i--){
+	for(int i = len; i > 0; i--){
 		ret = lCons(vsp[i], ret);
 	}
 	return ret;
@@ -195,9 +195,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
 	ctx.csp              = 0;
-	ctx.sp               = 0;
+	ctx.sp              = 0;
 	ctx.closureStack[0]  = c;
 	ctx.text             = text;
+	ctx.valueStack[0]    = NIL;
+	ctx.valueStack[1]    = NIL;
 
 	ip = ops->data;
 
@@ -206,57 +208,57 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopNOP)
 		vmbreak;
 	vmcase(lopIntByte)
-		ctx.valueStack[ctx.sp++] = lValInt((i8)*ip++);
+		ctx.valueStack[++ctx.sp] = lValInt((i8)*ip++);
 		vmbreak;
 	vmcase(lopAdd) {
-		const lVal a = ctx.valueStack[ctx.sp-2];
-		const lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal b = ctx.valueStack[ctx.sp];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt += b.vInt;
+				ctx.valueStack[ctx.sp].vInt += b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = lValFloat(b.vFloat + a.vInt);
+				ctx.valueStack[ctx.sp] = lValFloat(b.vFloat + a.vInt);
 			} else if(b.type != ltNil){
 				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1].vFloat += b.vFloat;
+				ctx.valueStack[ctx.sp].vFloat += b.vFloat;
 			} else if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vFloat += b.vInt;
+				ctx.valueStack[ctx.sp].vFloat += b.vInt;
 			} else if(b.type != ltNil) {
 				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(a.type != ltNil){
 			lThrow(lValExceptionNonNumeric(b));
 		} else {
-			ctx.valueStack[ctx.sp-1] = lValInt(0);
+			ctx.valueStack[ctx.sp] = lValInt(0);
 		}
 		vmbreak; }
 	vmcase(lopSub) {
-		const lVal a = ctx.valueStack[ctx.sp-2];
-		const lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal b = ctx.valueStack[ctx.sp];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt -= b.vInt;
+				ctx.valueStack[ctx.sp].vInt -= b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt - b.vFloat);
+				ctx.valueStack[ctx.sp] = lValFloat(a.vInt - b.vFloat);
 			} else if(b.type != ltNil){
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				ctx.valueStack[ctx.sp-1].vInt = -ctx.valueStack[ctx.sp-1].vInt;
+				ctx.valueStack[ctx.sp].vInt = -ctx.valueStack[ctx.sp].vInt;
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1].vFloat -= b.vFloat;
+				ctx.valueStack[ctx.sp].vFloat -= b.vFloat;
 			} else if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vFloat -= b.vInt;
+				ctx.valueStack[ctx.sp].vFloat -= b.vInt;
 			} else if(b.type != ltNil) {
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				ctx.valueStack[ctx.sp-1].vFloat = -ctx.valueStack[ctx.sp-1].vFloat;
+				ctx.valueStack[ctx.sp].vFloat = -ctx.valueStack[ctx.sp].vFloat;
 			}
 		} else if(a.type != ltNil){
 			lThrow(lValExceptionNonNumeric(b));
@@ -265,14 +267,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopMul) {
-		const lVal a = ctx.valueStack[ctx.sp-2];
-		const lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal b = ctx.valueStack[ctx.sp];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt *= b.vInt;
+				ctx.valueStack[ctx.sp].vInt *= b.vInt;
 			} else if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt * b.vFloat);
+				ctx.valueStack[ctx.sp] = lValFloat(a.vInt * b.vFloat);
 			} else if(b.type != ltNil){
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
@@ -280,9 +282,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
-				ctx.valueStack[ctx.sp-1].vFloat *= b.vFloat;
+				ctx.valueStack[ctx.sp].vFloat *= b.vFloat;
 			} else if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vFloat *= b.vInt;
+				ctx.valueStack[ctx.sp].vFloat *= b.vInt;
 			} else if(b.type != ltNil) {
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
@@ -291,12 +293,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		} else if(a.type != ltNil){
 			lThrow(lValExceptionNonNumeric(b));
 		} else {
-			ctx.valueStack[ctx.sp-1] = lValInt(1);
+			ctx.valueStack[ctx.sp] = lValInt(1);
 		}
 		vmbreak; }
 	vmcase(lopDiv) {
-		const lVal a = ctx.valueStack[ctx.sp-2];
-		const lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal b = ctx.valueStack[ctx.sp];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
@@ -304,13 +306,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(likely(b.type == ltFloat)){
 				lVal r = lValFloat((float)a.vInt / b.vFloat);
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(b.type != ltNil){
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
@@ -322,13 +324,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(likely(b.type == ltInt)){
 				const lVal r = lValFloat(a.vFloat / (float)b.vInt);
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(b.type != ltNil) {
 				lThrow(lValExceptionNonNumeric(b));
 			} else {
@@ -341,18 +343,18 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak; }
 	vmcase(lopRem) {
-		const lVal a = ctx.valueStack[ctx.sp-2];
-		const lVal b = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal b = ctx.valueStack[ctx.sp];
 		ctx.sp--;
 		if(likely(a.type == ltInt)){
 			if(likely(b.type == ltInt)){
-				ctx.valueStack[ctx.sp-1].vInt = a.vInt % b.vInt;
+				ctx.valueStack[ctx.sp].vInt = a.vInt % b.vInt;
 			} else if(likely(b.type == ltFloat)){
 				const lVal r = lValFloat(fmod(a.vInt, b.vFloat));
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(unlikely(b.type != ltNil)){
 				lThrow(lValExceptionNonNumeric(b));
 			}
@@ -362,13 +364,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(likely(b.type == ltInt)){
 				const lVal r = lValFloat(fmod(a.vFloat, b.vInt));
 				if(unlikely(r.type == ltException)){
 					lThrow(r);
 				}
-				ctx.valueStack[ctx.sp-1] = r;
+				ctx.valueStack[ctx.sp] = r;
 			} else if(unlikely(b.type != ltNil)) {
 				lThrow(lValExceptionNonNumeric(b));
 			}
@@ -378,11 +380,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmbreak; }
 
 #define vmBinaryIntegerOp(OP) do{\
-	const lVal a = ctx.valueStack[ctx.sp-2];\
-	const lVal b = ctx.valueStack[ctx.sp-1];\
+	const lVal a = ctx.valueStack[ctx.sp-1];\
+	const lVal b = ctx.valueStack[ctx.sp];\
 	ctx.sp--;\
 	if(likely((a.type == ltInt) && (b.type == ltInt))){\
-		ctx.valueStack[ctx.sp-1].vInt = a.vInt OP b.vInt;\
+		ctx.valueStack[ctx.sp].vInt = a.vInt OP b.vInt;\
 	} else {\
 		lThrow(lValExceptionNonNumeric(b));\
 	}\
@@ -405,30 +407,30 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmbreak;
 
 	vmcase(lopBitNot)
-		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
-			ctx.valueStack[ctx.sp-1].vInt = ~ctx.valueStack[ctx.sp-1].vInt;
+		if(likely(ctx.valueStack[ctx.sp].type == ltInt)){
+			ctx.valueStack[ctx.sp].vInt = ~ctx.valueStack[ctx.sp].vInt;
 		} else {
-			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]));
+			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp]));
 		}
 		vmbreak;
 	vmcase(lopIntAdd)
-		if(likely((ctx.valueStack[ctx.sp-2].type == ltInt) && (ctx.valueStack[ctx.sp-1].type == ltInt))){
-			ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
+		if(likely((ctx.valueStack[ctx.sp-1].type == ltInt) && (ctx.valueStack[ctx.sp].type == ltInt))){
+			ctx.valueStack[ctx.sp-1].vInt += ctx.valueStack[ctx.sp].vInt;
 			ctx.sp--;
 		} else {
-			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]));
+			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp]));
 		}
 		vmbreak;
 	vmcase(lopCons)
-		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		ctx.valueStack[ctx.sp-1] = lCons(ctx.valueStack[ctx.sp-1], ctx.valueStack[ctx.sp]);
 		ctx.sp--;
 		vmbreak;
 
 #define vmBinaryPredicateOp(OP) do{\
-	const lVal a = ctx.valueStack[ctx.sp-2];\
-	const lVal b = ctx.valueStack[ctx.sp-1];\
+	const lVal a = ctx.valueStack[ctx.sp-1];\
+	const lVal b = ctx.valueStack[ctx.sp];\
 	ctx.sp--;\
-	ctx.valueStack[ctx.sp-1] = lValBool(OP);\
+	ctx.valueStack[ctx.sp] = lValBool(OP);\
 	} while(0)
 
 	vmcase(lopLessPred)
@@ -452,26 +454,26 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 
 	vmcase(lopPushNil)
-		ctx.valueStack[ctx.sp++] = NIL;
+		ctx.valueStack[++ctx.sp] = NIL;
 		vmbreak;
 	vmcase(lopPushTrue)
-		ctx.valueStack[ctx.sp++] = lValBool(true);
+		ctx.valueStack[++ctx.sp] = lValBool(true);
 		vmbreak;
 	vmcase(lopPushFalse)
-		ctx.valueStack[ctx.sp++] = lValBool(false);
+		ctx.valueStack[++ctx.sp] = lValBool(false);
 		vmbreak;
 	vmcase(lopPushValExt) {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		ctx.valueStack[ctx.sp++] = lits[v];
+		ctx.valueStack[++ctx.sp] = lits[v];
 		vmbreak; }
 	vmcase(lopPushVal) {
 		const uint v = *ip++;
-		ctx.valueStack[ctx.sp++] = lits[v];
+		ctx.valueStack[++ctx.sp] = lits[v];
 		vmbreak; }
 	vmcase(lopDup)
 		ctx.sp++;
-		ctx.valueStack[ctx.sp-1] = ctx.valueStack[ctx.sp-2];
+		ctx.valueStack[ctx.sp] = ctx.valueStack[ctx.sp-1];
 		vmbreak;
 	vmcase(lopDrop)
 		ctx.sp--;
@@ -482,20 +484,20 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmbreak;
 	vmcase(lopJt)
 		lGarbageCollectIfNecessary();
-		ip +=  castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
+		ip +=  castToBool(ctx.valueStack[ctx.sp--]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		vmbreak;
 	vmcase(lopJf)
 		lGarbageCollectIfNecessary();
-		ip += !castToBool(ctx.valueStack[--ctx.sp]) ? lBytecodeGetOffset16(ip)-1 : 2;
+		ip += !castToBool(ctx.valueStack[ctx.sp--]) ? lBytecodeGetOffset16(ip)-1 : 2;
 		vmbreak;
 	vmcase(lopDefValExt) {
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp]);
 		vmbreak; }
 	vmcase(lopDefVal) {
 		const uint v = *ip++;
-		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		lDefineClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp]);
 		vmbreak; }
 	vmcase(lopGetValExt) {
 		// Could be optimized like lopGetVal, but this opcode so rarely
@@ -506,7 +508,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		if(unlikely(v.type == ltException)){
 			lThrow(v);
 		}
-		ctx.valueStack[ctx.sp++] = v;
+		ctx.valueStack[++ctx.sp] = v;
 		vmbreak; }
 	vmcase(lopGetVal) {
 		const lSymbol *s = lits[*ip++].vSymbol;
@@ -514,7 +516,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lTree *t = cc->data;
 			while(t){
 				if(s == t->key){
-					ctx.valueStack[ctx.sp++] = t->value;
+					ctx.valueStack[++ctx.sp] = t->value;
 					vmbreak;
 				}
 				t = s > t->key ? t->right : t->left;
@@ -522,19 +524,18 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		lThrow(lValException(lSymUnboundVariable, "Can't resolve symbol", lValSymS(s))); }
 	vmcase(lopRef) {
-		lVal v = lGenericRef(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
+		lVal v = lGenericRef(ctx.valueStack[ctx.sp-1], ctx.valueStack[ctx.sp]);
 		if(unlikely(v.type == ltException)){
 			lThrow(v);
 		}
-		ctx.valueStack[ctx.sp-2] = v;
-		ctx.sp--;
+		ctx.valueStack[--ctx.sp] = v;
 		vmbreak; }
 	vmcase(lopSetValExt) {
 		// Could be optimized like lopSetVal, but this opcode so rarely
 		// used that I prefer to keep it simple
 		const uint v = (ip[0] << 8) | (ip[1]);
 		ip += 2;
-		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp-1]);
+		lSetClosureSym(c, lits[v].vSymbol, ctx.valueStack[ctx.sp]);
 		vmbreak; }
 	vmcase(lopSetVal) {
 		const lSymbol *s = lits[*ip++].vSymbol;
@@ -542,7 +543,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lTree *t = cc->data;
 			while(t){
 				if(t->key == s){
-					t->value = ctx.valueStack[ctx.sp-1];
+					t->value = ctx.valueStack[ctx.sp];
 					vmbreak;
 				}
 				t = s > t->key ? t->right : t->left;
@@ -550,50 +551,50 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		lThrow(lValException(lSymUnboundVariable, "Can't set symbol", lValSymS(s))); }
 	vmcase(lopGenSet) {
-		lVal val = ctx.valueStack[ctx.sp-1];
-		lVal key = ctx.valueStack[ctx.sp-2];
-		lVal col = ctx.valueStack[ctx.sp-3];
+		lVal val = ctx.valueStack[ctx.sp];
+		lVal key = ctx.valueStack[ctx.sp-1];
+		lVal col = ctx.valueStack[ctx.sp-2];
 		lVal ret = lGenericSet(col, key, val);
 		if(unlikely(ret.type == ltException)){
 			lThrow(ret);
 		}
 		ctx.sp -= 2;
-		ctx.valueStack[ctx.sp-1] = ret;
+		ctx.valueStack[ctx.sp] = ret;
 		vmbreak; }
 	vmcase(lopZeroPred) {
-		const lVal a = ctx.valueStack[ctx.sp-1];
+		const lVal a = ctx.valueStack[ctx.sp];
 
 		if (likely(a.type == ltInt)) {
-			ctx.valueStack[ctx.sp-1] = lValBool(a.vInt == 0);
+			ctx.valueStack[ctx.sp] = lValBool(a.vInt == 0);
 		} else if(a.type == ltFloat) {
-			ctx.valueStack[ctx.sp-1] = lValBool(a.vFloat == 0.0);
+			ctx.valueStack[ctx.sp] = lValBool(a.vFloat == 0.0);
 		} else {
-			ctx.valueStack[ctx.sp-1] = lValBool(false);
+			ctx.valueStack[ctx.sp] = lValBool(false);
 		}
 		vmbreak;
 	}
 	vmcase(lopIncInt)
-		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
-			ctx.valueStack[ctx.sp-1].vInt++;
+		if(likely(ctx.valueStack[ctx.sp].type == ltInt)){
+			ctx.valueStack[ctx.sp].vInt++;
 		}
 		vmbreak;
 	vmcase(lopCar)
-		ctx.valueStack[ctx.sp-1] = lCar(ctx.valueStack[ctx.sp-1]);
+		ctx.valueStack[ctx.sp] = lCar(ctx.valueStack[ctx.sp]);
 		vmbreak;
 	vmcase(lopCdr)
-		ctx.valueStack[ctx.sp-1] = lCdr(ctx.valueStack[ctx.sp-1]);
+		ctx.valueStack[ctx.sp] = lCdr(ctx.valueStack[ctx.sp]);
 		vmbreak;
 	vmcase(lopCadr)
-		ctx.valueStack[ctx.sp-1] = lCadr(ctx.valueStack[ctx.sp-1]);
+		ctx.valueStack[ctx.sp] = lCadr(ctx.valueStack[ctx.sp]);
 		vmbreak;
 	vmcase(lopList) {
 		int len = *ip++;
 		lVal cargs = lStackBuildList(ctx.valueStack, ctx.sp, len);
-		ctx.sp = ctx.sp - len;
-		ctx.valueStack[ctx.sp++] = cargs;
+		ctx.sp -= len;
+		ctx.valueStack[++ctx.sp] = cargs;
 		vmbreak; }
 	vmcase(lopClosurePush)
-		ctx.valueStack[ctx.sp++] = lValEnvironment(c);
+		ctx.valueStack[++ctx.sp] = lValEnvironment(c);
 		vmbreak;
 	vmcase(lopLet)
 		c = lClosureNew(c, closureLet);
@@ -607,12 +608,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lStoreInClosure(lBytecodeGetOffset16(ip)-1);
 
 		c = lClosureNew(c, closureTry);
-		c->exceptionHandler = ctx.valueStack[--ctx.sp];
+		c->exceptionHandler = ctx.valueStack[ctx.sp--];
 		ctx.closureStack[++ctx.csp] = c;
 		ip+=2;
 		vmbreak;
 	vmcase(lopThrow) {
-		lVal v = ctx.valueStack[ctx.sp-1];
+		lVal v = ctx.valueStack[ctx.sp];
 		if(likely(v.type == ltPair)){
 			v.type = ltException;
 		}
@@ -633,8 +634,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 		while(likely(c != NULL) && (c->type != closureTry)){
 			if(unlikely(ctx.csp <= 0)){
-				ctx.valueStack[ctx.sp-1] = exceptionThrownValue;
-				ctx.valueStack[ctx.sp-1].type = ltException;
+				ctx.valueStack[ctx.sp] = exceptionThrownValue;
+				ctx.valueStack[ctx.sp].type = ltException;
 				goto topLevelReturn;
 			}
 			c = ctx.closureStack[--ctx.csp];
@@ -681,7 +682,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 			lRestoreFromClosure();
 			ctx.sp = c->sp;
-			ctx.valueStack[ctx.sp++] = nv;
+			ctx.valueStack[++ctx.sp] = nv;
 			break; }
 		default:
 			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun););
@@ -690,21 +691,21 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopMacroDynamic)
 	vmcase(lopFnDynamic) {
 		const lBytecodeOp curOp = ip[-1];
-		lVal cBody = ctx.valueStack[--ctx.sp];
-		lVal cDocs = ctx.valueStack[--ctx.sp];
-		lVal cArgs = ctx.valueStack[--ctx.sp];
+		lVal cBody = ctx.valueStack[ctx.sp--];
+		lVal cDocs = ctx.valueStack[ctx.sp--];
+		lVal cArgs = ctx.valueStack[ctx.sp--];
 		lVal fun = lLambdaNew(c, cArgs, cBody);
 		lClosureSetMeta(fun.vClosure, cDocs);
 		if(unlikely(curOp == lopMacroDynamic)){
 			fun.type = ltMacro;
 		}
-		ctx.valueStack[ctx.sp++] = fun;
+		ctx.valueStack[++ctx.sp] = fun;
 		vmbreak; }
 	vmcase(lopMutableEval)
 	vmcase(lopEval) {
 		const lBytecodeOp curOp = ip[-1];
-		lVal env = ctx.valueStack[--ctx.sp];
-		lVal bc = ctx.valueStack[--ctx.sp];
+		lVal env = ctx.valueStack[ctx.sp--];
+		lVal bc = ctx.valueStack[ctx.sp--];
 		if(unlikely((env.type != ltEnvironment) || (bc.type != ltBytecodeArr))){
 			lThrow(lValException(lSymTypeError, "Can't eval in that", env));
 		}
@@ -727,9 +728,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	vmcase(lopApply) {
 		const int len = *ip++;
 		const int argsSp = ctx.sp;
-		ctx.sp = ctx.sp - len;
-		lVal fun = ctx.valueStack[--ctx.sp];
-		lVal *vs = &ctx.valueStack[argsSp-1];
+		ctx.sp -= len;
+		lVal fun = ctx.valueStack[ctx.sp--];
+		lVal *vs = &ctx.valueStack[argsSp];
 		if(unlikely(fun.type == ltKeyword)){
 			const lVal self = vs[1-len];
 			const lVal nfun = lMethodLookup(fun.vSymbol, self);
@@ -802,15 +803,15 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(unlikely(v.type == ltException)){
 				lThrow(v);
 			}
-			ctx.valueStack[ctx.sp++] = v;
+			ctx.valueStack[++ctx.sp] = v;
 			break; }
 		default:
 			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun));
 		}
 		vmbreak; }
 	vmcase(lopApplyCollection) {
-		lVal cargs = ctx.valueStack[--ctx.sp];
-		lVal fun = ctx.valueStack[--ctx.sp];
+		lVal cargs = ctx.valueStack[ctx.sp--];
+		lVal fun = ctx.valueStack[ctx.sp--];
 		if(unlikely(fun.type == ltKeyword)){
 			lVal self = lCar(cargs);
 			lVal nfun = lMethodLookup(fun.vSymbol, self);
@@ -857,7 +858,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(unlikely(v.type == ltException)){
 				lThrow(v);
 			}
-			ctx.valueStack[ctx.sp++] = v;
+			ctx.valueStack[++ctx.sp] = v;
 			break; }
 		default:
 			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun));
@@ -868,16 +869,16 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			while(ctx.closureStack[ctx.csp]->type != closureCall){
 				if(unlikely(--ctx.csp <= 0)){goto topLevelReturn;}
 			}
-			lVal ret = ctx.valueStack[ctx.sp-1];
+			lVal ret = ctx.valueStack[ctx.sp];
 			c   = ctx.closureStack[--ctx.csp];
 			lRestoreFromClosure();
 			ctx.text = ops;
 			ctx.sp = c->sp;
-			ctx.valueStack[ctx.sp++] = ret;
+			ctx.valueStack[++ctx.sp] = ret;
 			vmbreak;
 		}
 	topLevelReturn: {
-		lVal ret = ctx.valueStack[ctx.sp-1];
+		lVal ret = ctx.valueStack[ctx.sp];
 		free(ctx.closureStack);
 		free(ctx.valueStack);
 		return ret; }
