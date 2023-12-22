@@ -95,6 +95,11 @@ static inline lClosure *funCallClosure(lVal lambda) {
 	}\
 } while(0)
 
+#define lThrow(v) do {\
+	exceptionThrownValue = v;\
+	goto throwException;\
+} while(0)
+
 /* Evaluate ops within callingClosure after pushing args on the stack.
  *
  * Doesn't look particularly elegant at times, but gets turned into pretty
@@ -205,8 +210,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltFloat)){
 				ctx.valueStack[ctx.sp-1] = lValFloat(b.vFloat + a.vInt);
 			} else if(b.type != ltNil){
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
@@ -214,12 +218,10 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vFloat += b.vInt;
 			} else if(b.type != ltNil) {
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(a.type != ltNil){
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(b));
 		} else {
 			ctx.valueStack[ctx.sp-1] = lValInt(0);
 		}
@@ -234,8 +236,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltFloat)){
 				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt - b.vFloat);
 			} else if(b.type != ltNil){
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
 				ctx.valueStack[ctx.sp-1].vInt = -ctx.valueStack[ctx.sp-1].vInt;
 			}
@@ -245,17 +246,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vFloat -= b.vInt;
 			} else if(b.type != ltNil) {
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
 				ctx.valueStack[ctx.sp-1].vFloat = -ctx.valueStack[ctx.sp-1].vFloat;
 			}
 		} else if(a.type != ltNil){
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(b));
 		} else {
-			exceptionThrownValue = lValExceptionArity(a, 2);
-			goto throwException;
+			lThrow(lValExceptionArity(a, 2));
 		}
 		vmbreak; }
 	vmcase(lopMul) {
@@ -268,11 +266,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltFloat)){
 				ctx.valueStack[ctx.sp-1] = lValFloat(a.vInt * b.vFloat);
 			} else if(b.type != ltNil){
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				exceptionThrownValue = lValExceptionArity(a, 2);
-				goto throwException;
+				lThrow(lValExceptionArity(a, 2));
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
@@ -280,15 +276,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltInt)){
 				ctx.valueStack[ctx.sp-1].vFloat *= b.vInt;
 			} else if(b.type != ltNil) {
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				exceptionThrownValue = lValExceptionArity(a, 2);
-				goto throwException;
+				lThrow(lValExceptionArity(a, 2));
 			}
 		} else if(a.type != ltNil){
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(b));
 		} else {
 			ctx.valueStack[ctx.sp-1] = lValInt(1);
 		}
@@ -301,52 +294,42 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			if(likely(b.type == ltInt)){
 				lVal r = lValFloat((float)a.vInt / (float)b.vInt);
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(likely(b.type == ltFloat)){
 				lVal r = lValFloat((float)a.vInt / b.vFloat);
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(b.type != ltNil){
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				exceptionThrownValue = lValExceptionArity(a, 2);
-				goto throwException;
+				lThrow(lValExceptionArity(a, 2));
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
 				const lVal r = lValFloat(a.vFloat / b.vFloat);
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(likely(b.type == ltInt)){
 				const lVal r = lValFloat(a.vFloat / (float)b.vInt);
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(b.type != ltNil) {
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			} else {
-				exceptionThrownValue = lValExceptionArity(a, 2);
-				goto throwException;
+				lThrow(lValExceptionArity(a, 2));
 			}
 		} else if(a.type != ltNil){
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(b));
 		} else {
-			exceptionThrownValue = lValExceptionArity(a, 2);
-			goto throwException;
+			lThrow(lValExceptionArity(a, 2));
 		}
 		vmbreak; }
 	vmcase(lopRem) {
@@ -359,36 +342,30 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			} else if(likely(b.type == ltFloat)){
 				const lVal r = lValFloat(fmod(a.vInt, b.vFloat));
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(unlikely(b.type != ltNil)){
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(likely(a.type == ltFloat)){
 			if(likely(b.type == ltFloat)){
 				const lVal r = lValFloat(fmod(a.vFloat, b.vFloat));
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(likely(b.type == ltInt)){
 				const lVal r = lValFloat(fmod(a.vFloat, b.vInt));
 				if(unlikely(r.type == ltException)){
-					exceptionThrownValue = r;
-					goto throwException;
+					lThrow(r);
 				}
 				ctx.valueStack[ctx.sp-1] = r;
 			} else if(unlikely(b.type != ltNil)) {
-				exceptionThrownValue = lValExceptionNonNumeric(b);
-				goto throwException;
+				lThrow(lValExceptionNonNumeric(b));
 			}
 		} else if(unlikely(a.type != ltNil)){
-			exceptionThrownValue = lValExceptionNonNumeric(b);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(b));
 		}
 		vmbreak; }
 
@@ -399,8 +376,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	if(likely((a.type == ltInt) && (b.type == ltInt))){\
 		ctx.valueStack[ctx.sp-1].vInt = a.vInt OP b.vInt;\
 	} else {\
-		exceptionThrownValue = lValExceptionNonNumeric(b);\
-		goto throwException;\
+		lThrow(lValExceptionNonNumeric(b));\
 	}\
 	} while(0)
 
@@ -424,8 +400,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
 			ctx.valueStack[ctx.sp-1].vInt = ~ctx.valueStack[ctx.sp-1].vInt;
 		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]));
 		}
 		vmbreak;
 	vmcase(lopIntAdd)
@@ -433,8 +408,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
 			ctx.sp--;
 		} else {
-			exceptionThrownValue = lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]);
-			goto throwException;
+			lThrow(lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]));
 		}
 		vmbreak;
 	vmcase(lopCons)
@@ -522,8 +496,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		ip += 2;
 		lVal v = lGetClosureSym(c, lits[off].vSymbol);
 		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
-			goto throwException;
+			lThrow(v);
 		}
 		ctx.valueStack[ctx.sp++] = v;
 		vmbreak; }
@@ -539,13 +512,11 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				t = s > t->key ? t->right : t->left;
 			}
 		}
-		exceptionThrownValue = lValException(lSymUnboundVariable, "Can't resolve symbol", lValSymS(s));
-		goto throwException; }
+		lThrow(lValException(lSymUnboundVariable, "Can't resolve symbol", lValSymS(s))); }
 	vmcase(lopRef) {
 		lVal v = lGenericRef(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
 		if(unlikely(v.type == ltException)){
-			exceptionThrownValue = v;
-			goto throwException;
+			lThrow(v);
 		}
 		ctx.valueStack[ctx.sp-2] = v;
 		ctx.sp--;
@@ -569,16 +540,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				t = s > t->key ? t->right : t->left;
 			}
 		}
-		exceptionThrownValue = lValException(lSymUnboundVariable, "Can't set symbol", lValSymS(s));
-		goto throwException; }
+		lThrow(lValException(lSymUnboundVariable, "Can't set symbol", lValSymS(s))); }
 	vmcase(lopGenSet) {
 		lVal val = ctx.valueStack[ctx.sp-1];
 		lVal key = ctx.valueStack[ctx.sp-2];
 		lVal col = ctx.valueStack[ctx.sp-3];
 		lVal ret = lGenericSet(col, key, val);
 		if(unlikely(ret.type == ltException)){
-			exceptionThrownValue = ret;
-			goto throwException;
+			lThrow(ret);
 		}
 		ctx.sp -= 2;
 		ctx.valueStack[ctx.sp-1] = ret;
@@ -700,16 +669,14 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			default: nv = lValException(lSymVMError, "Unsupported funcall", fun); break;
 			}
 			if(unlikely(nv.type == ltException)){
-				exceptionThrownValue = nv;
-				goto throwException;
+				lThrow(nv);
 			}
 			lRestoreFromClosure();
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = nv;
 			break; }
-		default: {
-			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
-			goto throwException; }
+		default:
+			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun););
 		}
 		vmbreak; }
 	vmcase(lopMacroDynamic)
@@ -731,8 +698,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		lVal env = ctx.valueStack[--ctx.sp];
 		lVal bc = ctx.valueStack[--ctx.sp];
 		if(unlikely((env.type != ltEnvironment) || (bc.type != ltBytecodeArr))){
-			exceptionThrownValue = lValException(lSymTypeError, "Can't eval in that", env);
-			goto throwException;
+			lThrow(lValException(lSymTypeError, "Can't eval in that", env));
 		}
 
 		lStoreInClosure(0);
@@ -760,8 +726,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			const lVal self = vs[1-len];
 			const lVal nfun = lMethodLookup(fun.vSymbol, self);
 			if(unlikely(nfun.type == ltException)){
-				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL)));
-				goto throwException;
+				lThrow(lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL))));
 			}
 			fun = nfun;
 		}
@@ -827,14 +792,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			default: v = lValException(lSymVMError, "Unsupported funcall", fun); break;
 			}
 			if(unlikely(v.type == ltException)){
-				exceptionThrownValue = v;
-				goto throwException;
+				lThrow(v);
 			}
 			ctx.valueStack[ctx.sp++] = v;
 			break; }
-		default: {
-			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
-			goto throwException; }
+		default:
+			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun));
 		}
 		vmbreak; }
 	vmcase(lopApplyCollection) {
@@ -844,8 +807,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			lVal self = lCar(cargs);
 			lVal nfun = lMethodLookup(fun.vSymbol, self);
 			if(unlikely(nfun.type == ltException)){
-				exceptionThrownValue = lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL)));
-				goto throwException;
+				lThrow(lValException(lSymTypeError, "Unknown method", lCons(fun, lCons(lValType(&lClassList[self.type]), NIL))));
 			}
 			fun = nfun;
 		}
@@ -885,14 +847,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			default: v = lValException(lSymVMError, "Unsupported funcall", fun); break;
 			}
 			if(unlikely(v.type == ltException)){
-				exceptionThrownValue = v;
-				goto throwException;
+				lThrow(v);
 			}
 			ctx.valueStack[ctx.sp++] = v;
 			break; }
-		default: {
-			exceptionThrownValue = lValException(lSymTypeError, "Can't apply to following val", fun);
-			goto throwException; }
+		default:
+			lThrow(lValException(lSymTypeError, "Can't apply to following val", fun));
 		}
 		vmbreak; }
 	vmcase(lopRet)
