@@ -106,6 +106,7 @@
             ("euler4" "906609")
             ("md5" "47afad6ea7d0515701d2b63472530971")
             ("crc32" "0936343A")
+            ("compile-stdlib" "Image built")
             ("adler32" "E50BA232")
             (otherwise "チーズスイートホーム")))
 
