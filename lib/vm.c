@@ -12,9 +12,9 @@
 
 /* Create a new Lambda Value */
 static inline lVal lLambdaNew(lClosure *parent, lVal args, lVal body){
+	reqBytecodeArray(body);
 	lVal ret = lValAlloc(ltLambda, lClosureNew(parent, closureDefault));
 	ret.vClosure->args = args;
-	reqBytecodeArray(body);
 	ret.vClosure->text = body.vBytecodeArr;
 	ret.vClosure->ip   = ret.vClosure->text->data;
 	return ret;
@@ -39,7 +39,7 @@ static lVal lStackBuildList(lVal *stack, int sp, int len){
 static void lBytecodeEnsureSufficientStack(lThread *ctx){
 	const int closureSizeLeft = (ctx->closureStackSize - ctx->csp) - 1;
 	if(unlikely(closureSizeLeft < 16)){
-		ctx->closureStackSize += 32;
+		ctx->closureStackSize += 512;
 		lClosure **t = realloc(ctx->closureStack, ctx->closureStackSize * sizeof(lClosure *));
 		if(unlikely(t == NULL)){ exit(56); }
 		ctx->closureStack = t;
@@ -47,7 +47,7 @@ static void lBytecodeEnsureSufficientStack(lThread *ctx){
 
 	const int valueSizeLeft = ctx->valueStackSize - ctx->sp;
 	if(unlikely(valueSizeLeft < 32)){
-		ctx->valueStackSize += 128;
+		ctx->valueStackSize += 512;
 		lVal *t = realloc(ctx->valueStack, ctx->valueStackSize * sizeof(lVal));
 		if(unlikely(t == NULL)){ exit(57); }
 		ctx->valueStack = t;
@@ -77,6 +77,24 @@ static inline lClosure *funCallClosure(lVal lambda) {
 	return tmpc;
 }
 
+#define lStoreInClosure(ipOffset) do {\
+	c->ip = ip + (ipOffset);\
+	c->sp = ctx.sp;\
+	c->text = ctx.text = ops;\
+} while (0)
+
+#define lRestoreFromClosure() do {\
+	ip = c->ip;\
+	ctx.text = ops = c->text;\
+	lits = ops->literals->data;\
+} while (0)
+
+#define lGarbageCollectIfNecessary() do {\
+	if(unlikely(lGCShouldRunSoon)){\
+		lGarbageCollect(&ctx);\
+	}\
+} while(0)
+
 /* Evaluate ops within callingClosure after pushing args on the stack.
  *
  * Doesn't look particularly elegant at times, but gets turned into pretty
@@ -89,12 +107,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	lThread ctx;
 	const lVal * lits = text->literals->data;
 	lVal exceptionThrownValue;
-
-#define lGarbageCollectIfNecessary() do {\
-	if(unlikely(lGCShouldRunSoon)){\
-		lGarbageCollect(&ctx);\
-	}\
-} while(0)
 
 #ifndef NUJEL_USE_JUMPTABLE
 	#define vmdispatch(o)	switch(o)
@@ -165,8 +177,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		&&llopUnequalPred,
 	};
 #endif
-	ctx.closureStackSize = 256;
-	ctx.valueStackSize   = 32;
+	ctx.closureStackSize = 512;
+	ctx.valueStackSize   = 512;
 	ctx.closureStack     = malloc(ctx.closureStackSize * sizeof(lClosure *));
 	ctx.valueStack       = malloc(ctx.valueStackSize * sizeof(lVal));
 	ctx.csp              = 0;
@@ -177,24 +189,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ip = ops->data;
 
 	while(true){
-		#ifdef VM_RUNTIME_CHECKS
-		if(unlikely(ctx.csp >= ctx.closureStackSize-1)){
-			ctx.closureStackSize *= 2;
-			lClosure **newStack = realloc(ctx.closureStack, ctx.closureStackSize * sizeof(lClosure*));
-			if (unlikely(newStack == NULL)) {
-				goto topLevelNoReturn;
-			}
-			ctx.closureStack = newStack;
-		}
-		if(unlikely(ctx.sp >= ctx.valueStackSize-1)){
-			ctx.valueStackSize *= 2;
-			lVal **newStack = realloc(ctx.valueStack, ctx.valueStackSize * sizeof(lVal*));
-			if (unlikely(newStack == NULL)) {
-				goto topLevelNoReturn;
-			}
-			ctx.valueStack = newStack;
-		}
-		#endif
 	vmdispatch(*ip++){
 	vmcase(lopNOP)
 		vmbreak;
@@ -426,7 +420,6 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		vmBinaryIntegerOp(^);
 		vmbreak;
 
-
 	vmcase(lopBitNot)
 		if(likely(ctx.valueStack[ctx.sp-1].type == ltInt)){
 			ctx.valueStack[ctx.sp-1].vInt = ~ctx.valueStack[ctx.sp-1].vInt;
@@ -436,8 +429,13 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 		vmbreak;
 	vmcase(lopIntAdd)
-		ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
-		ctx.sp--;
+		if(likely((ctx.valueStack[ctx.sp-2].type == ltInt) && (ctx.valueStack[ctx.sp-1].type == ltInt))){
+			ctx.valueStack[ctx.sp-2].vInt += ctx.valueStack[ctx.sp-1].vInt;
+			ctx.sp--;
+		} else {
+			exceptionThrownValue = lValExceptionNonNumeric(ctx.valueStack[ctx.sp-1]);
+			goto throwException;
+		}
 		vmbreak;
 	vmcase(lopCons)
 		ctx.valueStack[ctx.sp-2] = lCons(ctx.valueStack[ctx.sp-2], ctx.valueStack[ctx.sp-1]);
@@ -629,9 +627,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		c = ctx.closureStack[--ctx.csp];
 		vmbreak;
 	vmcase(lopTry)
-		c->ip	= ip + lBytecodeGetOffset16(ip)-1;
-		c->sp	= ctx.sp;
-		c->text = ops;
+		lStoreInClosure(lBytecodeGetOffset16(ip)-1);
 
 		c = lClosureNew(c, closureTry);
 		c->exceptionHandler = ctx.valueStack[--ctx.sp];
@@ -660,10 +656,9 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 
 		while(likely(c != NULL) && (c->type != closureTry)){
 			if(unlikely(ctx.csp <= 0)){
-				free(ctx.closureStack);
-				free(ctx.valueStack);
-				exceptionThrownValue.type = ltException;
-				return exceptionThrownValue;
+				ctx.valueStack[ctx.sp-1] = exceptionThrownValue;
+				ctx.valueStack[ctx.sp-1].type = ltException;
+				goto topLevelReturn;
 			}
 			c = ctx.closureStack[--ctx.csp];
 		}
@@ -677,9 +672,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		switch(fun.type){
 		case ltLambda:
 			c = ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
-			ip = c->ip;
-			ctx.text = ops = c->text;
-			lits = ops->literals->data;
+			lRestoreFromClosure();
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
 			break;
@@ -710,10 +703,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				exceptionThrownValue = nv;
 				goto throwException;
 			}
-			ops = c->text;
-			lits = ops->literals->data;
-			ip = c->ip;
-			ctx.text = ops;
+			lRestoreFromClosure();
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = nv;
 			break; }
@@ -745,9 +735,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			goto throwException;
 		}
 
-		c->text = ops;
-		c->sp   = ctx.sp;
-		c->ip   = ip;
+		lStoreInClosure(0);
 
 		if(unlikely(curOp == lopMutableEval)){
 			c = ctx.closureStack[++ctx.csp] = env.vClosure;
@@ -756,9 +744,8 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		}
 
 		c->text = bc.vBytecodeArr;
-		ip = c->ip = c->text->data;
-		ctx.text = ops = c->text;
-		lits = ops->literals->data;
+		c->ip = c->text->data;
+		lRestoreFromClosure();
 		lBytecodeEnsureSufficientStack(&ctx);
 		lGarbageCollectIfNecessary();
 
@@ -781,9 +768,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		switch(fun.type){
 		case ltMacro:
 		case ltLambda: {
-			c->text = ops;
-			c->sp   = ctx.sp;
-			c->ip   = ip;
+			lStoreInClosure(0);
 
 			ctx.closureStack[++ctx.csp] = c = funCallClosure(fun);
 			int vsi = -(len-1);
@@ -804,9 +789,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 				}
 				break;
 			}
-			ip = c->ip;
-			ctx.text = ops = c->text;
-			lits = ops->literals->data;
+			lRestoreFromClosure();
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
 			break; }
@@ -869,15 +852,12 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 		switch(fun.type){
 		case ltMacro:
 		case ltLambda:
-			c->text = ops;
-			c->sp   = ctx.sp;
-			c->ip   = ip;
+			lStoreInClosure(0);
 
 			ctx.closureStack[++ctx.csp] = lClosureNewFunCall(cargs, fun);
 			c = ctx.closureStack[ctx.csp];
-			ip = c->ip;
-			ctx.text = ops = c->text;
-			lits = ops->literals->data;
+
+			lRestoreFromClosure();
 			lBytecodeEnsureSufficientStack(&ctx);
 			lGarbageCollectIfNecessary();
 			break;
@@ -922,9 +902,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			}
 			lVal ret = ctx.valueStack[ctx.sp-1];
 			c   = ctx.closureStack[--ctx.csp];
-			ip  = c->ip;
-			ops = c->text;
-			lits = ops->literals->data;
+			lRestoreFromClosure();
 			ctx.text = ops;
 			ctx.sp = c->sp;
 			ctx.valueStack[ctx.sp++] = ret;
