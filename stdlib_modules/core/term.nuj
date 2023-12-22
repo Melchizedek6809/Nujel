@@ -41,57 +41,57 @@
   :export
 
   (defn new (self out in)
-        (when-not in (set! in stdin))
-        (when-not out (set! out stdout))
+        (when-not in (set! in (:new InputPort stdin*)))
+        (when-not out (set! out (:new OutputPort stdout*)))
         { :in-port in
           :out-port out
-          :buf-port (make-string-output-port)
+          :buf-port (:new StringOutputPort)
           :prototype* self })
 
   (defn flip (self)
-        (def s ((ref self :buf-port) 'return-string))
-        ((ref self :buf-port) 'close!)
-        (set! self :buf-port (make-string-output-port))
-        ((ref self :out-port) 'block-write s)
-        ((ref self :out-port) 'flush-output))
+        (def s (:return-string (ref self :buf-port)))
+        (:close! (ref self :buf-port))
+        (set! self :buf-port (:new StringOutputPort))
+        (:block-write (ref self :out-port) s)
+        (:flush-output (ref self :out-port)))
 
   (defn put-char (self char)
-        ((ref self :buf-port) 'char-write char))
+        (:char-write (ref self :buf-port) char))
 
   (defn put-string (self text)
-        ((ref self :buf-port) 'block-write text))
+        (:block-write (ref self :buf-port) text))
 
   (defn clear-screen (self)
-        ((ref self :buf-port) 'block-write "\e[2J"))
+        (:block-write (ref self :buf-port) "\e[2J"))
 
   (defn clear-line (self)
-        ((ref self :buf-port) 'block-write "\e[2K"))
+        (:block-write (ref self :buf-port) "\e[2K"))
 
   (defn hide-cursor (self)
-        ((ref self :out-port) 'block-write "\e[?25l"))
+        (:block-write (ref self :out-port) "\e[?25l"))
 
   (defn show-cursor (self)
-        ((ref self :out-port) 'block-write "\e[?25h"))
+        (:block-write (ref self :out-port) "\e[?25h"))
 
   (defn start (self)
-        ((ref self :in-port) :raw!)
-        ((ref self :out-port) 'block-write "\e[?1049h"))
+        (:raw! (ref self :in-port))
+        (:block-write (ref self :out-port) "\e[?1049h"))
 
   (defn stop (self)
-        ((ref self :out-port) 'block-write "\e[?1049l"))
+        (:block-write (ref self :out-port) "\e[?1049l"))
 
   (defn move-cursor (self column line)
-        ((ref self :buf-port) 'block-write (fmt "\e[{line};{column}H")))
+        (:block-write (ref self :buf-port) (fmt "\e[{line};{column}H")))
 
   (defn set-fg-color (self color-name)
         (def v (ref fg-colors color-name))
         (when-not v (exception "Unknown color" color-name))
-        ((ref self :buf-port) 'block-write v))
+        (:block-write (ref self :buf-port) v))
 
   (defn set-bg-color (self color-name)
         (def v (ref bg-colors color-name))
         (when-not v (exception "Unknown color" color-name))
-        ((ref self :buf-port) 'block-write v))
+        (:block-write (ref self :buf-port) v))
 
   (defn set-color (self fg-color-name bg-color-name)
         (when fg-color-name (:set-fg-color self fg-color-name))
@@ -99,16 +99,16 @@
 
   (defn get-size (self)
         :export
-        ((ref self :out-port) 'block-write "\e 7")
-        ((ref self :out-port) 'block-write "\e[9999;9999H")
-        ((ref self :out-port) 'block-write "\e[6n")
-        ((ref self :out-port) 'flush-output)
+        (:block-write (ref self :out-port) "\e 7")
+        (:block-write (ref self :out-port) "\e[9999;9999H")
+        (:block-write (ref self :out-port) "\e[6n")
+        (:flush-output (ref self :out-port))
         (def buf (buffer/allocate 128))
         (def i 0)
         (while #t
-          (def c ((ref self :in-port) 'char-read))
+          (def c (:char-read (ref self :in-port)))
           (when (= c #\R)
-            ((ref self :out-port) 'block-write "\e 8")
+            (:block-write (ref self :out-port) "\e 8")
             (def s (split (cut (buffer->string buf i) 2) ";"))
             (return { :width (read/int (cadr s))
                       :height (read/int (car s))}))
@@ -122,144 +122,7 @@
         (ref (:get-size self) :height))
 
   (defn poll-input (self)
-        (def c ((ref self :in-port) 'char-read))
-        (if (= c :end-of-file)
-            0
-            c))
-
-  (defn draw-box (self color pos-x pos-y width height)
-        :export
-        (:set-bg-color self color)
-        (dotimes (y height)
-                 (:move-cursor self pos-x (+ y pos-y))
-                 (dotimes (x width)
-                          (:put-char self 32)))
-        (:set-bg-color self :default)))
-;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
-;;; This project uses the MIT license, a copy should be included under /LICENSE
-;;;
-
-(def fg-colors { :default "\e[0m"
-
-                 :black "\e[30m"
-                 :red "\e[31m"
-                 :green "\e[32m"
-                 :yellow "\e[33m"
-                 :blue "\e[34m"
-
-                 :pink "\e[35m"
-                 :magenta "\e[35m"
-                 :purple "\e[35m"
-
-                 :cyan "\e[36m"
-                 :teal "\e[36m"
-
-                 :white "\e[37m"})
-
-(def bg-colors { :default "\e[49m"
-
-                 :black "\e[40m"
-                 :red "\e[41m"
-                 :green "\e[42m"
-                 :yellow "\e[43m"
-                 :blue "\e[44m"
-
-                 :pink "\e[45m"
-                 :magenta "\e[45m"
-                 :purple "\e[45m"
-
-                 :cyan "\e[46m"
-                 :teal "\e[46m"
-
-                 :white "\e[47m"})
-
-(defclass Term
-  "A buffered terminal connection"
-  :export
-
-  (defn new (self out in)
-        (when-not in (set! in stdin))
-        (when-not out (set! out stdout))
-        { :in-port in
-          :out-port out
-          :buf-port (make-string-output-port)
-          :prototype* self })
-
-  (defn flip (self)
-        (def s ((ref self :buf-port) 'return-string))
-        ((ref self :buf-port) 'close!)
-        (set! self :buf-port (make-string-output-port))
-        ((ref self :out-port) 'block-write s)
-        ((ref self :out-port) 'flush-output))
-
-  (defn put-char (self char)
-        ((ref self :buf-port) 'char-write char))
-
-  (defn put-string (self text)
-        ((ref self :buf-port) 'block-write text))
-
-  (defn clear-screen (self)
-        ((ref self :buf-port) 'block-write "\e[2J"))
-
-  (defn clear-line (self)
-        ((ref self :buf-port) 'block-write "\e[2K"))
-
-  (defn hide-cursor (self)
-        ((ref self :out-port) 'block-write "\e[?25l"))
-
-  (defn show-cursor (self)
-        ((ref self :out-port) 'block-write "\e[?25h"))
-
-  (defn start (self)
-        ((ref self :in-port) :raw!)
-        ((ref self :out-port) 'block-write "\e[?1049h"))
-
-  (defn stop (self)
-        ((ref self :out-port) 'block-write "\e[?1049l"))
-
-  (defn move-cursor (self column line)
-        ((ref self :buf-port) 'block-write (fmt "\e[{line};{column}H")))
-
-  (defn set-fg-color (self color-name)
-        (def v (ref fg-colors color-name))
-        (when-not v (exception "Unknown color" color-name))
-        ((ref self :buf-port) 'block-write v))
-
-  (defn set-bg-color (self color-name)
-        (def v (ref bg-colors color-name))
-        (when-not v (exception "Unknown color" color-name))
-        ((ref self :buf-port) 'block-write v))
-
-  (defn set-color (self fg-color-name bg-color-name)
-        (when fg-color-name (:set-fg-color self fg-color-name))
-        (when bg-color-name (:set-bg-color self bg-color-name)))
-
-  (defn get-size (self)
-        :export
-        ((ref self :out-port) 'block-write "\e 7")
-        ((ref self :out-port) 'block-write "\e[9999;9999H")
-        ((ref self :out-port) 'block-write "\e[6n")
-        ((ref self :out-port) 'flush-output)
-        (def buf (buffer/allocate 128))
-        (def i 0)
-        (while #t
-          (def c ((ref self :in-port) 'char-read))
-          (when (= c #\R)
-            ((ref self :out-port) 'block-write "\e 8")
-            (def s (split (cut (buffer->string buf i) 2) ";"))
-            (return { :width (read/int (cadr s))
-                      :height (read/int (car s))}))
-          (set! buf i c)
-          (inc! i)))
-
-  (defn get-width (self)
-        (ref (:get-size self) :width))
-
-  (defn get-height (self)
-        (ref (:get-size self) :height))
-
-  (defn poll-input (self)
-        (def c ((ref self :in-port) 'char-read))
+        (def c (:char-read (ref self :in-port)))
         (if (= c :end-of-file)
             0
             c))

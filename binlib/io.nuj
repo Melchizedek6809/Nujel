@@ -99,62 +99,6 @@
       "Writes CONTENT into PATHNAME"
       (spit pathname content))
 
-(def stdin (make-input-port stdin*))
-(defn current-input-port () stdin)
- (defn current-input-port! (nport) (set! stdin nport))
-
-(def stdout (make-output-port stdout*))
-(defn current-output-port () stdout)
-(defn current-output-port! (nport) (set! stdout nport))
-
-(def stderr (make-output-port stderr*))
-(defn current-error-port () stderr)
-(defn current-error-port! (nport) (set! stderr nport))
-
-(defn newline (port)
-      "Print a single line feed character"
-      ((or port stdout) 'block-write "\r\n")
-      #nil)
-
-(defn print (v port)
-      "Display V on the standard output port"
-      (write/raw v (or port stdout) #t)
-      #nil)
-
-(defn error (v port)
-      "Prints v on the standard error port"
-      (print v stderr)
-      #nil)
-
-(defn read-line/raw (port buf)
-      "Reads in a line of user input and returns it"
-      (def i 0)
-      (def c 0)
-      (def view (:u8 buf))
-      (while #t
-             (while (>= i (:length buf))
-                    (:length! (+ 128 (:length buf))))
-             (set! c (port 'char-read))
-             (when (= c :end-of-file)
-                   (return (if (zero? i) #nil i)))
-             (when (= c #\lf)
-                   (return i))
-             (set! view i c)
-             (set! i (inc i))))
-
-(defn read-line ()
-      "Reads in a line of user input and returns it"
-      (def buf (buffer/allocate 128))
-      (def len (read-line/raw stdin buf))
-      (and len (buffer->string buf len)))
-(def input read-line)
-
-(defn readline (prompt)
-      "Read a line of input in a user friendly way after writing PROMPT"
-      (stdout 'block-write (or prompt ""))
-      (stdout 'flush-output)
-      (read-line))
-
 (defn popen/trim (cmd)
   "Run CMD using popen and return the trimmed stdout"
   (trim (cdr (popen cmd))))

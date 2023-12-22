@@ -5,6 +5,11 @@
 (def output-file "tmp/init.nuji")
 
 (def env (environment*))
+(set! env :stdin* stdin*)
+(set! env :stdout* stdout*)
+(set! env :stderr* stderr*)
+(set! env :*module* :core)
+(set! env :exports {})
 
 (defn define-in-env (v)
       (def kw (:keyword (cat v)))
@@ -24,7 +29,8 @@
           (map directory/read-recursive)
           (flatten)
           (filter (path/ext?! "nuj"))
-          (for-each compile-in-env)))
+          (for-each compile-in-env))
+      (mutable-eval* (compile* `(do (init/ports!)) env) env))
 
 (compile-stdlib)
 
@@ -33,12 +39,7 @@
     (filter (fn (v) (or (= NativeFunc (:type-of v))
                         (= Type (:type-of v)))))
     (for-each define-in-env))
-(set! env :stdin* stdin*)
-(set! env :stdout* stdout*)
-(set! env :stderr* stderr*)
 
-(set! env :*module* :core)
-(set! env :exports {})
 (:parent! env #nil)
 
 (compile-stdlib)

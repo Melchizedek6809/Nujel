@@ -1,0 +1,197 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; The port system for Nujel which provides an object oriented abstraction over
+;;; low-level file streams
+
+(defn cat l
+      "ConCATenates all arguments into a single string"
+      (def p (:new StringOutputPort))
+      (doseq (c l (:return-string p))
+             (:block-write p (string/display c))))
+
+
+(defmacro with-string-port (name . body)
+          `(let ((~name (:new StringOutputPort)))
+                ~@body
+                (:return-string ~name)))
+
+(defn print (v port)
+      "Display V on the standard output port"
+      (display v (or port stdout)))
+
+(defn error (v)
+      "Prints v on the standard error port"
+      (display v stderr))
+
+(defn newline (port)
+      "Print a single line feed character"
+      (print "\r\n" port))
+
+(defn read-line/raw (port buf)
+      "Reads in a line of user input and returns it"
+      (def i 0)
+      (def c 0)
+      (def view (:u8 buf))
+      (while #t
+             (while (>= i (:length buf))
+                    (:length! (+ 128 (:length buf))))
+             (set! c (:char-read port))
+             (when (= c :end-of-file)
+                   (return (if (zero? i) #nil i)))
+             (when (= c #\lf)
+                   (return i))
+             (set! view i c)
+             (set! i (inc i))))
+
+(defn read-line ()
+      "Reads in a line of user input and returns it"
+      (def buf (buffer/allocate 128))
+      (def len (read-line/raw stdin buf))
+      (and len (buffer->string buf len)))
+(def input read-line)
+
+(defn readline (prompt)
+      "Read a line of input in a user friendly way after writing PROMPT"
+      (print (or prompt ""))
+      (:flush-output stdout)
+      (read-line))
+
+(defn string/write (v)
+      (def p (:new StringOutputPort))
+      (write/raw v p #f)
+      (:return-string p))
+
+(defn string/display (v)
+      (def p (:new StringOutputPort))
+      (write/raw v p #t)
+      (:return-string p))
+
+(defn write (v port)
+      (write/raw v (or port stdout) #f)
+      #nil)
+
+(defn display (v port)
+      (write/raw v (or port stdout) #t)
+      #nil)
+
+(defn init/ports! ()
+      (defclass OutputPort
+  "OutputPort"
+
+  (defn new (self handle)
+        "Create a new OutputPort from a handle"
+        { :prototype* self
+          :handle handle
+          :temp-buffer (buffer/allocate 16) })
+
+  (defn flush-output (self)
+        (file/flush* (ref self :handle)))
+
+  (defn block-write (self buffer size)
+        (file/write* (ref self :handle) buffer size))
+
+  (defn write (self . buffers)
+        (doseq (buf buffers self)
+               (:block-write self buf)))
+
+  (defn char-write (self char)
+        (set! (ref self :temp-buffer) 0 char)
+        (file/write* (ref self :handle) temporary-buffer 1))
+
+  (defn close! (self)
+        (file/close* (ref self :handle)))
+
+  (defn position (self)
+        (file/tell* (ref self :handle)))
+
+  (defn position! (self new-position)
+        (file/seek* (ref self :handle) new-position 0))
+
+  (defn file-handle (self)
+        (ref self :handle))
+)
+
+(defclass StringOutputPort
+  "StringOutputPort"
+
+  (defn new (self handle)
+        "Create a new OutputPort from a handle"
+        { :prototype* self
+          :buffer-pos 0
+          :buffer (buffer/allocate 16) })
+
+  (defn flush-output (self) #t)
+
+  (defn block-write (self buffer size)
+        (def buf (ref self :buffer))
+        (when-not size (set! size (:length buffer)))
+        (when (> size (- (:length buf) (ref self :buffer-pos)))
+          (:length! buf (+ #x80 (bit-and (+ (:length buf) size) (bit-not #x7F)))))
+        (buffer/copy buf buffer (ref self :buffer-pos) size)
+        (set! self :buffer-pos (+ (ref self :buffer-pos) size)))
+
+  (defn char-write (self char)
+        (def buf (ref self :buffer))
+        (when (< (- (:length buf) (ref self :buffer-pos)) 1)
+          (:length! buf (+ #x80 (:length buf))))
+        (set! buf (ref self :buffer-pos) char)
+        (set! self :buffer-pos (+ (ref self :buffer-pos) 1)))
+
+  (defn write (self . buffers)
+        (doseq (buf buffers self)
+               (:block-write self buf)))
+
+  (defn close! (self) self)
+
+  (defn return-string (self)
+        (buffer->string (ref self :buffer) (ref self :buffer-pos)))
+
+  (defn position (self)
+        (ref self :buffer-pos))
+)
+
+(defclass InputPort
+  "InputPort"
+
+  (defn new (self handle)
+        "Create a new OutputPort from a handle"
+        { :prototype* self
+          :handle handle
+          :temp-buffer (buffer/allocate 16) })
+
+  (defn block-read (self buffer size)
+        (if (file/eof*? (ref self :handle))
+            :end-of-file
+            (file/read* (ref self :handle) buffer size)))
+
+  (defn char-read (self char)
+        (when (file/eof*? (ref self :handle))
+          (return :end-of-file))
+        (when-not (file/read* (ref self :handle) (ref self :temp-buffer) 1)
+                  (return :end-of-file))
+        (ref (ref self :temp-buffer) 0))
+
+  (defn raw! (self)
+        (file/raw* (ref self :handle) #t))
+
+  (defn close! (self)
+        (file/close* (ref self :handle)))
+
+  (defn position (self)
+        (file/tell* (ref self :handle)))
+
+  (defn position! (self new-position)
+        (file/seek* (ref self :handle) new-position 0))
+
+  (defn file-handle (self)
+        (ref self :handle))
+  )
+
+(set! root-closure :InputPort InputPort)
+(set! root-closure :OutputPort OutputPort)
+(set! root-closure :StringOutputPort StringOutputPort)
+
+     (set! root-closure :stdin (:new InputPort stdin*))
+     (set! root-closure :stdout (:new OutputPort stdout*))
+     (set! root-closure :stderr (:new OutputPort stderr*)))

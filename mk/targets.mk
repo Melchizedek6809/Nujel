@@ -13,10 +13,10 @@ DOSNUJEL.EXE: $(NUJEL) tools/watcom.nuj
 	@source /opt/watcom/owsetenv.sh && ./$(NUJEL) tools/watcom.nuj
 
 tmp/image.c: tmp/init.nuji $(NUJEL)
-	@./$(NUJEL) -m :compiler/c-asset-packer "./tmp/init.nuji" "./tmp/image.c" "bootstrap_image"
+	@./$(NUJEL) ./tools/c-asset-packer.nuj "./tmp/init.nuji" "./tmp/image.c" "bootstrap_image"
 	@echo "$(ANSI_GREY)" "[ST] " "$(ANSI_RESET)" $@
 
-tmp/init.nuji: $(NUJEL) $(STDLIB_NUJS) $(STDLIB_MODS)
+tmp/init.nuji: $(NUJEL) $(STDLIB_NUJS) $(STDLIB_MODS) $(BINLIB_NUJS)
 	@mkdir -p tmp/
 	@./$(NUJEL) tools/build-image.nuj
 	@echo "$(ANSI_GREEN)" "[IMG]" "$(ANSI_RESET)" $@

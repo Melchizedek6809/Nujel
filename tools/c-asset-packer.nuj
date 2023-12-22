@@ -10,22 +10,23 @@
 
 (defn create-c-asset (raw out symbol-name)
       :export
-      (typecheck/only out :lambda)
       (typecheck/only symbol-name :string)
 
-      (out 'block-write (fmt "unsigned long long int {symbol-name}_len = {};\n" (:length raw)))
-      (out 'block-write (fmt "unsigned char {symbol-name}[] = "))
-      (out 'block-write "{")
+      (:block-write out (fmt "unsigned long long int {symbol-name}_len = {};\n" (:length raw)))
+      (:block-write out (fmt "unsigned char {symbol-name}[] = "))
+      (:block-write out "{")
       (dotimes (i (:length raw))
                (when (zero? (bit-and i #xF))
-                 (out 'block-write "\n  "))
-               (out 'block-write (ref hex-cache (ref raw i))))
-      (out 'block-write "};")
-      (out 'close!))
+                 (:block-write out "\n  "))
+               (:block-write out (ref hex-cache (ref raw i))))
+      (:block-write out "};")
+      (:close! out))
 
 (defn create-string-asset (in symbol-name)
       :export
-      (with-string-port out (create-c-asset in out symbol-name)))
+      (def out (:new StringOutputPort))
+      (create-c-asset in out symbol-name)
+      (:return-string out))
 
 (defn main (args)
       :export
@@ -35,6 +36,7 @@
       (typecheck/only filename :string)
       (typecheck/only output-file :string)
       (typecheck/only symbol-name :string)
-      (def out (make-output-port (file/open-output* output-file :replace)))
-      (out 'block-write "/* This file is auto-generated, manual changes will be overwritten! */\n")
+      (pfmtln "Packing {filename} into {output-file} as {symbol-name}")
+      (def out (:new OutputPort (file/open-output* output-file :replace)))
+      (:block-write out "/* This file is auto-generated, manual changes will be overwritten! */\n")
       (create-c-asset (slurp filename) out symbol-name))
