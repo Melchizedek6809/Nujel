@@ -41,10 +41,15 @@
 (defn next-line () (:next-line cur-buffer))
 (defn forward-char () (:forward-char cur-buffer))
 (defn backward-char () (:backward-char cur-buffer))
-(defn kill-line () (set! clipboard (:kill-line cur-buffer)))
 (defn yank () (:insert-text cur-buffer clipboard))
 (defn scroll-down-command () (:scroll-down-command cur-buffer))
 (defn scroll-up-command () (:scroll-up-command cur-buffer))
+(defn beginning-of-line () (:beginning-of-line cur-buffer))
+(defn end-of-line () (:end-of-line cur-buffer))
+(defn beginning-of-buffer () (:beginning-of-buffer cur-buffer))
+(defn end-of-buffer () (:end-of-buffer cur-buffer))
+
+(defn kill-line () (set! clipboard (:kill-line cur-buffer)))
 
 (defn draw-gutter ()
       (:draw-box term :red 1 2 4 (- screen-height 2)))
@@ -100,11 +105,6 @@
       (:stop term)
       (exit 0))
 
-(defn beginning-of-line ()
-      (set! cur-buffer :pos-x 0))
-
-(defn end-of-line ()
-      (set! cur-buffer :pos-x (:line-length cur-buffer (ref cur-buffer :pos-y))))
 
 (defn clear-frame ()
       (dotimes (y (- screen-height 1))
@@ -153,6 +153,8 @@
       (def c (poll-key "E-"))
       (case c
             (#\[ (read-bracketed-input))
+            (#x3C (beginning-of-buffer))
+            (#x3E (end-of-buffer))
             (otherwise (insert-char #\[))))
 
 (defn read-cx-input ()
@@ -184,8 +186,15 @@
 (defn load-buffer (filename)
       (def buf (new-buffer filename))
       (def text (slurp filename))
-      (when text
-        (set! buf :lines (apply array/new (map (split text "\n") :clone)))))
+      (def raw-lines (if text (split text "\n") #nil))
+      (def lines (:alloc Array (max 1 (:length raw-lines))))
+      (set! buf :lines lines)
+      (def i 0)
+      (doseq (line raw-lines buf)
+             (def cur-line (buffer/allocate (bit-shift-left (inc (bit-shift-right (:length line) 4)) 4)))
+             (buffer/copy cur-line line 0 (:length line))
+             (set! lines i cur-line)
+             (inc! i)))
 
 (defn main (args)
       :export
