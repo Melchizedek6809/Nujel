@@ -48,6 +48,8 @@
 (defn end-of-line () (:end-of-line cur-buffer))
 (defn beginning-of-buffer () (:beginning-of-buffer cur-buffer))
 (defn end-of-buffer () (:end-of-buffer cur-buffer))
+(defn keyboard-quit () (:keyboard-quit cur-buffer))
+(defn set-mark-command () (:set-mark-command cur-buffer))
 
 (defn kill-line () (set! clipboard (:kill-line cur-buffer)))
 
@@ -81,10 +83,36 @@
       (:put-string term ln)
       (:set-color term :default)
       (:move-cursor term (+ 1 (:length ln) term-x) term-y)
-      (def max-w (- term-w 7))
-      (when (>= (:length line) max-w)
-        (set! line (:clone (:cut (buffer->string line) 0 max-w))))
-      (:put-string term line))
+      (def buf-off 0)
+      (def buf-max (:length line))
+      (def max-w (min (- buf-max buf-off) (- term-w 7)))
+      (def mark-start 0)
+      (def mark-end 0)
+      (when (:use-region? cur-buffer)
+        (def rs-y (:region-start-y cur-buffer))
+        (def re-y (:region-end-y cur-buffer))
+        (def rs-x (:region-start-x cur-buffer))
+        (def re-x (:region-end-x cur-buffer))
+        (when (and (>= line-y rs-y)
+                   (<= line-y re-y))
+          (set! mark-end max-w)
+          (when (= line-y rs-y)
+            (set! mark-start rs-x))
+          (when (= line-y re-y)
+            (set! mark-end re-x))))
+
+      (def c 0)
+      (dotimes (i max-w)
+               (set! c (ref line (+ i buf-off)))
+               (when (zero? c)
+                 (:set-color term :default)
+                 (return))
+               (when (= i mark-start)
+                 (:set-color term :white :black))
+               (when (= i mark-end)
+                 (:set-color term :default))
+               (:put-char term c))
+      (:set-color term :default))
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
@@ -167,10 +195,12 @@
       (set! last-char c)
       (case c
             (#x1B (read-escaped-input))
+            (#x00 (set-mark-command))
             (#x01 (beginning-of-line))
             (#x02 (backward-char))
             (#x05 (end-of-line)) ; C-e
             (#x06 (forward-char)) ; C-f
+            (#x07 (keyboard-quit)) ; C-g
             (#x0B (kill-line)) ; C-k
             (#x10 (previous-line)) ; C-p
             (#x0E (next-line)) ; C-n

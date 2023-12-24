@@ -11,6 +11,7 @@
           :pos-y 0
           :scroll-x 0
           :scroll-y 0
+          :mark #nil
           :scroll-interval 20
           :prototype* self })
 
@@ -141,8 +142,43 @@
         (set! line bl 0)
         (set! self :pos-x (- (ref self :pos-x) 1)))
 
+  (defn keyboard-quit (self)
+        (set! self :mark #nil))
+
+  (defn use-region? (self)
+        (pair? (ref self :mark)))
+
+  (defn region-start-y (self)
+        (min (ref self :pos-y)
+             (cdr (ref self :mark))))
+
+  (defn region-end-y (self)
+        (max (ref self :pos-y)
+             (cdr (ref self :mark))))
+
+  (defn region-start-x (self)
+        (if (= (ref self :pos-y) (cdr (ref self :mark)))
+            (min (ref self :pos-x)
+                 (car (ref self :mark)))
+            (if (< (ref self :pos-y) (cdr (ref self :mark)))
+                (ref self :pos-x)
+                (car (ref self :mark)))))
+
+  (defn region-end-x (self)
+        (if (= (ref self :pos-y) (cdr (ref self :mark)))
+            (max (ref self :pos-x)
+                 (car (ref self :mark)))
+            (if (< (ref self :pos-y) (cdr (ref self :mark)))
+                (car (ref self :mark))
+                (ref self :pos-x))))
+
+  (defn set-mark-command (self)
+        (set! self :mark (cons (ref self :pos-x) (ref self :pos-y))))
+
   (defn insert-char (self c)
         (when (zero? c) (return))
+        (when (= c #\LineFeed)
+          (return (:insert-newline self)))
         (def line (:get-line self (ref self :pos-y)))
         (when-not line (return))
         (def pos-x (ref self :pos-x))
