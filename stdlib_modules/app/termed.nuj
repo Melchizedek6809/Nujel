@@ -89,7 +89,7 @@
                  (:set-color term :default)
                  (return))
                (when (= i mark-start)
-                 (:set-color term :white :black))
+                 (:set-color term :black :white))
                (when (= i mark-end)
                  (:set-color term :default))
                (:put-char term c))
