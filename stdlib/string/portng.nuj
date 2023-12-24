@@ -149,6 +149,9 @@
 
   (defn position (self)
         (ref self :buffer-pos))
+
+  (defn position! (self pos)
+        (set! self :buffer-pos (max 0 (min (:length (ref self :buffer)) pos))))
 )
 
 (defclass InputPort

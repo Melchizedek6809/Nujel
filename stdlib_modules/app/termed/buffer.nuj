@@ -29,8 +29,22 @@
                  (when (zero? (ref line i))
                    (return i))))
 
+  (defn line-indent-depth (self pos-y)
+        (def line (:get-line self pos-y))
+        (when-not line (return 0))
+        (dotimes (i (:length line) (:length line))
+                 (when (or (zero? (ref line i))
+                           (> (ref line i) #x20))
+                   (return i))))
+
   (defn beginning-of-line (self)
         (set! self :pos-x 0))
+
+  (defn start-of-line (self)
+        (def depth (:line-indent-depth self (ref self :pos-y)))
+        (if (> (ref self :pos-x) depth)
+            (set! self :pos-x depth)
+            (:beginning-of-line self)))
 
   (defn end-of-line (self)
         (set! self :pos-x (:line-length self (ref self :pos-y))))
@@ -219,7 +233,7 @@
             (set! mark-start rs-x))
           (when (= line-y re-y)
             (set! mark-end re-x))
-          (set! buf (cons (buffer->string (ref lines line-y) (- mark-end mark-start) mark-start) buf))
+          (set! buf (cons (buffer->string (ref lines line-y) mark-end mark-start) buf))
           (inc! line-y))
         (join (nreverse buf) "\n"))
 

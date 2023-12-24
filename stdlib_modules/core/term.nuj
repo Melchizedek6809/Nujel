@@ -50,8 +50,7 @@
 
   (defn flip (self)
         (def s (:return-string (ref self :buf-port)))
-        (:close! (ref self :buf-port))
-        (set! self :buf-port (:new StringOutputPort))
+        (:position! (ref self :buf-port) 0)
         (:block-write (ref self :out-port) s)
         (:flush-output (ref self :out-port)))
 

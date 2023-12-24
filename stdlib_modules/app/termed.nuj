@@ -9,6 +9,7 @@
 (def last-char 0)
 (def clipboard "")
 (def keycodes #nil)
+(def scroll-interval 8)
 
 (defn add-keycode (c t)
       (set! keycodes (cons (fmt "{t}{c:02X}") keycodes))
@@ -19,10 +20,9 @@
 (defn poll-key (t)
       (add-keycode (:poll-input term) t))
 
-(def scroll-interval 10)
-
 (defn set-cur-buffer! (buf)
-      (set! buf :scroll-interval (max 4 (bit-shift-right screen-height 1)))
+      (set! scroll-interval (max 4 (int (/ screen-height 3))))
+      (set! buf :scroll-interval scroll-interval)
       (set! cur-buffer buf))
 
 (defn new-buffer (filename)
@@ -30,28 +30,7 @@
       (array/push buffers buf)
       buf)
 
-(defn backward-char () (:backward-char cur-buffer))
-(defn forward-char () (:forward-char cur-buffer))
-(defn previous-line () (:previous-line cur-buffer))
-(defn next-line () (:next-line cur-buffer))
-(defn delete-forward-char () (:delete-forward-char cur-buffer))
-(defn backward-delete-char () (:backward-delete-char cur-buffer))
-(defn insert-newline () (:insert-newline cur-buffer))
-(defn insert-char (c) (:insert-char cur-buffer c))
-(defn next-line () (:next-line cur-buffer))
-(defn forward-char () (:forward-char cur-buffer))
-(defn backward-char () (:backward-char cur-buffer))
 (defn yank () (:insert-text cur-buffer clipboard))
-(defn scroll-down-command () (:scroll-down-command cur-buffer))
-(defn scroll-up-command () (:scroll-up-command cur-buffer))
-(defn beginning-of-line () (:beginning-of-line cur-buffer))
-(defn end-of-line () (:end-of-line cur-buffer))
-(defn beginning-of-buffer () (:beginning-of-buffer cur-buffer))
-(defn end-of-buffer () (:end-of-buffer cur-buffer))
-(defn keyboard-quit () (:keyboard-quit cur-buffer))
-(defn set-mark-command () (:set-mark-command cur-buffer))
-(defn get-region () (:get-region cur-buffer))
-
 (defn kill-line () (set! clipboard (:kill-line cur-buffer)))
 
 (defn draw-gutter ()
@@ -63,12 +42,13 @@
       (def bufname (:get-buf-name buf))
       (def saved (if (ref buf :changed) "*" ""))
       (def ll (:line-length buf (ref buf :pos-y)))
+      (def id (:line-indent-depth buf (ref buf :pos-y)))
       (def keys (join keycodes " "))
-      (fmt " L{y} - {bufname} - ({keys})"))
+      (fmt " L{y}:{x} - {ll}:{id} - {bufname} - ({keys})"))
 
 (defn draw-modeline (buf)
       (:move-cursor term 1 (dec screen-height))
-      (:set-color term :yellow :blue)
+      (:set-color term :white :blue)
       (def colored-modeline (cat " " (pad-end (get-modeline buf) (dec screen-width))))
       (:put-string term colored-modeline)
       (:set-color term :default :default))
@@ -79,7 +59,7 @@
       (:clear-line term)
       (when-not line (return))
       (when (= line-y (ref buf :pos-y))
-        (:set-color term :yellow :blue))
+        (:set-color term :white :blue))
       (def ln (fmt " {:4} " (inc line-y)))
       (:put-string term ln)
       (:set-color term :default)
@@ -126,8 +106,10 @@
       (:hide-cursor term)
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
       (:show-cursor term)
-      (:move-cursor term (+ 1 1 6 (ref cur-buffer :pos-x)) (- (inc (ref cur-buffer :pos-y))
-                                                              (ref cur-buffer :scroll-y)))
+      (:move-cursor term
+                    (+ 1 1 6 (ref cur-buffer :pos-x))
+                    (- (inc (ref cur-buffer :pos-y))
+                       (ref cur-buffer :scroll-y)))
       (:flip term))
 
 (defn quit ()
@@ -156,36 +138,35 @@
       (when (< (ref buf :scroll-y) 0)
         (set! buf :scroll-y)))
 
-(defn read-page-up-input ()
+(defn read-nav-key (method)
       (def c (poll-key "U-"))
-      (case c
-            (#x7E (scroll-down-command))))
-
-(defn read-page-down-input ()
-      (def c (poll-key "U-"))
-      (case c
-            (#x7E (scroll-up-command))))
+      (when (= c #x7E)
+        (if (lambda? method)
+            (method)
+            (method cur-buffer))))
 
 (defn read-bracketed-input ()
       (def c (poll-key "[-"))
       (case c
-            (#\A (previous-line))
-            (#\B (next-line))
-            (#\C (forward-char))
-            (#\D (backward-char))
-            (#x35 (read-page-up-input))
-            (#x36 (read-page-down-input))
-            (#x46 (end-of-line))
-            (#x48 (beginning-of-line))))
+            (#\A (:previous-line cur-buffer))
+            (#\B (:next-line cur-buffer))
+            (#\C (:forward-char cur-buffer))
+            (#\D (:backward-char cur-buffer))
+            (#x32 (read-nav-key yank))
+            (#x33 (read-nav-key :delete-forward-char))
+            (#x35 (read-nav-key :scroll-down-command))
+            (#x36 (read-nav-key :scroll-up-command))
+            (#x46 (:end-of-line cur-buffer))
+            (#x48 (:start-of-line cur-buffer))))
 
 (defn read-escaped-input ()
       (def c (poll-key "E-"))
       (case c
             (#\[ (read-bracketed-input))
-            (#x3C (beginning-of-buffer))
-            (#x3E (end-of-buffer))
-            (#x77 (set! clipboard (get-region)) (keyboard-quit))
-            (otherwise (insert-char #\[))))
+            (#x3C (:beginning-of-buffer cur-buffer))
+            (#x3E (:end-of-buffer cur-buffer))
+            (#x77 (set! clipboard (:get-region cur-buffer)) (:keyboard-quit cur-buffer))
+            (otherwise (:insert-char cur-buffer #\[))))
 
 (defn read-cx-input ()
       (def c (poll-key "C-"))
@@ -197,24 +178,24 @@
       (set! last-char c)
       (case c
             (#x1B (read-escaped-input))
-            (#x00 (set-mark-command))
-            (#x01 (beginning-of-line))
-            (#x02 (backward-char))
-            (#x05 (end-of-line)) ; C-e
-            (#x06 (forward-char)) ; C-f
-            (#x07 (keyboard-quit)) ; C-g
-            (#x0B (kill-line)) ; C-k
-            (#x10 (previous-line)) ; C-p
-            (#x0E (next-line)) ; C-n
-            (#x17 (set! clipboard (get-region)) (:delete-region cur-buffer)) ; C-w
+            (#x17 (set! clipboard (:get-region cur-buffer)) (:delete-region cur-buffer)) ; C-w
             (#x18 (read-cx-input)) ; C-x
             (#x19 (yank)) ; C-y
-            (#x7E (delete-forward-char))
-            (#x7F (backward-delete-char))
-            (#x0D (insert-newline))
+            (#x00 (:set-mark-command cur-buffer))
+            (#x01 (:start-of-line cur-buffer))
+            (#x02 (:backward-char cur-buffer))
+            (#x05 (:end-of-line cur-buffer)) ; C-e
+            (#x06 (:forward-char cur-buffer)) ; C-f
+            (#x07 (:keyboard-quit cur-buffer)) ; C-g
+            (#x0B (kill-line)) ; C-k
+            (#x10 (:previous-line cur-buffer)) ; C-p
+            (#x0E (:next-line cur-buffer)) ; C-n
+            (#x7E (:delete-forward-char cur-buffer))
+            (#x7F (:backward-delete-char cur-buffer))
+            (#x0D (:insert-newline cur-buffer))
             (otherwise (when (and (>= c #x20)
                                   (<  c #x80))
-                         (return (insert-char c))))))
+                         (return (:insert-char cur-buffer c))))))
 
 (defn load-buffer (filename)
       (def buf (new-buffer filename))
