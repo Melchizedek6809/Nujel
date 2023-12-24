@@ -170,8 +170,9 @@
 
 (defn read-cx-input ()
       (def c (poll-key "C-"))
-      (when (= c 3)
-        (return (quit))))
+      (case c
+            (#x68 (:mark-whole-buffer cur-buffer))
+            (#x03 (quit))))
 
 (defn read-input ()
       (def c (poll-key #nil))

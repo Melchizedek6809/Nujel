@@ -192,6 +192,11 @@
   (defn set-mark-command (self)
         (set! self :mark (cons (ref self :pos-x) (ref self :pos-y))))
 
+  (defn mark-whole-buffer (self)
+        (:end-of-buffer self)
+        (:set-mark-command self)
+        (:beginning-of-buffer self))
+
   (defn delete-region (self)
         (when (nil? (ref self :mark))
           (return #f))
@@ -290,7 +295,7 @@
 
   (defn goto-line (self line)
         (set! self :pos-y (max 0 (min (- (:length (ref self :lines)) 1) line)))
-        (def pos-x (max 0 (min (- (:line-length self (ref self :pos-y)) 1) (ref self :pos-x)))))
+        (set! self :pos-x (max 0 (min (- (:line-length self (ref self :pos-y)) 1) (ref self :pos-x)))))
 
   (defn scroll-up-command (self)
         (:goto-line self (+ (ref self :pos-y) (ref self :scroll-interval))))
