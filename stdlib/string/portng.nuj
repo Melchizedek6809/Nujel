@@ -75,8 +75,7 @@
       (write/raw v (or port stdout) #t)
       #nil)
 
-(defn init/ports! ()
-      (defclass OutputPort
+(defclass OutputPort
   "OutputPort"
 
   (defn new (self handle)
@@ -109,8 +108,7 @@
         (file/seek* (ref self :handle) new-position 0))
 
   (defn file-handle (self)
-        (ref self :handle))
-)
+        (ref self :handle)))
 
 (defclass StringOutputPort
   "StringOutputPort"
@@ -151,8 +149,7 @@
         (ref self :buffer-pos))
 
   (defn position! (self pos)
-        (set! self :buffer-pos (max 0 (min (:length (ref self :buffer)) pos))))
-)
+        (set! self :buffer-pos (max 0 (min (:length (ref self :buffer)) pos)))))
 
 (defclass InputPort
   "InputPort"
@@ -188,13 +185,8 @@
         (file/seek* (ref self :handle) new-position 0))
 
   (defn file-handle (self)
-        (ref self :handle))
-  )
+        (ref self :handle)))
 
-(set! root-closure :InputPort InputPort)
-(set! root-closure :OutputPort OutputPort)
-(set! root-closure :StringOutputPort StringOutputPort)
-
-     (set! root-closure :stdin (:new InputPort stdin*))
-     (set! root-closure :stdout (:new OutputPort stdout*))
-     (set! root-closure :stderr (:new OutputPort stderr*)))
+(def stdin (:new InputPort stdin*))
+(def stdout (:new OutputPort stdout*))
+(def stderr (:new OutputPort stderr*))

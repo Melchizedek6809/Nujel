@@ -139,12 +139,12 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 
 static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lTree *)mapP; }
+	if(mapP != NULL){ return ((lTreeRoot *)mapP)->root; }
 	if(off < 0){return NULL;}
 	if(off >= (1<<24)-1){return NULL;}
 	const i32 len = img->data[off] | (img->data[off+1]<<8);
-	lTree *ret = lTreeAllocRaw();
-	readMapSet(map, off, ret);
+	lTreeRoot *root = lTreeRootAllocRaw();
+	readMapSet(map, off, root);
 	off += 2;
 	for(int i=0;i<len;i++){
 		const i32 sym = img->data[off+0] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
@@ -152,10 +152,12 @@ static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool stati
 		off += 6;
 
 		const lSymbol *s = readSymbol(map, img, sym, staticImage);
-		lVal v = readVal(map, img, val, staticImage);
-		ret = lTreeInsert(ret, s, v);
+		if(s){
+			lVal v = readVal(map, img, val, staticImage);
+			root->root = lTreeInsert(root->root, s, v);
+		}
 	}
-	return ret;
+	return root->root;
 }
 
 static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool staticImage){

@@ -22,7 +22,7 @@ static uint lTreeCalcHeight(const lTree *t){
 
 /* Return the total size of the tree T */
 int lTreeSize(const lTree *t){
-	if(t == NULL){return 0;}
+	if((t == NULL) || (t->key == NULL)){return 0;}
 	return 1 + lTreeSize(t->left) + lTreeSize(t->right);
 }
 

@@ -29,8 +29,7 @@
           (map directory/read-recursive)
           (flatten)
           (filter (path/ext?! "nuj"))
-          (for-each compile-in-env))
-      (mutable-eval* (compile* `(do (init/ports!)) env) env))
+          (for-each compile-in-env)))
 
 (compile-stdlib)
 

@@ -94,7 +94,7 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 	if(mapOff > 0){ return mapOff; }
 
 	const int len = lTreeSize(v);
-	const i32 eleSize = 2 + (3*2*len);
+	const i32 eleSize = 2 + (6*len);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;

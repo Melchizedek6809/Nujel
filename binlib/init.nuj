@@ -13,7 +13,6 @@
 (def *module-path* "")
 
 (defn init args (let*
-            (init/ports!)
             (def init/parse-args/eval-next-module #f)
             (def init/parse-args/eval-next #f)
             (def init/parse-args/run-repl #t)
