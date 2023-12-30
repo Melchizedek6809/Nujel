@@ -1,7 +1,7 @@
-(import (Term) :core/term)
+(import (TermIO) :core/TermIO)
 (import (TextBuffer) :app/termed/buffer)
 
-(def term (:new Term))
+(def term (:new TermIO))
 (def buffers [])
 (def cur-buffer #nil)
 (def screen-width #nil)
@@ -33,9 +33,6 @@
 (defn yank () (:insert-text cur-buffer clipboard))
 (defn kill-line () (set! clipboard (:kill-line cur-buffer)))
 
-(defn draw-gutter ()
-      (:draw-box term :red 1 2 4 (- screen-height 2)))
-
 (defn get-modeline (buf)
       (def x (ref buf :pos-x))
       (def y (inc (ref buf :pos-y)))
@@ -47,23 +44,17 @@
       (fmt " L{y}:{x} - {ll}:{id} - {bufname} - ({keys})"))
 
 (defn draw-modeline (buf)
-      (:move-cursor term 1 (dec screen-height))
-      (:set-color term :white :blue)
       (def colored-modeline (cat " " (pad-end (get-modeline buf) (dec screen-width))))
-      (:put-string term colored-modeline)
-      (:set-color term :default :default))
+      (:draw-text term colored-modeline 1 (dec screen-height) screen-width 1 #x34))
 
 (defn draw-buffer-line (buf term-x term-y term-w line-y)
       (def line (:get-line buf line-y))
-      (:move-cursor term term-x term-y)
-      (:clear-line term)
-      (when-not line (return))
-      (when (= line-y (ref buf :pos-y))
-        (:set-color term :white :blue))
+      (when-not line
+                (:draw-text term (pad-end "" term-w) term-x term-y term-w 1 #xFF)
+                (return))
+      (def gutter-color (if (= line-y (ref buf :pos-y)) #x34 #xFF))
       (def ln (fmt " {:4} " (inc line-y)))
-      (:put-string term ln)
-      (:set-color term :default)
-      (:move-cursor term (+ 1 (:length ln) term-x) term-y)
+      (:draw-text term ln term-x term-y 6 1 gutter-color)
       (def buf-off 0)
       (def buf-max (:length line))
       (def max-w (min (- buf-max buf-off) (- term-w 7)))
@@ -83,17 +74,17 @@
             (set! mark-end re-x))))
 
       (def c 0)
-      (dotimes (i max-w)
-               (set! c (ref line (+ i buf-off)))
-               (when (zero? c)
-                 (:set-color term :default)
-                 (return))
-               (when (= i mark-start)
-                 (:set-color term :black :white))
-               (when (= i mark-end)
-                 (:set-color term :default))
-               (:put-char term c))
-      (:set-color term :default))
+      (def color 0)
+      (:draw-char term #x20 (+ 6 term-x) term-y #xFF)
+      (dotimes (i term-w)
+               (if (< i max-w)
+                   (do (set! c (ref line (+ i buf-off)))
+                       (set! color (if (and (>= i mark-start)
+                                            (< i mark-end)
+                                            (not (zero? c)))
+                                       #x34 #xFF))
+                     (:draw-char term (if (zero? c) #x20 c) (+ 7 term-x i) term-y color))
+                   (:draw-char term #x20 (+ 7 term-x i) term-y color))))
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
@@ -103,12 +94,10 @@
 
 (defn draw-screen ()
       (def cur-buffer cur-buffer)
-      (:hide-cursor term)
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
-      (:show-cursor term)
-      (:move-cursor term
-                    (+ 1 1 6 (ref cur-buffer :pos-x))
-                    (- (inc (ref cur-buffer :pos-y))
+      (:set-cursor term
+                   (+ 1 1 6 (ref cur-buffer :pos-x))
+                   (- (inc (ref cur-buffer :pos-y))
                        (ref cur-buffer :scroll-y)))
       (:flip term))
 
@@ -116,11 +105,7 @@
       (:stop term)
       (exit 0))
 
-
-(defn clear-frame ()
-      (dotimes (y (- screen-height 1))
-               (:move-cursor term 0 y)
-               (:clear-line term)))
+(defn clear-frame () #t)
 
 (defn scroll-into-view ()
       (def buf cur-buffer)

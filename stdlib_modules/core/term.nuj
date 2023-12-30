@@ -36,6 +36,12 @@
 
                  :white "\e[47m"})
 
+(def fg-codes [ 30 31 32 33 34 35 36 37
+                0  0  0  0  0  0  0  0 ])
+
+(def bg-codes [ 40 41 42 43 44 45 46 47
+                49 49 49 49 49 49 49 49 ])
+
 (defclass Term
   "A buffered terminal connection"
   :export
@@ -43,6 +49,7 @@
   (defn new (self out in)
         (when-not in (set! in (:new InputPort stdin*)))
         (when-not out (set! out (:new OutputPort stdout*)))
+        (:raw! in)
         { :in-port in
           :out-port out
           :buf-port (:new StringOutputPort)
@@ -67,20 +74,26 @@
         (:block-write (ref self :buf-port) "\e[2K"))
 
   (defn hide-cursor (self)
-        (:block-write (ref self :out-port) "\e[?25l"))
+        (:block-write (ref self :buf-port) "\e[?25l"))
 
   (defn show-cursor (self)
-        (:block-write (ref self :out-port) "\e[?25h"))
+        (:block-write (ref self :buf-port) "\e[?25h"))
 
   (defn start (self)
-        (:raw! (ref self :in-port))
-        (:block-write (ref self :out-port) "\e[?1049h"))
+        (:block-write (ref self :buf-port) "\e[?1049h")
+        (:flip self))
 
   (defn stop (self)
-        (:block-write (ref self :out-port) "\e[?1049l"))
+        (:block-write (ref self :buf-port) "\e[?1049l")
+        (:flip self))
 
   (defn move-cursor (self column line)
         (:block-write (ref self :buf-port) (fmt "\e[{line};{column}H")))
+
+  (defn set-color-code (self color-code)
+        (def fg (ref fg-codes (bit-shift-right color-code 4)))
+        (def bg (ref bg-codes (bit-and color-code #xF)))
+        (:block-write (ref self :buf-port) (fmt "\e[{fg}m\e[{bg}m")))
 
   (defn set-fg-color (self color-name)
         (def v (ref fg-colors color-name))
@@ -122,15 +135,4 @@
 
   (defn poll-input (self)
         (def c (:char-read (ref self :in-port)))
-        (if (= c :end-of-file)
-            0
-            c))
-
-  (defn draw-box (self color pos-x pos-y width height)
-        :export
-        (:set-bg-color self color)
-        (dotimes (y height)
-                 (:move-cursor self pos-x (+ y pos-y))
-                 (dotimes (x width)
-                          (:put-char self 32)))
-        (:set-bg-color self :default)))
+        (if (= c :end-of-file) 0 c)))

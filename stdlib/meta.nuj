@@ -17,7 +17,7 @@
                        (ref c :*module*)
                        " - "
                        (if (< l 8)
-                           (string/write data)
+                           (:cut (string/write data) 0 120)
                            "-+- Very big tree structure -+-"))))))
 
 (defn print/stacktrace (trace)
