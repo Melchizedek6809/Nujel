@@ -51,7 +51,11 @@
                     (defn macroexpand-set (source env)
                           (if (= 3 (:length (cdr source)))
                               (macroexpand-form source env set! 3 #f #b000)
-                              (macroexpand-form source env set! 2 #f #b001)))
+                              (if (pair? (cadr source))
+                                  (if (= (car (cadr source)) 'ref)
+                                      (macroexpand-form (list 'set! (cadr (cadr source)) (caddr (cadr source)) (caddr source)) env set! 3 #f #b000)
+                                      (throw (list :type-error "(set!) needs a symbol name and a value as arguments" source env)))
+                                  (macroexpand-form source env set! 2 #f #b001))))
 
                     (defn macroexpand* (source env)
                           ; Expand all macros within source

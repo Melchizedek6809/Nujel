@@ -518,3 +518,5 @@
 ;(:arity-error (try car (div/int 10)))
 (123 (let ((env (environment*))) (eval-in env '(def test-asd 123)) (ref (:data env) 'test-asd)))
 (#nil (try car (:meta #nil)))
+(3 (def o {:a 1}) (set! (ref o :b) 2) (+ (ref o :a) (ref o :b)))
+(3 (def o [1 0]) (set! (ref o 1) 2) (+ (ref o 0) (ref o 1)))
