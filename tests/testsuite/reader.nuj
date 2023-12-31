@@ -55,7 +55,6 @@
 (:read-error (try car (read "(a .)")))
 (:read-error (try car (read "(#;a . b)")))
 (:read-error (try car (read "(a . #;b)")))
-('(a b) (car (read "(a #;. b)")))
 (:read-error (try car (read "(#;x #;y . z)")))
 (:read-error (try car (read "(#; #;x #;y . z)")))
 (:read-error (try car (read "(#; #;x . z)")))

@@ -1,5 +1,6 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#include "nujel.h"
 #ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
 #endif
@@ -162,15 +163,47 @@ static lVal lParseString(lReadContext *s){
 	return lValException(lSymReadError, "Can't find closing \"", lValString(buf));
 }
 
+static lVal lFinishSymbol(lReadContext *s, uint i, char buf[128], const char *start, bool keyword, lVal refVal){
+	buf[i] = 0;
+	while(isspace((u8)*s->data)){
+		if(*s->data == 0){break;}
+		s->data++;
+	}
+
+	char *kwstart = buf;
+	if((i > 0) && (buf[i-1] == ':')){
+		buf[i-1] = 0;
+	}
+	if(buf[0] == ':'){
+		kwstart = &buf[1];
+	}
+	if(unlikely(*start == 0)){
+		return lValExceptionReaderEnd(s, kwstart, "Sym/KW too short");
+	}
+	lVal ret = keyword
+		? lValKeyword(kwstart)
+		: lValSym(buf);
+	if(unlikely(refVal.type != ltNil)){
+		ret = lCons(lValSymS(symRef), lCons(refVal, lCons(ret, NIL)));
+	}
+	return ret;
+}
+
 /* Parse s as a symbol and return the ltSymbol lVal */
-static lVal lParseSymbol(lReadContext *s){
+static lVal lParseSymbol(lReadContext *s, lVal refVal){
 	uint i;
 	char buf[128];
-	bool keyword = false;
+	bool keyword = refVal.type != ltNil;
+	if(unlikely(refVal.type == ltException)){
+		return refVal;
+	}
 	const char *start = s->data;
 	for(i=0;i<(sizeof(buf)-1);i++){
 		const char c = *s->data++;
 		if(c == ':'){
+			if(keyword){
+				return lValExceptionReaderEnd(s, start, "Can't have a colon there");
+			}
 			keyword = true;
 			if(i > 0){
 				const char cc = *s->data++;
@@ -182,7 +215,7 @@ static lVal lParseSymbol(lReadContext *s){
 			}
 		}
 		if(c == '.'){
-			return lValExceptionReaderEnd(s, start, "Can't have a period there");
+			return lParseSymbol(s, lFinishSymbol(s, i, buf, start, keyword, refVal));
 		}
 		if((c == 0) || isspace((u8)c) || isnonsymbol(c)){
 			s->data--;
@@ -190,25 +223,7 @@ static lVal lParseSymbol(lReadContext *s){
 		}
 		buf[i] = c;
 	}
-	buf[i] = 0;
-	while(isspace((u8)*s->data)){
-		if(*s->data == 0){break;}
-		s->data++;
-	}
-
-	char *kwstart = buf;
-	if(unlikely(i > 0) && (buf[i-1] == ':')){
-		buf[i-1] = 0;
-	}
-	if(buf[0] == ':'){
-		kwstart = &buf[1];
-	}
-	if(unlikely(*start == 0)){
-		return lValExceptionReaderEnd(s, kwstart, "Sym/KW too short");
-	}
-	return keyword
-		? lValKeyword(kwstart)
-		: lValSym(buf);
+	return lFinishSymbol(s, i, buf, start, keyword, refVal);
 }
 
 static lVal lParseNumberBase(lReadContext *s, int base, int maxDigits){
@@ -515,7 +530,7 @@ static lVal lReadValue(lReadContext *s){
 		if((isdigit((u8)c)) || ((c == '-') && isdigit(((u8 *)s->data)[1]))){
 			return lParseNumber(s, 10, 18);
 		}
-		return lParseSymbol(s);
+		return lParseSymbol(s, NIL);
 	}
 }
 

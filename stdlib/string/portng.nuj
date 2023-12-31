@@ -85,30 +85,30 @@
           :temp-buffer (buffer/allocate 16) })
 
   (defn flush-output (self)
-        (file/flush* (ref self :handle)))
+        (file/flush* self.handle))
 
   (defn block-write (self buffer size)
-        (file/write* (ref self :handle) buffer size))
+        (file/write* self.handle buffer size))
 
   (defn write (self . buffers)
         (doseq (buf buffers self)
                (:block-write self buf)))
 
   (defn char-write (self char)
-        (set! (ref self :temp-buffer) 0 char)
-        (file/write* (ref self :handle) temporary-buffer 1))
+        (set! self.temp-buffer 0 char)
+        (file/write* self.handle temporary-buffer 1))
 
   (defn close! (self)
-        (file/close* (ref self :handle)))
+        (file/close* self.handle))
 
   (defn position (self)
-        (file/tell* (ref self :handle)))
+        (file/tell* self.handle))
 
   (defn position! (self new-position)
-        (file/seek* (ref self :handle) new-position 0))
+        (file/seek* self.handle new-position 0))
 
   (defn file-handle (self)
-        (ref self :handle)))
+        self.handle))
 
 (defclass StringOutputPort
   "StringOutputPort"
@@ -122,19 +122,19 @@
   (defn flush-output (self) #t)
 
   (defn block-write (self buffer size)
-        (def buf (ref self :buffer))
+        (def buf self.buffer)
         (when-not size (set! size (:length buffer)))
-        (when (> size (- (:length buf) (ref self :buffer-pos)))
+        (when (> size (- (:length buf) self.buffer-pos))
           (:length! buf (+ #x80 (bit-and (+ (:length buf) size) (bit-not #x7F)))))
-        (buffer/copy buf buffer (ref self :buffer-pos) size)
-        (set! self :buffer-pos (+ (ref self :buffer-pos) size)))
+        (buffer/copy buf buffer self.buffer-pos size)
+        (set! self.buffer-pos (+ self.buffer-pos size)))
 
   (defn char-write (self char)
-        (def buf (ref self :buffer))
-        (when (< (- (:length buf) (ref self :buffer-pos)) 1)
+        (def buf self.buffer)
+        (when (< (- (:length buf) self.buffer-pos) 1)
           (:length! buf (+ #x80 (:length buf))))
-        (set! buf (ref self :buffer-pos) char)
-        (set! self :buffer-pos (+ (ref self :buffer-pos) 1)))
+        (set! buf self.buffer-pos char)
+        (set! self.buffer-pos (+ self.buffer-pos 1)))
 
   (defn write (self . buffers)
         (doseq (buf buffers self)
@@ -143,13 +143,13 @@
   (defn close! (self) self)
 
   (defn return-string (self)
-        (buffer->string (ref self :buffer) (ref self :buffer-pos)))
+        (buffer->string self.buffer self.buffer-pos))
 
   (defn position (self)
-        (ref self :buffer-pos))
+        self.buffer-pos)
 
   (defn position! (self pos)
-        (set! self :buffer-pos (max 0 (min (:length (ref self :buffer)) pos)))))
+        (set! self.buffer-pos (max 0 (min (:length self.buffer) pos)))))
 
 (defclass InputPort
   "InputPort"
@@ -161,31 +161,31 @@
           :temp-buffer (buffer/allocate 16) })
 
   (defn block-read (self buffer size)
-        (if (file/eof*? (ref self :handle))
+        (if (file/eof*? self.handle)
             :end-of-file
-            (file/read* (ref self :handle) buffer size)))
+            (file/read* self.handle buffer size)))
 
   (defn char-read (self char)
-        (when (file/eof*? (ref self :handle))
+        (when (file/eof*? self.handle)
           (return :end-of-file))
-        (when-not (file/read* (ref self :handle) (ref self :temp-buffer) 1)
+        (when-not (file/read* self.handle self.temp-buffer 1)
                   (return :end-of-file))
-        (ref (ref self :temp-buffer) 0))
+        (ref self.temp-buffer 0))
 
   (defn raw! (self)
-        (file/raw* (ref self :handle) #t))
+        (file/raw* self.handle #t))
 
   (defn close! (self)
-        (file/close* (ref self :handle)))
+        (file/close* self.handle))
 
   (defn position (self)
-        (file/tell* (ref self :handle)))
+        (file/tell* self.handle))
 
   (defn position! (self new-position)
-        (file/seek* (ref self :handle) new-position 0))
+        (file/seek* self.handle new-position 0))
 
   (defn file-handle (self)
-        (ref self :handle)))
+        self.handle))
 
 (def stdin (:new InputPort stdin*))
 (def stdout (:new OutputPort stdout*))

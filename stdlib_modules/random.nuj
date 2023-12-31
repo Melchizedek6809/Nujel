@@ -13,13 +13,13 @@
 
   (defn seed! (self seed)
         "Set a new seed value for the RNG"
-        (set! self :seed seed))
+        (set! self.seed seed))
 
   (defn rng! (self)
         "Generate a random integer"
-        (set! self :seed (+ 12345 (* (ref self :seed) 1103515245)))
-        (bit-or (bit-shift-left (bit-and (ref self :seed) #xFFFF) 16)
-                (bit-and (bit-shift-right (ref self :seed) 16) #xFFFF)))
+        (set! self.seed (+ 12345 (* self.seed 1103515245)))
+        (bit-or (bit-shift-left (bit-and self.seed #xFFFF) 16)
+                (bit-and (bit-shift-right self.seed 16) #xFFFF)))
 
   (defn int (self max)
         "Return a value from 0 to MAX, or, if left out, a random int"

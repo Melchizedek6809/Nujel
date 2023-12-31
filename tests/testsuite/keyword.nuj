@@ -8,6 +8,7 @@
 (#f (keyword? 'asd))
 (#f (keyword? (:symbol "asd")))
 (#f (keyword? 123))
+(:read-error (try car (read/single ":asd:")))
 (:read-error (try car (read/single ":asd:qwe:")))
 (:read-error (try car (read/single ":asd:qwe")))
 (:read-error (try car (read/single "asd:qwe")))

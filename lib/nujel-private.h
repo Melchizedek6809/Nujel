@@ -350,6 +350,7 @@ extern lSymbol *symArguments;
 extern lSymbol *symCode;
 extern lSymbol *symData;
 extern lSymbol *symName;
+extern lSymbol *symRef;
 
 extern lSymbol *lSymLTNil;
 extern lSymbol *lSymLTBool;

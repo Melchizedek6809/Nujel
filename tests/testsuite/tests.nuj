@@ -154,7 +154,7 @@
 (#t (:has? {:a 123} :a))
 (123 (ref {:a 123} :a))
 (123 (ref {b: 2, a: 123} :a))
-(2 (ref {b: 2, a: 123} :b:))
+(2 (ref {b: 2, a: 123} :b))
 (9 (ref (set! {:b 2 :a 123} :a 9) :a))
 (:type-error (try car (set! #@(:b 2 :a 123) :a 9)))
 (2 (ref {:b 2 :a 123} :b))
