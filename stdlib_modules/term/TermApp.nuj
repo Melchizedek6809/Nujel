@@ -1,0 +1,143 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+(import (VT100) :term/VT100)
+
+(defclass TermApp
+  "An high-level abstract I/O interface towards a terminal"
+  :export
+
+  (defn new (self in out)
+        (def term (:new VT100 in out))
+        (:start term)
+        (def ret { :term term
+                   :width 0
+                   :height 0
+                   :frontbuffer #nil
+                   :backbuffer #nil
+                   :input-buffer (buffer/allocate 16)
+                   :input-buffer-pos 0
+                   :event-queue #nil
+                   :cursor-x -1
+                   :cursor-y -1
+                   :prototype* self })
+        (:resize ret))
+
+  (defn start (self)
+        self)
+
+  (defn stop (self)
+        (:stop self.term)
+        self)
+
+  (defn resize (self)
+        (def term self.term)
+        (def size (:get-size term))
+        (def buf-size (* 2 size.width size.height))
+        (set! self.width size.width)
+        (set! self.height size.height)
+        (set! self.frontbuffer (buffer/allocate buf-size))
+        (set! self.backbuffer (buffer/allocate buf-size)))
+
+  (defn flip (self)
+        (def backbuffer self.backbuffer)
+        (def frontbuffer self.frontbuffer)
+        (def term self.term)
+        (:hide-cursor term)
+        (def last-color -1)
+        (def pos-x -1)
+        (def pos-y -1)
+        (dotimes (y self.height)
+                 (dotimes (x self.width)
+                          (def off (* 2 (+ x (* y self.width))))
+                          (def bc  (+ (ref backbuffer off)
+                                      (bit-shift-left (ref backbuffer (inc off)) 8)))
+                          (def fc  (+ (ref frontbuffer off)
+                                      (bit-shift-left (ref frontbuffer (inc off)) 8)))
+                          (when (not= fc bc)
+                            (when (or (not= x pos-x)
+                                      (not= y pos-y))
+                              (:move-cursor term x y))
+                            (set! pos-y y)
+                            (set! pos-x (inc x))
+                            (when (not= (bit-shift-right bc 8) last-color)
+                              (:set-color-code term (bit-shift-right bc 8))
+                              (set! last-color (bit-shift-right bc 8)))
+                            (:put-char term (bit-and #xFF bc))
+                            (set! frontbuffer off (bit-and bc #xFF))
+                            (set! frontbuffer (inc off) (bit-shift-right bc 8)))))
+        (when (and (> self.cursor-x 0)
+                   (> self.cursor-y 0)
+                   (< self.cursor-x self.width)
+                   (< self.cursor-y self.height))
+          (:move-cursor term self.cursor-x self.cursor-y)
+          (:show-cursor term))
+        (:flip self.term)
+        self)
+
+  (defn draw-char (self char x y color)
+        (when (>= x self.width) (return))
+        (when (>= y self.height) (return))
+        (when (< x 0) (return))
+        (when (< y 0) (return))
+        (def off (* 2 (+ x (* y self.width))))
+        (def color color)
+        (set! self.backbuffer off char)
+        (set! self.backbuffer (inc off) color))
+
+  (defn set-cursor (self x y)
+       (set! self.cursor-x x)
+       (set! self.cursor-y y))
+
+  (defn clear-screen (self)
+        (def bb self.backbuffer)
+        (dotimes (i (:length bb) self)
+                 (set! bb i 0)))
+
+  (defn draw-text (self text x y w h color)
+        (set! x (max 0 x))
+        (set! y (max 0 y))
+        (set! w (min (- self.width x) w (:length text)))
+        (set! h (min (- self.height y) h))
+        (def off (* 2 (+ x (* y self.width))))
+        (def bb self.backbuffer)
+        (dotimes (i w self)
+                 (set! bb off (ref text i))
+                 (set! bb (inc off) color)
+                 (set! off (+ off 2))))
+
+  (defn get-size (self)
+        { :width self.width
+          :height self.height })
+
+  (defn pop-input-buffer! (self bytes)
+        (dotimes (i (:length self.input-buffer))
+          (def src-pos (+ i self.input-buffer-pos))
+          (def src-key (if (< src-pos (:length self.input-buffer))
+                           (ref self.input-buffer (+ i self.input-buffer-pos))
+                           0))
+          (set! self.input-buffer i src-key))
+        (set! self.input-buffer-pos 0)
+        (return self))
+
+  (defn parse-input-buffer (self)
+        (when (zero? self.input-buffer-pos) (return))
+        (def key (ref self.input-buffer-pos 0))
+        (cond ((and (>= c #x20) (<  c #x80))
+               (:add-input-event self { :T :input :code key :char (buffer->string self.input-buffer 1 0) })))
+        (:pop-input-buffer! self 1))
+
+  (defn poll-events (self)
+        (def key (:poll-input self.term))
+        (when key
+          (set! self.input-buffer self.input-buffer-pos key)
+          (set! self.input-buffer-pos (inc self.input-buffer-pos)))
+        (:parse-input-buffer self)
+        (when self.event-queue
+          (def ret (car (last-pair self.event-queue)))
+          (set! self.event-queue (except-last-pair self.event-queue))
+          (return ret))
+        (return #nil))
+
+  (defn poll-input (self)
+        (:poll-input self.term)))

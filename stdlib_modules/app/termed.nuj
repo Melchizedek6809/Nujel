@@ -1,7 +1,7 @@
-(import (TermIO) :core/TermIO)
+(import (TermApp) :term/TermApp)
 (import (TextBuffer) :app/termed/buffer)
 
-(def term (:new TermIO))
+(def term (:new TermApp))
 (def buffers [])
 (def cur-buffer #nil)
 (def screen-width #nil)
@@ -88,8 +88,7 @@
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
-               (def line-y (+ cy buf.scroll-y))
-               (draw-buffer-line buf x (+ cy y) w line-y))
+               (draw-buffer-line buf x (+ cy y) w (+ cy buf.scroll-y)))
       (draw-modeline buf))
 
 (defn draw-screen ()

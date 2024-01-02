@@ -1,7 +1,7 @@
 ;;; Nujel - Copyright (C) 2020-2023 - Benjamin Vincent Schulenburg
 ;;; This project uses the MIT license, a copy should be included under /LICENSE
 ;;;
-(import (Term) :core/term)
+(import (VT100) :term/VT100)
 (import (get) :net/gopher)
 
 (def screen-width 0)
@@ -16,7 +16,7 @@
                 :data #nil
                 :item #nil })
 (def history #nil)
-(def term (:new Term))
+(def term (:new VT100))
 
 (def gopher-type-map { :0 "(TXT)"
                        :1 "(DIR)"

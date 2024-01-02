@@ -192,4 +192,4 @@
                 (emftln "Usage: (...FILES)")
                 (exit 1))
       (doseq (file args)
-             (println (pp-nujel (slurp file)))))
+             (-> file slurp pp-nujel println)))
