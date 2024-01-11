@@ -58,7 +58,7 @@
                (cdr! lines))
       ret)
 
-(def ex-map (map/load "tests/fast/day9.dat" 100 100))
+(def ex-map (map/load "tests/slow/day9.dat" 100 100))
 (def res (array/2d/find-low-points ex-map))
 (def result (ref res :part1))
 (when (not= result 480)

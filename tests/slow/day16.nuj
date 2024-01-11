@@ -93,8 +93,8 @@
 				     " v:" (ansi-green (ref p :version))))
 		       (for-each (ref p :value) (fn (a) (bits/print a (+ 4 indent)))))))
 
-(def res-p1 (bits/version-sum (cdr (bits/parse/hex (file/read "tests/fast/day16.dat")))))
-(def res-p2 (eval (bits/compile (cdr (bits/parse/hex (file/read "tests/fast/day16.dat"))))))
+(def res-p1 (bits/version-sum (cdr (bits/parse/hex (file/read "tests/slow/day16.dat")))))
+(def res-p2 (eval (bits/compile (cdr (bits/parse/hex (file/read "tests/slow/day16.dat"))))))
 (when (not= res-p1 951)
       (throw (list :wrong-result "Wrong result" res-p1)))
 (when (not= res-p2 902198718880)

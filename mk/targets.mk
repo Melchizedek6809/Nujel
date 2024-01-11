@@ -54,9 +54,6 @@ test.debug: $(NUJEL)
 test.slow.debug: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r --slow-test tools/tests.nuj"
 
-test.ridiculous: $(NUJEL)
-	@./$(NUJEL) --slow-test --ridiculous-test tools/tests.nuj
-
 rund: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r"
 

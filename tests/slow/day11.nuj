@@ -75,7 +75,7 @@
                      (throw (list :all-flashes))))
       α)
 
-(def state (map/load "tests/fast/day11.dat" 10 10))
+(def state (map/load "tests/slow/day11.dat" 10 10))
 (try (fn (ε) (when (not= (car ε) :all-flashes) (throw ε)))
      (def ret (step/do-many state 1000)))
 (when (not= p1-res 1694)
