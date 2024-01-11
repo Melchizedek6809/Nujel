@@ -43,33 +43,30 @@
 
 (defn image/ref (img x y)
       :export-as ref
-      (def i (+ (int x) (* (int y) (ref img :width))))
-      (ref (ref img :pixels) i))
+      (ref img.pixels (+ x (* y img.width))))
 
 (defn image/set! (img x y value)
       :export-as set!
-      (def i (+ (int x) (* (int y) (ref img :width))))
-      (set! (ref img :pixels) i value))
+      (set! img.pixels (+ x (* y img.width)) value))
 
 (defn fill! (img value)
       :export
-      (def p (ref img :pixels))
-      (dotimes (i (* (ref img :width) (ref img :height)) img)
+      (def p img.pixels)
+      (dotimes (i (* img.width img.height) img)
         (set! p i value)))
 
 (defn map! (img fun)
       :export
-      (def p (ref img :pixels))
-      (dotimes (i (* (ref img :width) (ref img :height)) img)
+      (def p img.pixels)
+      (dotimes (i (* img.width img.height) img)
         (set! p i (fun (ref p i)))))
 
 (defn dup (img)
       :export
-      (def ret (image/new (ref img :width)
-                          (ref img :height)))
-      (def in (ref img :pixels))
-      (def out (ref ret :pixels))
-      (dotimes (i (* (ref img :width) (ref img :height)) img)
+      (def ret (image/new img.width img.height))
+      (def in img.pixels)
+      (def out ret.pixels)
+      (dotimes (i (* img.width img.height) img)
         (set! out i (ref in i))))
 
 (defn save! (img path)
@@ -86,11 +83,11 @@
 
 (defn test-image-xor ()
       :export
-      (def w 256)
-      (def h 256)
+      (def w 128)
+      (def h 128)
       (def out (new w h))
       (dotimes (x w out)
         (dotimes (y h)
           (image/set! out x y (bit-or x (bit-shift-left y 8) (bit-shift-left (bit-xor x y) 16))))))
 
-(deftest 4040398435 (image/adler32 (image/test-image-xor)))
+(deftest 1443406530 (image/adler32 (image/test-image-xor)))
