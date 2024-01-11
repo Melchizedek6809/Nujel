@@ -1,0 +1,11 @@
+(def T {})
+(set! T :new (defn new (self)
+      { :prototype* self :count 0 }))
+(set! T :inc (defn inc (self)
+                        (set! self :count (inc (ref self :count)))
+                        (ref self :count)))
+
+(def res (:inc (:new T)))
+(return (if (= res 1)
+            :success
+            (exception :incorrect-result "Should result in 1" res)))

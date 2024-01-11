@@ -1,0 +1,14 @@
+(defclass A
+          (defn new (self)
+                { :prototype* self :count 0 })
+
+          (defn inc (self)
+                (set! self :count (inc (ref self :count)))
+                (ref self :count)))
+
+(def B (image/deserialize (image/serialize A)))
+(def res (:inc (:new B)))
+
+(return (if (= res 1)
+            :success
+            (exception :incorrect-result "Should result in 1" res)))
