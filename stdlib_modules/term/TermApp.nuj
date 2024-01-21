@@ -120,24 +120,79 @@
         (set! self.input-buffer-pos 0)
         (return self))
 
+  (defn add-input-event (self event)
+        (set! self.event-queue (cons event self.event-queue)))
+
   (defn parse-input-buffer (self)
         (when (zero? self.input-buffer-pos) (return))
-        (def key (ref self.input-buffer-pos 0))
-        (cond ((and (>= c #x20) (<  c #x80))
-               (:add-input-event self { :T :input :code key :char (buffer->string self.input-buffer 1 0) })))
-        (:pop-input-buffer! self 1))
 
-  (defn poll-events (self)
-        (def key (:poll-input self.term))
+        (def c (ref self.input-buffer 0))
+        (when (= c #x1B) ; Escaped Input
+          (def d (ref self.input-buffer 1))
+          (when (= d #\[) ; Bracketed Input
+            (def e (ref self.input-buffer 2))
+            (case e
+                  (0 (return))
+                  ((#x33 #x35 #x36)
+                   (def f (ref self.input-buffer 3))
+                   (when (= f 0) (return))
+                   (when (= f 126)
+                     (case e
+                           (#x33 (:add-input-event self { :T :key-down
+                                                :key :delete }))
+                           (#x35 (:add-input-event self { :T :key-down
+                                                :key :page-up }))
+                           (#x36 (:add-input-event self { :T :key-down
+                                                          :key :page-down }))
+                           (otherwise (exception :invalid-input (fmt "Unknown bracketed input: {e:X}") e)))
+                     (:pop-input-buffer! self 4)
+                     (return (:parse-input-buffer self)))
+                   (exception :invalid-input (fmt "Unknown bracketed input suffix: {f:X}") f))
+                  (#\A (:add-input-event self { :T :key-down
+                                                :key :up }))
+                  (#\B (:add-input-event self { :T :key-down
+                                                :key :down }))
+                  (#\C (:add-input-event self { :T :key-down
+                                                :key :right }))
+                  (#\D (:add-input-event self { :T :key-down
+                                                :key :left }))
+                  (#\F (:add-input-event self { :T :key-down
+                                                :key :end }))
+                  (#\H (:add-input-event self { :T :key-down
+                                                :key :home }))
+                  (otherwise (exception :invalid-input (fmt "Unknown bracketed input: {e:X}") e)))
+            (:pop-input-buffer! self 3)
+            (return (:parse-input-buffer self))))
+        (when (= c 127)
+          (:add-input-event self { :T :key-down :key :backspace })
+          (:pop-input-buffer! self 1)
+          (return (:parse-input-buffer self)))
+        (when (and (>= c #x20) (<  c #x79))
+          (:add-input-event self { :T :input
+                                   :code c
+                                   :char (buffer->string self.input-buffer 1 0)
+                                   })
+          (:pop-input-buffer! self 1)
+          (return (:parse-input-buffer self))))
+
+  (defn parse-input-key (self key)
         (when key
+          (:add-input-event self { :T :raw-input :code key })
           (set! self.input-buffer self.input-buffer-pos key)
           (set! self.input-buffer-pos (inc self.input-buffer-pos)))
-        (:parse-input-buffer self)
-        (when self.event-queue
-          (def ret (car (last-pair self.event-queue)))
-          (set! self.event-queue (except-last-pair self.event-queue))
-          (return ret))
-        (return #nil))
+        (:parse-input-buffer self))
+
+  (defn get-events (self)
+        (when-not self.event-queue (return #nil))
+        (def ret (car self.event-queue))
+        (set! self.event-queue (cdr self.event-queue))
+        (return ret))
 
   (defn poll-input (self)
-        (:poll-input self.term)))
+        (def key (:poll-input self.term))
+        (:parse-input-key self key)
+        key)
+
+  (defn poll-events (self)
+        (:poll-input self)
+        (:get-events self)))

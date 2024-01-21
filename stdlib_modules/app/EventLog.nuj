@@ -1,0 +1,50 @@
+(import (TermApp) :term/TermApp)
+(import (TextBuffer) :app/termed/buffer)
+
+(def term (:new TermApp))
+(def events #nil)
+
+(defn draw-events ()
+      (def ev (filter events (fn (e) (not= e.T :raw-input))))
+      (def w (bit-shift-right term.width 1))
+      (dotimes (i (- term.height 2))
+               (when-not ev (return #nil))
+               (def line (pad-end (string/write (car ev)) w))
+               (:draw-text term line 1 (+ 2 i) w 1 #xF0)
+               (cdr! ev)))
+
+(defn draw-raw-events ()
+      (def ev (filter events (fn (e) (= e.T :raw-input))))
+      (def w (bit-shift-right term.width 1))
+      (dotimes (i (- term.height 2))
+               (when-not ev (return #nil))
+               (def line (pad-end (string/write (car ev)) w))
+               (:draw-text term line w (+ 2 i) w 1 #xF0)
+               (cdr! ev)))
+
+(defn draw-screen ()
+      (def title (fmt " Nujel EventLog - {}" (:length events)))
+      (:draw-text term (pad-end title term.width) 1 1 term.width 1 #x34)
+      (draw-events)
+      (draw-raw-events)
+      (:flip term))
+
+(defn read-input ()
+      (def c (:poll-input term))
+      (when (= c #\q) (quit))
+      (dotimes (i 100)
+               (def ev (:get-events term))
+               (if ev
+                   (set! events (cons ev events))
+                   (return #nil))))
+
+(defn quit ()
+      (:stop term)
+      (exit 0))
+
+(defn main (args)
+      :export
+      (:start term)
+      (while #t
+        (draw-screen)
+        (read-input)))

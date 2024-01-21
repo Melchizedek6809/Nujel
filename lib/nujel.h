@@ -199,7 +199,7 @@ lVal requireFloat            (lVal v);
 lVal optionalSymbolic        (lVal v, const lSymbol *fallback);
 
 #define reqNaturalInt(str) do { if(unlikely(str.type != ltInt)){\
-	return lValException(lSymTypeError, "Need ab Int", str);\
+	return lValException(lSymTypeError, "Need natural Int", str);\
 }\
 if(unlikely(str.vInt < 0)){\
 	return lValException(lSymTypeError, "Expected a Natural int, not: ", str);\

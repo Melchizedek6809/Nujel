@@ -57,7 +57,7 @@
       (:draw-text term ln term-x term-y 6 1 gutter-color)
       (def buf-off 0)
       (def buf-max (:length line))
-      (def max-w (min (- buf-max buf-off) (- term-w 7)))
+      (def max-w (min (- buf-max buf-off) (- term-w 5)))
       (def mark-start 0)
       (def mark-end 0)
       (when (:use-region? cur-buffer)
@@ -83,8 +83,8 @@
                                             (< i mark-end)
                                             (not (zero? c)))
                                        #x34 #xFF))
-                     (:draw-char term (if (zero? c) #x20 c) (+ 7 term-x i) term-y color))
-                   (:draw-char term #x20 (+ 7 term-x i) term-y color))))
+                     (:draw-char term (if (zero? c) #x20 c) (+ 6 term-x i) term-y color))
+                   (:draw-char term #x20 (+ 6 term-x i) term-y color))))
 
 (defn draw-buffer (buf x y w h)
       (dotimes (cy h)
@@ -95,7 +95,7 @@
       (def cur-buffer cur-buffer)
       (draw-buffer cur-buffer 1 1 screen-width (- screen-height 2))
       (:set-cursor term
-                   (+ 1 1 6 cur-buffer.pos-x)
+                   (+ 1 6 cur-buffer.pos-x)
                    (- (inc cur-buffer.pos-y)
                       cur-buffer.scroll-y))
       (:flip term))
