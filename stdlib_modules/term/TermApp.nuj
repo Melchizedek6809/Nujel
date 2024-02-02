@@ -4,7 +4,7 @@
 (import (VT100) :term/VT100)
 
 (defclass TermApp
-  "An high-level abstract I/O interface towards a terminal"
+  "A high-level I/O interface for a terminal"
   :export
 
   (defn new (self in out)
@@ -129,15 +129,30 @@
         (def c (ref self.input-buffer 0))
         (when (= c #x1B) ; Escaped Input
           (def d (ref self.input-buffer 1))
+          (when (= d 79) ; F Input
+            (def e (ref self.input-buffer 2))
+            (when (and (>= e 80) (< e 92))
+              (def key (:keyword (fmt "F{}" (- e 79))))
+              (:add-input-event self { :T :key-down :key key })
+              (:pop-input-buffer! self 3)))
           (when (= d #\[) ; Bracketed Input
             (def e (ref self.input-buffer 2))
             (case e
                   (0 (return))
-                  ((#x33 #x35 #x36)
+                  #;(0 (:add-input-event self { :T :key-down :key (:keyword "M-[") })
+                     (:pop-input-buffer! self 2)
+                     (return (:parse-input-buffer self)))
+                  ((#x32 #x33 #x35 #x36)
                    (def f (ref self.input-buffer 3))
                    (when (= f 0) (return))
+                   (when (= f #x37)
+                     (:add-input-event self { :T :key-down :key :print })
+                     (:pop-input-buffer! self 4)
+                     (return (:parse-input-buffer self)))
                    (when (= f 126)
                      (case e
+                           (#x32 (:add-input-event self { :T :key-down
+                                                :key :insert }))
                            (#x33 (:add-input-event self { :T :key-down
                                                 :key :delete }))
                            (#x35 (:add-input-event self { :T :key-down
@@ -162,12 +177,49 @@
                                                 :key :home }))
                   (otherwise (exception :invalid-input (fmt "Unknown bracketed input: {e:X}") e)))
             (:pop-input-buffer! self 3)
+            (return (:parse-input-buffer self)))
+          (when (= d 127)
+            (:add-input-event self { :T :key-down :key :M-backspace })
+            (:pop-input-buffer! self 2)
+            (return (:parse-input-buffer self)))
+          (when (= d #\Tab)
+            (:add-input-event self { :T :key-down :key :M-tab })
+            (:pop-input-buffer! self 2)
+            (return (:parse-input-buffer self)))
+          (when (and (>= d #\0) (<= d #\9))
+            (def key (:keyword (fmt "M-{}" (from-char-code d))))
+            (:add-input-event self { :T :key-down :key key })
+            (:pop-input-buffer! self 2)
+            (return (:parse-input-buffer self)))
+          (when (and (>= d #x20) (< d #x79))
+            (def key (:keyword (fmt "M-{}" (from-char-code d))))
+            (:add-input-event self { :T :key-down :key key })
+            (:pop-input-buffer! self 2)
+            (return (:parse-input-buffer self)))
+          (when (and (>= d #\a) (<= d #\z))
+            (def key (:keyword (fmt "M-{}" (from-char-code d))))
+            (:add-input-event self { :T :key-down :key key })
+            (:pop-input-buffer! self 2)
             (return (:parse-input-buffer self))))
+        (when (< c 27)
+          (when (< c 9)
+            (def key (:keyword (fmt "C-{}" (from-char-code (+ #\a (dec c))))))
+            (:add-input-event self { :T :key-down :key key })
+            (:pop-input-buffer! self 1)
+            (return (:parse-input-buffer self)))
+          (when (= c 9)
+            (:add-input-event self { :T :key-down :key :tab })
+            (:pop-input-buffer! self 1)
+            (return (:parse-input-buffer self)))
+          (def key (:keyword (fmt "C-{}" (from-char-code (+ #\j (- c 10))))))
+            (:add-input-event self { :T :key-down :key key })
+            (:pop-input-buffer! self 1)
+            (return (:parse-input-buffer self)))
         (when (= c 127)
           (:add-input-event self { :T :key-down :key :backspace })
           (:pop-input-buffer! self 1)
           (return (:parse-input-buffer self)))
-        (when (and (>= c #x20) (<  c #x79))
+        (when (and (>= c #x20) (<  c #x80))
           (:add-input-event self { :T :input
                                    :code c
                                    :char (buffer->string self.input-buffer 1 0)
