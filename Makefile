@@ -9,8 +9,8 @@
 # for the newline character, so the next line is still a comment.
 # However, Microsoft's nmake.exe (that comes with Visual Studio) does
 # not interpret the final '\' that way in a comment. The end result is
-# that when using nmake.exe, this will include "mk/NMake.mk", whereas
-# GNU/BSD make will include "mk/BMake.mk".
+# that when using nmake.exe, this will include "mk/nmake.mk", whereas
+# GNU/BSD make will include "mk/bmake.mk".
 
 !ifndef 0 # \
 !include mk/nmake.mk # \

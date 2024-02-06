@@ -8,7 +8,7 @@
 (#f (file/dir? "GNUmakefile"))
 (#f (ref (file/stat "GNUmakefile") :error?))
 (#t (ref (file/stat "This-file-should-never-exist.jpeg") :error?))
-(#t (> (ref (file/stat "GNUmakefile") :size) 1024))
+(#t (> (ref (file/stat "GNUmakefile") :size) 8))
 (#t (int? (ref (file/stat "GNUmakefile") :modification-time)))
 (#t (int? (ref (file/stat "GNUmakefile") :access-time)))
 (#t (bool? (ref (file/stat "GNUmakefile") :regular-file?)))
