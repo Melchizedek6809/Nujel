@@ -195,7 +195,6 @@
 
                     (defn bytecompile* (source env)
                           "Compile the forms in source"
-                          :cat :bytecode
                           :internal
                           (def op (if (resolves? (car source) env)
                                       (ref (or env (current-closure)) (car source))
@@ -224,7 +223,6 @@
                                                (bytecompile/literal source)))))))
 
 (defn bytecompile (form environment)
-      :cat :bytecode
       :internal
       (list (bytecompile* form environment)
             ($ret)))

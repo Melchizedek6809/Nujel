@@ -8,18 +8,15 @@
 (def module/loader #nil)
 
 (defn module/save-state ()
-      :cat :modules
       :internal
       {:cache module/cache :loader module/loader})
 
 (defn module/restore-state (c)
-      :cat :modules
       :internal
       (set! module/cache (ref c :cache))
       (set! module/loader (ref c :loader)))
 
 (defn module/qualify-symbol (module-name symbol)
-      :cat :modules
       :internal
       (case (:type-name module-name)
             (:string (module/qualify-symbol (:keyword module-name) symbol))
@@ -27,7 +24,6 @@
             (otherwise (exception "Can't qualify that" module-name))))
 
 (defn require* (module env qualify?)
-      :cat :modules
       :internal
       (def mod (module/load module env))
       (when-not mod (exception "Can't load that module" module))
@@ -40,12 +36,10 @@
                (ref exports k))))
 
 (defn module/load/cache (name)
-      :cat :modules
       :internal
       (ref module/cache name))
 
 (defn module/load/store (name)
-      :cat :modules
       :internal
       (def source (ref module/store name))
       (when source
@@ -53,7 +47,6 @@
         (module/load/cache name)))
 
 (defn module/load/external (name)
-      :cat :modules
       :internal
       (doseq (loader module/loader)
              (def mod (loader name))
@@ -62,17 +55,14 @@
                (return mod))))
 
 (defn module/insert/defer (name module-source)
-      :cat :modules
       :internal
       (set! module/store name module-source))
 
 (defn module/insert (name module)
-      :cat :modules
       :internal
       (set! module/cache name module))
 
 (defn module/resolve-string/join (parts ret)
-      :cat :modules
       :internal
       (cond ((not parts) ret)
             ((or (= "" (car parts))
@@ -85,14 +75,12 @@
             (otherwise (module/resolve-string/join (cdr parts) (cons (car parts) ret)))))
 
 (defn module/resolve-string (name wd)
-      :cat :modules
       :internal
       (def mod-path wd)
       (def parts (module/resolve-string/join (nreverse (append (split mod-path "/") (split name "/"))) #nil))
       (:keyword (join (cons "" parts) "/"))) ; The cons is for the leading /
 
 (defn module/load (name env)
-      :cat :modules
       :internal
       (case (:type-name name)
             (:environment name)
@@ -103,14 +91,12 @@
             (otherwise (exception "Can't load that value as a module" name))))
 
 (defn module/import-all (module symbol)
-      :cat :modules
       :internal
       (def exports (ref module :exports))
       (typecheck/only exports :tree)
       (return exports))
 
 (defn module/import (module symbol)
-      :cat :modules
       :internal
       (def exports (module/import-all module symbol))
       (when-not (:has? exports symbol)

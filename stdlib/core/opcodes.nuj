@@ -35,6 +35,10 @@
       "Return the rest of PAIR"
       (cdr pair))
 
+(defn cadr (pair)
+      "Return the cadr of PAIR"
+      (cadr pair))
+
 (defn cons (a b)
       "Construct a new pair of A and B"
       (cons a b))

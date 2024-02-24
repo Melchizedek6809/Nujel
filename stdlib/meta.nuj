@@ -4,7 +4,6 @@
 ;;; Introspection and procedures returning info about the runtime
 
 (defn describe/closure (c i)
-      :cat :compiler
       :internal
       (when c
             (if (= c root-closure)
