@@ -1,0 +1,8 @@
+#!/usr/bin/env nujel
+
+(defn fib (n)
+      (cond ((zero? n) 0)
+            ((= 1 n) 1)
+            (#t (+ (fib (- n 1)) (fib (- n 2))))))
+
+(pfmtln "fib(40) is: {}\nGC Runs: {}" (fib 40) (garbage-collection-runs))
