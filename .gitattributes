@@ -13,6 +13,7 @@ vendor/** linguist-vendored=true
 tools/** linguist-vendored=true
 web/** linguist-vendored=true
 benchmark/** linguist-vendored=true
+third-party/** linguist-vendored=true
 bootstrap/** linguist-vendored=true
 
 Nujel.sln	text	eol=crlf
