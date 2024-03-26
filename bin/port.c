@@ -70,7 +70,7 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 
 static lVal lnfBytesLeftToRead(lVal file){
 	reqFileHandle(file);
-#if (!defined(_WIN32)) && (!defined(__wasi__)) && (!defined(__MINGW32__))
+#if (defined(_WIN32)) || (defined(__wasi__)) || (defined(__MINGW32__))
 	return lValInt(0);
 #else
 	int fd = fileno(file.vFileHandle);

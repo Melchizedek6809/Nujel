@@ -104,7 +104,7 @@ static lVal lnfFileStat(lVal aPath){
 	DWORD dwError = 0;
 
 	if (unlikely(lStringLength(aPath.vString) >= MAX_PATH)) {
-		return lValException("invalid-call", "Directory path is too long.", lCar(v));
+		return lValException(lSymIOError, "Directory path is too long.", lCar(v));
 	}
 
 	hFind = FindFirstFile(lBufferData(aPath.vString), &ffd);
@@ -203,7 +203,7 @@ static lVal lnfPopen(lVal aCommand){
 #else
 static lVal lnfPopen(lVal aCommand){
 	(void)aCommand;
-	return lValException("not-available","(popen) is not implemented on your current platform, please try and work around that", aCommand);
+	return lValException(lSymNotSupportedOnPlatform, "(popen) is not implemented on your current platform, please try and work around that", aCommand);
 }
 #endif
 
@@ -221,7 +221,7 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 
 	StringCchLength(path, MAX_PATH, &length_of_arg);
 	if (length_of_arg > (MAX_PATH - 3)){
-		return lValException("invalid-call", "Directory path is too long.", lCar(v));
+		return lValException(lSymNotSupportedOnPlatform, "Directory path is too long.", lCar(v));
 	}
 
 	StringCchCopy(szDir, MAX_PATH, path);
@@ -230,7 +230,7 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
-		return lValException("invalid-call", "FindFirstFile failed", lCar(v));
+		return lValException(lSymNotSupportedOnPlatform, "FindFirstFile failed", lCar(v));
 	}
 
 	lVal ret = NULL;

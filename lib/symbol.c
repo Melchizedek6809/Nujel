@@ -79,6 +79,7 @@ lSymbol *lSymReadError;
 lSymbol *lSymOOM;
 lSymbol *lSymUnmatchedOpeningBracket;
 lSymbol *lSymUnboundVariable;
+lSymbol *lSymNotSupportedOnPlatform;
 
 uint symbolLookups = 0;
 uint tombLookups = 0;
@@ -148,6 +149,7 @@ void lSymbolInit(){
 	lSymOOM              = lSymSM("out-of-memory");
 	lSymUnboundVariable  = lSymSM("unbound-variable");
 	lSymUnmatchedOpeningBracket = lSymSM("unmatched-opening-bracket");
+	lSymNotSupportedOnPlatform = lSymSM("not-supported-on-platform");
 }
 
 static inline int lSymIndex(const lSymbol *s){

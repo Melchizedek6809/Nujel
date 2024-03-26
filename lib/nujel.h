@@ -308,6 +308,7 @@ extern lSymbol *lSymReadError;
 extern lSymbol *lSymOOM;
 extern lSymbol *lSymUnmatchedOpeningBracket;
 extern lSymbol *lSymUnboundVariable;
+extern lSymbol *lSymNotSupportedOnPlatform;
 
 /*
  | lVal related procedures

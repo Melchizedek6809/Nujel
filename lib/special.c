@@ -5,10 +5,9 @@
 #endif
 
 char *errorSym = "vm-error";
-char *errorMsg = "Gotta use bytecode";
 #define lVMErrorPlaceholder(sym) \
 	static lVal sym (){\
-		return lValException(lSymVMError, errorMsg, NIL); \
+		return lValException(lSymVMError, "Gotta use bytecode " #sym, NIL); \
 	}
 
 lVMErrorPlaceholder(lnfAnd)
@@ -27,7 +26,6 @@ lVMErrorPlaceholder(lnfEnvironment)
 lVMErrorPlaceholder(lnfBytecodeEval)
 lVMErrorPlaceholder(lnfMutableEval)
 lVMErrorPlaceholder(lnfRef)
-lVMErrorPlaceholder(lnfCadr)
 lVMErrorPlaceholder(lnfList)
 lVMErrorPlaceholder(lnfThrow)
 lVMErrorPlaceholder(lnfApply)
@@ -50,7 +48,6 @@ void lOperationsSpecial(){
 	lAddNativeFunc("mutable-eval*",   "(bc-arr env)",            "Evaluate BC-ARR directly in ENV", lnfMutableEval, 0);
 	lAddNativeFunc("list",            "arguments",               "Return ARGUMENTS as a list", lnfList, 0);
 	lAddNativeFunc("ref",             "(collection key)",        "Look up key in collection", lnfRef, NFUNC_PURE);
-	lAddNativeFunc("cadr",            "(list)",                  "Look up the cadr of list", lnfCadr, NFUNC_PURE);
 	lAddNativeFunc("throw",           "(v)",                     "Throw V to the closest exception handler", lnfThrow, 0);
 	lAddNativeFunc("apply",           "(func list)",             "Evaluate FUNC with LIST as arguments",  lnfApply, NFUNC_PURE);
 }
