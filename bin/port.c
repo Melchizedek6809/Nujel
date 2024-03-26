@@ -6,7 +6,6 @@
 
 #if (!defined(_WIN32)) && (!defined(__wasi__))
 #include <termios.h>
-#include <sys/ioctl.h>
 
 bool rawMode = false;
 struct termios orig_termios;
@@ -35,6 +34,10 @@ static lVal lnfFileRaw(lVal handle){
 	return NIL;
 }
 
+#endif
+
+#if (!defined(_WIN32)) && (!defined(__wasi__)) && (!defined(__MINGW32__))
+#include <sys/ioctl.h>
 #endif
 
 static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
@@ -67,7 +70,7 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 
 static lVal lnfBytesLeftToRead(lVal file){
 	reqFileHandle(file);
-#if defined(__wasm__) || defined(_MSC_VER)
+#if (!defined(_WIN32)) && (!defined(__wasi__)) && (!defined(__MINGW32__))
 	return lValInt(0);
 #else
 	int fd = fileno(file.vFileHandle);
