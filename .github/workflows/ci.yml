@@ -55,7 +55,7 @@ jobs:
     - name: Run Tests
       run: ./nujel.exe --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Nujel-windows-${{ matrix.sys }}-release-${{ github.ref_name }}
         path: "./nujel.exe"
@@ -90,7 +90,7 @@ jobs:
     - name: Test runtime
       run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Nujel-macos-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
@@ -199,7 +199,7 @@ jobs:
     - name: Test runtime
       run: ./nujel --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Nujel-linux-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
@@ -223,7 +223,7 @@ jobs:
     - name: Test runtime
       run: ./wasmtime-v14.0.4-x86_64-linux/wasmtime --dir=. nujel.wasm --slow-test tools/tests.nuj
     - name: Upload release
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Nujel-wasm-${{ github.ref_name }}-release
         path: "./nujel.wasm"
