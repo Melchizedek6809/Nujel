@@ -22,7 +22,7 @@ T * T##AllocRaw (){\
 		}\
 	}else{\
 		ret = T ## FFree;\
-		(T##FFree) = ret->nextFree;	\
+		(T##FFree) = ret->nextFree;\
 	}\
 	if(unlikely((typeMax - (++T##Active) < 128))){lGCShouldRunSoon = true;} \
 	T##MarkMap[ret - T##List] = 0;\

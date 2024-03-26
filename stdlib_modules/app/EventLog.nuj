@@ -10,7 +10,7 @@
       (dotimes (i (- term.height 2))
                (when-not ev (return #nil))
                (def line (pad-end (string/write (car ev)) w))
-               (:draw-text term line 1 (+ 2 i) w 1 #xF0)
+               (:draw-text term line 1 (+ 2 i) w 1 #xFF)
                (cdr! ev)))
 
 (defn draw-raw-events ()
@@ -19,7 +19,7 @@
       (dotimes (i (- term.height 2))
                (when-not ev (return #nil))
                (def line (pad-end (string/write (car ev)) w))
-               (:draw-text term line w (+ 2 i) w 1 #xF0)
+               (:draw-text term line w (+ 2 i) w 1 #xFF)
                (cdr! ev)))
 
 (defn draw-screen ()
