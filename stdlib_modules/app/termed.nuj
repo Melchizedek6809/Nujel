@@ -132,7 +132,8 @@
               (:key-down (handle-key-down e.key))
               (:input (if cx-active
                           (handle-key-down (:keyword e.char))
-                          (:insert-char cur-buffer e.code))))))
+                          (:insert-char cur-buffer e.code)))))
+      (when-not (:input-would-block? term) (read-input)))
 
 (defn load-buffer (filename)
       (def buf (new-buffer filename))

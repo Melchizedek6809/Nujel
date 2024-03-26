@@ -133,6 +133,12 @@
   (defn get-height (self)
         (ref (:get-size self) :height))
 
+  (defn input-would-block? (self)
+        (zero? (:length self.in-port)))
+
+  (defn input-left (self)
+        (:length self.in-port))
+
   (defn poll-input (self)
         (def c (:char-read self.in-port))
         (if (= c :end-of-file) 0 c)))

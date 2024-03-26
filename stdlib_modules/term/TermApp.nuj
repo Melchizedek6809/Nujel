@@ -283,6 +283,12 @@
         (set! self.event-queue (cdr self.event-queue))
         (return ret))
 
+  (defn input-would-block? (self)
+        (:input-would-block? self.term))
+
+  (defn input-left (self)
+        (:input-left self.term))
+
   (defn poll-input (self)
         (def key (:poll-input self.term))
         (:parse-input-key self key)

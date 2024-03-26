@@ -6,6 +6,7 @@
 
 #if (!defined(_WIN32)) && (!defined(__wasi__))
 #include <termios.h>
+#include <sys/ioctl.h>
 
 bool rawMode = false;
 struct termios orig_termios;
@@ -36,7 +37,6 @@ static lVal lnfFileRaw(lVal handle){
 
 #endif
 
-
 static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 	reqString(aPathname);
 	const char *path = lBufferData(aPathname.vString);
@@ -64,6 +64,22 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 
 	return fh ? lValFileHandle(fh) : NIL;
 }
+
+static lVal lnfBytesLeftToRead(lVal file){
+	reqFileHandle(file);
+#if defined(__wasm__) || defined(_MSC_VER)
+	return lValInt(0);
+#else
+	int fd = fileno(file.vFileHandle);
+	int bytesAvailable = 0;
+	int err = ioctl(fd, FIONREAD, &bytesAvailable);
+	if(err){
+		return lValBool(false);
+	}
+	return lValInt(bytesAvailable);
+#endif
+}
+
 
 static lVal lnfFileOpenInput(lVal aPathname){
 	reqString(aPathname);
@@ -209,6 +225,7 @@ void lOperationsPort(){
 	lAddNativeFuncVVV ("file/seek*",   "(handle offset whence)",      "Seek stream of HANDLE to OFFSET from WHENCE where 0 is SEEK_SET, 1 is SEEK_CUR and 2 is SEEK_END", lnfFileSeek, 0);
 	lAddNativeFuncV   ("file/eof*?",   "(handle)",                    "Return whether the end-of-file indicator is set for HANDLE", lnfFileEof, 0);
 	lAddNativeFuncV   ("file/error*?", "(handle)",                    "Return whether the error indicator is set for HANDLE", lnfFileError, 0);
+	lAddNativeFuncV   ("file/bytes-available*", "(handle)",           "Return how many bytes are available to read on supported platforms", lnfBytesLeftToRead, 0);
 #if (!defined(_WIN32)) && (!defined(__wasi__))
 	lAddNativeFuncV   ("file/raw*",    "(handle)",                    "Set an input stream into raw mode", lnfFileRaw, 0);
 #endif

@@ -101,6 +101,8 @@
   (defn close! (self)
         (file/close* self.handle))
 
+  (defn length (self) 0)
+
   (defn position (self)
         (file/tell* self.handle))
 
@@ -145,6 +147,8 @@
   (defn return-string (self)
         (buffer->string self.buffer self.buffer-pos))
 
+  (defn length (self) 0)
+
   (defn position (self)
         self.buffer-pos)
 
@@ -164,6 +168,9 @@
         (if (file/eof*? self.handle)
             :end-of-file
             (file/read* self.handle buffer size)))
+
+  (defn length (self)
+        (or (file/bytes-available* self.handle) 0))
 
   (defn char-read (self char)
         (when (file/eof*? self.handle)
