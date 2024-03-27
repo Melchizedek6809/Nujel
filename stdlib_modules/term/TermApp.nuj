@@ -23,8 +23,17 @@
                    :prototype* self })
         (:resize ret))
 
-  (defn start (self)
-        self)
+  (defn run (self child)
+        (:clear-screen self)
+        (let ((s (:get-size self)))
+             (child (list {:T :start}
+                          {:T :resize :width s.width :height s.height})))
+        (while #t
+          (:poll-input self) ;; Poll once so we do end up blocking on IO
+          (while (not (:input-would-block? self))
+            (:poll-input self))
+          (child self.event-queue)
+          (set! self.event-queue #nil)))
 
   (defn stop (self)
         (:stop self.term)
@@ -76,10 +85,11 @@
         self)
 
   (defn draw-char (self char x y color)
-        (when (>= x self.width) (return))
-        (when (>= y self.height) (return))
-        (when (< x 0) (return))
-        (when (< y 0) (return))
+        (when (or (>= x self.width)
+                  (>= y self.height)
+                  (< x 0)
+                  (< y 0))
+          (return))
         (def off (* 2 (+ x (* y self.width))))
         (def color color)
         (set! self.backbuffer off char)
@@ -97,8 +107,8 @@
   (defn draw-text (self text x y w h color)
         (set! x (max 0 x))
         (set! y (max 0 y))
-        (set! w (min (- self.width x) w (:length text)))
-        (set! h (min (- self.height y) h))
+        (set! w (min (- self.width x) (- w 1) (:length text)))
+        (set! h (min (- self.height y) (- h 1)))
         (def off (* 2 (+ x (* y self.width))))
         (def bb self.backbuffer)
         (dotimes (i w self)

@@ -15,6 +15,13 @@
           :scroll-interval 20
           :prototype* self })
 
+  (defn get-modeline (self)
+        (def x self.pos-x)
+        (def y (inc self.pos-y))
+        (def bufname (:get-buf-name self))
+        (def saved (if self.changed "*" ""))
+        (fmt " L{y}:{x} - {bufname}"))
+
   (defn get-line (self line-y)
         (def lines self.lines)
         (if (or (< line-y 0)
