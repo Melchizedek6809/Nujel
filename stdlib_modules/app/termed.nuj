@@ -7,8 +7,7 @@
 (defclass TextEditor
   "A terminal-based text editor with controls very similar to Emacs"
 
-  (defn new (self args)
-        (def term (:new TermApp))
+  (defn new (self term args)
         (def ret { :term term
                    :cur-buffer #nil
                    :screen-width 0
@@ -17,6 +16,7 @@
                    :cx-active #f
                    :cx-key-down-handler {}
                    :key-down-handler {}
+                   :focus? #f
                    :prototype* self })
         (:add-default-keys ret)
         (when (zero? (:length buffers))
@@ -42,16 +42,21 @@
   (defn kill-line (self)
         (set! clipboard (:kill-line self.cur-buffer)))
 
+  (defn accent-color (self)
+        (if self.focus?
+            #x34
+            #xF8))
+
   (defn draw-modeline (self buf)
         (def colored-modeline (cat " " (pad-end (:get-modeline buf) (dec self.screen-width))))
-        (:draw-text self.term colored-modeline 1 (dec self.screen-height) self.screen-width 1 #x34))
+        (:draw-text self.term colored-modeline 1 (dec self.screen-height) self.screen-width 1 (:accent-color self)))
 
   (defn draw-buffer-line (self buf term-x term-y term-w line-y)
         (def line (:get-line buf line-y))
         (when-not line
                   (:draw-text self.term (pad-end "" term-w) term-x term-y term-w 1 #xFF)
                   (return))
-        (def gutter-color (if (= line-y buf.pos-y) #x34 #xFF))
+        (def gutter-color (if (= line-y buf.pos-y) (:accent-color self) #xFF))
         (def ln (fmt " {:4} " (inc line-y)))
         (:draw-text self.term ln term-x term-y 6 1 gutter-color)
         (def buf-off 0)
@@ -80,7 +85,7 @@
                   (set! color (if (and (>= i mark-start)
                                        (< i mark-end)
                                        (not (zero? c)))
-                                  #x34 #xFF))
+                                  (:accent-color self) #xFF))
                 (:draw-char self.term (if (zero? c) #x20 c) (+ 6 term-x i) term-y color))
               (:draw-char self.term #x20 (+ 6 term-x i) term-y color))))
 
@@ -94,8 +99,7 @@
         (:set-cursor self.term
                      (+ 1 6 self.cur-buffer.pos-x)
                      (- (inc self.cur-buffer.pos-y)
-                        self.cur-buffer.scroll-y))
-        (:flip self.term))
+                        self.cur-buffer.scroll-y)))
 
   (defn quit (self)
         (:stop self.term)
@@ -131,6 +135,9 @@
 
   (defn handle-event (self event)
         (case event.T
+              (:blur (set! self.focus? #f))
+              (:focus (set! self.focus? #t))
+              (:draw (:scroll-into-view self) (:draw-screen self))
               (:resize (:resize self event.width event.height))
               (:key-down (:handle-key-down self event.key))
               (:input (if self.cx-active
@@ -150,14 +157,16 @@
                (set! lines i cur-line)
                (inc! i)))
 
-  (defn main-loop (self events)
-        (doseq (event events)
-               (:handle-event self event))
-        (:scroll-into-view self)
-        (:draw-screen self))
+  (defn set-parent! (self parent)
+        (set! self.term parent))
+
+  (defn split-window-right (self)
+        (def new (:new TextEditor))
+        (:set-cur-buffer! new self.cur-buffer)
+        (:split-window-right self.term new))
 
   (defn run (self)
-        (:run self.term (fn (events) (:main-loop self events))))
+        (:run self.term self))
 
   (defn add-default-keys (self)
         (def key-down-handler self.key-down-handler)
@@ -193,8 +202,9 @@
         (set! key-down-handler :insert (fn () (:yank self)))
         (set! key-down-handler :ret :insert-newline)
         (set! cx-key-down-handler :h :mark-whole-buffer)
+        (set! cx-key-down-handler :3 (fn () (:split-window-right self)))
         (set! cx-key-down-handler :C-c (fn () (:quit self)))))
 
 (defn main (args)
       :export
-      (:run (:new TextEditor args)))
+      (:run (:new TextEditor (:new TermApp) args)))

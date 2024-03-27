@@ -1,0 +1,109 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+
+(defclass TermAppVerticalSplit
+  :export
+
+  (defn new (self parent left-child right-child)
+        (def s (:get-size parent))
+        (def ret { :parent parent
+                   :width s.width
+                   :height s.height
+                   :left-child left-child
+                   :right-child right-child
+                   :right-child-focus? #f
+                   :right-child-active? #f
+                   :split-pos (div/int s.width 2)
+                   :prototype* self })
+        (:set-parent! left-child ret)
+        (:set-parent! right-child ret)
+        ret)
+
+  (defn child-offset (self)
+        (if self.right-child-active?
+            self.split-pos
+            0))
+
+  (defn child-width (self)
+        (if self.right-child-active?
+            (- self.width self.split-pos)
+            self.split-pos))
+
+  (defn split-window-right (self right-child)
+        (def new (:new TermAppVerticalSplit
+                       self
+                       (if self.right-child-active?
+                           self.right-child
+                           self.left-child)
+                       right-child))
+        (if self.right-child-active?
+            (set! self.right-child new)
+            (set! self.left-child new))
+        (:handle-event new {:T :resize :width self.width :height self.height}))
+
+  (defn run (self child)
+        (if self.right-child-active?
+            (set! self.right-child child)
+            (set! self.left-child child))
+        (child {:T :resize :width (:child-width self) :height s.height})
+        (child {:T :draw}))
+
+  (defn stop (self) (:stop self.parent))
+  (defn flip (self) (:flip self.parent))
+  (defn draw-char (self char x y color)
+        (when (or (>= x (:child-width self))
+                  (>= y self.height)
+                  (< x 0)
+                  (< y 0))
+          (return))
+        (:draw-char self.parent char (+ (:child-offset self) x) y color))
+
+  (defn set-cursor (self x y)
+        (when (= self.right-child-active? self.right-child-focus?)
+                  (def child-offset (if self.right-child-active?
+                                        self.split-pos
+                                        0))
+                  (:set-cursor self.parent (+ x child-offset) y)))
+
+  (defn draw-text (self text x y w h color)
+        (set! x (max 0 x))
+        (set! y (max 0 y))
+        (set! w (min (- (min w (:child-width self)) x) (:length text)))
+        (set! h (min (- self.height y) (- h 1)))
+        (:draw-text self.parent text (+ x (:child-offset self)) y w h color))
+
+  (defn stop (self)
+        (:stop self.parent))
+
+  (defn set-parent! (self parent)
+        (set! self.parent parent))
+
+  (defn run (self child)
+        (if self.right-child-active?
+            (set! self.right-child child)
+            (set! self.left-child child)))
+
+  (defn clear-screen (self) #f)
+
+  (defn handle-event (self event)
+        (when (= :resize event.T)
+          (set! self.right-child-active? #f)
+          (:handle-event self.left-child {:T :resize :width (:child-width self) :height self.height})
+          (set! self.right-child-active? #t)
+          (:handle-event self.right-child {:T :resize :width (:child-width self) :height self.height})
+          (return))
+        (when (= :draw event.T)
+          (set! self.right-child-active? #f)
+          (:handle-event self.left-child event)
+          (set! self.right-child-active? #t)
+          (:handle-event self.right-child event)
+          (return))
+
+        (set! self.right-child-active? self.right-child-focus?)
+        (:handle-event (if self.right-child-focus? self.right-child self.left-child) event))
+
+  (defn get-size (self)
+        (def child-width )
+        { :width (:child-width self)
+          :height self.height }))

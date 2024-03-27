@@ -2,6 +2,7 @@
 ;;; This project uses the MIT license, a copy should be included under /LICENSE
 ;;;
 (import (VT100) :term/VT100)
+(import (TermAppVerticalSplit) :term/TermAppVerticalSplit)
 
 (defclass TermApp
   "A high-level I/O interface for a terminal"
@@ -18,22 +19,38 @@
                    :input-buffer (buffer/allocate 16)
                    :input-buffer-pos 0
                    :event-queue #nil
+                   :child #nil
                    :cursor-x -1
                    :cursor-y -1
                    :prototype* self })
         (:resize ret))
 
+  (defn split-window-right (self right-child)
+        (def new (:new TermAppVerticalSplit self self.child right-child))
+        (set! self.child new)
+        (:handle-event new {:T :resize :width self.width :height self.height}))
+
   (defn run (self child)
-        (:clear-screen self)
-        (let ((s (:get-size self)))
-             (child (list {:T :start}
-                          {:T :resize :width s.width :height s.height})))
-        (while #t
-          (:poll-input self) ;; Poll once so we do end up blocking on IO
-          (while (not (:input-would-block? self))
-            (:poll-input self))
-          (child self.event-queue)
-          (set! self.event-queue #nil)))
+        (try (fn (e) (:stop self)
+               (efmtln "{e:?}")
+               (exit 0))
+             (:clear-screen self)
+             (def draw {:T :draw})
+             (let ((s (:get-size self)))
+                  (:handle-event child {:T :resize :width s.width :height s.height})
+                  (:handle-event child {:T :focus})
+                  (:handle-event child draw))
+             (set! self.child child)
+             (:flip self)
+             (while #t
+               (:poll-input self) ;; Poll once so we do end up blocking on IO
+               (while (not (:input-would-block? self))
+                 (:poll-input self))
+               (doseq (event self.event-queue)
+                      (:handle-event self.child event))
+               (:handle-event self.child draw)
+               (:flip self)
+               (set! self.event-queue #nil))))
 
   (defn stop (self)
         (:stop self.term)
@@ -107,7 +124,7 @@
   (defn draw-text (self text x y w h color)
         (set! x (max 0 x))
         (set! y (max 0 y))
-        (set! w (min (- self.width x) (- w 1) (:length text)))
+        (set! w (min (min w (- self.width x)) (:length text)))
         (set! h (min (- self.height y) (- h 1)))
         (def off (* 2 (+ x (* y self.width))))
         (def bb self.backbuffer)
