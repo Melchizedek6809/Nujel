@@ -56,6 +56,9 @@
         (:stop self.term)
         self)
 
+  (defn windmove-left (self) #f)
+  (defn windmove-right (self) #f)
+
   (defn resize (self)
         (def term self.term)
         (def size (:get-size term))
@@ -194,39 +197,55 @@
                   #;(0 (:add-input-event self { :T :key-down :key (:keyword "M-[") })
                      (:pop-input-buffer! self 2)
                      (return (:parse-input-buffer self)))
-                  ((#x32 #x33 #x35 #x36)
+                  ((#x31 #x32 #x33 #x35 #x36)
                    (def f (ref self.input-buffer 3))
                    (when (= f 0) (return))
+                   (when (= f #x3B)
+                     (when (zero? (ref self.input-buffer 4))
+                       (return))
+                     (def prefix (case (ref self.input-buffer 4)
+                                       (53 "C-")
+                                       (50 "S-")
+                                       (otherwise (exception :invalid-input (fmt "Unknown C-arrow 4 suffix: {e:X}") (ref self.input-buffer 4)))))
+                     (def dir (ref self.input-buffer 5))
+                     (when (zero? dir)
+                       (return))
+                     (case dir
+                           (#\A (:add-input-event self { :T :key-down :key (:keyword (cat prefix "up"))}))
+                           (#\B (:add-input-event self { :T :key-down :key (:keyword (cat prefix "down"))}))
+                           (#\C (:add-input-event self { :T :key-down :key (:keyword (cat prefix "right"))}))
+                           (#\D (:add-input-event self { :T :key-down :key (:keyword (cat prefix "left"))}))
+                           (#\F (:add-input-event self { :T :key-down :key (:keyword (cat prefix "end"))}))
+                           (#\H (:add-input-event self { :T :key-down :key (:keyword (cat prefix "home"))}))
+                           (#x7E (case e
+                                       (#x32 (:add-input-event self { :T :key-down :key :C-insert }))
+                                       (#x33 (:add-input-event self { :T :key-down :key :C-delete }))
+                                       (#x35 (:add-input-event self { :T :key-down :key :C-page-up }))
+                                       (#x36 (:add-input-event self { :T :key-down :key :C-page-down }))
+                                       (otherwise (exception :invalid-input (fmt "Unknown C-special: {e:X}")))))
+                           (otherwise (exception :invalid-input (fmt "Unknown C-arrow dir: {dir:X}"))))
+                     (:pop-input-buffer! self 6)
+                     (return (:parse-input-buffer self)))
                    (when (= f #x37)
                      (:add-input-event self { :T :key-down :key :print })
                      (:pop-input-buffer! self 4)
                      (return (:parse-input-buffer self)))
                    (when (= f 126)
                      (case e
-                           (#x32 (:add-input-event self { :T :key-down
-                                                :key :insert }))
-                           (#x33 (:add-input-event self { :T :key-down
-                                                :key :delete }))
-                           (#x35 (:add-input-event self { :T :key-down
-                                                :key :page-up }))
-                           (#x36 (:add-input-event self { :T :key-down
-                                                          :key :page-down }))
-                           (otherwise (exception :invalid-input (fmt "Unknown bracketed input: {e:X}") e)))
+                           (#x32 (:add-input-event self { :T :key-down :key :insert }))
+                           (#x33 (:add-input-event self { :T :key-down :key :delete }))
+                           (#x35 (:add-input-event self { :T :key-down :key :page-up }))
+                           (#x36 (:add-input-event self { :T :key-down :key :page-down }))
+                           (otherwise (exception :invalid-input (fmt "Unknown bracketed arrow input: {e:X}") e)))
                      (:pop-input-buffer! self 4)
                      (return (:parse-input-buffer self)))
                    (exception :invalid-input (fmt "Unknown bracketed input suffix: {f:X}") f))
-                  (#\A (:add-input-event self { :T :key-down
-                                                :key :up }))
-                  (#\B (:add-input-event self { :T :key-down
-                                                :key :down }))
-                  (#\C (:add-input-event self { :T :key-down
-                                                :key :right }))
-                  (#\D (:add-input-event self { :T :key-down
-                                                :key :left }))
-                  (#\F (:add-input-event self { :T :key-down
-                                                :key :end }))
-                  (#\H (:add-input-event self { :T :key-down
-                                                :key :home }))
+                  (#\A (:add-input-event self { :T :key-down :key :up }))
+                  (#\B (:add-input-event self { :T :key-down :key :down }))
+                  (#\C (:add-input-event self { :T :key-down :key :right }))
+                  (#\D (:add-input-event self { :T :key-down :key :left }))
+                  (#\F (:add-input-event self { :T :key-down :key :end }))
+                  (#\H (:add-input-event self { :T :key-down :key :home }))
                   (otherwise (exception :invalid-input (fmt "Unknown bracketed input: {e:X}") e)))
             (:pop-input-buffer! self 3)
             (return (:parse-input-buffer self)))

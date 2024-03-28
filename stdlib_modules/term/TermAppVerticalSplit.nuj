@@ -25,6 +25,20 @@
             self.split-pos
             0))
 
+  (defn windmove-left (self)
+        (if self.right-child-focus?
+            (do (set! self.right-child-focus? #f)
+                (:handle-event self.right-child {:T :blur})
+                (:handle-event self.left-child {:T :focus}))
+            (:windmove-left self.parent)))
+
+  (defn windmove-right (self)
+        (if self.right-child-focus?
+            (:windmove-right self.parent)
+            (do (set! self.right-child-focus? #t)
+                (:handle-event self.left-child {:T :blur})
+                (:handle-event self.right-child {:T :focus}))))
+
   (defn child-width (self)
         (if self.right-child-active?
             (- self.width self.split-pos)

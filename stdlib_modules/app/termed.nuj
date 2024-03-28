@@ -157,6 +157,12 @@
                (set! lines i cur-line)
                (inc! i)))
 
+  (defn windmove-left (self)
+        (:windmove-left self.term))
+
+  (defn windmove-right (self)
+        (:windmove-right self.term))
+
   (defn set-parent! (self parent)
         (set! self.term parent))
 
@@ -182,6 +188,8 @@
         (set! key-down-handler :C-k (fn () (:kill-line self)))
         (set! key-down-handler :C-p :previous-line)
         (set! key-down-handler :C-n :next-line)
+        (set! key-down-handler :C-right (fn () (:windmove-right self)))
+        (set! key-down-handler :C-left (fn () (:windmove-left self)))
         (set! key-down-handler :C-y (fn () (:yank self)))
         (set! key-down-handler :C-w (fn () (:kill-region self)))
 

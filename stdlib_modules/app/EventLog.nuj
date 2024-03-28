@@ -44,7 +44,6 @@
 
 (defn main (args)
       :export
-      (:start term)
       (while #t
         (draw-screen)
         (read-input)))
