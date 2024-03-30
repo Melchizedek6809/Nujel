@@ -3,6 +3,7 @@
 
 (def clipboard "")
 (def buffers [])
+(def bgcolor 1)
 
 (defclass TextEditor
   "A terminal-based text editor with controls very similar to Emacs"
@@ -44,7 +45,7 @@
 
   (defn accent-color (self)
         (if self.focus?
-            #x34
+            #xF4
             #xF8))
 
   (defn draw-modeline (self buf)

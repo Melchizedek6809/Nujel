@@ -83,7 +83,7 @@
   (defn draw-text (self text x y w h color)
         (set! x (max 0 x))
         (set! y (max 0 y))
-        (set! w (min (- (min w (:child-width self)) x) (:length text)))
+        (set! w (min (- (:child-width self) x) w))
         (set! h (min (- self.height y) (- h 1)))
         (:draw-text self.parent text (+ x (:child-offset self)) y w h color))
 
