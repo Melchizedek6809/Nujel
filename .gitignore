@@ -28,6 +28,8 @@ gmon.out
 *.so
 *.o
 *.err
+*.cmi
+*.cmx
 /stdlib/**/*.no
 /stdlib_modules/**/*.no
 /binlib/**/*.no
