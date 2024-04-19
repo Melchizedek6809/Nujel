@@ -43,7 +43,7 @@
   (defn child-width (self)
         (if self.right-child-active?
             (- self.width self.split-pos)
-            self.split-pos))
+            (inc self.split-pos)))
 
   (defn split-window-right (self right-child)
         (def new (:new TermAppVerticalSplit
