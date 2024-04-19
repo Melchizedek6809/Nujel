@@ -121,8 +121,10 @@
 
   (defn clear-screen (self)
         (def bb self.backbuffer)
+        (def fb self.frontbuffer)
         (dotimes (i (:length bb) self)
-                 (set! bb i 0)))
+          (set! fb i #xFF)
+          (set! bb i 0)))
 
   (defn draw-text (self text x y w h color)
         (set! x (max 0 x))

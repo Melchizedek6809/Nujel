@@ -18,6 +18,7 @@
                    :prototype* self })
         (:set-parent! left-child ret)
         (:set-parent! right-child ret)
+        (:clear-screen ret)
         ret)
 
   (defn child-offset (self)
@@ -98,7 +99,8 @@
             (set! self.right-child child)
             (set! self.left-child child)))
 
-  (defn clear-screen (self) #f)
+  (defn clear-screen (self)
+        (:clear-screen self.parent))
 
   (defn handle-event (self event)
         (when (= :resize event.T)

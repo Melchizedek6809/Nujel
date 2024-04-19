@@ -10,6 +10,7 @@
       (println (cat "\nHigh-level options - for working with/on Nujel code"))
       (println (cat "  " (blue "h") " - Print this help screen"))
       (println (cat "  " (blue "m") " - Execute the following module"))
+      (println (cat "  " (blue "e") " - Evaluate file and to stdout"))
       (println (cat "  " (blue "x") " - Run the expression following this argument directly"))
       (println (cat "\nLong options - for working with/on Nujel code"))
       (println (cat "  " (green "no-color") " - Disable ANSI color"))

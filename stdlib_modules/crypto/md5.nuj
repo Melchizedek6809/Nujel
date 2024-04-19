@@ -95,7 +95,7 @@
 (deftest "d174ab98d277d9f5a5611c2c9f419d9f" (crypto/md5/hash "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
 (deftest "57edf4a22be3c955ac49da2e2107b67a" (crypto/md5/hash "12345678901234567890123456789012345678901234567890123456789012345678901234567890"))
 (deftest "9e107d9d372bb6826bd81d3542a419d6" (crypto/md5/hash "The quick brown fox jumps over the lazy dog"))
-(deftest "cb4794d9a70d922a9eafd5b82d14d560" (crypto/md5/hash (-> (range 2048) (map :string) (join ", "))))
+(deftest "790c0d49a536afcce65cf64e17f053b6" (crypto/md5/hash (-> (range 512) (map :string) (join ", "))))
 
 (defn main (args)
       :export

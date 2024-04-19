@@ -153,8 +153,8 @@
 
 (defn println (str)
       "Print STR on a single line"
-      (print (cat str "\r\n")))
+      (print (cat str "\n")))
 
 (defn errorln (str)
       "Print to stderr STR on a single line"
-      (error (cat str "\r\n")))
+      (error (cat str "\n")))

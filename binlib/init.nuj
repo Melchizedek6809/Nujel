@@ -15,6 +15,7 @@
 (defn init args (let*
             (def init/parse-args/eval-next-module #f)
             (def init/parse-args/eval-next #f)
+            (def init/parse-args/eval-write-next #f)
             (def init/parse-args/run-repl #t)
             (def init/parse-args/ignore-next #f)
             (set! init/args args)
@@ -30,6 +31,9 @@
             (set! init/option-map 'm
                        (fn (option)
                            (set! init/parse-args/eval-next-module #t)))
+            (set! init/option-map 'e
+                       (fn (option)
+                           (set! init/parse-args/eval-write-next #t)))
             (set! init/option-map 'h
                        (fn (option)
                            (module/main :help #nil)
@@ -64,12 +68,14 @@
                         (init/parse-args/eval-next (try print/error
                                                         (eval-in root-closure (cons do (read arg)))
                                                         (set! init/parse-args/eval-next #f)))
+                        (init/parse-args/eval-write-next (pfmtln "{:?}" (file/eval arg))
+                                                         (exit 0))
                         (init/parse-args/eval-next-module (try (fn (e)
                                                                    (print/error e)
                                                                  (exit 1))
                                                                (when (= (ref arg 0) #\:)
                                                                  (set! arg (:cut arg 1)))
-                                                               (module/main (:keyword arg) (cdr args))
+                                                               (def ret (module/main (:keyword arg) (cdr args)))
                                                                (exit 0)))
                         ((= (ref arg 0) #\-) (init/parse-options (:cut arg 1)))
                         (#t (try (fn (e)

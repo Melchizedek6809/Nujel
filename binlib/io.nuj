@@ -21,15 +21,16 @@
                 (cons 'do (read (file/read path)))))
 
 (defn file/eval-module (path args)
-       "Evaluate a Nujel source file in the current context"
-       (def mod-name (module/resolve-string (cat (path/without-extension path)) (cwd)))
-       (def mod (module/load mod-name))
-       (when-not (= :environment (:type-name mod))
-                 (return mod))
-       (def exports (ref mod :exports))
-       (when-not exports (exception (fmt "Couldn't load {path} as a module since it has no exports")))
-       (when (:has? exports :main)
-         ((ref exports :main) args)))
+      "Evaluate a Nujel source file in the current context"
+      (def root (if (= (ref path 0) #\/) "" (cwd)))
+      (def mod-name (module/resolve-string (cat (path/without-extension path)) root))
+      (def mod (module/load mod-name))
+      (when-not (= :environment (:type-name mod))
+                (return mod))
+      (def exports (ref mod :exports))
+      (when-not exports (exception (fmt "Couldn't load {path} as a module since it has no exports")))
+      (when (:has? exports :main)
+        ((ref exports :main) args)))
 
 
 (defn file/file? (filename)
