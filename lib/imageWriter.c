@@ -5,12 +5,25 @@
 #include "nujel-private.h"
 #endif
 
+#include "image.h"
+
 typedef struct {
 	u8 *start;
 	i32 curOff;
 	i32 size;
 	lMap *map;
 } writeImageContext;
+
+static void writeI16(writeImageContext *ctx, i32 curOff, i32 v){
+	ctx->start[curOff  ] = (v    )&0xFF;
+	ctx->start[curOff+1] = (v>> 8)&0xFF;
+}
+
+static void writeI24(writeImageContext *ctx, i32 curOff, i32 v){
+	ctx->start[curOff  ] = (v    )&0xFF;
+	ctx->start[curOff+1] = (v>> 8)&0xFF;
+	ctx->start[curOff+2] = (v>>16)&0xFF;
+}
 
 static i32 ctxAddVal(writeImageContext *ctx, lVal v);
 
@@ -66,22 +79,13 @@ static i32 ctxAddMap(writeImageContext *ctx, lMap *v){
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(ctx->map, (void *)v, curOff);
-	ctx->start[curOff  ] =  len     & 0xFF;
-	ctx->start[curOff+1] = (len>>8) & 0xFF;
+	writeI16(ctx, curOff, len);
 	ctx->curOff += eleSize;
 	i32 off = curOff + 2;
 	for(uint i=0;i<v->size;i++){
 		if(v->entries[i].key.type == ltNil){continue;}
-		const i32 key = ctxAddVal(ctx, v->entries[i].key);
-		ctx->start[off  ] = (key    )&0xFF;
-		ctx->start[off+1] = (key>> 8)&0xFF;
-		ctx->start[off+2] = (key>>16)&0xFF;
-
-		const i32 val = ctxAddVal(ctx, v->entries[i].val);
-		ctx->start[off+3] = (val    )&0xFF;
-		ctx->start[off+4] = (val>> 8)&0xFF;
-		ctx->start[off+5] = (val>>16)&0xFF;
-
+		writeI24(ctx, off  , ctxAddVal(ctx, v->entries[i].key));
+		writeI24(ctx, off+3, ctxAddVal(ctx, v->entries[i].val));
 		off += 6;
 	}
 	return curOff;
@@ -89,15 +93,8 @@ static i32 ctxAddMap(writeImageContext *ctx, lMap *v){
 static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 	if((v == NULL) || (v->key == NULL)){return curOff;}
 
-	const i32 sym = ctxAddSymbol(ctx, v->key);
-	ctx->start[curOff]   = (sym    )&0xFF;
-	ctx->start[curOff+1] = (sym>> 8)&0xFF;
-	ctx->start[curOff+2] = (sym>>16)&0xFF;
-
-	const i32 val = ctxAddVal(ctx, v->value);
-	ctx->start[curOff+3] = (val    )&0xFF;
-	ctx->start[curOff+4] = (val>> 8)&0xFF;
-	ctx->start[curOff+5] = (val>>16)&0xFF;
+	writeI24(ctx, curOff  , ctxAddSymbol(ctx, v->key));
+	writeI24(ctx, curOff+3, ctxAddVal(ctx, v->value));
 
 	curOff += 6;
 	curOff = ctxAddTreeVal(ctx, curOff, v->left);
@@ -116,8 +113,7 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 
 	const i32 curOff = ctx->curOff;
 	writeMapSet(ctx->map, (void *)v, curOff);
-	ctx->start[curOff  ] =  len     & 0xFF;
-	ctx->start[curOff+1] = (len>>8) & 0xFF;
+	writeI16(ctx, curOff, len);
 	ctx->curOff += eleSize;
 	ctxAddTreeVal(ctx, curOff + 2, v);
 	return curOff;
@@ -251,14 +247,10 @@ static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
 	ctx->curOff += eleSize;
 
 	const i32 car = v->car.type != ltNil ? ctxAddVal(ctx, v->car) : -1;
-	ctx->start[curOff  ] =  car      & 0xFF;
-	ctx->start[curOff+1] = (car>> 8) & 0xFF;
-	ctx->start[curOff+2] = (car>>16) & 0xFF;
+	writeI24(ctx, curOff, car);
 
 	const i32 cdr = v->cdr.type != ltNil ? ctxAddVal(ctx, v->cdr) : -1;
-	ctx->start[curOff+3] =  cdr      & 0xFF;
-	ctx->start[curOff+4] = (cdr>> 8) & 0xFF;
-	ctx->start[curOff+5] = (cdr>>16) & 0xFF;
+	writeI24(ctx, curOff+3, cdr);
 
 	return curOff;
 }
@@ -291,125 +283,73 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 		*outb++ = litFileHandle;
 		*outb = ctxAddFilehandle(v.vFileHandle);
 		break;
-	case ltNativeFunc: {
+	case ltNativeFunc:
 		ctx->curOff += 4;
 		*outb = litNativeFunc;
-		const i32 off = ctxAddSymbol(ctx, v.vNFunc->name);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltType: {
+		writeI24(ctx, curOff+1, ctxAddSymbol(ctx, v.vNFunc->name));
+		break;
+	case ltType:
 		ctx->curOff += 4;
 		*outb = litType;
-		const i32 off = ctxAddSymbol(ctx, v.vType->name);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltBytecodeArr: {
+		writeI24(ctx, curOff+1, ctxAddSymbol(ctx, v.vType->name));
+		break;
+	case ltBytecodeArr:
 		ctx->curOff += 4;
 		*outb = litBytecodeArr;
-		const i32 off = ctxAddBytecodeArray(ctx, v.vBytecodeArr);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltTree: {
+		writeI24(ctx, curOff+1, ctxAddBytecodeArray(ctx, v.vBytecodeArr));
+		break;
+	case ltTree:
 		ctx->curOff += 4;
 		*outb = litTree;
-		const i32 off = ctxAddTree(ctx, v.vTree->root);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltMap: {
+		writeI24(ctx, curOff+1, ctxAddTree(ctx, v.vTree->root));
+		break;
+	case ltMap:
 		ctx->curOff += 4;
 		*outb = litMap;
-		const i32 off = ctxAddMap(ctx, v.vMap);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltArray: {
+		writeI24(ctx, curOff+1, ctxAddMap(ctx, v.vMap));
+		break;
+	case ltArray:
 		ctx->curOff += 5;
 		*outb = litArray;
-		const i32 off = ctxAddArray(ctx, v.vArray);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltPair: {
+		writeI24(ctx, curOff+1, ctxAddArray(ctx, v.vArray));
+		break;
+	case ltPair:
 		ctx->curOff += 4;
 		*outb = litPair;
-		const i32 off = ctxAddPair(ctx, v.vList);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
+		writeI24(ctx, curOff+1, ctxAddPair(ctx, v.vList));
+		break;
 	case ltSymbol:
-	case ltKeyword: {
+	case ltKeyword:
 		ctx->curOff += 4;
 		*outb = v.type == ltSymbol ? litSymbol : litKeyword;
-		const i32 off = ctxAddSymbol(ctx, v.vSymbol);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltBufferView: {
+		writeI24(ctx, curOff+1, ctxAddSymbol(ctx, v.vSymbol));
+		break;
+	case ltBufferView:
 		ctx->curOff += 4;
 		*outb = litBufferView;
-		const i32 off = ctxAddBufferView(ctx, v.vBufferView);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltLambda: {
+		writeI24(ctx, curOff+1, ctxAddBufferView(ctx, v.vBufferView));
+		break;
+	case ltLambda:
 		ctx->curOff += 4;
 		*outb = litLambda;
-		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltMacro: {
+		writeI24(ctx, curOff+1, ctxAddClosure(ctx, v.vClosure));
+		break;
+	case ltMacro:
 		ctx->curOff += 4;
 		*outb = litMacro;
-		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
-	case ltEnvironment: {
+		writeI24(ctx, curOff+1, ctxAddClosure(ctx, v.vClosure));
+		break;
+	case ltEnvironment:
 		ctx->curOff += 4;
 		*outb = litEnvironment;
-		const i32 off = ctxAddClosure(ctx, v.vClosure);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
+		writeI24(ctx, curOff+1, ctxAddClosure(ctx, v.vClosure));
+		break;
 	case ltString:
-	case ltBuffer: {
+	case ltBuffer:
 		ctx->curOff += 4;
 		*outb = v.type == ltString ? litString : litBuffer;
-		const i32 off = ctxAddBuffer(ctx, v.vBuffer);
-		outb = ((void *)&ctx->start[curOff+1]);
-		*outb++ = off&0xFF;
-		*outb++ = (off>>8)&0xFF;
-		*outb++ = (off>>16)&0xFF;
-		break; }
+		writeI24(ctx, curOff+1, ctxAddBuffer(ctx, v.vBuffer));
+		break;
 	case ltInt:
 		if(v.vInt == ((i8)v.vInt)){
 			ctx->curOff += 2;

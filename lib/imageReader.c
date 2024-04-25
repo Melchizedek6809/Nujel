@@ -5,8 +5,11 @@
 #include "nujel-private.h"
 #endif
 
+#include "image.h"
+
 typedef struct {
 	i32 imgSize;
+	i32 curOff;
 	lMap *map;
 } readImageMap;
 
@@ -226,8 +229,10 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	if(off < 0){return NIL;}
 
 	const lImageType T = img->data[off++];
+	map->curOff++;
 	switch(T){
 	case litFileHandle:
+		map->curOff++;
 		switch(img->data[off]){
 		case 0:
 			return lValFileHandle(stdin);
@@ -241,14 +246,19 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	case litNil:
 		return NIL;
 	case litInt64:
+		map->curOff += 8;
 		return lValInt(*(i64 *)((void *)&img->data[off]));
 	case litInt32:
+		map->curOff += 4;
 		return lValInt(*(i32 *)((void *)&img->data[off]));
 	case litInt16:
+		map->curOff += 2;
 		return lValInt(*(i16 *)((void *)&img->data[off]));
 	case litInt8:
+		map->curOff += 1;
 		return lValInt(*(i8 *)((void *)&img->data[off]));
 	case litFloat: {
+		map->curOff += 8;
 		const double *fword = (double *)((void *)&img->data[off]);
 		return lValFloat(*fword);
 	}
@@ -261,6 +271,7 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	}
 
 	const i32 tbyte = img->data[off] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
+	map->curOff += 3;
 	switch(T){
 	default:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
