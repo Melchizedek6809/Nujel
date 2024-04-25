@@ -38,7 +38,7 @@ extern char **environ;
 void lRedefineEnvironment(lClosure *c){
 	lMap *t = lMapAllocRaw();
 	#ifdef __wasi__
-	t = addVar("PATH=",t); // Necessary so that tests don't fail
+	addVar("PATH=",t); // Necessary so that tests don't fail
 	#endif
 	for(int i=0;environ[i];i++){
 		addVar(environ[i], t);
