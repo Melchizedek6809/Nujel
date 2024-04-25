@@ -25,12 +25,22 @@
                    :prototype* self })
         (:resize ret))
 
+  (defn handle-event (self event)
+        (:handle-event self.child event))
+
   (defn split-window-right (self right-child)
         (def new (:new TermAppVerticalSplit self self.child right-child))
         (set! self.child new)
         (:handle-event new {:T :resize :width self.width :height self.height}))
 
   (defn run (self child)
+        (when self.child
+          (set! self.child child)
+          (let ((s (:get-size self)))
+                  (:handle-event child {:T :resize :width s.width :height s.height})
+                  (:handle-event child {:T :focus})
+                  (:handle-event child {:T :draw}))
+          (return))
         (try (fn (e) (:stop self)
                (efmtln "{e:?}")
                (exit 0))
@@ -54,7 +64,11 @@
 
   (defn stop (self)
         (:stop self.term)
-        self)
+        (exit 0))
+
+  (defn quit (self)
+        (:stop self.term)
+        (exit 0))
 
   (defn windmove-left (self) #f)
   (defn windmove-right (self) #f)

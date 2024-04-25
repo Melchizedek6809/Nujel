@@ -102,9 +102,15 @@
                      (- (inc self.cur-buffer.pos-y)
                         self.cur-buffer.scroll-y)))
 
+  (defn stop (self)
+        (:stop self.term))
+
   (defn quit (self)
-        (:stop self.term)
+        (:quit self.term)
         (exit 0))
+
+  (defn set-parent! (self parent)
+        (set! self.term parent))
 
   (defn scroll-into-view (self)
         (def buf self.cur-buffer)
@@ -137,6 +143,7 @@
   (defn handle-event (self event)
         (case event.T
               (:blur (set! self.focus? #f))
+              (:reparent (set! self.term event.parent))
               (:focus (set! self.focus? #t))
               (:draw (:scroll-into-view self) (:draw-screen self))
               (:resize (:resize self event.width event.height))
@@ -212,6 +219,7 @@
         (set! key-down-handler :ret :insert-newline)
         (set! cx-key-down-handler :h :mark-whole-buffer)
         (set! cx-key-down-handler :3 (fn () (:split-window-right self)))
+        (set! cx-key-down-handler :0 (fn () (:stop self)))
         (set! cx-key-down-handler :C-c (fn () (:quit self)))))
 
 (defn main (args)

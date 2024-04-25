@@ -61,10 +61,27 @@
         (if self.right-child-active?
             (set! self.right-child child)
             (set! self.left-child child))
-        (child {:T :resize :width (:child-width self) :height s.height})
+        (child {:T :resize :width (:child-width self) :height self.height})
         (child {:T :draw}))
 
-  (defn stop (self) (:stop self.parent))
+  (defn active-child (self)
+        (if self.right-child-active?
+            self.right-child
+            self.left-child))
+
+  (defn inactive-child (self)
+        (if self.right-child-active?
+            self.left-child
+            self.right-child))
+
+  (defn stop (self)
+        (def child (:inactive-child self))
+        (child {:T :reparent :parent self.parent})
+        (:run self.parent child))
+
+  (defn quit (self)
+        (:quit self.parent))
+
   (defn flip (self) (:flip self.parent))
   (defn draw-char (self char x y color)
         (when (or (>= x (:child-width self))
@@ -88,16 +105,8 @@
         (set! h (min (- self.height y) (- h 1)))
         (:draw-text self.parent text (+ x (:child-offset self)) y w h color))
 
-  (defn stop (self)
-        (:stop self.parent))
-
   (defn set-parent! (self parent)
         (set! self.parent parent))
-
-  (defn run (self child)
-        (if self.right-child-active?
-            (set! self.right-child child)
-            (set! self.left-child child)))
 
   (defn clear-screen (self)
         (:clear-screen self.parent))
@@ -108,6 +117,9 @@
           (:handle-event self.left-child {:T :resize :width (:child-width self) :height self.height})
           (set! self.right-child-active? #t)
           (:handle-event self.right-child {:T :resize :width (:child-width self) :height self.height})
+          (return))
+        (when (= :reparent event.T)
+          (set! self.parent event.parent)
           (return))
         (when (= :draw event.T)
           (set! self.right-child-active? #f)
