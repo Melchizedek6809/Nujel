@@ -6,39 +6,25 @@
 #endif
 
 typedef struct {
-	i32 len;
-	i32 size;
-	void **key;
-	i32 *val;
-} writeImageMap;
-
-typedef struct {
 	u8 *start;
 	i32 curOff;
 	i32 size;
-	writeImageMap map;
+	lMap *map;
 } writeImageContext;
 
 static i32 ctxAddVal(writeImageContext *ctx, lVal v);
 
-static i32 writeMapGet(writeImageMap *map, void *key){
-	for(int i=0;i<map->len;i++){
-		if(map->key[i] == key){
-			return map->val[i];
-		}
+static i32 writeMapGet(lMap *map, void *key){
+	lVal v = lMapRef(map, lValInt((u64)key));
+	if(v.type == ltInt){
+		return v.vInt;
+	} else {
+		return 0;
 	}
-	return 0;
 }
 
-static void writeMapSet(writeImageMap *map, void *key, i32 val){
-	if(map->len+1 >= map->size){
-		map->size += 32;
-		map->key = realloc(map->key, map->size * sizeof(void *));
-		map->val = realloc(map->val, map->size * sizeof(i32));
-	}
-	map->key[map->len] = key;
-	map->val[map->len] = val;
-	map->len++;
+static void writeMapSet(lMap *map, void *key, i32 val){
+	lMapSet(map, lValInt((u64)key), lValInt(val));
 }
 
 static void ctxRealloc(writeImageContext *ctx, i32 eleSize){
@@ -53,7 +39,7 @@ static void ctxRealloc(writeImageContext *ctx, i32 eleSize){
 
 static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 	if(v == NULL){return -1;}
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 strLen = strnlen(v->c, sizeof(v->c));
@@ -62,7 +48,7 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 	memcpy(&ctx->start[curOff], v->c, strLen);
         ctx->start[curOff + strLen] = 0;
@@ -71,7 +57,7 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 
 static i32 ctxAddMap(writeImageContext *ctx, lMap *v){
 	if(v == NULL){return -1;}
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const int len = v->length;
@@ -79,7 +65,7 @@ static i32 ctxAddMap(writeImageContext *ctx, lMap *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->start[curOff  ] =  len     & 0xFF;
 	ctx->start[curOff+1] = (len>>8) & 0xFF;
 	ctx->curOff += eleSize;
@@ -121,7 +107,7 @@ static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 
 static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 	if(v == NULL){return -1;}
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const int len = lTreeSize(v);
@@ -129,7 +115,7 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->start[curOff  ] =  len     & 0xFF;
 	ctx->start[curOff+1] = (len>>8) & 0xFF;
 	ctx->curOff += eleSize;
@@ -138,14 +124,14 @@ static i32 ctxAddTree(writeImageContext *ctx, lTree *v){
 }
 
 static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 eleSize = 4 + (4 * v->length);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 
 	i32 *out = (i32 *)((void *)&ctx->start[curOff]);
@@ -160,7 +146,7 @@ static i32 ctxAddArray(writeImageContext *ctx, lArray *v){
 }
 
 static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 	if(v == NULL){return -1;}
 
@@ -169,7 +155,7 @@ static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 	ctxRealloc(ctx, eleSize);
 
 	i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 
 	ctx->curOff += eleSize;
 
@@ -183,14 +169,14 @@ static i32 ctxAddBytecodeArray(writeImageContext *ctx, lBytecodeArray *v){
 
 static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 	if(v == NULL){return -1;}
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 eleSize = sizeof(lImageClosure);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 
 	const i32 args = ctxAddVal(ctx, v->args);
@@ -214,14 +200,14 @@ static i32 ctxAddClosure(writeImageContext *ctx, lClosure *v){
 }
 
 static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 eleSize = 4 + v->length;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	u32 *out = (u32 *)((void *)&ctx->start[ctx->curOff]);
 	const u32 outVal = (v->length & 0x0FFFFFFF) | (v->flags << 28);
 	*out = outVal;
@@ -232,14 +218,14 @@ static i32 ctxAddBuffer(writeImageContext *ctx, lBuffer *v){
 }
 
 static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 eleSize = sizeof(lImageBufferView);
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 	const i32 buf = ctxAddBuffer(ctx, v->buf);
 
@@ -254,14 +240,14 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 }
 
 static i32 ctxAddPair(writeImageContext *ctx, lPair *v){
-	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
 	const i32 eleSize = 8;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
-	writeMapSet(&ctx->map, (void *)v, curOff);
+	writeMapSet(ctx->map, (void *)v, curOff);
 	ctx->curOff += eleSize;
 
 	const i32 car = v->car.type != ltNil ? ctxAddVal(ctx, v->car) : -1;
@@ -468,6 +454,7 @@ static lImage *writeImage(lVal rootValue, i32 *outSize){
 	size_t size = sizeof(lImage);
 	writeImageContext ctx;
 	memset(&ctx, 0, sizeof(ctx));
+	ctx.map = lMapAllocRaw();
 	lImage *buf = malloc(size);
 
 	buf->magic[0] = 'N';
@@ -482,8 +469,6 @@ static lImage *writeImage(lVal rootValue, i32 *outSize){
 	size += ctx.curOff;
 	*outSize = size;
 	free(ctx.start);
-	free(ctx.map.key);
-	free(ctx.map.val);
 	return buf;
 }
 

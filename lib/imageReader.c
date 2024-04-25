@@ -7,32 +7,22 @@
 
 typedef struct {
 	i32 imgSize;
-	i32 len;
-	i32 size;
-	i32 *key;
-	void **val;
+	lMap *map;
 } readImageMap;
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage);
 
 static void *readMapGet(readImageMap *map, i32 key){
-	for(int i=0;i<map->len;i++){
-		if(map->key[i] == key){
-			return map->val[i];
-		}
+	lVal v = lMapRef(map->map, lValInt(key));
+	if(v.type == ltInt){
+		return (void *)v.vInt;
+	} else {
+		return NULL;
 	}
-	return NULL;
 }
 
 static void readMapSet(readImageMap *map, i32 key, void *val){
-	if(map->len+1 >= map->size){
-		map->size += 32;
-		map->key = realloc(map->key, map->size * sizeof(i32));
-		map->val = realloc(map->val, map->size * sizeof(void *));
-	}
-	map->key[map->len] = key;
-	map->val[map->len] = val;
-	map->len++;
+	lMapSet(map->map, lValInt(key), lValInt((u64)val));
 }
 
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
@@ -322,10 +312,9 @@ lVal readImage(const void *ptr, size_t imgSize, bool staticImage){
 	readImageMap map;
 	memset(&map, 0, sizeof(map));
 	map.imgSize = imgSize-4;
+	map.map = lMapAllocRaw();
 
 	lVal ret = readVal(&map, img, 0, staticImage);
-	free(map.key);
-	free(map.val);
 	return ret;
 }
 
