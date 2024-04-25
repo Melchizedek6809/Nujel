@@ -14,6 +14,10 @@ typedef struct {
 	lMap *map;
 } writeImageContext;
 
+static void writeI8(writeImageContext *ctx, i32 curOff, i32 v){
+	ctx->start[curOff  ] = (v    )&0xFF;
+}
+
 static void writeI16(writeImageContext *ctx, i32 curOff, i32 v){
 	ctx->start[curOff  ] = (v    )&0xFF;
 	ctx->start[curOff+1] = (v>> 8)&0xFF;
@@ -23,6 +27,13 @@ static void writeI24(writeImageContext *ctx, i32 curOff, i32 v){
 	ctx->start[curOff  ] = (v    )&0xFF;
 	ctx->start[curOff+1] = (v>> 8)&0xFF;
 	ctx->start[curOff+2] = (v>>16)&0xFF;
+}
+
+static void writeI32(writeImageContext *ctx, i32 curOff, i32 v){
+	ctx->start[curOff  ] = (v    )&0xFF;
+	ctx->start[curOff+1] = (v>> 8)&0xFF;
+	ctx->start[curOff+2] = (v>>16)&0xFF;
+	ctx->start[curOff+3] = (v>>24)&0xFF;
 }
 
 static i32 ctxAddVal(writeImageContext *ctx, lVal v);
@@ -217,7 +228,7 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 	const i32 mapOff = writeMapGet(ctx->map, (void *)v);
 	if(mapOff > 0){ return mapOff; }
 
-	const i32 eleSize = sizeof(lImageBufferView);
+	const i32 eleSize = 13;
 	ctxRealloc(ctx, eleSize);
 
 	const i32 curOff = ctx->curOff;
@@ -225,12 +236,11 @@ static i32 ctxAddBufferView(writeImageContext *ctx, lBufferView *v){
 	ctx->curOff += eleSize;
 	const i32 buf = ctxAddBuffer(ctx, v->buf);
 
-	lImageBufferView *out = (lImageBufferView *)((void *)&ctx->start[curOff]);
-	out->buffer = buf;
-	out->length = v->length;
-	out->offset = v->offset;
-	out->flags = v->flags;
-	out->type = v->type;
+	writeI8 (ctx, curOff+0, v->flags);
+	writeI24(ctx, curOff+1, buf);
+	writeI32(ctx, curOff+4, v->length);
+	writeI32(ctx, curOff+8, v->offset);
+	writeI8 (ctx, curOff+12, v->type);
 
 	return curOff;
 }

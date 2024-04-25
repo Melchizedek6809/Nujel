@@ -52,14 +52,6 @@ typedef enum {
 } lImageType;
 
 typedef struct {
-	i32 buffer;
-	i32 length;
-	i32 offset;
-	u8 flags;
-	u8 type;
-} lImageBufferView;
-
-typedef struct {
 	i32 parent;
 	i32 data;
 	i32 meta;

@@ -28,6 +28,22 @@ static void readMapSet(readImageMap *map, i32 key, void *val){
 	lMapSet(map->map, lValInt(key), lValInt((u64)val));
 }
 
+static inline i32 readI8(const lImage *img, i32 off){
+	return img->data[off  ];
+}
+
+static inline i32 readI16(const lImage *img, i32 off){
+	return img->data[off  ] | (img->data[off+1]<<8);
+}
+
+static i32 readI24(const lImage *img, i32 off){
+	return img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16);
+}
+
+static i32 readI32(const lImage *img, i32 off){
+	return img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16) | (img->data[off+3]<<24);
+}
+
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)staticImage;
 	(void)map;
@@ -85,8 +101,8 @@ static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool stati
 	if(off >= (1<<24)-1){return NULL;}
 	lPair *ret = lPairAllocRaw();
 	readMapSet(map, off, ret);
-	const i32 car = img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16);
-	const i32 cdr = img->data[off+3] | (img->data[off+4]<<8) | (img->data[off+5]<<16);
+	const i32 car = readI24(img, off);
+	const i32 cdr = readI24(img, off+3);
 	ret->car = car < ((1<<24)-1) ? readVal(map, img, car, staticImage) : NIL;
 	ret->cdr = cdr < ((1<<24)-1) ? readVal(map, img, cdr, staticImage) : NIL;
 	return ret;
@@ -118,15 +134,15 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 	if(mapP != NULL){ return (lBufferView *)mapP; }
 	if(off < 0){return NULL;}
 	if(off >= (1<<24)-1){return NULL;}
-	lImageBufferView *imgBuf = (lImageBufferView *)((void *)&img->data[off]);
-	lBuffer *buf = readBuffer(map, img, imgBuf->buffer, staticImage);
+	const u8 flags = readI8(img, off);
+	lBuffer *buf = readBuffer(map, img, readI24(img, off+1), staticImage);
 	lBufferView *view = lBufferViewAllocRaw();
 	readMapSet(map, off, view);
+	view->flags = flags;
 	view->buf = buf;
-	view->offset = imgBuf->offset;
-	view->length = imgBuf->length;
-	view->flags = imgBuf->flags;
-	view->type = imgBuf->type;
+	view->length = readI32(img, off+4);
+	view->offset = readI32(img, off+8);
+	view->type = readI8(img, off+12);
 	return view;
 }
 
@@ -140,8 +156,8 @@ static lMap *readMap(readImageMap *map, const lImage *img, i32 off, bool staticI
 	readMapSet(map, off, ret);
 	off += 2;
 	for(int i=0;i<len;i++){
-		const i32 key = img->data[off+0] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
-		const i32 val = img->data[off+3] | (img->data[off+4] << 8) | (img->data[off+5] << 16);
+		const i32 key = readI24(img, off+0);
+		const i32 val = readI24(img, off+3);
 		off += 6;
 		lMapSet(ret, readVal(map, img, key, staticImage), readVal(map, img, val, staticImage));
 	}
@@ -158,8 +174,8 @@ static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool stati
 	readMapSet(map, off, root);
 	off += 2;
 	for(int i=0;i<len;i++){
-		const i32 sym = img->data[off+0] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
-		const i32 val = img->data[off+3] | (img->data[off+4] << 8) | (img->data[off+5] << 16);
+		const i32 sym = readI24(img, off+0);
+		const i32 val = readI24(img, off+3);
 		off += 6;
 
 		const lSymbol *s = readSymbol(map, img, sym, staticImage);
@@ -172,7 +188,6 @@ static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool stati
 }
 
 static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	(void)map;
 	if(off < 0){return NULL;}
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
 	for(uint i=0;i<lNFuncMax;i++){
@@ -186,7 +201,6 @@ static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool sta
 }
 
 static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	(void)map;
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
 	if(off < 0){return NULL;}
 	if(off >= (1<<24)-1){return NULL;}
@@ -270,7 +284,7 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		break;
 	}
 
-	const i32 tbyte = img->data[off] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
+	const i32 tbyte = readI24(img, off);
 	map->curOff += 3;
 	switch(T){
 	default:

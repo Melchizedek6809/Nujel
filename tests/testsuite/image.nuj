@@ -7,6 +7,8 @@
 ("asdq" (image/deserialize (image/serialize "asdq")))
 ("asdq" (image/deserialize (image/serialize "asdq")))
 ("asd" (image/deserialize (image/serialize "asd")))
+(#x20 (ref (image/deserialize (image/serialize (:u8 #m2030))) 0))
+(#x30 (ref (image/deserialize (image/serialize (:u8 #m2030))) 1))
 ("" (image/deserialize (image/serialize "")))
 ('(1 2 3) (image/deserialize (image/serialize '(1 2 3))))
 ('(1 "qwe" :asd) (image/deserialize (image/serialize '(1 "qwe" :asd))))
