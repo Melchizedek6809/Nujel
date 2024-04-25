@@ -108,6 +108,7 @@
             ("crc32" "0936343A")
             ("compile-stdlib" "Image built")
             ("adler32" "E50BA232")
+            ("recfib" "832040")
             (otherwise "チーズスイートホーム")))
 
 (def time-template "#@(:user %U :system %S :elapsed \\\"%E\\\" :cpu \\\"%P\\\" :text %X :data %D :max-resident %M :inputs %I :outputs %O :pagefaults-major %F :pagefaults-minor %R :swaps %W)")

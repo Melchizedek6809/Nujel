@@ -273,6 +273,7 @@ void lDefineTypeVars(lClosure *c){
 	lDefineVal(c, "Pair",       lValType(&lClassList[ltPair]));
 	lDefineVal(c, "Array",      lValType(&lClassList[ltArray]));
 	lDefineVal(c, "Tree",       lValType(&lClassList[ltTree]));
+	lDefineVal(c, "Map",        lValType(&lClassList[ltMap]));
 	lDefineVal(c, "Lambda",     lValType(&lClassList[ltLambda]));
 	lDefineVal(c, "Macro",      lValType(&lClassList[ltMacro]));
 	lDefineVal(c, "NativeFunc", lValType(&lClassList[ltNativeFunc]));
@@ -301,6 +302,7 @@ void lTypesInit(){
 	initType(ltPair, lSymLTPair, tAny);
 	initType(ltArray, lSymLTArray, tAny);
 	initType(ltTree, lSymLTTree, tAny);
+	initType(ltMap, lSymLTMap, tAny);
 
 	initType(ltNativeFunc, lSymLTNativeFunction, tAny);
 	initType(ltLambda, lSymLTLambda, tAny);

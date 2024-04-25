@@ -69,6 +69,37 @@ static i32 ctxAddSymbol(writeImageContext *ctx, const lSymbol *v){
 	return curOff;
 }
 
+static i32 ctxAddMap(writeImageContext *ctx, lMap *v){
+	if(v == NULL){return -1;}
+	const i32 mapOff = writeMapGet(&ctx->map, (void *)v);
+	if(mapOff > 0){ return mapOff; }
+
+	const int len = v->length;
+	const i32 eleSize = 2 + (6*len);
+	ctxRealloc(ctx, eleSize);
+
+	const i32 curOff = ctx->curOff;
+	writeMapSet(&ctx->map, (void *)v, curOff);
+	ctx->start[curOff  ] =  len     & 0xFF;
+	ctx->start[curOff+1] = (len>>8) & 0xFF;
+	ctx->curOff += eleSize;
+	i32 off = curOff + 2;
+	for(uint i=0;i<v->size;i++){
+		if(v->entries[i].key.type == ltNil){continue;}
+		const i32 key = ctxAddVal(ctx, v->entries[i].key);
+		ctx->start[off  ] = (key    )&0xFF;
+		ctx->start[off+1] = (key>> 8)&0xFF;
+		ctx->start[off+2] = (key>>16)&0xFF;
+
+		const i32 val = ctxAddVal(ctx, v->entries[i].val);
+		ctx->start[off+3] = (val    )&0xFF;
+		ctx->start[off+4] = (val>> 8)&0xFF;
+		ctx->start[off+5] = (val>>16)&0xFF;
+
+		off += 6;
+	}
+	return curOff;
+}
 static i32 ctxAddTreeVal(writeImageContext *ctx, i32 curOff, lTree *v){
 	if((v == NULL) || (v->key == NULL)){return curOff;}
 
@@ -305,6 +336,15 @@ static i32 ctxAddVal(writeImageContext *ctx, lVal v){
 		ctx->curOff += 4;
 		*outb = litTree;
 		const i32 off = ctxAddTree(ctx, v.vTree->root);
+		outb = ((void *)&ctx->start[curOff+1]);
+		*outb++ = off&0xFF;
+		*outb++ = (off>>8)&0xFF;
+		*outb++ = (off>>16)&0xFF;
+		break; }
+	case ltMap: {
+		ctx->curOff += 4;
+		*outb = litMap;
+		const i32 off = ctxAddMap(ctx, v.vMap);
 		outb = ((void *)&ctx->start[curOff+1]);
 		*outb++ = off&0xFF;
 		*outb++ = (off>>8)&0xFF;

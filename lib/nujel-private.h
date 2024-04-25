@@ -82,6 +82,7 @@ struct lBuffer {
 #define BUFFER_STATIC 2
 
 struct lSymbol {
+	u32 hash;
 	union {
 		char c[94];
 		struct lSymbol *nextFree;
@@ -140,6 +141,22 @@ struct lTree {
 	u8 flags;
 };
 #define TREE_IMMUTABLE 1
+
+struct lMapEntry {
+	lVal key;
+	lVal val;
+};
+
+struct lMap {
+	u32 length;
+	u16 size;
+	u8 flags;
+	union {
+		lMapEntry *entries;
+		lMap *nextFree;
+	};
+};
+#define MAP_IMMUTABLE 1
 
 struct lClosure {
 	union {
@@ -284,6 +301,7 @@ void lAddPlatformVars(lClosure *c);
 lSymbol *lRootsSymbolPush(lSymbol *v);
 void lDefineTypeVars(lClosure *c);
 extern int lGCRuns;
+extern lMap *lSymbolTable;
 
 extern bool lGCShouldRunSoon;
 
@@ -302,12 +320,14 @@ void lGarbageCollect(lThread *ctx);
 #define BFV_MAX (1<<14)
 #define TRE_MAX (1<<18)
 #define CON_MAX (1<<18)
+#define MAP_MAX (1<<15)
 
 #define allocatorTypes() \
 	defineAllocator(lArray, ARR_MAX) \
 	defineAllocator(lClosure, CLO_MAX) \
 	defineAllocator(lTree, TRE_MAX) \
 	defineAllocator(lTreeRoot, TRR_MAX) \
+	defineAllocator(lMap, MAP_MAX) \
 	defineAllocator(lBytecodeArray, BCA_MAX) \
 	defineAllocator(lBuffer, BUF_MAX) \
 	defineAllocator(lBufferView, BFV_MAX) \
@@ -366,6 +386,7 @@ extern lSymbol *lSymLTEnvironment;
 extern lSymbol *lSymLTMacro;
 extern lSymbol *lSymLTArray;
 extern lSymbol *lSymLTTree;
+extern lSymbol *lSymLTMap;
 extern lSymbol *lSymLTBytecodeArray;
 extern lSymbol *lSymLTBuffer;
 extern lSymbol *lSymLTBufferView;
@@ -381,6 +402,7 @@ extern lSymbol *symUnquote;
 extern lSymbol *symUnquoteSplicing;
 extern lSymbol *symArr;
 extern lSymbol *symTreeNew;
+extern lSymbol *symMapNew;
 extern lSymbol *symDocumentation;
 extern lSymbol *symPure;
 extern lSymbol *symFold;
@@ -399,8 +421,16 @@ lBytecodeArray * lBytecodeArrayAlloc (size_t len);
 lBufferView *    lBufferViewAlloc    (lBuffer *buf, lBufferViewType type, size_t offset, size_t length, bool immutable);
 int              lBufferViewTypeSize (lBufferViewType T);
 
+lTree *lTreeNew    (const lSymbol *s, lVal v);
+lTree *lTreeDup    (const lTree *t);
+int    lTreeSize   (const lTree *t);
+lVal   lTreeRef    (const lTree *t, const lSymbol *s);
+lTree *lTreeInsert (lTree *t, const lSymbol *s, lVal v);
+
 lVal lnfArrNew  (lVal v);
 lVal lnfTreeNew(lVal v);
+lVal lnfMapNew(lVal v);
+u32  lHashString(const char *str, i32 len);
 lVal lnfSerialize(lVal val);
 lVal lnfDeserialize(lVal val);
 
@@ -413,6 +443,7 @@ void lOperationsCore       ();
 void lOperationsSpecial    ();
 void lOperationsGeneric    ();
 void lOperationsTree       ();
+void lOperationsMap        ();
 void lOperationsArray      ();
 void lOperationsString     ();
 void lOperationsBytecode   ();
@@ -464,6 +495,8 @@ typedef enum {
 
 	litTrue,
 	litFalse,
+
+	litMap
 
 } lImageType;
 

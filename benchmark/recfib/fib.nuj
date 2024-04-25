@@ -5,4 +5,4 @@
             ((= 1 n) 1)
             (#t (+ (fib (- n 1)) (fib (- n 2))))))
 
-(pfmtln "fib(40) is: {}\nGC Runs: {}" (fib 40) (garbage-collection-runs))
+(pfmtln "fib(30) is: {}\nGC Runs: {}" (fib 30) (garbage-collection-runs))

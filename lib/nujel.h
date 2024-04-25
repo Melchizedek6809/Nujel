@@ -59,6 +59,7 @@ typedef enum {
 	ltPair,
 	ltArray,
 	ltTree,
+	ltMap,
 
 	ltLambda,
 	ltMacro,
@@ -89,6 +90,8 @@ typedef struct lSymbol        lSymbol;
 typedef struct lClass         lClass;
 typedef struct lTree          lTree;
 typedef struct lTreeRoot      lTreeRoot;
+typedef struct lMap           lMap;
+typedef struct lMapEntry      lMapEntry;
 typedef struct lVec           lVec;
 typedef struct lVal           lVal;
 typedef struct lPair          lPair;
@@ -115,6 +118,7 @@ struct lVal {
 		lBytecodeArray *vBytecodeArr;
 		lArray *        vArray;
 		lTreeRoot *     vTree;
+		lMap *          vMap;
 		lString *       vString;
 		lClosure *      vClosure;
 		lNFunc *        vNFunc;
@@ -158,6 +162,7 @@ void *               lBufferViewDataMutable (lBufferView *v);
 size_t               lBufferViewLength      (const lBufferView *v);
 
 lPair *lPairAllocRaw();
+lMap *lMapAllocRaw();
 static inline lVal lCons(lVal car, lVal cdr){
 	lPair *cons = lPairAllocRaw();
 	cons->car = car;
@@ -281,13 +286,11 @@ lVal lAddNativeStaticMethodVV(lClass *T, const lSymbol *name, const char *args, 
 lVal lAddNativeStaticMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags);
 
 /*
- | Tree related procedures
+ | Map related procedures
  */
-lTree *lTreeNew             (const lSymbol *s, lVal v);
-lTree *lTreeDup             (const lTree *t);
-int    lTreeSize            (const lTree *t);
-lVal   lTreeRef             (const lTree *t, const lSymbol *s);
-lTree *lTreeInsert          (      lTree *t, const lSymbol *s, lVal v);
+lVal lMapSet       (lMap *map, lVal key, lVal val);
+lVal lMapRef       (lMap *map, lVal key);
+lVal lMapRefString (lMap *map, const char *key);
 
 /*
  | Symbolic routines
@@ -344,6 +347,10 @@ static inline lVal lValTree(lTree *v){
 	lTreeRoot *root = lTreeRootAllocRaw();
 	root->root = v;
 	return (lVal){ltTree, .vTree = root};
+}
+
+static inline lVal lValMap(lMap *v){
+	return (lVal){ltMap, .vMap = v};
 }
 
 static inline lVal lValEnvironment(lClosure *v){

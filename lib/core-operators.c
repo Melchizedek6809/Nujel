@@ -89,6 +89,7 @@ static i64 lValToId(lVal v){
 	case ltBuffer: return v.vBuffer - lBufferList;
 	case ltArray: return v.vArray - lArrayList;
 	case ltTree: return v.vTree - lTreeRootList;
+	case ltMap: return v.vMap - lMapList;
 	case ltBytecodeArr: return v.vBytecodeArr - lBytecodeArrayList;
 	case ltKeyword:
 	case ltSymbol: return v.vSymbol - lSymbolList;
@@ -204,8 +205,13 @@ void lInit(){
 	lOperationsCore();
 	lOperationsArray();
 	lOperationsTree();
+	lOperationsMap();
 	lOperationsBytecode();
 	lOperationsString();
+}
+
+static lVal lnfSymbolTable(){
+	return lValMap(lSymbolTable);
 }
 
 void lOperationsCore(){
@@ -231,9 +237,11 @@ void lOperationsCore(){
 
 	lAddNativeFuncR("array/new", "args",  "Create a new array from ...ARGS", lnfArrNew, 0);
 	lAddNativeFuncR("tree/new",  "plist", "Return a new tree", lnfTreeNew, 0);
+	lAddNativeFuncR("map/new",  "plist", "Return a new map", lnfMapNew, 0);
 
 	lAddNativeFuncV("image/serialize",   "(val)", "Serializes val into a binary representation that can be stored", lnfSerialize, 0);
 	lAddNativeFuncV("image/deserialize", "(buf)", "Deserializes buf into a value", lnfDeserialize, 0);
+	lAddNativeFunc("symbol-table", "()", "Returns the global symbol table", lnfSymbolTable, 0);
 
 	lAddNativeMethodV(&lClassList[ltNil],     lSymLTString, "(self)", lnfNilToString, NFUNC_PURE);
 	lAddNativeMethodV(&lClassList[ltInt],     lSymLTString, "(self)", lnfIntToString, NFUNC_PURE);

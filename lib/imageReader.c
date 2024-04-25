@@ -137,6 +137,24 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 	return view;
 }
 
+static lMap *readMap(readImageMap *map, const lImage *img, i32 off, bool staticImage){
+	const void *mapP = readMapGet(map, off);
+	if(mapP != NULL){ return (lMap *)mapP; }
+	if(off < 0){return NULL;}
+	if(off >= (1<<24)-1){return NULL;}
+	const i32 len = img->data[off] | (img->data[off+1]<<8);
+	lMap *ret = lMapAllocRaw();
+	readMapSet(map, off, ret);
+	off += 2;
+	for(int i=0;i<len;i++){
+		const i32 key = img->data[off+0] | (img->data[off+1] << 8) | (img->data[off+2] << 16);
+		const i32 val = img->data[off+3] | (img->data[off+4] << 8) | (img->data[off+5] << 16);
+		off += 6;
+		lMapSet(ret, readVal(map, img, key, staticImage), readVal(map, img, val, staticImage));
+	}
+	return ret;
+}
+
 static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	const void *mapP = readMapGet(map, off);
 	if(mapP != NULL){ return ((lTreeRoot *)mapP)->root; }
@@ -262,6 +280,8 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		return lValAlloc(ltType, readType(map, img, tbyte, staticImage));
 	case litBytecodeArr:
 		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, tbyte, staticImage));
+	case litMap:
+		return lValMap(readMap(map, img, tbyte, staticImage));
 	case litTree:
 		return lValTree(readTree(map, img, tbyte, staticImage));
 	case litArray:

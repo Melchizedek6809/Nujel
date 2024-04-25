@@ -1,30 +1,16 @@
 /* Nujel - Copyright (C) 2020-2022 - Benjamin Vincent Schulenburg
  * This project uses the MIT license, a copy should be included under /LICENSE */
+#include "nujel.h"
 #ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
 #endif
 
-#include "../third-party/fasthash/fasthash.h"
+lMap *lSymbolTable;
 
 lSymbol  lSymbolList[SYM_MAX];
 uint     lSymbolActive = 0;
 uint     lSymbolMax    = 0;
 lSymbol *lSymbolFFree = NULL;
-
-// a hash index over the symbol array.  It is essentially a sparse map such that
-// for a string S, lHashSymStr(S) is a slot in the hash table (with linear
-// probing if there's a hash collision).  Then lSymbolIndex[slot] is the
-// position in lSymbolList where the actual symbol is stored, and
-// lSymbolBackIndex[pos] is the opposite mapping from a position in lSymbolList
-// to the corresponding slot in the hash table.
-// lSymbolIndex stores all indices 1-based, because it allows us to use 0 to
-// mean that the slot is empty which is more convenient.  negative values denote
-// deleted slots, and positive values denote used slots.
-i16      lSymbolIndex[SYM_MAX];
-i16      lSymbolBackIndex[SYM_MAX];
-#define SYMBOL_SLOT_IS_EMPTY(X) (X == 0)
-#define SYMBOL_SLOT_IS_TOMB(X)  (X < 0)
-#define SYMBOL_SLOT_IS_USED(X)  (X > 0)
 
 lSymbol *symNull;
 lSymbol *symQuote;
@@ -33,6 +19,7 @@ lSymbol *symUnquote;
 lSymbol *symUnquoteSplicing;
 lSymbol *symArr;
 lSymbol *symTreeNew;
+lSymbol *symMapNew;
 lSymbol *symDocumentation;
 lSymbol *symPure;
 lSymbol *symFold;
@@ -58,6 +45,7 @@ lSymbol *lSymLTEnvironment;
 lSymbol *lSymLTMacro;
 lSymbol *lSymLTArray;
 lSymbol *lSymLTTree;
+lSymbol *lSymLTMap;
 lSymbol *lSymLTBytecodeArray;
 lSymbol *lSymLTBuffer;
 lSymbol *lSymLTBufferView;
@@ -81,10 +69,8 @@ lSymbol *lSymUnmatchedOpeningBracket;
 lSymbol *lSymUnboundVariable;
 lSymbol *lSymNotSupportedOnPlatform;
 
-uint symbolLookups = 0;
-uint tombLookups = 0;
-
 void lSymbolInit(){
+	lSymbolTable = lMapAllocRaw();
 	lSymbolActive = 0;
 	lSymbolMax    = 0;
 	lSymbolFFree  = NULL;
@@ -102,6 +88,7 @@ void lSymbolInit(){
 	symUnquoteSplicing   = lSymSM("unquote-splicing");
 	symArr               = lSymSM("array/new");
 	symTreeNew           = lSymSM("tree/new");
+	symMapNew            = lSymSM("map/new");
 	symDocumentation     = lSymSM("documentation");
 	symPure              = lSymSM("pure");
 	symFold              = lSymSM("fold");
@@ -127,6 +114,7 @@ void lSymbolInit(){
 	lSymLTArray          = lSymSM("array");
 	lSymLTMacro          = lSymSM("macro");
 	lSymLTTree           = lSymSM("tree");
+	lSymLTMap            = lSymSM("map");
 	lSymLTBytecodeArray  = lSymSM("bytecode-array");
 	lSymLTBuffer         = lSymSM("buffer");
 	lSymLTBufferView     = lSymSM("buffer-view");
@@ -152,11 +140,10 @@ void lSymbolInit(){
 	lSymNotSupportedOnPlatform = lSymSM("not-supported-on-platform");
 }
 
-static inline int lSymIndex(const lSymbol *s){
-	return s - lSymbolList;
-}
-
 void lSymbolFree(lSymbol *s){
+	 // WIP - should actualle free them in the future
+	(void)s;
+	/*
 	s->nextFree = lSymbolFFree;
 	s->c[sizeof(s->c)-1] = 0xFF;
 	lSymbolFFree = s;
@@ -165,6 +152,7 @@ void lSymbolFree(lSymbol *s){
 	const int slot = lSymbolBackIndex[symIndex];
 	lSymbolIndex[slot] = -symIndex;
 	lSymbolMarkMap[s - lSymbolList] = 2;
+	*/
 }
 
 lSymbol *lSymSL(const char *str, uint len){
@@ -179,50 +167,12 @@ lSymbol *lSymSM(const char *str){
 	return lRootsSymbolPush(lSymS(str));
 }
 
-static inline u32 lHashSymStr(const char *str){
-	return fasthash32(str, strlen(str), 0x5b0a159d9eac0381ULL);
-}
-
-// Probes the symbol index and returns the slot where STR is stored.  If STR is
-// not in the map, returns a slot where it could be inserted, which could be
-// either an empty slot or a tomb slot from when a different symbol with a hash
-// collision was deleted.
-uint lSymbolIndexSlot(const char *str){
-	uint firstTomb = 0xffffffff;
-	uint h = lHashSymStr(str) % SYM_MAX;
-	uint hInitial = h;
-	//symbolLookups++;
-	do {
-		//tombLookups++;
-		int idx = lSymbolIndex[h];
-		if(SYMBOL_SLOT_IS_EMPTY(idx)){
-			return firstTomb == 0xffffffff ? h : firstTomb;
-		}
-		if(SYMBOL_SLOT_IS_TOMB(idx) && firstTomb == 0xffffffff){
-			firstTomb = h;
-		}
-		if(SYMBOL_SLOT_IS_USED(idx)){
-			--idx;
-			if (0 == strncmp(str,lSymbolList[idx].c,sizeof(lSymbolList[idx].c)-1)
-				&& 0 == lSymbolList[idx].c[sizeof(lSymbolList[idx].c)-1])
-			{
-				return h;
-			}
-		}
-		if (++h == SYM_MAX) {
-			h = 0;
-		}
-	} while (h != hInitial);
-	exit(111);
-	return 0;
-}
-
 lSymbol *lSymS(const char *str){
-	uint slot = lSymbolIndexSlot(str);
-	int symIndex = lSymbolIndex[slot];
-	if(SYMBOL_SLOT_IS_USED(symIndex)){
-		return &lSymbolList[symIndex-1];
+	lVal oldEntry = lMapRefString(lSymbolTable, str);
+	if(oldEntry.type == ltSymbol){
+		return (lSymbol *)oldEntry.vSymbol;
 	}
+
 	lSymbol *ret;
 	if(lSymbolFFree){
 		ret = lSymbolFFree;
@@ -235,12 +185,10 @@ lSymbol *lSymS(const char *str){
 		}
 	}
 	lSymbolActive++;
+	ret->hash = lHashString(str, strlen(str));
 	strncpy(ret->c, str, sizeof(ret->c));
 	ret->c[sizeof(ret->c)-1] = 0;
-	symIndex = lSymIndex(ret);
-	lSymbolIndex[slot] = symIndex + 1;
-	lSymbolBackIndex[symIndex] = slot;
-	lSymbolMarkMap[ret - lSymbolList] = 0;
+	lMapSet(lSymbolTable, lValString(str), lValAlloc(ltSymbol, ret));
 	return ret;
 }
 
@@ -261,6 +209,7 @@ lSymbol *getTypeSymbolT(const lType T){
 		case ltArray:       return lSymLTArray;
 		case ltMacro:       return lSymLTMacro;
 		case ltTree:        return lSymLTTree;
+		case ltMap:         return lSymLTMap;
 		case ltBytecodeArr: return lSymLTBytecodeArray;
 		case ltBuffer:      return lSymLTBuffer;
 		case ltBufferView:  return lSymLTBufferView;

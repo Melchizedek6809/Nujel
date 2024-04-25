@@ -9,13 +9,13 @@
 #endif
 
 /* Add environment key/value pair to tree T */
-static lTree *addVar(const char *e, lTree *t){
+static void addVar(const char *e, lMap *t){
 	int endOfKey, endOfString;
 	for(endOfKey=0;e[endOfKey] != '=';endOfKey++){}
 	for(endOfString=endOfKey+1;e[endOfString];endOfString++){}
 	lSymbol *sym = lSymSL(e,endOfKey);
 	lVal v = lValString(&e[endOfKey+1]);
-	return lTreeInsert(t, sym, v);
+	lMapSet(t, lValKeywordS(sym), v);
 }
 
 #if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
@@ -26,23 +26,23 @@ void lRedefineEnvironment(lClosure *c){
 	lTree *t = NULL;
 	LPCH env = GetEnvironmentStrings();
 	while(*env){
-		t = addVar(env,t);
+		addVar(env,t);
 		while(*env++){}
 	}
-	lDefineClosureSym(c,lSymS("System/Environment"), lValTree(t));
+	lDefineClosureSym(c,lSymS("System/Environment"), lValMap(t));
 }
 
 #else
 extern char **environ;
 /* Add Environment args to `environment/variables` */
 void lRedefineEnvironment(lClosure *c){
-	lTree *t = NULL;
+	lMap *t = lMapAllocRaw();
 	#ifdef __wasi__
 	t = addVar("PATH=",t); // Necessary so that tests don't fail
 	#endif
 	for(int i=0;environ[i];i++){
-		t = addVar(environ[i],t);
+		addVar(environ[i], t);
 	}
-	lDefineClosureSym(c,lSymS("System/Environment"), lValTree(t));
+	lDefineClosureSym(c,lSymS("System/Environment"), lValMap(t));
 }
 #endif

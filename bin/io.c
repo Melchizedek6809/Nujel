@@ -110,50 +110,48 @@ static lVal lnfFileStat(lVal aPath){
 	hFind = FindFirstFile(lBufferData(aPath.vString), &ffd);
 
 
-	lVal ret = lValTree(NULL);
-	lTreeRoot *t = ret.vTree;
-	t->root = lTreeInsert(t->root, lsError, lValBool(INVALID_HANDLE_VALUE == hFind));
+	lMap *map = lMapAllocRaw();
+	lMapSet(map, lValKeywordS(lsError, lValBool(INVALID_HANDLE_VALUE == hFind)));
 	if (likely(INVALID_HANDLE_VALUE != hFind)) {
 		LARGE_INTEGER filesize;
 		filesize.LowPart = ffd.nFileSizeLow;
 		filesize.HighPart = ffd.nFileSizeHigh;
-		t->root = lTreeInsert(t->root, lsSize, lValInt(filesize.QuadPart));
-		t->root = lTreeInsert(t->root, lsAccessTime, lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
-		t->root = lTreeInsert(t->root, lsCreationTime, lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
-		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
-		t->root = lTreeInsert(t->root, lsUserID, lValInt(1000));
-		t->root = lTreeInsert(t->root, lsGroupID, lValInt(1000));
+		lMapSet(map, lValKeywordS(lsSize), lValInt(filesize.QuadPart));
+		lMapSet(map, lValKeywordS(lsAccessTime), lValInt(FileTime_to_POSIX(ffd.ftLastAccessTime)));
+		lMapSet(map, lValKeywordS(lsCreationTime), lValInt(FileTime_to_POSIX(ffd.ftCreationTime)));
+		lMapSet(map, lValKeywordS(lsModificationTime), lValInt(FileTime_to_POSIX(ffd.ftLastWriteTime)));
+		lMapSet(map, lValKeywordS(lsUserID), lValInt(1000));
+		lMapSet(map, lValKeywordS(lsGroupID), lValInt(1000));
 
-		t->root = lTreeInsert(t->root, lsRegularFile, lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
-		t->root = lTreeInsert(t->root, lsDirectory, lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-		t->root = lTreeInsert(t->root, lsCharacterDevice, lValBool(false));
-		t->root = lTreeInsert(t->root, lsBlockDevice, lValBool(false));
-		t->root = lTreeInsert(t->root, lsNamedPipe, lValBool(false));
+		lMapSet(map, lValKeywordS(lsRegularFile), lValBool(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)));
+		lMapSet(map, lValKeywordS(lsDirectory), lValBool(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+		lMapSet(map, lValKeywordS(lsCharacterDevice), lValBool(false));
+		lMapSet(map, lValKeywordS(lsBlockDevice), lValBool(false));
+		lMapSet(map, lValKeywordS(lsNamedPipe), lValBool(false));
 	}
-	return ret;
+	return lValMap(map);
 #else
 	struct stat statbuf;
 	int err = stat(lBufferData(aPath.vString), &statbuf);
-	lVal ret = lValTree(NULL);
-	lTreeRoot *t = ret.vTree;
-	t->root = lTreeInsert(t->root, lsError, lValBool(err));
+	lMap *map = lMapAllocRaw();
+	lMapSet(map, lValKeywordS(lsError), lValBool(err));
 	if(err){
-		t->root = lTreeInsert(t->root, lsErrorNumber,      lValInt(errno));
-		t->root = lTreeInsert(t->root, lsErrorText,        lValString(strerror(errno)));
+		lMapSet(map, lValKeywordS(lsErrorNumber),      lValInt(errno));
+		lMapSet(map, lValKeywordS(lsErrorText),        lValString(strerror(errno)));
 	}else{
-		t->root = lTreeInsert(t->root, lsUserID,           lValInt(statbuf.st_uid));
-		t->root = lTreeInsert(t->root, lsGroupID,          lValInt(statbuf.st_gid));
-		t->root = lTreeInsert(t->root, lsSize,             lValInt(statbuf.st_size));
-		t->root = lTreeInsert(t->root, lsAccessTime,       lValInt(statbuf.st_atime));
-		t->root = lTreeInsert(t->root, lsModificationTime, lValInt(statbuf.st_mtime));
+		lMapSet(map, lValKeywordS(lsUserID),           lValInt(statbuf.st_uid));
+		lMapSet(map, lValKeywordS(lsGroupID),          lValInt(statbuf.st_gid));
+		lMapSet(map, lValKeywordS(lsSize),             lValInt(statbuf.st_size));
+		lMapSet(map, lValKeywordS(lsAccessTime),       lValInt(statbuf.st_atime));
+		lMapSet(map, lValKeywordS(lsModificationTime), lValInt(statbuf.st_mtime));
 
-		t->root = lTreeInsert(t->root, lsRegularFile,      lValBool(S_ISREG(statbuf.st_mode)));
-		t->root = lTreeInsert(t->root, lsDirectory,        lValBool(S_ISDIR(statbuf.st_mode)));
-		t->root = lTreeInsert(t->root, lsCharacterDevice,  lValBool(S_ISCHR(statbuf.st_mode)));
-		t->root = lTreeInsert(t->root, lsBlockDevice,      lValBool(S_ISBLK(statbuf.st_mode)));
-		t->root = lTreeInsert(t->root, lsNamedPipe,        lValBool(S_ISFIFO(statbuf.st_mode)));
+		lMapSet(map, lValKeywordS(lsRegularFile),      lValBool(S_ISREG(statbuf.st_mode)));
+		lMapSet(map, lValKeywordS(lsDirectory),        lValBool(S_ISDIR(statbuf.st_mode)));
+		lMapSet(map, lValKeywordS(lsCharacterDevice),  lValBool(S_ISCHR(statbuf.st_mode)));
+		lMapSet(map, lValKeywordS(lsBlockDevice),      lValBool(S_ISBLK(statbuf.st_mode)));
+		lMapSet(map, lValKeywordS(lsNamedPipe),        lValBool(S_ISFIFO(statbuf.st_mode)));
 	}
-	return ret;
+	return lValMap(map);
 #endif
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env nujel
-(popen "rsync -avhe ssh web/benchmark-results/ wolkenwelten.net:/srv/http/nujel.net-performance/benchmark-results/")
-(popen "rsync -avhe ssh wolkenwelten.net:/srv/http/nujel.net-performance/benchmark-results/ web/benchmark-results/")
+(popen "rsync -avhe ssh web/benchmark-results/ wolkenwelten.net:~/http/nujel.net/performance/benchmark-results/")
+(popen "rsync -avhe ssh wolkenwelten.net:~/http/nujel.net/performance/benchmark-results/ web/benchmark-results/")
 (popen "./tools/benchmark-aggregate.nuj")
-(popen "rsync -avhe ssh web/ wolkenwelten.net:/srv/http/nujel.net-performance/")
+(popen "rsync -avhe ssh web/ wolkenwelten.net:~/http/nujel.net/performance/")

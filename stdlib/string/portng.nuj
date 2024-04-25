@@ -96,7 +96,7 @@
 
   (defn char-write (self char)
         (set! self.temp-buffer 0 char)
-        (file/write* self.handle temporary-buffer 1))
+        (file/write* self.handle self.temp-buffer 1))
 
   (defn close! (self)
         (file/close* self.handle))

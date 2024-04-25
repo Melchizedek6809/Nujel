@@ -28,6 +28,7 @@ T##MarkMap[ci] = 1
 static void lValGCMark         (lVal v);
 static void lBufferGCMark      (const lBuffer *v);
 static void lBufferViewGCMark  (const lBufferView *v);
+static void lMapGCMark         (const lMap *v);
 static void lTreeGCMark        (const lTree *v);
 static void lTreeRootGCMark    (const lTreeRoot *v);
 static void lClosureGCMark     (const lClosure *c);
@@ -90,6 +91,15 @@ static void lTreeFree(lTree *t){
 	lTreeFFree = t;
 	lTreeActive--;
 	lTreeMarkMap[t - lTreeList] = 2;
+}
+
+static void lMapFree(lMap *t){
+	free(t->entries);
+	t->entries = NULL;
+	t->nextFree = lMapFFree;
+	lMapFFree = t;
+	lMapActive--;
+	lMapMarkMap[t - lMapList] = 2;
 }
 
 static void lTreeRootFree(lTreeRoot *t){
@@ -165,6 +175,9 @@ static void lValGCMark(lVal v){
 	case ltSymbol:
 		lSymbolGCMark(v.vSymbol);
 		break;
+	case ltMap:
+		lMapGCMark(v.vMap);
+		break;
 	case ltTree:
 		lTreeRootGCMark(v.vTree);
 		break;
@@ -180,6 +193,15 @@ static void lValGCMark(lVal v){
 		break;
 	default:
 		break;
+	}
+}
+
+static void lMapGCMark(const lMap *v){
+	markerPrefix(lMap);
+	for(int i=0;i<v->size;i++){
+		if(v->entries[i].key.type == ltNil){continue;}
+		lValGCMark(v->entries[i].key);
+		lValGCMark(v->entries[i].val);
 	}
 }
 
@@ -233,6 +255,7 @@ static void lRootsMark(){
 	for(uint i=0;i<lNFuncMax;i++){
 		lNFuncGCMark(&lNFuncList[i]);
 	}
+	lMapGCMark(lSymbolTable);
 }
 
 lSymbol *lRootsSymbolPush(lSymbol *v){

@@ -16,5 +16,5 @@
 (#t (bool? (ref (file/stat "GNUmakefile") :character-device?)))
 (#t (bool? (ref (file/stat "GNUmakefile") :block-device?)))
 (#t (bool? (ref (file/stat "GNUmakefile") :named-pipe?)))
-(#t (tree? System/Environment))
-(#t (string? (ref System/Environment 'PATH)))
+(#t (map? System/Environment))
+(#t (string? (ref System/Environment :PATH)))

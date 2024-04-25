@@ -43,6 +43,8 @@ static lVal lBufferViewRef(lVal car, size_t i){
 
 lVal lGenericRef(lVal col, lVal key){
 	switch(col.type){
+	case ltMap:
+		return lMapRef(col.vMap, key);
 	case ltPair:
 		reqNaturalInt(key);
 		for(int i=0;i<key.vInt;i++){
@@ -160,6 +162,8 @@ static lVal lBufferViewSet(lVal car, size_t i, lVal v){
 
 lVal lGenericSet(lVal col, lVal key, lVal v){
 	switch(col.type){
+	case ltMap:
+		return lMapSet(col.vMap, key, v);
 	case ltBytecodeArr: {
 		const lBytecodeArray *arr = col.vBytecodeArr;
 		reqNaturalInt(key);

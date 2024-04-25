@@ -137,6 +137,13 @@
 
       (= :tree (:type-name val)))
 
+(defn map? (val)
+      "Test whether val is a Map"
+      :cat :type-predicate
+      :inline
+
+      (= :map (:type-name val)))
+
 (defn collection? (l)
       "Test whether val is a collection"
       :cat :type-predicate
