@@ -121,9 +121,11 @@
                             (yellow (pad-end runtime 20))))
                 (return #nil))
       (when (zero? i)
-            (pfmt "{} {} "
+            (def testname (cadr (split filename "/")))
+            (pfmt "{} {} {}"
                   (blue (pad-end language 14))
-                  (green (pad-end runtime 20))))
+                  (green (pad-end runtime 20))
+                  (yellow (pad-end testname 20))))
       (when (>= i 0) (pfmt "{i} "))
       (when-not (file/file? filename)
                 (exception :io-error "Can't open the following file to benchmark it:" filename))
