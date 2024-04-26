@@ -18,22 +18,18 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 static void *readMapGet(readImageMap *map, i32 key){
 	lVal v = lMapRef(map->map, lValInt(key));
 	if(v.type == ltInt){
-		return (void *)v.vInt;
+		return (void *)(intptr_t)v.vInt;
 	} else {
 		return NULL;
 	}
 }
 
 static void readMapSet(readImageMap *map, i32 key, void *val){
-	lMapSet(map->map, lValInt(key), lValInt((u64)val));
+	lMapSet(map->map, lValInt(key), lValInt((intptr_t)val));
 }
 
-static inline i32 readI8(const lImage *img, i32 off){
+static i32 readI8(const lImage *img, i32 off){
 	return img->data[off  ];
-}
-
-static inline i32 readI16(const lImage *img, i32 off){
-	return img->data[off  ] | (img->data[off+1]<<8);
 }
 
 static i32 readI24(const lImage *img, i32 off){

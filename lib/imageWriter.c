@@ -39,7 +39,7 @@ static void writeI32(writeImageContext *ctx, i32 curOff, i32 v){
 static i32 ctxAddVal(writeImageContext *ctx, lVal v);
 
 static i32 writeMapGet(lMap *map, void *key){
-	lVal v = lMapRef(map, lValInt((u64)key));
+	lVal v = lMapRef(map, lValInt((intptr_t)key));
 	if(v.type == ltInt){
 		return v.vInt;
 	} else {
@@ -48,7 +48,7 @@ static i32 writeMapGet(lMap *map, void *key){
 }
 
 static void writeMapSet(lMap *map, void *key, i32 val){
-	lMapSet(map, lValInt((u64)key), lValInt(val));
+	lMapSet(map, lValInt((intptr_t)key), lValInt(val));
 }
 
 static void ctxRealloc(writeImageContext *ctx, i32 eleSize){

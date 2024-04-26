@@ -8,6 +8,12 @@
 #include <unistd.h>
 #endif
 
+#if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
+#include <windows.h>
+#else
+extern char **environ;
+#endif
+
 /* Add environment key/value pair to tree T */
 static void addVar(const char *e, lMap *t){
 	int endOfKey, endOfString;
@@ -18,31 +24,26 @@ static void addVar(const char *e, lMap *t){
 	lMapSet(t, lValKeywordS(sym), v);
 }
 
-#if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
-#include <windows.h>
-
-/* Windows specific - add Environment args to `environment/variables` */
+/* Add Environment args to `environment/variables` */
 void lRedefineEnvironment(lClosure *c){
-	lTree *t = NULL;
+	lMap *t = lMapAllocRaw();
+
+	#if (defined(__MSYS__)) || (defined(__MINGW32__)) || (defined(_WIN32))
+	/* Windows */
 	LPCH env = GetEnvironmentStrings();
 	while(*env){
 		addVar(env,t);
 		while(*env++){}
 	}
-	lDefineClosureSym(c,lSymS("System/Environment"), lValMap(t));
-}
-
-#else
-extern char **environ;
-/* Add Environment args to `environment/variables` */
-void lRedefineEnvironment(lClosure *c){
-	lMap *t = lMapAllocRaw();
-	#ifdef __wasi__
+	#elif defined(__wasi__)
+	/* Wasm */
 	addVar("PATH=",t); // Necessary so that tests don't fail
-	#endif
+	#else
+	/* Most other system, mainly *nix Systems */
 	for(int i=0;environ[i];i++){
 		addVar(environ[i], t);
 	}
+	#endif
+
 	lDefineClosureSym(c,lSymS("System/Environment"), lValMap(t));
 }
-#endif
