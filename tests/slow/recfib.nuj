@@ -1,0 +1,11 @@
+#!/usr/bin/env nujel
+
+(defn fib (n)
+      (cond ((zero? n) 0)
+            ((= 1 n) 1)
+            (#t (+ (fib (- n 1)) (fib (- n 2))))))
+
+(def res (fib 36))
+(when-not (= res 14930352)
+          (throw (list :wrong-result "Wrong result" res)))
+:success
