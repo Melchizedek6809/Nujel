@@ -9,11 +9,19 @@
 
 typedef struct {
 	i32 imgSize;
-	i32 curOff;
 	lMap *map;
 } readImageMap;
 
 static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticImage);
+
+// First checks whether the offset has already been read, and whether the offset
+// is valid, which means pretty much ((off < 0) || (off >= (1<<24)-1))
+#define readPrefix(T, off)\
+	T *mapP = readMapGet(map, off);\
+	if(mapP != NULL){ return mapP; }\
+	if(off & ~0xFFFFFF){return NULL;}\
+(void)0
+
 
 static void *readMapGet(readImageMap *map, i32 key){
 	lVal v = lMapRef(map->map, lValInt(key));
@@ -32,6 +40,10 @@ static i32 readI8(const lImage *img, i32 off){
 	return img->data[off  ];
 }
 
+static i32 readI16(const lImage *img, i32 off){
+	return img->data[off  ] | (img->data[off+1]<<8);
+}
+
 static i32 readI24(const lImage *img, i32 off){
 	return img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16);
 }
@@ -39,6 +51,8 @@ static i32 readI24(const lImage *img, i32 off){
 static i32 readI32(const lImage *img, i32 off){
 	return img->data[off  ] | (img->data[off+1]<<8) | (img->data[off+2]<<16) | (img->data[off+3]<<24);
 }
+
+
 
 static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, bool staticImage){
 	(void)staticImage;
@@ -48,10 +62,7 @@ static const lSymbol *readSymbol(readImageMap *map, const lImage *img, i32 off, 
 }
 
 static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lArray *)mapP; }
+	readPrefix(lArray, off);
 
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const u32 raw = in[0];
@@ -71,10 +82,8 @@ static lArray *readArray(readImageMap *map, const lImage *img, i32 off, bool sta
 }
 
 static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lBytecodeArray *)mapP; }
+	readPrefix(lBytecodeArray, off);
+
 	const i32 *in = (i32 *)((void *)&img->data[off]);
 	const i32 len = *in++;
 	lBytecodeArray *ret = lBytecodeArrayAllocRaw();
@@ -91,10 +100,8 @@ static lBytecodeArray *readBytecodeArray(readImageMap *map, const lImage *img, i
 }
 
 static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lPair *)mapP; }
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
+	readPrefix(lPair, off);
+
 	lPair *ret = lPairAllocRaw();
 	readMapSet(map, off, ret);
 	const i32 car = readI24(img, off);
@@ -105,10 +112,8 @@ static lPair *readPair(readImageMap *map, const lImage *img, i32 off, bool stati
 }
 
 static lBuffer *readBuffer(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lBuffer *)mapP; }
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
+	readPrefix(lBuffer, off);
+
 	const u32 raw = *(u32 *)((void *)&img->data[off]);
 	const u32 len = raw & 0x0FFFFFFF;
 	const bool immutable = (raw >> 28) & BUFFER_IMMUTABLE;
@@ -126,10 +131,8 @@ static lBuffer *readBuffer(readImageMap *map, const lImage *img, i32 off, bool s
 }
 
 static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lBufferView *)mapP; }
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
+	readPrefix(lBufferView, off);
+
 	const u8 flags = readI8(img, off);
 	lBuffer *buf = readBuffer(map, img, readI24(img, off+1), staticImage);
 	lBufferView *view = lBufferViewAllocRaw();
@@ -143,11 +146,9 @@ static lBufferView *readBufferView(readImageMap *map, const lImage *img, i32 off
 }
 
 static lMap *readMap(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lMap *)mapP; }
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
-	const i32 len = img->data[off] | (img->data[off+1]<<8);
+	readPrefix(lMap, off);
+
+	const i32 len = readI16(img, off);
 	lMap *ret = lMapAllocRaw();
 	readMapSet(map, off, ret);
 	off += 2;
@@ -161,35 +162,35 @@ static lMap *readMap(readImageMap *map, const lImage *img, i32 off, bool staticI
 }
 
 static lTree *readTree(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return ((lTreeRoot *)mapP)->root; }
+	// Can't use readPrefix because it stores the lTreeRoot but retunrs an lTree
+	lTreeRoot *mapP = readMapGet(map, off);
+	if(mapP != NULL){ return mapP->root; }
+
 	if(off < 0){return NULL;}
 	if(off >= (1<<24)-1){return NULL;}
-	const i32 len = img->data[off] | (img->data[off+1]<<8);
+
+	const i32 len = readI16(img, off);
 	lTreeRoot *root = lTreeRootAllocRaw();
 	readMapSet(map, off, root);
 	off += 2;
 	for(int i=0;i<len;i++){
-		const i32 sym = readI24(img, off+0);
-		const i32 val = readI24(img, off+3);
-		off += 6;
-
-		const lSymbol *s = readSymbol(map, img, sym, staticImage);
+		const lSymbol *s = readSymbol(map, img, readI24(img, off), staticImage);
 		if(s){
-			lVal v = readVal(map, img, val, staticImage);
+			lVal v = readVal(map, img, readI24(img, off+3), staticImage);
 			root->root = lTreeInsert(root->root, s, v);
 		}
+		off += 6;
 	}
 	return root->root;
 }
 
 static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	if(off < 0){return NULL;}
+	readPrefix(lNFunc, off);
+
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
 	for(uint i=0;i<lNFuncMax;i++){
 		lNFunc *t = &lNFuncList[i];
-		if(t == NULL){break;}
-		if(t->name == sym){
+		if((t != NULL) && (t->name == sym)){
 			return t;
 		}
 	}
@@ -197,13 +198,12 @@ static lNFunc *readNFunc(readImageMap *map, const lImage *img, i32 off, bool sta
 }
 
 static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool staticImage){
+	readPrefix(lClass, off);
+
 	const lSymbol *sym = readSymbol(map, img, off, staticImage);
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
 	for(uint i=0;i<countof(lClassList);i++){
 		lClass *t = &lClassList[i];
-		if(t == NULL){break;}
-		if(t->name == sym){
+		if((t != NULL) && (t->name == sym)){
 			return t;
 		}
 	}
@@ -211,10 +211,8 @@ static lClass *readType(readImageMap *map, const lImage *img, i32 off, bool stat
 }
 
 static lClosure *readClosure(readImageMap *map, const lImage *img, i32 off, bool staticImage){
-	const void *mapP = readMapGet(map, off);
-	if(mapP != NULL){ return (lClosure *)mapP; }
-	if(off < 0){return NULL;}
-	if(off >= (1<<24)-1){return NULL;}
+	readPrefix(lClosure, off);
+
 	lImageClosure *clo = (lImageClosure *)((void *)&img->data[off]);
 	lClosure *ret = lClosureAllocRaw();
 	readMapSet(map, off, ret);
@@ -239,10 +237,8 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	if(off < 0){return NIL;}
 
 	const lImageType T = img->data[off++];
-	map->curOff++;
 	switch(T){
 	case litFileHandle:
-		map->curOff++;
 		switch(img->data[off]){
 		case 0:
 			return lValFileHandle(stdin);
@@ -256,19 +252,14 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 	case litNil:
 		return NIL;
 	case litInt64:
-		map->curOff += 8;
 		return lValInt(*(i64 *)((void *)&img->data[off]));
 	case litInt32:
-		map->curOff += 4;
 		return lValInt(*(i32 *)((void *)&img->data[off]));
 	case litInt16:
-		map->curOff += 2;
 		return lValInt(*(i16 *)((void *)&img->data[off]));
 	case litInt8:
-		map->curOff += 1;
 		return lValInt(*(i8 *)((void *)&img->data[off]));
 	case litFloat: {
-		map->curOff += 8;
 		const double *fword = (double *)((void *)&img->data[off]);
 		return lValFloat(*fword);
 	}
@@ -280,45 +271,48 @@ static lVal readVal(readImageMap *map, const lImage *img, i32 off, bool staticIm
 		break;
 	}
 
-	const i32 tbyte = readI24(img, off);
-	map->curOff += 3;
+	const i32 valOff = readI24(img, off);
 	switch(T){
 	default:
 		return lValException(lSymReadError, "Can't have rootValues of that Type", NIL);
 	case litNativeFunc:
-		return lValAlloc(ltNativeFunc, readNFunc(map, img, tbyte, staticImage));
+		return lValAlloc(ltNativeFunc, readNFunc(map, img, valOff, staticImage));
 	case litType:
-		return lValAlloc(ltType, readType(map, img, tbyte, staticImage));
+		return lValAlloc(ltType, readType(map, img, valOff, staticImage));
 	case litBytecodeArr:
-		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, tbyte, staticImage));
+		return lValAlloc(ltBytecodeArr, readBytecodeArray(map, img, valOff, staticImage));
 	case litMap:
-		return lValMap(readMap(map, img, tbyte, staticImage));
+		return lValMap(readMap(map, img, valOff, staticImage));
 	case litTree:
-		return lValTree(readTree(map, img, tbyte, staticImage));
+		return lValTree(readTree(map, img, valOff, staticImage));
 	case litArray:
-		return lValAlloc(ltArray, readArray(map, img, tbyte, staticImage));
+		return lValAlloc(ltArray, readArray(map, img, valOff, staticImage));
 	case litPair:
-		return lValAlloc(ltPair, readPair(map, img, tbyte, staticImage));
+		return lValAlloc(ltPair, readPair(map, img, valOff, staticImage));
 	case litBufferView:
-		return lValAlloc(ltBufferView, readBufferView(map, img, tbyte, staticImage));
+		return lValAlloc(ltBufferView, readBufferView(map, img, valOff, staticImage));
 	case litLambda:
-		return lValAlloc(ltLambda, readClosure(map, img, tbyte, staticImage));
+		return lValAlloc(ltLambda, readClosure(map, img, valOff, staticImage));
 	case litMacro:
-		return lValAlloc(ltMacro, readClosure(map, img, tbyte, staticImage));
+		return lValAlloc(ltMacro, readClosure(map, img, valOff, staticImage));
 	case litEnvironment:
-		return lValAlloc(ltEnvironment, readClosure(map, img, tbyte, staticImage));
+		return lValAlloc(ltEnvironment, readClosure(map, img, valOff, staticImage));
 	case litString:
-		return lValAlloc(ltString, readBuffer(map, img, tbyte, staticImage));
+		return lValAlloc(ltString, readBuffer(map, img, valOff, staticImage));
 	case litBuffer:
-		return lValAlloc(ltBuffer, readBuffer(map, img, tbyte, staticImage));
+		return lValAlloc(ltBuffer, readBuffer(map, img, valOff, staticImage));
 	case litSymbol:
-		return lValAlloc(ltSymbol, (void *)readSymbol(map, img, tbyte, staticImage));
+		return lValAlloc(ltSymbol, (void *)readSymbol(map, img, valOff, staticImage));
 	case litKeyword:
-		return lValAlloc(ltKeyword, (void *)readSymbol(map, img, tbyte, staticImage));
+		return lValAlloc(ltKeyword, (void *)readSymbol(map, img, valOff, staticImage));
 	}
 	return NIL;
 }
 
+// Main entry point to the imageReader, when staticImage is set then
+// we'll store static references into the image for things like bytecodeArrays
+// or strings to conserve memory. This is mainly used with the builtin image so
+// that we don't have to keep as many duplicates around.
 lVal readImage(const void *ptr, size_t imgSize, bool staticImage){
 	const lImage *img = ptr;
 	if(unlikely(img == NULL)){

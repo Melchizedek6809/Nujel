@@ -146,4 +146,4 @@
       (cdr (cdr (cdr (cdr (cdr p))))))
 
 (defmacro exception (type description value)
-          `(throw (list ~type ~description ~value (current-lambda))))
+          `(throw (list ~type ~description ~value)))

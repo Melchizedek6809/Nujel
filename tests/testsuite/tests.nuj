@@ -275,7 +275,6 @@
 (#t (def i 1) (case (inc! i) ((9) #f) ((4) #f) ((2) #t)))
 ;(:arity-error (try car (eval '(cons 123 234 345))))
 (#t (= car (ref (current-closure) (car '(car asd)))))
-(#t (pos? (:index-of (describe/closure ((defn stackTraceTest () (current-lambda)))) "stackTraceTest")))
 (2 (case 'asd (('qwe) 1) (('asd) 2) (otherwise 3)))
 (10 (reduce [1 2 3 4] add/int 0))
 ("1,2,3,4" (join [1 2 3 4] ","))
