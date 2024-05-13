@@ -223,7 +223,7 @@ static lVal lnmMapClone(lVal self) {
 	m->length = self.vMap->length;
 	m->flags = self.vMap->flags;
 	m->size = self.vMap->size;
-	m->entries = calloc(sizeof(lMapEntry), m->size);
+	m->entries = calloc(m->size, sizeof(lMapEntry));
 	memcpy(m->entries, self.vMap->entries, sizeof(lMapEntry) * m->size);
 	return lValAlloc(ltMap, m);
 }
