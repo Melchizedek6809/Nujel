@@ -204,6 +204,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 	ip = ops->data;
 
 	while(true){
+	dispatchLoop:
 	vmdispatch(*ip++){
 	vmcase(lopNOP)
 		vmbreak;
@@ -517,7 +518,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			while(t){
 				if(s == t->key){
 					ctx.valueStack[++ctx.sp] = t->value;
-					vmbreak;
+					goto dispatchLoop;
 				}
 				t = s > t->key ? t->right : t->left;
 			}
@@ -544,7 +545,7 @@ lVal lBytecodeEval(lClosure *callingClosure, lBytecodeArray *text){
 			while(t){
 				if(t->key == s){
 					t->value = ctx.valueStack[ctx.sp];
-					vmbreak;
+					goto dispatchLoop;
 				}
 				t = s > t->key ? t->right : t->left;
 			}
