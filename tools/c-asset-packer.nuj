@@ -6,7 +6,7 @@
 
 (def hex-cache (:alloc Array 256))
 (dotimes (i 256)
-  (set! hex-cache i (fmt "0x{i:02X}, ")))
+  (set! hex-cache i (fmt " {i},")))
 
 (defn create-c-asset (raw out symbol-name)
       :export
@@ -17,7 +17,7 @@
       (:block-write out "{")
       (dotimes (i (:length raw))
                (when (zero? (bit-and i #xF))
-                 (:block-write out "\n  "))
+                 (:block-write out "\n"))
                (:block-write out (ref hex-cache (ref raw i))))
       (:block-write out "};")
       (:close! out))
