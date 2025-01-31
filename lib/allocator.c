@@ -4,8 +4,31 @@
 #include "nujel-private.h"
 #endif
 
+/* This boolean flag is used to determine if the garbage collector should run soon.
+ * It is set to true when the number of remaining slots in the static array falls below 128.
+ * This is used to make sure that the GC only runs when it is safe to, since otherwise we'd have to
+ * scan the entire stack and dump all registers. By only doing a collection at certain safe points
+ * we can greatly simplify the overall codebase.
+ */
 bool lGCShouldRunSoon = false;
 
+/* This macro defines a simple allocator for a given type T with a maximum capacity of typeMax.
+ * For each type T it defines:
+ * - A static array TList to store all instances
+ * - TMax tracking the next free index in TList
+ * - TActive counting currently allocated objects
+ * - TFFree pointing to the first free object in the free list
+ * - TAllocRaw() function to allocate new instances
+ *
+ * The allocator works in two ways:
+ * 1. If there are freed objects (TFFree != NULL), reuse one from the free list
+ * 2. Otherwise allocate a new object from TList if space remains
+ *
+ * It also integrates with the GC by:
+ * - Triggering collection when fewer than 128 slots remain
+ * - Clearing mark bits in TMarkMap for new allocations
+ * - Zeroing new objects with memset
+ */
 #define defineAllocator(T, typeMax) \
 T T##List[typeMax]; \
 uint T##Max = 0; \
@@ -32,6 +55,9 @@ T * T##AllocRaw (){\
 allocatorTypes()
 #undef defineAllocator
 
+/* We could also use the defineAllocator macro for this, but right now it doesn't make sense to free Native Function bindings
+ * since they can't be created from within Nujel, only via the C API.
+ */
 lNFunc   lNFuncList[NFN_MAX];
 uint     lNFuncMax    = 0;
 
