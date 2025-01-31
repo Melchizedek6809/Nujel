@@ -30,6 +30,11 @@ lVMErrorPlaceholder(lnfList)
 lVMErrorPlaceholder(lnfThrow)
 lVMErrorPlaceholder(lnfApply)
 
+/* These are placeholders for functions that need to be compiled to special Bytecode OPs, because
+ * of this we specify them like this to make sure that we get an error if we for example try to use 
+ * apply with a special form, this way we can also easily compare these special forms because they
+ * have distinct values. 
+ */
 void lOperationsSpecial(){
 	lAddNativeFunc("do",              "body",                    "Evaluate body in order and returns the last result", lnfDo, 0);
 	lAddNativeFunc("let*",            "body",                    "Run BODY wihtin a new closure",  lnfLetRaw, 0);
