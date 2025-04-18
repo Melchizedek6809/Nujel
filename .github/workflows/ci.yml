@@ -21,7 +21,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest]
-        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
+        sys: [mingw64, mingw32, ucrt64, clang64]
+        include:
+        - os: windows-11-arm
+          sys: clangarm64
     steps:
     - name: Setup MSYS2
       uses: msys2/setup-msys2@v2
@@ -35,10 +38,12 @@ jobs:
       run: make nujel.exe
     - name: Test runtime
       run: make test
+
+
   release-windows:
     name: release-${{ matrix.sys }}-windows
     needs: static-checks
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     defaults:
       run:
@@ -46,7 +51,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-latest]
         sys: [mingw32, mingw64, ucrt64, clang64, clang32]
+        include:
+        - os: windows-11-arm
+          sys: clangarm64
     steps:
     - name: Setup MSYS2
       uses: msys2/setup-msys2@v2
@@ -66,6 +75,8 @@ jobs:
         name: Nujel-windows-${{ matrix.sys }}-release-${{ github.ref_name }}
         path: "./nujel.exe"
         retention-days: 7
+        
+
   build-macos:
     name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -81,6 +92,8 @@ jobs:
       run: make nujel
     - name: Test runtime
       run: make test
+
+
   release-macos:
     name: ${{ matrix.buildtype }}-macos
     needs: static-checks
@@ -103,6 +116,8 @@ jobs:
         name: Nujel-macos-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
         retention-days: 7
+
+
   build-linux:
     name: ${{ matrix.os }}-${{ matrix.cc }}-${{matrix.make}}
     runs-on: ${{ matrix.os }}
@@ -110,7 +125,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-22.04]
+        os: [ubuntu-24.04, ubuntu-22.04, ubuntu-24.04-arm64]
         cc: [clang, gcc]
         make: [make]
         include:
@@ -127,6 +142,8 @@ jobs:
       run: ${{matrix.make}} CC=${{ matrix.cc }} nujel
     - name: Test runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} test
+
+
   build-wasm:
     name: wasm-clang-make
     runs-on: ubuntu-24.04
@@ -147,6 +164,8 @@ jobs:
         make nujel.wasm WASI_CLANG=./wasi-sdk-20.0/bin/clang WASI_SDK_PATH=./wasi-sdk-20.0/share/wasi-sysroot/ WASI_STRIP=./wasi-sdk-20.0/bin/strip
     - name: Test runtime
       run: ./wasmtime-v14.0.4-x86_64-linux/wasmtime --dir=. nujel.wasm tools/tests.nuj
+
+
   build-stdlib:
     name: Build stdlib from source
     runs-on: ubuntu-latest
@@ -163,6 +182,8 @@ jobs:
       run: sudo apt-get -y install ${{ matrix.cc }} ${{ matrix.make }}
     - name: Test runtime
       run: ${{matrix.make}} CC=${{ matrix.cc }} test.future.slow
+
+
   static-analysis-linux:
     name: Clang - static analysis
     runs-on: ubuntu-latest
@@ -175,6 +196,8 @@ jobs:
         sudo apt-get -y install clang clang-tools make
     - name: Run static analyzer
       run: scan-build --status-bugs make nujel
+
+
   valgrind-linux:
     name: Valgrind - memory leak check
     runs-on: ubuntu-latest
@@ -187,6 +210,8 @@ jobs:
         sudo apt-get update && sudo apt-get -y install valgrind
     - name: Check for leaks
       run: make valgrind
+
+
   static-checks:
     name: Static checks
     needs: [valgrind-linux, static-analysis-linux, build-stdlib, build-linux, build-macos, build-windows, build-wasm]
@@ -195,6 +220,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+
   release-linux:
     name: ${{ matrix.buildtype }}-linux
     runs-on: ubuntu-latest
@@ -219,6 +246,8 @@ jobs:
         name: Nujel-linux-${{ github.ref_name }}-${{ matrix.buildtype }}
         path: "./nujel"
         retention-days: 7
+
+
   release-wasm:
     name: release.wasm
     runs-on: ubuntu-latest
