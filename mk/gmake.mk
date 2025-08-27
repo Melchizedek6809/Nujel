@@ -15,13 +15,13 @@ STDLIB_MODS   := $(shell find stdlib_modules -type f -name '*.nuj' | sort)
 STDLIB_NOBS   := $(STDLIB_NUJS:.nuj=.no)
 STDLIB_MOBS   := $(STDLIB_MODS:.nuj=.no)
 
-ifeq (, $(shell which $(CC)))
+ifeq (, $(shell command -v $(CC)))
 CC                   := gcc
 endif
-ifeq (, $(shell which $(CC)))
+ifeq (, $(shell command -v $(CC)))
 CC                   := clang
 endif
-ifeq (, $(shell which $(CC)))
+ifeq (, $(shell command -v $(CC)))
 CC                   := tcc
 endif
 
