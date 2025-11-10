@@ -61,8 +61,9 @@
         (if self.right-child-active?
             (set! self.right-child child)
             (set! self.left-child child))
-        (child {:T :resize :width (:child-width self) :height self.height})
-        (child {:T :draw}))
+        (:handle-event child {:T :resize :width (:child-width self) :height self.height})
+        (:handle-event child {:T :focus})
+        (:handle-event child {:T :draw}))
 
   (defn active-child (self)
         (if self.right-child-active?
@@ -76,13 +77,14 @@
 
   (defn stop (self)
         (def child (:inactive-child self))
-        (child {:T :reparent :parent self.parent})
+        (:handle-event child {:T :reparent :parent self.parent})
         (:run self.parent child))
 
   (defn quit (self)
         (:quit self.parent))
 
   (defn flip (self) (:flip self.parent))
+
   (defn draw-char (self char x y color)
         (when (or (>= x (:child-width self))
                   (>= y self.height)
@@ -113,6 +115,8 @@
 
   (defn handle-event (self event)
         (when (= :resize event.T)
+          (set! self.width event.width)
+          (set! self.height event.height)
           (set! self.right-child-active? #f)
           (:handle-event self.left-child {:T :resize :width (:child-width self) :height self.height})
           (set! self.right-child-active? #t)
