@@ -171,6 +171,12 @@
   (defn windmove-right (self)
         (:windmove-right self.term))
 
+  (defn windmove-up (self)
+        (:windmove-up self.term))
+
+  (defn windmove-down (self)
+        (:windmove-down self.term))
+
   (defn set-parent! (self parent)
         (set! self.term parent))
 
@@ -178,6 +184,11 @@
         (def new (:new TextEditor))
         (:set-cur-buffer! new self.cur-buffer)
         (:split-window-right self.term new))
+
+  (defn split-window-below (self)
+        (def new (:new TextEditor))
+        (:set-cur-buffer! new self.cur-buffer)
+        (:split-window-below self.term new))
 
   (defn run (self)
         (:run self.term self))
@@ -196,6 +207,8 @@
         (set! key-down-handler :C-k (fn () (:kill-line self)))
         (set! key-down-handler :C-p :previous-line)
         (set! key-down-handler :C-n :next-line)
+        (set! key-down-handler :C-up (fn () (:windmove-up self)))
+        (set! key-down-handler :C-down (fn () (:windmove-down self)))
         (set! key-down-handler :C-right (fn () (:windmove-right self)))
         (set! key-down-handler :C-left (fn () (:windmove-left self)))
         (set! key-down-handler :C-y (fn () (:yank self)))
@@ -218,6 +231,7 @@
         (set! key-down-handler :insert (fn () (:yank self)))
         (set! key-down-handler :ret :insert-newline)
         (set! cx-key-down-handler :h :mark-whole-buffer)
+        (set! cx-key-down-handler :2 (fn () (:split-window-below self)))
         (set! cx-key-down-handler :3 (fn () (:split-window-right self)))
         (set! cx-key-down-handler :0 (fn () (:stop self)))
         (set! cx-key-down-handler :C-c (fn () (:quit self)))))
