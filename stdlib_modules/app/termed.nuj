@@ -19,7 +19,8 @@
                    :key-down-handler {}
                    :focus? #f
                    :prototype* self })
-        (:add-default-keys ret)
+
+        (:text-mode ret)
         (when (zero? (:length buffers))
           (:new-buffer ret "*scratch*"))
         (doseq (arg args)
@@ -141,7 +142,11 @@
         (:set-cur-buffer! self self.cur-buffer))
 
   (defn insert-char (self event)
-        (:insert-char self.cur-buffer event.code))
+        (def handler (ref self.key-down-handler (:keyword event.char)))
+        (set! self.cx-active #f)
+        (if handler
+            (handler self.cur-buffer)
+            (:insert-char self.cur-buffer event.code)))
 
   (defn handle-event (self event)
         (case event.T
@@ -196,7 +201,7 @@
   (defn run (self)
         (:run self.term self))
 
-  (defn add-default-keys (self)
+  (defn fundamental-mode (self)
         (def key-down-handler self.key-down-handler)
         (def cx-key-down-handler self.cx-key-down-handler)
 
@@ -207,16 +212,14 @@
         (set! key-down-handler :C-e :end-of-line)
         (set! key-down-handler :C-f :forward-char)
         (set! key-down-handler :C-g :keyboard-quit)
-        (set! key-down-handler :C-k (fn () (:kill-line self)))
         (set! key-down-handler :C-p :previous-line)
         (set! key-down-handler :C-n :next-line)
         (set! key-down-handler :C-up (fn () (:windmove-up self)))
         (set! key-down-handler :C-down (fn () (:windmove-down self)))
         (set! key-down-handler :C-right (fn () (:windmove-right self)))
         (set! key-down-handler :C-left (fn () (:windmove-left self)))
-        (set! key-down-handler :C-y (fn () (:yank self)))
-        (set! key-down-handler :C-w (fn () (:kill-region self)))
 
+        (set! key-down-handler :C-w (fn () (:kill-region self)))
         (set! key-down-handler :M-w (fn () (:kill-ring-save self)))
         (set! key-down-handler :M-< :beginning-of-buffer)
         (set! key-down-handler :M-> :end-of-buffer)
@@ -229,15 +232,23 @@
         (set! key-down-handler :end :end-of-line)
         (set! key-down-handler :page-up :scroll-down-command)
         (set! key-down-handler :page-down :scroll-up-command)
-        (set! key-down-handler :backspace :backward-delete-char)
-        (set! key-down-handler :delete :delete-forward-char)
-        (set! key-down-handler :insert (fn () (:yank self)))
-        (set! key-down-handler :ret :insert-newline)
+
         (set! cx-key-down-handler :h :mark-whole-buffer)
         (set! cx-key-down-handler :2 (fn () (:split-window-below self)))
         (set! cx-key-down-handler :3 (fn () (:split-window-right self)))
         (set! cx-key-down-handler :0 (fn () (:stop self)))
-        (set! cx-key-down-handler :C-c (fn () (:quit self)))))
+        (set! cx-key-down-handler :C-c (fn () (:quit self))))
+
+  (defn text-mode (self)
+        (:fundamental-mode self)
+        (def key-down-handler self.key-down-handler)
+
+        (set! key-down-handler :C-k (fn () (:kill-line self)))
+        (set! key-down-handler :backspace :backward-delete-char)
+        (set! key-down-handler :delete :delete-forward-char)
+        (set! key-down-handler :C-y (fn () (:yank self)))
+        (set! key-down-handler :insert (fn () (:yank self)))
+        (set! key-down-handler :ret :insert-newline)))
 
 (defn main (args)
       :export
