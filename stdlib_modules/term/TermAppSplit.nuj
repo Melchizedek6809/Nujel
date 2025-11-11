@@ -59,7 +59,7 @@
         (if self.bottom-child-active?
             (set! self.bottom-child new)
             (set! self.top-child new))
-        (:handle-event new {:T :resize :width self.width :height self.height}))
+        (:handle-event new {:T :resize :width self.width :height (:child-height self)}))
 
 
   (defn split-window-below (self new-child)
@@ -70,7 +70,7 @@
         (if self.bottom-child-active?
             (set! self.bottom-child new)
             (set! self.top-child new))
-        (:handle-event new {:T :resize :width self.width :height self.height}))
+        (:handle-event new {:T :resize :width self.width :height (:child-height self)}))
 
   (defn run (self child)
         (if self.bottom-child-active?
@@ -213,7 +213,7 @@
         (if self.right-child-active?
             (set! self.right-child new)
             (set! self.left-child new))
-        (:handle-event new {:T :resize :width self.width :height self.height}))
+        (:handle-event new {:T :resize :width (:child-width self) :height self.height}))
 
   (defn split-window-below (self new-child)
         (def new (:new TermAppHorizontalSplit
@@ -223,7 +223,7 @@
         (if self.right-child-active?
             (set! self.right-child new)
             (set! self.left-child new))
-        (:handle-event new {:T :resize :width self.width :height self.height}))
+        (:handle-event new {:T :resize :width (:child-width self) :height self.height}))
 
   (defn run (self child)
         (if self.right-child-active?
