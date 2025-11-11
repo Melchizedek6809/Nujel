@@ -140,6 +140,9 @@
         (set! self.screen-height height)
         (:set-cur-buffer! self self.cur-buffer))
 
+  (defn insert-char (self event)
+        (:insert-char self.cur-buffer event.code))
+
   (defn handle-event (self event)
         (case event.T
               (:blur (set! self.focus? #f))
@@ -150,7 +153,7 @@
               (:key-down (:handle-key-down self event.key))
               (:input (if self.cx-active
                           (:handle-key-down self (:keyword event.char))
-                          (:insert-char self.cur-buffer event.code)))))
+                          (:insert-char self event)))))
 
   (defn load-buffer (self filename)
         (def buf (:new-buffer self filename))
