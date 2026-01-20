@@ -51,6 +51,9 @@ test.slow: $(NUJEL)
 test.debug: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r tools/tests.nuj"
 
+test.reader: $(NUJEL)
+	@./$(NUJEL) tests/reader.nuj
+
 test.slow.debug: $(NUJEL)
 	@gdb ./$(NUJEL) -ex "r --slow-test tools/tests.nuj"
 

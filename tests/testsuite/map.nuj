@@ -21,7 +21,7 @@
 (123 (def a (map/new :asd 123)) (def b (:clone a)) (set! b.asd #f) a.asd)
 (#f (def a (map/new :asd 123)) (def b (:clone a)) (set! b.asd #f) b.asd)
 (123 (def k #mDEADBEEF) (def m (map/new)) (set! m k 123) (ref m k))
-(#nil (def k #mDEADBEEF) (def m (map/new)) (set! m k 123) (ref m #mDEADBEEF))
+(123 (def k #mDEADBEEF) (def m (map/new)) (set! m k 123) (ref m #mDEADBEEF))
 (123 (def k "asd") (def m (map/new)) (set! m k 123) (ref m k))
 (123 (def k "asd") (def m (map/new)) (set! m k 123) (ref m "asd"))
 (123 (def k [123]) (def m (map/new)) (set! m k 123) (ref m k))

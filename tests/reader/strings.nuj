@@ -1,0 +1,3 @@
+"hello" "" "with spaces"
+"escape\ttab\nnewline"
+"quote\"here" "back\\slash"

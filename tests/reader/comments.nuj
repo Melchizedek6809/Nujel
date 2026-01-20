@@ -6,3 +6,7 @@ zxc #|
 qwe
 asd |#
 zxc
+#;ignored visible
+#;(list a b) shown
+(a #;b c)
+#| outer #| inner |# outer |# nested
