@@ -49,6 +49,7 @@
           #f
           (case cur-type
                 (:array (array/equal? val-a val-b))
+                (:buffer (buffer/equal? val-a val-b))
                 (:tree (tree/equal? val-a val-b))
                 (:pair (list/equal? val-a val-b))
                 (otherwise (= val-a val-b)))))
