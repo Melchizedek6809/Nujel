@@ -25,6 +25,7 @@
                   mold
                   dash
                   gnumake
+                  rlwrap
                 ];
               };
             });

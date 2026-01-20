@@ -1,0 +1,13 @@
+;;; Nujel - Copyright (C) 2020-2021 - Benjamin Vincent Schulenburg
+;;; This project uses the MIT license, a copy should be included under /LICENSE
+;;;
+;;; Some functions dealing with buffers
+
+(defn buffer/equal? (a b)
+      (def len (:length a))
+      (when-not (= len (:length b))
+                (return #f))
+      (dotimes (i len #t)
+        (when-not (= (ref a i)
+                     (ref b i))
+                  (return #f))))
