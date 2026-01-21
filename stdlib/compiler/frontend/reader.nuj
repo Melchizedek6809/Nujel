@@ -16,20 +16,21 @@
                     (set! i (inc/int i)))
                   (cons new-buf new-cap))))
 
+    (def delimiter-map (map/new #\; #t
+                                #\( #t
+                                #\) #t
+                                #\[ #t
+                                #\] #t
+                                #\{ #t
+                                #\} #t
+                                #\# #t
+                                #\' #t
+                                #\` #t
+                                #\~ #t
+                                #\" #t))
+
     (defn delimiter? (c)
-          (or (<= c 32)
-              (= c #\;)
-              (= c #\()
-              (= c #\))
-              (= c #\[)
-              (= c #\])
-              (= c #\{)
-              (= c #\})
-              (= c #\#)
-              (= c #\')
-              (= c #\`)
-              (= c #\~)
-              (= c #\")))
+          (or (<= c 32) (ref delimiter-map c)))
 
     (defn atom-terminator? (c)
           "Like delimiter? but also includes . for dotted pair syntax"
@@ -62,7 +63,7 @@
           (def j 0)
           (while (< i end)
             (def c (ref buf i))
-            (when (or (<= c 32) (delimiter? c))
+            (when (delimiter? c)
               (return (cons (:clone (:cut result 0 j) #t) (- i 1))))
             (def high (hex-char->value c))
             (when (< high 0)
@@ -71,7 +72,7 @@
             (when (>= i end)
               (return (cons (:clone (:cut result 0 j) #t) (- i 1))))
             (def c2 (ref buf i))
-            (when (or (<= c2 32) (delimiter? c2))
+            (when (delimiter? c2)
               (exception :read-error "Odd number of hex digits in buffer literal"))
             (def low (hex-char->value c2))
             (when (< low 0)
@@ -166,7 +167,7 @@
                    (return (read-symbol-path buf (inc i) end combined #f)))
                   ((= c #\:)
                    (def nc (if (< (inc i) end) (ref buf (inc i)) 0))
-                   (if (or (delimiter? nc) (= nc 0))
+                   (if (delimiter? nc)
                        (if as-keyword
                            (exception :read-error "Trailing colon on keyword")
                            (return (finish (new-keyword buf start i) i)))
@@ -340,7 +341,7 @@
                   ((and (= c #\.)
                         (or (>= (inc i) end)
                             (let ((nc (ref buf (inc i))))
-                              (or (<= nc 32) (delimiter? nc)))))
+                              (delimiter? nc))))
                    (when (nil? ret)
                      (exception :read-error "Missing car in dotted pair"))
                    (set! i (inc/int i))
