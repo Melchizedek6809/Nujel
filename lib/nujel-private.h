@@ -122,7 +122,6 @@ struct lNFunc {
 	};
 	const lSymbol *name;
 	lTree *meta;
-	lVal args;
 	u8 argCount;
 };
 

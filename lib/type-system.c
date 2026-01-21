@@ -23,8 +23,7 @@ static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, v
 	(void)args;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = NIL; //lCar(lRead(args, strlen(args)));
-	v.vNFunc->meta = NULL;
+	v.vNFunc->meta = lTreeInsert(NULL, symArguments, lValString(args));
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){
 		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
@@ -50,8 +49,7 @@ static lVal lAddNativeStaticMethod(lClass *T, const lSymbol *name, const char *a
 	(void)args;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = NIL; // lCar(lRead(args, strlen(args)));
-	v.vNFunc->meta = NULL;
+	v.vNFunc->meta = lTreeInsert(NULL, symArguments, lValString(args));
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){
 		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
@@ -197,8 +195,8 @@ static lVal lnmNujelMetaSet(lVal self, lVal key, lVal value){
 	return self;
 }
 
-static lVal lnmNFuncArguments(lVal self){
-	return self.vNFunc->args;
+static lVal lnmNFuncArguments(lVal self) {
+	return lTreeRef(self.vNFunc->meta, symArguments);
 }
 
 static void lTypesAddCoreMethods(){

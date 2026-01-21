@@ -144,7 +144,6 @@ static void lSymbolGCMark(const lSymbol *v){
 static void lNFuncGCMark(const lNFunc *v){
 	markerPrefix(lNFunc);
 
-	lValGCMark(v->args);
 	lTreeGCMark(v->meta);
 }
 

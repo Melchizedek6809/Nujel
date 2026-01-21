@@ -27,6 +27,7 @@
                   gnumake
                   rlwrap
                   tokei
+                  gdb
                 ];
               };
             });

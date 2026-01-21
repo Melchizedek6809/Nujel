@@ -84,8 +84,8 @@ static lVal lAddNativeFuncRaw(const char *sym, const char *args, const char *doc
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	lSymbol *name = lSymS(sym);
 	v.vNFunc->fp   = func;
-	v.vNFunc->args = NIL;
 	v.vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
+	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symArguments, lValString(args));
 	v.vNFunc->argCount = argCount;
 	v.vNFunc->name = name;
 	if(flags & NFUNC_FOLD){
