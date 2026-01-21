@@ -186,11 +186,6 @@ static inline lVal lCaddr (lVal v){return lCar(lCdr(lCdr(v)));}
 static inline lVal lCadddr(lVal v){return lCar(lCdr(lCdr(lCdr(v))));}
 
 /*
- | Reader/Printer
- */
-lVal lRead(const char *str, size_t len);
-
-/*
  | Type related procedores
  */
 i64             castToInt        (const lVal v, i64 fallback);

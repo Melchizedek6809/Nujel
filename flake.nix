@@ -26,6 +26,7 @@
                   dash
                   gnumake
                   rlwrap
+                  tokei
                 ];
               };
             });

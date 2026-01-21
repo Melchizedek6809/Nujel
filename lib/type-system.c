@@ -5,6 +5,7 @@
  * another, as well as code for determining which type would be most fitting when
  * you have to for example add two values together.
  */
+#include "nujel.h"
 #ifndef NUJEL_AMALGAMATION
 #include "nujel-private.h"
 #endif
@@ -19,9 +20,10 @@ static void initType(int i, const lSymbol *name, lClass *parent){
 }
 
 static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
+	(void)args;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = lCar(lRead(args, strlen(args)));
+	v.vNFunc->args = NIL; //lCar(lRead(args, strlen(args)));
 	v.vNFunc->meta = NULL;
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){
@@ -45,9 +47,10 @@ lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal 
 }
 
 static lVal lAddNativeStaticMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
+	(void)args;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
-	v.vNFunc->args = lCar(lRead(args, strlen(args)));
+	v.vNFunc->args = NIL; // lCar(lRead(args, strlen(args)));
 	v.vNFunc->meta = NULL;
 	v.vNFunc->argCount = argCount;
 	if(flags & NFUNC_FOLD){

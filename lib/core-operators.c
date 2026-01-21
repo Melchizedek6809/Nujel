@@ -49,11 +49,6 @@ static lVal lnfQuote(lVal v){
 	return v;
 }
 
-static lVal lnfRead(lVal a){
-	reqString(a);
-	return lRead(a.vString->data, a.vString->length);
-}
-
 static lVal lnfGarbageCollectRuns(){
 	return lValInt(lGCRuns);
 }
@@ -216,7 +211,6 @@ static lVal lnfSymbolTable(){
 
 void lOperationsCore(){
 	lAddNativeFuncV("quote", "(v)",   "Return v as is without evaluating", lnfQuote, NFUNC_PURE);
-	lAddNativeFuncV("read",  "(str)", "Read and Parses STR as an S-Expression", lnfRead, NFUNC_PURE);
 
 	lAddNativeFuncCVV("resolves?",     "(sym environment)",   "Check if SYM resolves to a value", lnfResolvesPred, 0);
 

@@ -80,10 +80,11 @@ void lDefineVal(lClosure *c, const char *str, lVal val){
 }
 
 static lVal lAddNativeFuncRaw(const char *sym, const char *args, const char *doc, void *func, uint flags, u8 argCount){
+	(void)args;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	lSymbol *name = lSymS(sym);
 	v.vNFunc->fp   = func;
-	v.vNFunc->args = lCar(lRead(args, strlen(args)));
+	v.vNFunc->args = NIL;
 	v.vNFunc->meta = lTreeInsert(NULL, symDocumentation, lValString(doc));
 	v.vNFunc->argCount = argCount;
 	v.vNFunc->name = name;

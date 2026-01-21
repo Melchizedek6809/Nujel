@@ -33,8 +33,8 @@ Here is a collection of features already implemented, or about to be finished.
 - [X] Simple HTTP 1.1 client
 - [X] (somewhat) useable object system
 - [X] Binary/FASL format
+- [X] Reader written in Nujel (requires FASL for bootstrapping)
 - [ ] Simple HTTP 1.1 server
-- [ ] Reader written in Nujel (requires FASL for bootstrapping)
 - [ ] Tail-call optimization (doesn't seem to be much of a problem right now)
 - [ ] Fibers
 

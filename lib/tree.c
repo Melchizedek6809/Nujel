@@ -208,6 +208,13 @@ static lVal lnmTreeHas(lVal self, lVal key) {
 	return lValBool(lTreeRef(self.vTree->root, key.vSymbol).type != ltException);
 }
 
+static lVal lnmTreeFreeze(lVal self) {
+	if(self.vTree->root){
+		self.vTree->root->flags |= TREE_IMMUTABLE;
+	}
+	return self;
+}
+
 void lOperationsTree() {
 	lClass *Tree = &lClassList[ltTree];
 	lAddNativeMethodV (Tree, lSymS("length"), "(self)", lnmTreeLength, NFUNC_PURE);
@@ -219,4 +226,5 @@ void lOperationsTree() {
 	lAddNativeMethodV (Tree, lSymS("left*"),  "(self)", lnmTreeLeftAst, NFUNC_PURE);
 	lAddNativeMethodV (Tree, lSymS("right*"), "(self)", lnmTreeRightAst, NFUNC_PURE);
 	lAddNativeMethodVV(Tree, lSymS("has?"),   "(self key)", lnmTreeHas, NFUNC_PURE);
+	lAddNativeMethodV (Tree, lSymS("freeze!"), "(self)", lnmTreeFreeze, 0);
 }
