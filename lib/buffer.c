@@ -9,8 +9,8 @@ const void *lBufferData (lBuffer *v){
 }
 
 void *lBufferDataMutable(lBuffer *v){
-	if(v->flags & BUFFER_IMMUTABLE){return NULL;}
-	return v == NULL ? NULL : v->buf;
+	if(v == NULL || (v->flags & BUFFER_IMMUTABLE)){return NULL;}
+	return v->buf;
 }
 
 size_t lBufferLength(const lBuffer *v){

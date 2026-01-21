@@ -50,14 +50,12 @@ static lVal lnfFileOpenOutput(lVal aPathname, lVal aIfExists){
 	const lSymbol *mode = cadr.vSymbol;
 
 	FILE *fh = NULL;
-	if(mode == lSymError){
+	if((mode == lSymError) || (mode == lSymReplace)){
 #if defined(_MSC_VER)
-		if (_access(path, 02) == 0) { lValBool(false); }
+		if((mode == lSymError) && (_access(path, 02) == 0)){ lValBool(false); }
 #else
-		if(access(path, F_OK) == 0){lValBool(false);}
+		if((mode == lSymError) && (access(path, F_OK) == 0)){ lValBool(false); }
 #endif
-		fh = fopen(path, "wb");
-	}else if(mode == lSymReplace){
 		fh = fopen(path, "wb");
 	}else if(mode == lSymAppend){
 		fh = fopen(path, "ab");

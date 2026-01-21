@@ -98,42 +98,25 @@ static lVal lAddNativeFuncRaw(const char *sym, const char *args, const char *doc
 	v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symName, lValSymS(name));
 	return v;
 }
-lVal lAddNativeFunc(const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 0);
-}
-lVal lAddNativeFuncC(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1);
-}
-lVal lAddNativeFuncV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 << 1);
-}
-lVal lAddNativeFuncCV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (1 << 1));
-}
-lVal lAddNativeFuncVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 2 << 1);
-}
-lVal lAddNativeFuncCVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (2 << 1));
-}
-lVal lAddNativeFuncVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 3 << 1);
-}
-lVal lAddNativeFuncCVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (3 << 1));
-}
-lVal lAddNativeFuncVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 4 << 1);
-}
-lVal lAddNativeFuncCVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (4 << 1));
-}
-lVal lAddNativeFuncR(const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 << 4);
-}
-lVal lAddNativeFuncCR(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *,lVal), uint flags){
-	return lAddNativeFuncRaw(sym, args, doc, func, flags, 1 | (1 << 4));
-}
+/* Native function argument count encoding:
+ * Bit 0: has closure arg (C)
+ * Bits 1-3: number of lVal args (V count)
+ * Bit 4: is rest/variadic args (R)
+ */
+#define NFUNC_ARGC(hasC, vCount, hasR) ((hasC) | ((hasR) ? (1 << 4) : ((vCount) << 1)))
+
+lVal lAddNativeFunc    (const char *sym, const char *args, const char *doc, lVal (*func)(), uint flags)                                    { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 0, 0)); }
+lVal lAddNativeFuncC   (const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *), uint flags)                          { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 0, 0)); }
+lVal lAddNativeFuncV   (const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags)                                { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 1, 0)); }
+lVal lAddNativeFuncCV  (const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags)                    { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 1, 0)); }
+lVal lAddNativeFuncVV  (const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal), uint flags)                          { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 2, 0)); }
+lVal lAddNativeFuncCVV (const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal), uint flags)              { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 2, 0)); }
+lVal lAddNativeFuncVVV (const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal), uint flags)                    { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 3, 0)); }
+lVal lAddNativeFuncCVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal), uint flags)        { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 3, 0)); }
+lVal lAddNativeFuncVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lVal, lVal, lVal, lVal), uint flags)              { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 4, 0)); }
+lVal lAddNativeFuncCVVVV(const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal, lVal, lVal, lVal), uint flags) { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 4, 0)); }
+lVal lAddNativeFuncR   (const char *sym, const char *args, const char *doc, lVal (*func)(lVal), uint flags)                                { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(0, 0, 1)); }
+lVal lAddNativeFuncCR  (const char *sym, const char *args, const char *doc, lVal (*func)(lClosure *, lVal), uint flags)                    { return lAddNativeFuncRaw(sym, args, doc, func, flags, NFUNC_ARGC(1, 0, 1)); }
 
 lClosure *findRoot (lVal v){
 	switch(v.type){

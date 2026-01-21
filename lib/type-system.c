@@ -19,8 +19,8 @@ static void initType(int i, const lSymbol *name, lClass *parent){
 	lClassList[i].staticMethods = NULL;
 }
 
-static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
-	(void)args;
+static lVal lAddNativeMethodCommon(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount, lTree **targetTree){
+	(void)args; (void)T;
 	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
 	v.vNFunc->fp   = fun;
 	v.vNFunc->meta = lTreeInsert(NULL, symArguments, lValString(args));
@@ -31,44 +31,28 @@ static lVal lAddNativeMethod(lClass *T, const lSymbol *name, const char *args, v
 	if(flags & NFUNC_PURE){
 		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
 	}
-	T->methods = lTreeInsert(T->methods, name, v);
+	*targetTree = lTreeInsert(*targetTree, name, v);
 	return v;
 }
 
 lVal lAddNativeMethodV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal), uint flags){
-	return lAddNativeMethod(T, name, args, fun, flags, (1 << 1));
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (1 << 1), &T->methods);
 }
 lVal lAddNativeMethodVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal), uint flags){
-	return lAddNativeMethod(T, name, args, fun, flags, (2 << 1));
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (2 << 1), &T->methods);
 }
 lVal lAddNativeMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags){
-	return lAddNativeMethod(T, name, args, fun, flags, (3 << 1));
-}
-
-static lVal lAddNativeStaticMethod(lClass *T, const lSymbol *name, const char *args, void *fun, uint flags, u8 argCount){
-	(void)args;
-	lVal v = lValAlloc(ltNativeFunc, lNFuncAlloc());
-	v.vNFunc->fp   = fun;
-	v.vNFunc->meta = lTreeInsert(NULL, symArguments, lValString(args));
-	v.vNFunc->argCount = argCount;
-	if(flags & NFUNC_FOLD){
-		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symFold, lValBool(true));
-	}
-	if(flags & NFUNC_PURE){
-		v.vNFunc->meta = lTreeInsert(v.vNFunc->meta, symPure, lValBool(true));
-	}
-	T->staticMethods = lTreeInsert(T->staticMethods, name, v);
-	return v;
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (3 << 1), &T->methods);
 }
 
 lVal lAddNativeStaticMethodV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal), uint flags){
-	return lAddNativeStaticMethod(T, name, args, fun, flags, (1 << 1));
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (1 << 1), &T->staticMethods);
 }
 lVal lAddNativeStaticMethodVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal), uint flags){
-	return lAddNativeStaticMethod(T, name, args, fun, flags, (2 << 1));
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (2 << 1), &T->staticMethods);
 }
 lVal lAddNativeStaticMethodVVV(lClass *T, const lSymbol *name, const char *args, lVal (*fun)(lVal, lVal, lVal), uint flags){
-	return lAddNativeStaticMethod(T, name, args, fun, flags, (3 << 1));
+	return lAddNativeMethodCommon(T, name, args, fun, flags, (3 << 1), &T->staticMethods);
 }
 
 static lVal lnmTypeName(lVal self){

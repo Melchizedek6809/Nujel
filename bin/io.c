@@ -49,6 +49,11 @@ lSymbol *lSymError;
 lSymbol *lSymReplace;
 lSymbol *lSymAppend;
 
+static inline bool isDotOrDotDot(const char *name){
+	return (name[0] == '.' && name[1] == 0) ||
+	       (name[0] == '.' && name[1] == '.' && name[2] == 0);
+}
+
 void setIOSymbols(){
 	lsError            = lSymSM("error?");
 	lsErrorNumber      = lSymSM("error-number");
@@ -236,8 +241,7 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 		if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && !showHidden){
 			continue;
 		}
-		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == 0)) { continue; }
-		if ((ffd.cFileName[0] == '.') && (ffd.cFileName[1] == '.') && (ffd.cFileName[2] == 0)) { continue; }
+		if(isDotOrDotDot(ffd.cFileName)){ continue; }
 		ret = lCons(lValString(ffd.cFileName), ret);
    } while (FindNextFile(hFind, &ffd) != 0);   return ret;
 #else
@@ -246,11 +250,8 @@ static lVal lnfDirectoryRead(lVal aPath, lVal aShowHidden){
 	lVal ret = NIL;
 	lVal cur = NIL;
 	for(struct dirent *de = readdir(dp); de ; de = readdir(dp)){
-		if(!showHidden){
-			if(de->d_name[0] == '.'){continue;}
-		}
-		if((de->d_name[0] == '.') && (de->d_name[1] == 0)){continue;}
-		if((de->d_name[0] == '.') && (de->d_name[1] == '.') && (de->d_name[2] == 0)){continue;}
+		if(isDotOrDotDot(de->d_name)){ continue; }
+		if(!showHidden && de->d_name[0] == '.'){ continue; }
 		if(cur.type == ltNil){
 			ret = cur = lCons(NIL, NIL);
 		}else{

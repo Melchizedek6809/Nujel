@@ -198,55 +198,46 @@ lVal lValExceptionNonNumeric (lVal v);
 lVal requireFloat            (lVal v);
 lVal optionalSymbolic        (lVal v, const lSymbol *fallback);
 
-#define reqNaturalInt(str) do { if(unlikely(str.type != ltInt)){\
-	return lValException(lSymTypeError, "Need natural Int", str);\
-}\
-if(unlikely(str.vInt < 0)){\
-	return lValException(lSymTypeError, "Expected a Natural int, not: ", str);\
-} } while(0)
+/* Type requirement macros - return exception if type check fails */
+#define reqType(val, typeEnum, msg) do { \
+	if(unlikely((val).type != (typeEnum))){ \
+		return lValException(lSymTypeError, msg, (val)); \
+	} \
+} while(0)
 
-#define reqClosure(str) do { if(unlikely((str.type != ltLambda) && (str.type != ltEnvironment) && str.type != ltMacro)){ \
-	return lValException(lSymTypeError, "Need a Closure", str);\
-} } while(0)
+#define reqInt(v)           reqType(v, ltInt, "Need an Int")
+#define reqString(v)        reqType(v, ltString, "Need a String")
+#define reqBuffer(v)        reqType(v, ltBuffer, "Need a Buffer")
+#define reqArray(v)         reqType(v, ltArray, "Need an Array")
+#define reqSymbol(v)        reqType(v, ltSymbol, "Need a Symbol")
+#define reqFileHandle(v)    reqType(v, ltFileHandle, "Need a FileHandle")
+#define reqBytecodeArray(v) reqType(v, ltBytecodeArr, "Need a BytecodeArr")
 
-#define reqBytecodeArray(str) do { if(unlikely(str.type != ltBytecodeArr)){\
-	return lValException(lSymTypeError, "Need a BytecodeArr", str);\
-} } while(0)
+#define reqNaturalInt(v) do { \
+	reqInt(v); \
+	if(unlikely((v).vInt < 0)){ \
+		return lValException(lSymTypeError, "Expected a Natural int", (v)); \
+	} \
+} while(0)
 
-#define reqInt(str) do { if(unlikely(str.type != ltInt)){\
-	return lValException(lSymTypeError, "Need an Int", str);\
-} } while(0)
+#define reqClosure(v) do { \
+	if(unlikely(((v).type != ltLambda) && ((v).type != ltEnvironment) && ((v).type != ltMacro))){ \
+		return lValException(lSymTypeError, "Need a Closure", (v)); \
+	} \
+} while(0)
 
-#define reqString(str) do { if(unlikely(str.type != ltString)){\
-	return lValException(lSymTypeError, "Need a String", str);\
-} } while(0)
+#define reqSymbolic(v) do { \
+	if(unlikely(((v).type != ltSymbol) && ((v).type != ltKeyword))){ \
+		return lValException(lSymTypeError, "Need a Symbol or Keyword", (v)); \
+	} \
+} while(0)
 
-#define reqBuffer(val) do { if(unlikely(val.type != ltBuffer)){\
-	return lValException(lSymTypeError, "Need a Buffer", val);\
-} } while(0)
-
-#define reqArray(val) do { if(unlikely(val.type != ltArray)){\
-	return lValException(lSymTypeError, "Need an Array", val);\
-} } while(0)
-
-#define reqSymbol(val) do { if(unlikely(val.type != ltSymbol)){\
-	return lValException(lSymTypeError, "Need a Symbol", val);\
-} } while(0)
-
-#define reqSymbolic(val) do { if(unlikely((val.type != ltSymbol) && (val.type != ltKeyword))){ \
-	return lValException(lSymTypeError, "Need a Symbol or Keyword", val);\
-} } while(0)
-
-#define reqFileHandle(val) do { if(unlikely(val.type != ltFileHandle)){\
-	return lValException(lSymTypeError, "Need a FileHandle", val);\
-} } while(0)
-
-#define reqMutableBuffer(val) do { if(unlikely(val.type != ltBuffer)){\
-	return lValException(lSymTypeError, "Need a Buffer", val);\
-}\
-if(unlikely(val.vBuffer->flags & BUFFER_IMMUTABLE)){\
-	return lValException(lSymTypeError, "Buffer is immutable", val);\
- } } while(0)
+#define reqMutableBuffer(v) do { \
+	reqBuffer(v); \
+	if(unlikely((v).vBuffer->flags & BUFFER_IMMUTABLE)){ \
+		return lValException(lSymTypeError, "Buffer is immutable", (v)); \
+	} \
+} while(0)
 
 
 /*
