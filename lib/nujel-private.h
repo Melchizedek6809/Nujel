@@ -311,32 +311,56 @@ void lGarbageCollect(lThread *ctx);
 \*/
 #define SYM_MAX (1<<14)
 #define NFN_MAX (1<<10)
-#define ARR_MAX (1<<14)
-#define CLO_MAX (1<<17)
-#define TRR_MAX (1<<15)
-#define BCA_MAX (1<<14)
-#define BUF_MAX (1<<15)
-#define BFV_MAX (1<<14)
-#define TRE_MAX (1<<18)
-#define CON_MAX (1<<18)
-#define MAP_MAX (1<<15)
+#define ARR_CHUNK_BYTES (16*1024)
+#define CLO_CHUNK_BYTES (16*1024)
+#define TRR_CHUNK_BYTES (16*1024)
+#define BCA_CHUNK_BYTES (16*1024)
+#define BUF_CHUNK_BYTES (16*1024)
+#define BFV_CHUNK_BYTES (16*1024)
+#define TRE_CHUNK_BYTES (32*1024)
+#define CON_CHUNK_BYTES (32*1024)
+#define MAP_CHUNK_BYTES (16*1024)
+
+/* Heap chunk sizes are total aligned block bytes. lHeapBlock.size stores
+ * only the object region; one tail mark byte is stored per object slot.
+ */
+#define L_HEAP_TREE_NODE ((uint)ltAny + 1)
 
 #define allocatorTypes() \
-	defineAllocator(lArray, ARR_MAX) \
-	defineAllocator(lClosure, CLO_MAX) \
-	defineAllocator(lTree, TRE_MAX) \
-	defineAllocator(lTreeRoot, TRR_MAX) \
-	defineAllocator(lMap, MAP_MAX) \
-	defineAllocator(lBytecodeArray, BCA_MAX) \
-	defineAllocator(lBuffer, BUF_MAX) \
-	defineAllocator(lBufferView, BFV_MAX) \
-	defineAllocator(lPair, CON_MAX)
+	defineAllocator(lArray, ltArray, ARR_CHUNK_BYTES) \
+	defineAllocator(lClosure, ltLambda, CLO_CHUNK_BYTES) \
+	defineAllocator(lTree, L_HEAP_TREE_NODE, TRE_CHUNK_BYTES) \
+	defineAllocator(lTreeRoot, ltTree, TRR_CHUNK_BYTES) \
+	defineAllocator(lMap, ltMap, MAP_CHUNK_BYTES) \
+	defineAllocator(lBytecodeArray, ltBytecodeArr, BCA_CHUNK_BYTES) \
+	defineAllocator(lBuffer, ltBuffer, BUF_CHUNK_BYTES) \
+	defineAllocator(lBufferView, ltBufferView, BFV_CHUNK_BYTES) \
+	defineAllocator(lPair, ltPair, CON_CHUNK_BYTES)
 
-#define defineAllocator(T, typeMax) \
-extern T T##List[typeMax]; \
-extern uint T##Max;	   \
+typedef struct lHeapBlock {
+	void *ptr;
+	uint type;
+	uint size;
+} lHeapBlock;
+
+extern lHeapBlock *lHeapBlocks;
+extern uint lHeapBlockMax;
+extern uint lHeapBlockCap;
+extern size_t lHeapActiveBytes;
+extern size_t lHeapNextGCBytes;
+
+void *lHeapAllocBlock(uint type, size_t eleSize, uint chunkBytes, uint *count);
+static inline u8 *lHeapMarkByte(const void *ptr, size_t eleSize, uint chunkBytes){
+	const uintptr_t base = ((uintptr_t)ptr) & ~(((uintptr_t)chunkBytes) - 1);
+	const uintptr_t off = (uintptr_t)ptr - base;
+	const uint slotCount = chunkBytes / (eleSize + 1);
+	const uint objectBytes = slotCount * eleSize;
+	return ((u8 *)base) + objectBytes + (off / eleSize);
+}
+i64 lHeapObjectID(const void *ptr, uint type, size_t eleSize);
+
+#define defineAllocator(T, typeTag, chunkBytes) \
 extern uint T##Active; \
-extern u8 T##MarkMap[typeMax]; \
 extern T * T##FFree; \
 T * T##AllocRaw();
 
@@ -350,7 +374,7 @@ extern uint     lNFuncMax;
 
 
 static inline int lClosureID(const lClosure *n){
-	return n - lClosureList;
+	return lHeapObjectID(n, ltLambda, sizeof(lClosure));
 }
 static inline int lNFuncID(const lNFunc *n){
 	return n - lNFuncList;

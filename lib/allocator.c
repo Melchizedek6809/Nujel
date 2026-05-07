@@ -4,51 +4,123 @@
 #include "nujel-private.h"
 #endif
 
+#ifdef _MSC_VER
+#include <malloc.h>
+#endif
+
 /* This boolean flag is used to determine if the garbage collector should run soon.
- * It is set to true when the number of remaining slots in the static array falls below 128.
- * This is used to make sure that the GC only runs when it is safe to, since otherwise we'd have to
- * scan the entire stack and dump all registers. By only doing a collection at certain safe points
- * we can greatly simplify the overall codebase.
+ * It is set when active heap bytes cross the next GC threshold. This keeps
+ * collection at VM safe points, where we already know how to mark the runtime
+ * stacks without scanning the native C stack.
  */
 bool lGCShouldRunSoon = false;
 
-/* This macro defines a simple allocator for a given type T with a maximum capacity of typeMax.
+/* This macro defines a chunked allocator for a given type T.
  * For each type T it defines:
- * - A static array TList to store all instances
- * - TMax tracking the next free index in TList
  * - TActive counting currently allocated objects
  * - TFFree pointing to the first free object in the free list
  * - TAllocRaw() function to allocate new instances
  *
  * The allocator works in two ways:
  * 1. If there are freed objects (TFFree != NULL), reuse one from the free list
- * 2. Otherwise allocate a new object from TList if space remains
+ * 2. Otherwise allocate a new chunk, add its slots to the free list, and retry
  *
  * It also integrates with the GC by:
- * - Triggering collection when fewer than 128 slots remain
- * - Clearing mark bits in TMarkMap for new allocations
+ * - Keeping one tail mark byte per object slot in each aligned chunk
+ * - Clearing mark bits for new allocations
  * - Zeroing new objects with memset
  */
-#define defineAllocator(T, typeMax) \
-T T##List[typeMax]; \
-uint T##Max = 0; \
+lHeapBlock *lHeapBlocks = NULL;
+uint lHeapBlockMax = 0;
+uint lHeapBlockCap = 0;
+size_t lHeapActiveBytes = 0;
+size_t lHeapNextGCBytes = 4 * 1024 * 1024;
+
+static bool lHeapIsPowerOfTwo(uint v){
+	return v && ((v & (v - 1)) == 0);
+}
+
+void *lHeapAllocBlock(uint type, size_t eleSize, uint chunkBytes, uint *count){
+	if(unlikely(!lHeapIsPowerOfTwo(chunkBytes))){
+		fprintf(stderr, "VM error: heap chunk size must be a power of two\n");
+		exit(125);
+	}
+	if(unlikely(lHeapBlockMax >= lHeapBlockCap)){
+		const uint newCap = lHeapBlockCap ? lHeapBlockCap * 2 : 16;
+		lHeapBlock *newBlocks = realloc(lHeapBlocks, newCap * sizeof(lHeapBlock));
+		if(unlikely(newBlocks == NULL)){
+			fprintf(stderr, "OOM: couldn't allocate heap block table\n");
+			exit(123);
+		}
+		lHeapBlocks = newBlocks;
+		lHeapBlockCap = newCap;
+	}
+
+	uint slotCount = chunkBytes / (eleSize + 1);
+	if(slotCount < 1){slotCount = 1;}
+	const uint objectBytes = slotCount * eleSize;
+	void *ptr = NULL;
+#ifdef _MSC_VER
+	ptr = _aligned_malloc(chunkBytes, chunkBytes);
+	if(ptr != NULL){
+		memset(ptr, 0, chunkBytes);
+	}
+#else
+	if(posix_memalign(&ptr, chunkBytes, chunkBytes) == 0){
+		memset(ptr, 0, chunkBytes);
+	} else {
+		ptr = NULL;
+	}
+#endif
+	if(unlikely(ptr == NULL)){
+		fprintf(stderr, "OOM: couldn't allocate heap block\n");
+		exit(123);
+	}
+
+	lHeapBlocks[lHeapBlockMax++] = (lHeapBlock){ptr, type, objectBytes};
+	*count = slotCount;
+	return ptr;
+}
+
+i64 lHeapObjectID(const void *ptr, uint type, size_t eleSize){
+	i64 ret = 0;
+	const uintptr_t p = (uintptr_t)ptr;
+	for(uint i=0;i<lHeapBlockMax;i++){
+		lHeapBlock *block = &lHeapBlocks[i];
+		if(block->type != type){continue;}
+		const uintptr_t start = (uintptr_t)block->ptr;
+		const uintptr_t end = start + block->size;
+		if((p >= start) && (p < end)){
+			return ret + ((p - start) / eleSize);
+		}
+		ret += block->size / eleSize;
+	}
+	return 0;
+}
+
+#define defineAllocator(T, typeTag, chunkBytes) \
 uint T##Active = 0; \
 T * T##FFree = NULL; \
-T * T##AllocRaw (){\
-	T *ret;\
-	if((T##FFree) == NULL){			\
-		if(unlikely(T##Max >= typeMax-1)){	\
-			fprintf(stderr, "OOM: static %s heap exhausted \n", #T);\
-			exit(123);\
-		}else{\
-			ret = &(T##List)[(T##Max)++];	\
-		}\
-	}else{\
-		ret = T ## FFree;\
-		(T##FFree) = ret->nextFree;\
+static void T##AllocBlock(){\
+	uint count;\
+	T *block = lHeapAllocBlock(typeTag, sizeof(T), chunkBytes, &count);\
+	u8 *marks = ((u8 *)block) + (count * sizeof(T));\
+	for(uint i=0;i<count;i++){\
+		block[i].nextFree = T##FFree;\
+		T##FFree = &block[i];\
+		marks[i] = 2;\
 	}\
-	if(unlikely((typeMax - (++T##Active) < 128))){lGCShouldRunSoon = true;} \
-	T##MarkMap[ret - T##List] = 0;\
+}\
+T * T##AllocRaw (){\
+	if((T##FFree) == NULL){			\
+		T##AllocBlock();\
+	}\
+	T *ret = T ## FFree;\
+	(T##FFree) = ret->nextFree;\
+	T##Active++;\
+	lHeapActiveBytes += sizeof(T);\
+	if(unlikely(lHeapActiveBytes > lHeapNextGCBytes)){lGCShouldRunSoon = true;} \
+	*lHeapMarkByte(ret, sizeof(T), chunkBytes) = 0;\
 	memset(ret,0,sizeof(T));\
 	return ret;\
 }

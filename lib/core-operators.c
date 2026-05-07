@@ -78,14 +78,14 @@ static i64 lValToId(lVal v){
 	default:      return 0;
 	case ltEnvironment:
 	case ltMacro:
-	case ltLambda: return v.vClosure - lClosureList;
-	case ltBufferView: return v.vBufferView - lBufferViewList;
+	case ltLambda: return lHeapObjectID(v.vClosure, ltLambda, sizeof(lClosure));
+	case ltBufferView: return lHeapObjectID(v.vBufferView, ltBufferView, sizeof(lBufferView));
 	case ltString:
-	case ltBuffer: return v.vBuffer - lBufferList;
-	case ltArray: return v.vArray - lArrayList;
-	case ltTree: return v.vTree - lTreeRootList;
-	case ltMap: return v.vMap - lMapList;
-	case ltBytecodeArr: return v.vBytecodeArr - lBytecodeArrayList;
+	case ltBuffer: return lHeapObjectID(v.vBuffer, ltBuffer, sizeof(lBuffer));
+	case ltArray: return lHeapObjectID(v.vArray, ltArray, sizeof(lArray));
+	case ltTree: return lHeapObjectID(v.vTree, ltTree, sizeof(lTreeRoot));
+	case ltMap: return lHeapObjectID(v.vMap, ltMap, sizeof(lMap));
+	case ltBytecodeArr: return lHeapObjectID(v.vBytecodeArr, ltBytecodeArr, sizeof(lBytecodeArray));
 	case ltKeyword:
 	case ltSymbol: return v.vSymbol - lSymbolList;
 	case ltFileHandle: return fileno(v.vFileHandle);

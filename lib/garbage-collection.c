@@ -14,16 +14,26 @@ int lGCRuns = 0;
 u8 fileDescriptorMarkMap[MAX_OPEN_FILE_DESCRIPTORS];
 
 #define defineAllocator(T, TMAX) u8 T##MarkMap[TMAX];
-allocatorTypes()
 defineAllocator(lSymbol, SYM_MAX)
 defineAllocator(lNFunc, NFN_MAX)
 #undef defineAllocator
 
-#define markerPrefix(T) \
+#define heapMarkerPrefix(T, chunkBytes) \
+if(unlikely(v == NULL)){return;} \
+u8 *mark = lHeapMarkByte(v, sizeof(T), chunkBytes); \
+if(*mark){return;} \
+*mark = 1
+
+#define staticMarkerPrefix(T) \
 if(unlikely(v == NULL)){return;} \
 const uint ci = v - T##List; \
 if(T##MarkMap[ci]){return;} \
 T##MarkMap[ci] = 1
+
+#define lHeapFreeMark(v, T, chunkBytes) do { \
+	lHeapActiveBytes -= sizeof(T); \
+	*lHeapMarkByte((v), sizeof(T), (chunkBytes)) = 2; \
+} while(0)
 
 static void lValGCMark         (lVal v);
 static void lBufferGCMark      (const lBuffer *v);
@@ -46,7 +56,7 @@ static void lBufferFree(lBuffer *buf){
 	buf->nextFree = lBufferFFree;
 	lBufferActive--;
 	lBufferFFree = buf;
-	lBufferMarkMap[buf - lBufferList] = 2;
+	lHeapFreeMark(buf, lBuffer, BUF_CHUNK_BYTES);
 }
 
 
@@ -54,7 +64,7 @@ static void lBufferViewFree(lBufferView *buf){
 	buf->nextFree = lBufferViewFFree;
 	lBufferViewActive--;
 	lBufferViewFFree = buf;
-	lBufferViewMarkMap[buf - lBufferViewList] = 2;
+	lHeapFreeMark(buf, lBufferView, BFV_CHUNK_BYTES);
 }
 
 static void lBytecodeArrayFree(lBytecodeArray *v){
@@ -64,7 +74,7 @@ static void lBytecodeArrayFree(lBytecodeArray *v){
 	v->nextFree = lBytecodeArrayFFree;
 	lBytecodeArrayActive--;
 	lBytecodeArrayFFree = v;
-	lBytecodeArrayMarkMap[v - lBytecodeArrayList] = 2;
+	lHeapFreeMark(v, lBytecodeArray, BCA_CHUNK_BYTES);
 }
 
 static void lNFuncFree(lNFunc *n){
@@ -76,21 +86,21 @@ static void lArrayFree(lArray *v){
 	v->nextFree = lArrayFFree;
 	lArrayFFree = v;
 	lArrayActive--;
-	lArrayMarkMap[v - lArrayList] = 2;
+	lHeapFreeMark(v, lArray, ARR_CHUNK_BYTES);
 }
 
 static void lClosureFree(lClosure *clo){
 	clo->nextFree = lClosureFFree;
 	lClosureFFree = clo;
 	lClosureActive--;
-	lClosureMarkMap[clo - lClosureList] = 2;
+	lHeapFreeMark(clo, lClosure, CLO_CHUNK_BYTES);
 }
 
 static void lTreeFree(lTree *t){
 	t->nextFree = lTreeFFree;
 	lTreeFFree = t;
 	lTreeActive--;
-	lTreeMarkMap[t - lTreeList] = 2;
+	lHeapFreeMark(t, lTree, TRE_CHUNK_BYTES);
 }
 
 static void lMapFree(lMap *t){
@@ -99,14 +109,14 @@ static void lMapFree(lMap *t){
 	t->nextFree = lMapFFree;
 	lMapFFree = t;
 	lMapActive--;
-	lMapMarkMap[t - lMapList] = 2;
+	lHeapFreeMark(t, lMap, MAP_CHUNK_BYTES);
 }
 
 static void lTreeRootFree(lTreeRoot *t){
 	t->nextFree = lTreeRootFFree;
 	lTreeRootFFree = t;
 	lTreeRootActive--;
-	lTreeRootMarkMap[t - lTreeRootList] = 2;
+	lHeapFreeMark(t, lTreeRoot, TRR_CHUNK_BYTES);
 }
 
 static void lPairFree(lPair *cons){
@@ -114,7 +124,7 @@ static void lPairFree(lPair *cons){
 	cons->nextFree = lPairFFree;
 	lPairFFree = cons;
 	lPairActive--;
-	lPairMarkMap[cons - lPairList] = 2;
+	lHeapFreeMark(cons, lPair, CON_CHUNK_BYTES);
 }
 
 static void lThreadGCMark(lThread *c){
@@ -128,27 +138,27 @@ static void lThreadGCMark(lThread *c){
 }
 
 static void lBufferGCMark(const lBuffer *v){
-	markerPrefix(lBuffer);
+	heapMarkerPrefix(lBuffer, BUF_CHUNK_BYTES);
 }
 
 static void lBufferViewGCMark(const lBufferView *v){
-	markerPrefix(lBufferView);
+	heapMarkerPrefix(lBufferView, BFV_CHUNK_BYTES);
 
-	lBufferGCMark(lBufferViewList[ci].buf);
+	lBufferGCMark(v->buf);
 }
 
 static void lSymbolGCMark(const lSymbol *v){
-	markerPrefix(lSymbol);
+	staticMarkerPrefix(lSymbol);
 }
 
 static void lNFuncGCMark(const lNFunc *v){
-	markerPrefix(lNFunc);
+	staticMarkerPrefix(lNFunc);
 
 	lTreeGCMark(v->meta);
 }
 
 static void lPairGCMark(const lPair *v){
-	markerPrefix(lPair);
+	heapMarkerPrefix(lPair, CON_CHUNK_BYTES);
 
 	lValGCMark(v->car);
 	lValGCMark(v->cdr);
@@ -196,7 +206,7 @@ static void lValGCMark(lVal v){
 }
 
 static void lMapGCMark(const lMap *v){
-	markerPrefix(lMap);
+	heapMarkerPrefix(lMap, MAP_CHUNK_BYTES);
 	for(int i=0;i<v->size;i++){
 		if(v->entries[i].key.type == ltNil){continue;}
 		lValGCMark(v->entries[i].key);
@@ -205,7 +215,7 @@ static void lMapGCMark(const lMap *v){
 }
 
 static void lTreeGCMark(const lTree *v){
-	markerPrefix(lTree);
+	heapMarkerPrefix(lTree, TRE_CHUNK_BYTES);
 
 	lSymbolGCMark(v->key);
 	lValGCMark(v->value);
@@ -215,12 +225,12 @@ static void lTreeGCMark(const lTree *v){
 }
 
 static void lTreeRootGCMark(const lTreeRoot *v){
-	markerPrefix(lTreeRoot);
+	heapMarkerPrefix(lTreeRoot, TRR_CHUNK_BYTES);
 	lTreeGCMark(v->root);
 }
 
 static void lClosureGCMark(const lClosure *v){
-	markerPrefix(lClosure);
+	heapMarkerPrefix(lClosure, CLO_CHUNK_BYTES);
 
 	lClosureGCMark(v->parent);
 	lTreeGCMark(v->data);
@@ -230,7 +240,7 @@ static void lClosureGCMark(const lClosure *v){
 }
 
 static void lArrayGCMark(const lArray *v){
-	markerPrefix(lArray);
+	heapMarkerPrefix(lArray, ARR_CHUNK_BYTES);
 
 	for(int i=0;i<v->length;i++){
 		lValGCMark(v->data[i]);
@@ -238,7 +248,7 @@ static void lArrayGCMark(const lArray *v){
 }
 
 static void lBytecodeArrayMark(const lBytecodeArray *v){
-	markerPrefix(lBytecodeArray);
+	heapMarkerPrefix(lBytecodeArray, BCA_CHUNK_BYTES);
 
 	lArrayGCMark(v->literals);
 }
@@ -264,17 +274,39 @@ lSymbol *lRootsSymbolPush(lSymbol *v){
 
 /* Free all values that have not been marked by lGCMark */
 static void lGCSweep(){
-	#define defineAllocator(T, TMAX) \
+	#define defineAllocator(T, typeTag, chunkBytes) \
+	for(uint bi=0;bi < lHeapBlockMax;bi++){\
+		lHeapBlock *block = &lHeapBlocks[bi];\
+		if(block->type != typeTag){continue;}\
+		T *objects = block->ptr;\
+		u8 *marks = ((u8 *)block->ptr) + block->size;\
+		const uint count = block->size / sizeof(T);\
+		for(uint i=0;i < count;i++){\
+			if(marks[i] == 0) {\
+				T##Free(&objects[i]);\
+			}\
+			marks[i] = marks[i]&2;\
+		}\
+	}
+	allocatorTypes()
+	#undef defineAllocator
+
+	#define defineStaticAllocator(T, TMAX) \
 	for(uint i=0;i < T##Max;i++){\
 		if(T##MarkMap[i] == 0) {\
 			T##Free(&T##List[i]);\
 		}\
 		T##MarkMap[i] = T##MarkMap[i]&2;\
 	}
-	allocatorTypes()
-	defineAllocator(lSymbol, SYM_MAX)
-	defineAllocator(lNFunc, NFN_MAX)
-	#undef defineAllocator
+	defineStaticAllocator(lSymbol, SYM_MAX)
+	defineStaticAllocator(lNFunc, NFN_MAX)
+	#undef defineStaticAllocator
+}
+
+static void lHeapUpdateGCThreshold(){
+	const size_t minThreshold = 4 * 1024 * 1024;
+	const size_t doubled = lHeapActiveBytes * 2;
+	lHeapNextGCBytes = MAX(minThreshold, doubled);
 }
 
 /* Force a garbage collection cycle, shouldn't need to be called manually since
@@ -285,5 +317,6 @@ void lGarbageCollect(lThread *ctx){
 	lThreadGCMark(ctx);
 
 	lGCSweep();
+	lHeapUpdateGCThreshold();
 	lGCShouldRunSoon = false;
 }

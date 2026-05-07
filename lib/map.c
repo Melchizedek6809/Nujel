@@ -49,6 +49,10 @@ static inline u32 lHashVal(lVal v){
 	}
 }
 
+static inline bool lMapKeyEqual(lVal a, lVal b){
+	return ((a.type == b.type) && (a.vPointer == b.vPointer)) || lValEqual(a, b);
+}
+
 static bool lMapSetSimple(lMap *map, lVal key, lVal val){
 	const u32 size = map->size;
 	const u32 mask = size-1;
@@ -62,7 +66,7 @@ static bool lMapSetSimple(lMap *map, lVal key, lVal val){
 			map->entries[off].val = val;
 			return true;
 		}
-		if(lValEqual(key, map->entries[off].key)){
+		if(lMapKeyEqual(key, map->entries[off].key)){
 			map->entries[off].key = key;
 			map->entries[off].val = val;
 			return false;
@@ -79,7 +83,7 @@ static lVal lMapRefSimple(lMap *map, lVal key){
 	u32 off = lHashVal(key) & mask;
 	for(u32 i=0; i < size; i++){
 		if(map->entries[off].key.type == ltNil){ return NIL; }
-		if(lValEqual(key, map->entries[off].key)){
+		if(lMapKeyEqual(key, map->entries[off].key)){
 			return map->entries[off].val;
 		}
 		off = (off + 1) & mask;
@@ -93,7 +97,7 @@ static bool lMapHasSimple(lMap *map, lVal key){
 	u32 off = lHashVal(key) & mask;
 	for(u32 i=0; i < size; i++){
 		if(map->entries[off].key.type == ltNil){ return false; }
-		if(lValEqual(key, map->entries[off].key)){
+		if(lMapKeyEqual(key, map->entries[off].key)){
 			return true;
 		}
 		off = (off + 1) & mask;
